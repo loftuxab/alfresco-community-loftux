@@ -205,10 +205,11 @@ public class PasswordEncryptor
         while (p14str.length() < 14)
             p14str.append((char) 0x00);
 
-        // Convert the P14 string to an array of bytes. Allocate the return 16 byte array.
+        // Convert the P14 string to an array of bytes. Allocate a 21 byte buffer as the result is usually passed
+        // through the P24() method
 
         byte[] p14 = p14str.toString().getBytes();
-        byte[] p16 = new byte[16];
+        byte[] p16 = new byte[21];
 
         try
         {

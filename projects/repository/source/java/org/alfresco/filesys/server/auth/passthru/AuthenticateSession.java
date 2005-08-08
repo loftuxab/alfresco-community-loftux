@@ -21,6 +21,10 @@ import java.io.IOException;
 
 import org.alfresco.filesys.netbios.RFCNetBIOSProtocol;
 import org.alfresco.filesys.server.auth.PasswordEncryptor;
+import org.alfresco.filesys.server.auth.ntlm.NTLM;
+import org.alfresco.filesys.server.auth.ntlm.Type1NTLMMessage;
+import org.alfresco.filesys.server.auth.ntlm.Type2NTLMMessage;
+import org.alfresco.filesys.server.auth.ntlm.Type3NTLMMessage;
 import org.alfresco.filesys.smb.Capability;
 import org.alfresco.filesys.smb.Dialect;
 import org.alfresco.filesys.smb.NTTime;
@@ -29,6 +33,7 @@ import org.alfresco.filesys.smb.PCShare;
 import org.alfresco.filesys.smb.PacketType;
 import org.alfresco.filesys.smb.SMBDate;
 import org.alfresco.filesys.smb.SMBException;
+import org.alfresco.filesys.smb.SMBStatus;
 import org.alfresco.filesys.util.DataPacker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -133,6 +138,18 @@ public class AuthenticateSession
 
     private boolean m_guest;
 
+    // Flag to indicate extended security exchange is being used
+    
+    private boolean m_extendedSec;
+    
+    // Server GUID, if using extended security
+    
+    private byte[] m_serverGUID;
+    
+    // Type 2 security blob from the server
+    
+    private Type2NTLMMessage m_type2Msg;
+    
     // Global session id
 
     private static int m_sessionIdx = 1;
@@ -148,8 +165,10 @@ public class AuthenticateSession
      * @param sess NetworkSession
      * @param dialect int
      * @param pkt SMBPacket
+     * @exception IOException If a network error occurs
+     * @eception SMBException If a CIFS error occurs
      */
-    protected AuthenticateSession(PCShare shr, NetworkSession sess, int dialect, SMBPacket pkt)
+    protected AuthenticateSession(PCShare shr, NetworkSession sess, int dialect, SMBPacket pkt) throws IOException, SMBException
     {
 
         // Set the SMB dialect for this session
@@ -200,6 +219,16 @@ public class AuthenticateSession
         return new SMBPacket(pref + RFCNetBIOSProtocol.HEADER_LEN);
     }
 
+    /**
+     * Determine if the session supports extended security
+     * 
+     * @return true if this session supports extended security, else false
+     */
+    public final boolean supportsExtendedSecurity()
+    {
+        return (m_sessCaps & Capability.ExtendedSecurity) != 0 ? true : false;
+    }
+    
     /**
      * Determine if the session supports raw mode read/writes
      * 
@@ -515,6 +544,26 @@ public class AuthenticateSession
     }
 
     /**
+     * Determine if the session has an associated type2 NTLM security blob
+     * 
+     * @return boolean
+     */
+    public final boolean hasType2NTLMMessage()
+    {
+        return m_type2Msg != null ? true : false;
+    }
+    
+    /**
+     * Return the type2 NTLM security blob that was received from the authentication server
+     * 
+     * @return Type2NTLMMessage 
+     */
+    public final Type2NTLMMessage getType2NTLMMessage()
+    {
+        return m_type2Msg;
+    }
+    
+    /**
      * Return the session capability flags.
      * 
      * @return int
@@ -625,6 +674,16 @@ public class AuthenticateSession
         return (m_defFlags2 & SMBPacket.FLG2_UNICODE) != 0 ? true : false;
     }
 
+    /**
+     * Determine if extended security exchanges are being used
+     * 
+     * @return boolean
+     */
+    public final boolean isUsingExtendedSecurity()
+    {
+        return m_extendedSec;
+    }
+    
     /**
      * Send a single echo request to the server
      * 
@@ -945,10 +1004,51 @@ public class AuthenticateSession
      * @param userName String
      * @param ascPwd ASCII password hash
      * @param uniPwd Unicode password hash
+     * @exception IOException If a network error occurs
+     * @exception SMBException If a CIFS error occurs
      */
     public final void doSessionSetup(String userName, byte[] ascPwd, byte[] uniPwd) throws IOException, SMBException
     {
-
+        doSessionSetup(null, userName, null, ascPwd, uniPwd);
+    }
+    
+    /**
+     * Perform a session using the type3 NTLM response received from the client
+     * 
+     * @param type3 Type3NTLMMessage
+     * @exception IOException If a network error occurs
+     * @exception SMBException If a CIFS error occurs
+     */
+    public final void doSessionSetup(Type3NTLMMessage type3Msg) throws IOException, SMBException
+    {
+        doSessionSetup(type3Msg.getDomain(), type3Msg.getUserName(), type3Msg.getWorkstation(),
+                type3Msg.getLMHash(), type3Msg.getNTLMHash());
+    }
+    
+    /**
+     * Perform a session setup to create a session on the remote server validating the user.
+     * 
+     * @param domain String
+     * @param userName String
+     * @param wksName String
+     * @param ascPwd ASCII password hash
+     * @param uniPwd Unicode password hash
+     * @exception IOException If a network error occurs
+     * @exception SMBException If a CIFS error occurs
+     */
+    public final void doSessionSetup(String domain, String userName, String wksName,
+            byte[] ascPwd, byte[] uniPwd) throws IOException, SMBException
+    {
+        // Check if we are using extended security
+        
+        if ( isUsingExtendedSecurity())
+        {
+            // Run the second phase of the extended security session setup
+        
+            doExtendedSessionSetupPhase2(domain, userName, wksName, ascPwd, uniPwd);
+            return;
+        }
+        
         // Create a session setup packet
 
         SMBPacket pkt = new SMBPacket();
@@ -982,14 +1082,17 @@ public class AuthenticateSession
 
             int caps = Capability.LargeFiles + Capability.Unicode + Capability.NTSMBs + Capability.NTStatus
                     + Capability.RemoteAPIs;
+            
+            // Set the client capabilities
+            
             pkt.setParameterLong(11, caps);
 
-            // Store the encrypted passwords
-            //
-            // Store the ASCII password hash, if specified
-
+            // Get the offset to the session setup request byte data
+            
             int pos = pkt.getByteOffset();
             pkt.setPosition(pos);
+
+            // Store the ASCII password hash, if specified
 
             if (ascPwd != null)
                 pkt.packBytes(ascPwd, ascPwd.length);
@@ -1012,7 +1115,7 @@ public class AuthenticateSession
 
             pkt.packString("Java VM", false);
             pkt.packString("JLAN", false);
-
+            
             // Set the packet length
 
             pkt.setByteCount(pkt.getPosition() - pos);
@@ -1149,8 +1252,11 @@ public class AuthenticateSession
 
     /**
      * Process the negotiate response SMB packet
+     * 
+     * @exception IOException If a network error occurs
+     * @eception SMBException If a CIFS error occurs
      */
-    private void processNegotiateResponse()
+    private void processNegotiateResponse() throws IOException, SMBException
     {
 
         // Set the security mode flags
@@ -1186,6 +1292,11 @@ public class AuthenticateSession
             // Set the server capabailities
 
             setCapabilities(m_pkt.unpackInt());
+            
+            // Check if extended security is enabled
+            
+            if ( supportsExtendedSecurity())
+                m_extendedSec = true;
 
             // Get the server system time and timezone
 
@@ -1207,6 +1318,9 @@ public class AuthenticateSession
             // Set the default flags for subsequent SMB requests
 
             defFlags2 = SMBPacket.FLG2_LONGFILENAMES + SMBPacket.FLG2_UNICODE + SMBPacket.FLG2_LONGERRORCODE;
+            
+            if ( isUsingExtendedSecurity())
+                defFlags2 += SMBPacket.FLG2_EXTENDEDSECURITY;
         }
         else if (getDialect() > Dialect.CorePlus)
         {
@@ -1244,39 +1358,284 @@ public class AuthenticateSession
         {
 
             // Get the returned byte area length and offset
-
+            
             int bytsiz = m_pkt.getByteCount();
             int bytpos = m_pkt.getByteOffset();
             byte[] buf = m_pkt.getBuffer();
 
-            // Extract the challenge response key, if specified
-
-            if (keyLen > 0)
+            // Original format response
+            
+            if ( isUsingExtendedSecurity() == false)
             {
-
-                // Allocate a buffer for the challenge response key
-
-                byte[] encryptKey = new byte[keyLen];
-
-                // Copy the challenge response key
-
-                for (int keyIdx = 0; keyIdx < keyLen; keyIdx++)
-                    encryptKey[keyIdx] = buf[bytpos++];
-
-                // Set the sessions encryption key
-
-                setEncryptionKey(encryptKey);
+                // Extract the challenge response key, if specified
+    
+                if (keyLen > 0)
+                {
+    
+                    // Allocate a buffer for the challenge response key
+    
+                    byte[] encryptKey = new byte[keyLen];
+    
+                    // Copy the challenge response key
+    
+                    for (int keyIdx = 0; keyIdx < keyLen; keyIdx++)
+                        encryptKey[keyIdx] = buf[bytpos++];
+    
+                    // Set the sessions encryption key
+    
+                    setEncryptionKey(encryptKey);
+                }
+    
+                // Extract the domain name
+    
+                String dom;
+    
+                if (unicodeStr == false)
+                    dom = DataPacker.getString(buf, bytpos, bytsiz);
+                else
+                    dom = DataPacker.getUnicodeString(buf, bytpos, bytsiz / 2);
+                setDomain(dom);
             }
-
-            // Extract the domain name
-
-            String dom;
-
-            if (unicodeStr == false)
-                dom = DataPacker.getString(buf, bytpos, bytsiz);
             else
-                dom = DataPacker.getUnicodeString(buf, bytpos, bytsiz / 2);
-            setDomain(dom);
+            {
+                // Extract the server GUID
+                
+                m_serverGUID = new byte[16];
+                System.arraycopy(buf, bytpos, m_serverGUID, 0, 16);
+                
+                // Run the first phase of the extended security session setup to get the challenge
+                // from the server
+                
+                doExtendedSessionSetupPhase1();
+            }
         }
     }
+    
+    /**
+     * Send the first stage of the extended security session setup
+     * 
+     * @exception IOException If a network error occurs
+     * @eception SMBException If a CIFS error occurs
+     */
+    private final void doExtendedSessionSetupPhase1() throws IOException, SMBException
+    {
+        // Create a session setup packet
+
+        SMBPacket pkt = new SMBPacket();
+
+        pkt.setCommand(PacketType.SessionSetupAndX);
+        
+        pkt.setFlags(getDefaultFlags());
+        pkt.setFlags2(getDefaultFlags2());
+
+        // Build the extended session setup phase 1 request
+        
+        pkt.setParameterCount(12);
+        pkt.setAndXCommand(0xFF);   // no secondary command
+        pkt.setParameter(1, 0);     // offset to next command
+        pkt.setParameter(2, DefaultPacketSize);
+        pkt.setParameter(3, 1);
+        pkt.setParameter(4, 0);     // virtual circuit number
+        pkt.setParameterLong(5, 0); // session key
+
+        // Clear the security blob length and reserved area
+
+        pkt.setParameter(7, 0);     // security blob length
+        pkt.setParameterLong(8, 0); // reserved
+
+        // Send the client capabilities
+
+        int caps = Capability.LargeFiles + Capability.Unicode + Capability.NTSMBs + Capability.NTStatus
+                + Capability.RemoteAPIs + Capability.ExtendedSecurity;
+        
+        // Set the client capabilities
+        
+        pkt.setParameterLong(10, caps);
+
+        // Get the offset to the session setup request byte data
+        
+        int pos = pkt.getByteOffset();
+        pkt.setPosition(pos);
+
+        // Create a type 1 NTLM message using the session setup request buffer
+        
+        Type1NTLMMessage type1Msg = new Type1NTLMMessage(pkt.getBuffer(), pos, 0);
+
+        int type1Flags = getPCShare().getExtendedSecurityFlags();
+        if ( type1Flags == 0)
+            type1Flags = NTLM.FlagNegotiateUnicode + NTLM.FlagNegotiateNTLM + NTLM.FlagRequestTarget;
+        
+        type1Msg.buildType1(type1Flags, null, null);
+        
+        // Update the request buffer position
+        
+        pkt.setPosition(pos + type1Msg.getLength());
+
+        // Set the security blob length
+        
+        pkt.setParameter(7, type1Msg.getLength());
+        
+        // Pack the OS details
+        
+        pkt.packString("Java VM", true);
+        pkt.packString("JLAN", true);
+
+        pkt.packString("", true);
+            
+        // Set the packet length
+
+        pkt.setByteCount(pkt.getPosition() - pos);
+
+        // Exchange an SMB session setup packet with the remote file server
+
+        pkt.ExchangeSMB(this, pkt, false);
+
+        // Check the error status, should be a warning status to indicate more processing required
+        
+        if ( pkt.isLongErrorCode() == false || pkt.getLongErrorCode() != SMBStatus.NTMoreProcessingRequired)
+            pkt.checkForError();
+        
+        // Save the session user id
+
+        setUserId(pkt.getUserId());
+
+        // The response packet should also have the type 2 security blob
+
+        int type2Len = pkt.getParameter(3);
+        if (pkt.getByteCount() > 0)
+        {
+
+            // Get the packet buffer and byte offset
+
+            byte[] buf = pkt.getBuffer();
+            int offset = pkt.getByteOffset();
+            int maxlen = offset + pkt.getByteCount();
+
+            // Take a copy of the type 2 security blob
+            
+            m_type2Msg = new Type2NTLMMessage();
+            m_type2Msg.copyFrom(buf, offset, type2Len);
+            
+            // Get the encryption key from the security blob
+            
+            m_encryptKey = m_type2Msg.getChallenge();
+            
+            // Update the byte area offset and align
+            
+            offset = DataPacker.wordAlign(offset + type2Len);
+            maxlen -= type2Len;
+            
+            // Get the server OS
+
+            String srvOS = DataPacker.getString(buf, offset, maxlen);
+            setOperatingSystem(srvOS);
+
+            offset += srvOS.length() + 1;
+            maxlen -= srvOS.length() + 1;
+
+            // Get the LAN Manager type
+
+            String lanman = DataPacker.getString(buf, offset, maxlen);
+            setLANManagerType(lanman);
+        }
+    }
+    
+   /**
+    * Send the second stage of the extended security session setup
+    * 
+    * @param domain String
+    * @param userName String
+    * @param wksName String
+    * @param lmPwd byte[]
+    * @param ntlmPwd byte[]
+    * @exception IOException If a network error occurs
+    * @eception SMBException If a CIFS error occurs
+    */
+   private final void doExtendedSessionSetupPhase2(String domain, String userName, String wksName,
+           byte[] lmPwd, byte[] ntlmPwd) throws IOException, SMBException
+   {
+       // Check if the domain name has been specified, if not then use the domain name from the
+       // original connection details or the servers domain name
+       
+       if ( domain == null)
+       {
+           if ( getPCShare().hasDomain() && getPCShare().getDomain().length() > 0)
+               domain = getPCShare().getDomain();
+           else
+               domain = m_type2Msg.getTarget();
+       }
+       
+       // Create a session setup packet
+
+       SMBPacket pkt = new SMBPacket();
+
+       pkt.setCommand(PacketType.SessionSetupAndX);
+       
+       pkt.setFlags(getDefaultFlags());
+       pkt.setFlags2(getDefaultFlags2());
+       
+       pkt.setUserId(getUserId());
+
+       // Build the extended session setup phase 2 request
+       
+       pkt.setParameterCount(12);
+       pkt.setAndXCommand(0xFF);   // no secondary command
+       pkt.setParameter(1, 0);     // offset to next command
+       pkt.setParameter(2, DefaultPacketSize);
+       pkt.setParameter(3, 1);
+       pkt.setParameter(4, 0);     // virtual circuit number
+       pkt.setParameterLong(5, 0); // session key
+
+       // Clear the security blob length and reserved area
+
+       pkt.setParameter(7, 0);     // security blob length
+       pkt.setParameterLong(8, 0); // reserved
+
+       // Send the client capabilities
+
+       int caps = Capability.LargeFiles + Capability.Unicode + Capability.NTSMBs + Capability.NTStatus
+               + Capability.RemoteAPIs + Capability.ExtendedSecurity;
+       
+       // Set the client capabilities
+       
+       pkt.setParameterLong(10, caps);
+
+       // Get the offset to the session setup request byte data
+       
+       int pos = pkt.getByteOffset();
+       pkt.setPosition(pos);
+
+       // Create a type 3 NTLM message using the session setup request buffer
+       
+       Type3NTLMMessage type3Msg = new Type3NTLMMessage(pkt.getBuffer(), pos, 0, true);
+       
+       type3Msg.buildType3(lmPwd, ntlmPwd, domain, userName, wksName != null ? wksName : "", null, m_type2Msg.getFlags());
+       
+       // Update the request buffer position
+       
+       pkt.setPosition(pos + type3Msg.getLength());
+
+       // Set the security blob length
+       
+       pkt.setParameter(7, type3Msg.getLength());
+       
+       // Pack the OS details
+       
+       pkt.packString("Java VM", true);
+       pkt.packString("JLAN", true);
+
+       pkt.packString("", true);
+           
+       // Set the packet length
+
+       pkt.setByteCount(pkt.getPosition() - pos);
+
+       // Exchange an SMB session setup packet with the remote file server
+
+       pkt.ExchangeSMB(this, pkt, true);
+       
+       // Set the guest status for the session
+
+       setGuest(pkt.getParameter(2) != 0 ? true : false);
+   }
 }

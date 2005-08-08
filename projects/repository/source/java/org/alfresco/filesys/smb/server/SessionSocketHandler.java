@@ -33,7 +33,7 @@ public abstract class SessionSocketHandler implements Runnable
 {
     // Debug logging
 
-    protected static Log logger = LogFactory.getLog(SessionSocketHandler.class);
+    protected static Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Define the listen backlog for the server socket
 

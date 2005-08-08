@@ -254,6 +254,14 @@ public abstract class SrvAuthenticator
     }
 
     /**
+     * Close the authenticator, perform any cleanup
+     */
+    public void closeAuthenticator()
+    {
+        // Override if cleanup required
+    }
+    
+    /**
      * Validate a password by encrypting the plain text password using the specified encryption key
      * and encryption algorithm.
      * 

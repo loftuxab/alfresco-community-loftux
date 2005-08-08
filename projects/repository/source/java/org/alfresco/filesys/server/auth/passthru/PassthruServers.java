@@ -299,6 +299,17 @@ public class PassthruServers
      */
     public final AuthenticateSession openSession()
     {
+        return openSession( 0);
+    }
+    
+    /**
+     * Open a new session to an authentication server
+     * 
+     * @param extFlags int
+     * @return AuthenticateSession
+     */
+    public final AuthenticateSession openSession(int extFlags)
+    {
         // Get the details of an authentication server to connect to 
 
         PassthruServerDetails passthruServer = getAuthenticationServer();
@@ -313,6 +324,8 @@ public class PassthruServers
         // Open a new authentication session to the server
         
         PCShare authShare = new PCShare(passthruServer.getAddress().getHostAddress(), "IPC$", "", "");
+        authShare.setExtendedSecurityFlags( extFlags);
+        
         AuthenticateSession authSess = null;
         
         while ( authSess == null && passthruServer != null && hasOnlineServers()) {

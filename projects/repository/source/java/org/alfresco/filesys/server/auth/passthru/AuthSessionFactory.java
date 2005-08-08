@@ -118,6 +118,10 @@ public final class AuthSessionFactory
     // NetBIOS name scope
 
     private static String m_netBIOSScopeId = null;
+    
+    // Flag to enable extended security exchanges in the session setup
+    
+    private static boolean m_useExtendedSec = true;
 
     /**
      * Build an SMB negotiate dialect packet.
@@ -138,12 +142,19 @@ public final class AuthSessionFactory
 
         // If the NT dialect is enabled set the Unicode flag in the request flags
 
+        int flags2 = 0;
+        
         if (dlct.hasDialect(Dialect.NT))
-            pkt.setFlags2(SMBPacket.FLG2_UNICODE);
+            flags2 += SMBPacket.FLG2_UNICODE;
+        
+        if ( useExtendedSecurity())
+            flags2 += SMBPacket.FLG2_EXTENDEDSECURITY;
+            
+        pkt.setFlags2(flags2);
 
         // Build the SMB dialect list
 
-        StringBuffer dia = new StringBuffer();
+        StringBuilder dia = new StringBuilder();
         StringList diaList = new StringList();
 
         // Loop through all SMB dialect types and add the appropriate dialect strings
@@ -337,6 +348,16 @@ public final class AuthSessionFactory
     }
 
     /**
+     * Determine if extended security exchanges are enabled
+     * 
+     * @return boolean
+     */
+    public static final boolean useExtendedSecurity()
+    {
+        return m_useExtendedSec;
+    }
+    
+    /**
      * Open a session to a remote server, negotiate an SMB dialect and get the returned challenge
      * key. Returns an AuthenticateSession which can then be used to provide passthru
      * authentication.
@@ -378,7 +399,7 @@ public final class AuthSessionFactory
 
         int pid = getSessionId();
 
-        StringBuffer nameBuf = new StringBuffer(InetAddress.getLocalHost().getHostName() + "_" + pid);
+        StringBuilder nameBuf = new StringBuilder(InetAddress.getLocalHost().getHostName() + "_" + pid);
         String localName = nameBuf.toString();
 
         // Debug
@@ -510,6 +531,16 @@ public final class AuthSessionFactory
         m_defUserName = user;
     }
 
+    /**
+     * Enable/disable the use of extended security exchanges
+     * 
+     * @param ena boolean
+     */
+    public static final void setExtendedSecurity(boolean ena)
+    {
+        m_useExtendedSec = ena;
+    }
+    
     /**
      * Set the NetBIOS socket number to be used when setting up new sessions. The default socket is
      * 139.

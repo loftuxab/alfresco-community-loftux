@@ -429,6 +429,17 @@ public class PassthruAuthenticator extends SrvAuthenticator implements SessionLi
     }
 
     /**
+     * Close the authenticator, perform cleanup
+     */
+    public void closeAuthenticator()
+    {
+        // Close the passthru authentication server list
+        
+        if ( m_passthruServers != null)
+            m_passthruServers.shutdown();
+    }
+    
+    /**
      * SMB server session closed notification
      * 
      * @param sess SrvSession

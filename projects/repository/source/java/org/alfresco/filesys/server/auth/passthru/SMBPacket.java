@@ -29,30 +29,32 @@ import org.alfresco.filesys.util.DataPacker;
 
 /**
  * SMB packet type class
+ * 
+ * @author GKSpencer
  */
 public class SMBPacket
 {
 
     // SMB packet offsets, assuming an RFC NetBIOS transport
 
-    public static final int SIGNATURE = RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int COMMAND = 4 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int ERRORCODE = 5 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int ERRORCLASS = 5 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int ERROR = 7 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int FLAGS = 9 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int FLAGS2 = 10 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int PIDHIGH = 12 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int SID = 18 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int SEQNO = 20 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int TID = 24 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int PID = 26 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int UID = 28 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int MID = 30 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int WORDCNT = 32 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int SIGNATURE   = RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int COMMAND     = 4 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int ERRORCODE   = 5 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int ERRORCLASS  = 5 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int ERROR       = 7 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int FLAGS       = 9 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int FLAGS2      = 10 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int PIDHIGH     = 12 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int SID         = 18 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int SEQNO       = 20 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int TID         = 24 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int PID         = 26 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int UID         = 28 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int MID         = 30 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int WORDCNT     = 32 + RFCNetBIOSProtocol.HEADER_LEN;
     public static final int ANDXCOMMAND = 33 + RFCNetBIOSProtocol.HEADER_LEN;
     public static final int ANDXRESERVED = 34 + RFCNetBIOSProtocol.HEADER_LEN;
-    public static final int PARAMWORDS = 33 + RFCNetBIOSProtocol.HEADER_LEN;
+    public static final int PARAMWORDS  = 33 + RFCNetBIOSProtocol.HEADER_LEN;
 
     // SMB packet header length for a transaction type request
 
@@ -68,20 +70,21 @@ public class SMBPacket
 
     // Flag bits
 
-    public static final int FLG_SUBDIALECT = 0x01;
-    public static final int FLG_CASELESS = 0x08;
-    public static final int FLG_CANONICAL = 0x10;
-    public static final int FLG_OPLOCK = 0x20;
-    public static final int FLG_NOTIFY = 0x40;
-    public static final int FLG_RESPONSE = 0x80;
+    public static final int FLG_SUBDIALECT  = 0x01;
+    public static final int FLG_CASELESS    = 0x08;
+    public static final int FLG_CANONICAL   = 0x10;
+    public static final int FLG_OPLOCK      = 0x20;
+    public static final int FLG_NOTIFY      = 0x40;
+    public static final int FLG_RESPONSE    = 0x80;
 
     // Flag2 bits
 
-    public static final int FLG2_LONGFILENAMES = 0x0001;
-    public static final int FLG2_EXTENDEDATTRIB = 0x0002;
-    public static final int FLG2_READIFEXE = 0x2000;
-    public static final int FLG2_LONGERRORCODE = 0x4000;
-    public static final int FLG2_UNICODE = 0x8000;
+    public static final int FLG2_LONGFILENAMES      = 0x0001;
+    public static final int FLG2_EXTENDEDATTRIB     = 0x0002;
+    public static final int FLG2_EXTENDEDSECURITY   = 0x0800;
+    public static final int FLG2_READIFEXE          = 0x2000;
+    public static final int FLG2_LONGERRORCODE      = 0x4000;
+    public static final int FLG2_UNICODE            = 0x8000;
 
     // Security mode bits
 
