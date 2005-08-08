@@ -655,6 +655,12 @@ public final class SMBErrorText
         case SMBStatus.NTNoSuchFile:
             errtext = "No such file";
             break;
+        case SMBStatus.NTInvalidDeviceRequest:
+            errtext = "Invalid device request";
+            break;
+        case SMBStatus.NTMoreProcessingRequired:
+            errtext = "More processing required";
+            break;
         case SMBStatus.NTInvalidSecDescriptor:
             errtext = "Invalid security descriptor";
             break;

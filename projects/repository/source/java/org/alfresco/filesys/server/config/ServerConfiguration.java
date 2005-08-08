@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
@@ -56,6 +57,7 @@ import org.alfresco.filesys.server.auth.acl.DefaultAccessControlManager;
 import org.alfresco.filesys.server.auth.acl.InvalidACLTypeException;
 import org.alfresco.filesys.server.auth.passthru.AcegiPassthruAuthenticator;
 import org.alfresco.filesys.server.auth.passthru.PassthruAuthenticator;
+import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.core.ShareMapper;
 import org.alfresco.filesys.server.core.SharedDevice;
@@ -2617,5 +2619,38 @@ public class ServerConfiguration
     public final void setFTPDebug(int dbg)
     {
         m_ftpDebug = dbg;
+    }
+    
+    /**
+     * Close the server configuration, used to close various components that are shared between protocol
+     * handlers.
+     */
+    public final void closeConfiguration()
+    {
+        // Close the authenticator
+        
+        if ( getAuthenticator() != null)
+        {
+            getAuthenticator().closeAuthenticator();
+            m_authenticator = null;
+        }
+
+        // Close the shared filesystems
+        
+        if ( getShares() != null && getShares().numberOfShares() > 0)
+        {
+            // Close the shared filesystems
+            
+            Enumeration<SharedDevice> shareEnum = getShares().enumerateShares();
+            
+            while ( shareEnum.hasMoreElements())
+            {
+                SharedDevice share = shareEnum.nextElement();
+                DeviceContext devCtx = share.getContext();
+                
+                if ( devCtx != null)
+                    devCtx.CloseContext();
+            }
+        }
     }
 }

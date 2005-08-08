@@ -59,6 +59,10 @@ public final class PCShare
     private int m_primaryProto = Protocol.UseDefault;
     private int m_secondaryProto = Protocol.UseDefault;
 
+    // Extended security negotiation flags
+    
+    private int m_extendedSecFlags;
+    
     /**
      * Construct an empty PCShare object.
      */
@@ -142,6 +146,26 @@ public final class PCShare
         return m_domain;
     }
 
+    /**
+     * Determine if extended security flags have been set
+     * 
+     * @return boolean
+     */
+    public final boolean hasExtendedSecurityFlags()
+    {
+        return m_extendedSecFlags != 0 ? true : false;
+    }
+    
+    /**
+     * Return the extended security flags
+     * 
+     * @return int
+     */
+    public final int getExtendedSecurityFlags()
+    {
+        return m_extendedSecFlags;
+    }
+    
     /**
      * Get the remote file name string.
      * 
@@ -469,6 +493,16 @@ public final class PCShare
             m_path = "\\";
     }
 
+    /**
+     * Set the extended security negotiation flags
+     * 
+     * @param extFlags int
+     */
+    public final void setExtendedSecurityFlags(int extFlags)
+    {
+        m_extendedSecFlags = extFlags;
+    }
+    
     /**
      * Set the remote node name string.
      * 

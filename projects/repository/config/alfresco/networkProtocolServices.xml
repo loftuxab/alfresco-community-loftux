@@ -6,6 +6,7 @@
    <bean id="fileServerConfiguration"
          class="org.alfresco.filesys.server.config.ServerConfiguration"
          init-method="init"
+         destroy-method="closeConfiguration"
          depends-on="importerBootstrap">
       <constructor-arg>
          <ref bean="serviceRegistry" />
@@ -70,6 +71,15 @@
       -->
    </bean>
 
+   <bean id="contentDiskDriverNoTransactions" class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
+         <constructor-arg>
+            <ref bean="serviceRegistry" />
+         </constructor-arg>
+         <constructor-arg>
+            <ref bean="cifsHelper" />
+         </constructor-arg>
+   </bean>
+   
    <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">
       <property name="nodeService"><ref bean="nodeService" /></property>
       <property name="searchService"><ref bean="searchService" /></property>
