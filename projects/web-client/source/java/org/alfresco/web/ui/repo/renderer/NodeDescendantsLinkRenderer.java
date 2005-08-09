@@ -29,6 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -94,6 +95,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          
          // use Spring JSF integration to get the node service bean
          NodeService service = getNodeService(context);
+         DictionaryService dd = getDictionaryService(context);
          UserTransaction tx = null;
          try
          {
@@ -115,7 +117,8 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             for (int index=0; index<childRefs.size(); index++)
             {
                ChildAssociationRef ref = childRefs.get(index);
-               if (service.getType(ref.getChildRef()).equals(ContentModel.TYPE_FOLDER))
+               if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
+                   dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
                {
                   refs.add(ref);
                }
@@ -127,7 +130,8 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             for (int index=0; index<maximum; index++)
             {
                ChildAssociationRef ref = refs.get(index);
-               if (service.getType(ref.getChildRef()).equals(ContentModel.TYPE_FOLDER))
+               if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
+                   dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
                {
                   // output separator if appropriate
                   if (total > 0)
@@ -229,11 +233,11 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
    }
    
    /**
-    * Use Spring JSF integration to return the node service bean instance
+    * Use Spring JSF integration to return the Node Service bean instance
     * 
     * @param context    FacesContext
     * 
-    * @return node service bean instance or throws runtime exception if not found
+    * @return Node Service bean instance or throws exception if not found
     */
    private static NodeService getNodeService(FacesContext context)
    {
@@ -241,6 +245,24 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
       if (service == null)
       {
          throw new IllegalStateException("Unable to obtain NodeService bean reference.");
+      }
+      
+      return service;
+   }
+   
+   /**
+    * Use Spring JSF integration to return the Dictionary Service bean instance
+    * 
+    * @param context    FacesContext
+    * 
+    * @return Dictionary Service bean instance or throws exception if not found
+    */
+   private static DictionaryService getDictionaryService(FacesContext context)
+   {
+      DictionaryService service = Repository.getServiceRegistry(context).getDictionaryService();
+      if (service == null)
+      {
+         throw new IllegalStateException("Unable to obtain DictionaryService bean reference.");
       }
       
       return service;

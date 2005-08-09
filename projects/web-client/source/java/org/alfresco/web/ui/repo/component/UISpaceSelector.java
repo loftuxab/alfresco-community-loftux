@@ -24,6 +24,7 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -74,15 +75,17 @@ public class UISpaceSelector extends AbstractItemSelector
    {
       NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.navigationId);
       List<ChildAssociationRef> allKids = getNodeService(context).getChildAssocs(nodeRef);
+      DictionaryService dd = getDictionaryService(context);
       NodeService service = getNodeService(context);
       
       // filter out those children that are not spaces
       List<ChildAssociationRef> spaceKids = new ArrayList<ChildAssociationRef>(); 
-      for (ChildAssociationRef childRef : allKids)
+      for (ChildAssociationRef ref : allKids)
       {
-         if (service.getType(childRef.getChildRef()).equals(ContentModel.TYPE_FOLDER))
+         if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
+             dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
          {
-            spaceKids.add(childRef);
+            spaceKids.add(ref);
          }
       }
       

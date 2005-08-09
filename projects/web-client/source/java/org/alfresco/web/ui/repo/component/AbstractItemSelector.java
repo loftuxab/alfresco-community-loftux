@@ -32,6 +32,7 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -513,6 +514,7 @@ public abstract class AbstractItemSelector extends UIInput
       this.initialSelectionId = initialSelection;
    }
    
+   
    // ------------------------------------------------------------------------------
    // Protected helpers
    
@@ -576,11 +578,11 @@ public abstract class AbstractItemSelector extends UIInput
    }
    
    /**
-    * Use Spring JSF integration to return the node service bean instance
+    * Use Spring JSF integration to return the Node Service bean instance
     * 
     * @param context    FacesContext
     * 
-    * @return node service bean instance or throws runtime exception if not found
+    * @return Node Service bean instance or throws exception if not found
     */
    protected static NodeService getNodeService(FacesContext context)
    {
@@ -588,6 +590,24 @@ public abstract class AbstractItemSelector extends UIInput
       if (service == null)
       {
          throw new IllegalStateException("Unable to obtain NodeService bean reference.");
+      }
+      
+      return service;
+   }
+   
+   /**
+    * Use Spring JSF integration to return the Dictionary Service bean instance
+    * 
+    * @param context    FacesContext
+    * 
+    * @return Dictionary Service bean instance or throws exception if not found
+    */
+   protected static DictionaryService getDictionaryService(FacesContext context)
+   {
+      DictionaryService service = Repository.getServiceRegistry(context).getDictionaryService();
+      if (service == null)
+      {
+         throw new IllegalStateException("Unable to obtain DictionaryService bean reference.");
       }
       
       return service;
