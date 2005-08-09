@@ -73,9 +73,13 @@
       <filter-name>Mode Detection Filter</filter-name>
       <filter-class>org.alfresco.web.app.servlet.ModeDetectionFilter</filter-class>
    </filter>
-   
+
+<!--
    <filter>
       <filter-name>NTLM Authentication Filter</filter-name>
+      <description>
+      Provides auto-logon support for browsers that support NTLM.
+      </description>
       <filter-class>org.alfresco.web.app.servlet.NTLMAuthenticationFilter</filter-class>
       <init-param>
          <param-name>LocalDomain</param-name>
@@ -85,13 +89,8 @@
          <param-name>AllowGuest</param-name>
          <param-value>true</param-value>
       </init-param>
-<!--      
-      <init-param>
-         <param-name>Servers</param-name>
-         <param-value>LINUXSRV,TEST02</param-value>
-      </init-param>
--->
    </filter>
+-->
 
    <filter-mapping>
       <filter-name>Authentication Filter</filter-name>
