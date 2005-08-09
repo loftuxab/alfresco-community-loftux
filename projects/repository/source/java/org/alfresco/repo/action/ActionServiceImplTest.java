@@ -17,12 +17,18 @@
  */
 package org.alfresco.repo.action;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
 import org.alfresco.repo.action.evaluator.NoConditionEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
+import org.alfresco.repo.action.executer.CheckInActionExecuter;
+import org.alfresco.repo.action.executer.CheckOutActionExecuter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
@@ -228,4 +234,246 @@ public class ActionServiceImplTest extends BaseSpringTest
 		// TODO
 	}	
 	
+	public void testGetAndGetAllWithNoActions()
+	{
+		assertNull(this.actionService.getAction(this.nodeRef, AddFeaturesActionExecuter.NAME));
+		List<Action> actions = this.actionService.getActions(this.nodeRef);
+		assertNotNull(actions);
+		assertEquals(0, actions.size());
+	}
+	
+	public void testGetAll()
+	{
+		
+	}
+	
+	/**
+	 * Test saving an action with no conditions
+	 */
+	public void testSaveActionNoCondition()
+	{
+		// Create the action
+		Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+		String actionId = action.getId();
+		
+		// Set the parameters of the action
+		action.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+				
+		// Save the action
+		this.actionService.saveAction(this.nodeRef, action);
+		
+		// Get the action
+		Action savedAction = this.actionService.getAction(this.nodeRef, actionId);
+		
+		// Check the action 
+		assertEquals(action.getId(), savedAction.getId());
+		assertEquals(action.getActionDefinitionName(), savedAction.getActionDefinitionName());
+		
+		// Check the properties
+		assertEquals(1, savedAction.getParameterValues().size());
+		assertEquals(ContentModel.ASPECT_VERSIONABLE, savedAction.getParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME));
+				
+		// Check the conditions
+		assertNotNull(savedAction.getActionConditions());
+		assertEquals(0, savedAction.getActionConditions().size());
+		
+		// Edit the properties of the action		
+		Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+		properties.put(ContentModel.PROP_NAME, "testName");
+		action.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_PROPERTIES, (Serializable)properties);
+		action.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_AUDITABLE);
+		
+		this.actionService.saveAction(this.nodeRef, action);
+		Action savedAction2 = this.actionService.getAction(this.nodeRef, actionId);
+		
+		// Check the updated properties
+		assertEquals(2, savedAction2.getParameterValues().size());
+		assertEquals(ContentModel.ASPECT_AUDITABLE, savedAction2.getParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME));
+		Map<QName, Serializable> temp = (Map<QName, Serializable>)savedAction2.getParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_PROPERTIES);
+		assertNotNull(temp);
+		assertEquals(1, temp.size());
+		assertEquals("testName", temp.get(ContentModel.PROP_NAME));
+		
+		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+	}
+
+	/**
+	 * Test saving an action with conditions
+	 */
+	public void testSaveActionWithConditions()
+	{
+		// Create the action
+		Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+		String actionId = action.getId();
+		
+		// Set the parameters of the action
+		action.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+		Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+		properties.put(ContentModel.PROP_NAME, "testName");
+		action.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_PROPERTIES, (Serializable)properties);
+		
+		// Set the conditions of the action
+		ActionCondition actionCondition = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+		ActionCondition actionCondition2 = this.actionService.createActionCondition(MatchTextEvaluator.NAME);
+		actionCondition2.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "*.doc");
+		action.addActionCondition(actionCondition);
+		action.addActionCondition(actionCondition2);
+		
+		// Save the action
+		this.actionService.saveAction(this.nodeRef, action);
+		
+		// Get the action
+		Action savedAction = this.actionService.getAction(this.nodeRef, actionId);
+		
+		// Check the action 
+		assertEquals(action.getId(), savedAction.getId());
+		assertEquals(action.getActionDefinitionName(), savedAction.getActionDefinitionName());
+		
+		// Check the properties
+		assertEquals(action.getParameterValues().size(), savedAction.getParameterValues().size());
+		assertEquals(ContentModel.ASPECT_VERSIONABLE, savedAction.getParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME));
+		Map<QName, Serializable> temp = (Map<QName, Serializable>)savedAction.getParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_PROPERTIES);
+		assertNotNull(temp);
+		assertEquals(1, temp.size());
+		assertEquals("testName", temp.get(ContentModel.PROP_NAME));
+		
+		// Check the conditions
+		assertNotNull(savedAction.getActionConditions());
+		assertEquals(2, savedAction.getActionConditions().size());
+		for (ActionCondition savedCondition : savedAction.getActionConditions())
+		{
+			if (savedCondition.getActionConditionDefinitionName().equals(NoConditionEvaluator.NAME) == true)
+			{
+				assertEquals(0, savedCondition.getParameterValues().size());
+			}
+			else if (savedCondition.getActionConditionDefinitionName().equals(MatchTextEvaluator.NAME) == true)
+			{
+				assertEquals(1, savedCondition.getParameterValues().size());
+				assertEquals("*.doc", savedCondition.getParameterValue(MatchTextEvaluator.PARAM_TEXT));
+			}
+			else
+			{
+				fail("There is a condition here that we are not expecting.");
+			}
+		}
+		
+		// Modify the conditions of the action
+		ActionCondition actionCondition3 = this.actionService.createActionCondition(InCategoryEvaluator.NAME);
+		actionCondition3.setParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_ACTIONABLE);
+		action.addActionCondition(actionCondition3);
+		action.removeActionCondition(actionCondition);
+		actionCondition2.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "*.exe");
+		actionCondition2.setParameterValue(MatchTextEvaluator.PARAM_OPERATION, MatchTextEvaluator.Operation.EXACT);
+		
+		this.actionService.saveAction(this.nodeRef, action);
+		Action savedAction2 = this.actionService.getAction(this.nodeRef, actionId);
+		
+		// Check that the conditions have been updated correctly
+		assertNotNull(savedAction2.getActionConditions());
+		assertEquals(2, savedAction2.getActionConditions().size());
+		for (ActionCondition savedCondition : savedAction2.getActionConditions())
+		{
+			if (savedCondition.getActionConditionDefinitionName().equals(InCategoryEvaluator.NAME) == true)
+			{
+				assertEquals(1, savedCondition.getParameterValues().size());
+				assertEquals(ContentModel.ASPECT_ACTIONABLE, savedCondition.getParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT));
+			}
+			else if (savedCondition.getActionConditionDefinitionName().equals(MatchTextEvaluator.NAME) == true)
+			{
+				assertEquals(2, savedCondition.getParameterValues().size());
+				assertEquals("*.exe", savedCondition.getParameterValue(MatchTextEvaluator.PARAM_TEXT));
+				assertEquals(MatchTextEvaluator.Operation.EXACT, savedCondition.getParameterValue(MatchTextEvaluator.PARAM_OPERATION));
+			}
+			else
+			{
+				fail("There is a condition here that we are not expecting.");
+			}
+		}
+		
+		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+	}
+	
+	/**
+	 * Test saving a composite action
+	 */
+	public void testSaveCompositeAction()
+	{
+		Action action1 = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+		Action action2 = this.actionService.createAction(CheckInActionExecuter.NAME);
+		
+		CompositeAction compositeAction = this.actionService.createCompositeAction();
+		String actionId = compositeAction.getId();
+		compositeAction.addAction(action1);
+		compositeAction.addAction(action2);
+		
+		this.actionService.saveAction(this.nodeRef, compositeAction);
+		assertEquals(1, this.actionService.getActions(this.nodeRef).size());
+		CompositeAction savedCompositeAction = (CompositeAction)this.actionService.getAction(this.nodeRef, actionId);
+		
+		// Check the saved composite action
+		assertEquals(2, savedCompositeAction.getActions().size());
+		for (Action action : savedCompositeAction.getActions())
+		{
+			if (action.getActionDefinitionName().equals(AddFeaturesActionExecuter.NAME) == true)
+			{
+				assertEquals(action, action1);
+			}
+			else if (action.getActionDefinitionName().equals(CheckInActionExecuter.NAME) == true)
+			{
+				assertEquals(action, action2);
+			}
+			else
+			{
+				fail("We have an action here we are not expecting.");
+			}
+		}
+		
+		// Change the actions and re-save
+		compositeAction.removeAction(action1);
+		Action action3 = this.actionService.createAction(CheckOutActionExecuter.NAME);
+		compositeAction.addAction(action3);
+		action2.setParameterValue(CheckInActionExecuter.PARAM_DESCRIPTION, "description");
+		
+		this.actionService.saveAction(this.nodeRef, compositeAction);
+		assertEquals(1, this.actionService.getActions(this.nodeRef).size());
+		CompositeAction savedCompositeAction2 = (CompositeAction)this.actionService.getAction(this.nodeRef, actionId);
+		
+		assertEquals(2, savedCompositeAction2.getActions().size());
+		for (Action action : savedCompositeAction2.getActions())
+		{
+			if (action.getActionDefinitionName().equals(CheckOutActionExecuter.NAME) == true)
+			{
+				assertEquals(action, action3);
+			}
+			else if (action.getActionDefinitionName().equals(CheckInActionExecuter.NAME) == true)
+			{
+				assertEquals(action, action2);
+				assertEquals("description", action2.getParameterValue(CheckInActionExecuter.PARAM_DESCRIPTION));
+			}
+			else
+			{
+				fail("We have an action here we are not expecting.");
+			}
+		}
+	}
+	
+	/**
+	 * Test remove action
+	 */
+	public void testRemove()
+	{
+		assertEquals(0, this.actionService.getActions(this.nodeRef).size());
+		
+		Action action1 = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+		this.actionService.saveAction(this.nodeRef, action1);
+		Action action2 = this.actionService.createAction(CheckInActionExecuter.NAME);
+		this.actionService.saveAction(this.nodeRef, action2);		
+		assertEquals(2, this.actionService.getActions(this.nodeRef).size());
+		
+		this.actionService.removeAction(this.nodeRef, action1);
+		assertEquals(1, this.actionService.getActions(this.nodeRef).size());
+		
+		this.actionService.removeAllActions(this.nodeRef);
+		assertEquals(0, this.actionService.getActions(this.nodeRef).size());		
+	}
 }

@@ -145,4 +145,20 @@ public interface ContentModel
 	static final QName PROP_REJECT_STEP = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectStep");
 	static final QName PROP_REJECT_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectFolder");
 	static final QName PROP_REJECT_MOVE = QName.createQName(NamespaceService.ALFRESCO_URI, "rejectMove");
+	
+	// acitons, conditions and rules
+	static final QName TYPE_ACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "action");
+	static final QName PROP_DEFINITION_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "definitionName");
+	static final QName ASSOC_CONDITIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "conditions");
+	static final QName ASSOC_PARAMETERS = QName.createQName(NamespaceService.ALFRESCO_URI, "parameters");
+	static final QName TYPE_ACTION_CONDITION = QName.createQName(NamespaceService.ALFRESCO_URI, "actioncondition");
+	static final QName TYPE_ACTION_PARAMETER = QName.createQName(NamespaceService.ALFRESCO_URI, "actionparameter");
+	static final QName PROP_PARAMETER_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "parameterName");
+	static final QName PROP_PARAMETER_VALUE = QName.createQName(NamespaceService.ALFRESCO_URI, "parameterValue");
+	static final QName TYPE_COMPOSITE_ACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "compositeaction");
+	static final QName ASSOC_ACTIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "actions");
+	static final QName TYPE_RULE = QName.createQName(NamespaceService.ALFRESCO_URI, "rule");
+	static final QName PROP_RULE_TYPE = QName.createQName(NamespaceService.ALFRESCO_URI, "ruleType");
+	static final QName PROP_APPLY_TO_CHILDREN = QName.createQName(NamespaceService.ALFRESCO_URI, "applyToChildren");
+	
 }

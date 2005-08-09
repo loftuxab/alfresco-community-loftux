@@ -6,6 +6,12 @@
    <!-- Rules Service -->
    
    <bean id="actionService" class="org.alfresco.repo.action.ActionServiceImpl">		
+	  <property name="nodeService">
+         <ref bean="nodeService"/>
+	  </property>	  
+	  <property name="configurableService">
+         <ref bean="configurableService"/>
+	  </property>
    </bean>
    
    <!-- Definitions for beans that use the common resource -->

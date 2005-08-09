@@ -234,7 +234,90 @@
             </property>
          </properties>
       </type>
-
+      
+      <!-- Action, conditions and rules -->
+      
+      <type name="alf:actionbase">
+	     <title>Action Base Type</title>
+	     <parent>alf:cmobject</parent> 
+	     <properties>
+            <property name="alf:definitionName">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>  
+         <associations>
+            <child-association name="alf:parameters">
+               <target>
+                  <class>alf:actionparameter</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </child-association>
+         </associations>  
+      </type>
+      
+	  <type name="alf:action">
+	     <title>Action</title>
+	     <parent>alf:actionbase</parent>
+         <associations>
+            <child-association name="alf:conditions">
+               <target>
+                  <class>alf:actioncondition</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </child-association>
+         </associations>
+	  </type>
+	  
+	  <type name="alf:actioncondition">	  
+	     <title>Action Condition</title>
+	     <parent>alf:actionbase</parent>
+	  </type>
+	  
+	  <type name="alf:actionparameter">
+	     <title>Action/Condition Parameter</title>
+	     <parent>alf:cmobject</parent>
+	     <properties>
+            <property name="alf:parameterName">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="alf:parameterValue">
+               <type>d:any</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+	  </type>
+	  
+	  <type name="alf:compositeaction">
+	     <title>Composite Action</title>
+	     <parent>alf:action</parent>
+         <associations>
+            <child-association name="alf:actions">
+               <target>
+                  <class>alf:action</class>
+                  <mandatory>true</mandatory>
+                  <many>true</many>
+               </target>
+            </child-association>
+         </associations>
+	  </type>
+	  
+	  <type name="alf:rule">
+	     <title>Rule</title>
+	     <properties>
+            <property name="alf:ruleType">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="alf:applyToChildren">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+	  </type>
 
       <!-- Application level ???? -->
 
