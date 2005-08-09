@@ -36,7 +36,7 @@
          
          <!-- specifies the default view mode in the browse screen -->
          <!-- can be: list|details|icons -->
-         <default-view>list<default-view>
+         <default-view>list</default-view>
          
          <!-- specified the maximum number of items to show in the recent spaces shelf component -->
          <recent-spaces-items>6</recent-spaces-items>
