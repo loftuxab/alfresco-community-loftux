@@ -273,8 +273,13 @@ public class NTLMAuthenticationFilter implements Filter
             // Get the existing NTLM authentication session and details
             
             AuthenticateSession authSess = null;
+            NTLMLogonDetails ntlmDetails = null;
+            
             if ( httpSess != null)
+            {
                 authSess = (AuthenticateSession) httpSess.getAttribute(NTLM_AUTH_SESSION);
+                ntlmDetails = (NTLMLogonDetails) httpSess.getAttribute(NTLM_AUTH_DETAILS);
+            }
                 
             // Decode the received NTLM blob and validate
             
@@ -284,7 +289,7 @@ public class NTLMAuthenticationFilter implements Filter
             if ( ntlmTyp == NTLM.Type1)
             {
                 Type1NTLMMessage type1Msg = new Type1NTLMMessage(ntlmByts);
-                
+
                 // Debug
                 
                 if ( logger.isDebugEnabled())
@@ -294,10 +299,9 @@ public class NTLMAuthenticationFilter implements Filter
                 
                 if ( authSess != null) {
                     
-                    // Remove any existing session and NTLM details from the session
+                    // Remove any existing authentication session
                     
                     httpSess.removeAttribute(NTLM_AUTH_SESSION);
-                    httpSess.removeAttribute(NTLM_AUTH_DETAILS);
                     
                     try 
                     {
@@ -307,33 +311,22 @@ public class NTLMAuthenticationFilter implements Filter
                     {
                     }
                 }
+
+                // Check if cached logon details are available
                 
-                // Create an authentication session
-                
-                authSess = m_authServers.openSession();
-                
-                // Debug
-                
-                if ( logger.isDebugEnabled())
-                    logger.debug("Opened authentication session " + authSess);
-                
-                if ( authSess.hasType2NTLMMessage()) {
-                    
-                    // Store the authentication session
-                    
-                    httpSess.setAttribute(NTLM_AUTH_SESSION, authSess);
-                    
+                if ( ntlmDetails != null && ntlmDetails.hasType2Message() && ntlmDetails.hasNTLMHashedPassword())
+                {
                     // Get the authentication server type2 response
                     
-                    Type2NTLMMessage authType2 = authSess.getType2NTLMMessage();
+                    Type2NTLMMessage cachedType2 = ntlmDetails.getType2Message();
 
-                    byte[] type2Bytes = authType2.getBytes();
+                    byte[] type2Bytes = cachedType2.getBytes();
                     String ntlmBlob = "NTLM " + new String(Base64.encodeBase64(type2Bytes));
 
                     // Debug
                     
                     if ( logger.isDebugEnabled())
-                        logger.debug("Sending NTLM type2 to client - " + authType2);
+                        logger.debug("Sending cached NTLM type2 to client - " + cachedType2);
                     
                     // Send back a request for NTLM authentication
                     
@@ -342,6 +335,55 @@ public class NTLMAuthenticationFilter implements Filter
                     
                     resp.flushBuffer();
                     return;
+                }
+                else
+                {
+                    // Clear any cached logon details
+                    
+                    httpSess.removeAttribute(NTLM_AUTH_DETAILS);
+                    
+                    // Create an authentication session
+                    
+                    authSess = m_authServers.openSession();
+                    
+                    // Debug
+                    
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Opened authentication session " + authSess);
+                    
+                    if ( authSess.hasType2NTLMMessage()) {
+                        
+                        // Store the authentication session
+                        
+                        httpSess.setAttribute(NTLM_AUTH_SESSION, authSess);
+                        
+                        // Get the authentication server type2 response
+                        
+                        Type2NTLMMessage authType2 = authSess.getType2NTLMMessage();
+    
+                        byte[] type2Bytes = authType2.getBytes();
+                        String ntlmBlob = "NTLM " + new String(Base64.encodeBase64(type2Bytes));
+    
+                        // Store the NTLM logon details, cache the type2 message
+                        
+                        ntlmDetails = new NTLMLogonDetails();
+                        ntlmDetails.setType2Message( authType2);
+                        
+                        httpSess.setAttribute(NTLM_AUTH_DETAILS, ntlmDetails);
+                        
+                        // Debug
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Sending NTLM type2 to client - " + authType2);
+                        
+                        // Send back a request for NTLM authentication
+                        
+                        resp.setHeader("WWW-Authenticate", ntlmBlob);
+                        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        
+                        resp.flushBuffer();
+                        return;
+                    }
                 }
             }
             else if ( ntlmTyp == NTLM.Type3)
@@ -364,91 +406,148 @@ public class NTLMAuthenticationFilter implements Filter
                 boolean authenticated = false;
                 boolean useNTLM = true;
                 
-                try
+                // Check if we are using cached details for the authentication
+                
+                if ( authSess == null && ntlmDetails != null && ntlmDetails.hasNTLMHashedPassword())
                 {
-                    // Authenticate the user using the session to the authentication server
+                    // Check if the received NTLM hashed password matches the cached password
                     
-                    authSess.doSessionSetup(type3Msg);
+                    byte[] ntlmPwd = type3Msg.getNTLMHash();
+                    byte[] cachedPwd = ntlmDetails.getNTLMHashedPassword();
                     
-                    // Check if the logon was authenticated, check if the guest account was used
-                    
-                    if ( authSess.isGuest() == false || allowsGuest())
+                    if ( ntlmPwd != null)
                     {
-                        
-                        // Indicate that the user has been authenticated
-
-                        authenticated = true;
-
-                        // Get user details for the authenticated user
-                        
-                        WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(m_context);
-                        AuthenticationService authService = (AuthenticationService)ctx.getBean("authenticationService");
-                        StoreContextHolder.setContext(Repository.getStoreRef());
-
-                        Authentication authToken = authService.setAuthenticatedUser(userName);
-                        
-                        // Setup User object and Home space ID etc.
-                        
-                        NodeService nodeService = (NodeService) ctx.getBean("nodeService");
-                        RepositoryUserDetails principal = (RepositoryUserDetails)authToken.getPrincipal();
-                        User user = new User(principal.getUserNodeRef(), userName, authService.getCurrentTicket(), principal.getPersonNodeRef());
-                        
-                        String homeSpaceId = (String)nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
-                        user.setHomeSpaceId(homeSpaceId);
-                        
-                        httpSess.setAttribute(AuthenticationFilter.AUTHENTICATION_USER, user);
-
-                        // Save the NTLM logon details in the session
-                        
-                        NTLMLogonDetails ntlmDetails = new NTLMLogonDetails( userName, workstation, domain,
-                                authSess.isGuest(), authSess.getServer());
-                        httpSess.setAttribute(NTLM_AUTH_DETAILS, ntlmDetails);
-                        
-                        // Debug
-                        
-                        if ( logger.isDebugEnabled())
-                            logger.debug("User logged on via NTLM, " + ntlmDetails);
-                    }                    
-                }
-                catch (UsernameNotFoundException ex)
-                {
+                        if ( ntlmPwd.length == cachedPwd.length)
+                        {
+                            authenticated = true;
+                            for ( int i = 0; i < ntlmPwd.length; i++)
+                            {
+                                if ( ntlmPwd[i] != cachedPwd[i])
+                                    authenticated = false;
+                            }
+                        }
+                    }
+                    
                     // Debug
                     
                     if ( logger.isDebugEnabled())
-                        logger.debug("User " + userName + " authenticated, but no Alfresco account");
-                    
-                    // Bypass NTLM authentication and display the logon screen, user account does not
-                    // exist in Alfresco
-                    
-                    useNTLM = false;
-                    authenticated = false;
+                        logger.debug("Using cached NTLM hash, authenticated = " + authenticated);
                 }
-                catch (IOException ex)
+                else
                 {
-                    ex.printStackTrace();
-                }
-                catch (SMBException ex)
-                {
-                    ex.printStackTrace();
-                }
-                finally
-                {
-                    // Remove the authentication session from the web session
-                    
-                    httpSess.removeAttribute(NTLM_AUTH_SESSION);
-                    
-                    // Close the authentication session
-                    
                     try
                     {
-                        authSess.CloseSession();
+                        // Authenticate the user using the session to the authentication server
+                        
+                        authSess.doSessionSetup(type3Msg);
+                    
+                        // Check if the logon was authenticated, check if the guest account was used
+                        
+                        if ( authSess.isGuest() == false || allowsGuest())
+                        {
+                            
+                            // Indicate that the user has been authenticated
+    
+                            authenticated = true;
+    
+                            // Get user details for the authenticated user
+                            
+                            WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(m_context);
+                            AuthenticationService authService = (AuthenticationService)ctx.getBean("authenticationService");
+                            StoreContextHolder.setContext(Repository.getStoreRef());
+    
+                            Authentication authToken = authService.setAuthenticatedUser(userName);
+                            
+                            // Setup User object and Home space ID etc.
+                            
+                            NodeService nodeService = (NodeService) ctx.getBean("nodeService");
+                            RepositoryUserDetails principal = (RepositoryUserDetails)authToken.getPrincipal();
+                            User user = new User(principal.getUserNodeRef(), userName, authService.getCurrentTicket(), principal.getPersonNodeRef());
+                            
+                            String homeSpaceId = (String)nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
+                            user.setHomeSpaceId(homeSpaceId);
+                            
+                            httpSess.setAttribute(AuthenticationFilter.AUTHENTICATION_USER, user);
+    
+                            // Update the NTLM logon details in the session
+                            
+                            if ( ntlmDetails == null)
+                            {
+                                // No cached NTLM details
+                                
+                                ntlmDetails = new NTLMLogonDetails( userName, workstation, domain,
+                                    authSess.isGuest(), authSess.getServer());
+                                
+                                httpSess.setAttribute(NTLM_AUTH_DETAILS, ntlmDetails);
+                                
+                                // Debug
+                                
+                                if ( logger.isDebugEnabled())
+                                    logger.debug("No cached NTLM details, created");
+                                
+                            }
+                            else
+                            {
+                                // Update the cached NTLM details
+                                
+                                ntlmDetails.setDetails(userName, workstation, domain, authSess.isGuest(), authSess.getServer());
+                                ntlmDetails.setNTLMHashedPassword(type3Msg.getNTLMHash());
+    
+                                // Debug
+                                
+                                if ( logger.isDebugEnabled())
+                                    logger.debug("Updated cached NTLM details");
+                            }
+                            
+                            // Debug
+                            
+                            if ( logger.isDebugEnabled())
+                                logger.debug("User logged on via NTLM, " + ntlmDetails);
+                        }                    
+                    }
+                    catch (UsernameNotFoundException ex)
+                    {
+                        // Debug
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("User " + userName + " authenticated, but no Alfresco account");
+                        
+                        // Bypass NTLM authentication and display the logon screen, user account does not
+                        // exist in Alfresco
+                        
+                        useNTLM = false;
+                        authenticated = false;
+                    }
+                    catch (IOException ex)
+                    {
+                        ex.printStackTrace();
                     }
                     catch (SMBException ex)
                     {
                         ex.printStackTrace();
                     }
+                    finally
+                    {
+                        // Remove the authentication session from the web session
+                        
+                        httpSess.removeAttribute(NTLM_AUTH_SESSION);
+                        
+                        // Close the authentication session
+    
+                        if ( authSess != null)
+                        {
+                            try
+                            {
+                                authSess.CloseSession();
+                            }
+                            catch (SMBException ex)
+                            {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
                 }
-                    
+                
                 // Check if the user was authenticated, this may be due to the user not existing in the
                 // Alfresco user database in which case we redirect to the login page, otherwise start the
                 // logon process again
