@@ -153,6 +153,13 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 
+	<xsd:group name="AnonymousType">
+		<xsd:sequence>
+			<xsd:element name="type" type="cms:Name"></xsd:element>
+			<xsd:element name="aspect" type="cms:Name" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+
 	<!-- -->	
 	<!-- Generic Content Definitions -->
 	<!-- -->
@@ -160,11 +167,7 @@
     <xsd:complexType name="Node">
     	<xsd:sequence>
     		<xsd:element name="reference" type="cms:Reference"></xsd:element>
-    		<xsd:element name="type" type="cms:Name">
-    			<xsd:annotation>
-    				<xsd:documentation>TODO: Change type to NodeDescription</xsd:documentation>
-    			</xsd:annotation>
-    		</xsd:element>
+    		<xsd:group ref="cms:AnonymousType"/>
     		<xsd:element name="properties" type="cms:NamedValue" minOccurs="0" maxOccurs="unbounded"></xsd:element>
     	</xsd:sequence>
     </xsd:complexType>
@@ -254,8 +257,7 @@
 				<xsd:complexType>
 					<xsd:sequence>
 						<xsd:element name="id" type="cms:UUID"></xsd:element>
-						<xsd:element name="type" type="cms:Name"></xsd:element>
-						<xsd:element name="aspect" type="cms:Name" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+						<xsd:group ref="cms:AnonymousType"/>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
