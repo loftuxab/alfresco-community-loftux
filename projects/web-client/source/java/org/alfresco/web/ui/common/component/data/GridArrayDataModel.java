@@ -17,8 +17,6 @@
  */
 package org.alfresco.web.ui.common.component.data;
 
-
-
 /**
  * @author kevinr
  */
@@ -45,8 +43,6 @@ public class GridArrayDataModel implements IGridDataModel
    {
       return this.data[index];
    }
-   
-   // TODO: allow formatting etc. of strings
    
    /**
     * Return the number of rows in the data model

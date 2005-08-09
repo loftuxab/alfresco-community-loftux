@@ -28,6 +28,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
@@ -50,6 +51,7 @@ import org.alfresco.web.bean.repository.NodePropertyResolver;
 import org.alfresco.web.bean.repository.QNameMap;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewSpaceWizard;
+import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIActionLink;
@@ -80,8 +82,6 @@ public class BrowseBean implements IContextListener
    public BrowseBean()
    {
       UIContextService.getInstance(FacesContext.getCurrentInstance()).registerBean(this);
-      
-      // TODO: use ConfigService to get default view mode
    }
    
    
@@ -129,10 +129,22 @@ public class BrowseBean implements IContextListener
    }
    
    /**
+    * @param configService The ConfigService to set.
+    */
+   public void setConfigService(ConfigService configService)
+   {
+      this.configService = configService;
+   }
+   
+   /**
     * @return Returns the browse View mode. See UIRichList
     */
    public String getBrowseViewMode()
    {
+      if (this.clientConfig == null)
+      {
+         initFromClientConfig();
+      }
       return this.browseViewMode;
    }
    
@@ -149,7 +161,11 @@ public class BrowseBean implements IContextListener
     */
    public int getBrowsePageSize()
    {
-      return browsePageSize;
+      if (this.clientConfig == null)
+      {
+         initFromClientConfig();
+      }
+      return this.browsePageSize;
    }
    
    /**
@@ -181,7 +197,7 @@ public class BrowseBean implements IContextListener
     */
    public Node getDocument()
    {
-      return document;
+      return this.document;
    }
 
    /**
@@ -308,21 +324,21 @@ public class BrowseBean implements IContextListener
       String viewMode = viewList.getValue().toString();
       
       // set the page size based on the style of display
-      if (viewMode.equals(RichListRenderer.DetailsViewRenderer.VIEWMODEID))
+      if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(viewMode))
       {
-         setBrowsePageSize(10);
+         setBrowsePageSize(this.clientConfig.getDetailsPageSize());
       }
-      else if (viewMode.equals(RichListRenderer.IconViewRenderer.VIEWMODEID))
+      else if (RichListRenderer.IconViewRenderer.VIEWMODEID.equals(viewMode))
       {
-         setBrowsePageSize(9);
+         setBrowsePageSize(this.clientConfig.getIconsPageSize());
       }
-      else if (viewMode.equals(RichListRenderer.ListViewRenderer.VIEWMODEID))
+      else if (RichListRenderer.ListViewRenderer.VIEWMODEID.equals(viewMode))
       {
-         setBrowsePageSize(10);
+         setBrowsePageSize(this.clientConfig.getListPageSize());
       }
       else
       {
-         // in-case another view mode appears
+         // in case another view mode appears we should have a default
          setBrowsePageSize(10);
       }
       if (logger.isDebugEnabled())
@@ -380,7 +396,7 @@ public class BrowseBean implements IContextListener
             
             // look for Space or File nodes
             if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) == true && 
-            	this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYTEM_FOLDER) == false)
+            	this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
             {
                // TODO: We need to get at least Name etc. for sorting purposes,
                //       if the props are always needed then it's better to get them here...?
@@ -471,7 +487,7 @@ public class BrowseBean implements IContextListener
                
                // look for Space or File nodes
                if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) && 
-                   this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYTEM_FOLDER) == false)
+                   this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
                {
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService, true);
@@ -952,6 +968,33 @@ public class BrowseBean implements IContextListener
    // Private helpers
    
    /**
+    * Initialise default values from client configuration
+    */
+   private void initFromClientConfig()
+   {
+      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement("client");
+      this.browseViewMode = clientConfig.getDefaultView();
+      
+      if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(this.browseViewMode))
+      {
+         this.browsePageSize = this.clientConfig.getDetailsPageSize();
+      }
+      else if (RichListRenderer.IconViewRenderer.VIEWMODEID.equals(this.browseViewMode))
+      {
+         this.browsePageSize = this.clientConfig.getIconsPageSize();
+      }
+      else if (RichListRenderer.ListViewRenderer.VIEWMODEID.equals(this.browseViewMode))
+      {
+         this.browsePageSize = this.clientConfig.getListPageSize();
+      }
+      else
+      {
+         // in case another view mode appears we should have a default
+         this.browsePageSize = 10;
+      }
+   }
+   
+   /**
     * Refresh the UI after a Space selection change. Adds the selected space to the breadcrumb
     * location path and also updates the list components in the UI.
     * 
@@ -1134,6 +1177,12 @@ public class BrowseBean implements IContextListener
    /** The DictionaryService bean reference */
    private DictionaryService dictionaryService;
    
+   /** ConfigService bean reference */
+   private ConfigService configService;
+   
+   /** Client configuration object */
+   private ClientConfigElement clientConfig = null;
+   
    /** Component references */
    private UIRichList spacesRichList;
    private UIRichList contentRichList;
@@ -1148,9 +1197,9 @@ public class BrowseBean implements IContextListener
    /** The current document */
    private Node document;
    
-   /** The current browse view mode - set to a well known IRichListRenderer name */
-   private String browseViewMode = "list";
+   /** The current browse view mode - set to a well known IRichListRenderer identifier */
+   private String browseViewMode;
    
    /** The current browse view page size */
-   private int browsePageSize = 10;
+   private int browsePageSize;
 }

@@ -128,7 +128,7 @@ public interface ContentModel
     public static final QName PROP_SALT = QName.createQName(NamespaceService.ALFRESCO_URI, "salt");
     
     // system folder type
-    static final QName TYPE_SYTEM_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "systemfolder");
+    static final QName TYPE_SYSTEM_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "systemfolder");
 
     // rules
     static final QName ASPECT_ACTIONABLE = QName.createQName(NamespaceService.ALFRESCO_URI, "actionable");

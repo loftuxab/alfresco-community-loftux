@@ -24,12 +24,14 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.repo.component.shelf.UIRecentSpacesShelfItem;
 import org.apache.log4j.Logger;
@@ -46,13 +48,17 @@ public class RecentSpacesBean implements IContextListener
 {
    private static Logger logger = Logger.getLogger(RecentSpacesBean.class);
    
-   private static final int MAX_RECENT_SPACES = 6;
-   
    /** The NavigationBean reference */
    private NavigationBean navigator;
    
    /** The BrowseBean reference */
    private BrowseBean browseBean;
+   
+   /** ConfigService bean reference */
+   private ConfigService configService;
+   
+   /** Maximum number of recent spaces to show */
+   private Integer maxRecentSpaces = null;
    
    /** List of recent space nodes */
    private List<Node> recentSpaces = new LinkedList<Node>();
@@ -87,6 +93,14 @@ public class RecentSpacesBean implements IContextListener
    public void setBrowseBean(BrowseBean browseBean)
    {
       this.browseBean = browseBean;
+   }
+   
+   /**
+    * @param configService The ConfigService to set.
+    */
+   public void setConfigService(ConfigService configService)
+   {
+      this.configService = configService;
    }
    
    /**
@@ -159,9 +173,10 @@ public class RecentSpacesBean implements IContextListener
       }
       
       // remove an item if the list is at the maximum length
-      if (this.recentSpaces.size() == MAX_RECENT_SPACES)
+      int maxItems = getMaxRecentSpaces();
+      if (this.recentSpaces.size() == maxItems)
       {
-         this.recentSpaces.remove(MAX_RECENT_SPACES - 1);
+         this.recentSpaces.remove(maxItems - 1);
       }
       
       if (logger.isDebugEnabled())
@@ -169,5 +184,19 @@ public class RecentSpacesBean implements IContextListener
       
       // insert our Node at the top of the list so it's most relevent
       this.recentSpaces.add(0, node);
+   }
+   
+   /**
+    * @return the max number of recent spaces to show, retrieved from client config
+    */
+   private int getMaxRecentSpaces()
+   {
+      if (maxRecentSpaces == null)
+      {
+         ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement("client");
+         maxRecentSpaces = Integer.valueOf(config.getRecentSpacesItems());
+      }
+      
+      return maxRecentSpaces.intValue();
    }
 }

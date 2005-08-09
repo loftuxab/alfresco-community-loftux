@@ -463,7 +463,7 @@ public class RuleStoreImpl implements RuleStore
 														configFolder,
 														ContentModel.ASSOC_CONTAINS,
 														QName.createQName(NamespaceService.ALFRESCO_URI, "rules"),
-														ContentModel.TYPE_SYTEM_FOLDER).getChildRef();
+														ContentModel.TYPE_SYSTEM_FOLDER).getChildRef();
 				}
 				else
 				{

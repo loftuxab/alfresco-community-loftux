@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.alfresco.web.data.QuickSort;
 
-
 /**
  * @author kevinr
  */
@@ -78,8 +77,6 @@ public class GridListDataModel implements IGridDataModel
          throw new RuntimeException("Failed to sort data: " + err.getMessage(), err);
       }
    }
-   
-   // TODO: allow formatting etc. of strings
    
    private List data = null;
 }

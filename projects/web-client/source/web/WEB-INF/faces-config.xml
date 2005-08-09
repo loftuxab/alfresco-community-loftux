@@ -90,6 +90,10 @@
          <property-name>dictionaryService</property-name>
          <value>#{AlfDictionaryService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>configService</property-name>
+         <value>#{configService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
@@ -127,6 +131,10 @@
       <managed-property>
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>configService</property-name>
+         <value>#{configService}</value>
       </managed-property>
    </managed-bean>
    
@@ -381,6 +389,35 @@
       <managed-property>
          <property-name>rulesBean</property-name>
          <value>#{RulesBean}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         The bean that backs up the New Action Wizard
+      </description>
+      <managed-bean-name>NewActionWizard</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.NewActionWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>actionService</property-name>
+         <value>#{AlfActionService}</value>
       </managed-property>
    </managed-bean>
    

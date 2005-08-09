@@ -155,6 +155,9 @@
                                  <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>
+                                 
+                                 <%-- other action --%>
+                                 <a:actionLink value="#{msg.other_action}" image="/images/icons/action.gif" action="createAction" actionListener="#{NewActionWizard.startWizard}" />
                               </a:menu>
                            </td>
                            

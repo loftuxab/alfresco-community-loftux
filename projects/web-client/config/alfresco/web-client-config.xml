@@ -7,6 +7,7 @@
       </evaluators>
       <element-readers>
          <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
+         <element-reader element-name="client" class="org.alfresco.web.config.ClientElementReader"/>
          <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
       </element-readers>
    </plug-ins>
@@ -25,6 +26,20 @@
       <admin>
          <initial-password>admin</initial-password>
       </admin>
+      <client>
+         <!-- specifies the maximum page size for each view mode in the browse screen -->
+         <page-size>
+            <list>10</list>
+            <details>10</details>
+            <icons>9</icons>
+         </page-size>
+         
+         <!-- specifies the default view mode in the browse screen -->
+         <!-- can be: list|details|icons -->
+         <default-view>list<default-view>
+         
+         <!-- specified the maximum number of items to show in the recent spaces shelf component -->
+         <recent-spaces-items>6</recent-spaces-items>
    </config>
    
    <config evaluator="node-type" condition="content">
@@ -90,7 +105,7 @@
       </property-sheet>
    </config>
    
-   <config evaluator="string-compare" condition="New Rule Wizard">
+   <config evaluator="string-compare" condition="Action Wizards">
       <aspects>
          <aspect id="generalclassifiable" description="Classifiable"/>
          <aspect id="complianceable" description="Complianceable"/>
