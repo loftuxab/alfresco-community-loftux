@@ -26,21 +26,6 @@
    </bean>   
    
    <!-- Datasource bean -->
-   <bean id="dataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
-      <property name="dataSource">
-         <bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
-            <property name="transactionManager"><ref local="jotm"/></property>
-            <property name="driverName"><value>${db.driver}</value></property>
-            <property name="url"><value>${db.url}</value></property>
-            <property name="user"><value>${db.username}</value></property>
-            <property name="password"><value>${db.password}</value></property>
-         </bean>
-      </property>
-      <property name="user"><value>${db.username}</value></property>
-      <property name="password"><value>${db.password}</value></property>
-      <property name="maxSize"><value>100</value></property>
-   </bean>
-   <!--
    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
          destroy-method="close">
       <property name="driverClassName">
@@ -54,34 +39,6 @@
       </property>
       <property name="password">
          <value>${db.password}</value>
-      </property>
-   </bean>
-   -->
-   
-   <!-- create a transaction manager -->
-   <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager" >
-      <property name="userTransaction"><ref local="jotm"/></property>
-   </bean>
-   <!--
-   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-      <property name="transactionSynchronizationName" >
-         <value>SYNCHRONIZATION_ALWAYS</value>
-      </property>
-      <property name="sessionFactory">
-         <ref local="sessionFactory"/>
-      </property>
-   </bean>
-   -->
-   
-   <bean id="jotm" class="org.springframework.transaction.jta.JotmFactoryBean"/>
-
-   <!-- factory for UserTransaction instances -->
-   <bean id="userTransaction" class="org.alfresco.util.transaction.UserTransactionFactory">
-      <constructor-arg>
-         <ref bean="transactionManager" />
-      </constructor-arg>
-      <property name="singleton">
-         <value>false</value>
       </property>
    </bean>
 
@@ -100,17 +57,36 @@
       </property>
       <property name="hibernateProperties" >
          <props>
-            <prop key="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JOTMTransactionManagerLookup</prop>
             <prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
             <prop key="hibernate.dialect" >org.hibernate.dialect.MySQLDialect</prop>
             <prop key="hibernate.show_sql">false</prop>
             <prop key="hibernate.hbm2ddl.auto">update</prop>
             <prop key="hibernate.cache.use_query_cache">true</prop>
             <prop key="hibernate.max_fetch_depth">10</prop>
-            <prop key="hibernate.cache.provider_class">org.hibernate.cache.TreeCacheProvider</prop>
+            <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
             <prop key="hibernate.default_batch_fetch_size">1</prop>
             <prop key="hibernate.jdbc.batch_size">32</prop>
          </props>
+      </property>
+   </bean>
+   
+   <!-- create a transaction manager -->
+   <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+      <property name="transactionSynchronizationName" >
+         <value>SYNCHRONIZATION_ALWAYS</value>
+      </property>
+      <property name="sessionFactory">
+         <ref local="sessionFactory"/>
+      </property>
+   </bean>
+   
+   <!-- factory for UserTransaction instances -->
+   <bean id="userTransaction" class="org.alfresco.util.transaction.UserTransactionFactory">
+      <constructor-arg>
+         <ref bean="transactionManager" />
+      </constructor-arg>
+      <property name="singleton">
+         <value>false</value>
       </property>
    </bean>
    

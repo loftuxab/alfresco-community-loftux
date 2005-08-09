@@ -15,7 +15,7 @@
         lazy="true"
         optimistic-lock="version" >
 
-        <cache usage="transactional" />
+        <cache usage="read-write" />
 
         <composite-id name="nodeKey" class="org.alfresco.repo.domain.NodeKey">
            <key-property name="protocol" length="100" />
@@ -55,7 +55,7 @@
         lazy="false"
         optimistic-lock="version" >
         
-        <cache usage="transactional" />
+        <cache usage="read-write" />
         
         <id
             name="id"
@@ -102,7 +102,7 @@
         lazy="true"
         optimistic-lock="version" >
         
-        <cache usage="transactional" />
+        <cache usage="read-write" />
         
         <composite-id>
             <key-property name="typeUri" type="string" length="100" column="type_uri"/>
@@ -121,7 +121,7 @@
         lazy="true"
         optimistic-lock="version" >
         
-        <cache usage="transactional" />
+        <cache usage="read-write" />
         
         <composite-id>
             <key-property name="recipient"

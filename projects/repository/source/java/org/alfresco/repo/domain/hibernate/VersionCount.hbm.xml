@@ -14,7 +14,7 @@
          dynamic-insert="false"
          select-before-update="false"
          optimistic-lock="version" >
-      <cache usage="transactional" />
+      <cache usage="read-write" />
       <!-- composite PK -->
       <composite-id name="key" class="org.alfresco.repo.domain.StoreKey">
          <key-property name="protocol" length="100" />
