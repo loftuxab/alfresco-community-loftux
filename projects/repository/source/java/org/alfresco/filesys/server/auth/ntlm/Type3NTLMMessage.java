@@ -285,10 +285,19 @@ public class Type3NTLMMessage extends NTLMMessage
         StringBuilder str = new StringBuilder();
         
         str.append("[Type3:");
+        
         str.append(",LM:");
-        str.append(HexDump.hexString(getLMHash()));
+        if ( getLMHash() != null)
+            str.append(HexDump.hexString(getLMHash()));
+        else
+            str.append("<Null>");
+        
         str.append(",NTLM:");
-        str.append(HexDump.hexString(getNTLMHash()));
+        if ( getNTLMHash() != null)
+            str.append(HexDump.hexString(getNTLMHash()));
+        else
+            str.append("<Null>");
+        
         str.append(",Dom:");
         str.append(getDomain());
         str.append(",User:");
