@@ -41,11 +41,9 @@ public interface PermissionService
      * 
      * @param nodeRef -
      *            the reference to the node
-     * @param auth -
-     *            the authentication
      * @return the set of allowed permissions
      */
-    public Set<AccessPermission> getPermissions(NodeRef nodeRef, Authentication auth);
+    public Set<AccessPermission> getPermissions(NodeRef nodeRef);
 
     /**
      * Get all the AccessPermissions that are granted/denied to the given
@@ -53,11 +51,9 @@ public interface PermissionService
      * 
      * @param nodeRef -
      *            the reference to the node
-     * @param auth -
-     *            the authentication
      * @return the set of allowed permissions
      */
-    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef, Authentication auth);
+    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef);
 
     /**
      * Get the permissions that can be set for a given node
@@ -89,11 +85,10 @@ public interface PermissionService
      * given node. (The default behaviour is ot inherit permissions)
      * 
      * @param nodeRef
-     * @param auth
      * @param perm
      * @return
      */
-    public boolean hasPermission(NodeRef nodeRef, Authentication auth, PermissionReference perm);
+    public boolean hasPermission(NodeRef nodeRef, PermissionReference perm);
 
     /**
      * Where is the permission set that controls the behaviour for the givent
@@ -104,7 +99,7 @@ public interface PermissionService
      * @param perm
      * @return
      */
-    public NodePermissionEntry explainPermission(NodeRef nodeRef, Authentication auth, PermissionReference perm);
+    public NodePermissionEntry explainPermission(NodeRef nodeRef, PermissionReference perm);
 
     /**
      * Delete all the permission assigned to the node

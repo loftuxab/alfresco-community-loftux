@@ -902,6 +902,9 @@
             <property name="modelDAO">
                 <ref bean="permissionsModelDAO" />
             </property>     
+            <property name="authenticationService">
+                <ref bean="authenticationService" />
+            </property>     
          </bean>
       </property>
       <property name="transactionAttributes">

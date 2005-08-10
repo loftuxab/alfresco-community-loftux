@@ -23,7 +23,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.acegisecurity.Authentication;
+import net.sf.acegisecurity.providers.dao.User;
 
+import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.AccessPermission;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
@@ -45,6 +47,8 @@ public class PermissionServiceImpl implements PermissionService
     private NodeService nodeService;
 
     private DictionaryService dictionaryService;
+    
+    private AuthenticationService authenticationService;
 
     public PermissionServiceImpl()
     {
@@ -74,18 +78,23 @@ public class PermissionServiceImpl implements PermissionService
     {
         this.permissionsDAO = permissionsDAO;
     }
+    
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService;
+    }
 
     //
     // Permissions Service
     //
-
-    public Set<AccessPermission> getPermissions(NodeRef nodeRef, Authentication auth)
+  
+    public Set<AccessPermission> getPermissions(NodeRef nodeRef)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef, Authentication auth)
+    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef)
     {
         // TODO Auto-generated method stub
         return null;
@@ -106,8 +115,9 @@ public class PermissionServiceImpl implements PermissionService
         return permissionsDAO.getPermissions(nodeRef);
     }
 
-    public boolean hasPermission(NodeRef nodeRef, Authentication auth, PermissionReference perm)
+    public boolean hasPermission(NodeRef nodeRef, PermissionReference perm)
     {
+        Authentication auth = authenticationService.getCurrentAuthentication();
         // TODO: Dynamic permissions via evaluators
         Set<PermissionReference> available = modelDAO.getPermissions(nodeRef);
         if (!(available.contains(perm)))
@@ -345,12 +355,13 @@ public class PermissionServiceImpl implements PermissionService
     private Set<String> getAuthorisations(Authentication auth)
     {
         HashSet<String> auths = new HashSet<String>();
-        auths.add(auth.getName());
+        User user = (User)auth.getPrincipal();
+        auths.add(user.getUsername());
         auths.add(SimplePermissionEntry.ALL_AUTHORITIES);
         return auths;
     }
 
-    public NodePermissionEntry explainPermission(NodeRef nodeRef, Authentication auth, PermissionReference perm)
+    public NodePermissionEntry explainPermission(NodeRef nodeRef, PermissionReference perm)
     {
         // TODO Auto-generated method stub
         return null;
