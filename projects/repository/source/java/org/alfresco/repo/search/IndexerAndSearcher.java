@@ -48,4 +48,11 @@ public interface IndexerAndSearcher
      * @throws SearcherException
      */
     public abstract SearchService getSearcher(StoreRef storeRef, boolean searchDelta) throws SearcherException;
+    
+    
+    /**
+     * Do any indexing that may be pending on behalf of the current transaction.
+     *
+     */
+    public abstract void flush();
 }

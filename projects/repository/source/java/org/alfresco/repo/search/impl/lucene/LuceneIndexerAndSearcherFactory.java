@@ -220,9 +220,10 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
     public LuceneIndexer getIndexer(StoreRef storeRef) throws IndexerException
     {
         // register to receive txn callbacks
-        // TODO: make this conditional on whether the XA stuff is being used directly on not
+        // TODO: make this conditional on whether the XA stuff is being used
+        // directly on not
         AlfrescoTransactionSupport.bindLucene(this);
-        
+
         if (inGlobalTransaction())
         {
             SimpleTransaction tx = getTransaction();
@@ -343,7 +344,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         if (searchDelta)
         {
             deltaId = getTransactionId(getTransaction(), storeRef);
-            if(deltaId != null)
+            if (deltaId != null)
             {
                 indexer = getIndexer(storeRef);
             }
@@ -360,7 +361,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
      * @return
      * @throws SearcherException
      */
-    private LuceneSearcher getSearcher(StoreRef storeRef,  LuceneIndexer indexer) throws SearcherException
+    private LuceneSearcher getSearcher(StoreRef storeRef, LuceneIndexer indexer) throws SearcherException
     {
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, indexer, this);
         searcher.setNamespacePrefixResolver(nameSpaceService);
@@ -423,8 +424,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                 }
                 return;
             }
-        }
-        finally
+        } finally
         {
             activeIndexersInGlobalTx.remove(xid);
         }
@@ -557,8 +557,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
             {
                 indexer.rollback();
             }
-        }
-        finally
+        } finally
         {
             activeIndexersInGlobalTx.remove(xid);
         }
@@ -648,8 +647,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
                     }
                 }
             }
-        }
-        finally
+        } finally
         {
             if (threadLocalIndexers.get() != null)
             {
@@ -730,6 +728,20 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
             threadLocalIndexers.set(null);
         }
 
+    }
+
+    public void flush()
+    {
+        // TODO: Needs fixing if we expose the indexer in JTA
+        Map<StoreRef, LuceneIndexer> indexers = threadLocalIndexers.get();
+
+        if (indexers != null)
+        {
+            for (LuceneIndexer indexer : indexers.values())
+            {
+                indexer.flushPending();
+            }
+        }
     }
 
     public void setContentService(ContentService contentService)
