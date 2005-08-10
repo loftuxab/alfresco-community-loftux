@@ -261,11 +261,14 @@ public class NavigationBean
          Path path = this.nodeService.getPath(nodeRef);
 
          // resolve CIFS network folder location for this node
-         NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
-         String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
-
-         node.getProperties().put("cifsPath", cifsPath);
-         node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
+         if (this.contentDiskDriver != null)
+         {
+	         NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
+	         String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
+	
+	         node.getProperties().put("cifsPath", cifsPath);
+	         node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
+         }
 
          this.currentNode = node;
       }

@@ -40,7 +40,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author Kevin Roast
  * 
- * Servlet filter responsible for redirecting to the login page for the web-client if the user
+ * Servlet filter responsible for redirecting to the login page for the Web Client if the user
  * does not have a valid ticket.
  * <p>
  * The current ticker is validated for each page request and the login page is shown if the

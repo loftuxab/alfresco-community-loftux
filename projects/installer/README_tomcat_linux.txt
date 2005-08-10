@@ -101,7 +101,7 @@ Ensure that the MySQL server is running, then navigate to the '~/alfresco/tomcat
 - If you wish to use OpenOffice document transformations, run '../start_oo.sh'
 - You can now try Alfresco by visiting:
 
-http://localhost:8080/web-client/faces/jsp/login.jsp
+http://localhost:8080/alfresco
 
 The server is configured with a single administrative login with user name and password
 both set to 'admin'.
@@ -141,7 +141,7 @@ To check the CIFS server is running, try connecting from the Alfresco server usi
 If you are unable to connect to the CIFS server, then depending on your network, you may need 
 to configure the domain for CIFS to use.  You will need to have started the Alfresco server
 at least once to be able to do this.  To set the domain, edit the 'alfresco-file-servers.xml' 
-file in the '~/alfresco/tomcat/webapps/web-client/WEB-INF/classes' directory and add the 
+file in the '~/alfresco/tomcat/webapps/alfresco/WEB-INF/classes' directory and add the 
 domain into the following line:
    <host name="${localname}_A"/>
 so that it is something like:

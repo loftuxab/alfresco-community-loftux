@@ -101,7 +101,7 @@ Navigate to the '~/alfresco' directory
 - If you wish to use OpenOffice document transformations, run 'start_oo.sh'
 - You can now try Alfresco by visiting:
 
-http://localhost:8080/portal and navigating to 'web-client' from the Page Menu and
+http://localhost:8080/portal and navigating to 'Alfresco' from the Page Menu and
 then maximizing the portlet (top-right-most icon).
 
 Or:

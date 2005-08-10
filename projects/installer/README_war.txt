@@ -98,7 +98,7 @@ Navigate to the 'C:\alfresco' folder and run 'alf_start_jb.bat'
 - when the console has the message 'Started in nnnnn ms', JBoss is running
 - you can now try Alfresco by visiting:
 
-http://localhost:8080/portal and navigating to 'web-client' from the Page Menu and
+http://localhost:8080/portal and navigating to 'Alfresco' from the Page Menu and
 then maximizing the portlet (top-right-most icon).
 
 Or:
@@ -130,7 +130,7 @@ you may need to adjust the instructions above as appropriate, such as changing
 the Tomcat port settings.
 
 The Alfresco server is packaged as a war file and can be found in:
-c:\alfresco\tomcat\webapps\web-client.war
+c:\alfresco\tomcat\webapps\alfresco.war
 
 The Alfresco 'db_setup.bat' performs the following MySQL commands:
 

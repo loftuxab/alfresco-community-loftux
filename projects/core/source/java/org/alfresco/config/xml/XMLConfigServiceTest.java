@@ -187,7 +187,7 @@ public class XMLConfigServiceTest extends BaseTest
     public void xtestHTTPSource()
     {
         List<String> configFile = new ArrayList<String>(1);
-        configFile.add("http://localhost:8080/web-client/config-http.xml");
+        configFile.add("http://localhost:8080/alfresco/config-http.xml");
         XMLConfigService svc = new XMLConfigService(new HTTPConfigSource(configFile));
         svc.init();
         

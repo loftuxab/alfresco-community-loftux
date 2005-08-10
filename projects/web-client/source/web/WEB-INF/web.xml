@@ -164,11 +164,15 @@
    
    <servlet-mapping>
 		<servlet-name>axis</servlet-name>
-		<url-pattern>/remote-api/*</url-pattern>
+		<url-pattern>/api/*</url-pattern>
 	</servlet-mapping>
    
    <session-config>
       <session-timeout>60</session-timeout>
    </session-config>
+   
+   <welcome-file-list>
+      <welcome-file>index.jsp</welcome-file>
+   </welcome-file-list>
 
 </web-app>

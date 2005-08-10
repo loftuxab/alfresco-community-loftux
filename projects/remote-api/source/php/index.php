@@ -21,7 +21,7 @@
       print("Authenticating...");
 
       // get hold of the authentication service
-      $client = new SOAP_Client("http://localhost:8080/web-client/remote-api/AuthenticationService");
+      $client = new SOAP_Client("http://localhost:8080/alfresco/api/AuthenticationService");
       $namespace = array('namespace' => 'http://www.alfresco.org/ws/service/authentication/1.0', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
       $client->__options = array('trace'=>1);
       		
@@ -57,7 +57,7 @@
       }
       
       // get hold of the repository service
-      $client = new SOAP_Client("http://localhost:8080/web-client/remote-api/RepositoryService");
+      $client = new SOAP_Client("http://localhost:8080/alfresco/api/RepositoryService");
       $namespace = array('namespace' => 'http://www.alfresco.org/ws/service/repository/1.0', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
       $client->__options = array('trace'=>1);
 

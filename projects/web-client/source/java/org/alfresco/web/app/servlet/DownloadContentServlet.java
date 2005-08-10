@@ -48,9 +48,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * The appropriate mimetype is calculated based on filename extension.
  * <p>
  * The URL to the servlet should be generated thus:
- * <pre>/web-client/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
+ * <pre>/alfresco/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
  * or
- * <pre>/web-client/download/direct/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
+ * <pre>/alfresco/download/direct/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
  * The store protocol, followed by the store ID, followed by the content Node Id
  * the last part is used for mimetype calculation and browser default filename.
  * The 'attach' or 'direct' element is used to indicate whether to display the stream directly
@@ -78,7 +78,7 @@ public class DownloadContentServlet extends HttpServlet
          //       only really needed if we don't use the built in compression of the servlet container
          
          // The URL contains multiple parts
-         // /web-client/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
+         // /alfresco/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
          // the protocol, followed by the store, followed by the Id
          // the last part is only used for mimetype and browser use
          String uri = req.getRequestURI();

@@ -22,7 +22,7 @@ public class AuthenticationServiceLocator extends org.apache.axis.client.Service
     }
 
     // Use to get a proxy class for AuthenticationService
-    private java.lang.String AuthenticationService_address = "http://localhost:8080/web-client/remote-api/AuthenticationService";
+    private java.lang.String AuthenticationService_address = "http://localhost:8080/alfresco/api/AuthenticationService";
 
     public java.lang.String getAuthenticationServiceAddress() {
         return AuthenticationService_address;

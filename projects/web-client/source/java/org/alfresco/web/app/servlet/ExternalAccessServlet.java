@@ -32,7 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Servlet allowing external URL access to various global JSF views in the web-client.
+ * Servlet allowing external URL access to various global JSF views in the Web Client.
  * 
  * @author Kevin Roast
  */
@@ -50,7 +50,7 @@ public class ExternalAccessServlet extends HttpServlet
       throws ServletException, IOException
    {
       // The URL contains multiple parts
-      // /web-client/navigate/<outcome>
+      // /alfresco/navigate/<outcome>
       // the protocol, followed by the store, followed by the Id
       // the last part is only used for mimetype and browser use
       String uri = req.getRequestURI();

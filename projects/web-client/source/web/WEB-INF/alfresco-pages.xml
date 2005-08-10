@@ -1,10 +1,10 @@
 <pages>
    <portal-name>default</portal-name>
    <page>
-      <page-name>web-client</page-name>
+      <page-name>Alfresco</page-name>
       <window>
          <window-name>AlfrescoClientWindow</window-name>
-         <instance-ref>/web-client.AlfrescoClient.AlfrescoClientInstance</instance-ref>
+         <instance-ref>/alfresco.AlfrescoClient.AlfrescoClientInstance</instance-ref>
          <default>true</default>
          <region>center</region>
          <height>0</height>

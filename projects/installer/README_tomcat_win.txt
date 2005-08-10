@@ -98,7 +98,7 @@ Navigate to the 'C:\alfresco' folder and run 'alf_start_tc.bat'
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
 - you can now try Alfresco by visiting:
 
-http://localhost:8080/web-client/faces/jsp/login.jsp
+http://localhost:8080/alfresco/faces/jsp/login.jsp
 
 The server is configured with a single administrative login with user name and password
 both set to 'admin'.
@@ -149,7 +149,7 @@ you may need to adjust the instructions above as appropriate, such as changing
 the Tomcat port settings.
 
 The Alfresco server is packaged as a war file and can be found in:
-c:\alfresco\tomcat\webapps\web-client.war
+c:\alfresco\tomcat\webapps\alfresco.war
 
 The Alfresco 'db_setup.bat' performs the following MySQL commands:
 

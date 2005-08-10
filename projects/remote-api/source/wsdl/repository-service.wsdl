@@ -105,14 +105,14 @@
    </wsdl:portType>
    
    <wsdl:binding name="RepositoryServiceSoapBinding" type="rep:RepositoryServiceSoapPort">
-        <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        <wsdl:operation name="getStores"><wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/getStores"/><wsdl:input name="getStoresRequest"><wsdlsoap:body use="literal"/></wsdl:input><wsdl:output name="getStoreResponse"><wsdlsoap:body use="literal"/></wsdl:output><wsdl:fault name="RepositoryFault"><wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/></wsdl:fault></wsdl:operation>
-      <wsdl:operation name="query"><wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/query"/><wsdl:input name="queryRequest"><wsdlsoap:body use="literal"/></wsdl:input><wsdl:output name="queryResponse"><wsdlsoap:body use="literal"/></wsdl:output><wsdl:fault name="RepositoryFault"><wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/></wsdl:fault></wsdl:operation>
+       <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+       <wsdl:operation name="getStores"><wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/getStores"/><wsdl:input name="getStoresRequest"><wsdlsoap:body use="literal"/></wsdl:input><wsdl:output name="getStoreResponse"><wsdlsoap:body use="literal"/></wsdl:output><wsdl:fault name="RepositoryFault"><wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/></wsdl:fault></wsdl:operation>
+       <wsdl:operation name="query"><wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/query"/><wsdl:input name="queryRequest"><wsdlsoap:body use="literal"/></wsdl:input><wsdl:output name="queryResponse"><wsdlsoap:body use="literal"/></wsdl:output><wsdl:fault name="RepositoryFault"><wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/></wsdl:fault></wsdl:operation>
    </wsdl:binding>
 
    <wsdl:service name="RepositoryService">
       <wsdl:port binding="rep:RepositoryServiceSoapBinding" name="RepositoryService">
-         <wsdlsoap:address location="http://localhost:8080/web-client/remote-api/RepositoryService"/>
+         <wsdlsoap:address location="http://localhost:8080/alfresco/api/RepositoryService"/>
       </wsdl:port>
    </wsdl:service>
    

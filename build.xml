@@ -98,10 +98,8 @@
       <copy file="${file.deploy}" todir="${dir.deploy.jboss}" />
       <!-- push externally visible config files into conf directory -->
       <copy todir="${dir.deploy.jboss}/../conf" >
-         <fileset dir="${dir.config.repository}" />
-         <fileset dir="${dir.config.webclient}" >
-            <exclude name="alfresco/log4j.properties" />
-         </fileset>
+         <fileset dir="${dir.config.repository}"/>
+         <fileset dir="${dir.config.webclient}"/>
       </copy>
       <copy file="${dir.common}/version.properties" todir="${dir.deploy.jboss}/../conf/alfresco" />
       <!-- ensure mysql drivers are present -->
@@ -110,16 +108,14 @@
    </target>
 
    <target name="deploy-tomcat" depends="init" description="Deploys to Tomcat">
-      <delete dir="${dir.deploy.tomcat}/${dir.name.webclient}" includeEmptyDirs="true" quiet="yes" />
-      <delete dir="${home.tomcat}/work/catalina/localhost/${dir.name.webclient}" includeEmptyDirs="true" quiet="yes" />
+      <delete dir="${dir.deploy.tomcat}/alfresco" includeEmptyDirs="true" quiet="yes" />
+      <delete dir="${home.tomcat}/work/catalina/localhost/alfresco" includeEmptyDirs="true" quiet="yes" />
       <copy file="${file.deploy}" todir="${dir.deploy.tomcat}" />
       <!-- push externally visible config files into war file -->
-      <war warfile="${dir.deploy.tomcat}/${file.name.war.webclient}" update="true" >
-         <classes dir="${dir.config.repository}" />
-         <classes dir="${dir.config.webclient}">
-            <exclude name="alfresco/log4j.properties" />
-         </classes>
-         <classes file="${dir.config.webclient}/alfresco/log4j.properties" 
+      <war warfile="${dir.deploy.tomcat}/${file.name.war.alfresco}" update="true" >
+         <classes dir="${dir.config.repository}"/>
+         <classes dir="${dir.config.webclient}"/>
+         <classes file="${dir.project.core}/source/java/log4j.properties" 
                   prefix="WEB-INF/classes"/>
          <classes file="${dir.common}/version.properties" prefix="WEB-INF/classes/alfresco"/>
       </war>
@@ -140,7 +136,7 @@
    </target>
 
    <target name="deploy-exploded-web-client-tomcat" depends="init">
-      <copy todir="${dir.deploy.tomcat}/${dir.name.webclient}" verbose="true">
+      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="true">
          <fileset dir="${dir.project.webclient}/source/web" excludes="WEB-INF/**" />
       </copy>
    </target>
@@ -243,10 +239,9 @@
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
          <zipfileset dir="${dir.project.webclient}/build/dist" prefix="jboss/server/default/deploy" 
-                     includes="${file.name.war.webclient}"/>
-         <zipfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf" />
-         <zipfileset dir="${dir.config.webclient}"  prefix="jboss/server/default/conf" 
-                     excludes="alfresco/log4j.properties" />
+                     includes="${file.name.war.alfresco}"/>
+         <zipfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf"/>
+         <zipfileset dir="${dir.config.webclient}"  prefix="jboss/server/default/conf"/>
          <zipfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
       </zip>
    </target>
@@ -257,11 +252,10 @@
          <tarfileset dir="${dir.project.installer}" 
                      includes="AlfrescoTest.pdf,license.txt,notice.txt,README_jboss_linux.txt,start_oo.sh,stop_oo.sh" />
          <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
-         <tarfileset dir="${dir.project.webclient}/build/dist" includes="${file.name.war.webclient}"
+         <tarfileset dir="${dir.project.webclient}/build/dist" includes="${file.name.war.alfresco}"
                      prefix="jboss/server/default/deploy" />
          <tarfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf" />
-         <tarfileset dir="${dir.config.webclient}" prefix="jboss/server/default/conf" 
-                     excludes="alfresco/log4j.properties" />
+         <tarfileset dir="${dir.config.webclient}" prefix="jboss/server/default/conf" />
          <tarfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.bin.jboss}.tar.gz" src="${dir.dist}/${file.name.dist.bin.jboss}.tar" />
@@ -278,7 +272,7 @@
          <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
-         <zipfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.webclient}"/>
+         <zipfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.alfresco}"/>
       </zip>
    </target>
    
@@ -289,7 +283,7 @@
                      includes="AlfrescoTest.pdf,license.txt,notice.txt,README_tomcat_linux.txt,start_oo.sh,stop_oo.sh" />
          <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
          <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
-         <tarfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.webclient}"/>
+         <tarfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.alfresco}"/>
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.bin.tomcat}.tar.gz" src="${dir.dist}/${file.name.dist.bin.tomcat}.tar" />
       <delete file="${dir.dist}/${file.name.dist.bin.tomcat}.tar" />

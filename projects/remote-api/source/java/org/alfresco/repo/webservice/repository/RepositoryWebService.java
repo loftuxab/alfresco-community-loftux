@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Web service implementation of the RepositoryService.
- * The WSDL for this service can be accessed from http://localhost:8080/web-client/remote-api/RepositoryService?wsdl
+ * The WSDL for this service can be accessed from http://localhost:8080/alfresco/api/RepositoryService?wsdl
  * 
  * @author gavinc
  */

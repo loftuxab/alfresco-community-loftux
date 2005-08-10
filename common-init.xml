@@ -1,89 +1,87 @@
 <project name="common-init">
-   
-   <!-- *************************** -->
-   <!-- ** Common initialisation ** -->
-   <!-- *************************** -->
 
-   <target name="init">
-      <tstamp>
-         <format property="time" pattern="HH:mm" />
-         <format property="date" pattern="ddMMyyyy" />
-      </tstamp>
+    <!-- *************************** -->
+    <!-- ** Common initialisation ** -->
+    <!-- *************************** -->
 
-      <property environment="env" />
-      <property file="${user.home}/user-override.properties" />
-      <property file="project-override.properties" />
-      <property file="${dir.common}/version.properties" />
-      <property file="${dir.common}/common.properties" />
-      <property file="project.properties" />
-      
-      <path id="classpath.compile">
-         <fileset dir="${dir.common.lib}">
-            <include name="**/*.jar" />
-         </fileset>
-         <fileset dir="${dir.projects}">
-            <include name="**/build/dist/*.jar" />
-         </fileset>
-      </path>
-    
-      <path id="classpath.unit.test">
-         <dirset dir="${dir.projects}">
-            <include name="**/build/classes" />
-         </dirset>
-         <dirset dir="${dir.projects}">
-            <include name="**/config" />
-         </dirset>
-         <pathelement location="${dir.src.test.resources}" />  
-         <fileset dir="${dir.common.lib}">
-            <include name="**/*.jar" />
-         </fileset>  
-      </path>
-      
-      <!-- load the JIBX task definition -->
-      <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask"
-               classpath="${dir.common.lib}/jibx/jibx-bind.jar;${dir.common.lib}/bcel.jar;${dir.common.lib}/xpp3.jar"/>
-      
-      <echo level="info">${startup.message}</echo>
-   </target>
+    <target name="init">
+        <tstamp>
+            <format property="time" pattern="HH:mm" />
+            <format property="date" pattern="ddMMyyyy" />
+        </tstamp>
 
-   <!-- **************************** -->
-   <!-- ** Common utility targets ** -->
-   <!-- **************************** -->  
-   
-   <target name="dump-properties" depends="init">
-         <echo level="info">ant.project.name = ${ant.project.name}</echo>
-         <echo level="info">basedir = ${basedir}</echo>
-         <echo level="info">user.home = ${user.home}</echo>     
-         <echo level="info">version.number = ${version.number}</echo>   
-         <echo level="info">home.jboss = ${home.jboss}</echo>
-         <echo level="info">home.tomcat = ${home.tomcat}</echo>
-         <antcall target="dump-dir-properties"/>
-         <antcall target="dump-file-properties"/>
-   </target>
+        <property environment="env" />
+        <property file="${user.home}/user-override.properties" />
+        <property file="project-override.properties" />
+        <property file="${dir.common}/version.properties" />
+        <property file="${dir.common}/common.properties" />
+        <property file="project.properties" />
 
-   <target name="dump-dir-properties" depends="init">
-      <echoproperties prefix="dir"/>
-   </target>
- 
-   <target name="dump-file-properties" depends="init">
-      <echoproperties prefix="file"/>
-   </target>
-   
-   <target name="dump-arbitary-properties" depends="init">
-      <fail unless="prefix"
-            message="You must supply a prefix i.e. -Dprefix=file.name" />  
-      <echoproperties prefix="${prefix}"/>
-   </target>
-   
-   <target name="dump-all-properties" depends="init">
-      <echoproperties/>
-   </target>
- 
-   <target name="setup" depends="init">
-      <mkdir dir="${dir.src.java}" />
-      <mkdir dir="${dir.src.webinf}" />
-      <mkdir dir="${dir.local.lib}" />
-      <mkdir dir="${dir.classes}" />
-   </target>
+        <path id="classpath.compile">
+            <fileset dir="${dir.common.lib}">
+                <include name="**/*.jar" />
+            </fileset>
+            <fileset dir="${dir.projects}">
+                <include name="**/build/dist/*.jar" />
+            </fileset>
+        </path>
+
+        <path id="classpath.unit.test">
+            <dirset dir="${dir.projects}">
+                <include name="**/build/classes" />
+            </dirset>
+            <dirset dir="${dir.projects}">
+                <include name="**/config" />
+            </dirset>
+            <pathelement location="${dir.src.test.resources}" />
+            <fileset dir="${dir.common.lib}">
+                <include name="**/*.jar" />
+            </fileset>
+        </path>
+
+        <!-- load the JIBX task definition -->
+        <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask" classpath="${dir.common.lib}/jibx/jibx-bind.jar;${dir.common.lib}/bcel.jar;${dir.common.lib}/xpp3.jar" />
+
+        <echo level="info">${startup.message}</echo>
+    </target>
+
+    <!-- **************************** -->
+    <!-- ** Common utility targets ** -->
+    <!-- **************************** -->
+
+    <target name="dump-properties" depends="init">
+        <echo level="info">ant.project.name = ${ant.project.name}</echo>
+        <echo level="info">basedir = ${basedir}</echo>
+        <echo level="info">user.home = ${user.home}</echo>
+        <echo level="info">version.number = ${version.number}</echo>
+        <echo level="info">home.jboss = ${home.jboss}</echo>
+        <echo level="info">home.tomcat = ${home.tomcat}</echo>
+        <antcall target="dump-dir-properties" />
+        <antcall target="dump-file-properties" />
+    </target>
+
+    <target name="dump-dir-properties" depends="init">
+        <echoproperties prefix="dir" />
+    </target>
+
+    <target name="dump-file-properties" depends="init">
+        <echoproperties prefix="file" />
+    </target>
+
+    <target name="dump-arbitary-properties" depends="init">
+        <fail unless="prefix" message="You must supply a prefix i.e. -Dprefix=file.name" />
+        <echoproperties prefix="${prefix}" />
+    </target>
+
+    <target name="dump-all-properties" depends="init">
+        <echoproperties />
+    </target>
+
+    <target name="setup" depends="init">
+        <mkdir dir="${dir.src.java}" />
+        <mkdir dir="${dir.src.webinf}" />
+        <mkdir dir="${dir.local.lib}" />
+        <mkdir dir="${dir.classes}" />
+    </target>
 
 </project>

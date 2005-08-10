@@ -1,8 +1,0 @@
-<jboss-app>
-   <loader-repository>
-      alfresco.org:loader=web-client.ear
-      <loader-repository-config> 
-         java2ParentDelegation=false 
-      </loader-repository-config>
-   </loader-repository>
-</jboss-app>
