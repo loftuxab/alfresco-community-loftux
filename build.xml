@@ -146,6 +146,12 @@
          <arg line="/k startup.bat" />
       </exec>
    </target>
+ 
+   <target name="start-tomcat-debug" depends="init" description="Starts the Tomcat server on Windows">
+      <exec dir="${home.tomcat}/bin" executable="cmd.exe" spawn="true">
+         <arg line="/k catalina.bat jpda start" />
+      </exec>
+   </target>  
 
    <target name="start-jboss" depends="init" description="Starts the JBoss server on Windows">
       <exec dir="${home.jboss}/bin" executable="cmd.exe" spawn="true">
@@ -293,13 +299,13 @@
            description="Creates the source distribution file for all platforms">
       <mkdir dir="${dir.dist}" />
       <zip destfile="${dir.dist}/${file.name.dist.src}.zip">
-         <zipfileset dir="${dir.common}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,
-                                                **/*.classpath,projects/repository/alfresco/**,projects/website/**" />
+         <zipfileset dir="${dir.common}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,
+                                                   projects/repository/alfresco/**,projects/website/**" />
       </zip>
       
       <tar destfile="${dir.dist}/${file.name.dist.src}.tar" longfile="gnu">
-         <tarfileset dir="${dir.common}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,**/*.project,
-                                                **/*.classpath,projects/repository/alfresco/**,projects/website/**" />
+         <tarfileset dir="${dir.common}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,
+                                                   projects/repository/alfresco/**,projects/website/**" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.src}.tar.gz" src="${dir.dist}/${file.name.dist.src}.tar" />
       <delete file="${dir.dist}/${file.name.dist.src}.tar" />
