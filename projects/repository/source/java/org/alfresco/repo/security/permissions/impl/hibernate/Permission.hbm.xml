@@ -33,7 +33,7 @@
             fetch="join"
             optimistic-lock="true"
             cascade="delete" >
-            <cache usage="read-write" />
+            <cache usage="transactional" />
             <key>
                <column name="protocol"  />
                <column name="identifier" length="100" />

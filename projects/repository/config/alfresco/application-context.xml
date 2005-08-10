@@ -898,6 +898,9 @@
             </property>
             <property name="permissionsDAO">
                 <ref bean="permissionsDAO" />
+            </property> 
+            <property name="modelDAO">
+                <ref bean="permissionsModelDAO" />
             </property>     
          </bean>
       </property>
@@ -928,6 +931,20 @@
          <props>
             <prop key="*">PROPAGATION_REQUIRED</prop>
          </props>
+      </property>
+   </bean>
+   
+   <!-- Permissions MOdel DAO -->
+
+   <bean id='permissionsModelDAO' class="org.alfresco.repo.security.permissions.impl.model.PermissionModel">
+      <property name="model">
+         <value>alfresco/permissionDefinitions.xml</value>
+      </property>
+      <property name="nodeService">
+         <ref bean="nodeService" />
+      </property>  
+      <property name="dictionaryService">
+         <ref bean="dictionaryService" />
       </property>
    </bean>
    

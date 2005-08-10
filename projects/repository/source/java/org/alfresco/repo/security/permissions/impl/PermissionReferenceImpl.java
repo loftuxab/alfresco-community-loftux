@@ -19,10 +19,10 @@
  */
 package org.alfresco.repo.security.permissions.impl;
 
-import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.AbstractPermissionReference;
 import org.alfresco.service.namespace.QName;
 
-public class PermissionReferenceImpl implements PermissionReference
+public class PermissionReferenceImpl extends AbstractPermissionReference
 {
     private QName qName;
     

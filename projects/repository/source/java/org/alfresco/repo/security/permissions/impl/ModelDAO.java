@@ -19,7 +19,26 @@
  */
 package org.alfresco.repo.security.permissions.impl;
 
+import java.util.Set;
+
+import org.alfresco.repo.security.permissions.AccessStatus;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
+
 public interface ModelDAO
 {
+
+    public Set<PermissionReference> getPermissions(QName type);
+
+    public Set<PermissionReference> getPermissions(NodeRef nodeRef);
+
+    public Set<PermissionReference> getGrantingPermissions(PermissionReference perm);
+
+    public Set<PermissionReference> getRequiredNodePermissions(PermissionReference required, QName qName, Set<QName> aspectQNames);
+
+    public Set<PermissionReference> getRequiredParentPermissions(PermissionReference required, QName qName, Set<QName> aspectQNames);
+
+    public AccessStatus getDefaultPermission(PermissionReference required);
 
 }

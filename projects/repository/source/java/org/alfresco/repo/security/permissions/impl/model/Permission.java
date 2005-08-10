@@ -35,9 +35,9 @@ import org.dom4j.Element;
 public class Permission extends AbstractPermission implements XMLModelInitialisable
 {
 
-    private static final String GRANTED_TO_GROUPS = "grantedToGroups";
+    private static final String GRANTED_TO_GROUP = "grantedToGroup";
     
-    private static final String GTG_NAME = "name";
+    private static final String GTG_NAME = "permissionGroup";
 
     private static final String GTG_TYPE = "type";
 
@@ -82,7 +82,7 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
             defaultPermission = AccessStatus.DENIED;
         }
         
-        for (Iterator gtgit = element.elementIterator(GRANTED_TO_GROUPS); gtgit.hasNext(); /**/)
+        for (Iterator gtgit = element.elementIterator(GRANTED_TO_GROUP); gtgit.hasNext(); /**/)
         {
             QName qName;
             Element grantedToGroupsElement = (Element) gtgit.next();
@@ -112,7 +112,5 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
     {
         return Collections.unmodifiableSet(grantedToGroups);
     }
-    
-    
 
 }

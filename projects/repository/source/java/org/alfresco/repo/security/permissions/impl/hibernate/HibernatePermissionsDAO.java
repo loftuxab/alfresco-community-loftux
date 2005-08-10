@@ -164,23 +164,18 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     }
 
     public void deletePermissions(NodeRef nodeRef, String authority,
-            PermissionReference perm)
+            PermissionReference perm, boolean allow)
     {
         SimplePermissionEntry spe = new SimplePermissionEntry(nodeRef,
                 perm == null ? null : new SimplePermissionReference(perm
-                        .getQName(), perm.getName()), authority, AccessStatus.ALLOWED);
+                        .getQName(), perm.getName()), authority, allow ? AccessStatus.ALLOWED : AccessStatus.DENIED);
         deletePermissions(spe);
-        spe = new SimplePermissionEntry(nodeRef,
-                perm == null ? null : new SimplePermissionReference(perm
-                        .getQName(), perm.getName()), authority, AccessStatus.DENIED);
-        deletePermissions(spe);
-        
     }
 
     public void setPermission(NodeRef nodeRef, String authority,
             PermissionReference perm, boolean allow)
     {
-        deletePermissions(nodeRef, authority, perm);
+        deletePermissions(nodeRef, authority, perm, allow);
         PermissionEntryImpl entry = PermissionEntryImpl.create(
                 getHibernateNodePermissionEntry(nodeRef, true),
                 getHibernatePermissionReference(perm, true),

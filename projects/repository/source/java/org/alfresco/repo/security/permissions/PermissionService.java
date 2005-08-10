@@ -93,7 +93,7 @@ public interface PermissionService
      * @param perm
      * @return
      */
-    public boolean hasPermision(NodeRef nodeRef, Authentication auth, PermissionReference perm);
+    public boolean hasPermission(NodeRef nodeRef, Authentication auth, PermissionReference perm);
 
     /**
      * Where is the permission set that controls the behaviour for the givent
@@ -131,7 +131,7 @@ public interface PermissionService
      * @param authority
      * @param perm
      */
-    public void deletePermission(NodeRef nodeRef, String authority, PermissionReference perm);
+    public void deletePermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow);
     
     /**
      * Set a specific permission on a node.

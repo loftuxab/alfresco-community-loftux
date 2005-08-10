@@ -35,7 +35,7 @@ public interface PermissionsDAO
 
     public void deletePermissions(PermissionEntry permissionEntry);
 
-    public void deletePermissions(NodeRef nodeRef, String authority, PermissionReference perm);
+    public void deletePermissions(NodeRef nodeRef, String authority, PermissionReference perm,  boolean allow);
 
     public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow);
 

@@ -1,8 +1,8 @@
-<!DOCTYPE permissions>
+<!DOCTYPE permissions >
 
 <!-- The base permission model for the repository -->
 
-<permissions>
+<permissions defaultPermission="deny">
     
     <!-- Namespaces used in type references -->
     
@@ -28,12 +28,12 @@
     
       <!-- Low level access groupings -->
     
-      <permission name="ReadProperties">
+      <permission name="ReadProperties" defaultPermission="allow">
          <grantedToGroup permissionGroup="Read" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="ReadChildren">
+      <permission name="ReadChildren" defaultPermission="allow">
          <grantedToGroup permissionGroup="Read" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
@@ -67,7 +67,7 @@
         <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="ReadAssociations" >
+      <permission name="ReadAssociations" defaultPermission="allow">
         <requiredPermission on="parent" name="ReadChildren" implies="false" />
       </permission>
       
@@ -91,15 +91,15 @@
    <permissionSet type="alf:content">
 
       <!-- Extend some base permissions -->
-      <permissionGroup name="Read"/>
-      <permissionGroup name="Write" />
+      <permissionGroup name="Read" extends="true" />
+      <permissionGroup name="Write" extends="true" />
       
       <!-- Add some new -->
       <permissionGroup name="Execute" allowFullControl="deny" />
       
       <!-- Content specific permissions -->
       
-      <permission name="ReadContent">
+      <permission name="ReadContent" defaultPermission="allow">
          <grantedToGroup permissionGroup="Read"/>
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>

@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.alfresco.repo.security.permissions.AbstractPermissionReference;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.PermissionReferenceImpl;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -31,9 +32,11 @@ import org.alfresco.service.namespace.QName;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
-public class PermissionGroup implements XMLModelInitialisable
+public class PermissionGroup extends AbstractPermissionReference implements XMLModelInitialisable
 {
     private static final String NAME = "name";
+    
+    private static final String EXTENDS = "extends";
 
     private static final String ALLOW_FULL_CONTOL = "allowFullControl";
 
@@ -44,6 +47,10 @@ public class PermissionGroup implements XMLModelInitialisable
     private static final String TYPE = "type";
 
     private String name;
+    
+    private QName type;
+    
+    private boolean extendz;
 
     private boolean allowFullControl;
 
@@ -71,6 +78,27 @@ public class PermissionGroup implements XMLModelInitialisable
         {
             allowFullControl = false;
         }
+        
+        att = element.attribute(EXTENDS);
+        if (att != null)
+        {
+            extendz = Boolean.parseBoolean(att.getStringValue());
+        }
+        else
+        {
+            extendz = false;
+        }
+        
+        att = element.attribute(TYPE);
+        if (att != null)
+        {
+            type = QName.createQName(att.getStringValue(),nspr);
+        }
+        else
+        {
+            type = null;
+        }
+        
         // Include permissions defined for other permission groups
 
         for (Iterator ipgit = element.elementIterator(INCLUDE_PERMISSION_GROUP); ipgit.hasNext(); /**/)
@@ -105,6 +133,21 @@ public class PermissionGroup implements XMLModelInitialisable
     public boolean isAllowFullControl()
     {
         return allowFullControl;
+    }
+
+    public QName getQName()
+    {
+        return container;
+    }
+
+    public boolean isExtends()
+    {
+        return extendz;
+    }
+
+    public QName getTypeQName()
+    {
+        return type;
     }
     
     

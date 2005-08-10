@@ -54,6 +54,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
@@ -2225,7 +2226,19 @@ public class LuceneTest extends TestCase
         //test.testForKev();
         //test.testDeleteContainer();
        
-        test.testReadAgainstDelta();
+        //test.testReadAgainstDelta();
+        
+        
+        NodeRef targetNode = test.rootNodeRef;
+        Path path = test.serviceRegistry.getNodeService().getPath(targetNode);
+
+        SearchParameters sp = new SearchParameters();
+        sp.addStore(test.rootNodeRef.getStoreRef());
+        sp.setQuery("lucene", "PATH:\"" + path + "//." + "\"");        
+        ResultSet results = test.serviceRegistry.getSearchService().query(sp);
+        
+        results.close();
+
         
     }
 }

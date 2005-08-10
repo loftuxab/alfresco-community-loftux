@@ -25,13 +25,18 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.PermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -45,6 +50,8 @@ public class PermissionServiceTest extends TestCase
     PermissionService permissionService;
     
     private NodeRef rootNodeRef;
+
+    private NamespacePrefixResolver namespacePrefixResolver;
 
     public PermissionServiceTest()
     {
@@ -63,7 +70,7 @@ public class PermissionServiceTest extends TestCase
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
-        
+        namespacePrefixResolver = (NamespacePrefixResolver) ctx.getBean("namespaceService");
         
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
@@ -181,13 +188,13 @@ public class PermissionServiceTest extends TestCase
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
-        // Replace
+        // Add deny
         
         permissionService.setPermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, false);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
-        assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
+        assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
         // new
         
@@ -195,23 +202,29 @@ public class PermissionServiceTest extends TestCase
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
+        assertEquals(4, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
+        
+        // delete 
+        
+        permissionService.deletePermission(rootNodeRef, "andy", new SimplePermissionReference(QName.createQName("A", "B"), "C"), false);
+        assertNotNull(permissionService.getSetPermissions(rootNodeRef));
+        assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
+        assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
-        // delete replaced
-        
-        permissionService.deletePermission(rootNodeRef, "andy", new SimplePermissionReference(QName.createQName("A", "B"), "C"));
+        permissionService.deletePermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, false);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
-        permissionService.deletePermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS);
+        permissionService.deletePermission(rootNodeRef, "other", SimplePermissionEntry.ALL_PERMISSIONS, true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(1, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
-        permissionService.deletePermission(rootNodeRef, "other", SimplePermissionEntry.ALL_PERMISSIONS);
+        permissionService.deletePermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -254,13 +267,13 @@ public class PermissionServiceTest extends TestCase
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
-        // Replace
+        // Deny
         
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, "andy", AccessStatus.DENIED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
-        assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
+        assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
         // new
         
@@ -268,27 +281,256 @@ public class PermissionServiceTest extends TestCase
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
-        assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
+        assertEquals(4, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, new SimplePermissionReference(QName.createQName("A", "B"), "C"), "andy", AccessStatus.DENIED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
-        assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
+        assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, "andy", AccessStatus.DENIED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
-        assertEquals(1, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
+        assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
         
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, "other", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
-        assertEquals(0, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
+        assertEquals(1, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());  
         
-        
-        
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, "andy", AccessStatus.ALLOWED));
+        assertNotNull(permissionService.getSetPermissions(rootNodeRef));
+        assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
+        assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
+        assertEquals(0, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());  
     }
+    
+    public void testGetSettablePermissionsForType()
+    {
+        Set<PermissionReference>answer = permissionService.getSettablePermissions(QName.createQName("alf", "base", namespacePrefixResolver));
+        assertEquals(17, answer.size());
+        
+        answer = permissionService.getSettablePermissions(QName.createQName("alf", "ownable", namespacePrefixResolver));
+        assertEquals(2, answer.size());
+        
+        answer = permissionService.getSettablePermissions(QName.createQName("alf", "content", namespacePrefixResolver));
+        assertEquals(21, answer.size());    
+    }
+    
+    public void testGetSettablePermissionsForNode()
+    {
+        QName ownable = QName.createQName("alf", "ownable", namespacePrefixResolver);
+        
+        Set<PermissionReference> answer = permissionService.getSettablePermissions(rootNodeRef);
+        assertEquals(17, answer.size());
+        
+        nodeService.addAspect(rootNodeRef, ownable, null);
+        answer = permissionService.getSettablePermissions(rootNodeRef);
+        assertEquals(19, answer.size());
+        
+        nodeService.removeAspect(rootNodeRef, ownable);
+        answer = permissionService.getSettablePermissions(rootNodeRef);
+        assertEquals(17, answer.size());
+    }
+    
+    public void testSimplePermissionOnRoot()
+    {
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+    }
+    
+    public void testPermissionGroupOnRoot()
+    {
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+        
+        
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+    }
+    
+    public void testSimplePermissionSimpleInheritance()
+    {
+        NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+    }
+    
+    public void testPermissionGroupSimpleInheritance()
+    {
+        NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
+        
+        
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+        
+        
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_CONTENT));
+    }
+    
+    public void testDenySimplePermisionOnRootNOde()
+    {
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        assertTrue(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, new UsernamePasswordAuthenticationToken("andy", "andy") ,READ_PROPERTIES));
+    }
+    
 }

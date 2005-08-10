@@ -19,15 +19,26 @@
  */
 package org.alfresco.repo.security.permissions.impl.model;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.impl.ModelDAO;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.dom4j.Attribute;
@@ -35,9 +46,14 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.beans.factory.InitializingBean;
 
-public class PermissionModel
+public class PermissionModel implements ModelDAO, InitializingBean
 {
+    private NodeService nodeService;
+
+    private DictionaryService dictionaryService;
+
     private static final String NAMESPACES = "namespaces";
 
     private static final String NAMESPACE = "namespace";
@@ -49,39 +65,56 @@ public class PermissionModel
     private static final String PERMISSION_SET = "permissionSet";
 
     private static final String NODE_PERMISSIONS = "nodePermissions";
-    
+
     private static final String DENY = "deny";
-    
+
     private static final String ALLOW = "allow";
-    
+
     private static final String DEFAULT_PERMISSION = "defaultPermission";
+
+    private String model;
 
     private Map<QName, PermissionSet> permissionSets = new HashMap<QName, PermissionSet>();
 
     private Map<NodeRef, NodePermissionEntry> nodePermissions = new HashMap<NodeRef, NodePermissionEntry>();
 
     private AccessStatus defaultPermission;
-    
+
     public PermissionModel()
     {
         super();
     }
 
-    public void initialise(File file)
+    public void setModel(String model)
     {
-        Document document = createDocument(file);
+        this.model = model;
+    }
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    public void afterPropertiesSet()
+    {
+        Document document = createDocument(model);
         Element root = document.getRootElement();
-        
+
         Attribute defaultPermissionAttribute = root.attribute(DEFAULT_PERMISSION);
-        if(defaultPermissionAttribute != null)
+        if (defaultPermissionAttribute != null)
         {
-            if(defaultPermissionAttribute.getStringValue().equalsIgnoreCase(ALLOW))
+            if (defaultPermissionAttribute.getStringValue().equalsIgnoreCase(ALLOW))
             {
-                defaultPermission = AccessStatus.ALLOWED;  
+                defaultPermission = AccessStatus.ALLOWED;
             }
-            else if(defaultPermissionAttribute.getStringValue().equalsIgnoreCase(DENY))
+            else if (defaultPermissionAttribute.getStringValue().equalsIgnoreCase(DENY))
             {
-                defaultPermission = AccessStatus.DENIED;  
+                defaultPermission = AccessStatus.DENIED;
             }
             else
             {
@@ -103,7 +136,8 @@ public class PermissionModel
             for (Iterator it = namespacesElement.elementIterator(NAMESPACE); it.hasNext(); /**/)
             {
                 Element nameSpaceElement = (Element) it.next();
-                nspr.addDynamicNamespace(nameSpaceElement.attributeValue(NAMESPACE_PREFIX), nameSpaceElement.attributeValue(NAMESPACE_URI));
+                nspr.addDynamicNamespace(nameSpaceElement.attributeValue(NAMESPACE_PREFIX), nameSpaceElement
+                        .attributeValue(NAMESPACE_URI));
             }
         }
 
@@ -128,24 +162,48 @@ public class PermissionModel
         }
     }
 
-    private Document createDocument(File file)
+    private Document createDocument(String model)
     {
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(model);
+        if (is == null)
+        {
+            throw new PermissionModelException("File not found: " + model);
+        }
         SAXReader reader = new SAXReader();
-        Document document;
         try
         {
-            document = reader.read(file);
+            Document document = reader.read(is);
+            is.close();
             return document;
         }
         catch (DocumentException e)
         {
             throw new PermissionModelException("Failed to create permission model document ", e);
         }
+        catch (IOException e)
+        {
+            throw new PermissionModelException("Failed to close permission model document ", e);
+        }
 
     }
 
     public AccessStatus getDefaultPermission()
     {
+        return defaultPermission;
+    }
+    
+    public AccessStatus getDefaultPermission(PermissionReference pr)
+    {
+        for (PermissionSet ps : permissionSets.values())
+        {
+            for (Permission p : ps.getPermissions())
+            {
+                if (p.equals(pr))
+                {
+                    return p.getDefaultPermission();
+                }
+            }
+        }
         return defaultPermission;
     }
 
@@ -157,6 +215,306 @@ public class PermissionModel
     public Map<QName, PermissionSet> getPermissionSets()
     {
         return Collections.unmodifiableMap(permissionSets);
+    }
+
+    public Set<PermissionReference> getPermissions(QName type)
+    {
+        Set<PermissionReference> permissions = new HashSet<PermissionReference>();
+        if (dictionaryService.getClass(type).isAspect())
+        {
+            addAspectPermissions(type, permissions);
+        }
+        else
+        {
+            addTypePermissions(type, permissions);
+        }
+        return permissions;
+    }
+
+    private void addTypePermissions(QName type, Set<PermissionReference> permissions)
+    {
+        TypeDefinition typeDef = dictionaryService.getType(type);
+        if (typeDef.getParentName() != null)
+        {
+            addTypePermissions(typeDef.getParentName(), permissions);
+        }
+        for (AspectDefinition ad : typeDef.getDefaultAspects())
+        {
+            addAspectPermissions(ad.getName(), permissions);
+        }
+        mergePermissions(permissions, type);
+    }
+
+    private void addAspectPermissions(QName type, Set<PermissionReference> permissions)
+    {
+        AspectDefinition aspectDef = dictionaryService.getAspect(type);
+        if (aspectDef.getParentName() != null)
+        {
+            addTypePermissions(aspectDef.getParentName(), permissions);
+        }
+        mergePermissions(permissions, type);
+    }
+
+    private void mergePermissions(Set<PermissionReference> target, QName type)
+    {
+        PermissionSet permissionSet = permissionSets.get(type);
+        if (permissionSet != null)
+        {
+            for (PermissionGroup pg : permissionSet.getPermissionGroups())
+            {
+                if (!pg.isExtends())
+                {
+                    target.add(pg);
+                }
+            }
+            target.addAll(permissionSet.getPermissions());
+        }
+    }
+
+    public Set<PermissionReference> getPermissions(NodeRef nodeRef)
+    {
+        QName typeName = nodeService.getType(nodeRef);
+        Set<PermissionReference> permissions = getPermissions(typeName);
+        // Add non mandatory aspects..
+        Set<QName> defaultAspects = new HashSet<QName>();
+        for (AspectDefinition aspDef : dictionaryService.getType(typeName).getDefaultAspects())
+        {
+            defaultAspects.add(aspDef.getName());
+        }
+        for (QName aspect : nodeService.getAspects(nodeRef))
+        {
+            if (!defaultAspects.contains(aspect))
+            {
+                addAspectPermissions(aspect, permissions);
+            }
+        }
+        return permissions;
+    }
+
+    public Set<PermissionReference> getGrantingPermissions(PermissionReference perm)
+    {
+        HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
+        permissions.add(perm);
+        for (PermissionSet ps : permissionSets.values())
+        {
+            for (PermissionGroup pg : ps.getPermissionGroups())
+            {
+                if (pg.getIncludedPermissionGroups().contains(perm))
+                {
+                    permissions.add(getBasePermissionGroup(pg));
+                }
+                if(pg.isAllowFullControl())
+                {
+                    permissions.add(pg);
+                }
+            }
+            for (Permission p : ps.getPermissions())
+            {
+                if (p.equals(perm))
+                {
+                    for (PermissionReference pg : p.getGrantedToGroups())
+                    {
+                        permissions.add(getBasePermissionGroup(getPermissionGroup(pg)));
+                    }
+                }
+                for (RequiredPermission rp : p.getRequiredPermissions())
+                {
+                    if (rp.equals(perm) && rp.isImplies())
+                    {
+                        permissions.add(p);
+                        break;
+                    }
+                }
+            }
+        }
+        return permissions;
+    }
+
+    private PermissionGroup getPermissionGroupOrNull(PermissionReference target)
+    {
+        for (PermissionSet ps : permissionSets.values())
+        {
+            for (PermissionGroup pg : ps.getPermissionGroups())
+            {
+                if (pg.equals(target))
+                {
+                    return pg;
+                }
+            }
+        }
+        return null;
+    }
+
+    private PermissionGroup getPermissionGroup(PermissionReference target)
+    {
+        PermissionGroup pg = getPermissionGroupOrNull(target);
+        if (pg == null)
+        {
+            throw new PermissionModelException("There is no permission group :"
+                    + target.getQName() + " " + target.getName());
+        }
+        return pg;
+    }
+
+    private PermissionGroup getBasePermissionGroupOrNull(PermissionGroup pg)
+    {
+        if (pg == null)
+        {
+            return null;
+        }
+        if (pg.isExtends())
+        {
+            if (pg.getTypeQName() != null)
+            {
+                return getPermissionGroup(new SimplePermissionReference(pg.getTypeQName(), pg.getName()));
+            }
+            else
+            {
+                ClassDefinition classDefinition = dictionaryService.getClass(pg.getQName());
+                QName parent;
+                while ((parent = classDefinition.getParentName()) != null)
+                {
+                    classDefinition = dictionaryService.getClass(parent);
+                    PermissionGroup attempt = getPermissionGroupOrNull(new SimplePermissionReference(parent, pg
+                            .getName()));
+                    if ((attempt != null) && (!attempt.isExtends()))
+                    {
+                        return attempt;
+                    }
+                }
+                return null;
+            }
+        }
+        else
+        {
+            return pg;
+        }
+    }
+
+    private PermissionGroup getBasePermissionGroup(PermissionGroup target)
+    {
+        PermissionGroup pg = getBasePermissionGroupOrNull(target);
+        if (pg == null)
+        {
+            throw new PermissionModelException("There is no parent for permission group :"
+                    + target.getQName() + " " + target.getName());
+        }
+        return pg;
+    }
+
+    public Set<PermissionReference> getRequiredNodePermissions(PermissionReference required, QName qName,
+            Set<QName> aspectQNames)
+    {
+        return getRequiredPermissions(required, qName, aspectQNames, RequiredPermission.On.NODE);
+    }
+
+    public Set<PermissionReference> getRequiredParentPermissions(PermissionReference required, QName qName,
+            Set<QName> aspectQNames)
+    {
+        return getRequiredPermissions(required, qName, aspectQNames, RequiredPermission.On.PARENT);
+    }
+
+    private Set<PermissionReference> getRequiredPermissions(PermissionReference required, QName qName,
+            Set<QName> aspectQNames, RequiredPermission.On on)
+    {
+        PermissionGroup pg = getBasePermissionGroupOrNull(getPermissionGroupOrNull(required));
+        if (pg == null)
+        {
+            return getRequirementsForPermission(required, on);
+        }
+        else
+        {
+            return getRequirementsForPermissionGroup(pg, on, qName, aspectQNames);
+        }
+    }
+
+    private Set<PermissionReference> getRequirementsForPermission(PermissionReference required, RequiredPermission.On on)
+    {
+        HashSet<PermissionReference> requiredPermissions = new HashSet<PermissionReference>();
+        Permission p = getPermissionOrNull(required);
+        if (p != null)
+        {
+            for (RequiredPermission rp : p.getRequiredPermissions())
+            {
+                if (!rp.isImplies() && rp.getOn().equals(on))
+                {
+                    requiredPermissions.add(rp);
+                }
+            }
+        }
+        return requiredPermissions;
+    }
+
+    private Set<PermissionReference> getRequirementsForPermissionGroup(PermissionGroup target,
+            RequiredPermission.On on, QName qName, Set<QName> aspectQNames)
+    {
+        HashSet<PermissionReference> requiredPermissions = new HashSet<PermissionReference>();
+        if (target == null)
+        {
+            return requiredPermissions;
+        }
+        for (PermissionSet ps : permissionSets.values())
+        {
+            for (PermissionGroup pg : ps.getPermissionGroups())
+            {
+                if (target.equals(getBasePermissionGroupOrNull(pg))
+                        && isPartOfDynamicPermissionGroup(pg, qName, aspectQNames))
+                {
+                    // Add includes
+                    for (PermissionReference pr : pg.getIncludedPermissionGroups())
+                    {
+                        requiredPermissions
+                                .addAll(getRequirementsForPermissionGroup(
+                                        getBasePermissionGroupOrNull(getPermissionGroupOrNull(pr)), on, qName,
+                                        aspectQNames));
+                    }
+                }
+            }
+            for (Permission p : ps.getPermissions())
+            {
+                for(PermissionReference grantedTo: p.getGrantedToGroups())
+                {
+                    PermissionGroup base = getBasePermissionGroupOrNull(getPermissionGroupOrNull(grantedTo));
+                    if(target.equals(base) && isPartOfDynamicPermissionGroup(grantedTo, qName, aspectQNames) )
+                    {
+                        requiredPermissions.addAll(getRequirementsForPermission(p, on));
+                    }
+                }
+            }
+        }
+        return requiredPermissions;
+    }
+
+    private boolean isPartOfDynamicPermissionGroup(PermissionReference pr, QName typeQname, Set<QName> aspects)
+    {
+        if (dictionaryService.isSubClass(typeQname, pr.getQName()))
+        {
+            return true;
+        }
+        for (QName aspect : aspects)
+        {
+            if (dictionaryService.isSubClass(aspect, pr.getQName()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Permission getPermissionOrNull(PermissionReference perm)
+    {
+        for (PermissionSet ps : permissionSets.values())
+        {
+
+            for (Permission p : ps.getPermissions())
+            {
+                if (p.equals(perm))
+                {
+                    return p;
+                }
+            }
+        }
+        return null;
     }
     
     

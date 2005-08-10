@@ -4,18 +4,18 @@
 <!ELEMENT namespace EMPTY>
 <!ATTLIST namespace uri CDATA #REQUIRED>
 <!ATTLIST namespace prefix CDATA #REQUIRED>
-<!ATTLIST permissions defaultPermission (allow | deny ) "deny" >
 <!ELEMENT permissionGroup (includePermissionGroup*)>
 <!ATTLIST permissionGroup name CDATA #REQUIRED>
+<!ATTLIST permissionGroup type CDATA #IMPLIED>
+<!ATTLIST permissionGroup extends (true | false) "false">
 <!ATTLIST permissionGroup allowFullControl (allow | deny) "deny" >
 <!ELEMENT includePermissionGroup EMPTY>
 <!ATTLIST includePermissionGroup type CDATA #IMPLIED>
 <!ATTLIST includePermissionGroup permissionGroup CDATA #REQUIRED>
-<!ELEMENT permissionSet (permissionGroup*, permission*, dynamicPermission)>
+<!ELEMENT permissionSet (permissionGroup*, permission*, dynamicPermission*)>
 <!ATTLIST permissionSet type CDATA #REQUIRED>
 <!ELEMENT permission (grantedToGroup*, requiredPermission* )>
 <!ATTLIST permission name CDATA #REQUIRED>
-<!ATTLIST permission defaultPermission (allow | deny) "deny" >
 <!ELEMENT dynamicPermission (requiredPermission* )>
 <!ATTLIST dynamicPermission name CDATA #REQUIRED>
 <!ATTLIST dynamicPermission evaluator CDATA #REQUIRED>
