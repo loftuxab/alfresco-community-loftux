@@ -9,8 +9,8 @@ package org.alfresco.example.webservice.types;
 
 public class Node  implements java.io.Serializable {
     private org.alfresco.example.webservice.types.Reference reference;
-    /** TODO: Change type to NodeDescription */
     private java.lang.String type;
+    private java.lang.String[] aspect;
     private org.alfresco.example.webservice.types.NamedValue[] properties;
 
     public Node() {
@@ -19,9 +19,11 @@ public class Node  implements java.io.Serializable {
     public Node(
            org.alfresco.example.webservice.types.Reference reference,
            java.lang.String type,
+           java.lang.String[] aspect,
            org.alfresco.example.webservice.types.NamedValue[] properties) {
            this.reference = reference;
            this.type = type;
+           this.aspect = aspect;
            this.properties = properties;
     }
 
@@ -49,7 +51,7 @@ public class Node  implements java.io.Serializable {
     /**
      * Gets the type value for this Node.
      * 
-     * @return type TODO: Change type to NodeDescription
+     * @return type
      */
     public java.lang.String getType() {
         return type;
@@ -59,10 +61,38 @@ public class Node  implements java.io.Serializable {
     /**
      * Sets the type value for this Node.
      * 
-     * @param type TODO: Change type to NodeDescription
+     * @param type
      */
     public void setType(java.lang.String type) {
         this.type = type;
+    }
+
+
+    /**
+     * Gets the aspect value for this Node.
+     * 
+     * @return aspect
+     */
+    public java.lang.String[] getAspect() {
+        return aspect;
+    }
+
+
+    /**
+     * Sets the aspect value for this Node.
+     * 
+     * @param aspect
+     */
+    public void setAspect(java.lang.String[] aspect) {
+        this.aspect = aspect;
+    }
+
+    public java.lang.String getAspect(int i) {
+        return this.aspect[i];
+    }
+
+    public void setAspect(int i, java.lang.String _value) {
+        this.aspect[i] = _value;
     }
 
 
@@ -111,6 +141,9 @@ public class Node  implements java.io.Serializable {
             ((this.type==null && other.getType()==null) || 
              (this.type!=null &&
               this.type.equals(other.getType()))) &&
+            ((this.aspect==null && other.getAspect()==null) || 
+             (this.aspect!=null &&
+              java.util.Arrays.equals(this.aspect, other.getAspect()))) &&
             ((this.properties==null && other.getProperties()==null) || 
              (this.properties!=null &&
               java.util.Arrays.equals(this.properties, other.getProperties())));
@@ -130,6 +163,17 @@ public class Node  implements java.io.Serializable {
         }
         if (getType() != null) {
             _hashCode += getType().hashCode();
+        }
+        if (getAspect() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getAspect());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getAspect(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         if (getProperties() != null) {
             for (int i=0;
@@ -163,6 +207,14 @@ public class Node  implements java.io.Serializable {
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "type"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Name"));
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("aspect");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "aspect"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Name"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("properties");

@@ -6,12 +6,10 @@
    xmlns:auth="http://www.alfresco.org/ws/service/authentication/1.0" 
    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
    xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
-   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-   xmlns:cms="http://www.alfresco.org/ws/model/content/1.0">
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
    <!-- ************************************** -->
    <!-- Copyright Alfresco Software, Inc. 2005 -->
    <!-- ************************************** -->
-   <wsdl:import namespace="http://www.alfresco.org/ws/model/content/1.0" location="types.xsd"/>
    <wsdl:types>
       <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/authentication/1.0" xmlns="http://www.w3.org/2001/XMLSchema">
          <element name="authenticate">
@@ -40,11 +38,6 @@
          <element name="AuthenticationResult" type="auth:AuthenticationResult"/>
          
          <complexType name="AuthenticationFault">
-            <!-- 
-            <complexContent>
-               <extension base="cms:ServiceFault"/>
-            </complexContent>
-            -->
             <sequence>
                <element name="errorCode" type="xsd:int"/>
                <element name="message" type="xsd:string"/>

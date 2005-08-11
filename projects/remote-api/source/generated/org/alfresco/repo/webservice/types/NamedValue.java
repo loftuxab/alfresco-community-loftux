@@ -9,14 +9,14 @@ package org.alfresco.repo.webservice.types;
 
 public class NamedValue  implements java.io.Serializable {
     private java.lang.String name;
-    private java.lang.Object value;
+    private java.lang.String value;
 
     public NamedValue() {
     }
 
     public NamedValue(
            java.lang.String name,
-           java.lang.Object value) {
+           java.lang.String value) {
            this.name = name;
            this.value = value;
     }
@@ -47,7 +47,7 @@ public class NamedValue  implements java.io.Serializable {
      * 
      * @return value
      */
-    public java.lang.Object getValue() {
+    public java.lang.String getValue() {
         return value;
     }
 
@@ -57,7 +57,7 @@ public class NamedValue  implements java.io.Serializable {
      * 
      * @param value
      */
-    public void setValue(java.lang.Object value) {
+    public void setValue(java.lang.String value) {
         this.value = value;
     }
 
@@ -115,7 +115,7 @@ public class NamedValue  implements java.io.Serializable {
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("value");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "value"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyType"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }

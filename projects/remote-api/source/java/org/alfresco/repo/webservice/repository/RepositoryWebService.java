@@ -18,9 +18,15 @@
 package org.alfresco.repo.webservice.repository;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
+import org.alfresco.repo.webservice.types.AssociationDefinition;
+import org.alfresco.repo.webservice.types.CML;
 import org.alfresco.repo.webservice.types.NamedValue;
+import org.alfresco.repo.webservice.types.NodeDefinition;
+import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Query;
+import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.ResultSet;
 import org.alfresco.repo.webservice.types.ResultSetMetaData;
 import org.alfresco.repo.webservice.types.ResultSetRow;
@@ -28,6 +34,7 @@ import org.alfresco.repo.webservice.types.Store;
 import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.repo.webservice.types.ValueDefinition;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,12 +66,17 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public Store[] getStores() throws RemoteException, RepositoryFault
    {
-      // TODO: Return the proper list of stores
+      List<StoreRef> stores = this.nodeService.getStores();
+      Store[] returnStores = new Store[stores.size()];
+      for (int x = 0; x < stores.size(); x++)
+      {
+         StoreRef storeRef = stores.get(x);
+         StoreEnum storeEnum = StoreEnum.fromString(storeRef.getProtocol());
+         Store store = new Store(storeEnum, storeRef.getIdentifier());
+         returnStores[x] = store;
+      }
       
-      Store store1 = new Store(StoreEnum.workspace, "SpacesStore");
-      Store store2 = new Store(StoreEnum.version, "LightweightVersionStore");
-      
-      return new Store[] {store1, store2};
+      return returnStores;
    }
 
    /**
@@ -72,33 +84,56 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult query(Store store, Query query, boolean includeMetaData) throws RemoteException, RepositoryFault
    {
-      logger.info("query received is " + query.getStatement());
-      logger.info("query language is " + query.getLanguage());
+      // TODO: Perform a proper query 
       
-      QueryResult queryResult = new QueryResult();
-      
-      queryResult.setQuerySession(GUID.generate());
-      
-      ResultSetRow row1 = new ResultSetRow(1, new NamedValue[] {new NamedValue("name", "Gav")}, new Float(1.0), null);
-      ResultSetRow row2 = new ResultSetRow(2, new NamedValue[] {new NamedValue("name", "Dave")}, new Float(1.0), null);
-      ResultSetRow[] rows = new ResultSetRow[] {row1, row2};
-      
-      ValueDefinition valueDef = new ValueDefinition();
-      valueDef.setDataType("string");
-      valueDef.setDescription("desc");
-      valueDef.setName("name");
-      valueDef.setTitle("title");
-      
-      ResultSetMetaData metaData = new ResultSetMetaData();
-      metaData.setValueDef(new ValueDefinition[] {valueDef});
-      
-      ResultSet resultSet = new ResultSet();
-      resultSet.setSize(2);
-      resultSet.setMetaData(metaData);
-      resultSet.setRow(rows);
-      
-      queryResult.setResultSet(resultSet);
-      
-      return queryResult;
+      return null;
+   }
+
+   /**
+    * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#queryChildren(org.alfresco.repo.webservice.types.Reference)
+    */
+   public QueryResult queryChildren(Reference node) throws RemoteException, RepositoryFault
+   {
+      return null;
+   }
+
+   /**
+    * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#queryParents(org.alfresco.repo.webservice.types.Reference)
+    */
+   public QueryResult queryParents(Reference node) throws RemoteException, RepositoryFault
+   {
+      return null;
+   }
+   
+   /**
+    * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#queryAssociated(org.alfresco.repo.webservice.types.Reference, org.alfresco.repo.webservice.types.AssociationDefinition[])
+    */
+   public QueryResult queryAssociated(Reference node, AssociationDefinition[] association) throws RemoteException, RepositoryFault
+   {
+      return null;
+   }
+
+   /**
+    * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#fetchMore(java.lang.String)
+    */
+   public QueryResult fetchMore(String querySession) throws RemoteException, RepositoryFault
+   {
+      return null;
+   }
+
+   /**
+    * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#update(org.alfresco.repo.webservice.types.CML)
+    */
+   public UpdateResult update(CML statements) throws RemoteException, RepositoryFault
+   {
+      return null;
+   }
+
+   /**
+    * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#describe(org.alfresco.repo.webservice.types.Predicate)
+    */
+   public NodeDefinition[] describe(Predicate node) throws RemoteException, RepositoryFault
+   {
+      return null;
    }
 }

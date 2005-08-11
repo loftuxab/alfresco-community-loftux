@@ -9,6 +9,10 @@ package org.alfresco.example.webservice.repository;
 
 public class RepositoryServiceLocator extends org.apache.axis.client.Service implements org.alfresco.example.webservice.repository.RepositoryService {
 
+/**
+ * Provides read and write operations against a repository.
+ */
+
     public RepositoryServiceLocator() {
     }
 

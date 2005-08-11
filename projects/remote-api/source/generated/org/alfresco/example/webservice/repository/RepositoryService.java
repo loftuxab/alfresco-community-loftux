@@ -8,6 +8,10 @@
 package org.alfresco.example.webservice.repository;
 
 public interface RepositoryService extends javax.xml.rpc.Service {
+
+/**
+ * Provides read and write operations against a repository.
+ */
     public java.lang.String getRepositoryServiceAddress();
 
     public org.alfresco.example.webservice.repository.RepositoryServiceSoapPort getRepositoryService() throws javax.xml.rpc.ServiceException;

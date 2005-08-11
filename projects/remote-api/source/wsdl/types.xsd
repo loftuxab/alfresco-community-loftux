@@ -106,7 +106,7 @@
 				<xsd:sequence>
 					<xsd:element name="mandatory" type="xsd:boolean" default="false"></xsd:element>
 					<xsd:element name="readOnly" type="xsd:boolean" default="false"></xsd:element>
-					<xsd:element name="defaultValue" maxOccurs="1" minOccurs="0" type="xsd:anyType"></xsd:element>
+					<xsd:element name="defaultValue" maxOccurs="1" minOccurs="0" type="xsd:string"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -217,7 +217,7 @@
     <xsd:complexType name="NamedValue">
     	<xsd:sequence>
     		<xsd:element name="name" type="cms:Name"></xsd:element>
-    		<xsd:element name="value" type="xsd:anyType" nillable="true"></xsd:element>
+    		<xsd:element name="value" type="xsd:string" nillable="true"></xsd:element>
     	</xsd:sequence>
     </xsd:complexType>
 

@@ -20,11 +20,12 @@ package org.alfresco.repo.webservice.axis;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
 import org.apache.axis.transport.http.HTTPConstants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -41,6 +42,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class TicketCallbackSpringHandler extends BasicHandler
 {
+   private static final Log logger = LogFactory.getLog(TicketCallbackSpringHandler.class);
    private static final String BEAN_NAME = "ticketCallbackHandler";
    private static final long serialVersionUID = -135125831180499667L;
 

@@ -10,7 +10,7 @@ package org.alfresco.repo.webservice.types;
 public class PropertyDefinition  extends org.alfresco.repo.webservice.types.ValueDefinition  implements java.io.Serializable {
     private boolean mandatory;
     private boolean readOnly;
-    private java.lang.Object defaultValue;
+    private java.lang.String defaultValue;
 
     public PropertyDefinition() {
     }
@@ -18,7 +18,7 @@ public class PropertyDefinition  extends org.alfresco.repo.webservice.types.Valu
     public PropertyDefinition(
            boolean mandatory,
            boolean readOnly,
-           java.lang.Object defaultValue) {
+           java.lang.String defaultValue) {
            this.mandatory = mandatory;
            this.readOnly = readOnly;
            this.defaultValue = defaultValue;
@@ -70,7 +70,7 @@ public class PropertyDefinition  extends org.alfresco.repo.webservice.types.Valu
      * 
      * @return defaultValue
      */
-    public java.lang.Object getDefaultValue() {
+    public java.lang.String getDefaultValue() {
         return defaultValue;
     }
 
@@ -80,7 +80,7 @@ public class PropertyDefinition  extends org.alfresco.repo.webservice.types.Valu
      * 
      * @param defaultValue
      */
-    public void setDefaultValue(java.lang.Object defaultValue) {
+    public void setDefaultValue(java.lang.String defaultValue) {
         this.defaultValue = defaultValue;
     }
 
@@ -142,7 +142,7 @@ public class PropertyDefinition  extends org.alfresco.repo.webservice.types.Valu
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("defaultValue");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "defaultValue"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "anyType"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
