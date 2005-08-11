@@ -171,16 +171,17 @@ public final class Repository
    }
 
    /**
-    * Return whether a Node is current Locked
+    * Return whether a Node is currently locked
     * 
     * @param node             The Node wrapper to test against
     * @param lockService      The LockService to use
     * 
-    * @return whether a Node is current Locked
+    * @return whether a Node is currently locked
     */
    public static Boolean isNodeLocked(Node node, LockService lockService)
    {
       Boolean locked = Boolean.FALSE;
+      
       if (node.hasAspect(ContentModel.ASPECT_LOCKABLE))
       {
          LockStatus lockStatus = lockService.getLockStatus(node.getNodeRef());
@@ -188,6 +189,27 @@ public final class Repository
          {
             locked = Boolean.TRUE;
          }
+      }
+      
+      return locked;
+   }
+   
+   /**
+    * Return whether a Node is currently locked by the current user
+    * 
+    * @param node             The Node wrapper to test against
+    * @param lockService      The LockService to use
+    * 
+    * @return whether a Node is currently locked by the current user
+    */
+   public static Boolean isNodeOwnerLocked(Node node, LockService lockService)
+   {
+      Boolean locked = Boolean.FALSE;
+      
+      if (node.hasAspect(ContentModel.ASPECT_LOCKABLE) &&
+          lockService.getLockStatus(node.getNodeRef()) == LockStatus.LOCK_OWNER)
+      {
+         locked = Boolean.TRUE;
       }
       
       return locked;
@@ -204,6 +226,7 @@ public final class Repository
    public static Boolean isNodeOwner(Node node, LockService lockService)
    {
       Boolean locked = Boolean.FALSE;
+      
       if (node.hasAspect(ContentModel.ASPECT_WORKING_COPY))
       {
          Object obj = node.getProperties().get("workingCopyOwner");

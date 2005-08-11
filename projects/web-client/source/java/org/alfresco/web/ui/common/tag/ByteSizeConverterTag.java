@@ -43,14 +43,4 @@ public class ByteSizeConverterTag extends ConverterTag
    {
       return (ByteSizeConverter)super.createConverter();
    }
-
-   /**
-    * @see javax.servlet.jsp.tagext.TagSupport#setPageContext(javax.servlet.jsp.PageContext)
-    */
-   /*public void setPageContext(PageContext arg0)
-   {
-      // TODO: needed for MyFaces dodgy impl??? 
-      setConverterId(ByteSizeConverter.CONVERTER_ID);
-      super.setPageContext(arg0);
-   }*/
 }

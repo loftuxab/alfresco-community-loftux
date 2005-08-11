@@ -72,8 +72,7 @@
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainTitle">
-                                 Details of '<h:outputText value="#{DocumentDetailsBean.name}" />'
-                                 <h:graphicImage url="/images/icons/locked.gif" rendered="#{DocumentDetailsBean.locked == true}" />
+                                 Details of '<h:outputText value="#{DocumentDetailsBean.name}" />'<r:lockIcon value="#{DocumentDetailsBean.document.nodeRef}" align="absmiddle" />
                               </div>
                               <div class="mainSubText"><h:outputText value="#{msg.location}" />: <r:nodePath value="#{DocumentDetailsBean.document.nodeRef}" breadcrumb="true" actionListener="#{BrowseBean.clickSpacePath}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>

@@ -5,11 +5,6 @@
 
    <!-- ==================== COMPONENTS ==================== -->
    <component>
-      <component-type>org.alfresco.faces.DataGrid</component-type>
-      <component-class>org.alfresco.web.ui.common.component.data.UIDataGrid</component-class>
-   </component>
-   
-   <component>
       <component-type>org.alfresco.faces.RichList</component-type>
       <component-class>org.alfresco.web.ui.common.component.data.UIRichList</component-class>
    </component>

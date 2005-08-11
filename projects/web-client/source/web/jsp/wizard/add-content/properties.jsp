@@ -175,13 +175,20 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>Inline Editable:</td>
+                                    <td></td>
                                     <td>
-                                       <table cellspacing=0 cellpadding=0>
-                                       <tr><td><h:selectBooleanCheckbox value="#{AddContentWizard.inlineEdit}" /></td>
-                                       <td>&nbsp;&nbsp;<img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                           <h:outputText value="#{msg.warning_inline}" /></td>
-                                       </tr></table>
+                                       <table cellspacing=2 cellpadding=0>
+                                          <tr>
+                                             <td>Inline Editable:&nbsp;</td>
+                                             <td width=100%><h:selectBooleanCheckbox value="#{AddContentWizard.inlineEdit}" /></td>
+                                          </tr>
+                                          <tr>
+                                             <td colspan=2>
+                                                <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                                <h:outputText value="#{msg.warning_inline}" />
+                                             </td>
+                                          </tr>
+                                       </table>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

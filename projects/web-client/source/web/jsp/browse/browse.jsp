@@ -335,7 +335,7 @@
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType16}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" />
-                           <h:graphicImage url="/images/icons/locked.gif" align="absmiddle" width="16" height="16" rendered="#{r.locked == true}" />
+                           <r:lockIcon value="#{r.nodeRef}" align="absmiddle" />
                         </a:column>
                         
                         <%-- Primary column for icons view mode --%>
@@ -344,7 +344,7 @@
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="header" />
-                           <h:graphicImage url="/images/icons/locked.gif" align="absmiddle"  width="16" height="16" rendered="#{r.locked == true}" />
+                           <r:lockIcon value="#{r.nodeRef}" align="absmiddle" />
                         </a:column>
                         
                         <%-- Primary column for list view mode --%>
@@ -353,7 +353,7 @@
                               <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
                            <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="title" />
-                           <h:graphicImage url="/images/icons/locked.gif" align="absmiddle" width="16" height="16" rendered="#{r.locked == true}" />
+                           <r:lockIcon value="#{r.nodeRef}" align="absmiddle" />
                         </a:column>
                         
                         <%-- Description column for all view modes --%>

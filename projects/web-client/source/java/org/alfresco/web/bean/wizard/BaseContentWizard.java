@@ -19,6 +19,7 @@ package org.alfresco.web.bean.wizard;
 
 import java.io.File;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
+import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -184,7 +186,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to add content", e);
+         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, e.getMessage()), e);
       }
    }
    

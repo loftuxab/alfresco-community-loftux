@@ -202,7 +202,6 @@ public class ActionLinkRenderer extends BaseRenderer
                buf.append("'>");
             }
             
-            // TODO: encode label value
             buf.append(linkBuf.toString());
             buf.append(Utils.encode(link.getValue().toString()));
             buf.append("</a>");
@@ -278,7 +277,13 @@ public class ActionLinkRenderer extends BaseRenderer
             .append(href)
             .append('"');
          
-         // TODO: support 'target' attribute?
+         // output href 'target' attribute if supplied
+         if (link.getTarget() != null)
+         {
+            buf.append(" target=\"")
+               .append(link.getTarget())
+               .append("\"");
+         }
       }
       
       if (attrs.get("style") != null)

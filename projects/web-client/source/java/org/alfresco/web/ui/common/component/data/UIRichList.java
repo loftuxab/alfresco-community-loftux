@@ -372,8 +372,6 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public IRichListRenderer getViewRenderer()
    {
       // get type from current view mode, then create an instance of the renderer
-      // TODO: set the appropriate IRichListRenderer impl - could come from a config?
-      //       should allow custom views to be specified in config etc.
       IRichListRenderer renderer = null;
       if (getViewMode() != null)
       {

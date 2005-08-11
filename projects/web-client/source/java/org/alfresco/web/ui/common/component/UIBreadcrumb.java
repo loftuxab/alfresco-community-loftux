@@ -185,7 +185,7 @@ public class UIBreadcrumb extends UICommand
    // Strongly typed component property accessors 
    
    /**
-    * Get the visible separator value for outputing the breadcrumb
+    * Get the separator string to output between each breadcrumb element
     * 
     * @return separator string
     */
@@ -203,7 +203,7 @@ public class UIBreadcrumb extends UICommand
    /**
     * Set separator
     * 
-    * @param separator     visible separator value for outputing the breadcrumb
+    * @param separator     the separator string to output between each breadcrumb element
     */
    public void setSeparator(String separator)
    {
