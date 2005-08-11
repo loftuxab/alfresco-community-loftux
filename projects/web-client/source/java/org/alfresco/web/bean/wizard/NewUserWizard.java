@@ -68,6 +68,8 @@ public class NewUserWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To add the user to this space click Finish.<br/>" +
                                                     "To review or change your selections click Back.";
    
+   private static final String ERROR = "Failed to create Person due to error: {0}";
+   
    /** form variables */
    private String firstName = null;
    private String lastName = null;
@@ -394,7 +396,8 @@ public class NewUserWizard extends AbstractWizardBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to create Person", e);
+         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         outcome = null;
       }
       
       return outcome;

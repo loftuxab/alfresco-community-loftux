@@ -84,9 +84,7 @@ public class AddContentWizard extends BaseContentWizard
     */
    public String finish()
    {
-      String outcome = FINISH_OUTCOME;
-      
-      saveContent(this.file, null);
+      String outcome = saveContent(this.file, null);
       
       // now we know the new details are in the repository, reset the
       // client side node representation so the new details are retrieved

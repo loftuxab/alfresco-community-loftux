@@ -76,8 +76,10 @@ public abstract class BaseContentWizard extends AbstractWizardBean
     * @param fileContent      File content to save
     * @param strContent       String content to save
     */
-   protected void saveContent(File fileContent, String strContent)
+   protected String saveContent(File fileContent, String strContent)
    {
+      String outcome = FINISH_OUTCOME;
+      
       UserTransaction tx = null;
       
       try
@@ -187,7 +189,10 @@ public abstract class BaseContentWizard extends AbstractWizardBean
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, e.getMessage()), e);
+         outcome = null;
       }
+      
+      return outcome;
    }
    
    /**

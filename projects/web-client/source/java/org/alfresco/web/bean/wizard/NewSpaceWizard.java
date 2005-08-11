@@ -18,6 +18,7 @@
 package org.alfresco.web.bean.wizard;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,6 +44,7 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
+import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,6 +69,8 @@ public class NewSpaceWizard extends AbstractWizardBean
    private static final String STEP3_TITLE = "Step Three - Space Details";
    private static final String STEP3_DESCRIPTION = "Enter information about the space.";
    private static final String FINISH_INSTRUCTION = "To close this wizard and create your space click Finish.";
+   
+   private static final String ERROR = "Failed to create new space due to error: {0}";
    
    // new space wizard specific properties
    private SearchService searchService;
@@ -244,7 +248,8 @@ public class NewSpaceWizard extends AbstractWizardBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to create new space", e);
+         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         outcome = null;
       }
       
       return outcome;

@@ -51,11 +51,7 @@ public class CreateContentWizard extends BaseContentWizard
     */
    public String finish()
    {
-      String outcome = FINISH_OUTCOME;
-      
-      saveContent(null, this.content);
-      
-      return outcome;
+      return saveContent(null, this.content);
    }
    
    /**
