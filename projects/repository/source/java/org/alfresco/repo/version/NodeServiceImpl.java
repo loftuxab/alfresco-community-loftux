@@ -109,6 +109,14 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     {
         this.dicitionaryService = dictionaryService;
     }
+    
+    /**
+     * Delegates to the <code>NodeService</code> used as the version store implementation
+     */
+    public List<StoreRef> getStores()
+    {
+        return dbNodeService.getStores();
+    }
 	
     /**
      * Delegates to the <code>NodeService</code> used as the version store implementation

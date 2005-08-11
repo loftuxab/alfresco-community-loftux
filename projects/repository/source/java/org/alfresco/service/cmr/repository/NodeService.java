@@ -38,6 +38,13 @@ import org.alfresco.service.namespace.QNamePattern;
 public interface NodeService
 {
     /**
+     * Gets a list of all available node store references
+     * 
+     * @return Returns a list of store references
+     */
+    public List<StoreRef> getStores();
+    
+    /**
      * Create a new store for the given protocol and identifier.  The implementation
      * may create the store in any number of locations, including a database or
      * Subversion.

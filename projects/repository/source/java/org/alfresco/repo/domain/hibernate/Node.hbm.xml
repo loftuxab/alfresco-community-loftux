@@ -212,6 +212,13 @@
       </many-to-one>
    </class>
    
+   <query name="store.GetAllStores">
+      select
+         store
+      from
+         org.alfresco.repo.domain.hibernate.StoreImpl as store
+   </query>
+   
    <query name="node.GetNodeAssoc">
       select
          assoc

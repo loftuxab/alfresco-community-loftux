@@ -333,6 +333,17 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals("Store root node of incorrect type", ContentModel.TYPE_STOREROOT, rootType);
     }
     
+    public void testGetStores() throws Exception
+    {
+        StoreRef storeRef = createStore();
+        
+        // get all stores
+        List<StoreRef> storeRefs = nodeService.getStores();
+        
+        // check that the store ref is present
+        assertTrue("New store not present is list of stores", storeRefs.contains(storeRef));
+    }
+    
     public void testExists() throws Exception
     {
         StoreRef storeRef = createStore();

@@ -53,6 +53,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements NodeDaoService
 {
+    public static final String QUERY_GET_ALL_STORES = "store.GetAllStores";
     public static final String QUERY_GET_NODE_ASSOC = "node.GetNodeAssoc";
     public static final String QUERY_GET_NODE_ASSOC_TARGETS = "node.GetNodeAssocTargets";
     public static final String QUERY_GET_NODE_ASSOC_SOURCES = "node.GetNodeAssocSources";
@@ -133,6 +134,25 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         // done
     }
 
+    /**
+     * @see #QUERY_GET_ALL_STORES
+     */
+    @SuppressWarnings("unchecked")
+    public List<Store> getStores()
+    {
+        HibernateCallback callback = new HibernateCallback()
+        {
+            public Object doInHibernate(Session session)
+            {
+                Query query = session.getNamedQuery(HibernateNodeDaoServiceImpl.QUERY_GET_ALL_STORES);
+                return query.list();
+            }
+        };
+        List<Store> queryResults = (List) getHibernateTemplate().execute(callback);
+        // done
+        return queryResults;
+    }
+    
     /**
      * Ensures that the store protocol/identifier combination is unique
      */

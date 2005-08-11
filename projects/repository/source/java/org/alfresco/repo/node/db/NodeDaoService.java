@@ -18,6 +18,7 @@
 package org.alfresco.repo.node.db;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
@@ -48,6 +49,13 @@ public interface NodeDaoService
      * committed until the transaction has completed.
      */
     public void flush();
+    
+    /**
+     * Fetch a list of all stores in the repository
+     * 
+     * @return Returns a list of stores
+     */
+    public List<Store> getStores();
     
     /**
      * Creates a unique store for the given protocol and identifier combination

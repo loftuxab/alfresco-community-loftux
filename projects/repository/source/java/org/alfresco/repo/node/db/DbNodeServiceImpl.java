@@ -132,6 +132,21 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
     
     /**
+     * @see NodeDaoService#getStores()
+     */
+    public List<StoreRef> getStores()
+    {
+        List<Store> stores = nodeDaoService.getStores();
+        List<StoreRef> storeRefs = new ArrayList<StoreRef>(stores.size());
+        for (Store store : stores)
+        {
+            storeRefs.add(store.getStoreRef());
+        }
+        // done
+        return storeRefs;
+    }
+    
+    /**
      * Defers to the typed service
      * @see StoreDaoService#createWorkspace(String)
      */
