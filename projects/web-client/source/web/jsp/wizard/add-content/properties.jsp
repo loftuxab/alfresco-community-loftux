@@ -176,10 +176,9 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td></td>
-                                    <td>
-                                       <table cellspacing=2 cellpadding=0>
+                                    <td><table cellspacing=0 cellpadding=0>
                                           <tr>
-                                             <td>Inline Editable:&nbsp;</td>
+                                             <td><nobr>Inline Editable:&nbsp;</nobr></td>
                                              <td width=100%><h:selectBooleanCheckbox value="#{AddContentWizard.inlineEdit}" /></td>
                                           </tr>
                                           <tr>
@@ -188,8 +187,7 @@
                                                 <h:outputText value="#{msg.warning_inline}" />
                                              </td>
                                           </tr>
-                                       </table>
-                                    </td>
+                                       </table></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
