@@ -8,7 +8,7 @@
 package org.alfresco.example.webservice.types;
 
 public class ResultSet  implements java.io.Serializable {
-    private org.alfresco.example.webservice.types.ResultSetRow[] row;
+    private org.alfresco.example.webservice.types.ResultSetRow[] rows;
     private long size;
     private org.alfresco.example.webservice.types.ResultSetMetaData metaData;
 
@@ -16,40 +16,40 @@ public class ResultSet  implements java.io.Serializable {
     }
 
     public ResultSet(
-           org.alfresco.example.webservice.types.ResultSetRow[] row,
+           org.alfresco.example.webservice.types.ResultSetRow[] rows,
            long size,
            org.alfresco.example.webservice.types.ResultSetMetaData metaData) {
-           this.row = row;
+           this.rows = rows;
            this.size = size;
            this.metaData = metaData;
     }
 
 
     /**
-     * Gets the row value for this ResultSet.
+     * Gets the rows value for this ResultSet.
      * 
-     * @return row
+     * @return rows
      */
-    public org.alfresco.example.webservice.types.ResultSetRow[] getRow() {
-        return row;
+    public org.alfresco.example.webservice.types.ResultSetRow[] getRows() {
+        return rows;
     }
 
 
     /**
-     * Sets the row value for this ResultSet.
+     * Sets the rows value for this ResultSet.
      * 
-     * @param row
+     * @param rows
      */
-    public void setRow(org.alfresco.example.webservice.types.ResultSetRow[] row) {
-        this.row = row;
+    public void setRows(org.alfresco.example.webservice.types.ResultSetRow[] rows) {
+        this.rows = rows;
     }
 
-    public org.alfresco.example.webservice.types.ResultSetRow getRow(int i) {
-        return this.row[i];
+    public org.alfresco.example.webservice.types.ResultSetRow getRows(int i) {
+        return this.rows[i];
     }
 
-    public void setRow(int i, org.alfresco.example.webservice.types.ResultSetRow _value) {
-        this.row[i] = _value;
+    public void setRows(int i, org.alfresco.example.webservice.types.ResultSetRow _value) {
+        this.rows[i] = _value;
     }
 
 
@@ -104,9 +104,9 @@ public class ResultSet  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.row==null && other.getRow()==null) || 
-             (this.row!=null &&
-              java.util.Arrays.equals(this.row, other.getRow()))) &&
+            ((this.rows==null && other.getRows()==null) || 
+             (this.rows!=null &&
+              java.util.Arrays.equals(this.rows, other.getRows()))) &&
             this.size == other.getSize() &&
             ((this.metaData==null && other.getMetaData()==null) || 
              (this.metaData!=null &&
@@ -122,11 +122,11 @@ public class ResultSet  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getRow() != null) {
+        if (getRows() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getRow());
+                 i<java.lang.reflect.Array.getLength(getRows());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getRow(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getRows(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -148,8 +148,8 @@ public class ResultSet  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ResultSet"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("row");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "row"));
+        elemField.setFieldName("rows");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "rows"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ResultSetRow"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

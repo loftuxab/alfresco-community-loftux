@@ -20,12 +20,14 @@ package org.alfresco.repo.webservice.repository;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.AssociationDefinition;
 import org.alfresco.repo.webservice.types.CML;
 import org.alfresco.repo.webservice.types.NamedValue;
 import org.alfresco.repo.webservice.types.NodeDefinition;
 import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Query;
+import org.alfresco.repo.webservice.types.QueryLanguageEnum;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.ResultSet;
 import org.alfresco.repo.webservice.types.ResultSetMetaData;
@@ -33,8 +35,11 @@ import org.alfresco.repo.webservice.types.ResultSetRow;
 import org.alfresco.repo.webservice.types.Store;
 import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.repo.webservice.types.ValueDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +55,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
    private static Log logger = LogFactory.getLog(RepositoryWebService.class);
    
    private NodeService nodeService;
+   private SearchService searchService;
    
    /**
     * Sets the instance of the NodeService to be used
@@ -60,23 +66,45 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
    {
       this.nodeService = nodeService;
    }
+   
+   /**
+    * Sets the instance of the SearchService to be used
+    * 
+    * @param searchService The SearchService
+    */
+   public void setSearchService(SearchService searchService)
+   {
+      this.searchService = searchService;
+   }
 
    /**
     * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#getStores()
     */
    public Store[] getStores() throws RemoteException, RepositoryFault
    {
-      List<StoreRef> stores = this.nodeService.getStores();
-      Store[] returnStores = new Store[stores.size()];
-      for (int x = 0; x < stores.size(); x++)
+      try
       {
-         StoreRef storeRef = stores.get(x);
-         StoreEnum storeEnum = StoreEnum.fromString(storeRef.getProtocol());
-         Store store = new Store(storeEnum, storeRef.getIdentifier());
-         returnStores[x] = store;
+         List<StoreRef> stores = this.nodeService.getStores();
+         Store[] returnStores = new Store[stores.size()];
+         for (int x = 0; x < stores.size(); x++)
+         {
+            StoreRef storeRef = stores.get(x);
+            StoreEnum storeEnum = StoreEnum.fromString(storeRef.getProtocol());
+            Store store = new Store(storeEnum, storeRef.getIdentifier());
+            returnStores[x] = store;
+         }
+         
+         return returnStores;
       }
-      
-      return returnStores;
+      catch (Throwable e)
+      {
+         if (logger.isDebugEnabled())
+         {
+            logger.error("Unexpected error occurred", e);
+         }
+         
+         throw new RepositoryFault(0, e.getMessage());
+      }
    }
 
    /**
@@ -84,9 +112,33 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult query(Store store, Query query, boolean includeMetaData) throws RemoteException, RepositoryFault
    {
-      // TODO: Perform a proper query 
+      QueryLanguageEnum langEnum = query.getLanguage();
       
-      return null;
+      if (langEnum.equals(QueryLanguageEnum.cql) || langEnum.equals(QueryLanguageEnum.xpath))
+      {
+         throw new RepositoryFault(110, "Currently only '" + QueryLanguageEnum.lucene.getValue() + "' queries are supported!");
+      }
+      
+      // TODO: Return metadata if the includeMetaData flag is set
+      
+      // handle the special search string of * meaning, get everything
+      String statement = query.getStatement();
+      if (statement.equals("*"))
+      {
+         statement = " ISNODE:*";
+      }
+      
+      org.alfresco.service.cmr.search.ResultSet results = this.searchService.query(Utils.convertToStoreRef(store), 
+            langEnum.getValue(), statement, null, null);
+
+      QueryResult queryResult = new QueryResult();
+      
+      // TODO: Setup a query session and only return the number of rows specified in the query config header
+      
+      queryResult.setQuerySession(GUID.generate());
+      queryResult.setResultSet(Utils.convertToResultSet(results, includeMetaData, this.nodeService));
+      
+      return queryResult;
    }
 
    /**
@@ -94,7 +146,18 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult queryChildren(Reference node) throws RemoteException, RepositoryFault
    {
-      return null;
+      // create the node ref and get the children from the repository
+      NodeRef nodeRef = new NodeRef(Utils.convertToStoreRef(node.getStore()), node.getUuid());
+      List<ChildAssociationRef> kids = this.nodeService.getChildAssocs(nodeRef);
+      
+      QueryResult queryResult = new QueryResult();
+      
+      // TODO: Setup a query session and only return the number of rows specified in the query config header
+      
+      queryResult.setQuerySession(GUID.generate());
+      queryResult.setResultSet(Utils.convertToResultSet(kids, this.nodeService));
+      
+      return queryResult;
    }
 
    /**

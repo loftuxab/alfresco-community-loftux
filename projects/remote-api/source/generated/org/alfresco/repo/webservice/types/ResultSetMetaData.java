@@ -8,73 +8,73 @@
 package org.alfresco.repo.webservice.types;
 
 public class ResultSetMetaData  implements java.io.Serializable {
-    private org.alfresco.repo.webservice.types.ValueDefinition[] valueDef;
-    private org.alfresco.repo.webservice.types.ClassDefinition[] classDef;
+    private org.alfresco.repo.webservice.types.ValueDefinition[] valueDefs;
+    private org.alfresco.repo.webservice.types.ClassDefinition[] classDefs;
 
     public ResultSetMetaData() {
     }
 
     public ResultSetMetaData(
-           org.alfresco.repo.webservice.types.ValueDefinition[] valueDef,
-           org.alfresco.repo.webservice.types.ClassDefinition[] classDef) {
-           this.valueDef = valueDef;
-           this.classDef = classDef;
+           org.alfresco.repo.webservice.types.ValueDefinition[] valueDefs,
+           org.alfresco.repo.webservice.types.ClassDefinition[] classDefs) {
+           this.valueDefs = valueDefs;
+           this.classDefs = classDefs;
     }
 
 
     /**
-     * Gets the valueDef value for this ResultSetMetaData.
+     * Gets the valueDefs value for this ResultSetMetaData.
      * 
-     * @return valueDef
+     * @return valueDefs
      */
-    public org.alfresco.repo.webservice.types.ValueDefinition[] getValueDef() {
-        return valueDef;
+    public org.alfresco.repo.webservice.types.ValueDefinition[] getValueDefs() {
+        return valueDefs;
     }
 
 
     /**
-     * Sets the valueDef value for this ResultSetMetaData.
+     * Sets the valueDefs value for this ResultSetMetaData.
      * 
-     * @param valueDef
+     * @param valueDefs
      */
-    public void setValueDef(org.alfresco.repo.webservice.types.ValueDefinition[] valueDef) {
-        this.valueDef = valueDef;
+    public void setValueDefs(org.alfresco.repo.webservice.types.ValueDefinition[] valueDefs) {
+        this.valueDefs = valueDefs;
     }
 
-    public org.alfresco.repo.webservice.types.ValueDefinition getValueDef(int i) {
-        return this.valueDef[i];
+    public org.alfresco.repo.webservice.types.ValueDefinition getValueDefs(int i) {
+        return this.valueDefs[i];
     }
 
-    public void setValueDef(int i, org.alfresco.repo.webservice.types.ValueDefinition _value) {
-        this.valueDef[i] = _value;
+    public void setValueDefs(int i, org.alfresco.repo.webservice.types.ValueDefinition _value) {
+        this.valueDefs[i] = _value;
     }
 
 
     /**
-     * Gets the classDef value for this ResultSetMetaData.
+     * Gets the classDefs value for this ResultSetMetaData.
      * 
-     * @return classDef
+     * @return classDefs
      */
-    public org.alfresco.repo.webservice.types.ClassDefinition[] getClassDef() {
-        return classDef;
+    public org.alfresco.repo.webservice.types.ClassDefinition[] getClassDefs() {
+        return classDefs;
     }
 
 
     /**
-     * Sets the classDef value for this ResultSetMetaData.
+     * Sets the classDefs value for this ResultSetMetaData.
      * 
-     * @param classDef
+     * @param classDefs
      */
-    public void setClassDef(org.alfresco.repo.webservice.types.ClassDefinition[] classDef) {
-        this.classDef = classDef;
+    public void setClassDefs(org.alfresco.repo.webservice.types.ClassDefinition[] classDefs) {
+        this.classDefs = classDefs;
     }
 
-    public org.alfresco.repo.webservice.types.ClassDefinition getClassDef(int i) {
-        return this.classDef[i];
+    public org.alfresco.repo.webservice.types.ClassDefinition getClassDefs(int i) {
+        return this.classDefs[i];
     }
 
-    public void setClassDef(int i, org.alfresco.repo.webservice.types.ClassDefinition _value) {
-        this.classDef[i] = _value;
+    public void setClassDefs(int i, org.alfresco.repo.webservice.types.ClassDefinition _value) {
+        this.classDefs[i] = _value;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -89,12 +89,12 @@ public class ResultSetMetaData  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.valueDef==null && other.getValueDef()==null) || 
-             (this.valueDef!=null &&
-              java.util.Arrays.equals(this.valueDef, other.getValueDef()))) &&
-            ((this.classDef==null && other.getClassDef()==null) || 
-             (this.classDef!=null &&
-              java.util.Arrays.equals(this.classDef, other.getClassDef())));
+            ((this.valueDefs==null && other.getValueDefs()==null) || 
+             (this.valueDefs!=null &&
+              java.util.Arrays.equals(this.valueDefs, other.getValueDefs()))) &&
+            ((this.classDefs==null && other.getClassDefs()==null) || 
+             (this.classDefs!=null &&
+              java.util.Arrays.equals(this.classDefs, other.getClassDefs())));
         __equalsCalc = null;
         return _equals;
     }
@@ -106,22 +106,22 @@ public class ResultSetMetaData  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getValueDef() != null) {
+        if (getValueDefs() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getValueDef());
+                 i<java.lang.reflect.Array.getLength(getValueDefs());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getValueDef(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getValueDefs(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
                 }
             }
         }
-        if (getClassDef() != null) {
+        if (getClassDefs() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getClassDef());
+                 i<java.lang.reflect.Array.getLength(getClassDefs());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getClassDef(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getClassDefs(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -139,16 +139,16 @@ public class ResultSetMetaData  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ResultSetMetaData"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("valueDef");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "valueDef"));
+        elemField.setFieldName("valueDefs");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "valueDefs"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ValueDefinition"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("classDef");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "classDef"));
+        elemField.setFieldName("classDefs");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "classDefs"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ClassDefinition"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

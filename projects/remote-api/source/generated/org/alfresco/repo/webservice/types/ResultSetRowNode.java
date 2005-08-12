@@ -10,7 +10,7 @@ package org.alfresco.repo.webservice.types;
 public class ResultSetRowNode  implements java.io.Serializable {
     private java.lang.String id;
     private java.lang.String type;
-    private java.lang.String[] aspect;
+    private java.lang.String[] aspects;
 
     public ResultSetRowNode() {
     }
@@ -18,10 +18,10 @@ public class ResultSetRowNode  implements java.io.Serializable {
     public ResultSetRowNode(
            java.lang.String id,
            java.lang.String type,
-           java.lang.String[] aspect) {
+           java.lang.String[] aspects) {
            this.id = id;
            this.type = type;
-           this.aspect = aspect;
+           this.aspects = aspects;
     }
 
 
@@ -66,30 +66,30 @@ public class ResultSetRowNode  implements java.io.Serializable {
 
 
     /**
-     * Gets the aspect value for this ResultSetRowNode.
+     * Gets the aspects value for this ResultSetRowNode.
      * 
-     * @return aspect
+     * @return aspects
      */
-    public java.lang.String[] getAspect() {
-        return aspect;
+    public java.lang.String[] getAspects() {
+        return aspects;
     }
 
 
     /**
-     * Sets the aspect value for this ResultSetRowNode.
+     * Sets the aspects value for this ResultSetRowNode.
      * 
-     * @param aspect
+     * @param aspects
      */
-    public void setAspect(java.lang.String[] aspect) {
-        this.aspect = aspect;
+    public void setAspects(java.lang.String[] aspects) {
+        this.aspects = aspects;
     }
 
-    public java.lang.String getAspect(int i) {
-        return this.aspect[i];
+    public java.lang.String getAspects(int i) {
+        return this.aspects[i];
     }
 
-    public void setAspect(int i, java.lang.String _value) {
-        this.aspect[i] = _value;
+    public void setAspects(int i, java.lang.String _value) {
+        this.aspects[i] = _value;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -110,9 +110,9 @@ public class ResultSetRowNode  implements java.io.Serializable {
             ((this.type==null && other.getType()==null) || 
              (this.type!=null &&
               this.type.equals(other.getType()))) &&
-            ((this.aspect==null && other.getAspect()==null) || 
-             (this.aspect!=null &&
-              java.util.Arrays.equals(this.aspect, other.getAspect())));
+            ((this.aspects==null && other.getAspects()==null) || 
+             (this.aspects!=null &&
+              java.util.Arrays.equals(this.aspects, other.getAspects())));
         __equalsCalc = null;
         return _equals;
     }
@@ -130,11 +130,11 @@ public class ResultSetRowNode  implements java.io.Serializable {
         if (getType() != null) {
             _hashCode += getType().hashCode();
         }
-        if (getAspect() != null) {
+        if (getAspects() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getAspect());
+                 i<java.lang.reflect.Array.getLength(getAspects());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getAspect(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getAspects(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -164,8 +164,8 @@ public class ResultSetRowNode  implements java.io.Serializable {
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("aspect");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "aspect"));
+        elemField.setFieldName("aspects");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "aspects"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Name"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

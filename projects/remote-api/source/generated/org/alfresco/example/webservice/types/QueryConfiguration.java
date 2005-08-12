@@ -8,13 +8,13 @@
 package org.alfresco.example.webservice.types;
 
 public class QueryConfiguration  implements java.io.Serializable {
-    private org.apache.axis.types.PositiveInteger fetchSize;
+    private int fetchSize;
 
     public QueryConfiguration() {
     }
 
     public QueryConfiguration(
-           org.apache.axis.types.PositiveInteger fetchSize) {
+           int fetchSize) {
            this.fetchSize = fetchSize;
     }
 
@@ -24,7 +24,7 @@ public class QueryConfiguration  implements java.io.Serializable {
      * 
      * @return fetchSize
      */
-    public org.apache.axis.types.PositiveInteger getFetchSize() {
+    public int getFetchSize() {
         return fetchSize;
     }
 
@@ -34,7 +34,7 @@ public class QueryConfiguration  implements java.io.Serializable {
      * 
      * @param fetchSize
      */
-    public void setFetchSize(org.apache.axis.types.PositiveInteger fetchSize) {
+    public void setFetchSize(int fetchSize) {
         this.fetchSize = fetchSize;
     }
 
@@ -50,9 +50,7 @@ public class QueryConfiguration  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.fetchSize==null && other.getFetchSize()==null) || 
-             (this.fetchSize!=null &&
-              this.fetchSize.equals(other.getFetchSize())));
+            this.fetchSize == other.getFetchSize();
         __equalsCalc = null;
         return _equals;
     }
@@ -64,9 +62,7 @@ public class QueryConfiguration  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getFetchSize() != null) {
-            _hashCode += getFetchSize().hashCode();
-        }
+        _hashCode += getFetchSize();
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -80,7 +76,7 @@ public class QueryConfiguration  implements java.io.Serializable {
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("fetchSize");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "fetchSize"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "positiveInteger"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
     }

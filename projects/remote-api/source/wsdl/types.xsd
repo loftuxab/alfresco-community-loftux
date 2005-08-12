@@ -133,7 +133,7 @@
 	<xsd:complexType name="NodeDefinition">
 		<xsd:sequence>
 			<xsd:element name="type" type="cms:ClassDefinition"></xsd:element>
-			<xsd:element name="aspect" type="cms:ClassDefinition" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="aspects" type="cms:ClassDefinition" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -156,7 +156,7 @@
 	<xsd:group name="AnonymousType">
 		<xsd:sequence>
 			<xsd:element name="type" type="cms:Name"></xsd:element>
-			<xsd:element name="aspect" type="cms:Name" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="aspects" type="cms:Name" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 
@@ -242,7 +242,7 @@
     
 	<xsd:complexType name="ResultSet">
 		<xsd:sequence>
-			<xsd:element name="row" type="cms:ResultSetRow" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="rows" type="cms:ResultSetRow" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 			<xsd:element name="size" type="xsd:long"></xsd:element>
 			<xsd:element name="metaData" type="cms:ResultSetMetaData" maxOccurs="1" minOccurs="0"></xsd:element>
 		</xsd:sequence>
@@ -251,7 +251,7 @@
 	<xsd:complexType name="ResultSetRow">
 		<xsd:sequence>
 			<xsd:element name="rowIndex" type="xsd:long"></xsd:element>
-			<xsd:element name="column" type="cms:NamedValue" maxOccurs="unbounded" minOccurs="0"/>
+			<xsd:element name="columns" type="cms:NamedValue" maxOccurs="unbounded" minOccurs="0"/>
 			<xsd:element name="score" type="xsd:float" maxOccurs="1" minOccurs="0"></xsd:element>
 			<xsd:element name="node" maxOccurs="1" minOccurs="0">
 				<xsd:complexType>
@@ -266,14 +266,14 @@
 
 	<xsd:complexType name="ResultSetMetaData">
 		<xsd:sequence>
-			<xsd:element name="valueDef" type="cms:ValueDefinition" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-			<xsd:element name="classDef" type="cms:ClassDefinition" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="valueDefs" type="cms:ValueDefinition" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="classDefs" type="cms:ClassDefinition" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="Predicate">
 		<xsd:choice>
-			<xsd:element name="node" type="cms:Reference" maxOccurs="unbounded" minOccurs="1">
+			<xsd:element name="nodes" type="cms:Reference" maxOccurs="unbounded" minOccurs="1">
 			</xsd:element>
 			<xsd:sequence>
 				<xsd:element name="store" type="cms:Store"></xsd:element>
@@ -294,7 +294,7 @@
 			<xsd:element name="creator" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
 			<xsd:element name="label" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
 			<xsd:element name="major" type="xsd:boolean" default="true"></xsd:element>
-			<xsd:element name="commentary" type="cms:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="commentaries" type="cms:NamedValue" maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 

@@ -19,6 +19,9 @@
       <property name="nodeService">
          <ref bean="AlfNodeService"/>
       </property>
+      <property name="searchService">
+         <ref bean="AlfSearchService"/>
+      </property>
    </bean>
    
 </beans>

@@ -25,8 +25,6 @@ import org.alfresco.example.webservice.authentication.AuthenticationResult;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceLocator;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceSoapBindingStub;
 import org.alfresco.util.BaseTest;
-import org.apache.axis.EngineConfiguration;
-import org.apache.axis.configuration.FileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,8 +46,6 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
    
    /**
     * Calls the AuthenticationService to retrieve a ticket for all tests to use.
-    * 
-    * @see junit.framework.TestCase#setUp()
     */
    @Override
    protected void setUp() throws Exception

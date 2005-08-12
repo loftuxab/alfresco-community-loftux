@@ -8,7 +8,7 @@
 package org.alfresco.example.webservice.types;
 
 public class Predicate  implements java.io.Serializable {
-    private org.alfresco.example.webservice.types.Reference[] node;
+    private org.alfresco.example.webservice.types.Reference[] nodes;
     private org.alfresco.example.webservice.types.Store store;
     private org.alfresco.example.webservice.types.Query query;
 
@@ -16,40 +16,40 @@ public class Predicate  implements java.io.Serializable {
     }
 
     public Predicate(
-           org.alfresco.example.webservice.types.Reference[] node,
+           org.alfresco.example.webservice.types.Reference[] nodes,
            org.alfresco.example.webservice.types.Store store,
            org.alfresco.example.webservice.types.Query query) {
-           this.node = node;
+           this.nodes = nodes;
            this.store = store;
            this.query = query;
     }
 
 
     /**
-     * Gets the node value for this Predicate.
+     * Gets the nodes value for this Predicate.
      * 
-     * @return node
+     * @return nodes
      */
-    public org.alfresco.example.webservice.types.Reference[] getNode() {
-        return node;
+    public org.alfresco.example.webservice.types.Reference[] getNodes() {
+        return nodes;
     }
 
 
     /**
-     * Sets the node value for this Predicate.
+     * Sets the nodes value for this Predicate.
      * 
-     * @param node
+     * @param nodes
      */
-    public void setNode(org.alfresco.example.webservice.types.Reference[] node) {
-        this.node = node;
+    public void setNodes(org.alfresco.example.webservice.types.Reference[] nodes) {
+        this.nodes = nodes;
     }
 
-    public org.alfresco.example.webservice.types.Reference getNode(int i) {
-        return this.node[i];
+    public org.alfresco.example.webservice.types.Reference getNodes(int i) {
+        return this.nodes[i];
     }
 
-    public void setNode(int i, org.alfresco.example.webservice.types.Reference _value) {
-        this.node[i] = _value;
+    public void setNodes(int i, org.alfresco.example.webservice.types.Reference _value) {
+        this.nodes[i] = _value;
     }
 
 
@@ -104,9 +104,9 @@ public class Predicate  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.node==null && other.getNode()==null) || 
-             (this.node!=null &&
-              java.util.Arrays.equals(this.node, other.getNode()))) &&
+            ((this.nodes==null && other.getNodes()==null) || 
+             (this.nodes!=null &&
+              java.util.Arrays.equals(this.nodes, other.getNodes()))) &&
             ((this.store==null && other.getStore()==null) || 
              (this.store!=null &&
               this.store.equals(other.getStore()))) &&
@@ -124,11 +124,11 @@ public class Predicate  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getNode() != null) {
+        if (getNodes() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getNode());
+                 i<java.lang.reflect.Array.getLength(getNodes());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getNode(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getNodes(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -152,8 +152,8 @@ public class Predicate  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("node");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "node"));
+        elemField.setFieldName("nodes");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "nodes"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

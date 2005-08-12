@@ -10,7 +10,7 @@ package org.alfresco.example.webservice.types;
 public class Node  implements java.io.Serializable {
     private org.alfresco.example.webservice.types.Reference reference;
     private java.lang.String type;
-    private java.lang.String[] aspect;
+    private java.lang.String[] aspects;
     private org.alfresco.example.webservice.types.NamedValue[] properties;
 
     public Node() {
@@ -19,11 +19,11 @@ public class Node  implements java.io.Serializable {
     public Node(
            org.alfresco.example.webservice.types.Reference reference,
            java.lang.String type,
-           java.lang.String[] aspect,
+           java.lang.String[] aspects,
            org.alfresco.example.webservice.types.NamedValue[] properties) {
            this.reference = reference;
            this.type = type;
-           this.aspect = aspect;
+           this.aspects = aspects;
            this.properties = properties;
     }
 
@@ -69,30 +69,30 @@ public class Node  implements java.io.Serializable {
 
 
     /**
-     * Gets the aspect value for this Node.
+     * Gets the aspects value for this Node.
      * 
-     * @return aspect
+     * @return aspects
      */
-    public java.lang.String[] getAspect() {
-        return aspect;
+    public java.lang.String[] getAspects() {
+        return aspects;
     }
 
 
     /**
-     * Sets the aspect value for this Node.
+     * Sets the aspects value for this Node.
      * 
-     * @param aspect
+     * @param aspects
      */
-    public void setAspect(java.lang.String[] aspect) {
-        this.aspect = aspect;
+    public void setAspects(java.lang.String[] aspects) {
+        this.aspects = aspects;
     }
 
-    public java.lang.String getAspect(int i) {
-        return this.aspect[i];
+    public java.lang.String getAspects(int i) {
+        return this.aspects[i];
     }
 
-    public void setAspect(int i, java.lang.String _value) {
-        this.aspect[i] = _value;
+    public void setAspects(int i, java.lang.String _value) {
+        this.aspects[i] = _value;
     }
 
 
@@ -141,9 +141,9 @@ public class Node  implements java.io.Serializable {
             ((this.type==null && other.getType()==null) || 
              (this.type!=null &&
               this.type.equals(other.getType()))) &&
-            ((this.aspect==null && other.getAspect()==null) || 
-             (this.aspect!=null &&
-              java.util.Arrays.equals(this.aspect, other.getAspect()))) &&
+            ((this.aspects==null && other.getAspects()==null) || 
+             (this.aspects!=null &&
+              java.util.Arrays.equals(this.aspects, other.getAspects()))) &&
             ((this.properties==null && other.getProperties()==null) || 
              (this.properties!=null &&
               java.util.Arrays.equals(this.properties, other.getProperties())));
@@ -164,11 +164,11 @@ public class Node  implements java.io.Serializable {
         if (getType() != null) {
             _hashCode += getType().hashCode();
         }
-        if (getAspect() != null) {
+        if (getAspects() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getAspect());
+                 i<java.lang.reflect.Array.getLength(getAspects());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getAspect(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getAspects(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -209,8 +209,8 @@ public class Node  implements java.io.Serializable {
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("aspect");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "aspect"));
+        elemField.setFieldName("aspects");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "aspects"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Name"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

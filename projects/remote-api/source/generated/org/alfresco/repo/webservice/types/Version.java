@@ -13,7 +13,7 @@ public class Version  implements java.io.Serializable {
     private java.lang.String creator;
     private java.lang.String label;
     private boolean major;
-    private org.alfresco.repo.webservice.types.NamedValue[] commentary;
+    private org.alfresco.repo.webservice.types.NamedValue[] commentaries;
 
     public Version() {
     }
@@ -24,13 +24,13 @@ public class Version  implements java.io.Serializable {
            java.lang.String creator,
            java.lang.String label,
            boolean major,
-           org.alfresco.repo.webservice.types.NamedValue[] commentary) {
+           org.alfresco.repo.webservice.types.NamedValue[] commentaries) {
            this.id = id;
            this.created = created;
            this.creator = creator;
            this.label = label;
            this.major = major;
-           this.commentary = commentary;
+           this.commentaries = commentaries;
     }
 
 
@@ -135,30 +135,30 @@ public class Version  implements java.io.Serializable {
 
 
     /**
-     * Gets the commentary value for this Version.
+     * Gets the commentaries value for this Version.
      * 
-     * @return commentary
+     * @return commentaries
      */
-    public org.alfresco.repo.webservice.types.NamedValue[] getCommentary() {
-        return commentary;
+    public org.alfresco.repo.webservice.types.NamedValue[] getCommentaries() {
+        return commentaries;
     }
 
 
     /**
-     * Sets the commentary value for this Version.
+     * Sets the commentaries value for this Version.
      * 
-     * @param commentary
+     * @param commentaries
      */
-    public void setCommentary(org.alfresco.repo.webservice.types.NamedValue[] commentary) {
-        this.commentary = commentary;
+    public void setCommentaries(org.alfresco.repo.webservice.types.NamedValue[] commentaries) {
+        this.commentaries = commentaries;
     }
 
-    public org.alfresco.repo.webservice.types.NamedValue getCommentary(int i) {
-        return this.commentary[i];
+    public org.alfresco.repo.webservice.types.NamedValue getCommentaries(int i) {
+        return this.commentaries[i];
     }
 
-    public void setCommentary(int i, org.alfresco.repo.webservice.types.NamedValue _value) {
-        this.commentary[i] = _value;
+    public void setCommentaries(int i, org.alfresco.repo.webservice.types.NamedValue _value) {
+        this.commentaries[i] = _value;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -186,9 +186,9 @@ public class Version  implements java.io.Serializable {
              (this.label!=null &&
               this.label.equals(other.getLabel()))) &&
             this.major == other.isMajor() &&
-            ((this.commentary==null && other.getCommentary()==null) || 
-             (this.commentary!=null &&
-              java.util.Arrays.equals(this.commentary, other.getCommentary())));
+            ((this.commentaries==null && other.getCommentaries()==null) || 
+             (this.commentaries!=null &&
+              java.util.Arrays.equals(this.commentaries, other.getCommentaries())));
         __equalsCalc = null;
         return _equals;
     }
@@ -213,11 +213,11 @@ public class Version  implements java.io.Serializable {
             _hashCode += getLabel().hashCode();
         }
         _hashCode += (isMajor() ? Boolean.TRUE : Boolean.FALSE).hashCode();
-        if (getCommentary() != null) {
+        if (getCommentaries() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getCommentary());
+                 i<java.lang.reflect.Array.getLength(getCommentaries());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getCommentary(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getCommentaries(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -268,8 +268,8 @@ public class Version  implements java.io.Serializable {
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("commentary");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "commentary"));
+        elemField.setFieldName("commentaries");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "commentaries"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);

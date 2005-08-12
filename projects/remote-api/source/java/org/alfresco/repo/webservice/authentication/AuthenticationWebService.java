@@ -70,13 +70,10 @@ public class AuthenticationWebService implements AuthenticationServiceSoapPort
       }
       catch (AuthenticationException ae)
       {
-         // TODO: Define the error codes in the WSDL
-         throw new AuthenticationFault(700, ae.getMessage());
+         throw new AuthenticationFault(100, ae.getMessage());
       }
       catch (Throwable e)
       {
-         // TODO: Define an unexpected error code or fault type
-         // TODO: Also log the error??
          throw new AuthenticationFault(0, e.getMessage());
       }
    }

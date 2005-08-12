@@ -3,7 +3,7 @@
 
 	<complexType name="QueryConfiguration">
 		<sequence>
-			<element name="fetchSize" type="positiveInteger" default="500"></element>
+			<element name="fetchSize" type="int" default="500"></element>
 		</sequence>
 	</complexType>
 

@@ -9,7 +9,7 @@ package org.alfresco.example.webservice.types;
 
 public class ResultSetRow  implements java.io.Serializable {
     private long rowIndex;
-    private org.alfresco.example.webservice.types.NamedValue[] column;
+    private org.alfresco.example.webservice.types.NamedValue[] columns;
     private java.lang.Float score;
     private org.alfresco.example.webservice.types.ResultSetRowNode node;
 
@@ -18,11 +18,11 @@ public class ResultSetRow  implements java.io.Serializable {
 
     public ResultSetRow(
            long rowIndex,
-           org.alfresco.example.webservice.types.NamedValue[] column,
+           org.alfresco.example.webservice.types.NamedValue[] columns,
            java.lang.Float score,
            org.alfresco.example.webservice.types.ResultSetRowNode node) {
            this.rowIndex = rowIndex;
-           this.column = column;
+           this.columns = columns;
            this.score = score;
            this.node = node;
     }
@@ -49,30 +49,30 @@ public class ResultSetRow  implements java.io.Serializable {
 
 
     /**
-     * Gets the column value for this ResultSetRow.
+     * Gets the columns value for this ResultSetRow.
      * 
-     * @return column
+     * @return columns
      */
-    public org.alfresco.example.webservice.types.NamedValue[] getColumn() {
-        return column;
+    public org.alfresco.example.webservice.types.NamedValue[] getColumns() {
+        return columns;
     }
 
 
     /**
-     * Sets the column value for this ResultSetRow.
+     * Sets the columns value for this ResultSetRow.
      * 
-     * @param column
+     * @param columns
      */
-    public void setColumn(org.alfresco.example.webservice.types.NamedValue[] column) {
-        this.column = column;
+    public void setColumns(org.alfresco.example.webservice.types.NamedValue[] columns) {
+        this.columns = columns;
     }
 
-    public org.alfresco.example.webservice.types.NamedValue getColumn(int i) {
-        return this.column[i];
+    public org.alfresco.example.webservice.types.NamedValue getColumns(int i) {
+        return this.columns[i];
     }
 
-    public void setColumn(int i, org.alfresco.example.webservice.types.NamedValue _value) {
-        this.column[i] = _value;
+    public void setColumns(int i, org.alfresco.example.webservice.types.NamedValue _value) {
+        this.columns[i] = _value;
     }
 
 
@@ -128,9 +128,9 @@ public class ResultSetRow  implements java.io.Serializable {
         boolean _equals;
         _equals = true && 
             this.rowIndex == other.getRowIndex() &&
-            ((this.column==null && other.getColumn()==null) || 
-             (this.column!=null &&
-              java.util.Arrays.equals(this.column, other.getColumn()))) &&
+            ((this.columns==null && other.getColumns()==null) || 
+             (this.columns!=null &&
+              java.util.Arrays.equals(this.columns, other.getColumns()))) &&
             ((this.score==null && other.getScore()==null) || 
              (this.score!=null &&
               this.score.equals(other.getScore()))) &&
@@ -149,11 +149,11 @@ public class ResultSetRow  implements java.io.Serializable {
         __hashCodeCalc = true;
         int _hashCode = 1;
         _hashCode += new Long(getRowIndex()).hashCode();
-        if (getColumn() != null) {
+        if (getColumns() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getColumn());
+                 i<java.lang.reflect.Array.getLength(getColumns());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getColumn(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getColumns(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -183,8 +183,8 @@ public class ResultSetRow  implements java.io.Serializable {
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("column");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "column"));
+        elemField.setFieldName("columns");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "columns"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
