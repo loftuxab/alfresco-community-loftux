@@ -33,6 +33,7 @@ import javax.faces.event.FacesEvent;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -198,7 +199,7 @@ public class UIShortcutsShelfItem extends UIShelfItem
             
             // output actions
             out.write("</nobr></td><td align=right><nobr>");
-            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", WebResources.IMAGE_REMOVE));
+            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, Application.getMessage(context, MSG_REMOVE_ITEM), WebResources.IMAGE_REMOVE));
             // TODO: add view details action here?
             
             // end actions cell and end row
@@ -355,6 +356,9 @@ public class UIShortcutsShelfItem extends UIShelfItem
    
    // ------------------------------------------------------------------------------
    // Private data
+   
+   /** I18N messages */
+   private static final String MSG_REMOVE_ITEM = "remove_item";
    
    private final static int ACTION_CLICK_ITEM = 0;
    private final static int ACTION_REMOVE_ITEM = 1;

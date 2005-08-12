@@ -123,7 +123,7 @@ public class UIProperty extends UIPanel implements NamingContainer
             {
                // add an error message as the property is not defined in the data dictionary and 
                // not in the node's set of properties
-               String msg = MessageFormat.format(MSG_ERROR_PROPERTY, new Object[] {propertyName});
+               String msg = MessageFormat.format(Application.getMessage(context, MSG_ERROR_PROPERTY), new Object[] {propertyName});
                Utils.addErrorMessage(msg);
                
                if (logger.isDebugEnabled())

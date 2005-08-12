@@ -19,6 +19,7 @@ package org.alfresco.web.ui.repo.component;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
@@ -29,6 +30,7 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.SearchContext;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
@@ -40,7 +42,7 @@ public class UISimpleSearch extends UICommand
 {
    // ------------------------------------------------------------------------------
    // Component implementation
-   
+
    /**
     * Default Constructor
     */
@@ -169,6 +171,8 @@ public class UISimpleSearch extends UICommand
       
       ResponseWriter out = context.getResponseWriter();
       
+      ResourceBundle bundle = (ResourceBundle)Application.getBundle(context);
+      
       // script for dynamic simple search menu drop-down options
       out.write("<script>");
       out.write("function _noenter(event) {" +
@@ -185,9 +189,11 @@ public class UISimpleSearch extends UICommand
       out.write("<table cellspacing=4 cellpadding=0>");
       out.write("<tr><td style='padding-top:2px'>");
       
-      String searchImage = Utils.buildImageTag(context, "/images/icons/search_icon.gif", 15, 15, "Go", "_searchSubmit();");
+      String searchImage = Utils.buildImageTag(context, "/images/icons/search_icon.gif", 15, 15,
+            bundle.getString(MSG_GO), "_searchSubmit();");
       
-      out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13, "Options", "javascript:_toggleMenu('_alfsearch');"));
+      out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13,
+            bundle.getString(MSG_OPTIONS), "javascript:_toggleMenu('_alfsearch');"));
       
       // dynamic DIV area containing search options
       out.write("<br><div id='_alfsearch' style='position:absolute;display:none'" +
@@ -221,7 +227,9 @@ public class UISimpleSearch extends UICommand
       // generate a link that will cause an action event to navigate to the advanced search screen
       out.write("<a class='small' href='#' onclick=\"");
       out.write(Utils.generateFormSubmit(context, this, Utils.getActionHiddenFieldName(context, this), ADVSEARCH_PARAM));
-      out.write("\">Advanced Search</a>");
+      out.write("\">");
+      out.write(bundle.getString(MSG_ADVANCED_SEARCH));
+      out.write("</a>");
       out.write("</td><td align=right>");
       out.write(searchImage);
       out.write("</td></tr></table></td></tr>");
@@ -289,6 +297,10 @@ public class UISimpleSearch extends UICommand
    // Private data
    
    private static Log logger = LogFactory.getLog(UISimpleSearch.class);
+   
+   private static final String MSG_ADVANCED_SEARCH = "advanced_search";
+   private static final String MSG_OPTIONS = "options";
+   private static final String MSG_GO = "go";
    
    private static final String OPTION_PARAM = "_option";
    private static final String ADVSEARCH_PARAM = "_advsearch";

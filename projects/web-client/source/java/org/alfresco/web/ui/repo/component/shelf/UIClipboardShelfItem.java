@@ -20,6 +20,7 @@ package org.alfresco.web.ui.repo.component.shelf;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
@@ -33,6 +34,7 @@ import javax.faces.event.FacesEvent;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.clipboard.ClipboardItem;
 import org.alfresco.web.bean.clipboard.ClipboardStatus;
 import org.alfresco.web.bean.repository.Repository;
@@ -47,7 +49,7 @@ public class UIClipboardShelfItem extends UIShelfItem
 {
    // ------------------------------------------------------------------------------
    // Component Impl
-   
+
    /**
     * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
     */
@@ -148,7 +150,9 @@ public class UIClipboardShelfItem extends UIShelfItem
       out.write(SHELF_START);
       if (items.size() != 0)
       {
-         DictionaryService dd = Repository.getServiceRegistry(getFacesContext()).getDictionaryService();
+         DictionaryService dd = Repository.getServiceRegistry(context).getDictionaryService();
+         
+         ResourceBundle bundle = Application.getBundle(context);
          
          for (int i=0; i<items.size(); i++)
          {
@@ -158,11 +162,11 @@ public class UIClipboardShelfItem extends UIShelfItem
             out.write("<tr><td>");
             if (item.Mode == ClipboardStatus.COPY)
             {
-               out.write(Utils.buildImageTag(context, WebResources.IMAGE_COPY, 14, 16, null, null, "absmiddle"));
+               out.write(Utils.buildImageTag(context, WebResources.IMAGE_COPY, 14, 16, bundle.getString(MSG_COPY), null, "absmiddle"));
             }
             else
             {
-               out.write(Utils.buildImageTag(context, WebResources.IMAGE_CUT, 13, 16, null, null, "absmiddle"));
+               out.write(Utils.buildImageTag(context, WebResources.IMAGE_CUT, 13, 16, bundle.getString(MSG_CUT), null, "absmiddle"));
             }
             out.write("</td><td>");
             
@@ -184,9 +188,9 @@ public class UIClipboardShelfItem extends UIShelfItem
             
             // output actions
             out.write("</nobr></td><td align=right><nobr>");
-            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, "Remove Item", WebResources.IMAGE_REMOVE));
+            out.write(buildActionLink(ACTION_REMOVE_ITEM, i, bundle.getString(MSG_REMOVE_ITEM), WebResources.IMAGE_REMOVE));
             out.write("&nbsp;");
-            out.write(buildActionLink(ACTION_PASTE_ITEM, i, "Paste Item", WebResources.IMAGE_PASTE));
+            out.write(buildActionLink(ACTION_PASTE_ITEM, i, bundle.getString(MSG_PASTE_ITEM), WebResources.IMAGE_PASTE));
             
             // end actions cell and end row
             out.write("</nobr></td></tr>");
@@ -194,9 +198,9 @@ public class UIClipboardShelfItem extends UIShelfItem
          
          // output general actions if any clipboard items are present
          out.write("<tr><td colspan=3><nobr>");
-         out.write(buildActionLink(ACTION_PASTE_ALL, -1, "Paste All", null));
+         out.write(buildActionLink(ACTION_PASTE_ALL, -1, bundle.getString(MSG_PASTE_ALL), null));
          out.write("&nbsp;");
-         out.write(buildActionLink(ACTION_REMOVE_ALL, -1, "Remove All", null));
+         out.write(buildActionLink(ACTION_REMOVE_ALL, -1, bundle.getString(MSG_REMOVE_ALL), null));
          out.write("</nobr></td><td></td></tr>");
       }
       
@@ -332,6 +336,14 @@ public class UIClipboardShelfItem extends UIShelfItem
    
    // ------------------------------------------------------------------------------
    // Private data
+   
+   /** I18N messages */
+   private static final String MSG_REMOVE_ALL = "remove_all";
+   private static final String MSG_PASTE_ALL = "paste_all";
+   private static final String MSG_PASTE_ITEM = "paste_item";
+   private static final String MSG_REMOVE_ITEM = "remove_item";
+   private static final String MSG_CUT = "cut";
+   private static final String MSG_COPY = "copy";
    
    private final static int ACTION_REMOVE_ITEM = 0;
    private final static int ACTION_REMOVE_ALL = 1;

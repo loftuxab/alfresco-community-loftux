@@ -36,6 +36,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 
@@ -46,6 +47,9 @@ import org.alfresco.web.ui.common.Utils;
  */
 public abstract class AbstractItemSelector extends UIInput
 {
+   private static final String MSG_GO_UP = "go_up";
+   private static final String MSG_OK = "ok";
+
    protected final static String OPTION = "_option";
    
    protected final static int MODE_BEFORE_SELECTION = 0;
@@ -352,7 +356,7 @@ public abstract class AbstractItemSelector extends UIInput
                   String id = getParentNodeId(context);
                   
                   // render a link to the parent node
-                  renderNodeLink(context, id, "Go Up", buf);
+                  renderNodeLink(context, id, Application.getMessage(context, MSG_GO_UP), buf);
                   buf.append("</td></tr>");
                }
                
@@ -417,7 +421,9 @@ public abstract class AbstractItemSelector extends UIInput
                buf.append("<tr><td></td><td align=center>")
                   .append("<input type='button' onclick=\"")
                   .append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue))
-                  .append("\" value='OK'></td></tr>");
+                  .append("\" value='")
+                  .append(Application.getMessage(context, MSG_OK))
+                  .append("'></td></tr>");
                
                buf.append("</table>");
                
