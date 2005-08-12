@@ -18,6 +18,7 @@
 package org.alfresco.web.bean.wizard;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +61,7 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
+import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -75,6 +77,8 @@ public class NewRuleWizard extends BaseActionWizard
    public static final String PROP_CONTAINS_TEXT = "containstext";
    
    private static Log logger = LogFactory.getLog(NewRuleWizard.class);
+   
+   private static final String ERROR = "Failed to create Rule due to error: {0}";
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "New Rule Wizard";
@@ -188,7 +192,8 @@ public class NewRuleWizard extends BaseActionWizard
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to create new rule.", e);
+         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         outcome = null;
       }
       
       return outcome;

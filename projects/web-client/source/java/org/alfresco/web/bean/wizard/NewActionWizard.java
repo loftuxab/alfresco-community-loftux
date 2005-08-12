@@ -18,6 +18,7 @@
 package org.alfresco.web.bean.wizard;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +62,7 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
+import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -73,6 +75,8 @@ import org.springframework.web.jsf.FacesContextUtils;
 public class NewActionWizard extends BaseActionWizard
 {
    private static Log logger = LogFactory.getLog(NewActionWizard.class);
+   
+   private static final String ERROR = "Failed to create Action due to error: {0}";
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "Custom Action Wizard";
@@ -125,7 +129,8 @@ public class NewActionWizard extends BaseActionWizard
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to create new action.", e);
+         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         outcome = null;
       }
       
       return outcome;
