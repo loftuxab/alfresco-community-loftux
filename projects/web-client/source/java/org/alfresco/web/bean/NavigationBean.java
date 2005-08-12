@@ -265,7 +265,7 @@ public class NavigationBean
          {
 	         NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
 	         String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
-	
+	         
 	         node.getProperties().put("cifsPath", cifsPath);
 	         node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
          }

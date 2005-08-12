@@ -78,8 +78,9 @@
                                  <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg2" /></div>
                                  <div class="mainSubText"><h:outputText value="#{msg.view_description}" id="msg3" /></div>
                                  <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
-                                 <div class="mainSubText"><h:outputText value="#{msg.network_folder}" id="msg41" />:
-                                          <a:actionLink value="#{NavigationBean.nodeProperties.cifsPathLabel}" href="#{NavigationBean.nodeProperties.cifsPath}" target="new" id="cifs1" />
+                                 <div class="mainSubText">
+                                    <h:outputText value="#{msg.network_folder}" id="msg41" />:
+                                    <a:actionLink value="#{NavigationBean.nodeProperties.cifsPathLabel}" href="#{NavigationBean.nodeProperties.cifsPath}" rendered="#{NavigationBean.nodeProperties.cifsPath != null}" target="new" id="cifs1" />
                                  </div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
