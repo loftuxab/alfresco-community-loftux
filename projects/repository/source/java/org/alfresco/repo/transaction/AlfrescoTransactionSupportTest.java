@@ -17,6 +17,9 @@
  */
 package org.alfresco.repo.transaction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
@@ -38,11 +41,12 @@ import org.springframework.transaction.TransactionDefinition;
  */
 public class AlfrescoTransactionSupportTest extends TestCase
 {
+    private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+
     private ServiceRegistry serviceRegistry;
     
     public void setUp() throws Exception
     {
-        ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
         serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
     }
     
@@ -104,5 +108,52 @@ public class AlfrescoTransactionSupportTest extends TestCase
         // rollback
         txn.rollback();
         assertNull("Thread shouldn't have a txn ID after rollback", AlfrescoTransactionSupport.getTransactionId());
+    }
+    
+    public void testListener() throws Exception
+    {
+        final List<String> strings = new ArrayList<String>(1);
+
+        // anonymous inner class to test it
+        TransactionListener listener = new TransactionListener()
+        {
+            public void flush()
+            {
+                strings.add("flush");
+            }
+            public void beforeCommit(boolean readOnly)
+            {
+                strings.add("beforeCommit");
+            }
+            public void beforeCompletion()
+            {
+                strings.add("beforeCompletion");
+            }
+            public void afterCommit()
+            {
+                strings.add("afterCommit");
+            }
+            public void afterRollback()
+            {
+                strings.add("afterRollback");
+            }
+        };
+        
+        // begin a transaction
+        UserTransaction txn = serviceRegistry.getUserTransaction();
+        txn.begin();
+        
+        // register it
+        AlfrescoTransactionSupport.bindListener(listener);
+
+        // test flush
+        AlfrescoTransactionSupport.flush();
+        assertTrue("flush not called on listener", strings.contains("flush"));
+        
+        // test commit
+        txn.commit();
+        assertTrue("beforeCommit not called on listener", strings.contains("beforeCommit"));
+        assertTrue("beforeCompletion not called on listener", strings.contains("beforeCompletion"));
+        assertTrue("afterCommit not called on listener", strings.contains("afterCommit"));
     }
 }

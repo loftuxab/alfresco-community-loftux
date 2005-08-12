@@ -44,6 +44,15 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public abstract class AlfrescoTransactionSupport
 {
+    /*
+     * The registrations of services is very explicit on the interface.  This
+     * is to convey the idea that the execution of these services when the
+     * transaction completes is very explicit.  As we only have a finite
+     * list of types of services that need registration, this is still
+     * OK.  3rd party users of the repository can make use of their own
+     * Spring synchronization execution relative to the order defined below.
+     */
+    
     /**
      * The order of synchronization set to be 100 less than the Hibernate synchronization order
      */
@@ -166,18 +175,7 @@ public abstract class AlfrescoTransactionSupport
         // done
         if (logger.isDebugEnabled())
         {
-            if (bound)
-            {
-                logger.debug("Bound NodeDaoService: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   NodeDaoService: " + nodeDaoService);
-            }
-            else
-            {
-                logger.debug("NodeDaoService already bound: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   NodeDaoService: " + nodeDaoService);
-            }
+            logBoundService(nodeDaoService, bound); 
         }
     }
 
@@ -202,18 +200,7 @@ public abstract class AlfrescoTransactionSupport
         // done
         if (logger.isDebugEnabled())
         {
-            if (bound)
-            {
-                logger.debug("Bound RuleService: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   RuleService: " + ruleService);
-            }
-            else
-            {
-                logger.debug("RuleService already bound: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   RuleService: " + ruleService);
-            }
+            logBoundService(ruleService, bound); 
         }
     }
 
@@ -238,18 +225,7 @@ public abstract class AlfrescoTransactionSupport
         // done
         if (logger.isDebugEnabled())
         {
-            if (bound)
-            {
-                logger.debug("Bound IntegrityChecker: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   IntegrityChecker: " + integrityChecker);
-            }
-            else
-            {
-                logger.debug("IntegrityChecker already bound: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   IntegrityChecker: " + integrityChecker);
-            }
+            logBoundService(integrityChecker, bound); 
         }
     }
 
@@ -277,18 +253,57 @@ public abstract class AlfrescoTransactionSupport
         // done
         if (logger.isDebugEnabled())
         {
-            if (bound)
-            {
-                logger.debug("Bound Indexer: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   indexer: " + indexerAndSearcher);
-            }
-            else
-            {
-                logger.debug("Indexer already bound: \n" +
-                        "   transaction: " + getTransactionId() + "\n" +
-                        "   Indexer: " + indexerAndSearcher);
-            }
+            logBoundService(indexerAndSearcher, bound); 
+        }
+    }
+    
+    /**
+     * Method that registers a <tt>LuceneIndexerAndSearcherFactory</tt> against
+     * the transaction.
+     * <p>
+     * Setting this will ensure that the pre- and post-commit operations perform
+     * the necessary cleanups against the <tt>LuceneIndexerAndSearcherFactory</tt>.
+     * <p>
+     * Although bound within a <tt>Set</tt>, it would still be better for the caller
+     * to only bind once per transaction, if possible.
+     * 
+     * @param indexerAndSearcher the Lucene indexer to perform transaction completion
+     *      tasks on
+     */
+    public static void bindListener(TransactionListener listener)
+    {
+        // get transaction-local synchronization
+        TransactionSynchronizationImpl synch = getSynchronization();
+        
+        // bind the service in
+        boolean bound = synch.getListeners().add(listener);
+        
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logBoundService(listener, bound); 
+        }
+    }
+    
+    /**
+     * Use as part of a debug statement
+     * 
+     * @param service the service to report 
+     * @param bound true if the service was just bound; false if it was previously bound
+     */
+    private static void logBoundService(Object service, boolean bound)
+    {
+        if (bound)
+        {
+            logger.debug("Bound service: \n" +
+                    "   transaction: " + getTransactionId() + "\n" +
+                    "   service: " + service);
+        }
+        else
+        {
+            logger.debug("Service already bound: \n" +
+                    "   transaction: " + getTransactionId() + "\n" +
+                    "   service: " + service);
         }
     }
     
@@ -400,6 +415,7 @@ public abstract class AlfrescoTransactionSupport
         private Set<RuleService> ruleServices;
         private Set<IntegrityChecker> integrityCheckers;
         private Set<LuceneIndexerAndSearcherFactory> lucenes;
+        private Set<TransactionListener> listeners;
         private final Map<Object, Object> resources;
         
         /**
@@ -414,6 +430,7 @@ public abstract class AlfrescoTransactionSupport
             ruleServices = new HashSet<RuleService>(3);
             integrityCheckers = new HashSet<IntegrityChecker>(3);
             lucenes = new HashSet<LuceneIndexerAndSearcherFactory>(3);
+            listeners = new HashSet<TransactionListener>(5);
             resources = new HashMap<Object, Object>(17);
         }
         
@@ -457,6 +474,15 @@ public abstract class AlfrescoTransactionSupport
         {
             return lucenes;
         }
+        
+        /**
+         * @return Returns a set of <tt>TransactionListener<tt> instances that will be called
+         *      during end-of-transaction processing
+         */
+        public Set<TransactionListener> getListeners()
+        {
+            return listeners;
+        }
 
         public String toString()
         {
@@ -470,6 +496,34 @@ public abstract class AlfrescoTransactionSupport
               .append(", resources=").append(resources)
               .append("]");
             return sb.toString();
+        }
+
+        /**
+         * Performs the in-transaction flushing.  Typically done during a transaction or
+         * before commit.
+         */
+        public void flush()
+        {
+            // execute pending rules
+            for (RuleService ruleService : ruleServices)
+            {
+                ruleService.executePendingRules();
+            }
+            // check integrity
+            for (IntegrityChecker integrityChecker : integrityCheckers)
+            {
+                integrityChecker.checkIntegrity();
+            }
+            // flush the node DAO services
+            for (NodeDaoService nodeDaoService : nodeDaoServices)
+            {
+                nodeDaoService.flush();
+            }
+            // flush listeners
+            for (TransactionListener listener : listeners)
+            {
+                listener.flush();
+            }
         }
         
         /**
@@ -529,28 +583,10 @@ public abstract class AlfrescoTransactionSupport
             {
                 lucene.prepare();
             }
-        }
-
-        /**
-         * Performs the in-transaction flushing.  Typically done during a transaction or
-         * before commit.
-         */
-        public void flush()
-        {
-            // execute pending rules
-            for (RuleService ruleService : ruleServices)
+            // notify listeners
+            for (TransactionListener listener : listeners)
             {
-                ruleService.executePendingRules();
-            }
-            // check integrity
-            for (IntegrityChecker integrityChecker : integrityCheckers)
-            {
-                integrityChecker.checkIntegrity();
-            }
-            // flush the node DAO services
-            for (NodeDaoService nodeDaoService : nodeDaoServices)
-            {
-                nodeDaoService.flush();
+                listener.beforeCommit(readOnly);
             }
         }
         
@@ -560,6 +596,11 @@ public abstract class AlfrescoTransactionSupport
             if (logger.isDebugEnabled())
             {
                 logger.debug("Before completion: " + this);
+            }
+            // notify listeners
+            for (TransactionListener listener : listeners)
+            {
+                listener.beforeCompletion();
             }
         }
 
@@ -592,6 +633,22 @@ public abstract class AlfrescoTransactionSupport
                 else
                 {
                     lucene.rollback();
+                }
+            }
+            
+            // notify listeners
+            if (status  == TransactionSynchronization.STATUS_COMMITTED)
+            {
+                for (TransactionListener listener : listeners)
+                {
+                    listener.afterCommit();
+                }
+            }
+            else
+            {
+                for (TransactionListener listener : listeners)
+                {
+                    listener.afterRollback();
                 }
             }
             
