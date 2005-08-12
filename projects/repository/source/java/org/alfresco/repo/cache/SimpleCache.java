@@ -38,4 +38,6 @@ public interface SimpleCache
     public void put(Serializable key, Serializable value);
     
     public void remove(Serializable key);
+    
+    public void clear();
 }
