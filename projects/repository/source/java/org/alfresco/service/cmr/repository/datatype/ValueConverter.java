@@ -46,8 +46,7 @@ import org.alfresco.util.ParameterCheck;
  * 
  * TODO: Add conversion for binary as byte[] for UTF8 String encoding 
  * 
- * TODO: Add
- * support for QName 
+ * TODO: Add support for QName 
  * 
  * TODO: Add support for Path 
  * 
@@ -63,9 +62,9 @@ import org.alfresco.util.ParameterCheck;
 public class ValueConverter
 {
     /**
-     * General conversion methos to Object types (not it can not support
-     * conversion to primary types due the restrictions of relfection. Use the
-     * static conversion methods to primitive types.
+     * General conversion method to Object types (note it cannot support
+     * conversion to primary types due the restrictions of reflection. Use the
+     * static conversion methods to primitive types)
      * 
      * @param propertyType - the target property type
      * @param value - the value to be converted
@@ -92,10 +91,9 @@ public class ValueConverter
     
     
     /**
-     * General conversion methos to Object types (not it can not support
-     * conversion to primary types due the restrictions of relfection. Use the
-     * static conversion methods to primitive types.
-     * 
+     * General conversion method to Object types (note it cannot support
+     * conversion to primary types due the restrictions of reflection. Use the
+     * static conversion methods to primitive types)
      * 
      * @param <T> The target type for the result of the conversion
      * @param c - a class for the target type

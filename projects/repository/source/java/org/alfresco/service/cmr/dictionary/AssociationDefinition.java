@@ -34,12 +34,12 @@ public interface AssociationDefinition
     public QName getName();
 
     /**
-     * @return the human-readable class title 
+     * @return the human-readable title 
      */
     public String getTitle();
     
     /**
-     * @return the human-readable class description 
+     * @return the human-readable description 
      */
     public String getDescription();
     

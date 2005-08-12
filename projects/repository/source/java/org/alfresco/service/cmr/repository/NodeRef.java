@@ -29,22 +29,17 @@ import org.alfresco.error.AlfrescoRuntimeException;
 public class NodeRef implements EntityRef, Serializable
 {
    
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3760844584074227768L;
-
     private static final String URI_FILLER = "/";
-
+    
     private StoreRef storeRef;
     private String id;
 
     /**
-     * @param storeRef
-     * @see StoreRef
-     * @param id
-     *      the manually assigned identifier of the node
+     * Construct a Node Reference from a Store Reference and Node Id
+     * 
+     * @param storeRef store reference
+     * @param id the manually assigned identifier of the node
      */
     public NodeRef(StoreRef storeRef, String id)
     {
@@ -62,6 +57,15 @@ public class NodeRef implements EntityRef, Serializable
         this.id = id;
     }
 
+    /**
+     * Construct a Node Reference from a string representation of a Node Reference.
+     * <p>
+     * The string representation of a Node Reference is as follows:
+     * <p>
+     * <pre><storeref>/<nodeId></pre>
+     * 
+     * @param nodeRef the string representation of a node ref
+     */
     public NodeRef(String nodeRef)
     {
         int lastForwardSlash = nodeRef.lastIndexOf('/');

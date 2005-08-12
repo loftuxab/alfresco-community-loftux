@@ -40,19 +40,18 @@ import org.alfresco.service.namespace.QName;
 
 
 /**
- * Registry of Repository Services.
- * 
- * Provides access to the public services of the Repository as well
- * descriptions of those services.
+ * This interface represents the registry of public Repository Services.
+ * The registry provides meta-data about each service and provides
+ * access to the service interface. 
  * 
  * @author David Caruana
  */
 public interface ServiceRegistry
 {
-    // Service Registry
-    static final String SERVICE_REGISTRY = "AlfServiceRegistry";
+    // Service Bean Names
     
-    // Core Services
+    static final String SERVICE_REGISTRY = "AlfServiceRegistry";
+
     static final QName USER_TRANSACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "UserTransaction");
     static final QName REGISTRY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ServiceRegistry");
     static final QName NAMESPACE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NamespaceService");
@@ -72,98 +71,98 @@ public interface ServiceRegistry
     static final QName ACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ActionService");
     
     /**
-     * Get Services provided by Repository
+     * Get the list of services provided by the Repository
      *
      * @return  list of provided Services
      */
     Collection<QName> getServices();
 
     /**
-     * Is Service Provided?
+     * Is the specified service provided by the Repository?
      * 
-     * @param serviceName  name of service to test provision of
-     * @return  true => provided, false => not provided
+     * @param service  name of service to test provision of
+     * @return true => provided, false => not provided
      */
     boolean isServiceProvided(QName service);
 
     /**
-     * Get Service Meta Data
+     * Get meta-data about the specified service
      *
-     * @param serviceName  name of service to retrieve meta data for
-     * @return  the service meta data
+     * @param service  name of service to retrieve meta data for
+     * @return the service meta data
      */
     ServiceDescriptor getServiceDescriptor(QName service);
 
     /** 
-     * Get Service Interface
+     * Get the specified service.
      *
-     * @param serviceName  name of service to retrieve
-     * @return  the service interface
+     * @param service  name of service to retrieve
+     * @return the service interface (must cast to interface as described in service meta-data)
      */  
     Object getService(QName service);
     
     /**
-     * @return  the user transaction
+     * @return the user transaction
      */
     UserTransaction getUserTransaction();
 
     /**
-     * @return  the namespace service (or null, if one is not provided)
+     * @return the namespace service (or null, if one is not provided)
      */
     NamespaceService getNamespaceService();
     
     /**
-     * @return  the node service (or null, if one is not provided)
+     * @return the node service (or null, if one is not provided)
      */
     NodeService getNodeService();
 
     /**
-     * @return  the content service (or null, if one is not provided)
+     * @return the content service (or null, if one is not provided)
      */
     ContentService getContentService();
     
     /**
-     * @return  the mimetype service (or null, if one is not provided)
+     * @return the mimetype service (or null, if one is not provided)
      */
     MimetypeService getMimetypeService();
 
     /**
-     * @return  the search service (or null, if one is not provided)
+     * @return the search service (or null, if one is not provided)
      */
     SearchService getSearchService();
     
     /**
-     * @return  the version service (or null, if one is not provided)
+     * @return the version service (or null, if one is not provided)
      */
     VersionService getVersionService();
     
     /**
-     * @return  the lock service (or null, if one is not provided)
+     * @return the lock service (or null, if one is not provided)
      */
     LockService getLockService();
 
     /**
-     * @return  the dictionary service (or null, if one is not provided)
+     * @return the dictionary service (or null, if one is not provided)
      */
     DictionaryService getDictionaryService();
  
     /**
-     * @return  the copy service (or null, if one is not provided)
+     * @return the copy service (or null, if one is not provided)
      */
     CopyService getCopyService();
     
     /**
-     * @return  the checkout / checkin service (or null, if one is not provided)
+     * @return the checkout / checkin service (or null, if one is not provided)
      */
     CheckOutCheckInService getCheckOutCheckInService();   
     
     /**
-     * @return  the category service (or null, if one is not provided)
+     * @return the category service (or null, if one is not provided)
      */
     CategoryService getCategoryService();
     
     /**
-     * @return Returns the importer service or null if not present
+     * @return the importer service or null if not present
      */
     ImporterService getImporterService();
     

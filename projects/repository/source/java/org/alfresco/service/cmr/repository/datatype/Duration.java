@@ -31,7 +31,7 @@ import java.util.Date;
 import org.alfresco.util.CachingDateFormat;
 
 /**
- * This data type represent duration/interval/period as defined by the XMLSchema type
+ * This data type represents duration/interval/period as defined by the XMLSchema type
  * duration.
  * 
  * The lexical representation of duration is

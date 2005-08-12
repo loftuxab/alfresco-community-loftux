@@ -71,22 +71,22 @@
       <mkdir dir="${dir.javadoc}"/>
       <mkdir dir="${dir.taglibdoc}"/>
       <copy todir="${dir.javadoc}/${dir.name.core}">
-          <fileset dir="${dir.project.core}/build/docs/java-api"/>
+          <fileset dir="${dir.project.core}/build/docs/java"/>
       </copy>
       <copy todir="${dir.javadoc}/${dir.name.remoteapi}">
-         <fileset dir="${dir.project.remoteapi}/build/docs/java-api"/>
+         <fileset dir="${dir.project.remoteapi}/build/docs/java"/>
       </copy>
       <copy todir="${dir.javadoc}/${dir.name.repository}">
-         <fileset dir="${dir.project.repository}/build/docs/java-api"/>
+         <fileset dir="${dir.project.repository}/build/docs/java"/>
       </copy>
-      <copy todir="${dir.javadoc}/${dir.name.repository}-api">
-         <fileset dir="${dir.project.repository}/build/docs/java-public-api"/>
+      <copy todir="${dir.javadoc}/${dir.name.repository}-service-api">
+         <fileset dir="${dir.project.repository}/build/docs/java-public-service-api"/>
       </copy>
       <copy todir="${dir.javadoc}/${dir.name.webclient}">
-         <fileset dir="${dir.project.webclient}/build/docs/java-api"/>
+         <fileset dir="${dir.project.webclient}/build/docs/java"/>
       </copy>
       <copy todir="${dir.taglibdoc}">
-         <fileset dir="${dir.project.webclient}/build/docs/taglib-api"/>
+         <fileset dir="${dir.project.webclient}/build/docs/taglib"/>
       </copy>  
    </target>
    

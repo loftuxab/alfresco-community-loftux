@@ -24,25 +24,24 @@ import org.alfresco.service.namespace.QName;
 
 
 /**
- * A Service Description.
+ * This interface represents service meta-data.
  * 
  * @author David Caruana
- *
  */
 public interface ServiceDescriptor
 {
     /**
-     * @return  the qualified name of the service
+     * @return the qualified name of the service
      */
     public QName getQualifiedName();
     
     /**
-     * @return  a description of the service
+     * @return the service description
      */
     public String getDescription();
 
     /**
-     * @return  the service interface
+     * @return the service interface class description
      */
     public Class getInterface();
 

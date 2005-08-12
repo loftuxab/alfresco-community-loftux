@@ -23,10 +23,15 @@ import org.alfresco.service.namespace.QName;
 
 
 /**
- * Data Dictionary Service.
- * 
- * The Dictionary Service provides access to Repository
- * meta-data.
+ * This interface represents the Repository Data Dictionary.  The
+ * dictionary provides access to content meta-data such as Type
+ * and Aspect descriptions.
+ *
+ * Content meta-data is organised into models where each model is
+ * given a qualified name.  This means that it is safe to develop
+ * independent models and bring them together into the same
+ * Repository without name clashes (as long their namespace is
+ * different). 
  * 
  * @author David Caruana
  */
@@ -116,7 +121,7 @@ public interface DictionaryService
      * 
      * @param className the sub-class to test
      * @param ofClassName the class to test against
-     * @return  true => the class is a sub-class (or itself)
+     * @return true => the class is a sub-class (or itself)
      */
     boolean isSubClass(QName className, QName ofClassName);
 
