@@ -70,7 +70,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    private static final String STEP3_DESCRIPTION = "Enter information about the space.";
    private static final String FINISH_INSTRUCTION = "To close this wizard and create your space click Finish.";
    
-   private static final String ERROR = "Failed to create new space due to error: {0}";
+   private static final String ERROR = "error_space";
    
    // new space wizard specific properties
    private SearchService searchService;
@@ -248,7 +248,8 @@ public class NewSpaceWizard extends AbstractWizardBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), ERROR), e.getMessage()), e);
          outcome = null;
       }
       

@@ -20,10 +20,12 @@ package org.alfresco.web.bean;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIModeList;
@@ -37,6 +39,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RulesBean
 {
+   private static final String MSG_ERROR_DELETE_RULE = "error_delete_rule";
+
    private static Log logger = LogFactory.getLog(RulesBean.class);
    
    private String viewMode = "local";
@@ -126,7 +130,8 @@ public class RulesBean
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to delete Rule due to system error: " + err.getMessage(), err);
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_DELETE_RULE) + err.getMessage(), err);
          }
       }
       else

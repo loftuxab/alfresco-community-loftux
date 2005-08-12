@@ -33,6 +33,7 @@ import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Node;
@@ -225,7 +226,8 @@ public class ClipboardBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-         Utils.addErrorMessage("Unable to paste item due to system error: " + err.getMessage(), err);
+         Utils.addErrorMessage(Application.getMessage(
+               FacesContext.getCurrentInstance(), MSG_ERROR_PASTE) + err.getMessage(), err);
       }
    }
 
@@ -307,7 +309,8 @@ public class ClipboardBean
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
       }
    }
    
@@ -316,6 +319,9 @@ public class ClipboardBean
    // Private data
    
    private static Log logger = LogFactory.getLog(ClipboardBean.class);
+   
+   /** I18N messages */
+   private static final String MSG_ERROR_PASTE = "error_paste";
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;

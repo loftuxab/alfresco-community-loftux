@@ -26,6 +26,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.el.ValueBinding;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.ui.common.PanelGenerator;
 import org.alfresco.web.ui.common.Utils;
 
@@ -37,7 +38,7 @@ import org.alfresco.web.ui.common.Utils;
  */
 public class ErrorsRenderer extends BaseRenderer
 {
-   private static final String DEFAULT_MESSAGE = "Please correct the errors below.";
+   private static final String DEFAULT_MESSAGE = "wizard_errors";
    
    /**
     * @see javax.faces.render.Renderer#encodeBegin(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
@@ -69,7 +70,7 @@ public class ErrorsRenderer extends BaseRenderer
             
             if (message == null)
             {
-               message = DEFAULT_MESSAGE;
+               message = Application.getMessage(context, DEFAULT_MESSAGE);
             }
          }
          

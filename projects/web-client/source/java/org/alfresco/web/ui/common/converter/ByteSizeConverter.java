@@ -23,6 +23,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
+import org.alfresco.web.app.Application;
+
 /**
  * Converter class to convert the size of an item in bytes into a readable KB/MB form.
  * 
@@ -35,9 +37,9 @@ public class ByteSizeConverter implements Converter
     */
    public static final String CONVERTER_ID = "org.alfresco.faces.ByteSizeConverter";
 
-   private static final String POSTFIX_KB = " KB";
-   private static final String POSTFIX_MB = " MB";
-   private static final String POSTFIX_GB = " GB";
+   private static final String MSG_POSTFIX_KB = "kilobyte";
+   private static final String MSG_POSTFIX_MB = "megabyte";
+   private static final String MSG_POSTFIX_GB = "gigabyte";
    
    private static final String NUMBER_PATTERN = "###,###.##";
    
@@ -90,20 +92,23 @@ public class ByteSizeConverter implements Converter
       if (size < 999999)
       {
          double val = ((double)size) / 1024.0;
-         buf.append(formatter.format(val));
-         buf.append(POSTFIX_KB);
+         buf.append(formatter.format(val))
+            .append(' ')
+            .append(Application.getMessage(context, MSG_POSTFIX_KB));
       }
       else if (size < 999999999)
       {
          double val = ((double)size) / 1048576.0;
-         buf.append(formatter.format(val));
-         buf.append(POSTFIX_MB);
+         buf.append(formatter.format(val))
+            .append(' ')
+            .append(Application.getMessage(context, MSG_POSTFIX_MB));
       }
       else
       {
          double val = ((double)size) / 1073741824.0;
-         buf.append(formatter.format(val));
-         buf.append(POSTFIX_GB);
+         buf.append(formatter.format(val))
+            .append(' ')
+            .append(Application.getMessage(context, MSG_POSTFIX_GB));
       }
       
       return buf.toString();

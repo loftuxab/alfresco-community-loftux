@@ -18,6 +18,7 @@
 package org.alfresco.web.ui.repo.component.property;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import javax.faces.FacesException;
 import javax.faces.component.NamingContainer;
@@ -50,6 +51,8 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public class UIProperty extends UIPanel implements NamingContainer
 {
+   private static final String MSG_ERROR_PROPERTY = "error_property";
+
    private static Log logger = LogFactory.getLog(UIProperty.class);
    
    private String name;
@@ -120,7 +123,7 @@ public class UIProperty extends UIPanel implements NamingContainer
             {
                // add an error message as the property is not defined in the data dictionary and 
                // not in the node's set of properties
-               String msg = "Property '"+ propertyName + "' is not available for this node";
+               String msg = MessageFormat.format(MSG_ERROR_PROPERTY, new Object[] {propertyName});
                Utils.addErrorMessage(msg);
                
                if (logger.isDebugEnabled())

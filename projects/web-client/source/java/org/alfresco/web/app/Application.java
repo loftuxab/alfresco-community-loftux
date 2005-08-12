@@ -18,6 +18,8 @@
 package org.alfresco.web.app;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletContext;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.repository.User;
@@ -47,6 +50,8 @@ public class Application
 {
    public static final String BEAN_CONFIG_SERVICE = "configService";
    public static final String BEAN_DATA_DICTIONARY = "dataDictionary";
+   
+   public static final String MESSAGE_BUNDLE = "alfresco.messages";
    
    private static boolean inPortalServer = true;
    private static String repoStoreUrl;
@@ -293,6 +298,46 @@ public class Application
    public static String getTemplatesFolderName(FacesContext context)
    {
       return getTemplatesFolderName(FacesContextUtils.getRequiredWebApplicationContext(context));
+   }
+   
+   /**
+    * Get the specified I18N message string from the default message bundle for this user
+    * 
+    * @param context        FacesContext
+    * @param msg            Message ID
+    * 
+    * @return String from message bundle or null if not found
+    */
+   public static String getMessage(FacesContext context, String msg)
+   {
+      return getBundle(context).getString(msg);
+   }
+   
+   /**
+    * Get the specified the default message bundle for this user
+    * 
+    * @param context        FacesContext
+    * 
+    * @return ResourceBundle for this user
+    */
+   public static ResourceBundle getBundle(FacesContext context)
+   {
+      // get the resource bundle for the current locale
+      // we store the bundle in the users session
+      // this makes it easy to add a locale per user support later
+      Map session = context.getExternalContext().getSessionMap();
+      ResourceBundle bundle = (ResourceBundle)session.get(MESSAGE_BUNDLE);
+      if (bundle == null)
+      {
+         bundle = ResourceBundle.getBundle(MESSAGE_BUNDLE, context.getApplication().getDefaultLocale());
+         if (bundle == null)
+         {
+            throw new AlfrescoRuntimeException("Unable to load Alfresco messages bundle: " + MESSAGE_BUNDLE);
+         }
+         session.put(MESSAGE_BUNDLE, bundle);
+      }
+      
+      return bundle;
    }
    
    /**

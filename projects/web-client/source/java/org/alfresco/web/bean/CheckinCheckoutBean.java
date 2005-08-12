@@ -37,6 +37,7 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.Node;
@@ -363,7 +364,8 @@ public class CheckinCheckoutBean
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
       }
       
       return node;
@@ -431,7 +433,8 @@ public class CheckinCheckoutBean
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-            Utils.addErrorMessage("Unable to checkout Content Node due to system error: " + err.getMessage());
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_CHECKOUT) + err.getMessage());
          }
       }
       else
@@ -568,7 +571,8 @@ public class CheckinCheckoutBean
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-            Utils.addErrorMessage("Unable to update Content Node due to system error: " + err.getMessage());
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_UPDATE) + err.getMessage());
          }
       }
       else
@@ -600,7 +604,8 @@ public class CheckinCheckoutBean
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to cancel checkout of Content Node due to system error: " + err.getMessage(), err);
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_CANCELCHECKOUT) + err.getMessage(), err);
          }
       }
       else
@@ -649,7 +654,7 @@ public class CheckinCheckoutBean
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to cancel checkout of Content Node due to system error: " + err.getMessage(), err);
+            Utils.addErrorMessage(MSG_ERROR_CANCELCHECKOUT + err.getMessage(), err);
          }
       }
       else
@@ -725,7 +730,8 @@ public class CheckinCheckoutBean
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-            Utils.addErrorMessage("Unable to check-in Content Node due to system error: " + err.getMessage(), err);
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_CHECKIN) + err.getMessage(), err);
          }
       }
       else
@@ -774,7 +780,8 @@ public class CheckinCheckoutBean
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-            Utils.addErrorMessage("Unable to update Content Node due to system error: " + err.getMessage(), err);
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_UPDATE) + err.getMessage(), err);
          }
       }
       else
@@ -825,8 +832,12 @@ public class CheckinCheckoutBean
    
    private static Log logger = LogFactory.getLog(CheckinCheckoutBean.class);
    
-   //private static final String WORKING_COPY = " (working copy)";
-   
+   /** I18N messages */
+   private static final String MSG_ERROR_CHECKIN = "error_checkin";
+   private static final String MSG_ERROR_CANCELCHECKOUT = "error_cancel_checkout";
+   private static final String MSG_ERROR_UPDATE = "error_update";
+   private static final String MSG_ERROR_CHECKOUT = "error_checkout";
+
    /** constants for copy location selection */
    private static final String COPYLOCATION_CURRENT = "current";
    private static final String COPYLOCATION_OTHER   = "other";

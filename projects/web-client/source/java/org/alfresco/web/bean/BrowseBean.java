@@ -424,14 +424,16 @@ public class BrowseBean implements IContextListener
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {parentNodeId}) );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {parentNodeId}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
       catch (Exception err)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, err.getMessage()), err );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
@@ -521,7 +523,8 @@ public class BrowseBean implements IContextListener
       catch (Exception err)
       {
          logger.info("Search failed for: " + query);
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_SEARCH, new Object[] {err.getMessage()}), err );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_SEARCH), new Object[] {err.getMessage()}), err );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
@@ -672,7 +675,8 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
          }
       }
    }
@@ -691,7 +695,8 @@ public class BrowseBean implements IContextListener
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {ref.getId()}) );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {ref.getId()}) );
       }
    }
    
@@ -742,7 +747,8 @@ public class BrowseBean implements IContextListener
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {nodeRef.getId()}) );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {nodeRef.getId()}) );
       }
    }
    
@@ -787,7 +793,8 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
          }
       }
       else
@@ -844,7 +851,8 @@ public class BrowseBean implements IContextListener
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
          }
       }
       else
@@ -914,7 +922,8 @@ public class BrowseBean implements IContextListener
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to delete Space due to system error: " + err.getMessage(), err);
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_DELETE_SPACE) + err.getMessage(), err);
          }
       }
       else
@@ -952,7 +961,8 @@ public class BrowseBean implements IContextListener
          }
          catch (Throwable err)
          {
-            Utils.addErrorMessage("Unable to delete File due to system error: " + err.getMessage(), err);
+            Utils.addErrorMessage(Application.getMessage(
+                  FacesContext.getCurrentInstance(), MSG_ERROR_DELETE_FILE) + err.getMessage(), err);
          }
       }
       else
@@ -1159,6 +1169,10 @@ public class BrowseBean implements IContextListener
    // Private data
    
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
+   
+   /** I18N messages */
+   private static final String MSG_ERROR_DELETE_FILE = "error_delete_file";
+   private static final String MSG_ERROR_DELETE_SPACE = "error_delete_space";
    
    private static Logger logger = Logger.getLogger(BrowseBean.class);
    

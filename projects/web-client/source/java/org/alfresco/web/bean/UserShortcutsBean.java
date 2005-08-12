@@ -140,7 +140,8 @@ public class UserShortcutsBean
          }
          catch (Exception err)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, err.getMessage()), err );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+                  FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
             try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
          }
       }
@@ -217,14 +218,16 @@ public class UserShortcutsBean
                }
                catch (Exception err)
                {
-                  Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, err.getMessage()), err );
+                  Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+                        FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
                   try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
                }
             }
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
          }
       }
    }
@@ -272,7 +275,8 @@ public class UserShortcutsBean
       }
       catch (Exception err)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_GENERIC, err.getMessage()), err );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
    }
@@ -305,7 +309,8 @@ public class UserShortcutsBean
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {selectedNode.getId()}) );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {selectedNode.getId()}) );
          
          // remove item from the shortcut list
          UserTransaction tx = null;

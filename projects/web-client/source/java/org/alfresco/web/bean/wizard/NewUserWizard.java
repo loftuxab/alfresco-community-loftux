@@ -68,7 +68,7 @@ public class NewUserWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION = "To add the user to this space click Finish.<br/>" +
                                                     "To review or change your selections click Back.";
    
-   private static final String ERROR = "Failed to create Person due to error: {0}";
+   private static final String ERROR = "error_person";
    
    /** form variables */
    private String firstName = null;
@@ -396,7 +396,8 @@ public class NewUserWizard extends AbstractWizardBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), ERROR), e.getMessage()), e);
          outcome = null;
       }
       
@@ -456,7 +457,8 @@ public class NewUserWizard extends AbstractWizardBean
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+                  FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
          }
       }
       else
@@ -501,7 +503,8 @@ public class NewUserWizard extends AbstractWizardBean
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NODEREF, new Object[] {id}) );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+                  FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
          }
       }
       else

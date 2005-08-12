@@ -20,6 +20,7 @@ package org.alfresco.web.ui.common.component.data;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
@@ -32,6 +33,7 @@ import javax.faces.event.FacesEvent;
 
 import org.apache.log4j.Logger;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.WebResources;
@@ -41,6 +43,18 @@ import org.alfresco.web.ui.common.WebResources;
  */
 public class UIDataPager extends UICommand
 {
+   private static Logger s_logger = Logger.getLogger(IDataContainer.class);
+   
+   private static final String LAST_PAGE = "last_page";
+   private static final String NEXT_PAGE = "next_page";
+   private static final String PREVIOUS_PAGE = "prev_page";
+   private static final String FIRST_PAGE = "first_page";
+   private static final String MSG_PAGEINFO = "page_info";
+   
+   
+   // ------------------------------------------------------------------------------
+   // Construction 
+   
    /**
     * Default constructor
     */
@@ -73,6 +87,8 @@ public class UIDataPager extends UICommand
       
       ResponseWriter out = context.getResponseWriter();
       
+      ResourceBundle bundle = Application.getBundle(context);
+      
       StringBuilder buf = new StringBuilder(420);
       
       // output HTML links or labels to render the paging controls
@@ -84,7 +100,7 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(0));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE, 13, 10, "First Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE, 13, 10, bundle.getString(FIRST_PAGE)));
          buf.append("</a>");
       }
       else
@@ -99,7 +115,7 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(nCurrentPage - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE, 9, 10, "Previous Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE, 9, 10, bundle.getString(PREVIOUS_PAGE)));
          buf.append("</a>");
       }
       else
@@ -109,7 +125,7 @@ public class UIDataPager extends UICommand
       buf.append("&nbsp;");
       
       // handle that the page count can be zero if no data present
-      buf.append(MessageFormat.format(MSG_PAGEINFO, new Object[] {
+      buf.append(MessageFormat.format(bundle.getString(MSG_PAGEINFO), new Object[] {
             Integer.toString(dataContainer.getCurrentPage() + 1),
             Integer.toString(dataContainer.getPageCount())
             }));
@@ -121,7 +137,7 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(nCurrentPage + 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE, 9, 10, "Next Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE, 9, 10, bundle.getString(NEXT_PAGE)));
          buf.append("</a>");
       }
       else
@@ -136,7 +152,7 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(dataContainer.getPageCount() - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE, 13, 10, "Last Page"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE, 13, 10, bundle.getString(LAST_PAGE)));
          buf.append("</a>");
       }
       else
@@ -236,12 +252,4 @@ public class UIDataPager extends UICommand
       
       public int Page = 0;
    }
-   
-   
-   // ------------------------------------------------------------------------------
-   // Private data
-   
-   private static final String MSG_PAGEINFO = "Page {0} of {1}";
-   
-   private static Logger s_logger = Logger.getLogger(IDataContainer.class);
 }

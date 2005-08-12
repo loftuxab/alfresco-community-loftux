@@ -165,11 +165,12 @@ public class LoginBean
    {
       String outcome = null;
       
+      FacesContext fc = FacesContext.getCurrentInstance();
+      
       if (this.username != null && this.password != null)
       {
          // Authenticate via the authentication service, then save the details of user in an object
          // in the session - this is used by the servlet filter etc. on each page to check for login
-         FacesContext fc = FacesContext.getCurrentInstance();
          try
          {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.username, this.password);
@@ -229,16 +230,17 @@ public class LoginBean
          }
          catch (AuthenticationException aerr)
          {
-            Utils.addErrorMessage("Unable to login - unknown username/password.");
+            Utils.addErrorMessage(Application.getMessage(fc, MSG_ERROR_UNKNOWN_USER));
          }
          catch (InvalidNodeRefException refErr)
          {
-            Utils.addErrorMessage( MessageFormat.format(Repository.ERROR_NOHOME, Application.getCurrentUser(fc).getHomeSpaceId()), refErr );
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+                  fc, Repository.ERROR_NOHOME), Application.getCurrentUser(fc).getHomeSpaceId()), refErr );
          }
       }
       else
       {
-         Utils.addErrorMessage("Must specify username and password.");
+         Utils.addErrorMessage(Application.getMessage(fc, MSG_ERROR_MISSING));
       }
       
       return outcome;
@@ -263,6 +265,10 @@ public class LoginBean
    
    // ------------------------------------------------------------------------------
    // Private data
+   
+   /** I18N messages */
+   private static final String MSG_ERROR_MISSING = "error_login_missing";
+   private static final String MSG_ERROR_UNKNOWN_USER = "error_login_user";
    
    public static final String LOGIN_OUTCOME_KEY  = "_alfOutcome";
    public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";

@@ -78,7 +78,7 @@ public class NewRuleWizard extends BaseActionWizard
    
    private static Log logger = LogFactory.getLog(NewRuleWizard.class);
    
-   private static final String ERROR = "Failed to create Rule due to error: {0}";
+   private static final String ERROR = "error_rule";
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "New Rule Wizard";
@@ -192,7 +192,8 @@ public class NewRuleWizard extends BaseActionWizard
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), ERROR), e.getMessage()), e);
          outcome = null;
       }
       

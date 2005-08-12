@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
@@ -38,8 +39,8 @@ import org.alfresco.web.ui.repo.WebResources;
  */
 public class UILockIcon extends SelfRenderingComponent
 {
-   private static final String MSG_LOCKED_YOU  = "Item locked by you";
-   private static final String MSG_LOCKED_USER = "Item locked by user";
+   private static final String MSG_LOCKED_YOU  = "locked_you";
+   private static final String MSG_LOCKED_USER = "locked_user";
    
    // ------------------------------------------------------------------------------
    // Component implementation
@@ -140,7 +141,7 @@ public class UILockIcon extends SelfRenderingComponent
          
          if (lockedOwner == true)
          {
-            msg = MSG_LOCKED_YOU;
+            msg = Application.getMessage(context, MSG_LOCKED_YOU);
             if (getLockedOwnerTooltip() != null)
             {
                msg = getLockedOwnerTooltip();
@@ -149,7 +150,7 @@ public class UILockIcon extends SelfRenderingComponent
          else
          {
             NodeRef lockUser = (NodeRef)nodeService.getProperty(ref, ContentModel.PROP_LOCK_OWNER);
-            msg = MSG_LOCKED_USER;
+            msg = Application.getMessage(context, MSG_LOCKED_USER);
             if (getLockedUserTooltip() != null)
             {
                msg = getLockedUserTooltip();

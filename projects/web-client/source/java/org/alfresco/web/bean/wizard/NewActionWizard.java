@@ -76,7 +76,7 @@ public class NewActionWizard extends BaseActionWizard
 {
    private static Log logger = LogFactory.getLog(NewActionWizard.class);
    
-   private static final String ERROR = "Failed to create Action due to error: {0}";
+   private static final String ERROR = "error_action";
    
    // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE = "Custom Action Wizard";
@@ -129,7 +129,8 @@ public class NewActionWizard extends BaseActionWizard
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         Utils.addErrorMessage( MessageFormat.format(ERROR, e.getMessage()), e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), ERROR), e.getMessage()), e);
          outcome = null;
       }
       

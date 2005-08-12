@@ -58,10 +58,11 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public final class Repository
 {
-   public static final String ERROR_NODEREF = "Unable to find the repository item referenced by Id: {0} - the record has probably been deleted from the database.";
-   public static final String ERROR_GENERIC = "A system error occured during the operation: {0}";
-   public static final String ERROR_NOHOME  = "The Home Space node referenced by Id: {0} cannot be found. It may have been deleted from the database. Please contact your system administrator.";
-   public static final String ERROR_SEARCH  = "Search failed due to system error: {0}";
+   /** I18N error messages */
+   public static final String ERROR_NODEREF = "error_noderef";
+   public static final String ERROR_GENERIC = "error_generic";
+   public static final String ERROR_NOHOME  = "error_homespace";
+   public static final String ERROR_SEARCH  = "error_search";
    
    private static final String IMAGE_PREFIX16 = "/images/filetypes/";
    private static final String IMAGE_PREFIX32 = "/images/filetypes32/";
@@ -504,13 +505,15 @@ public final class Repository
       }
       catch (InvalidNodeRefException refErr)
       {
-         Utils.addErrorMessage( MessageFormat.format(ERROR_NODEREF, new Object[] {"root"}) );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               context, Repository.ERROR_NODEREF), new Object[] {"root"}) );
          personNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
       catch (Exception err)
       {
-         Utils.addErrorMessage( MessageFormat.format(ERROR_GENERIC, err.getMessage()), err );
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               context, Repository.ERROR_GENERIC), err.getMessage()), err );
          personNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
