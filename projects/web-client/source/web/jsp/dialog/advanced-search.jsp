@@ -71,7 +71,7 @@
                               <img src="<%=request.getContextPath()%>/images/icons/search_large.gif" width=32 height=32>
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle"><h:outputText value="#{msg.advanced_search}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.advancedsearch_description}" /></div>
                            </td>

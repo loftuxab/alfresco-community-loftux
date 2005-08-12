@@ -102,7 +102,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/create_space_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
                               <div class="mainTitle"><h:outputText value="#{NewSpaceWizard.wizardTitle}" /></div>
                               <div class="mainSubText"><h:outputText value="#{NewSpaceWizard.wizardDescription}" /></div>
                            </td>

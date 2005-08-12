@@ -70,7 +70,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/rule_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle"><h:outputText value='#{msg.content_rules}' /></div>
                               <div class="mainSubText">This view shows you all the rules to be applied to content in this space.</div>
                            </td>

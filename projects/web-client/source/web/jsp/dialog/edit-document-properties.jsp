@@ -86,7 +86,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/details_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
                               <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.editdocument_description}" /></div>
                            </td>

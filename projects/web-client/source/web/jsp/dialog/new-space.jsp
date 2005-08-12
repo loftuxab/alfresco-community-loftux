@@ -86,7 +86,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/create_space_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle">Create Space</div>
                               <div class="mainSubText"><h:outputText value="#{msg.newspace_description}" /></div>
                            </td>

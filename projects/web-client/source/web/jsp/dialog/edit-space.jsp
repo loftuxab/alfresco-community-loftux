@@ -84,7 +84,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/create_space_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.actionSpace.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.editspace_description}" /></div>
                            </td>

@@ -70,7 +70,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/users_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle">Manage Users</div>
                               <div class="mainSubText"><h:outputText value="#{msg.manageusers_description}" /></div>
                            </td>

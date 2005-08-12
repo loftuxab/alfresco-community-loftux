@@ -71,7 +71,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/new_user_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle"><h:outputText value="#{NewUserWizard.wizardTitle}" /></div>
                               <div class="mainSubText"><h:outputText value="#{NewUserWizard.wizardDescription}" /></div>
                            </td>

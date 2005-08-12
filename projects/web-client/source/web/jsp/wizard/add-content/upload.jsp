@@ -73,7 +73,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/add_content_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
                               <div class="mainTitle"><h:outputText value="#{AddContentWizard.wizardTitle}" /></div>
                               <div class="mainSubText"><h:outputText value="#{AddContentWizard.wizardDescription}" /></div>
                            </td>

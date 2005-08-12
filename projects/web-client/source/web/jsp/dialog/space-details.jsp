@@ -70,7 +70,7 @@
                               <img src="<%=request.getContextPath()%>/images/icons/details_large.gif" width=32 height=32>
                            </td>
                            <td>
-                              <div class="mainSubTitle"/><h:outputText value="#{SpaceDetailsBean.name}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{SpaceDetailsBean.name}" /></div>
                               <div class="mainTitle">Details of '<h:outputText value="#{SpaceDetailsBean.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.location}" />: <r:nodePath value="#{SpaceDetailsBean.space.nodeRef}" breadcrumb="true" actionListener="#{BrowseBean.clickSpacePath}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.spacedetails_description}" /></div>
