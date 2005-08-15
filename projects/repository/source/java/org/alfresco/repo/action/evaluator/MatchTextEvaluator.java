@@ -24,8 +24,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -91,8 +91,8 @@ public class MatchTextEvaluator extends ActionConditionEvaluatorAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_TEXT, ParameterType.STRING, true, getParamDisplayLabel(PARAM_TEXT)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_OPERATION, ParameterType.STRING, false, getParamDisplayLabel(PARAM_OPERATION)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_TEXT, PropertyTypeDefinition.TEXT, true, getParamDisplayLabel(PARAM_TEXT)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_OPERATION, PropertyTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_OPERATION)));
 	}
 
 	/**

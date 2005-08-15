@@ -17,9 +17,9 @@
  */
 package org.alfresco.repo.action;
 
-import org.alfresco.service.cmr.action.ParameterType;
-
 import junit.framework.TestCase;
+
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 
 /**
  * Parameter definition implementation unit test.
@@ -40,7 +40,7 @@ public class ParameterDefinitionImplTest extends TestCase
     {
         ParameterDefinitionImpl paramDef = new ParameterDefinitionImpl(
                 NAME,
-                ParameterType.STRING,
+                PropertyTypeDefinition.TEXT,
                 true,
                 DISPLAY_LABEL);
         assertNotNull(paramDef);
@@ -56,7 +56,7 @@ public class ParameterDefinitionImplTest extends TestCase
     public void testGetClass()
     {
         ParameterDefinitionImpl temp = create();
-        assertEquals(ParameterType.STRING, temp.getType());
+        assertEquals(PropertyTypeDefinition.TEXT, temp.getType());
     }
 	
 	public void testIsMandatory()

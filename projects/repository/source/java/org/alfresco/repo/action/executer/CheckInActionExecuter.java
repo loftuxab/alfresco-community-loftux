@@ -26,8 +26,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
@@ -96,7 +96,7 @@ public class CheckInActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, ParameterType.STRING, false, getParamDisplayLabel(PARAM_DESCRIPTION)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, PropertyTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_DESCRIPTION)));
 	}
 
 }

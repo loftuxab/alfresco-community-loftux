@@ -23,7 +23,7 @@ import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.content.transform.magick.ImageMagickContentTransformer;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NoTransformerException;
@@ -63,7 +63,7 @@ public class ImageTransformActionExecuter extends TransformActionExecuter
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
 		super.addParameterDefintions(paramList);
-		paramList.add(new ParameterDefinitionImpl(PARAM_CONVERT_COMMAND, ParameterType.STRING, false, getParamDisplayLabel(PARAM_CONVERT_COMMAND)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_CONVERT_COMMAND, PropertyTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_CONVERT_COMMAND)));
 	}
 	
 	/**

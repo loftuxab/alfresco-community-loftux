@@ -34,6 +34,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.QName;
@@ -135,12 +136,12 @@ public class BaseRuleTest extends BaseSpringTest
     	this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_ACTIONABLE, null); 
     }
 
-    protected RuleImpl createTestRule(String id)
+    protected Rule createTestRule()
     {
-        return createTestRule(id, false);
+        return createTestRule(false);
     }
     
-    protected RuleImpl createTestRule(String id, boolean isAppliedToChildren)
+    protected Rule createTestRule(boolean isAppliedToChildren)
     {
         // Rule properties
         Map<String, Serializable> conditionProps = new HashMap<String, Serializable>();
@@ -150,12 +151,18 @@ public class BaseRuleTest extends BaseSpringTest
         actionProps.put(ACTION_PROP_NAME_1, ACTION_PROP_VALUE_1);
         
         // Create the rule
-        RuleImpl rule = new RuleImpl(id, this.ruleType);
+        Rule rule = this.ruleService.createRule(this.ruleType.getName());
         rule.setTitle(TITLE);
         rule.setDescription(DESCRIPTION);
         rule.applyToChildren(isAppliedToChildren);
-        rule.addActionCondition(CONDITION_DEF_NAME, conditionProps);
-        rule.addAction(ACTION_DEF_NAME, actionProps);
+        
+        ActionCondition actionCondition = this.actionService.createActionCondition(CONDITION_DEF_NAME);
+        actionCondition.setParameterValues(conditionProps);
+        rule.addActionCondition(actionCondition);
+        
+        Action action = this.actionService.createAction(CONDITION_DEF_NAME);
+        action.setParameterValues(conditionProps);
+        rule.addAction(action);
 
         return rule;
     }
@@ -164,7 +171,7 @@ public class BaseRuleTest extends BaseSpringTest
     {
         // Check the basic details of the rule
         assertEquals(id, rule.getId());
-        assertEquals(this.ruleType.getName(), rule.getRuleType().getName());
+        assertEquals(this.ruleType.getName(), rule.getRuleTypeName());
         assertEquals(TITLE, rule.getTitle());
         assertEquals(DESCRIPTION, rule.getDescription());
 

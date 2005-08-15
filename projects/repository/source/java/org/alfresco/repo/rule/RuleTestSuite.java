@@ -17,12 +17,6 @@
  */
 package org.alfresco.repo.rule;
 
-import org.alfresco.repo.rule.RuleServiceCoverageTest;
-import org.alfresco.repo.rule.RuleServiceImplTest;
-import org.alfresco.repo.rule.RuleStoreTest;
-import org.alfresco.repo.rule.RuleTypeImplTest;
-import org.alfresco.repo.rule.RuleXMLUtilTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -43,8 +37,8 @@ public class RuleTestSuite extends TestSuite
     {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(RuleTypeImplTest.class);
-        suite.addTestSuite(RuleXMLUtilTest.class);
-        suite.addTestSuite(RuleStoreTest.class);
+       // suite.addTestSuite(RuleXMLUtilTest.class);
+       // suite.addTestSuite(RuleStoreTest.class);
         suite.addTestSuite(RuleServiceImplTest.class);
         suite.addTestSuite(RuleServiceCoverageTest.class);
         return suite;

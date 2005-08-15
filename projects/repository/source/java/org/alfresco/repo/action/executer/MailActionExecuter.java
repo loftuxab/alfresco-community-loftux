@@ -22,7 +22,7 @@ import java.util.List;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -99,9 +99,9 @@ public class MailActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-        paramList.add(new ParameterDefinitionImpl(PARAM_TO, ParameterType.STRING, true, getParamDisplayLabel(PARAM_TO)));
-        paramList.add(new ParameterDefinitionImpl(PARAM_SUBJECT, ParameterType.STRING, true, getParamDisplayLabel(PARAM_SUBJECT)));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TEXT, ParameterType.STRING, true, getParamDisplayLabel(PARAM_TEXT)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TO, PropertyTypeDefinition.TEXT, true, getParamDisplayLabel(PARAM_TO)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_SUBJECT, PropertyTypeDefinition.TEXT, true, getParamDisplayLabel(PARAM_SUBJECT)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TEXT, PropertyTypeDefinition.TEXT, true, getParamDisplayLabel(PARAM_TEXT)));
 	}
 
 }

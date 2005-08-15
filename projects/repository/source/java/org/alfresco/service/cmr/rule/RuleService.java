@@ -19,8 +19,6 @@ package org.alfresco.service.cmr.rule;
 
 import java.util.List;
 
-import org.alfresco.repo.rule.RuleExecution;
-import org.alfresco.repo.rule.RuleRegistration;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
@@ -28,7 +26,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * 
  * @author Roy Wetherall
  */
-public interface RuleService extends  RuleRegistration, RuleExecution
+public interface RuleService
 {
     /**
      * Get the rule types currently defined in the repository.
@@ -40,8 +38,8 @@ public interface RuleService extends  RuleRegistration, RuleExecution
     /**
      * Gets a rule type by name.
      * 
-     * @param name the name of the rule type
-     * @return the rule type, null if not found
+     * @param name 	the name of the rule type
+     * @return 		the rule type, null if not found
      */
     public RuleType getRuleType(String name);
 
@@ -55,8 +53,8 @@ public interface RuleService extends  RuleRegistration, RuleExecution
     /**
      * Indicates whether a node is actionable.
      * 
-     * @param nodeRef the node reference
-     * @return true if the node is actionable, false otherwise
+     * @param nodeRef 	the node reference
+     * @return 			true if the node is actionable, false otherwise
      */
     public boolean isActionable(NodeRef nodeRef);    
     
@@ -88,8 +86,8 @@ public interface RuleService extends  RuleRegistration, RuleExecution
     /**
      * Indicates whether the node in question has any rules associated with it.
      * 
-     * @param nodeRef the node reference
-     * @return true if the node has rules associated, false otherwise
+     * @param nodeRef 	the node reference
+     * @return 			true if the node has rules associated, false otherwise
      */
     public boolean hasRules(NodeRef nodeRef);
 
@@ -100,8 +98,8 @@ public interface RuleService extends  RuleRegistration, RuleExecution
      * An exception is raised if the actionable aspect is not present on the
      * passed node.
      * 
-     * @param nodeRef the node reference
-     * @return a list of the rules associated with the node
+     * @param nodeRef 	the node reference
+     * @return 			a list of the rules associated with the node
      */
     public List<Rule> getRules(NodeRef nodeRef);
 
@@ -113,13 +111,24 @@ public interface RuleService extends  RuleRegistration, RuleExecution
      * An exception is raised if the actionable aspect is not present on the
      * passed node.
      * 
-     * @param nodeRef the node reference
-     * @param includeInhertied
-     *            indicates whether the inherited rules should be included in
-     *            the result list or not
-     * @return a list of the rules associated with the node
+     * @param nodeRef 			the node reference
+     * @param includeInhertied	indicates whether the inherited rules should be included in
+     *            				the result list or not
+     * @return 					a list of the rules associated with the node
      */
     public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied);
+    
+    /**
+     * Get the rules associatied with an actionable node that are of a specific rule type.
+     * 
+     * @param nodeRef					the node reference
+     * @param includeInhertiedRuleType	indicates whether the inherited rules should be included in 
+     * 									the result list or not
+     * @param ruleTypeName				the name of the rule type, if null is passed all rule types 
+     * 									are returned
+     * @return							a list of the rules associated with the node
+     */
+    public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertiedRuleType, String ruleTypeName);
 
     /**
      * Get the rule given its id.
@@ -129,14 +138,6 @@ public interface RuleService extends  RuleRegistration, RuleExecution
      * @return the rule corresponding ot the id
      */
     public Rule getRule(NodeRef nodeRef, String ruleId);
-
-    /**
-     * 
-     * @param nodeRef
-     * @param ruleType
-     * @return
-     */
-    public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType);
 	
 	/**
      * Helper method to create a new rule.
@@ -144,10 +145,10 @@ public interface RuleService extends  RuleRegistration, RuleExecution
      * Call add rule once the details of the rule have been specified in order
      * to associate the rule with a node reference.
      * 
-     * @param ruleType the type of rule to create
-     * @return the created rule
+     * @param ruleTypeName	the name of the rule type
+     * @return 				the created rule
      */
-    public Rule createRule(RuleType ruleType);
+    public Rule createRule(String ruleTypeName);
 
     /**
      * Saves the details of the rule to the specified node reference.

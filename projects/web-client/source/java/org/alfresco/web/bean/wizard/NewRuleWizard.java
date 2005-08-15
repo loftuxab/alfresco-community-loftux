@@ -29,33 +29,17 @@ import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
-import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
-import org.alfresco.repo.action.executer.CheckInActionExecuter;
-import org.alfresco.repo.action.executer.CheckOutActionExecuter;
-import org.alfresco.repo.action.executer.CopyActionExecuter;
-import org.alfresco.repo.action.executer.ImageTransformActionExecuter;
-import org.alfresco.repo.action.executer.LinkCategoryActionExecuter;
-import org.alfresco.repo.action.executer.MailActionExecuter;
-import org.alfresco.repo.action.executer.MoveActionExecuter;
-import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
-import org.alfresco.repo.action.executer.TransformActionExecuter;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
-import org.alfresco.service.cmr.action.ActionDefinition;
-import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.RulesBean;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -64,7 +48,6 @@ import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -164,15 +147,24 @@ public class NewRuleWizard extends BaseActionWizard
          }
          else
          {
-            RuleType ruleType = this.ruleService.getRuleType(this.getType());
-            rule = this.ruleService.createRule(ruleType);
+            rule = this.ruleService.createRule(this.getType());
          }
 
          // setup the rule and add it to the space
          rule.setTitle(this.title);
          rule.setDescription(this.description);
-         rule.addActionCondition(this.getCondition(), conditionParams);
-         rule.addAction(this.getAction(), actionParams);
+         
+         // Add the action to the rule
+         Action action = this.actionService.createAction(this.getCondition());
+         action.setParameterValues(conditionParams);
+         rule.addAction(action);
+         
+         // Add the condition to the rule
+         ActionCondition condition = this.actionService.createActionCondition(this.getCondition());
+         condition.setParameterValues(conditionParams);
+         rule.addActionCondition(condition);
+         
+         // Save the rule
          this.ruleService.saveRule(currentSpace.getNodeRef(), rule);
          
          if (logger.isDebugEnabled())
@@ -443,7 +435,7 @@ public class NewRuleWizard extends BaseActionWizard
       }
       
       // populate the bean with current values 
-      this.type = rule.getRuleType().getName();
+      this.type = rule.getRuleTypeName();
       this.title = rule.getTitle();
       this.description = rule.getDescription();
       // we know there is only 1 condition and action

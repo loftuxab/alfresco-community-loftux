@@ -49,6 +49,11 @@ public abstract class ParameterizedItemDefinitionImpl implements ParameterizedIt
      * The description of the rule item
      */
     private String description;
+        
+    /**
+     * Indicates whether adHocProperties are allowed
+     */
+    private boolean adhocPropertiesAllowed = false;
     
     /**
      * The list of parameters associated with the rule item
@@ -121,6 +126,24 @@ public abstract class ParameterizedItemDefinitionImpl implements ParameterizedIt
         return this.description;
     }
 
+    /**
+     * @see org.alfresco.service.cmr.action.ParameterizedItemDefinition#getAdhocPropertiesAllowed()
+     */
+    public boolean getAdhocPropertiesAllowed()
+    {
+    	return this.adhocPropertiesAllowed;
+    }
+    
+    /**
+     * Set whether adhoc properties are allowed
+     * 
+     * @param adhocPropertiesAllowed	true is adhoc properties are allowed, false otherwise
+     */
+    public void setAdhocPropertiesAllowed(boolean adhocPropertiesAllowed)
+	{
+		this.adhocPropertiesAllowed = adhocPropertiesAllowed;
+	}
+    
     /**
      * Set the parameter definitions for the rule item
      * 

@@ -18,7 +18,6 @@
 package org.alfresco.repo.action.executer;
 
 import org.alfresco.repo.action.ActionDefinitionImpl;
-import org.alfresco.repo.action.ActionRegistration;
 import org.alfresco.repo.action.ParameterizedItemAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionDefinition;
@@ -41,7 +40,7 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
 	 */
 	public void init()
 	{
-		((ActionRegistration)this.actionService).registerActionExecuter(this);
+		this.runtimeActionService.registerActionExecuter(this);
 	}
 	
 	/**
@@ -56,6 +55,7 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
 			this.actionDefinition = new ActionDefinitionImpl(this.name);
 			((ActionDefinitionImpl)this.actionDefinition).setTitle(getTitle());
 			((ActionDefinitionImpl)this.actionDefinition).setDescription(getDescription());
+			((ActionDefinitionImpl)this.actionDefinition).setAdhocPropertiesAllowed(getAdhocPropertiesAllowed());
 			((ActionDefinitionImpl)this.actionDefinition).setRuleActionExecutor(this.name);
 			((ActionDefinitionImpl)this.actionDefinition).setParameterDefinitions(getParameterDefintions());
 		}

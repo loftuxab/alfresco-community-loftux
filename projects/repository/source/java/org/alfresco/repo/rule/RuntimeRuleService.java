@@ -15,20 +15,20 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.service.cmr.action;
+package org.alfresco.repo.rule;
+
+import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.Rule;
 
 /**
- * Parameter type enum
- * 
  * @author Roy Wetherall
  */
-public enum ParameterType
+public interface RuntimeRuleService 
 {
-    STRING,             
-    INT,                
-    BOOLEAN,            
-    DATE,               
-    QNAME,              
-    NODE_REF,       
-    PROPERTY_VALUES     
+	void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule);
+
+	void executePendingRules();	
+	
+	void registerRuleType(RuleTypeAdapter ruleTypeAdapter);
 }

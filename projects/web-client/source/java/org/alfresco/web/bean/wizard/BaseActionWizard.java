@@ -445,7 +445,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    /**
     * Sets the action service
     * 
-    * @param actionService  the action service
+    * @param actionRegistration  the action service
     */
    public void setActionService(ActionService actionService)
    {

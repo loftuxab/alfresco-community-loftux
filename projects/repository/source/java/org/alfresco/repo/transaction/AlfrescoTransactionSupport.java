@@ -25,6 +25,7 @@ import java.util.Set;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.repo.node.integrity.IntegrityChecker;
+import org.alfresco.repo.rule.RuntimeRuleService;
 import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.util.GUID;
@@ -184,7 +185,7 @@ public abstract class AlfrescoTransactionSupport
      * 
      * @param ruleService
      */
-    public static void bindRuleService(RuleService ruleService)
+    public static void bindRuleService(RuntimeRuleService ruleService)
     {
         // get transaction-local synchronization
         TransactionSynchronizationImpl synch = getSynchronization();
@@ -407,7 +408,7 @@ public abstract class AlfrescoTransactionSupport
     {
         private String txnId;
         private Set<NodeDaoService> nodeDaoServices;
-        private Set<RuleService> ruleServices;
+        private Set<RuntimeRuleService> ruleServices;
         private Set<IntegrityChecker> integrityCheckers;
         private Set<LuceneIndexerAndSearcherFactory> lucenes;
         private Set<TransactionListener> listeners;
@@ -422,7 +423,7 @@ public abstract class AlfrescoTransactionSupport
         {
             this.txnId = txnId;
             nodeDaoServices = new HashSet<NodeDaoService>(3);
-            ruleServices = new HashSet<RuleService>(3);
+            ruleServices = new HashSet<RuntimeRuleService>(3);
             integrityCheckers = new HashSet<IntegrityChecker>(3);
             lucenes = new HashSet<LuceneIndexerAndSearcherFactory>(3);
             listeners = new HashSet<TransactionListener>(5);
@@ -447,7 +448,7 @@ public abstract class AlfrescoTransactionSupport
          * @return Returns a set of <tt>RuleService</tt> instances that will be called
          *      during end-of-transaction processing
          */
-        public Set<RuleService> getRuleServices()
+        public Set<RuntimeRuleService> getRuleServices()
         {
             return ruleServices;
         }
@@ -500,7 +501,7 @@ public abstract class AlfrescoTransactionSupport
         public void flush()
         {
             // execute pending rules
-            for (RuleService ruleService : ruleServices)
+            for (RuntimeRuleService ruleService : ruleServices)
             {
                 ruleService.executePendingRules();
             }

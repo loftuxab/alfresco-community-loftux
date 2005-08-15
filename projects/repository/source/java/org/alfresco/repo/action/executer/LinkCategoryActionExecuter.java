@@ -26,7 +26,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
@@ -84,8 +83,8 @@ public class LinkCategoryActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_ASPECT, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_CATEGORY_ASPECT)));
-        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_VALUE, ParameterType.NODE_REF, true, getParamDisplayLabel(PARAM_CATEGORY_VALUE)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_ASPECT, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_CATEGORY_ASPECT)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_VALUE, PropertyTypeDefinition.NODE_REF, true, getParamDisplayLabel(PARAM_CATEGORY_VALUE)));
 	}
 	
     /**

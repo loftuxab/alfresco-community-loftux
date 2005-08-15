@@ -25,11 +25,13 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -98,6 +100,12 @@ public class AuditableAspect
         policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), ContentModel.ASPECT_AUDITABLE, onCreateAudit);
         policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), ContentModel.ASPECT_AUDITABLE, onAddAudit);
         policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateNode"), ContentModel.ASPECT_AUDITABLE, onUpdateAudit);
+        
+		// Register onCopy class behaviour
+		this.policyComponent.bindClassBehaviour(
+				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
+				ContentModel.ASPECT_AUDITABLE,
+				new JavaBehaviour(this, "onCopy"));
     }
 
     /**
@@ -182,4 +190,21 @@ public class AuditableAspect
         return USERNAME_UNKNOWN;
     }
     
+    /**
+	 * OnCopy behaviour implementation for the lock aspect.
+	 * <p>
+	 * Ensures that the propety values of the lock aspect are not copied onto
+	 * the destination node.
+	 * 
+	 * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, StoreRef, boolean, PolicyScope)
+	 */
+	public void onCopy(
+            QName sourceClassRef, 
+            NodeRef sourceNodeRef, 
+            StoreRef destinationStoreRef,
+            boolean copyToNewNode,
+            PolicyScope copyDetails)
+	{
+		// The auditable aspect should not be copied
+	}    
 }

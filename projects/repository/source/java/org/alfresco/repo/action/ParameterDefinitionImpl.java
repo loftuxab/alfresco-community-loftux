@@ -20,7 +20,7 @@ package org.alfresco.repo.action;
 import java.io.Serializable;
 
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Parameter definition implementation class.
@@ -42,7 +42,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     /**
      * The type of the parameter
      */
-    private ParameterType type;
+    private QName type;
     
     /**
      * The display label
@@ -63,7 +63,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
      */
     public ParameterDefinitionImpl(
             String name, 
-            ParameterType type,
+            QName type,
             boolean isMandatory,
             String displayLabel)
     {
@@ -84,7 +84,7 @@ public class ParameterDefinitionImpl implements ParameterDefinition, Serializabl
     /**
      * @see org.alfresco.service.cmr.action.ParameterDefinition#getType()
      */
-    public ParameterType getType()
+    public QName getType()
     {
         return this.type;
     }

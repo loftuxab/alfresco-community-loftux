@@ -36,6 +36,8 @@ import org.alfresco.repo.dictionary.impl.M2Property;
 import org.alfresco.repo.dictionary.impl.M2Type;
 import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
 import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -49,10 +51,10 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
-import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Node operations service unit tests
@@ -70,6 +72,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 	private ContentService contentService;
     private RuleService ruleService;
     private ConfigurableService configurableService;
+    private ActionService actionService;
 	
 	/**
 	 * Data used by the tests
@@ -95,6 +98,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 	private static final QName PROP4_QNAME_OPTIONAL = QName.createQName(TEST_TYPE_NAMESPACE, "prop4Optional");
 	
 	private static final QName PROP_QNAME_MY_NODE_REF = QName.createQName(TEST_TYPE_NAMESPACE, "myNodeRef");
+	private static final QName PROP_QNAME_MY_ANY = QName.createQName(TEST_TYPE_NAMESPACE, "myAny");	
 	
     private static final QName TEST_MANDATORY_ASPECT_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testMandatoryAspect");
     private static final QName PROP5_QNAME_MANDATORY = QName.createQName(TEST_TYPE_NAMESPACE, "prop5Mandatory");
@@ -111,7 +115,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 	/**
 	 * Test content
 	 */
-	private static final String SOME_CONTENT = "This is some content ...";		
+	private static final String SOME_CONTENT = "This is some content ...";	
 	
 	/**
 	 * Sets the meta model DAO
@@ -136,6 +140,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
         this.ruleService = (RuleService)this.applicationContext.getBean("ruleService");
         this.configurableService = (ConfigurableService)this.applicationContext.getBean("configurableService");
+        this.actionService = (ActionService)this.applicationContext.getBean("actionService");
 		
 		// Create the test model
 		createTestModel();
@@ -259,6 +264,11 @@ public class CopyServiceImplTest extends BaseSpringTest
 		propNodeRef.setType("d:" + PropertyTypeDefinition.NODE_REF.getLocalName());
 		propNodeRef.setMandatory(false);
 		
+		M2Property propAnyNodeRef = testType.createProperty("test:" + PROP_QNAME_MY_ANY.getLocalName());
+		propAnyNodeRef.setMandatory(false);
+		propAnyNodeRef.setType("d:" + PropertyTypeDefinition.ANY.getLocalName());
+		propAnyNodeRef.setMandatory(false);
+		
 		M2ChildAssociation childAssoc = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_TYPE_QNAME.getLocalName());
         childAssoc.setTargetClassName("alf:base");
 		childAssoc.setTargetMandatory(false);
@@ -347,12 +357,16 @@ public class CopyServiceImplTest extends BaseSpringTest
         this.ruleService.makeActionable(this.sourceNodeRef);
         
         // Create a new rule and add it to the source noderef
-        RuleType ruleType = this.ruleService.getRuleType(InboundRuleTypeAdapter.NAME);
-        Rule rule = this.ruleService.createRule(ruleType);
-        rule.addActionCondition(NoConditionEvaluator.NAME, null);
+        Rule rule = this.ruleService.createRule(InboundRuleTypeAdapter.NAME);
+        
         Map<String, Serializable> props = new HashMap<String, Serializable>(1);
         props.put(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
-        rule.addAction(AddFeaturesActionExecuter.NAME, props);
+        Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME, props);
+        rule.addAction(action);
+        
+        ActionCondition actionCondition = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+        rule.addActionCondition(actionCondition);
+        
         this.ruleService.saveRule(this.sourceNodeRef, rule);
         
         //System.out.println(
@@ -378,7 +392,8 @@ public class CopyServiceImplTest extends BaseSpringTest
         List<Rule> copiedRules = this.ruleService.getRules(copy);
         assertEquals(1, copiedRules.size());
         Rule copiedRule = copiedRules.get(0);
-        assertEquals(rule.getId(), copiedRule.getId());
+        assertFalse(rule.getId() == copiedRule.getId());
+        assertEquals(rule.getAction(0).getActionDefinitionName(), copiedRule.getAction(0).getActionDefinitionName());
         
         // Now copy the node without copying the children and check that the rules have been copied
         NodeRef copy2 = this.copyService.copy(
@@ -399,7 +414,9 @@ public class CopyServiceImplTest extends BaseSpringTest
         List<Rule> copiedRules2 = this.ruleService.getRules(copy2);
         assertEquals(1, copiedRules.size());
         Rule copiedRule2 = copiedRules2.get(0);
-        assertEquals(rule.getId(), copiedRule2.getId());
+        assertFalse(rule.getId() == copiedRule2.getId());
+        assertEquals(rule.getAction(0).getActionDefinitionName(), copiedRule2.getAction(0).getActionDefinitionName());
+        
         
         //System.out.println(
         //         NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
@@ -485,18 +502,19 @@ public class CopyServiceImplTest extends BaseSpringTest
 		this.nodeService.addChild(nodeFour, nodeThree, TEST_CHILD_ASSOC_TYPE_QNAME, TEST_CHILD_ASSOC_QNAME);
 		this.nodeService.createAssociation(nodeTwo, nodeThree, TEST_ASSOC_TYPE_QNAME);
 		this.nodeService.setProperty(nodeOne, PROP_QNAME_MY_NODE_REF, nodeThree);
+		this.nodeService.setProperty(nodeOne, PROP_QNAME_MY_ANY, nodeThree);
 		
 		// Make node one actionable with a rule to copy nodes into node two
 		this.ruleService.makeActionable(nodeOne);
-		RuleType ruleType = this.ruleService.getRuleType("inbound");
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, nodeTwo);
         params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, TEST_CHILD_ASSOC_TYPE_QNAME);
         params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName("{test}ruleCopy"));
-        Rule rule = this.ruleService.createRule(ruleType);
-        String ruleId = rule.getId();
-        rule.addActionCondition(NoConditionEvaluator.NAME, null);
-        rule.addAction(CopyActionExecuter.NAME, params);
+        Rule rule = this.ruleService.createRule(InboundRuleTypeAdapter.NAME);
+        ActionCondition condition = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+        rule.addActionCondition(condition);
+        Action action = this.actionService.createAction(CopyActionExecuter.NAME, params);
+        rule.addAction(action);
         this.ruleService.saveRule(nodeOne, rule);
 		
 		// Do a deep copy
@@ -505,8 +523,8 @@ public class CopyServiceImplTest extends BaseSpringTest
 		NodeRef nodeThreeCopy = null;
 		NodeRef nodeFourCopy = null;
 		
-		//System.out.println(
-		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		System.out.println(
+				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		List<ChildAssociationRef> nodeOneCopyChildren = this.nodeService.getChildAssocs(nodeOneCopy);
 		assertNotNull(nodeOneCopyChildren);
@@ -549,15 +567,23 @@ public class CopyServiceImplTest extends BaseSpringTest
 		assertNotNull(nodeRef);
 		assertEquals(nodeThreeCopy, nodeRef);
 		
+		// Check the any property
+		NodeRef anyNodeRef = (NodeRef)this.nodeService.getProperty(nodeOneCopy, PROP_QNAME_MY_ANY);
+		assertNotNull(anyNodeRef);
+		assertEquals(nodeThreeCopy, anyNodeRef);
+		
 		// Check the target assoc
-		//List<AssociationRef> assocs = this.nodeService.getTargetAssocs(nodeTwoCopy, TEST_ASSOC_TYPE_QNAME);
-		//assertNotNull(assocs);
-		//assertEquals(1, assocs.size());
-		//AssociationRef assoc = assocs.get(0);
-		//assertEquals(assoc.getTargetRef(), nodeThreeCopy);		
+		List<AssociationRef> assocs = this.nodeService.getTargetAssocs(nodeTwoCopy, TEST_ASSOC_TYPE_QNAME);
+		assertNotNull(assocs);
+		assertEquals(1, assocs.size());
+		AssociationRef assoc = assocs.get(0);
+		assertEquals(assoc.getTargetRef(), nodeThreeCopy);		
 		
 		// Check that the rule parameter values have been made relative
-		Rule copiedRule = this.ruleService.getRule(nodeOneCopy, ruleId);
+		List<Rule> rules = this.ruleService.getRules(nodeOneCopy);
+		assertNotNull(rules);
+		assertEquals(1, rules.size());
+		Rule copiedRule = rules.get(0);
 		assertNotNull(copiedRule);
 		List<Action> ruleActions = copiedRule.getActions();
 		assertNotNull(ruleActions);

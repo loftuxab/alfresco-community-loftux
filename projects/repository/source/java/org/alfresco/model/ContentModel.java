@@ -149,6 +149,8 @@ public interface ContentModel
 	// acitons, conditions and rules
 	static final QName TYPE_ACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "action");
 	static final QName PROP_DEFINITION_NAME = QName.createQName(NamespaceService.ALFRESCO_URI, "definitionName");
+	static final QName PROP_ACTION_TITLE = QName.createQName(NamespaceService.ALFRESCO_URI, "actionTitle");
+	static final QName PROP_ACTION_DESCRIPTION = QName.createQName(NamespaceService.ALFRESCO_URI, "actionDescription");
 	static final QName ASSOC_CONDITIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "conditions");
 	static final QName ASSOC_PARAMETERS = QName.createQName(NamespaceService.ALFRESCO_URI, "parameters");
 	static final QName TYPE_ACTION_CONDITION = QName.createQName(NamespaceService.ALFRESCO_URI, "actioncondition");

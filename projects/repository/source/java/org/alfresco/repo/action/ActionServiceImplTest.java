@@ -252,12 +252,18 @@ public class ActionServiceImplTest extends BaseSpringTest
 	 */
 	public void testSaveActionNoCondition()
 	{
+		// TODO check the audiatble properties of the action
+		
 		// Create the action
 		Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
 		String actionId = action.getId();
 		
 		// Set the parameters of the action
 		action.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+		
+		// Set the title and description of the action
+		action.setTitle("title");
+		action.setDescription("description");
 				
 		// Save the action
 		this.actionService.saveAction(this.nodeRef, action);
@@ -268,6 +274,10 @@ public class ActionServiceImplTest extends BaseSpringTest
 		// Check the action 
 		assertEquals(action.getId(), savedAction.getId());
 		assertEquals(action.getActionDefinitionName(), savedAction.getActionDefinitionName());
+		
+		// Check the title and the description
+		assertEquals("title", savedAction.getTitle());
+		assertEquals("description", savedAction.getDescription());
 		
 		// Check the properties
 		assertEquals(1, savedAction.getParameterValues().size());

@@ -3,16 +3,39 @@
  
 <beans>
 	
-   <!-- Rules Service -->
+   <!-- Action Service -->
    
-   <bean id="actionService" class="org.alfresco.repo.action.ActionServiceImpl">		
-	  <property name="nodeService">
-         <ref bean="nodeService"/>
-	  </property>	  
-	  <property name="configurableService">
-         <ref bean="configurableService"/>
-	  </property>
+   <bean id="actionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+      	 <list>
+         	<value>org.alfresco.service.cmr.action.ActionService</value>
+         	<value>org.alfresco.repo.action.RuntimeActionService</value>
+         </list>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+         <bean class="org.alfresco.repo.action.ActionServiceImpl">		
+		    <property name="nodeService">
+		       <ref bean="nodeService"/>
+			</property>	  
+			<property name="configurableService">
+		       <ref bean="configurableService"/>
+			</property>	  
+			<property name="searchService">
+		       <ref bean="searchService"/>
+			</property>
+		 </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
    </bean>
+   
+   
    
    <!-- Definitions for beans that use the common resource -->
    
@@ -25,7 +48,7 @@
    <!-- Action Conditions -->
 
    <bean id="action-condition-evaluator" parent="action-common-resource" init-method="init">
-	  <property name="actionService">
+	  <property name="runtimeActionService">
 	     <ref bean="actionService"/>
 	  </property>
    </bean>	
@@ -60,7 +83,7 @@
    <!-- Actions -->
    
    <bean id="action-executer" parent="action-common-resource" init-method="init">
-	  <property name="actionService">
+	  <property name="runtimeActionService">
 	     <ref bean="actionService"/>
 	  </property>
    </bean>

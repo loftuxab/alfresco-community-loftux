@@ -26,7 +26,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -56,12 +56,12 @@ public class SimpleWorkflowActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_STEP, ParameterType.STRING, false, getParamDisplayLabel(PARAM_APPROVE_STEP)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_FOLDER, ParameterType.NODE_REF, false, getParamDisplayLabel(PARAM_APPROVE_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_MOVE, ParameterType.BOOLEAN, false, getParamDisplayLabel(PARAM_APPROVE_MOVE)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_STEP, ParameterType.STRING, false, getParamDisplayLabel(PARAM_REJECT_STEP)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_FOLDER, ParameterType.NODE_REF, false, getParamDisplayLabel(PARAM_REJECT_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_MOVE, ParameterType.BOOLEAN, false, getParamDisplayLabel(PARAM_REJECT_MOVE)));		
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_STEP, PropertyTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_APPROVE_STEP)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_FOLDER, PropertyTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_APPROVE_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_MOVE, PropertyTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_APPROVE_MOVE)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_STEP, PropertyTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_REJECT_STEP)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_FOLDER, PropertyTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_REJECT_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_MOVE, PropertyTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_REJECT_MOVE)));		
 	}
 
 	/**
@@ -86,13 +86,16 @@ public class SimpleWorkflowActionExecuter extends ActionExecuterAbstractBase
 			Map<QName, Serializable> propertyValues = new HashMap<QName, Serializable>();
 			propertyValues.put(ContentModel.PROP_APPROVE_STEP, approveStep);
 			propertyValues.put(ContentModel.PROP_APPROVE_FOLDER, approveFolder);
-			propertyValues.put(ContentModel.PROP_APPROVE_MOVE, approveMove.booleanValue());
+			if (approveMove != null)
+			{
+				propertyValues.put(ContentModel.PROP_APPROVE_MOVE, approveMove.booleanValue());
+			}						
 			propertyValues.put(ContentModel.PROP_REJECT_STEP, rejectStep);
 			propertyValues.put(ContentModel.PROP_REJECT_FOLDER, rejectFolder);
-         if (rejectMove != null)
-         {
-            propertyValues.put(ContentModel.PROP_REJECT_MOVE, rejectMove.booleanValue());
-         }
+	        if (rejectMove != null)
+	        {
+	        	propertyValues.put(ContentModel.PROP_REJECT_MOVE, rejectMove.booleanValue());
+	        }
 			
 			// Apply the simple workflow aspect to the node
 			this.nodeService.addAspect(actionedUponNodeRef, ContentModel.ASPECT_SIMPLE_WORKFLOW, propertyValues);

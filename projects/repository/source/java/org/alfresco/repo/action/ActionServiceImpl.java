@@ -19,6 +19,7 @@ package org.alfresco.repo.action;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
@@ -49,7 +52,7 @@ import org.springframework.context.ApplicationContextAware;
  * 
  * @author Roy Wetherall
  */
-public class ActionServiceImpl implements ActionService, ActionRegistration, ApplicationContextAware
+public class ActionServiceImpl implements ActionService, RuntimeActionService, ApplicationContextAware
 { 
 	private static final QName ASSOC_NAME_ACTION_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "actionFolder");
 	private static final QName ASSOC_NAME_ACTIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "actions");
@@ -68,6 +71,11 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	 * The configurable service
 	 */
 	private ConfigurableService configurableService;
+	
+	/**
+	 * The search service
+	 */
+	private SearchService searchService;
 	
 	/**
 	 * All the condition definitions currently registered
@@ -97,6 +105,16 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	public void setNodeService(NodeService nodeService)
 	{
 		this.nodeService = nodeService;
+	}
+	
+	/**
+	 * Set the search service
+	 * 
+	 * @param searchService  the search service
+	 */
+	public void setSearchService(SearchService searchService)
+	{
+		this.searchService = searchService;
 	}
 	
 	/**
@@ -150,11 +168,31 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	}
 
 	/**
+	 * @see org.alfresco.service.cmr.action.ActionService#createActionCondition(java.lang.String, java.util.Map)
+	 */
+	public ActionCondition createActionCondition(String name, Map<String, Serializable> params)
+	{
+		ActionCondition condition = createActionCondition(name);
+		condition.setParameterValues(params);
+		return condition;
+	}
+
+	/**
 	 * @see org.alfresco.service.cmr.action.ActionService#createAction()
 	 */
 	public Action createAction(String name)
 	{
 		return new ActionImpl(GUID.generate(),name);
+	}
+	
+	/**
+	 * @see org.alfresco.service.cmr.action.ActionService#createAction(java.lang.String, java.util.Map)
+	 */
+	public Action createAction(String name, Map<String, Serializable> params)
+	{
+		Action action = createAction(name);
+		action.setParameterValues(params);
+		return action;
 	}
 
 	/**
@@ -206,6 +244,8 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 			{
 				for (Action subAction : ((CompositeAction)action).getActions())
 				{
+					// TODO should we check each individual actions conditions and only potentially
+					// execute some of them .. not for now
 					executeAction(subAction, actionedUponNodeRef);
 				}
 			}
@@ -228,7 +268,7 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	}
 
 	/**
-	 * @see org.alfresco.repo.action.ActionRegistration#registerActionConditionEvaluator(org.alfresco.repo.action.evaluator.ActionConditionEvaluator)
+	 * @see org.alfresco.repo.action.RuntimeActionService#registerActionConditionEvaluator(org.alfresco.repo.action.evaluator.ActionConditionEvaluator)
 	 */
 	public void registerActionConditionEvaluator(ActionConditionEvaluator actionConditionEvaluator) 
 	{
@@ -237,12 +277,41 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	}
 
 	/**
-	 * @see org.alfresco.repo.action.ActionRegistration#registerActionExecuter(org.alfresco.repo.action.executer.ActionExecuter)
+	 * @see org.alfresco.repo.action.RuntimeActionService#registerActionExecuter(org.alfresco.repo.action.executer.ActionExecuter)
 	 */
 	public void registerActionExecuter(ActionExecuter actionExecuter) 
 	{
 		ActionDefinition action = actionExecuter.getRuleActionDefinition();
 		this.actionDefinitions.put(action.getName(), action);
+	}
+	
+	/**
+	 * Gets the action node ref from the action id
+	 * 
+	 * @param nodeRef	the node reference
+	 * @param actionId	the acition id
+	 * @return			the action node reference
+	 */
+	private NodeRef getActionNodeRefFromId(NodeRef nodeRef, String actionId)
+	{
+		NodeRef result = null;
+		NodeRef actionFolderNodeRef = getActionFolder(nodeRef);
+		
+		DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
+		namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+		
+		List<NodeRef> nodeRefs = searchService.selectNodes(
+				actionFolderNodeRef, 
+				"*[@alf:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + actionId + "']",
+				null,
+				namespacePrefixResolver,
+				false);
+		if (nodeRefs.size() != 0)
+		{
+			result = nodeRefs.get(0);
+		}
+		
+		return result;
 	}
 
 	/**
@@ -250,8 +319,8 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	 */
 	public void saveAction(NodeRef nodeRef, Action action)
 	{
-		NodeRef actionNodeRef = new NodeRef(nodeRef.getStoreRef(), action.getId());
-		if (this.nodeService.exists(actionNodeRef) == false)
+		NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, action.getId());
+		if (actionNodeRef == null)
 		{
 			NodeRef actionFolderNodeRef = getActionFolder(nodeRef); 
 
@@ -272,9 +341,22 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 					ASSOC_NAME_ACTIONS,
 					actionType,
 					props).getChildRef();
+			
+			// Update the created details
+			((ActionImpl)action).setCreator((String)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_CREATOR));
+			((ActionImpl)action).setCreatedDate((Date)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_CREATED));
 		}
 		
-		// TODO update any other action properties here !!
+		saveActionImpl(actionNodeRef, action);
+	}
+	
+	/**
+	 * @see org.alfresco.repo.action.RuntimeActionService#saveActionImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.action.Action)
+	 */
+	public void saveActionImpl(NodeRef actionNodeRef, Action action)
+	{
+		// Save action properties
+		saveActionProperties(actionNodeRef, action);
 		
 		// Update the parameters of the action
 		saveParameters(actionNodeRef, action);
@@ -287,6 +369,25 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 			// Update composite action
 			saveActions(actionNodeRef, (CompositeAction)action);
 		}
+		
+		// Update the modified details
+		((ActionImpl)action).setModifier((String)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_MODIFIER));
+		((ActionImpl)action).setModifiedDate((Date)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_MODIFIED));
+	}
+
+	/**
+	 * Save the action property values
+	 * 
+	 * @param actionNodeRef	the action node reference
+	 * @param action		the action
+	 */
+	private void saveActionProperties(NodeRef actionNodeRef, Action action)
+	{
+		// Update the action property values
+		Map<QName, Serializable> props = this.nodeService.getProperties(actionNodeRef);
+		props.put(ContentModel.PROP_ACTION_TITLE, action.getTitle());
+		props.put(ContentModel.PROP_ACTION_DESCRIPTION, action.getDescription());
+		this.nodeService.setProperties(actionNodeRef, props);
 	}
 
 	/**
@@ -317,7 +418,7 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 			else
 			{
 				// Update the action
-				saveAction(actionNodeRef, idToAction.get(actionNodeRef.getId()));
+				saveActionImpl(actionNodeRef, idToAction.get(actionNodeRef.getId()));
 				idToAction.remove(actionNodeRef.getId());
 			}
 			
@@ -337,7 +438,7 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 					ContentModel.TYPE_ACTION,
 					props).getChildRef();
 			
-			saveAction(actionNodeRef, entry.getValue());
+			saveActionImpl(actionNodeRef, entry.getValue());
 		}
 	}
 
@@ -538,6 +639,9 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	 */
 	private void populateAction(NodeRef actionNodeRef, Action action)
 	{
+		// Populate the action properties
+		populateActionProperties(actionNodeRef, action);
+		
 		// Set the parameters
 		populateParameters(actionNodeRef, action);
 		
@@ -548,6 +652,23 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 			NodeRef conditionNodeRef = condition.getChildRef();
 			action.addActionCondition(createActionCondition(conditionNodeRef));
 		}
+	}
+
+	/**
+	 * Populates the action properties from the node reference
+	 * 	
+	 * @param actionNodeRef	the action node reference
+	 * @param action		the action
+	 */
+	private void populateActionProperties(NodeRef actionNodeRef, Action action)
+	{
+		Map<QName, Serializable> props = this.nodeService.getProperties(actionNodeRef);
+		action.setTitle((String)props.get(ContentModel.PROP_ACTION_TITLE));
+		action.setDescription((String)props.get(ContentModel.PROP_ACTION_DESCRIPTION));
+		((ActionImpl)action).setCreator((String)props.get(ContentModel.PROP_CREATOR));
+		((ActionImpl)action).setCreatedDate((Date)props.get(ContentModel.PROP_CREATED));
+		((ActionImpl)action).setModifier((String)props.get(ContentModel.PROP_MODIFIER));
+		((ActionImpl)action).setModifiedDate((Date)props.get(ContentModel.PROP_MODIFIED));
 	}
 
 	/**
@@ -589,7 +710,7 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 	 * @param compositeNodeRef	the composite action node reference
 	 * @param compositeAction	the composite action
 	 */
-	private void populateCompositeAction(NodeRef compositeNodeRef, CompositeAction compositeAction)
+	public void populateCompositeAction(NodeRef compositeNodeRef, CompositeAction compositeAction)
 	{
 		populateAction(compositeNodeRef, compositeAction);
 		
@@ -611,8 +732,8 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 		if (this.nodeService.exists(nodeRef) == true &&
 			this.configurableService.isConfigurable(nodeRef) == true)
 		{
-			NodeRef actionNodeRef = new NodeRef(nodeRef.getStoreRef(), actionId);
-			if (this.nodeService.exists(actionNodeRef) == true)
+			NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, actionId);
+			if (actionNodeRef != null)
 			{
 				result = createAction(actionNodeRef);
 			}
@@ -629,8 +750,8 @@ public class ActionServiceImpl implements ActionService, ActionRegistration, App
 		if (this.nodeService.exists(nodeRef) == true &&
 			this.configurableService.isConfigurable(nodeRef) == true)
 		{
-			NodeRef actionNodeRef = new NodeRef(nodeRef.getStoreRef(), action.getId());
-			if (this.nodeService.exists(actionNodeRef) == true)
+			NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, action.getId());
+			if (actionNodeRef != null)
 			{
 				NodeRef actionFolder = getActionFolder(nodeRef);
 				this.nodeService.removeChild(actionFolder, actionNodeRef);

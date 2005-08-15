@@ -21,7 +21,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.action.ParameterizedItem;
 import org.alfresco.service.cmr.action.ParameterizedItemDefinition;
@@ -51,7 +50,7 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	/**
 	 * Action service
 	 */
-	protected ActionService actionService;
+	protected RuntimeActionService runtimeActionService;
     
     /**
      * @return Return a short title and description string
@@ -88,11 +87,11 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	/**
 	 * Sets the action service 
 	 * 
-	 * @param actionService the action service
+	 * @param actionRegistration the action service
 	 */
-	public void setActionService(ActionService actionService)
+	public void setRuntimeActionService(RuntimeActionService runtimeActionService)
 	{
-		this.actionService = actionService;
+		this.runtimeActionService = runtimeActionService;
 	}
 
 	/**
@@ -114,6 +113,17 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	{
 		return this.properties.getProperty(this.name + "." + DESCRIPTION);
 	}	
+	
+	/**
+	 * Indicates whether adhoc property definitions are allowed or not
+	 * 
+	 * @return	true if they are, by default false
+	 */
+	protected boolean getAdhocPropertiesAllowed()
+	{
+		// By default adhoc properties are not allowed
+		return false;
+	}
 
 	/**
 	 * Gets the parameter definition display label from the properties file.

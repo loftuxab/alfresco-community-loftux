@@ -224,16 +224,6 @@
             </association>
          </associations>
       </type>
-
-      <type name="alf:rulecontent">
-         <title>Rule Content</title>
-         <parent>alf:content</parent>
-         <properties>
-            <property name="alf:localScope">
-               <type>d:boolean</type>
-            </property>
-         </properties>
-      </type>
       
       <!-- Action, conditions and rules -->
       
@@ -260,6 +250,16 @@
 	  <type name="alf:action">
 	     <title>Action</title>
 	     <parent>alf:actionbase</parent>
+	     <properties>
+            <property name="alf:actionTitle">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="alf:actionDescription">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>	     
          <associations>
             <child-association name="alf:conditions">
                <target>
@@ -307,6 +307,7 @@
 	  
 	  <type name="alf:rule">
 	     <title>Rule</title>
+	     <parent>alf:compositeaction</parent>
 	     <properties>
             <property name="alf:ruleType">
                <type>d:text</type>

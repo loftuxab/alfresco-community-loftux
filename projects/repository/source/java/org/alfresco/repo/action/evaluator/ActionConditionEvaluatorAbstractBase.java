@@ -18,7 +18,6 @@
 package org.alfresco.repo.action.evaluator;
 
 import org.alfresco.repo.action.ActionConditionDefinitionImpl;
-import org.alfresco.repo.action.ActionRegistration;
 import org.alfresco.repo.action.ParameterizedItemAbstractBase;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
@@ -37,7 +36,7 @@ public abstract class ActionConditionEvaluatorAbstractBase extends Parameterized
 	public void init()
 	{
 		// Call back to the action service to register the condition
-		((ActionRegistration)this.actionService).registerActionConditionEvaluator(this);
+		this.runtimeActionService.registerActionConditionEvaluator(this);
 	}
 	
 	public ActionConditionDefinition getRuleConditionDefintion() 
@@ -47,6 +46,7 @@ public abstract class ActionConditionEvaluatorAbstractBase extends Parameterized
 			this.actionConditionDefinition = new ActionConditionDefinitionImpl(this.name);
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setTitle(getTitle());
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setDescription(getDescription());
+			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setAdhocPropertiesAllowed(getAdhocPropertiesAllowed());
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setConditionEvaluator(this.name);
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setParameterDefinitions(getParameterDefintions());
 		}

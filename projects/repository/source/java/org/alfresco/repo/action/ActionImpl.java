@@ -19,6 +19,7 @@ package org.alfresco.repo.action;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,36 @@ public class ActionImpl extends ParameterizedItemImpl
      * Serial version UID
      */
     private static final long serialVersionUID = 3258135760426186548L;
+    
+    /**
+     * The title 
+     */
+    private String title;
+    
+    /**
+     * The description 
+     */
+    private String description;
+    
+    /**
+     * The created date 
+     */
+    private Date createdDate;
+    
+    /**
+     * The creator
+     */
+    private String creator;
+    
+    /**
+     * The modified date
+     */
+    private Date modifiedDate;
+    
+    /**
+     * The modifier
+     */
+    private String modifier;
     
     /**
      * Rule action definition name
@@ -75,6 +106,113 @@ public class ActionImpl extends ParameterizedItemImpl
         this.actionDefinitionName = actionDefinitionName;
     }
     
+    /**
+     * @see org.alfresco.service.cmr.action.Action#getTitle()
+     */
+    public String getTitle()
+	{
+		return this.title;
+	}
+
+    /**
+     * @see org.alfresco.service.cmr.action.Action#setTitle(java.lang.String)
+     */
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
+
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getDescription()
+	 */
+	public String getDescription()
+	{
+		return this.description;
+	}
+
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#setDescription(java.lang.String)
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getCreatedDate()
+	 */
+	public Date getCreatedDate()
+	{
+		return this.createdDate;
+	}
+	
+	/**
+	 * Set the created date
+	 * 
+	 * @param createdDate  the created date
+	 */
+	public void setCreatedDate(Date createdDate)
+	{
+		this.createdDate = createdDate;
+	}
+
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getCreator()
+	 */
+	public String getCreator()
+	{
+		return this.creator;
+	}
+	
+	/**
+	 * Set the creator
+	 * 
+	 * @param creator  the creator
+	 */
+	public void setCreator(String creator)
+	{
+		this.creator = creator;
+	}
+
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getModifiedDate()
+	 */
+	public Date getModifiedDate()
+	{
+		return this.modifiedDate;
+	}
+	
+	/**
+	 * Set the modified date
+	 * 
+	 * @param modifiedDate	the modified date
+	 */
+	public void setModifiedDate(Date modifiedDate)
+	{
+		this.modifiedDate = modifiedDate;
+	}
+
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getModifier()
+	 */
+	public String getModifier()
+	{
+		return this.modifier;
+	}
+	
+	/**
+	 * Set the modifier
+	 * 
+	 * @param modifier	the modifier
+	 */
+	public void setModifier(String modifier)
+	{
+		this.modifier = modifier;
+	}
+    
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getActionDefinitionName()
+	 */
     public String getActionDefinitionName()
     {
     	return this.actionDefinitionName;
@@ -150,5 +288,5 @@ public class ActionImpl extends ParameterizedItemImpl
 	public void removeAllActionConditions()
 	{
 		this.actionConditions.clear();
-	}
+	}	
 }

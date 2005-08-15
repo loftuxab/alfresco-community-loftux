@@ -21,9 +21,8 @@ import java.util.List;
 
 import org.alfresco.repo.action.CommonResourceAbstractBase;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.rule.RuleExecution;
-import org.alfresco.repo.rule.RuleRegistration;
 import org.alfresco.repo.rule.RuleTypeImpl;
+import org.alfresco.repo.rule.RuntimeRuleService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -93,6 +92,7 @@ public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstract
 	
 	/**
 	 * Set the rule service
+	 * 
 	 * @param ruleService
 	 */
 	public void setRuleService(RuleService ruleService) 
@@ -110,7 +110,7 @@ public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstract
 	public void init()
 	{
 		// Call back to rule service to register rule type
-		((RuleRegistration)this.ruleService).registerRuleType(this);
+		((RuntimeRuleService)this.ruleService).registerRuleType(this);
 		
 		// Register the policy bahaviour
 		registerPolicyBehaviour();
@@ -148,13 +148,14 @@ public abstract class RuleTypeAdapterAbstractBase extends CommonResourceAbstract
     {
         if (this.ruleService.rulesEnabled(actionableNodeRef) == true && this.ruleService.hasRules(actionableNodeRef) == true)
         {
-            List<Rule> rules = this.ruleService.getRulesByRuleType(
+            List<Rule> rules = this.ruleService.getRules(
                     actionableNodeRef, 
-                    this.ruleType);
+                    true,
+                    this.ruleType.getName());
 			
             for (Rule rule : rules)
             {   
-				((RuleExecution)this.ruleService).addRulePendingExecution(actionableNodeRef, actionedUponNodeRef, rule);
+				((RuntimeRuleService)this.ruleService).addRulePendingExecution(actionableNodeRef, actionedUponNodeRef, rule);
             }
         }
     }

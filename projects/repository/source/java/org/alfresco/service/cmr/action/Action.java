@@ -17,6 +17,7 @@
  */
 package org.alfresco.service.cmr.action;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -33,6 +34,62 @@ public interface Action extends ParameterizedItem
 	 * @return	the action defintion name
 	 */
 	String getActionDefinitionName();
+	
+	/**
+	 * Get the title of the action
+	 * 
+	 * @return  the title of the action
+	 */
+	String getTitle();
+	
+	/**
+	 * Set the title of the action
+	 * 
+	 * @param title	the title of the action
+	 */
+	void setTitle(String title);
+	
+	/**
+	 * Get the description of the action
+	 * 
+	 * @return	the description of the action
+	 */
+	String getDescription();
+	
+	/**
+	 * Set the description of the action
+	 * 
+	 * @param description  the description of the action
+	 */
+	void setDescription(String description);
+	
+	/**
+	 * Get the date the action was created
+	 * 
+	 * @return	action creation date
+	 */
+	Date getCreatedDate();
+	
+	/**
+	 * Get the name of the user that created the action
+	 * 
+	 * @return	user name
+	 */
+	String getCreator();
+	
+	/**
+	 * Get the date that the action was last modified
+	 * 
+	 * @return	aciton modification date
+	 */
+	Date getModifiedDate();
+	
+	/**
+	 * Get the name of the user that last modified the action
+	 * 
+	 * @return	user name
+	 */
+	String getModifier();
 	
 	/**
 	 * Indicates whether the action has any conditions specified

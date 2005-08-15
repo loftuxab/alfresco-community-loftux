@@ -19,13 +19,26 @@ package org.alfresco.repo.action;
 
 import org.alfresco.repo.action.evaluator.ActionConditionEvaluator;
 import org.alfresco.repo.action.executer.ActionExecuter;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.CompositeAction;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * @author Roy Wetherall
  */
-public interface ActionRegistration
+public interface RuntimeActionService
 {
 	void registerActionConditionEvaluator(ActionConditionEvaluator actionConditionEvaluator);
 	
 	void registerActionExecuter(ActionExecuter actionExecuter);
+	
+	void populateCompositeAction(NodeRef compositeNodeRef, CompositeAction compositeAction);
+	
+	/**
+	 * Save action, used internally to store the details of an action on the aciton node.
+	 * 
+	 * @param actionNodeRef	the action node reference
+	 * @param action		the action
+	 */
+	void saveActionImpl(NodeRef actionNodeRef, Action action);
 }

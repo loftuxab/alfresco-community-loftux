@@ -20,10 +20,11 @@ package org.alfresco.repo.action;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
-
 import junit.framework.TestCase;
+
+import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.namespace.QName;
 
 /**
  * @author Roy Wetherall
@@ -38,8 +39,8 @@ public abstract class BaseParameterizedItemDefinitionImplTest extends TestCase
     
     private static final String PARAM1_DISPLAYNAME = "param1-displayname";
     private static final String PARAM1_NAME = "param1-name";
-    private static final ParameterType PARAM1_TYPE = ParameterType.STRING;
-    private static final ParameterType PARAM2_TYPE = ParameterType.STRING;
+    private static final QName PARAM1_TYPE = PropertyTypeDefinition.TEXT;
+    private static final QName PARAM2_TYPE = PropertyTypeDefinition.TEXT;
     private static final String PARAM2_DISPLAYNAME = "param2-displaname";
     private static final String PARAM2_NAME = "param2-name";
     

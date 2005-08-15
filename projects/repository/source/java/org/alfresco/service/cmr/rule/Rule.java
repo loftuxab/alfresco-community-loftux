@@ -18,28 +18,16 @@
 
 package org.alfresco.service.cmr.rule;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.action.CompositeAction;
 
 
 /**
+ * Rule Interface
  * 
  * @author Roy Wetherall
  */
-public interface Rule 
+public interface Rule extends CompositeAction
 {
-    /**
-     * Gets the unique identifier of the rule
-     * 
-     * @return  the id
-     */
-    String getId(); 
-    
     /**
      * Indicates that the rule is applied to the children of the associated
      * node, not just the node itself.
@@ -59,114 +47,11 @@ public interface Rule
      *                              otherwise
      */
     void applyToChildren(boolean isAppliedToChildren);
-    
-    /**
-     * Get the created date
-     * 
-     * @return  the created date
-     */
-    Date getCreatedDate();
-    
-    /**
-     * Get the modified date
-     * 
-     * @return  the modified date
-     */
-    Date getModifiedDate();
 
     /**
-     * Get the rule type
+     * Get the rule type name
      * 
-     * @return  the rule type
+     * @return  the rule type name
      */
-    RuleType getRuleType();
-
-    /**
-     * Get the title of the rule
-     * 
-     * @return	the title
-     */
-    String getTitle();
-
-    /**
-     * Set the title of the rule
-     * 
-     * @param title  the title
-     */
-    void setTitle(String title);
-
-    /**
-     * Get the description of the rule
-     * 
-     * @return	the description of the rule
-     */
-    String getDescription();
-
-    /**
-     * Set the description of the rule
-     * 
-     * @param description  the description of the rule
-     */
-    void setDescription(String description);
-
-    /**
-     * Get a list of action conditions.
-     * 
-     * @return     the list of action conditions
-     */
-    List<ActionCondition> getActionConditions();
-
-    /**
-     * Add an action condition to the rule.
-     * 
-     * @param actionConditionDefinitionName	the action condition definition name
-     * @param parameterValues				the parameter values
-     * @return								the added rule condition
-     */
-    ActionCondition addActionCondition(
-            String actionConditionDefinitionName,
-            Map<String, Serializable> parameterValues);
-
-    /**
-     * Remove an action condition
-     * 
-     * @param actionCondition	the action condition
-     */
-    void removeActionCondition(ActionCondition ruleCondition);
-    
-    /**
-     * Removes all the action conditions from the rule   
-     */
-    void removeAllActionConditions();
-
-    /**
-     * Get a list of all the actions.
-     * 
-     * @return      the list of actions
-     */
-    List<Action> getActions();
-
-    /**
-     * Add a rule action to the rule.
-     * 
-     * @param actionDefinitionName	the action defintion name
-     * @param parameterValues		the action parameters
-     * @return						the rule action
-     */
-    Action addAction(
-    		String actionDefinitionName,
-    		Map<String, Serializable> parameterValues);
-    
-    /**
-     * Remove an action
-     * 
-     * @param ruleAction	the action
-     */
-    void removeAction(Action ruleAction);
-    
-    /**
-     * Removes all the actions
-     */
-    void removeAllActions();
-
-}
+    String getRuleTypeName();
+ }

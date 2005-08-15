@@ -17,15 +17,25 @@
  */
 package org.alfresco.repo.rule;
 
+import java.util.List;
+
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 
 /**
+ * Rule cache interface
+ * 
  * @author Roy Wetherall
  */
-public interface RuleExecution 
+public interface RuleCache
 {
-	void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule);
-
-	void executePendingRules();	
+	List<Rule> getRules(NodeRef nodeRef);
+	
+	List<Rule> getInheritedRules(NodeRef nodeRef);
+	
+	void setRules(NodeRef nodeRef, List<Rule> rules);
+	
+	void setInheritedRules(NodeRef nodeRef, List<Rule> rules);
+	
+	void dirtyRules(NodeRef nodeRef);
 }

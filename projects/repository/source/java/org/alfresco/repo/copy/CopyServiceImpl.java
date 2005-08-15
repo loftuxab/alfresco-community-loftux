@@ -229,6 +229,13 @@ public class CopyServiceImpl implements CopyService
 		}		
 	}
 
+	/**
+	 * 
+	 * @param typeQName
+	 * @param sourceNodeRef
+	 * @param destinationNodeRef
+	 * @param copiedNodeRefs
+	 */
 	private void defaultOnCopyComplete(
 			QName typeQName, 
 			NodeRef sourceNodeRef, 
@@ -242,15 +249,19 @@ public class CopyServiceImpl implements CopyService
             Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
             for (Map.Entry<QName,PropertyDefinition> entry : propertyDefinitions.entrySet()) 
             {
-            	if (PropertyTypeDefinition.NODE_REF.equals(entry.getValue().getPropertyType().getName()) == true)
+            	QName propertyTypeDefinition = entry.getValue().getPropertyType().getName();
+            	if (PropertyTypeDefinition.NODE_REF.equals(propertyTypeDefinition) == true ||
+            		PropertyTypeDefinition.ANY.equals(propertyTypeDefinition) == true)
             	{
             		// Re-set the node ref so that it is still relative (if appropriate)
-            		NodeRef value = (NodeRef)this.nodeService.getProperty(destinationNodeRef, entry.getKey());
-            		if (value != null)
+            		Serializable value = this.nodeService.getProperty(destinationNodeRef, entry.getKey());
+            		if (value != null && value instanceof NodeRef)
             		{
-            			if (copiedNodeRefs.containsKey(value) == true)
+            			NodeRef nodeRef = (NodeRef)value;
+            			if (copiedNodeRefs.containsKey(nodeRef) == true)
             			{
-            				this.nodeService.setProperty(destinationNodeRef, entry.getKey(), copiedNodeRefs.get(value));
+            				NodeRef copiedNodeRef = copiedNodeRefs.get(nodeRef);
+            				this.nodeService.setProperty(destinationNodeRef, entry.getKey(), copiedNodeRef);
             			}
             		}            		
             	}
@@ -710,7 +721,7 @@ public class CopyServiceImpl implements CopyService
 		// Copy over the top of the destination node
 		copyProperties(destinationNodeRef, copyDetails);
 		copyAspects(destinationNodeRef, copyDetails);
-		copyAssociations(destinationNodeRef, copyDetails, false, null);
+		copyAssociations(destinationNodeRef, copyDetails, false, new HashMap<NodeRef, NodeRef>());
     }
 	
 	/**

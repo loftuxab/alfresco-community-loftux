@@ -18,13 +18,14 @@
 package org.alfresco.repo.action.executer;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -57,6 +58,15 @@ public class AddFeaturesActionExecuter extends ActionExecuterAbstractBase
 	{
 		this.nodeService = nodeService;
 	}
+	
+	/**
+	 * Adhoc properties are allowed for this executor
+	 */
+	@Override
+	protected boolean getAdhocPropertiesAllowed()
+	{
+		return true;
+	}
 
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuter#execute(org.alfresco.service.cmr.repository.NodeRef, NodeRef)
@@ -65,12 +75,24 @@ public class AddFeaturesActionExecuter extends ActionExecuterAbstractBase
     {
 		if (this.nodeService.exists(actionedUponNodeRef) == true)
 		{
-	        // Get the name of the aspec to add
-			Map<String, Serializable> paramValues = ruleAction.getParameterValues();
-	        QName aspectQName = (QName)paramValues.get(PARAM_ASPECT_NAME);
-	        
-			// Get the aspect properties (may be null if no values set)
-            Map<QName, Serializable> properties = (Map<QName, Serializable>)paramValues.get(PARAM_ASPECT_PROPERTIES);
+			Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
+			QName aspectQName = null;
+			
+	        Map<String, Serializable> paramValues = ruleAction.getParameterValues();
+	        for (Map.Entry<String, Serializable> entry : paramValues.entrySet())
+			{
+				if (entry.getKey().equals(PARAM_ASPECT_NAME) == true)
+				{
+					aspectQName = (QName)entry.getValue();
+				}
+				else
+				{
+					// Must be an adhoc property
+					QName propertyQName = QName.createQName(entry.getKey());
+					Serializable propertyValue = entry.getValue();
+					properties.put(propertyQName, propertyValue);
+				}
+			}
 			
 	        // Add the aspect
 	        this.nodeService.addAspect(actionedUponNodeRef, aspectQName, properties);
@@ -83,8 +105,7 @@ public class AddFeaturesActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASPECT_NAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASPECT_NAME)));
-        paramList.add(new ParameterDefinitionImpl(PARAM_ASPECT_PROPERTIES, ParameterType.PROPERTY_VALUES, false, getParamDisplayLabel(PARAM_ASPECT_PROPERTIES)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASPECT_NAME, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASPECT_NAME)));
 	}
 
 }

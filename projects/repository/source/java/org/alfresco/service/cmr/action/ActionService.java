@@ -17,7 +17,9 @@
  */
 package org.alfresco.service.cmr.action;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
@@ -67,6 +69,15 @@ public interface ActionService
 	Action createAction(String name);
 	
 	/**
+	 * Create a new action specifying the initial set of parameter values
+	 * 
+	 * @param name		the action defintion name
+	 * @param params	the parameter values
+	 * @return			the action
+	 */
+	Action createAction(String name, Map<String, Serializable> params);
+	
+	/**
 	 * Create a composite action 
 	 * 
 	 * @return	the composite action
@@ -80,6 +91,15 @@ public interface ActionService
 	 * @return		the action condition
 	 */
 	ActionCondition createActionCondition(String name);
+	
+	/**
+	 * Create an action condition specifying the initial set of parameter values
+	 * 
+	 * @param name		the aciton condition definition name
+	 * @param params	the parameter valeus
+	 * @return			the action condition
+	 */
+	ActionCondition createActionCondition(String name, Map<String, Serializable> params);
 	
 	/**
 	 * The actions conditions are always checked.

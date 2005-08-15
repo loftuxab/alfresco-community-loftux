@@ -17,7 +17,9 @@
  */
 package org.alfresco.repo.rule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,24 +27,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.action.RuntimeActionService;
 import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
-import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ActionCondition;
-import org.alfresco.service.cmr.action.ActionConditionDefinition;
-import org.alfresco.service.cmr.action.ActionDefinition;
 import org.alfresco.service.cmr.action.ActionService;
-import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
@@ -56,13 +54,19 @@ import org.alfresco.util.GUID;
  * 
  * @author Roy Wetherall   
  */
-public class RuleServiceImpl implements RuleService
+public class RuleServiceImpl implements RuleService, RuntimeRuleService
 {
     /** key against which to store rules pending on the current transaction */
     private static final String KEY_RULES_PENDING = "RuleServiceImpl.PendingRules";
     
     /** key against which to store executed rules on the current transaction */
     private static final String KEY_RULES_EXECUTED = "RuleServiceImpl.ExecutedRules";
+
+    /**
+     * Association names used internally
+     */
+	private static final QName ASSOC_NAME_RULE_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "rules");
+	private static final QName ASSOC_NAME_RULES = QName.createQName(NamespaceService.ALFRESCO_URI, "rules");
     
     /**
      * The node service
@@ -70,24 +74,24 @@ public class RuleServiceImpl implements RuleService
     private NodeService nodeService;
     
     /**
-     * The policy component
-     */
-    private PolicyComponent policyComponent;
-    
-    /**
      * The configurable service
      */
     private ConfigurableService configService;
     
     /**
-     * The rule store
-     */
-    private RuleStore ruleStore;
-    
-    /**
      * The action service
      */
     private ActionService actionService;
+    
+    /**
+     * The search service
+     */
+    private SearchService searchService;
+    
+    /**
+     * The rule cahce (set by default to an inactive rule cache)
+     */
+    private RuleCache ruleCache = new InactiveRuleCache();
        
     /**
      * List of disabled node refs.  The rules associated with these nodes will node be added to the pending list, and
@@ -99,29 +103,6 @@ public class RuleServiceImpl implements RuleService
 	 * All the rule type currently registered
 	 */
 	private Map<String, RuleType> ruleTypes = new HashMap<String, RuleType>();      
-
-    /**
-     * Service initialisation methods     
-     */
-    public void init()
-    {
-        // Register the copy policy behaviour
-        this.policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyComplete"),
-                ContentModel.ASPECT_ACTIONABLE,
-                new JavaBehaviour(this, "onCopyComplete"));
-    }
-	
-	/**
-	 * Set the rule store
-	 * 
-	 * @param ruleStore		the rule store
-	 */
-	public void setRuleStore(RuleStore ruleStore) 
-	{
-		this.ruleStore = ruleStore;
-		((RuleStoreImpl)this.ruleStore).setRuleService(this);
-	}
     
     /**
      * Set the node service 
@@ -134,23 +115,33 @@ public class RuleServiceImpl implements RuleService
     }
     
     /**
-     * Sets the policy component
-     * 
-     * @param policyComponent  the policy component
-     */
-    public void setPolicyComponent(PolicyComponent policyComponent)
-    {
-        this.policyComponent = policyComponent;
-    }
-    
-    /**
      * Set the action service
      * 
-     * @param actionService  the action service
+     * @param actionRegistration  the action service
      */
     public void setActionService(ActionService actionService)
 	{
 		this.actionService = actionService;
+	}
+    
+    /**
+     * Set the search service
+     * 
+     * @param searchService   the search service
+     */
+    public void setSearchService(SearchService searchService)
+	{
+		this.searchService = searchService;
+	}
+    
+    /**
+     * Set the rule cache
+     * 
+     * @param ruleCache  the rule cache
+     */
+    public void setRuleCache(RuleCache ruleCache)
+	{
+		this.ruleCache = ruleCache;
 	}
     
     /**
@@ -169,6 +160,11 @@ public class RuleServiceImpl implements RuleService
         return this.ruleTypes.get(name);
     }
     
+    /**
+     * Set the configurable service
+     * 
+     * @param configService	the configurable service
+     */
     public void setConfigService(ConfigurableService configService)
 	{
 		this.configService = configService;
@@ -197,15 +193,7 @@ public class RuleServiceImpl implements RuleService
     {
         // Determine whether a node is actionable or not
         return (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true);          
-    }
-    
-    /**
-     * @see org.alfresco.service.cmr.rule.RuleService#hasRules(org.alfresco.repo.ref.NodeRef)
-     */
-    public boolean hasRules(NodeRef nodeRef)
-    {
-        return this.ruleStore.hasRules(nodeRef);
-    }       
+    }      
     
     /**
      * @see org.alfresco.service.cmr.rule.RuleService#rulesEnabled(NodeRef)
@@ -232,49 +220,248 @@ public class RuleServiceImpl implements RuleService
         // Remove the node from the set of disabled nodes
         this.disabledNodeRefs.remove(nodeRef);
     }
+    
+    /**
+     * @see org.alfresco.service.cmr.rule.RuleService#hasRules(org.alfresco.repo.ref.NodeRef)
+     */
+    public boolean hasRules(NodeRef nodeRef)
+    {
+    	return (getRules(nodeRef).size() != 0);
+    } 
 
     /**
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef)
      */
     public List<Rule> getRules(NodeRef nodeRef)
     {
-        return getRules(nodeRef, true);
+    	return getRules(nodeRef, true, null);
     }
 
     /**  
      * @see org.alfresco.repo.rule.RuleService#getRules(org.alfresco.repo.ref.NodeRef, boolean)
      */
-    @SuppressWarnings("unchecked")
-    public List<Rule> getRules(NodeRef nodeRef, boolean includeInhertied)
+    public List<Rule> getRules(NodeRef nodeRef, boolean includeInherited)
     {
-        return (List<Rule>)this.ruleStore.get(nodeRef, includeInhertied);
+    	return getRules(nodeRef, includeInherited, null);
+    }
+    
+    /**
+     * @see org.alfresco.repo.rule.RuleService#getRulesByRuleType(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType)
+     */
+    public List<Rule> getRules(NodeRef nodeRef, boolean includeInherited, String ruleTypeName)
+    {
+    	List<Rule> rules = new ArrayList<Rule>();
+    	
+    	if (this.nodeService.exists(nodeRef) == true)
+    	{
+    		if (includeInherited == true)
+    		{
+    			// Get any inhertied rules
+    			for (Rule rule : getInheritedRules(nodeRef, ruleTypeName, null))
+				{
+    				// Ensure rules are not duplicated in the list
+    				if (rules.contains(rule) == false)
+    				{
+    					rules.add(rule);
+    				}
+				}
+    		}
+    		
+    		// If the node is actionable then get any rules that it might have set against it
+    		if (isActionable(nodeRef) == true)
+    		{
+    			List<Rule> allRules = this.ruleCache.getRules(nodeRef);
+    			if (allRules == null)
+    			{
+    				allRules = new ArrayList<Rule>();
+    				
+		    		// Get the rules for this node
+		    		NodeRef rulesFolderNodeRef = getRuleFolder(nodeRef);    		
+		    		if (rulesFolderNodeRef != null)
+		    		{
+			    		List<ChildAssociationRef> ruleChildAssocRefs = this.nodeService.getChildAssocs(rulesFolderNodeRef, ASSOC_NAME_RULES);
+			    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
+						{
+			    			// Create the rule and add to the list
+							NodeRef ruleNodeRef = ruleChildAssocRef.getChildRef();
+							Rule rule = createRule(ruleNodeRef);
+							allRules.add(rule);
+						}
+		    		}
+		    		
+		    		// Add the list to the cache
+		    		this.ruleCache.setRules(nodeRef, allRules);
+    			}
+    			
+    			// Build the list of rules that is returned to the client
+    			for (Rule rule : allRules)
+				{					
+					if ((rules.contains(rule) == false) &&
+					    (ruleTypeName == null || ruleTypeName.equals(rule.getRuleTypeName()) == true))
+					{
+						rules.add(rule);						
+					}
+				}
+    		}
+    	}
+    	
+    	return rules;
     }
 	
+    /**
+     * Gets the inherited rules for a given node reference
+     * 
+     * @param nodeRef			the nodeRef
+     * @param ruleTypeName		the rule type (null if all applicable)
+     * @return					a list of inherited rules (empty if none)
+     */
+	private List<Rule> getInheritedRules(NodeRef nodeRef, String ruleTypeName, Set<NodeRef> visitedNodeRefs)
+	{
+		List<Rule> inheritedRules = new ArrayList<Rule>();
+		
+		// Create the vistied nodes set if it has not already been created
+		if (visitedNodeRefs == null)
+		{
+			visitedNodeRefs = new HashSet<NodeRef>();
+		}
+		
+		// This check prevents stack over flow when we have a cyclic node graph
+		if (visitedNodeRefs.contains(nodeRef) == false)
+		{
+			visitedNodeRefs.add(nodeRef);
+			
+			List<Rule> allInheritedRules = this.ruleCache.getInheritedRules(nodeRef);
+			if (allInheritedRules == null)
+			{
+				allInheritedRules = new ArrayList<Rule>();
+				List<ChildAssociationRef> parents = this.nodeService.getParentAssocs(nodeRef);
+				for (ChildAssociationRef parent : parents)
+				{
+					List<Rule> rules = getRules(parent.getParentRef(), false);
+					for (Rule rule : rules)
+					{
+						// Add is we hanvn't already added and it should be applied to the children
+						if (rule.isAppliedToChildren() == true && allInheritedRules.contains(rule) == false)
+						{
+							allInheritedRules.add(rule);
+						}
+					}
+					
+					for (Rule rule : getInheritedRules(parent.getParentRef(), ruleTypeName, visitedNodeRefs))
+					{
+						// Ensure that we don't get any rule duplication (don't use a set cos we want to preserve order)
+						if (allInheritedRules.contains(rule) == false)
+						{
+							allInheritedRules.add(rule);
+						}
+					}
+				}
+				
+				// Add the list of inherited rules to the cache
+				this.ruleCache.setInheritedRules(nodeRef, allInheritedRules);
+			}
+			
+			if (ruleTypeName == null)
+			{
+				inheritedRules = allInheritedRules;
+			}
+			else
+			{
+				// Filter the rule list by rule type
+				for (Rule rule : allInheritedRules)
+				{
+					if (rule.getRuleTypeName().equals(ruleTypeName) == true)
+					{
+						inheritedRules.add(rule);
+					}
+				}
+			}
+		}
+		
+		return inheritedRules;
+	}
+
 	/**
 	 * @see org.alfresco.repo.rule.RuleService#getRule(String) 
 	 */
 	public Rule getRule(NodeRef nodeRef, String ruleId) 
 	{
-		return this.ruleStore.getById(nodeRef, ruleId);
+		Rule rule = null;
+		
+		if (this.nodeService.exists(nodeRef) == true)
+		{
+			NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, ruleId);
+			if (ruleNodeRef != null)
+			{
+				rule = createRule(ruleNodeRef);
+			}
+		}
+		
+		return rule;
+	}    
+	
+	/**
+	 * Gets the rule node ref from the action id
+	 * 
+	 * @param nodeRef	the node reference
+	 * @param actionId	the rule id
+	 * @return			the rule node reference
+	 */
+	private NodeRef getRuleNodeRefFromId(NodeRef nodeRef, String ruleId)
+	{
+		NodeRef result = null;
+		NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
+		
+		DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
+		namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+		
+		List<NodeRef> nodeRefs = searchService.selectNodes(
+				ruleFolderNodeRef, 
+				"*[@alf:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + ruleId + "']",
+				null,
+				namespacePrefixResolver,
+				false);
+		if (nodeRefs.size() != 0)
+		{
+			result = nodeRefs.get(0);
+		}
+		
+		return result;
 	}
 
-    /**
-     * @see org.alfresco.repo.rule.RuleService#getRulesByRuleType(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.rule.RuleType)
-     */
-    @SuppressWarnings("unchecked")
-    public List<Rule> getRulesByRuleType(NodeRef nodeRef, RuleType ruleType)
-    {
-        return (List<Rule>)this.ruleStore.getByRuleType(nodeRef, ruleType);
-    }
+	/**
+	 * Create the rule object from the rule node reference
+	 * 
+	 * @param ruleNodeRef	the rule node reference
+	 * @return				the rule
+	 */
+    private Rule createRule(NodeRef ruleNodeRef)
+	{
+    	// Get the rule properties
+		Map<QName, Serializable> props = this.nodeService.getProperties(ruleNodeRef);
+		
+    	// Create the rule
+    	String ruleTypeName = (String)props.get(ContentModel.PROP_RULE_TYPE);    	
+		Rule rule = new RuleImpl(ruleNodeRef.getId(), ruleTypeName);
+		
+		// Set the other rule properties
+		boolean isAppliedToChildren = ((Boolean)props.get(ContentModel.PROP_APPLY_TO_CHILDREN)).booleanValue();
+		rule.applyToChildren(isAppliedToChildren);
+		
+		// Populate the composite action details
+		((RuntimeActionService)this.actionService).populateCompositeAction(ruleNodeRef, rule);
+		
+		return rule;
+	}
 
-    /**
+	/**
      * @see org.alfresco.repo.rule.RuleService#createRule(org.alfresco.repo.rule.RuleType)
      */
-    public Rule createRule(RuleType ruleType)
+    public Rule createRule(String ruleTypeName)
     {
         // Create the new rule, giving it a unique rule id
         String id = GUID.generate();
-        return new RuleImpl(id, ruleType);
+        return new RuleImpl(id, ruleTypeName);
     }
 
     /**
@@ -282,8 +469,37 @@ public class RuleServiceImpl implements RuleService
      */
     public void saveRule(NodeRef nodeRef, Rule rule)
     {
-        // Add the rule to the rule store
-        this.ruleStore.put(nodeRef, (RuleImpl)rule);
+    	if (this.nodeService.exists(nodeRef) == false)
+    	{
+    		throw new RuleServiceException("The node does not exist.");
+    	}
+    	
+    	NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
+    	if (ruleNodeRef == null)
+    	{
+    		NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
+    		
+    		Map<QName, Serializable> props = new HashMap<QName, Serializable>(3);
+    		props.put(ContentModel.PROP_RULE_TYPE, rule.getRuleTypeName());
+			props.put(ContentModel.PROP_DEFINITION_NAME, rule.getActionDefinitionName());
+			props.put(ContentModel.PROP_NODE_UUID, rule.getId());
+			props.put(ContentModel.PROP_APPLY_TO_CHILDREN, rule.isAppliedToChildren());
+			
+			// Create the action node
+			ruleNodeRef = this.nodeService.createNode(
+					ruleFolderNodeRef,
+					ContentModel.ASSOC_CONTAINS,
+					ASSOC_NAME_RULES,
+					ContentModel.TYPE_RULE,
+					props).getChildRef();
+			
+			// Update the created details
+			((RuleImpl)rule).setCreator((String)this.nodeService.getProperty(ruleNodeRef, ContentModel.PROP_CREATOR));
+			((RuleImpl)rule).setCreatedDate((Date)this.nodeService.getProperty(ruleNodeRef, ContentModel.PROP_CREATED));
+    	}
+    	
+    	// Save the remainder of the rule as a composite action
+    	((RuntimeActionService)this.actionService).saveActionImpl(ruleNodeRef, rule);
     }
     
     /**
@@ -291,8 +507,15 @@ public class RuleServiceImpl implements RuleService
      */
     public void removeRule(NodeRef nodeRef, Rule rule)
     {
-        // Remove the rule from the rule store
-        this.ruleStore.remove(nodeRef, (RuleImpl)rule);
+    	if (this.nodeService.exists(nodeRef) == true && isActionable(nodeRef) == true)
+    	{
+    		NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
+    		if (ruleNodeRef != null)
+    		{
+    			NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
+    			this.nodeService.removeChild(ruleFolderNodeRef, ruleNodeRef);
+    		}
+    	}
     }	
     
     /**
@@ -300,11 +523,53 @@ public class RuleServiceImpl implements RuleService
      */
     public void removeAllRules(NodeRef nodeRef)
     {
-        List<? extends Rule> rules = this.ruleStore.get(nodeRef, false);
-        for (Rule rule : rules)
+    	if (this.nodeService.exists(nodeRef) == true && isActionable(nodeRef) == true)
+    	{
+    		NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
+    		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(ruleFolderNodeRef, ASSOC_NAME_RULES);
+    		for (ChildAssociationRef ruleChildAssoc : ruleChildAssocs)
+			{
+				this.nodeService.removeChild(ruleFolderNodeRef, ruleChildAssoc.getChildRef());
+			}
+    	}
+    }
+    
+    /**
+     * Get the node reference of the folder where the rule content nodes are stored
+     * 
+     * @param nodeRef       the node reference to the actionable node
+     * @return              the node reference to the configuration folder
+     */
+    private NodeRef getRuleFolder(NodeRef nodeRef)
+    {
+        NodeRef ruleFolder = null;
+        
+        if (isActionable(nodeRef) == false)
         {
-            this.ruleStore.remove(nodeRef, (RuleImpl)rule);
+        	makeActionable(nodeRef);
         }
+        
+		NodeRef configFolder = this.configService.getConfigurationFolder(nodeRef);
+		if (configFolder != null)
+		{
+			List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(
+													configFolder, 
+													ASSOC_NAME_RULE_FOLDER);
+			if (childAssocRefs.size() == 0)
+			{
+				ruleFolder = this.nodeService.createNode(
+													configFolder,
+													ContentModel.ASSOC_CONTAINS,
+													ASSOC_NAME_RULE_FOLDER,
+													ContentModel.TYPE_SYSTEM_FOLDER).getChildRef();
+			}
+			else
+			{
+				ruleFolder = childAssocRefs.get(0).getChildRef();
+			}
+		}
+		
+        return ruleFolder;
     }
 	
 	/**
@@ -391,42 +656,9 @@ public class RuleServiceImpl implements RuleService
 		NodeRef actionableNodeRef = pendingRule.getActionableNodeRef();
 		NodeRef actionedUponNodeRef = pendingRule.getActionedUponNodeRef();
 		Rule rule = pendingRule.getRule();
-		
-		// Get the rule conditions
-		List<ActionCondition> conds = rule.getActionConditions();				
-		if (conds.size() == 0)
-		{
-			throw new RuleServiceException("No rule conditions have been specified for the rule:" + rule.getTitle());
-		}
-		else if (conds.size() > 1)
-		{
-			// TODO at the moment we only support one rule condition
-			throw new RuleServiceException("Currently only one rule condition can be specified per rule:" + rule.getTitle());
-		}
-		
-		// Get the single rule condition
-		ActionCondition condition = conds.get(0);
-	    //ActionConditionEvaluator evaluator = getConditionEvaluator(cond);
-	      
-	    // Get the rule acitons
-	    List<Action> actions = rule.getActions();
-		if (actions.size() == 0)
-		{
-			throw new RuleServiceException("No rule actions have been specified for the rule:" + rule.getTitle());
-		}
-		else if (actions.size() > 1)
-		{
-			// TODO at the moment we only support one rule action
-			throw new RuleServiceException("Currently only one rule action can be specified per rule:" + rule.getTitle());
-		}
-			
-		// Get the single action
-	    Action action = actions.get(0);
-	    //ActionExecuter executor = getActionExecutor(action);
 	      
 		// Evaluate the condition
-	    //if (evaluator.evaluate(cond, actionedUponNodeRef) == true)
-	    if (this.actionService.evaluateActionCondition(condition, actionedUponNodeRef) == true)
+	    if (this.actionService.evaluateAction(rule, actionedUponNodeRef) == true)
 	    {
             // Add the rule to the executed rule list
             // (do this before this is executed to prevent rules being added to the pending list) 
@@ -435,8 +667,7 @@ public class RuleServiceImpl implements RuleService
             executedRules.add(new ExecutedRuleData(actionableNodeRef, rule));
             
 			// Execute the rule
-	        //executor.execute(action, actionedUponNodeRef);
-            this.actionService.executeAction(action, actionedUponNodeRef);
+            this.actionService.executeAction(rule, actionedUponNodeRef);
 	    }
 	}
 	
@@ -449,66 +680,7 @@ public class RuleServiceImpl implements RuleService
 	{
 		RuleType ruleType = ruleTypeAdapter.getRuleType();
 		this.ruleTypes.put(ruleType.getName(), ruleType);
-	}
-    
-	/**
-	 * On copy complete behaviour implementation
-	 */
-	public void onCopyComplete(
-			QName classRef,
-			NodeRef sourceNodeRef,
-			NodeRef destinationRef,
-			Map<NodeRef, NodeRef> copyMap)
-	{
-		Set<Rule> modifiedRules = new HashSet<Rule>();
-		List<? extends Rule> rules = this.ruleStore.get(destinationRef, false);
-		for (Rule rule : rules)
-		{
-			// Check all the rule actions 
-			for (Action ruleAction : rule.getActions())
-			{
-				ActionDefinition actionDefinition = this.actionService.getActionDefinition(ruleAction.getActionDefinitionName());
-				for (ParameterDefinition paramDef : actionDefinition.getParameterDefinitions())
-				{
-					if (ParameterType.NODE_REF.equals(paramDef.getType()))
-					{
-						NodeRef value = (NodeRef)ruleAction.getParameterValue(paramDef.getName());
-						if (value != null && copyMap.containsKey(value) == true)
-						{
-							// Change the parameter value to be relative
-							ruleAction.setParameterValue(paramDef.getName(), copyMap.get(value));
-							modifiedRules.add(rule);
-						}
-					}
-				}
-			}
-			
-			// Check all the rule conditions
-			for (ActionCondition ruleCondition : rule.getActionConditions())
-			{
-				ActionConditionDefinition actionConditionDefinition = this.actionService.getActionConditionDefinition(ruleCondition.getActionConditionDefinitionName());
-				for (ParameterDefinition paramDef : actionConditionDefinition.getParameterDefinitions())
-				{
-					if (ParameterType.NODE_REF.equals(paramDef.getType()))
-					{
-						NodeRef value = (NodeRef)ruleCondition.getParameterValue(paramDef.getName());
-						if (value != null && copyMap.containsKey(value) == true)
-						{
-							// Change the parameter value to be relative
-							ruleCondition.setParameterValue(paramDef.getName(), copyMap.get(value));
-							modifiedRules.add(rule);
-						}
-					}
-				}
-			}
-		}
-		
-		// Update any of the rules that have been modified
-		for (Rule modifiedRule : modifiedRules)
-		{
-			this.ruleStore.put(destinationRef, (RuleImpl)modifiedRule);
-		}
-	}
+	}    
     
     /**
      * Helper class to contain the information about a rule that is executed
@@ -613,4 +785,54 @@ public class RuleServiceImpl implements RuleService
 	        }
 		}
 	}	
+	
+	/**
+	 * Inactive rule cache
+	 * 
+	 * @author Roy Wetherall
+	 */
+	private class InactiveRuleCache implements RuleCache
+	{
+		/**
+		 * @see org.alfresco.repo.rule.RuleCache#getRules(org.alfresco.service.cmr.repository.NodeRef)
+		 */
+		public List<Rule> getRules(NodeRef nodeRef)
+		{
+			// do nothing
+			return null;
+		}
+
+		/**
+		 *  @see org.alfresco.repo.rule.RuleCache#setRules(org.alfresco.service.cmr.repository.NodeRef, List<Rule>)
+		 */
+		public void setRules(NodeRef nodeRef, List<Rule> rules)
+		{
+			// do nothing
+		}
+
+		/**
+		 * @see org.alfresco.repo.rule.RuleCache#dirtyRules(org.alfresco.service.cmr.repository.NodeRef)
+		 */
+		public void dirtyRules(NodeRef nodeRef)
+		{
+			// do nothing
+		}
+
+		/**
+		 * @see org.alfresco.repo.rule.RuleCache#getInheritedRules(org.alfresco.service.cmr.repository.NodeRef)
+		 */
+		public List<Rule> getInheritedRules(NodeRef nodeRef)
+		{
+			// do nothing
+			return null;
+		}
+
+		/**
+		 * @see org.alfresco.repo.rule.RuleCache#setInheritedRules(org.alfresco.service.cmr.repository.NodeRef, List<Rule>)
+		 */
+		public void setInheritedRules(NodeRef nodeRef, List<Rule> rules)
+		{
+			// do nothing
+		}
+	}
 }

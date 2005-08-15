@@ -17,6 +17,8 @@
  */
 package org.alfresco.service.cmr.action;
 
+import org.alfresco.service.namespace.QName;
+
 /**
  * Parameter definition interface.
  * 
@@ -36,9 +38,9 @@ public interface ParameterDefinition
 	/**
 	 * Get the type of parameter
 	 * 
-	 * @return	the parameter type
+	 * @return	the parameter type qname
 	 */
-	public ParameterType getType();
+	public QName getType();
 	
 	/**
 	 * Indicates whether the parameter is mandatory or not.

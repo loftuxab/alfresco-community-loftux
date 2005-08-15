@@ -31,18 +31,25 @@ public interface ParameterizedItemDefinition
 	public String getName();
 	
 	/**
-	 * The title of the rule item.
+	 * The title of the parameterized item definition
 	 * 
-	 * @return	the title of the rule item
+	 * @return	the title
 	 */
 	public String getTitle();
 	
 	/**
-	 * The description of the rule item.
+	 * The description of the parameterized item definition
 	 * 
-	 * @return	the description of the rule item
+	 * @return	the description
 	 */
 	public String getDescription();
+	
+	/**
+	 * Indicates whether the parameterized item allows adhoc properties to be set
+	 * 
+	 * @return	true if ashoc properties are allowed, false otherwise
+	 */
+	public boolean getAdhocPropertiesAllowed();
 	
 	/**
 	 * A list containing the parmameter defintions for this rule item.

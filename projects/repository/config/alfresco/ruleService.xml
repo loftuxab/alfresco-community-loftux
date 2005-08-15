@@ -5,27 +5,44 @@
 	
    <!-- Rules Service -->
    
-   <bean id="ruleService" class="org.alfresco.repo.rule.RuleServiceImpl" init-method="init">
-		<property name="nodeService">
-			<ref bean="nodeService"/>
-		</property>
-		<property name="policyComponent">
-			<ref bean="policyComponent"/>
-		</property>			
-		<property name="ruleStore">
-			<ref bean="ruleStore"/>
-		</property>
-		<property name="configService">
-			<ref bean="configurableService"/>
-		</property>	
-	  <property name="actionService">
-		 <ref bean="actionService"/>
-	  </property>
+   <bean id="ruleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+      	 <list>
+         	<value>org.alfresco.service.cmr.rule.RuleService</value>
+         	<value>org.alfresco.repo.rule.RuntimeRuleService</value>
+         </list>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager"/>
+      </property>
+      <property name="target">
+           <bean class="org.alfresco.repo.rule.RuleServiceImpl">
+				<property name="nodeService">
+					<ref bean="nodeService"/>
+				</property>		
+				<property name="configService">
+					<ref bean="configurableService"/>
+				</property>	
+			    <property name="actionService">
+				    <ref bean="actionService"/>
+			    </property>	
+			    <property name="searchService">
+				    <ref bean="searchService"/>
+			    </property>
+		   </bean>
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="*">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
    </bean>
+   
+ 
    
    <!-- Rule Store -->
    
-   <bean id="ruleStore" class="org.alfresco.repo.rule.RuleStoreImpl" init-method="init">
+  <!-- <bean id="ruleStore" class="org.alfresco.repo.rule.RuleStoreImpl" init-method="init">
 	  <property name="nodeService">
 		 <ref bean="nodeService"/>
 	  </property>
@@ -44,7 +61,7 @@
 	  <property name="actionService">
 		 <ref bean="actionService"/>
 	  </property>
-   </bean>
+   </bean> -->
    
    <!-- Definitions for beans that use the common resource -->
    

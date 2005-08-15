@@ -17,16 +17,16 @@
  */
 package org.alfresco.repo.action;
 
-import java.util.List;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
-
 import junit.framework.TestCase;
+
+import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 
 /**
  * @author Roy Wetherall
@@ -51,8 +51,8 @@ public abstract class BaseParameterizedItemImplTest extends TestCase
     protected void setUp() throws Exception
     {
         // Create param defs
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, ParameterType.STRING, false,  PARAM_DISPLAYLABEL));
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, ParameterType.STRING, false,  PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, PropertyTypeDefinition.TEXT, false,  PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, PropertyTypeDefinition.TEXT, false,  PARAM_DISPLAYLABEL));
         
         // Create param values
         paramValues.put(PARAM_1, VALUE_1);

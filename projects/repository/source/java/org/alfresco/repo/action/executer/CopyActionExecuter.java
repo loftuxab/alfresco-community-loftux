@@ -25,7 +25,7 @@ import java.util.List;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.action.ParameterType;
+import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -70,10 +70,10 @@ public class CopyActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, ParameterType.NODE_REF, true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, ParameterType.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_DEEP_COPY, ParameterType.BOOLEAN, false, getParamDisplayLabel(PARAM_DEEP_COPY)));		
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, PropertyTypeDefinition.NODE_REF, true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_DEEP_COPY, PropertyTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_DEEP_COPY)));		
 	}
 
     /**
