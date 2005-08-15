@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
@@ -55,7 +56,25 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
      */
     public FileContentWriter(File file)
     {
-        this(file, FileContentStore.STORE_PROTOCOL + file.getAbsolutePath());
+        this(
+                file,
+                FileContentStore.STORE_PROTOCOL + file.getAbsolutePath(),
+                null);
+    }
+    
+    /**
+     * Constructor that builds a URL based on the absolute path of the file.
+     * 
+     * @param file the file for writing.  This will most likely be directly
+     *      related to the content URL.
+     * @param existingContentReader a reader of a previous version of this content
+     */
+    public FileContentWriter(File file, ContentReader existingContentReader)
+    {
+        this(
+                file,
+                FileContentStore.STORE_PROTOCOL + file.getAbsolutePath(),
+                existingContentReader);
     }
     
     /**
@@ -64,14 +83,15 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
      * @param file the file for writing.  This will most likely be directly
      *      related to the content URL.
      * @param url the relative url that the reader represents
+     * @param existingContentReader a reader of a previous version of this content
      */
-    public FileContentWriter(File file, String url)
+    public FileContentWriter(File file, String url, ContentReader existingContentReader)
     {
-        super(url);
+        super(url, existingContentReader);
         
         this.file = file;
     }
-    
+
     /**
      * @return Returns the file that this writer accesses
      */
@@ -145,8 +165,48 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
 
     public FileChannel getChannel() throws ContentIOException
     {
+        /*
+         * By calling this method, clients indicate that they wish to make random
+         * changes to the file.  It is possible that the client might only want
+         * to update a tiny proportion of the file - or even none of it.  Either
+         * way, the file must be as whole and complete as before it was accessed.
+         */
+        
         // go through the super classes to ensure that all concurrency conditions
         // and listeners are satisfied
-        return (FileChannel) super.getWritableChannel();
+        FileChannel channel = (FileChannel) super.getWritableChannel();
+        // random access means that the the new content's starting point must be
+        // that of the existing content
+        ContentReader existingContentReader = getExistingContentReader();
+        if (existingContentReader != null)
+        {
+            ReadableByteChannel existingContentChannel = existingContentReader.getReadableChannel();
+            long existingContentLength = existingContentReader.getLength();
+            // copy the existing content
+            try
+            {
+                channel.transferFrom(existingContentChannel, 0, existingContentLength);
+                // copy complete
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Copied content for random access: \n" +
+                            "   writer: " + this + "\n" +
+                            "   existing: " + existingContentReader);
+                }
+            }
+            catch (IOException e)
+            {
+                throw new ContentIOException("Failed to copy from existing content to enable random access: \n" +
+                        "   writer: " + this + "\n" +
+                        "   existing: " + existingContentReader,
+                        e);
+            }
+            finally
+            {
+                try { existingContentChannel.close(); } catch (IOException e) {}
+            }
+        }
+        // the file is now available for random access
+        return channel;
     }
 }

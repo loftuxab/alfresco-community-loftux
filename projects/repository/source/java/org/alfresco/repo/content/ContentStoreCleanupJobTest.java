@@ -70,7 +70,7 @@ public class ContentStoreCleanupJobTest extends BaseSpringTest
         
         this.jobExecutionContext = new JobExecutionContext(scheduler, triggerFiredBundle, job);
         
-        ContentWriter contentWriter = this.contentStore.getWriter();
+        ContentWriter contentWriter = this.contentStore.getWriter(null);
         contentWriter.putContent("This is some content that I am going to delete.");
         this.url = contentWriter.getContentUrl();
     }

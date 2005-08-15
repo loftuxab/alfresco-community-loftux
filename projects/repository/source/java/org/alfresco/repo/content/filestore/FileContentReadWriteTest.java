@@ -19,14 +19,17 @@ package org.alfresco.repo.content.filestore;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
 import org.alfresco.repo.content.AbstractContentReadWriteTest;
 import org.alfresco.repo.content.CallbackFileChannel;
 import org.alfresco.repo.content.ContentStore;
+import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.util.TempFileProvider;
 
 /**
  * Tests that the file reader and writer work
@@ -49,7 +52,7 @@ public class FileContentReadWriteTest extends AbstractContentReadWriteTest
     public void setUp() throws Exception
     {
         super.setUp();
-        file = File.createTempFile(getName(), ".txt");
+        file = TempFileProvider.createTempFile(getName(), ".txt");
         file.deleteOnExit();
     }
 
@@ -91,5 +94,37 @@ public class FileContentReadWriteTest extends AbstractContentReadWriteTest
         ContentReader reader = writer.getReader();
         ReadableByteChannel readChannel = reader.getReadableChannel();
         assertTrue("Channel not of correct callback type", readChannel instanceof CallbackFileChannel);
+    }
+    
+    /**
+     * Ensures that the random writing of content takes pre-existing content
+     * into account, i.e. that the pre-existing content is copied.
+     */
+    public void testRandomAccessWriteCopy() throws Exception
+    {
+        String content = "ABC";
+        byte[] bytes = content.getBytes();
+        
+        ContentWriter seedWriter = getWriter();
+        seedWriter.putContent(content);
+        // create a new writer that uses the seed writer
+        File file = TempFileProvider.createTempFile(getName(), ".txt");
+        ContentWriter writer = new FileContentWriter(file, seedWriter.getReader());
+        // go the random access route
+        RandomAccessContent randAccessContent = (RandomAccessContent) writer;
+        FileChannel channel = randAccessContent.getChannel();
+        
+        // check that the previous contents are present in the file
+        ByteBuffer buffer = ByteBuffer.allocate(bytes.length);
+        int read = channel.read(buffer);
+        assertEquals("Not enough bytes read", bytes.length, read);
+        byte[] checkBytes = new byte[bytes.length];
+        buffer.rewind();
+        buffer.get(checkBytes);
+        String checkContent = new String(checkBytes);
+        assertEquals("Content is not exactly the same", content, checkContent);
+        
+        // close channel
+        channel.close();
     }
 }

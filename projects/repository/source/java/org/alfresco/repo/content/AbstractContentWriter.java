@@ -54,17 +54,28 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
     
     private List<ContentStreamListener> listeners;
     private WritableByteChannel channel;
+    private ContentReader existingContentReader;
     
     /**
      * @param contentUrl the content URL
+     * @param existingContentReader a reader of a previous version of this content
      */
-    protected AbstractContentWriter(String contentUrl)
+    protected AbstractContentWriter(String contentUrl, ContentReader existingContentReader)
     {
         super(contentUrl);
+        this.existingContentReader = existingContentReader;
         
         listeners = new ArrayList<ContentStreamListener>(2);
     }
-    
+
+    /**
+     * @return Returns a reader onto the previous version of this content
+     */
+    protected ContentReader getExistingContentReader()
+    {
+        return existingContentReader;
+    }
+
     /**
      * Adds the listener after checking that the output stream isn't already in
      * use.

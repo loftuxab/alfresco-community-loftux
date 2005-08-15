@@ -49,6 +49,7 @@ public interface ContentStore
      * @param contentUrl the store-specific URL where the content is located
      * @return Returns a read-only content accessor for the given URL.  There may
      *      be no content at the given URL, but the reader must still be returned.
+     *      The reader may implement the {@link RandomAccessContent random access interface}.
      * @throws ContentIOException
      */
     public ContentReader getReader(String contentUrl) throws ContentIOException;
@@ -61,15 +62,21 @@ public interface ContentStore
      * Every call to this method will return a writer onto a <b>new</b>
      * content URL.  It is never possible to write the same physical
      * location twice.
-     *  
-     * @return Returns a write-only content accessor
+     * <p>
+     * By supplying a reader to existing content, the store implementation may
+     * enable {@link RandomAccessContent random access}.
+     * 
+     * @param existingContentReader a reader onto any existing content for which
+     *      a writer is required - may be null
+     * @return Returns a write-only content accessor, possibly implementing
+     *      the {@link RandomAccessContent random access interface}
      * @throws ContentIOException
      *
      * @see #getWriter(NodeRef)
      * @see ContentWriter#addListener(ContentStreamListener)
      * @see ContentWriter#getContentUrl()
      */
-    public ContentWriter getWriter() throws ContentIOException;
+    public ContentWriter getWriter(ContentReader existingContentReader) throws ContentIOException;
 
     /**
      * Get a list of all content in the store

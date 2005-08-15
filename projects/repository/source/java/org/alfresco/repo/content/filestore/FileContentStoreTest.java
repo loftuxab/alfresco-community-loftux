@@ -50,7 +50,7 @@ public class FileContentStoreTest extends AbstractContentReadWriteTest
                 File.separatorChar +
                 getName());
         
-        writer = store.getWriter();
+        writer = store.getWriter(null);
         String contentUrl = writer.getContentUrl();
         reader = store.getReader(contentUrl);
     }

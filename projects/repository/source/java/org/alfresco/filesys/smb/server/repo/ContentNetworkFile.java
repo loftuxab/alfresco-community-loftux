@@ -28,11 +28,13 @@ import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
 import org.alfresco.filesys.server.filesys.NetworkFile;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.Content;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,6 +53,10 @@ public class ContentNetworkFile extends NetworkFile
     private NodeRef nodeRef;
     /** keeps track of the read/write access */
     private FileChannel channel;
+    /** the original content opened */
+    private Content content;
+    /** keeps track of any writes */
+    private boolean modified;
     
     /**
      * Helper method to create a {@link NetworkFile network file} given a node reference.
@@ -143,6 +149,8 @@ public class ContentNetworkFile extends NetworkFile
           .append("[ node=").append(nodeRef)
           .append(", channel=").append(channel)
           .append(", writable=").append(isWritable())
+          .append(", content=").append(content)
+          .append(", modified=").append(modified)
           .append("]");
         return sb.toString();
     }
@@ -173,7 +181,7 @@ public class ContentNetworkFile extends NetworkFile
     /**
      * Opens the channel for reading or writing depending on the access mode.
      * <p>
-     * The if the channel is already open, it is left.
+     * If the channel is already open, it is left.
      * 
      * @param write true if the channel must be writable
      * @throws AccessDeniedException if this network file is read only
@@ -204,25 +212,30 @@ public class ContentNetworkFile extends NetworkFile
             throw new AccessDeniedException("The network file was created for read-only: " + this);
         }
 
-        Content directContent = null;
+        content = null;
         if (write)
         {
-            directContent = contentService.getUpdatingWriter(nodeRef);
+            content = contentService.getWriter(nodeRef);
         }
         else
         {
-            directContent = contentService.getReader(nodeRef);
+            content = contentService.getReader(nodeRef);
+            if (content == null)  // no content on node
+            {
+                // give it an empty file
+                content = contentService.getTempWriter();
+            }
         }
         // wrap the channel accessor, if required
-        if (!(directContent instanceof RandomAccessContent))
+        if (!(content instanceof RandomAccessContent))
         {
             // TODO: create a temp, random access file and put a FileContentWriter on it
             //       barf for now
             throw new AlfrescoRuntimeException("Can only use a store that supplies randomly accessible channel");
         }
-        RandomAccessContent content = (RandomAccessContent) directContent;
+        RandomAccessContent randAccessContent = (RandomAccessContent) content;
         // get the channel - we can only make this call once
-        channel = content.getChannel();
+        channel = randAccessContent.getChannel();
     }
 
     @Override
@@ -236,9 +249,19 @@ public class ContentNetworkFile extends NetworkFile
         {
             return;
         }
+        else if (modified)              // file was modified
+        {
+            // write properties
+            NodeService nodeService = serviceRegistry.getNodeService();
+            nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT_URL, content.getContentUrl());
+            nodeService.setProperty(nodeRef, ContentModel.PROP_SIZE, channel.size());
+            // close it
+            channel.close();
+            channel = null;
+        }
         else
         {
-            // close it - we got an updating writer, previously, so it will update the node
+            // close it - it was not modified
             channel.close();
             channel = null;
         }
@@ -251,6 +274,8 @@ public class ContentNetworkFile extends NetworkFile
         openContent(true);
         // truncate the channel
         channel.truncate(size);
+        // set modification flag
+        modified = true;
         // done
         if (logger.isDebugEnabled())
         {
@@ -268,6 +293,8 @@ public class ContentNetworkFile extends NetworkFile
         // write to the channel
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, position, length);
         int count = channel.write(byteBuffer, fileOffset);
+        // set modification flag
+        modified = true;
         // done
         if (logger.isDebugEnabled())
         {

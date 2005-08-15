@@ -233,7 +233,7 @@ public class FileContentStore implements ContentStore
     /**
      * @return Returns a writer onto a location based on the date
      */
-    public ContentWriter getWriter()
+    public ContentWriter getWriter(ContentReader existingContentReader)
     {
         try
         {
@@ -241,7 +241,8 @@ public class FileContentStore implements ContentStore
             // make a URL
             String contentUrl = makeContentUrl(file);
             // create the writer
-            ContentWriter writer = new FileContentWriter(file, contentUrl);
+            ContentWriter writer = new FileContentWriter(file, contentUrl, existingContentReader);
+            // set the 
             // done
             if (logger.isDebugEnabled())
             {

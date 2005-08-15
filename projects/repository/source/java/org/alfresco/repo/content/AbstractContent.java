@@ -18,7 +18,6 @@
 package org.alfresco.repo.content;
 
 import org.alfresco.service.cmr.repository.Content;
-import org.springframework.util.Assert;
 
 /**
  * Provides basic information for <tt>Content</tt>.
@@ -36,7 +35,10 @@ public class AbstractContent implements Content
      */
     protected AbstractContent(String contentUrl)
     {
-        Assert.hasText(contentUrl, "Invalid content URL");
+        if (contentUrl == null || contentUrl.length() == 0)
+        {
+            throw new IllegalArgumentException("contentUrl must be a valid String");
+        }
         this.contentUrl = contentUrl;
     }
 

@@ -17,6 +17,7 @@
  */
 package org.alfresco.repo.content.transform;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.alfresco.repo.content.MimetypeMap;
@@ -63,7 +64,21 @@ public class TextMiningContentTransformer extends AbstractContentTransformer
     public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
     {
         InputStream is = reader.getContentInputStream();
-        String text = wordExtractor.extractText(is);
+        String text = null;
+        try
+        {
+            text = wordExtractor.extractText(is);
+        }
+        catch (IOException e)
+        {
+            // check if this is an error caused by the fact that the .doc is in fact
+            // one of Word's temp non-documents
+            if (e.getMessage().contains("Unable to read entire header"))
+            {
+                // just assign an empty string
+                text = "";
+            }
+        }
         // dump the text out
         writer.putContent(text);
     }

@@ -39,9 +39,9 @@ public class MemoryContentWriter extends AbstractContentWriter
     /**
      * @param contentUrl the URL by which the content can be accessed
      */
-    public MemoryContentWriter(String contentUrl)
+    public MemoryContentWriter(String contentUrl, ContentReader existingContentReader)
     {
-        super(contentUrl);
+        super(contentUrl, existingContentReader);
     }
     
     /**

@@ -17,6 +17,9 @@
  */
 package org.alfresco.repo.content;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
@@ -113,15 +116,13 @@ public class RoutingContentService implements ContentService
         // TODO: Choose the store to read from at runtime
         ContentReader reader = store.getReader(contentUrl);
         
+        // get node properties
+        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
         // get the content mimetype
-        String mimetype = (String) nodeService.getProperty(
-                nodeRef,
-                ContentModel.PROP_MIME_TYPE);
+        String mimetype = (String) properties.get(ContentModel.PROP_MIME_TYPE);
         reader.setMimetype(mimetype);
         // get the content encoding
-        String encoding = (String) nodeService.getProperty(
-                nodeRef,
-                ContentModel.PROP_ENCODING);
+        String encoding = (String) properties.get(ContentModel.PROP_ENCODING);
         reader.setEncoding(encoding);
         
         // we don't listen for anything
@@ -138,18 +139,19 @@ public class RoutingContentService implements ContentService
             throw new InvalidTypeException("The node must be an instance of type content", nodeType);
         }
         
+        // check for an existing URL
+        ContentReader existingContentReader = getReader(nodeRef);
+        
         // TODO: Choose the store to write to at runtime
-        ContentWriter writer = store.getWriter();
+        ContentWriter writer = store.getWriter(existingContentReader);
 
+        // get node properties
+        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
         // get the content mimetype
-        String mimetype = (String) nodeService.getProperty(
-                nodeRef,
-                ContentModel.PROP_MIME_TYPE);
+        String mimetype = (String) properties.get(ContentModel.PROP_MIME_TYPE);
         writer.setMimetype(mimetype);
         // get the content encoding
-        String encoding = (String) nodeService.getProperty(
-                nodeRef,
-                ContentModel.PROP_ENCODING);
+        String encoding = (String) properties.get(ContentModel.PROP_ENCODING);
         writer.setEncoding(encoding);
         
         // give back to the client
@@ -187,7 +189,7 @@ public class RoutingContentService implements ContentService
      */
     public ContentWriter getTempWriter()
     {
-        return tempStore.getWriter();
+        return tempStore.getWriter(null);
     }
 
     /**
