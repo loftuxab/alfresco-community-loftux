@@ -88,10 +88,63 @@
       <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
       <property name="filePathCache">
          <bean class="org.alfresco.filesys.server.filesys.cache.FilePathCache" >
-            <constructor-arg>
+            <property name="policyComponent">
                <ref bean="policyComponent" />
-            </constructor-arg>
+            </property>
+            <property name="fileStatesCache" >
+               <ref bean="fileStatesCache" />
+            </property>
+            <property name="pathResultsCache" >
+               <ref bean="pathResultsCache" />
+            </property>
          </bean>
       </property>
    </bean>
+
+   <bean name="fileStatesCache" class="org.alfresco.repo.cache.TransactionalCache">
+      <property name="cacheManager" >
+         <ref bean="ehCacheManager" />
+      </property>
+      <property name="name">
+         <value>cifs.transactional.fileStatesCache</value>
+      </property>
+      <property name="maxCacheSize">
+         <value>20000</value>
+      </property>
+      <property name="sharedCache">
+         <bean class="org.alfresco.repo.cache.EhCacheAdapter">
+            <property name="cache">
+               <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
+                  <property name="cacheName">
+                     <value>cifs.shared.fileStatesCache</value>
+                  </property>
+               </bean>
+            </property>
+         </bean>
+      </property>
+   </bean>
+   
+   <bean name="pathResultsCache" class="org.alfresco.repo.cache.TransactionalCache">
+      <property name="cacheManager" >
+         <ref bean="ehCacheManager" />
+      </property>
+      <property name="name">
+         <value>cifs.transactional.pathResultsCache</value>
+      </property>
+      <property name="maxCacheSize">
+         <value>20000</value>
+      </property>
+      <property name="sharedCache">
+         <bean class="org.alfresco.repo.cache.EhCacheAdapter">
+            <property name="cache">
+               <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
+                  <property name="cacheName">
+                     <value>cifs.shared.pathResultsCache</value>
+                  </property>
+               </bean>
+            </property>
+         </bean>
+      </property>
+   </bean>
+   
 </beans>

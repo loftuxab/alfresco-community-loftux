@@ -31,7 +31,7 @@
    </bean>
    
    <bean name="transactionalCache" class="org.alfresco.repo.cache.TransactionalCache">
-      <property name="globalCache">
+      <property name="sharedCache">
          <ref bean="backingCache" />
       </property>
       <property name="cacheManager" >

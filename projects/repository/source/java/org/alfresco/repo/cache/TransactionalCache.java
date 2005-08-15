@@ -37,34 +37,56 @@ import org.springframework.util.Assert;
 
 /**
  * A 2-level cache that mainains a both a transaction-local cache and
- * wraps a non-transactional (global) cache.
+ * wraps a non-transactional (shared) cache.
  * <p>
  * It uses the <b>Ehcache</b> <tt>Cache</tt> for it's per-transaction
  * caches as these provide automatic size limitations, etc.
  * <p>
  * Instances of this class <b>do not require a transaction</b>.  They will work
- * directly with the global cache when no transaction is present.
+ * directly with the shared cache when no transaction is present.  There is
+ * virtually no overhead when running out-of-transaction.
+ * <p>
+ * 3 caches are maintained.
+ * <ul>
+ *   <li>Shared backing cache that should only be accessed by instances of this class</li>
+ *   <li>Lazily created cache of updates made during the transaction</li>
+ *   <li>Lazily created cache of deletions made during the transaction</li>
+ * </ul>
+ * <p>
+ * When the cache is {@link #clear() cleared}, a flag is set on the transaction.
+ * The shared cache, instead of being cleared itself, is just ignored for the remainder
+ * of the tranasaction.  At the end of the transaction, if the flag is set, the
+ * shared transaction is cleared <i>before</i> updates are added back to it.
+ * <p>
+ * Because there is a limited amount of space available to the in-transaction caches,
+ * when either of these becomes full, the cleared flag is set.  This ensures that
+ * the shared cache will not have stale data in the event of the transaction-local
+ * caches dropping items.
  * 
  * @author Derek Hulley
  */
-public class TransactionalCache implements SimpleCache, TransactionListener, InitializingBean
+public class TransactionalCache<K extends Serializable, V extends Serializable>
+        implements SimpleCache<K, V>, TransactionListener, InitializingBean
 {
-    private static final String RESOURCE_KEY_UPDATED_CACHE = "TransactionalCache.Updated";
-    private static final String RESOURCE_KEY_REMOVED_CACHE = "TransactionalCache.Removed";
+    private static final String RESOURCE_KEY_TXN_DATA = "TransactionalCache.TxnData"; 
+    private static final String VALUE_DELETE = "TransactionalCache.DeleteMarker";
     
     private static Log logger = LogFactory.getLog(TransactionalCache.class);
 
-    /** a name for convenience in logging */
-    private String name = "transactionalCache";
+    /** a name used to uniquely identify the transactional caches */
+    private String name;
     
-    /** the global cache that will get updated after commits */
-    private SimpleCache globalCache;
+    /** the shared cache that will get updated after commits */
+    private SimpleCache<Serializable, Serializable> sharedCache;
 
     /** the manager to control Ehcache caches */
     private CacheManager cacheManager;
     
     /** the maximum number of elements to be contained in the cache */
     private int maxCacheSize = 500;
+    
+    /** a unique string identifying this instance when binding resources */
+    private String resourceKeyTxnData;
 
     /**
      * @see #setName(String)
@@ -98,14 +120,14 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
     }
     
     /**
-     * Set the global cache to use during transaction synchronization or when no transaction
+     * Set the shared cache to use during transaction synchronization or when no transaction
      * is present.
      * 
-     * @param globalCache
+     * @param sharedCache
      */
-    public void setGlobalCache(SimpleCache globalCache)
+    public void setSharedCache(SimpleCache<Serializable, Serializable> sharedCache)
     {
-        this.globalCache = globalCache;
+        this.sharedCache = sharedCache;
     }
 
     /**
@@ -150,60 +172,45 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
     {
         Assert.notNull(name, "name property not set");
         Assert.notNull(cacheManager, "cacheManager property not set");
+        // generate the resource binding key
+        resourceKeyTxnData = RESOURCE_KEY_TXN_DATA + "." + name;
     }
 
     /**
      * To be used in a transaction only.
      */
-    private Cache getRemovedCache(boolean create)
+    private TransactionData getTransactionData()
     {
-        Cache cache = (Cache) AlfrescoTransactionSupport.getResource(RESOURCE_KEY_REMOVED_CACHE);
-        if (create && cache == null)
+        TransactionData data = (TransactionData) AlfrescoTransactionSupport.getResource(resourceKeyTxnData);
+        if (data == null)
         {
-            // make a cache name
-            String cacheName = name + "_" + AlfrescoTransactionSupport.getTransactionId() + "_removes";
-            cache = new Cache(cacheName, maxCacheSize, false, true, 0, 0);
+            String txnId = AlfrescoTransactionSupport.getTransactionId();
+            data = new TransactionData();
+            // create and initialize caches
+            data.updatedItemsCache = new Cache(
+                    name + "_"+ txnId + "_updates",
+                    maxCacheSize, false, true, 0, 0);
+            data.removedItemsCache = new Cache(
+                    name + "_" + txnId + "_removes",
+                    maxCacheSize, false, true, 0, 0);
             try
             {
-                cacheManager.addCache(cache);
+                cacheManager.addCache(data.updatedItemsCache);
+                cacheManager.addCache(data.removedItemsCache);
             }
             catch (CacheException e)
             {
-                throw new AlfrescoRuntimeException("Failed to add txn updates cache to manager", e);
+                throw new AlfrescoRuntimeException("Failed to add txn caches to manager", e);
             }
-            AlfrescoTransactionSupport.bindResource(RESOURCE_KEY_REMOVED_CACHE, cache);
+            AlfrescoTransactionSupport.bindResource(resourceKeyTxnData, data);
         }
-        return cache;
+        return data;
     }
     
     /**
-     * To be used in a transaction only.
+     * Checks the transactional removed and updated caches before checking the shared cache.
      */
-    private Cache getUpdatedCache(boolean create)
-    {
-        Cache cache = (Cache) AlfrescoTransactionSupport.getResource(RESOURCE_KEY_UPDATED_CACHE);
-        if (create && cache == null)
-        {
-            // make a cache name
-            String cacheName = name + "_" + AlfrescoTransactionSupport.getTransactionId() + "_updates";
-            cache = new Cache(cacheName, maxCacheSize, true, true, 0, 0);
-            try
-            {
-                cacheManager.addCache(cache);
-            }
-            catch (CacheException e)
-            {
-                throw new AlfrescoRuntimeException("Failed to add txn updates cache to manager", e);
-            }
-            AlfrescoTransactionSupport.bindResource(RESOURCE_KEY_UPDATED_CACHE, cache);
-        }
-        return cache;
-    }
-
-    /**
-     * Checks the transactional removed and updated caches before checking the global cache.
-     */
-    public boolean contains(Serializable key)
+    public boolean contains(K key)
     {
         Object value = get(key);
         if (value == null)
@@ -217,81 +224,99 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
     }
 
     /**
-     * Checks the per-transaction caches for the object before going to the global cache.
-     * If the thread is not in a transaction, then the global cache is accessed directly.
+     * Checks the per-transaction caches for the object before going to the shared cache.
+     * If the thread is not in a transaction, then the shared cache is accessed directly.
      */
-    public Serializable get(Serializable key)
+    @SuppressWarnings("unchecked")
+    public V get(K key)
     {
+        boolean ignoreSharedCache = false;
         // are we in a transaction?
         if (AlfrescoTransactionSupport.getTransactionId() != null)
         {
+            TransactionData txnData = getTransactionData();
             try
             {
-                // check to see if the key is present in the transaction's removed items
-                Cache removedCache = getRemovedCache(false);
-                if (removedCache != null && removedCache.get(key) != null)
+                if (!txnData.isClearOn)   // deletions cache is still reliable
                 {
-                    // it has been removed in this transaction
-                    if (logger.isDebugEnabled())
+                    // check to see if the key is present in the transaction's removed items
+                    if (txnData.removedItemsCache.get(key) != null)
                     {
-                        logger.debug("get returning null - item has been removed from transactional cache: \n" +
-                                "   cache: " + this + "\n" +
-                                "   key: " + key);
-                    }
-                    return null;
-                }
-                // check for the item in the transaction's new/updated items
-                Cache updatedCache = getUpdatedCache(false);
-                if (updatedCache != null)
-                {
-                    Element element = updatedCache.get(key);
-                    if (element != null)
-                    {
-                        // element was found in transaction-specific updates/additions
+                        // it has been removed in this transaction
                         if (logger.isDebugEnabled())
                         {
-                            logger.debug("Found item in transactional cache: \n" +
+                            logger.debug("get returning null - item has been removed from transactional cache: \n" +
                                     "   cache: " + this + "\n" +
-                                    "   key: " + key + "\n" +
-                                    "   value: " + element.getValue());
+                                    "   key: " + key);
                         }
-                        return element.getValue();
+                        return null;
                     }
+                }
+                
+                // check for the item in the transaction's new/updated items
+                Element element = txnData.updatedItemsCache.get(key);
+                if (element != null)
+                {
+                    // element was found in transaction-specific updates/additions
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Found item in transactional cache: \n" +
+                                "   cache: " + this + "\n" +
+                                "   key: " + key + "\n" +
+                                "   value: " + element.getValue());
+                    }
+                    return (V) element.getValue();
                 }
             }
             catch (CacheException e)
             {
                 throw new AlfrescoRuntimeException("Cache failure", e);
             }
+            // check if the cleared flag has been set - cleared flag means ignore shared as unreliable
+            ignoreSharedCache = txnData.isClearOn;
         }
-        // it has not been handled in a transaction - go to the global cache
-        if (logger.isDebugEnabled())
+        // no value found - must we ignore the shared cache?
+        if (!ignoreSharedCache)
         {
-            logger.debug("Fetching instance direct from global cache: \n" +
-                    "   cache: " + this + "\n" +
-                    "   key: " + key + "\n" +
-                    "   value: " + globalCache.get(key));
+            // go to the shared cache
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No value found in transaction - fetching instance from shared cache: \n" +
+                        "   cache: " + this + "\n" +
+                        "   key: " + key + "\n" +
+                        "   value: " + sharedCache.get(key));
+            }
+            return (V) sharedCache.get(key);
         }
-        return globalCache.get(key);
+        else        // ignore shared cache
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No value found in transaction and ignoring shared cache: \n" +
+                        "   cache: " + this + "\n" +
+                        "   key: " + key);
+            }
+            return null;
+        }
     }
 
     /**
-     * Goes direct to the global cache in the absence of a transaction.
+     * Goes direct to the shared cache in the absence of a transaction.
      * <p>
      * Where a transaction is present, a cache of updated items is lazily added to the
      * thread and the <tt>Object</tt> put onto that. 
      */
-    public void put(Serializable key, Serializable value)
+    public void put(K key, V value)
     {
         // are we in a transaction?
         if (AlfrescoTransactionSupport.getTransactionId() == null)  // not in transaction
         {
             // no transaction
-            globalCache.put(key, value);
+            sharedCache.put(key, value);
             // done
             if (logger.isDebugEnabled())
             {
-                logger.debug("No transaction - adding item direct to global cache: \n" +
+                logger.debug("No transaction - adding item direct to shared cache: \n" +
                         "   cache: " + this + "\n" +
                         "   key: " + key + "\n" +
                         "   value: " + value);
@@ -299,18 +324,26 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
         }
         else  // transaction present
         {
+            TransactionData txnData = getTransactionData();
             // register for callbacks
-            AlfrescoTransactionSupport.bindListener(this);
-            // we have a transaction - add the item into the updated cache for this transaction
-            Cache updatedCache = getUpdatedCache(true);
-            Element element = new Element(key, value);
-            updatedCache.put(element);
-            // remove the item from the removed cache, if present
-            Cache removedCache = getRemovedCache(false);
-            if (removedCache != null)
+            if (!txnData.listenerBound)
             {
-                removedCache.remove(key);
+                AlfrescoTransactionSupport.bindListener(this);
+                txnData.listenerBound = true;
             }
+            // we have a transaction - add the item into the updated cache for this transaction
+            // are we in an overflow condition?
+            if (txnData.updatedItemsCache.getMemoryStoreSize() >= maxCacheSize)
+            {
+                // overflow about to occur or has occured - we can only guarantee non-stale
+                // data by clearing the shared cache after the transaction.  Also, the
+                // shared cache needs to be ignored for the rest of the transaction.
+                txnData.isClearOn = true;
+            }
+            Element element = new Element(key, value);
+            txnData.updatedItemsCache.put(element);
+            // remove the item from the removed cache, if present
+            txnData.removedItemsCache.remove(key);
             // done
             if (logger.isDebugEnabled())
             {
@@ -323,46 +356,65 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
     }
 
     /**
-     * Goes direct to the global cache in the absence of a transaction.
+     * Goes direct to the shared cache in the absence of a transaction.
      * <p>
      * Where a transaction is present, a cache of removed items is lazily added to the
      * thread and the <tt>Object</tt> put onto that. 
      */
-    public void remove(Serializable key)
+    public void remove(K key)
     {
         // are we in a transaction?
         if (AlfrescoTransactionSupport.getTransactionId() == null)  // not in transaction
         {
             // no transaction
-            globalCache.remove(key);
+            sharedCache.remove(key);
             // done
             if (logger.isDebugEnabled())
             {
-                logger.debug("No transaction - removing item from global cache: \n" +
+                logger.debug("No transaction - removing item from shared cache: \n" +
                         "   cache: " + this + "\n" +
                         "   key: " + key);
             }
         }
         else  // transaction present
         {
+            TransactionData txnData = getTransactionData();
             // register for callbacks
-            AlfrescoTransactionSupport.bindListener(this);
-            // if the item is not present in the global cache, then we need only ensure that
-            // we remove it from the transactional update cache
-            Serializable globalValue = globalCache.get(key);
-            if (globalValue != null)
+            if (!txnData.listenerBound)
             {
-                // it is present in the global cache - add it from the removed cache for this txn
-                Element element = new Element(key, globalValue);
-                Cache removedCache = getRemovedCache(true);
-                removedCache.put(element);
+                AlfrescoTransactionSupport.bindListener(this);
+                txnData.listenerBound = true;
+            }
+            // is the shared cache going to be cleared?
+            if (txnData.isClearOn)
+            {
+                // don't store removals
+            }
+            else
+            {
+                // are we in an overflow condition?
+                if (txnData.removedItemsCache.getMemoryStoreSize() >= maxCacheSize)
+                {
+                    // overflow about to occur or has occured - we can only guarantee non-stale
+                    // data by clearing the shared cache after the transaction.  Also, the
+                    // shared cache needs to be ignored for the rest of the transaction.
+                    txnData.isClearOn = true;
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("In transaction - removal cache reach capacity reached: \n" +
+                                "   cache: " + this + "\n" +
+                                "   txn: " + AlfrescoTransactionSupport.getTransactionId());
+                    }
+                }
+                else
+                {
+                    // add it from the removed cache for this txn
+                    Element element = new Element(key, VALUE_DELETE);
+                    txnData.removedItemsCache.put(element);
+                }
             }
             // remove the item from the udpated cache, if present
-            Cache updatedCache = getUpdatedCache(false);
-            if (updatedCache != null)
-            {
-                updatedCache.remove(key);
-            }
+            txnData.updatedItemsCache.remove(key);
             // done
             if (logger.isDebugEnabled())
             {
@@ -374,40 +426,57 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
     }
 
     /**
-     * Just clears the global and transaction-local caches alike
+     * Clears out all the caches.
      */
     public void clear()
     {
-        // clear global cache
-        globalCache.clear();
         // clear local caches
         if (AlfrescoTransactionSupport.getTransactionId() != null)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("In transaction clearing cache: \n" +
+                        "   cache: " + this + "\n" +
+                        "   txn: " + AlfrescoTransactionSupport.getTransactionId());
+            }
+            
+            TransactionData txnData = getTransactionData();
+            // register for callbacks
+            if (!txnData.listenerBound)
+            {
+                AlfrescoTransactionSupport.bindListener(this);
+                txnData.listenerBound = true;
+            }
+            // the shared cache must be cleared at the end of the transaction
+            // and also serves to ensure that the shared cache will be ignored
+            // for the remainder of the transaction
+            txnData.isClearOn = true;
             try
             {
-                Cache updatedCache = getUpdatedCache(false);
-                if (updatedCache != null)
-                {
-                    updatedCache.removeAll();
-                }
-                Cache removedCache = getRemovedCache(false);
-                if (removedCache != null)
-                {
-                    removedCache.removeAll();
-                }
+                txnData.updatedItemsCache.removeAll();
+                txnData.removedItemsCache.removeAll();
             }
             catch (IOException e)
             {
                 throw new AlfrescoRuntimeException("Failed to clear caches", e);
             }
         }
+        else            // no transaction
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("No transaction - clearing shared cache");
+            }
+            // clear shared cache
+            sharedCache.clear();
+        }
     }
 
+    /**
+     * NO-OP
+     */
     public void flush()
     {
-        /*
-         * Handle the removed items if they prove to be an issue
-         */
     }
 
     public void beforeCommit(boolean readOnly)
@@ -419,41 +488,64 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
     }
 
     /**
-     * Merge the transactional caches into the global cache
+     * Merge the transactional caches into the shared cache
      */
     @SuppressWarnings("unchecked")
     public void afterCommit()
     {
-        // transfer removed items
-        Cache removedCache = getRemovedCache(false);
-        if (removedCache != null)
+        if (logger.isDebugEnabled())
         {
+            logger.debug("Processing end of transaction commit");
+        }
+        
+        TransactionData txnData = getTransactionData();
+
+        if (txnData.isClearOn)
+        {
+            // clear shared cache
+            sharedCache.clear();
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Clear notification recieved at end of transaction - clearing shared cache");
+            }
+        }
+        else
+        {
+            // transfer any removed items
             // any removed items will have also been removed from the in-transaction updates
-            // propogate the deletes to the global cache
-            List<Serializable> keys = removedCache.getKeys();
+            // propogate the deletes to the shared cache
+            List<Serializable> keys = txnData.removedItemsCache.getKeys();
             for (Serializable key : keys)
             {
-                globalCache.remove(key);
+                sharedCache.remove(key);
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Removed " + keys.size() + " values from shared cache");
             }
         }
         // transfer updates
-        Cache updatedCache = getUpdatedCache(false);
-        if (updatedCache != null)
+        try
         {
-            try
+            List<Serializable> keys = txnData.updatedItemsCache.getKeys();
+            for (Serializable key : keys)
             {
-                List<Serializable> keys = updatedCache.getKeys();
-                for (Serializable key : keys)
-                {
-                    Element element = updatedCache.get(key);
-                    globalCache.put(key, element.getValue());
-                }
+                Element element = txnData.updatedItemsCache.get(key);
+                sharedCache.put(key, element.getValue());
             }
-            catch (CacheException e)
+            if (logger.isDebugEnabled())
             {
-                throw new AlfrescoRuntimeException("Failed to transfer updates to global cache", e);
+                logger.debug("Added " + keys.size() + " values to shared cache");
             }
         }
+        catch (CacheException e)
+        {
+            throw new AlfrescoRuntimeException("Failed to transfer updates to shared cache", e);
+        }
+
+        // drop caches from cachemanager
+        cacheManager.removeCache(txnData.updatedItemsCache.getName());
+        cacheManager.removeCache(txnData.removedItemsCache.getName());
     }
 
     /**
@@ -461,5 +553,19 @@ public class TransactionalCache implements SimpleCache, TransactionListener, Ini
      */
     public void afterRollback()
     {
+        TransactionData txnData = getTransactionData();
+
+        // drop caches from cachemanager
+        cacheManager.removeCache(txnData.updatedItemsCache.getName());
+        cacheManager.removeCache(txnData.removedItemsCache.getName());
+    }
+    
+    /** Data holder to bind data to the transaction */
+    private class TransactionData
+    {
+        public Cache updatedItemsCache;
+        public Cache removedItemsCache;
+        public boolean isClearOn;
+        public boolean listenerBound; 
     }
 }

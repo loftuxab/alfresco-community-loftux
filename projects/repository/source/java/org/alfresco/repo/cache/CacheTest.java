@@ -17,6 +17,8 @@
  */
 package org.alfresco.repo.cache;
 
+import java.io.Serializable;
+
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
@@ -41,17 +43,18 @@ public class CacheTest extends TestCase
             );
     
     private ServiceRegistry serviceRegistry;
-    private SimpleCache standaloneCache;
-    private SimpleCache backingCache;
-    private SimpleCache transactionalCache;
+    private SimpleCache<String, Serializable> standaloneCache;
+    private SimpleCache<String, Serializable> backingCache;
+    private SimpleCache<String, Serializable> transactionalCache;
     
+    @SuppressWarnings("unchecked")
     @Override
     public void setUp() throws Exception
     {
         serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        standaloneCache = (SimpleCache) ctx.getBean("ehCache1");
-        backingCache = (SimpleCache) ctx.getBean("backingCache");
-        transactionalCache = (SimpleCache) ctx.getBean("transactionalCache");
+        standaloneCache = (SimpleCache<String, Serializable>) ctx.getBean("ehCache1");
+        backingCache = (SimpleCache<String, Serializable>) ctx.getBean("backingCache");
+        transactionalCache = (SimpleCache<String, Serializable>) ctx.getBean("transactionalCache");
     }
     
     public void testSetUp() throws Exception
@@ -152,7 +155,7 @@ public class CacheTest extends TestCase
      * @param objectCount
      * @return Returns the time it took in <b>nanoseconds</b>.
      */
-    public long runPerformanceTestOnCache(SimpleCache cache, int objectCount)
+    public long runPerformanceTestOnCache(SimpleCache<String, Serializable> cache, int objectCount)
     {
         // preload
         for (int i = 0; i < objectCount; i++)
@@ -188,20 +191,10 @@ public class CacheTest extends TestCase
         for (int i = 0; i < 5; i++)
         {
             int count = (int) Math.pow(10D, (double)i);
-            // clear caches
-            standaloneCache.clear();
-            backingCache.clear();
-            transactionalCache.clear();
             
             // test standalone
             long timePlain = runPerformanceTestOnCache(standaloneCache, count);
             
-            // test transactional outside of transaction
-            long timeNoTxn = runPerformanceTestOnCache(transactionalCache, count);
-            
-            // clear the transactional cache and backing cache
-            backingCache.clear();
-            transactionalCache.clear();
             // do transactional cache in a transaction
             UserTransaction txn = serviceRegistry.getUserTransaction();
             txn.begin();
@@ -214,11 +207,10 @@ public class CacheTest extends TestCase
             timeTxn += commitTime;
             
             // report
-            System.out.printf("Cache performance test: \n" +
+            System.out.println("Cache performance test: \n" +
                     "   count: " + count + "\n" +
                     "   direct: " + timePlain/((long)count) + " ns\\count \n" + 
-                    "   no transaction: " + timeNoTxn/((long)count) + " ns\\count \n" + 
-                    "   transaction: " + timeTxn/((long)count) + " ns\\count \n"); 
+                    "   transaction: " + timeTxn/((long)count) + " ns\\count"); 
         }
     }
 }

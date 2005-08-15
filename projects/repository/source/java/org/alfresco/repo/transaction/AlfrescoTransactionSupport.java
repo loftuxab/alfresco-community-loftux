@@ -76,11 +76,6 @@ public abstract class AlfrescoTransactionSupport
         {
             return null;   // not in a transaction
         }
-        else if (!TransactionSynchronizationManager.hasResource(RESOURCE_KEY_TXN_SYNCH))
-        {
-            // register synchronizations to ensure that thread resources have been initialized
-            registerSynchronizations();
-        }
         TransactionSynchronizationImpl txnSynch = getSynchronization();
         return txnSynch.getTransactionId();
     }

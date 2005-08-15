@@ -17,6 +17,7 @@
  */
 package org.alfresco.filesys.server.filesys;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.alfresco.filesys.smb.SMBDate;
@@ -30,8 +31,9 @@ import org.alfresco.filesys.smb.SMBDate;
  * @see DiskInterface
  * @see SearchContext
  */
-public class FileInfo
+public class FileInfo implements Serializable
 {
+    private static final long serialVersionUID = 5710753560656277110L;
 
     // Constants
     //

@@ -17,6 +17,8 @@
  */
 package org.alfresco.filesys.server.filesys.cache;
 
+import java.io.Serializable;
+
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 
@@ -25,8 +27,10 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * 
  * @author Derek Hulley
  */
-public class FileState
+public class FileState implements Serializable
 {
+    private static final long serialVersionUID = 4805641599014620793L;
+    
     /** flag indicating existence */
     private boolean exists;
     /** the node being referenced */

@@ -25,6 +25,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -32,6 +34,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Thread-safe cache to store the file info of a file or folder against its search path.
@@ -47,42 +50,71 @@ import org.alfresco.service.namespace.QName;
  * @author Derek Hulley
  */
 public class FilePathCache
-        implements
+        implements InitializingBean,
         NodeServicePolicies.OnCreateNodePolicy,
         NodeServicePolicies.OnUpdateNodePolicy,
         NodeServicePolicies.OnDeleteNodePolicy
 {
+    /** the component to register the behaviour with */
+    private PolicyComponent policyComponent;
     /** the file state cache: for a given node and path, we have a state */
-    private Map<NodeRef, Map<String, FileState>> fileStates;
+    private SimpleCache<NodeRef, HashMap<String, FileState>> fileStatesCache;
     /** the path result cache: for a given node and search, we have a list of results */
-    private Map<NodeRef, Map<String, List<NodeRef>>> pathResults;
+    private SimpleCache<NodeRef, HashMap<String, List<NodeRef>>> pathResultsCache;
     /** lock for read-only operations */
     private Lock cacheReadLock;
     /** lock for write operations */
     private Lock cacheWriteLock;
-    /** the component to register the behaviour with */
-    private PolicyComponent policyComponent;
 
-    public FilePathCache(PolicyComponent policyComponent)
+    public FilePathCache()
     {
-        this.policyComponent = policyComponent;
-        
-        fileStates = new HashMap<NodeRef, Map<String, FileState>>(37);
-        pathResults = new HashMap<NodeRef, Map<String, List<NodeRef>>>(37);
-        
         // create lock objects for access to the cache
         ReadWriteLock cacheLock = new ReentrantReadWriteLock();
         cacheReadLock = cacheLock.readLock();
         cacheWriteLock = cacheLock.writeLock();
-        
-        init();
     }
 
     /**
-     * Registers the policy behaviour methods
+     * Used to register the behaviours necessary to invalidate the cache
+     * @param policyComponent
      */
-    private void init()
+    public void setPolicyComponent(PolicyComponent policyComponent)
     {
+        this.policyComponent = policyComponent;
+    }
+
+    /**
+     * Set the cache to be used for storing file state based on a query
+     * @param cache
+     */
+    public void setFileStatesCache(SimpleCache<NodeRef, HashMap<String, FileState>> cache)
+    {
+        this.fileStatesCache = cache;
+    }
+
+    /**
+     * Set the cache used to find a set of results from a path query
+     * @param cache
+     */
+    public void setPathResultsCache(SimpleCache<NodeRef, HashMap<String, List<NodeRef>>> cache)
+    {
+        this.pathResultsCache = cache;
+    }
+
+    /**
+     * Perform checks to ensure that all required properties were set
+     */
+    public void afterPropertiesSet() throws Exception
+    {
+        if (policyComponent == null)
+        {
+            throw new AlfrescoRuntimeException("policyComponent property not set");
+        }
+        if (fileStatesCache == null || pathResultsCache == null)
+        {
+            throw new AlfrescoRuntimeException("fileStatesCache and pathResultsCache properties not set");
+        }
+        // register behaviour
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
                 this,
@@ -137,8 +169,8 @@ public class FilePathCache
         cacheWriteLock.lock();
         try
         {
-            fileStates.clear();
-            pathResults.clear();
+            fileStatesCache.clear();
+            pathResultsCache.clear();
         }
         finally
         {
@@ -159,7 +191,7 @@ public class FilePathCache
         cacheReadLock.lock();
         try
         {
-            Map<String, FileState> fileStatesByPath = fileStates.get(nodeRef);
+            Map<String, FileState> fileStatesByPath = fileStatesCache.get(nodeRef);
             if (fileStatesByPath == null)
             {
                 // no state set against the ancestor
@@ -214,11 +246,11 @@ public class FilePathCache
         cacheWriteLock.lock();
         try
         {
-            Map<String, FileState> fileStatesByPath = fileStates.get(pathRootNodeRef);
+            HashMap<String, FileState> fileStatesByPath = fileStatesCache.get(pathRootNodeRef);
             if (fileStatesByPath == null)
             {
                 fileStatesByPath = new HashMap<String, FileState>(5);
-                fileStates.put(pathRootNodeRef, fileStatesByPath);
+                fileStatesCache.put(pathRootNodeRef, fileStatesByPath);
             }
             fileStatesByPath.put(path, fileState);
         }
@@ -233,7 +265,7 @@ public class FilePathCache
         cacheReadLock.lock();
         try
         {
-            Map<String, List<NodeRef>> resultsByPath = pathResults.get(pathRootNodeRef);
+            HashMap<String, List<NodeRef>> resultsByPath = pathResultsCache.get(pathRootNodeRef);
             if (resultsByPath == null)
             {
                 // no queries have been made against this search root yet
@@ -252,12 +284,12 @@ public class FilePathCache
         cacheWriteLock.lock();
         try
         {
-            Map<String, List<NodeRef>> resultsByPath = pathResults.get(pathRootNodeRef);
+            HashMap<String, List<NodeRef>> resultsByPath = pathResultsCache.get(pathRootNodeRef);
             if (resultsByPath == null)
             {
                 // no queries have been made against this search root yet
                 resultsByPath = new HashMap<String, List<NodeRef>>(5);
-                pathResults.put(pathRootNodeRef, resultsByPath);
+                pathResultsCache.put(pathRootNodeRef, resultsByPath);
             }
             resultsByPath.put(path, results);
         }

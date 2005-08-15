@@ -191,11 +191,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         String deviceName = tree.getContext().getDeviceName();
         NodeRef deviceRootNodeRef = new NodeRef(deviceName);
         
-        // check for existence
-        if (!nodeService.exists(deviceRootNodeRef))
-        {
-            throw new AlfrescoRuntimeException("Device root node does not exist: " + deviceRootNodeRef);
-        }
+        // no need to check for existence - we checked when the service started
         // done
         return deviceRootNodeRef;
     }

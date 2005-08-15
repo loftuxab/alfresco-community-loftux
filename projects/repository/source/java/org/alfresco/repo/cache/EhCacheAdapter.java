@@ -37,7 +37,8 @@ import org.alfresco.error.AlfrescoRuntimeException;
  * 
  * @author Derek Hulley
  */
-public class EhCacheAdapter implements SimpleCache
+public class EhCacheAdapter<K extends Serializable, V extends Serializable>
+        implements SimpleCache<K, V>
 {
     private net.sf.ehcache.Cache cache;
     
@@ -53,7 +54,7 @@ public class EhCacheAdapter implements SimpleCache
         this.cache = cache;
     }
 
-    public boolean contains(Serializable key)
+    public boolean contains(K key)
     {
         try
         {
@@ -65,14 +66,15 @@ public class EhCacheAdapter implements SimpleCache
         }
     }
 
-    public Serializable get(Serializable key)
+    @SuppressWarnings("unchecked")
+    public V get(K key)
     {
         try
         {
             Element element = cache.get(key);
             if (element != null)
             {
-                return element.getValue();
+                return (V) element.getValue();
             }
             else
             {
@@ -86,13 +88,13 @@ public class EhCacheAdapter implements SimpleCache
         }
     }
 
-    public void put(Serializable key, Serializable value)
+    public void put(K key, V value)
     {
         Element element = new Element(key, value);
         cache.put(element);
     }
 
-    public void remove(Serializable key)
+    public void remove(K key)
     {
         cache.remove(key);
     }

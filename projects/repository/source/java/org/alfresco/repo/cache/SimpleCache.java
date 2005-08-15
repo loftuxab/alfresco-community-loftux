@@ -29,15 +29,15 @@ import java.io.Serializable;
  * 
  * @author Derek Hulley
  */
-public interface SimpleCache
+public interface SimpleCache<K extends Serializable, V extends Serializable>
 {
-    public boolean contains(Serializable key);
+    public boolean contains(K key);
     
-    public Serializable get(Serializable key);
+    public V get(K key);
     
-    public void put(Serializable key, Serializable value);
+    public void put(K key, V value);
     
-    public void remove(Serializable key);
+    public void remove(K key);
     
     public void clear();
 }
