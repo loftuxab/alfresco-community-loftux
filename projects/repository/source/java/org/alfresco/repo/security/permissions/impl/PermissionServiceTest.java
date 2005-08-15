@@ -19,16 +19,17 @@
  */
 package org.alfresco.repo.security.permissions.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import net.sf.acegisecurity.Authentication;
+import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 import org.alfresco.model.ContentModel;
@@ -37,6 +38,7 @@ import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -44,21 +46,24 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.ApplicationContextHelper;
-import org.springframework.context.ApplicationContext;
+import org.alfresco.util.BaseSpringTest;
+import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
-public class PermissionServiceTest extends TestCase
+public class PermissionServiceTest extends BaseSpringTest
 {
-    private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+    //private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
+    private static final String ROLE_AUTHENTICATED = "ROLE_AUTHENTICATED";
     NodeService nodeService;
     DictionaryService dictionaryService;
     PermissionService permissionService;
     AuthenticationService authenticationService;
+    LocalSessionFactoryBean sessionFactory;
     
     private NodeRef rootNodeRef;
 
     private NamespacePrefixResolver namespacePrefixResolver;
+    private ServiceRegistry serviceRegistry;
 
     public PermissionServiceTest()
     {
@@ -66,19 +71,14 @@ public class PermissionServiceTest extends TestCase
         // TODO Auto-generated constructor stub
     }
 
-    public PermissionServiceTest(String arg0)
+    protected void onSetUpInTransaction() throws Exception
     {
-        super(arg0);
-        // TODO Auto-generated constructor stub
-    }
-
-    public void setUp() throws IOException, InterruptedException
-    {
-        nodeService = (NodeService) ctx.getBean("dbNodeService");
-        dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
-        permissionService = (PermissionService) ctx.getBean("permissionService");
-        namespacePrefixResolver = (NamespacePrefixResolver) ctx.getBean("namespaceService");
-        authenticationService  = (AuthenticationService) ctx.getBean("authenticationService");
+        nodeService = (NodeService) applicationContext.getBean("dbNodeService");
+        dictionaryService = (DictionaryService) applicationContext.getBean("dictionaryService");
+        permissionService = (PermissionService) applicationContext.getBean("permissionService");
+        namespacePrefixResolver = (NamespacePrefixResolver) applicationContext.getBean("namespaceService");
+        authenticationService  = (AuthenticationService) applicationContext.getBean("authenticationService");
+        serviceRegistry = (ServiceRegistry) applicationContext.getBean("serviceRegistry");
         
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
@@ -94,27 +94,52 @@ public class PermissionServiceTest extends TestCase
         NodeRef typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();
         Map<QName, Serializable> props = createPersonProperties("andy");
         nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
+        props = createPersonProperties("lemur");
+        nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("andy", "andy");
         // create an authentication object e.g. the user
         authenticationService.createAuthentication(storeRef, token);
-
-        // authenticate with this user details
-        authenticationService.authenticate(storeRef, token);
         
+        token = new UsernamePasswordAuthenticationToken("lemur", "lemur");
+        authenticationService.createAuthentication(storeRef, token);
     }
 
+    private void runAs(String userName)
+    {
+        Authentication woof = authenticationService.authenticate(rootNodeRef.getStoreRef(), new UsernamePasswordAuthenticationToken(userName, userName));
+        for(GrantedAuthority authority : woof.getAuthorities())
+        {
+            System.out.println("Auth = "+authority.getAuthority());
+        }
+        
+    }
+    
+    public void testAuthenticatedRoleIsPresent()
+    {
+        runAs("andy");
+        Authentication auth = authenticationService.getCurrentAuthentication();
+        for(GrantedAuthority authority : auth.getAuthorities())
+        {
+            if(authority.getAuthority().equals(ROLE_AUTHENTICATED))
+            {
+                return;
+            }
+        }
+        fail("Missing role ROLE_AUTHENTICATED ");
+    }
+    
     private Map<QName, Serializable> createPersonProperties(String userName)
     {
         HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
-        properties.put(ContentModel.PROP_USERNAME, "andy");
+        properties.put(ContentModel.PROP_USERNAME, userName);
         return properties;
     }
     
-    public void testUnset()
-    {
-        assertNull(permissionService.getSetPermissions(rootNodeRef));
-    }
+//    public void testUnset()
+//    {
+//        assertNull(permissionService.getSetPermissions(rootNodeRef));
+//    }
     
     // Simple inheritance flag
     
@@ -146,7 +171,7 @@ public class PermissionServiceTest extends TestCase
         testSetInheritTrue();
         
         permissionService.deletePermissions(rootNodeRef);
-        testUnset();
+        // testUnset();
     }
     
     public void testSetNodePermissionEntry()
@@ -374,66 +399,153 @@ public class PermissionServiceTest extends TestCase
     public void testSimplePermissionOnRoot()
     {
         SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
     }
     
     public void testPermissionGroupOnRoot()
     {
+       
+        
         SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
         SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
         SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
         SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
         
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
         
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef,READ));
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT)); 
+        runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef,READ));
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
@@ -442,29 +554,71 @@ public class PermissionServiceTest extends TestCase
     
     public void testSimplePermissionSimpleInheritance()
     {
+        
+        
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
         SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
     }
@@ -479,25 +633,47 @@ public class PermissionServiceTest extends TestCase
         SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
         SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
         
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+     
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n1,READ));
+        assertTrue(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
         
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1,READ));
-        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
-        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
-        assertTrue(permissionService.hasPermission(n1,READ));
-        assertTrue(permissionService.hasPermission(n1,READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n1,READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
@@ -506,7 +682,18 @@ public class PermissionServiceTest extends TestCase
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
@@ -515,7 +702,18 @@ public class PermissionServiceTest extends TestCase
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
@@ -524,7 +722,18 @@ public class PermissionServiceTest extends TestCase
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
@@ -533,7 +742,18 @@ public class PermissionServiceTest extends TestCase
         assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef,READ));
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
@@ -542,7 +762,27 @@ public class PermissionServiceTest extends TestCase
         assertTrue(permissionService.hasPermission(n1,READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(n1,READ_CHILDREN));
         assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n1,READ));
+        assertFalse(permissionService.hasPermission(n1,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
+        runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
@@ -553,40 +793,572 @@ public class PermissionServiceTest extends TestCase
         assertFalse(permissionService.hasPermission(n1,READ_CONTENT));
     }
     
-    public void testDenySimplePermisionOnRootNOde()
+    public void testDenySimplePermisionOnRootNode()
     {
         SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
 
+        runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
     }
     
-//    public void testDenyPermissionOnRootNOde()
-//    {
-//        NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
-//           
-//        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
-//        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
-//        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
-//        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
-//    
-//        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
-//        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
-//        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-//        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
-//        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-//        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
-//        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-//        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
-//        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
-//    }
-  
+    public void testDenyPermissionOnRootNOde()
+    {         
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
     
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+ 
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+    }
+    
+    public void testComplexDenyOnRootNode()
+    {     
+      
+        
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+    
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT)); 
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+    }
+  
+    public void testPerformance() throws Exception 
+    {
+        runAs("andy");
+        
+        UserTransaction tx = serviceRegistry.getUserTransaction();
+        tx.begin();
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        
+        NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n2 = nodeService.createNode(n1, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}two"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n3 = nodeService.createNode(n2, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}three"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n4= nodeService.createNode(n3, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}four"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n5 = nodeService.createNode(n4, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}five"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n6 = nodeService.createNode(n5, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}six"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n7 = nodeService.createNode(n6, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}seven"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n8 = nodeService.createNode(n7, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}eight"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n9 = nodeService.createNode(n8, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}nine"), ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef n10 = nodeService.createNode(n9, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}ten"), ContentModel.TYPE_FOLDER).getChildRef();
+
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        //permissionService.setPermission(new SimplePermissionEntry(n9, READ, "andy", AccessStatus.ALLOWED));
+        //permissionService.setPermission(new SimplePermissionEntry(n10, READ, "andy", AccessStatus.ALLOWED));
+         
+        long start;
+        long end;
+        long time = 0;
+        for(int i = 0; i < 1000; i++)
+        {
+           //getSession().flush();
+           //getSession().clear();
+           start = System.nanoTime();
+           assertTrue(permissionService.hasPermission(n10,READ));
+           end = System.nanoTime();
+           time += (end - start);
+        }
+        assertTrue( (time/1000000000.0) < 60.0);
+        
+        time = 0;
+        for(int i = 0; i < 1000; i++)
+        {
+           start = System.nanoTime();
+           assertTrue(permissionService.hasPermission(n10,READ));
+           end = System.nanoTime();
+           time += (end - start);
+        }
+        assertTrue( (time/1000000000.0) < 2.0);
+        
+        tx.rollback();
+    }
+    
+    
+    public void testAllPermissions()
+    {
+       
+        
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+    
+        SimplePermissionReference WRITE = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Write");
+        
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+    }
+    
+    public void testAuthenticatedAuthority()
+    {
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+    
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+      
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED, AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED, AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED, AccessStatus.DENIED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED, AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+    }
+    
+    public void testAllAuthorities()
+    {
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+    
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+      
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.ALLOWED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+    }
+    
+    public void testAllPermissionsAllAuthorities()
+    {  
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+    
+        SimplePermissionReference WRITE = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Write");
+        
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, SimplePermissionEntry.ALL_AUTHORITIES , AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,WRITE));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+    }
+    
+    public void testGroupAndUserInteraction()
+    {
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadProperties");
+        SimplePermissionReference READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "ReadChildren");
+        SimplePermissionReference READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver), "ReadContent");
+    
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED, AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy", AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+        runAs("lemur");
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef,READ_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
+    }
 }

@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.acegisecurity.Authentication;
+import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.providers.dao.User;
 
 import org.alfresco.repo.security.authentication.AuthenticationService;
@@ -47,7 +48,7 @@ public class PermissionServiceImpl implements PermissionService
     private NodeService nodeService;
 
     private DictionaryService dictionaryService;
-    
+
     private AuthenticationService authenticationService;
 
     public PermissionServiceImpl()
@@ -78,7 +79,7 @@ public class PermissionServiceImpl implements PermissionService
     {
         this.permissionsDAO = permissionsDAO;
     }
-    
+
     public void setAuthenticationService(AuthenticationService authenticationService)
     {
         this.authenticationService = authenticationService;
@@ -87,7 +88,7 @@ public class PermissionServiceImpl implements PermissionService
     //
     // Permissions Service
     //
-  
+
     public Set<AccessPermission> getPermissions(NodeRef nodeRef)
     {
         // TODO Auto-generated method stub
@@ -162,14 +163,20 @@ public class PermissionServiceImpl implements PermissionService
 
         Set<NodeTest> ancestorRequirements = new HashSet<NodeTest>();
 
-        NodeTest(PermissionReference required, QName qName, Set<QName> aspectQNames)
+        QName typeQName;
+
+        Set<QName> aspectQNames;
+
+        NodeTest(PermissionReference required, QName typeQName, Set<QName> aspectQNames)
         {
-            this(required, true, qName, aspectQNames);
+            this(required, true, typeQName, aspectQNames);
         }
 
         NodeTest(PermissionReference required, boolean recursive, QName typeQName, Set<QName> aspectQNames)
         {
             this.required = required;
+            this.typeQName = typeQName;
+            this.aspectQNames = aspectQNames;
             Set<PermissionReference> requiredNodePermissions = modelDAO.getRequiredNodePermissions(required, typeQName,
                     aspectQNames);
             for (PermissionReference pr : requiredNodePermissions)
@@ -201,6 +208,8 @@ public class PermissionServiceImpl implements PermissionService
             Set<Pair<String, PermissionReference>> locallyDenied = new HashSet<Pair<String, PermissionReference>>();
             locallyDenied.addAll(denied);
             boolean success = true;
+
+            // only check if not a set
             success &= checkRequired(authorisations, nodeRef, denied);
             for (NodeTest nt : nodeRequirements)
             {
@@ -243,8 +252,7 @@ public class PermissionServiceImpl implements PermissionService
 
             for (PermissionEntry pe : nodeEntry.getPermissionEntries())
             {
-
-                if (isGranted(pe, granters, authorisations, denied))
+                if (isGranted(pe, granters, authorisations, denied, nodeRef))
                 {
                     return true;
                 }
@@ -253,28 +261,27 @@ public class PermissionServiceImpl implements PermissionService
         }
 
         private boolean isGranted(PermissionEntry pe, Set<PermissionReference> granters, Set<String> authorisations,
-                Set<Pair<String, PermissionReference>> denied)
+                Set<Pair<String, PermissionReference>> denied, NodeRef nodeRef)
         {
-            if(pe.isDenied())
+            if (pe.isDenied())
             {
                 return false;
             }
-            
-            for(PermissionReference granter :granters)
+
+            Pair<String, PermissionReference> specific = new Pair<String, PermissionReference>(pe.getAuthority(),
+                    required);
+            if (denied.contains(specific))
             {
-                Pair<String, PermissionReference> specific = new Pair<String, PermissionReference>(pe.getAuthority(), granter);
-                if(denied.contains(specific))
-                {
-                    return false;
-                }
-                
+                return false;
             }
-            
+
             if (authorisations.contains(pe.getAuthority()) && granters.contains(pe.getPermissionReference()))
             {
-                return true;
+                {
+                    return true;
+                }
             }
-            
+
             return false;
 
         }
@@ -283,20 +290,30 @@ public class PermissionServiceImpl implements PermissionService
         {
             Set<Pair<String, PermissionReference>> authorisations = new HashSet<Pair<String, PermissionReference>>();
 
-            Set<PermissionReference> granters = modelDAO.getGrantingPermissions(required);
-            granters.add(SimplePermissionEntry.ALL_PERMISSIONS);
-
             NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
             if (nodeEntry != null)
             {
                 for (PermissionEntry pe : nodeEntry.getPermissionEntries())
                 {
-                    if (granters.contains(pe.getPermissionReference()))
+                    if (pe.isDenied())
                     {
-                        if (pe.isDenied())
+                        Set<PermissionReference> granters = modelDAO
+                                .getGrantingPermissions(pe.getPermissionReference());
+                        for (PermissionReference granter : granters)
                         {
-                            authorisations.add(new Pair<String, PermissionReference>(pe.getAuthority(), pe
-                                    .getPermissionReference()));
+                            authorisations.add(new Pair<String, PermissionReference>(pe.getAuthority(), granter));
+                        }
+                        Set<PermissionReference> grantees = modelDAO.getGranteePermissions(pe.getPermissionReference());
+                        for (PermissionReference grantee : grantees)
+                        {
+                            authorisations.add(new Pair<String, PermissionReference>(pe.getAuthority(), grantee));
+                        }
+                        if(pe.getPermissionReference().equals(SimplePermissionEntry.ALL_PERMISSIONS))
+                        {
+                            for(PermissionReference deny : modelDAO.getPermissions(nodeRef))
+                            {
+                               authorisations.add(new Pair<String, PermissionReference>(pe.getAuthority(), deny));
+                            }
                         }
                     }
                 }
@@ -355,9 +372,13 @@ public class PermissionServiceImpl implements PermissionService
     private Set<String> getAuthorisations(Authentication auth)
     {
         HashSet<String> auths = new HashSet<String>();
-        User user = (User)auth.getPrincipal();
+        User user = (User) auth.getPrincipal();
         auths.add(user.getUsername());
         auths.add(SimplePermissionEntry.ALL_AUTHORITIES);
+        for(GrantedAuthority authority : auth.getAuthorities())
+        {
+            auths.add(authority.getAuthority());
+        }
         return auths;
     }
 

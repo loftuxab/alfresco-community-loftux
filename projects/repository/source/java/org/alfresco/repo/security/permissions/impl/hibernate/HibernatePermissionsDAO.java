@@ -49,7 +49,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     public NodePermissionEntry getPermissions(NodeRef nodeRef)
     {
         return createSimpleNodePermissionEntry(getHibernateNodePermissionEntry(
-                nodeRef, false));
+                nodeRef, true));
     }
 
     private org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry getHibernateNodePermissionEntry(

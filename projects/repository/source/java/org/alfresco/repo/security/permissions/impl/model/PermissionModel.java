@@ -32,6 +32,7 @@ import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.ModelDAO;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionEntry;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -191,7 +192,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
     {
         return defaultPermission;
     }
-    
+
     public AccessStatus getDefaultPermission(PermissionReference pr)
     {
         for (PermissionSet ps : permissionSets.values())
@@ -291,26 +292,40 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return permissions;
     }
 
-    public Set<PermissionReference> getGrantingPermissions(PermissionReference perm)
+
+    private HashMap<PermissionReference, Set<PermissionReference>> grantingPermissions = new HashMap<PermissionReference, Set<PermissionReference>>();
+
+    public synchronized Set<PermissionReference> getGrantingPermissions(PermissionReference permissionReference)
+    {
+        Set<PermissionReference> granters = grantingPermissions.get(permissionReference);
+        if(granters == null)
+        {
+            granters = getGrantingPermissionsImpl(permissionReference);
+            grantingPermissions.put(permissionReference, granters);
+        }
+        return granters;        
+    }
+    
+    private Set<PermissionReference> getGrantingPermissionsImpl(PermissionReference permissionReference)
     {
         HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
-        permissions.add(perm);
+        permissions.add(permissionReference);
         for (PermissionSet ps : permissionSets.values())
         {
             for (PermissionGroup pg : ps.getPermissionGroups())
             {
-                if (pg.getIncludedPermissionGroups().contains(perm))
+                if (pg.getIncludedPermissionGroups().contains(permissionReference))
                 {
                     permissions.add(getBasePermissionGroup(pg));
                 }
-                if(pg.isAllowFullControl())
+                if (pg.isAllowFullControl())
                 {
                     permissions.add(pg);
                 }
             }
             for (Permission p : ps.getPermissions())
             {
-                if (p.equals(perm))
+                if (p.equals(permissionReference))
                 {
                     for (PermissionReference pg : p.getGrantedToGroups())
                     {
@@ -319,10 +334,86 @@ public class PermissionModel implements ModelDAO, InitializingBean
                 }
                 for (RequiredPermission rp : p.getRequiredPermissions())
                 {
-                    if (rp.equals(perm) && rp.isImplies())
+                    if (rp.equals(permissionReference) && rp.isImplies())
                     {
                         permissions.add(p);
                         break;
+                    }
+                }
+            }
+        }
+        return permissions;
+    }
+
+    private HashMap<PermissionReference, Set<PermissionReference>> granteePermissions = new HashMap<PermissionReference, Set<PermissionReference>>();
+
+    
+    public synchronized Set<PermissionReference> getGranteePermissions(PermissionReference permissionReference)
+    {
+        Set<PermissionReference> grantees = granteePermissions.get(permissionReference);
+        if(grantees == null)
+        {
+            grantees = getGranteePermissionsImpl(permissionReference);
+            granteePermissions.put(permissionReference, grantees);
+        }
+        return grantees; 
+    }
+    
+    private Set<PermissionReference> getGranteePermissionsImpl(PermissionReference permissionReference)
+    {
+        HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
+        permissions.add(permissionReference);
+        for (PermissionSet ps : permissionSets.values())
+        {
+            for (PermissionGroup pg : ps.getPermissionGroups())
+            {
+                if (pg.equals(permissionReference))
+                {
+                    for (PermissionReference included : pg.getIncludedPermissionGroups())
+                    {
+                        permissions.addAll(getGranteePermissions(included));
+                    }
+                }
+                if (pg.isAllowFullControl())
+                {
+                    permissions.add(SimplePermissionEntry.ALL_PERMISSIONS);
+                }
+                if (pg.isExtends())
+                {
+                    if (pg.getTypeQName() != null)
+                    {
+                        permissions.addAll(getGranteePermissions(new SimplePermissionReference(pg.getTypeQName(), pg
+                                .getName())));
+                    }
+                    else
+                    {
+                        ClassDefinition classDefinition = dictionaryService.getClass(pg.getQName());
+                        QName parent = classDefinition.getParentName();
+                        if(parent != null)
+                        {
+                            classDefinition = dictionaryService.getClass(parent);
+                            PermissionGroup attempt = getPermissionGroupOrNull(new SimplePermissionReference(parent, pg
+                                    .getName()));
+                            if (attempt != null)
+                            {
+                                permissions.addAll(getGranteePermissions(attempt));
+                            }
+                        }
+                    }
+                }
+            }
+            PermissionGroup baseGroup = getBasePermissionGroupOrNull(getPermissionGroupOrNull(permissionReference));
+            if (baseGroup != null)
+            {
+                for (Permission p : ps.getPermissions())
+                {
+                    for (PermissionReference grantedTo : p.getGrantedToGroups())
+                    {
+                        PermissionGroup base = getBasePermissionGroupOrNull(getPermissionGroupOrNull(grantedTo));
+                        if (baseGroup.equals(base))
+                        {
+                            permissions.add(p);
+                        }
                     }
                 }
             }
@@ -356,7 +447,23 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return pg;
     }
 
-    private PermissionGroup getBasePermissionGroupOrNull(PermissionGroup pg)
+    private HashMap<PermissionGroup, PermissionGroup> groupsToBaseGroup = new HashMap<PermissionGroup, PermissionGroup>();
+    
+    private synchronized PermissionGroup getBasePermissionGroupOrNull(PermissionGroup pg)
+    {
+        if(groupsToBaseGroup.containsKey(pg))
+        {
+            return groupsToBaseGroup.get(pg);
+        }
+        else
+        {
+            PermissionGroup answer = getBasePermissionGroupOrNullImpl(pg);
+            groupsToBaseGroup.put(pg, answer);
+            return answer;
+        }
+    }
+        
+    private PermissionGroup getBasePermissionGroupOrNullImpl(PermissionGroup pg)
     {
         if (pg == null)
         {
@@ -463,21 +570,22 @@ public class PermissionModel implements ModelDAO, InitializingBean
                     // Add includes
                     for (PermissionReference pr : pg.getIncludedPermissionGroups())
                     {
-                        requiredPermissions
-                                .addAll(getRequirementsForPermissionGroup(
-                                        getBasePermissionGroupOrNull(getPermissionGroupOrNull(pr)), on, qName,
-                                        aspectQNames));
+                        requiredPermissions.addAll(getRequirementsForPermissionGroup(
+                                getBasePermissionGroupOrNull(getPermissionGroupOrNull(pr)), on, qName, aspectQNames));
                     }
                 }
             }
             for (Permission p : ps.getPermissions())
             {
-                for(PermissionReference grantedTo: p.getGrantedToGroups())
+                for (PermissionReference grantedTo : p.getGrantedToGroups())
                 {
                     PermissionGroup base = getBasePermissionGroupOrNull(getPermissionGroupOrNull(grantedTo));
-                    if(target.equals(base) && isPartOfDynamicPermissionGroup(grantedTo, qName, aspectQNames) )
+                    if (target.equals(base) && isPartOfDynamicPermissionGroup(grantedTo, qName, aspectQNames))
                     {
-                        requiredPermissions.addAll(getRequirementsForPermission(p, on));
+                        if (on == RequiredPermission.On.NODE)
+                        {
+                            requiredPermissions.add(p);
+                        }
                     }
                 }
             }
@@ -516,6 +624,5 @@ public class PermissionModel implements ModelDAO, InitializingBean
         }
         return null;
     }
-    
-    
+
 }

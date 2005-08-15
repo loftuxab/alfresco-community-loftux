@@ -11,7 +11,7 @@
         table="node_permission"
         dynamic-insert="false"
         dynamic-update="false"
-        select-before-update="false"
+        select-before-update="false" 
         lazy="true"
         optimistic-lock="version" >
 
@@ -27,13 +27,13 @@
         
         <set
             name="permissionEntries"
-            lazy="false"
+            lazy="true"
             sort="unsorted"
             inverse="true" 
-            fetch="join"
+            fetch="select" 
             optimistic-lock="true"
             cascade="delete" >
-            <cache usage="transactional" />
+            <cache usage="read-write" />
             <key>
                <column name="protocol"  />
                <column name="identifier" length="100" />
@@ -52,7 +52,7 @@
         dynamic-insert="false"
         dynamic-update="false"
         select-before-update="false"
-        lazy="false"
+        lazy="true"
         optimistic-lock="version" >
         
         <cache usage="read-write" />
@@ -67,7 +67,7 @@
         <many-to-one 
             name="nodePermissionEntry" 
             class="org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntryImpl" 
-            lazy="false" fetch="join" optimistic-lock="true" not-null="true"  >
+            lazy="true" fetch="select" optimistic-lock="true" not-null="true"  > 
               <column name="protocol" length="100" />
               <column name="identifier" length="100" />
               <column name="guid" length="36"/>
@@ -76,7 +76,7 @@
         <many-to-one 
             name="permissionReference" 
             class="org.alfresco.repo.security.permissions.impl.hibernate.PermissionReferenceImpl" 
-            lazy="false" fetch="join" optimistic-lock="true" not-null="false">
+            lazy="true" fetch="select" optimistic-lock="true" not-null="false">
             <column name="typeUri" length="100" />
             <column name="typeName" length="100" />
             <column name="name" length="100" />
@@ -85,7 +85,7 @@
         <many-to-one 
             name="recipient" 
             class="org.alfresco.repo.security.permissions.impl.hibernate.RecipientImpl" 
-            lazy="false" fetch="join" optimistic-lock="true" not-null="false">
+            lazy="true" fetch="select" optimistic-lock="true" not-null="false">
         </many-to-one>
         
         <property name="allowed" column="allowed" type="boolean" not-null="true" />

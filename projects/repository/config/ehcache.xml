@@ -127,4 +127,35 @@
         maxElementsInMemory="5000" 
         eternal="true" 
         overflowToDisk="false"/>
+    <!-- Permission related caches -->
+    <cache 
+        name="org.alfresco.repo.security.permissions.impl.hibernate.RecipientImpl" 
+        maxElementsInMemory="5000" 
+        eternal="true" 
+        overflowToDisk="false"/>
+    <cache 
+        name="org.alfresco.repo.security.permissions.impl.hibernate.PermissionReferenceImpl" 
+        maxElementsInMemory="5000" 
+        eternal="true" 
+        overflowToDisk="false"/>
+    <cache 
+        name="org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntryImpl" 
+        maxElementsInMemory="5000" 
+        eternal="true" 
+        overflowToDisk="false"/>
+    <cache 
+        name="org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntryImpl" 
+        maxElementsInMemory="5000" 
+        eternal="true" 
+        overflowToDisk="false"/>
+    <cache 
+        name="org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntryImpl.permissionEntries" 
+        maxElementsInMemory="5000" 
+        eternal="true" 
+        overflowToDisk="false"/>
+    <cache 
+        name="org.alfresco.repo.security.permissions.impl.hibernate.RecipientImpl.externalKeys" 
+        maxElementsInMemory="5000" 
+        eternal="true" 
+        overflowToDisk="false"/>
 </ehcache>

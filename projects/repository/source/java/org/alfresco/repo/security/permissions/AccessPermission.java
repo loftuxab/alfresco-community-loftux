@@ -32,7 +32,7 @@ public interface AccessPermission
      * 
      * @return
      */
-    public PermissionReference getPermssionDefintion();
+    public PermissionReference getPermissionDefinition();
 
     /**
      * Is this permission allowed?

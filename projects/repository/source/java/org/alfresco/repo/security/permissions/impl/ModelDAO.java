@@ -41,4 +41,6 @@ public interface ModelDAO
 
     public AccessStatus getDefaultPermission(PermissionReference required);
 
+    public Set<PermissionReference> getGranteePermissions(PermissionReference permissionReference);
+
 }
