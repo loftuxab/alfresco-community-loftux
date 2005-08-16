@@ -401,7 +401,7 @@ public class PermissionServiceImpl implements PermissionService
             boolean success = true;
 
             // Check the required permissions but not for sets they rely on their underlying permissions
-            if(modelDAO.isPermission(required))
+            if(modelDAO.checkPermission(required))
             {
                success &= checkRequired(authorisations, nodeRef, denied);
             }

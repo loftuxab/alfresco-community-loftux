@@ -426,32 +426,35 @@ public class PermissionModel implements ModelDAO, InitializingBean
                     {
                         permissions.addAll(getGranteePermissions(included));
                     }
-                }
-                if (pg.isAllowFullControl())
-                {
-                    permissions.add(SimplePermissionEntry.ALL_PERMISSIONS);
-                }
-                if (pg.isExtends())
-                {
-                    if (pg.getTypeQName() != null)
+
+                    if (pg.isExtends())
                     {
-                        permissions.addAll(getGranteePermissions(new SimplePermissionReference(pg.getTypeQName(), pg
-                                .getName())));
-                    }
-                    else
-                    {
-                        ClassDefinition classDefinition = dictionaryService.getClass(pg.getQName());
-                        QName parent = classDefinition.getParentName();
-                        if (parent != null)
+                        if (pg.getTypeQName() != null)
                         {
-                            classDefinition = dictionaryService.getClass(parent);
-                            PermissionGroup attempt = getPermissionGroupOrNull(new SimplePermissionReference(parent, pg
-                                    .getName()));
-                            if (attempt != null)
+                            permissions.addAll(getGranteePermissions(new SimplePermissionReference(pg.getTypeQName(),
+                                    pg.getName())));
+                        }
+                        else
+                        {
+                            ClassDefinition classDefinition = dictionaryService.getClass(pg.getQName());
+                            QName parent = classDefinition.getParentName();
+                            if (parent != null)
                             {
-                                permissions.addAll(getGranteePermissions(attempt));
+                                classDefinition = dictionaryService.getClass(parent);
+                                PermissionGroup attempt = getPermissionGroupOrNull(new SimplePermissionReference(
+                                        parent, pg.getName()));
+                                if (attempt != null)
+                                {
+                                    permissions.addAll(getGranteePermissions(attempt));
+                                }
                             }
                         }
+                    }
+
+                    if (pg.isAllowFullControl())
+                    {
+                        // add all available
+                        permissions.addAll(getAllPermissions());
                     }
                 }
             }
@@ -469,6 +472,23 @@ public class PermissionModel implements ModelDAO, InitializingBean
                         }
                     }
                 }
+            }
+        }
+        return permissions;
+    }
+
+    private Set<PermissionReference> getAllPermissions()
+    {
+        HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
+        for (PermissionSet ps : permissionSets.values())
+        {
+            for (PermissionGroup pg : ps.getPermissionGroups())
+            {
+                permissions.add(pg);
+            }
+            for (Permission p : ps.getPermissions())
+            {
+                permissions.add(p);
             }
         }
         return permissions;
@@ -647,6 +667,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
     /**
      * Get the requirements for a permission set
+     * 
      * @param target
      * @param on
      * @param qName
@@ -740,9 +761,49 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return null;
     }
 
-    public boolean isPermission(PermissionReference required)
+    public boolean checkPermission(PermissionReference required)
     {
-        return getPermissionOrNull(required) != null;
+        Permission permission = getPermissionOrNull(required);
+        if (permission != null)
+        {
+            return true;
+        }
+        PermissionGroup pg = getPermissionGroupOrNull(required);
+        if (pg != null)
+        {
+            if (pg.isExtends())
+            {
+                if (pg.getTypeQName() != null)
+                {
+                    return checkPermission(new SimplePermissionReference(pg.getTypeQName(), pg.getName()));
+                }
+                else
+                {
+                    ClassDefinition classDefinition = dictionaryService.getClass(pg.getQName());
+                    QName parent;
+                    while ((parent = classDefinition.getParentName()) != null)
+                    {
+                        classDefinition = dictionaryService.getClass(parent);
+                        PermissionGroup attempt = getPermissionGroupOrNull(new SimplePermissionReference(parent, pg
+                                .getName()));
+                        if ((attempt != null) && attempt.isAllowFullControl())
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+            else
+            {
+                return pg.isAllowFullControl();
+            }
+        }
+        else
+        {
+            return false;
+        }
+
     }
 
 }

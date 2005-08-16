@@ -92,6 +92,6 @@ public interface ModelDAO
      * @param required
      * @return
      */
-    public boolean isPermission(PermissionReference required);
+    public boolean checkPermission(PermissionReference required);
 
 }

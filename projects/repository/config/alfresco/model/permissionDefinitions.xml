@@ -18,13 +18,13 @@
       <!-- Higher level permissions -->
     
       <!-- Full access -->
-      <permissionGroup name="FullControl" allowFullControl="allow" />
+      <permissionGroup name="FullControl" allowFullControl="true" />
       
       <!-- Higher level acces groupings -->
-      <permissionGroup name="Read" allowFullControl="deny" />  
-      <permissionGroup name="Write" allowFullControl="deny" />  
-      <permissionGroup name="Delete" allowFullControl="deny" />  
-      <permissionGroup name="AddChildren" allowFullControl="deny" />  
+      <permissionGroup name="Read" allowFullControl="false" />  
+      <permissionGroup name="Write" allowFullControl="false" />  
+      <permissionGroup name="Delete" allowFullControl="false" />  
+      <permissionGroup name="AddChildren" allowFullControl="false" />  
     
       <!-- Low level access groupings -->
     
@@ -95,7 +95,7 @@
       <permissionGroup name="Write" extends="true" />
       
       <!-- Add some new -->
-      <permissionGroup name="Execute" allowFullControl="deny" />
+      <permissionGroup name="Execute" allowFullControl="false" />
       
       <!-- Content specific permissions -->
       

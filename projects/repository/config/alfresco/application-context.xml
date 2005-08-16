@@ -414,9 +414,9 @@
    <!-- Data Dictionary -->
    <!--                 -->
    
-   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.impl.NamespaceDAOImpl" />
+   <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.NamespaceDAOImpl" />
 
-   <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.impl.DictionaryDAOImpl" init-method="bootstrap">
+   <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.DictionaryDAOImpl" init-method="bootstrap">
       <constructor-arg index="0">
          <ref bean="namespaceDAO"/>
       </constructor-arg>
@@ -430,14 +430,14 @@
    </bean>
    
    <bean id="dictionaryService"
-         class="org.alfresco.repo.dictionary.impl.DictionaryComponent" >
+         class="org.alfresco.repo.dictionary.DictionaryComponent" >
       <property name="dictionaryDAO">
          <ref bean="dictionaryDAO"/>
       </property>
    </bean>
    
    <bean id="namespaceService"
-         class="org.alfresco.repo.dictionary.impl.DictionaryNamespaceComponent"
+         class="org.alfresco.repo.dictionary.DictionaryNamespaceComponent"
          depends-on="dictionaryDAO" >
       <property name="namespaceDAO">
          <ref bean="namespaceDAO"/>

@@ -8,7 +8,7 @@
 <!ATTLIST permissionGroup name CDATA #REQUIRED>
 <!ATTLIST permissionGroup type CDATA #IMPLIED>
 <!ATTLIST permissionGroup extends (true | false) "false">
-<!ATTLIST permissionGroup allowFullControl (allow | deny) "deny" >
+<!ATTLIST permissionGroup allowFullControl (true | false) "false" >
 <!ELEMENT includePermissionGroup EMPTY>
 <!ATTLIST includePermissionGroup type CDATA #IMPLIED>
 <!ATTLIST includePermissionGroup permissionGroup CDATA #REQUIRED>
