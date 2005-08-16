@@ -31,9 +31,7 @@ import org.alfresco.example.webservice.types.ResultSetRow;
 import org.alfresco.example.webservice.types.ResultSetRowNode;
 import org.alfresco.example.webservice.types.Store;
 import org.alfresco.example.webservice.types.StoreEnum;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.util.BaseTest;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.commons.logging.Log;
@@ -78,7 +76,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     * 
     * @throws Exception
     */
-   public void xtestGetStores() throws Exception
+   public void testGetStores() throws Exception
    {
       Store[] stores = this.repSvc.getStores();
       assertNotNull("stores array should not be null", stores);
@@ -94,6 +92,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    public void testQuery() throws Exception
    {
       //Query query = new Query(QueryLanguageEnum.lucene, "*");
+      //Query query = new Query(QueryLanguageEnum.lucene, "PATH:\"/.\"");
+      //Query query = new Query(QueryLanguageEnum.lucene, "ISROOT:T");
       Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
       
       //QueryConfiguration queryCfg = new QueryConfiguration();
@@ -130,6 +130,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    
    /**
     * Tests the queryChildren service method
+    * 
+    * @throws Exception
     */
    public void testQueryChildren() throws Exception
    {
@@ -139,7 +141,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       
       Reference node = new Reference();
       node.setStore(STORE);
-      node.setUuid("c26c4a8d-058f-11da-811f-2fa895fd7caf");     // find a query to retrieve this maybe type == store_root?
+      node.setUuid("7329c9d2-0d89-11da-90fb-fbe4cb2183e7");     // find a query to retrieve this maybe type == store_root?
       QueryResult queryResult = this.repSvc.queryChildren(node);
       
       assertNotNull("queryResult should not be null", queryResult);
@@ -160,6 +162,78 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       else
       {
          logger.info("The query returned no results");
+      }
+   }
+   
+   /**
+    * Tests the queryParents service method
+    * 
+    * @throws Exception
+    */
+   public void testQueryParents() throws Exception
+   {
+      // query for all the child nodes of the root
+      Reference node = new Reference();
+      node.setStore(STORE);
+      String rootId = "7329c9d2-0d89-11da-90fb-fbe4cb2183e7";
+      node.setUuid(rootId);     // find a query to retrieve this maybe type == store_root?
+      QueryResult rootChildren = this.repSvc.queryChildren(node);
+      
+      assertNotNull("rootChildren should not be null", rootChildren);
+      ResultSet rootChildrenResults = rootChildren.getResultSet();
+      assertNotNull("rootChildrenResults should not be null", rootChildrenResults);
+      assertTrue("There should be at least one child of the root node", rootChildrenResults.getSize() > 0);
+      
+      // get hold of the id of the first child
+      ResultSetRow firstRow = rootChildrenResults.getRows(0);
+      String id = firstRow.getNode().getId();
+      logger.info("Retrieving parents for id: " + id + "....");
+      
+      node = new Reference();
+      node.setStore(STORE);
+      node.setUuid(id);
+      QueryResult parents = this.repSvc.queryParents(node);
+      
+      assertNotNull("parents should not be null", parents);
+      ResultSet parentsResults = parents.getResultSet();
+      assertNotNull("parentsResults should not be null", parentsResults);
+      assertTrue("There should be at least one parent", parentsResults.getSize() > 0);
+      
+      // show the results
+      boolean rootFound = false;
+      ResultSetRow[] rows = parentsResults.getRows();
+      for (int x = 0; x < rows.length; x++)
+      {
+         ResultSetRow row = rows[x];
+         ResultSetRowNode rowNode = row.getNode();
+         String nodeId = rowNode.getId();
+         logger.info("id = " + nodeId + ", type = " + rowNode.getType());
+         
+         if (nodeId.equals(rootId))
+         {
+            rootFound = true;
+         }
+      }
+      
+      // make sure the root node was one of the parents
+      assertTrue("The root node was not found as one of the parents!!", rootFound);
+   }
+   
+   /*
+    * Tests the queryAssociated service method
+    * 
+    * @throws Exception
+    */
+   public void testQueryAssociated() throws Exception
+   {
+      try
+      {
+         this.repSvc.queryAssociated(null, null);
+         fail("This method should have thrown a repository fault");
+      }
+      catch (RepositoryFault rf)
+      {
+         // expected to get this
       }
    }
 }

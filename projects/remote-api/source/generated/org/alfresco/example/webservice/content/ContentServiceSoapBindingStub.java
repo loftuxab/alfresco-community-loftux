@@ -1,13 +1,13 @@
 /**
- * RepositoryServiceSoapBindingStub.java
+ * ContentServiceSoapBindingStub.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package org.alfresco.example.webservice.repository;
+package org.alfresco.example.webservice.content;
 
-public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stub implements org.alfresco.example.webservice.repository.RepositoryServiceSoapPort {
+public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub implements org.alfresco.example.webservice.content.ContentServiceSoapPort {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
     private java.util.Vector cachedSerFactories = new java.util.Vector();
@@ -24,157 +24,159 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("getStores");
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Store"));
-        oper.setReturnClass(org.alfresco.example.webservice.types.Store[].class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "getStoresReturn"));
+        oper.setName("describe");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.example.webservice.types.Predicate[].class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Content"));
+        oper.setReturnClass(org.alfresco.example.webservice.types.Content[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "describeReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[0] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("query");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "store"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Store"), org.alfresco.example.webservice.types.Store.class, false, false);
+        oper.setName("read");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "query"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Query"), org.alfresco.example.webservice.types.Query.class, false, false);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "includeMetaData"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
-        oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult"));
-        oper.setReturnClass(org.alfresco.example.webservice.repository.QueryResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryReturn"));
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"));
+        oper.setReturnClass(byte[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[1] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("queryChildren");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
+        oper.setName("readChunk");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult"));
-        oper.setReturnClass(org.alfresco.example.webservice.repository.QueryResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryReturn"));
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "segment"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentSegment"), org.alfresco.example.webservice.content.ContentSegment.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ReadResult"));
+        oper.setReturnClass(org.alfresco.example.webservice.content.ReadResult.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readChunkReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[2] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("queryParents");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
+        oper.setName("readNext");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readSession"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult"));
-        oper.setReturnClass(org.alfresco.example.webservice.repository.QueryResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryReturn"));
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ReadResult"));
+        oper.setReturnClass(org.alfresco.example.webservice.content.ReadResult.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readNextReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[3] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("queryAssociated");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
+        oper.setName("write");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "association"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "Association"), org.alfresco.example.webservice.repository.Association[].class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "content"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"), byte[].class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult"));
-        oper.setReturnClass(org.alfresco.example.webservice.repository.QueryResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryReturn"));
+        oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[4] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("fetchMore");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "querySession"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.setName("create");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "parent"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ParentReference"), org.alfresco.example.webservice.types.ParentReference.class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult"));
-        oper.setReturnClass(org.alfresco.example.webservice.repository.QueryResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryReturn"));
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "format"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ContentFormat"), org.alfresco.example.webservice.types.ContentFormat.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "content"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"), byte[].class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Content"));
+        oper.setReturnClass(org.alfresco.example.webservice.types.Content.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "createReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[5] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("update");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "statements"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", "CML"), org.alfresco.example.webservice.types.CML.class, false, false);
+        oper.setName("delete");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.example.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "UpdateResult"));
-        oper.setReturnClass(org.alfresco.example.webservice.repository.UpdateResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "updateReturn"));
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"));
+        oper.setReturnClass(org.alfresco.example.webservice.types.Reference[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "deleteReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[6] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("describe");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.example.webservice.types.Predicate.class, false, false);
+        oper.setName("exists");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.example.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NodeDefinition"));
-        oper.setReturnClass(org.alfresco.example.webservice.types.NodeDefinition[].class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "describeReturn"));
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ExistsResult"));
+        oper.setReturnClass(org.alfresco.example.webservice.content.ExistsResult[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "existsReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"),
-                      "org.alfresco.example.webservice.repository.RepositoryFault",
-                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault"), 
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"),
+                      "org.alfresco.example.webservice.content.ContentFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault"), 
                       true
                      ));
         _operations[7] = oper;
 
     }
 
-    public RepositoryServiceSoapBindingStub() throws org.apache.axis.AxisFault {
+    public ContentServiceSoapBindingStub() throws org.apache.axis.AxisFault {
          this(null);
     }
 
-    public RepositoryServiceSoapBindingStub(java.net.URL endpointURL, javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
+    public ContentServiceSoapBindingStub(java.net.URL endpointURL, javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
          this(service);
          super.cachedEndpoint = endpointURL;
     }
 
-    public RepositoryServiceSoapBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
+    public ContentServiceSoapBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
         if (service == null) {
             super.service = new org.apache.axis.client.Service();
         } else {
@@ -194,113 +196,6 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
             java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
             java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
             java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>addAspect");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLAddAspect.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>addChild");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLAddChild.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>copy");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLCopy.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>create");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLCreate.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>createAssociation");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLCreateAssociation.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>delete");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLDelete.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>move");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLMove.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>removeAssociation");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLRemoveAssociation.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>removeChild");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLRemoveChild.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>update");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CMLUpdate.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", "CML");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.CML.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", ">NamespaceConfiguration>mapping");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.NamespaceConfigurationMapping.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "LocaleConfiguration");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.LocaleConfiguration.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "NamespaceConfiguration");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.NamespaceConfigurationMapping[].class;
-            cachedSerClasses.add(cls);
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", ">NamespaceConfiguration>mapping");
-            qName2 = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "mapping");
-            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
-            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "QueryConfiguration");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.QueryConfiguration.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ContentFormat>encoding");
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
@@ -525,37 +420,30 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "Association");
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentFault");
             cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.repository.Association.class;
+            cls = org.alfresco.example.webservice.content.ContentFault.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "AssociationDirectionEnum");
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ContentSegment");
             cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.repository.AssociationDirectionEnum.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(enumsf);
-            cachedDeserFactories.add(enumdf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.repository.QueryResult.class;
+            cls = org.alfresco.example.webservice.content.ContentSegment.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "RepositoryFault");
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ExistsResult");
             cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.repository.RepositoryFault.class;
+            cls = org.alfresco.example.webservice.content.ExistsResult.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "UpdateResult");
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ReadResult");
             cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.repository.UpdateResult.class;
+            cls = org.alfresco.example.webservice.content.ReadResult.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -628,346 +516,21 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
 
 
     /**
-     * Retrieves a list of stores where content resources are held.
+     * Describes one or more content streams.
      */
-    public org.alfresco.example.webservice.types.Store[] getStores() throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
+    public org.alfresco.example.webservice.types.Content[] describe(org.alfresco.example.webservice.types.Predicate[] items) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[0]);
         _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/getStores");
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/describe");
         _call.setEncodingStyle(null);
         _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "getStores"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (org.alfresco.example.webservice.types.Store[]) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.types.Store[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.types.Store[].class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-
-    /**
-     * Executes a query against a store
-     */
-    public org.alfresco.example.webservice.repository.QueryResult query(org.alfresco.example.webservice.types.Store store, org.alfresco.example.webservice.types.Query query, boolean includeMetaData) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[1]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/query");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "query"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {store, query, new java.lang.Boolean(includeMetaData)});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (org.alfresco.example.webservice.repository.QueryResult) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.repository.QueryResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.QueryResult.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-
-    /**
-     * Executes a query to retrieve the children of the specified
-     * resource.
-     */
-    public org.alfresco.example.webservice.repository.QueryResult queryChildren(org.alfresco.example.webservice.types.Reference node) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[2]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/queryChildren");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryChildren"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {node});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (org.alfresco.example.webservice.repository.QueryResult) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.repository.QueryResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.QueryResult.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-
-    /**
-     * Executes a query to retrieve the parents of the specified resource.
-     */
-    public org.alfresco.example.webservice.repository.QueryResult queryParents(org.alfresco.example.webservice.types.Reference node) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[3]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/queryParents");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryParents"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {node});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (org.alfresco.example.webservice.repository.QueryResult) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.repository.QueryResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.QueryResult.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-
-    /**
-     * Executes a query to retrieve associated resources of the specified
-     * resource.
-     */
-    public org.alfresco.example.webservice.repository.QueryResult queryAssociated(org.alfresco.example.webservice.types.Reference node, org.alfresco.example.webservice.repository.Association[] association) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[4]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/queryAssociated");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "queryAssociated"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {node, association});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (org.alfresco.example.webservice.repository.QueryResult) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.repository.QueryResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.QueryResult.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-
-    /**
-     * Fetches the next batch of query results.
-     */
-    public org.alfresco.example.webservice.repository.QueryResult fetchMore(java.lang.String querySession) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[5]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/fetchMore");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "fetchMore"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {querySession});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (org.alfresco.example.webservice.repository.QueryResult) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.repository.QueryResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.QueryResult.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-
-    /**
-     * Executes a CML script to manipulate the contents of a Repository
-     * store.
-     */
-    public org.alfresco.example.webservice.repository.UpdateResult update(org.alfresco.example.webservice.types.CML statements) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[6]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/update");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "update"));
-
-        setRequestHeaders(_call);
-        setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {statements});
-
-        if (_resp instanceof java.rmi.RemoteException) {
-            throw (java.rmi.RemoteException)_resp;
-        }
-        else {
-            extractAttachments(_call);
-            try {
-                return (org.alfresco.example.webservice.repository.UpdateResult) _resp;
-            } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.repository.UpdateResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.UpdateResult.class);
-            }
-        }
-  } catch (org.apache.axis.AxisFault axisFaultException) {
-    if (axisFaultException.detail != null) {
-        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
-              throw (java.rmi.RemoteException) axisFaultException.detail;
-         }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
-         }
-   }
-  throw axisFaultException;
-}
-    }
-
-
-    /**
-     * Describes a content resource.
-     */
-    public org.alfresco.example.webservice.types.NodeDefinition[] describe(org.alfresco.example.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
-        if (super.cachedEndpoint == null) {
-            throw new org.apache.axis.NoEndPointException();
-        }
-        org.apache.axis.client.Call _call = createCall();
-        _call.setOperation(_operations[7]);
-        _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/repository/1.0/describe");
-        _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
-        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "describe"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "describe"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
@@ -979,9 +542,9 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         else {
             extractAttachments(_call);
             try {
-                return (org.alfresco.example.webservice.types.NodeDefinition[]) _resp;
+                return (org.alfresco.example.webservice.types.Content[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.types.NodeDefinition[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.types.NodeDefinition[].class);
+                return (org.alfresco.example.webservice.types.Content[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.types.Content[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -989,8 +552,323 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         if (axisFaultException.detail instanceof java.rmi.RemoteException) {
               throw (java.rmi.RemoteException) axisFaultException.detail;
          }
-        if (axisFaultException.detail instanceof org.alfresco.example.webservice.repository.RepositoryFault) {
-              throw (org.alfresco.example.webservice.repository.RepositoryFault) axisFaultException.detail;
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+
+    /**
+     * Retrieves content from the repository.
+     */
+    public byte[] read(org.alfresco.example.webservice.types.Reference node) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[1]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/read");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "read"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {node});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (byte[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (byte[]) org.apache.axis.utils.JavaUtils.convert(_resp, byte[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+
+    /**
+     * Retrieves content from the repository in chunks.
+     */
+    public org.alfresco.example.webservice.content.ReadResult readChunk(org.alfresco.example.webservice.types.Reference node, org.alfresco.example.webservice.content.ContentSegment segment) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[2]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/readChunk");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readChunk"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {node, segment});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (org.alfresco.example.webservice.content.ReadResult) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (org.alfresco.example.webservice.content.ReadResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.content.ReadResult.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+
+    /**
+     * Retrieves the next chunk of content from the given read session.
+     */
+    public org.alfresco.example.webservice.content.ReadResult readNext(java.lang.String readSession) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[3]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/readNext");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readNext"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {readSession});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (org.alfresco.example.webservice.content.ReadResult) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (org.alfresco.example.webservice.content.ReadResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.content.ReadResult.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+
+    /**
+     * Writes content to the repository.
+     */
+    public void write(org.alfresco.example.webservice.types.Reference node, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[4]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/write");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "write"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {node, content});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        extractAttachments(_call);
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+
+    /**
+     * Creates new content in the repository.
+     */
+    public org.alfresco.example.webservice.types.Content create(org.alfresco.example.webservice.types.ParentReference parent, org.alfresco.example.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[5]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/create");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "create"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {parent, format, content});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (org.alfresco.example.webservice.types.Content) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (org.alfresco.example.webservice.types.Content) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.types.Content.class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+
+    /**
+     * Deletes content from the repository.
+     */
+    public org.alfresco.example.webservice.types.Reference[] delete(org.alfresco.example.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[6]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/delete");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "delete"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {items});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (org.alfresco.example.webservice.types.Reference[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (org.alfresco.example.webservice.types.Reference[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.types.Reference[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+
+    /**
+     * Determines whether content exists in the repository.
+     */
+    public org.alfresco.example.webservice.content.ExistsResult[] exists(org.alfresco.example.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[7]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/content/1.0/exists");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "exists"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {items});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (org.alfresco.example.webservice.content.ExistsResult[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (org.alfresco.example.webservice.content.ExistsResult[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.content.ExistsResult[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.content.ContentFault) {
+              throw (org.alfresco.example.webservice.content.ContentFault) axisFaultException.detail;
          }
    }
   throw axisFaultException;

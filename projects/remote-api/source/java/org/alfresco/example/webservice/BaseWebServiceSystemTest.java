@@ -24,6 +24,9 @@ import junit.framework.AssertionFailedError;
 import org.alfresco.example.webservice.authentication.AuthenticationResult;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceLocator;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceSoapBindingStub;
+import org.alfresco.example.webservice.types.Store;
+import org.alfresco.example.webservice.types.StoreEnum;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseTest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +46,9 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
    
    private static final String USERNAME = "admin";
    private static final String PASSWORD = "admin";
+   
+   protected Store STORE = new Store(StoreEnum.workspace, "SpacesStore");
+   protected StoreRef STORE_REF = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
    
    /**
     * Calls the AuthenticationService to retrieve a ticket for all tests to use.

@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wsdl:definitions name="authentication-service"
+   targetNamespace="http://www.alfresco.org/ws/service/content/1.0" 
+   xmlns:apachesoap="http://xml.apache.org/xml-soap" 
+   xmlns:content="http://www.alfresco.org/ws/service/content/1.0" 
+   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+   xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
+   xmlns:cms="http://www.alfresco.org/ws/model/content/1.0"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <!-- ************************************** -->
+   <!-- Copyright Alfresco Software, Inc. 2005 -->
+   <!-- ************************************** -->
+   <wsdl:import namespace="http://www.alfresco.org/ws/model/content/1.0" location="types.xsd"/>
+   <wsdl:types>
+      <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/content/1.0" xmlns="http://www.w3.org/2001/XMLSchema">
+         <element name="describe">
+            <complexType>
+               <sequence>
+                  <element name="items" type="cms:Predicate" maxOccurs="unbounded" minOccurs="0"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="describeResponse">
+            <complexType>
+               <sequence>
+                  <element name="describeReturn" type="cms:Content" maxOccurs="unbounded" minOccurs="0"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="read">
+            <complexType>
+               <sequence>
+                  <element name="node" type="cms:Reference"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="readResponse">
+            <complexType>
+               <sequence>
+                  <element name="readReturn" type="xsd:base64Binary"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="readChunk">
+            <complexType>
+               <sequence>
+                  <element name="node" type="cms:Reference"/>
+                  <element name="segment" type="content:ContentSegment"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="readChunkResponse">
+            <complexType>
+               <sequence>
+                  <element name="readChunkReturn" type="content:ReadResult"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="readNext">
+            <complexType>
+               <sequence>
+                  <element name="readSession" type="xsd:string"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="readNextResponse">
+            <complexType>
+               <sequence>
+                  <element name="readNextReturn" type="content:ReadResult"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="write">
+            <complexType>
+               <sequence>
+                  <element name="node" type="cms:Reference"/>
+                  <element name="content" type="xsd:base64Binary"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="writeResponse">
+            <complexType>
+               <sequence/>
+            </complexType>
+         </element>
+         
+         <element name="create">
+            <complexType>
+               <sequence>
+                  <element name="parent" type="cms:ParentReference"/>
+                  <element name="format" type="cms:ContentFormat"/>
+                  <element name="content" type="xsd:base64Binary"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="createResponse">
+            <complexType>
+               <sequence>
+                  <element name="createReturn" type="cms:Content"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="delete">
+            <complexType>
+               <sequence>
+                  <element name="items" type="cms:Predicate"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="deleteResponse">
+            <complexType>
+               <sequence>
+                  <element name="deleteReturn" type="cms:Reference" maxOccurs="unbounded" minOccurs="0"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="exists">
+            <complexType>
+               <sequence>
+                  <element name="items" type="cms:Predicate"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="existsResponse">
+            <complexType>
+               <sequence>
+                  <element name="existsReturn" type="content:ExistsResult" maxOccurs="unbounded" minOccurs="0"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <complexType name="ContentSegment">
+            <sequence>
+               <element name="offset" type="xsd:long"/>
+               <element name="length" type="xsd:long"/>
+            </sequence>
+         </complexType>
+         <element name="ContentSegment" type="content:ContentSegment"/>
+         
+         <complexType name="ReadResult">
+            <sequence>
+               <element name="readSession" type="xsd:string"/>
+               <element name="stream" type="xsd:base64Binary"/>
+               <element name="bytesRead" type="xsd:long"/>
+               <element name="content" type="cms:Content"/>
+            </sequence>
+         </complexType>
+         <element name="ReadResult" type="content:ReadResult"/>
+         
+         <complexType name="ExistsResult">
+            <sequence>
+               <element name="content" type="cms:Reference"/>
+               <element name="exists" type="xsd:boolean"/>
+               <element name="length" type="xsd:long"/>
+            </sequence>
+         </complexType>
+         <element name="ExistsResult" type="content:ExistsResult"/>
+         
+         <complexType name="ContentFault">
+            <sequence>
+               <element name="errorCode" type="xsd:int"/>
+               <element name="message" type="xsd:string"/>
+            </sequence>
+         </complexType>
+         <element name="ContentFault" type="content:ContentFault"/>
+         
+            <element name="readChunkContentFault" type="string"></element>
+        </schema>
+   </wsdl:types>
+   
+   <wsdl:message name="describeRequest">
+      <wsdl:part element="content:describe" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="describeResponse">
+      <wsdl:part element="content:describeResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="readRequest">
+      <wsdl:part element="content:read" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="readResponse">
+      <wsdl:part element="content:readResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="readChunkRequest">
+      <wsdl:part element="content:readChunk" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="readChunkResponse">
+      <wsdl:part element="content:readChunkResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="readNextRequest">
+      <wsdl:part element="content:readNext" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="readNextResponse">
+      <wsdl:part element="content:readNextResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="writeRequest">
+      <wsdl:part element="content:write" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="writeResponse">
+      <wsdl:part element="content:writeResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="createRequest">
+      <wsdl:part element="content:create" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="createResponse">
+      <wsdl:part element="content:createResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="deleteRequest">
+      <wsdl:part element="content:delete" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="deleteResponse">
+      <wsdl:part element="content:deleteResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="existsRequest">
+      <wsdl:part element="content:exists" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="existsResponse">
+      <wsdl:part element="content:existsResponse" name="parameters"/>
+   </wsdl:message>
+   
+   <wsdl:message name="ContentFault">
+      <wsdl:part element="content:ContentFault" name="fault"/>
+   </wsdl:message>
+   <wsdl:portType name="ContentServiceSoapPort">
+      <wsdl:operation name="describe">
+         <wsdl:documentation>Describes one or more content streams.</wsdl:documentation>
+         <wsdl:input message="content:describeRequest" name="describeRequest"/>
+         <wsdl:output message="content:describeResponse" name="describeResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="read">
+         <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
+         <wsdl:input message="content:readRequest" name="describeRequest"/>
+         <wsdl:output message="content:readResponse" name="describeResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="readChunk">
+         <wsdl:documentation>Retrieves content from the repository in chunks.</wsdl:documentation>
+         <wsdl:input message="content:readChunkRequest"/>
+         <wsdl:output message="content:readChunkResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="readNext">
+         <wsdl:documentation>Retrieves the next chunk of content from the given read session.</wsdl:documentation>
+         <wsdl:input message="content:readNextRequest"/>
+         <wsdl:output message="content:readNextResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="write">
+         <wsdl:documentation>Writes content to the repository.</wsdl:documentation>
+         <wsdl:input message="content:writeRequest"/>
+         <wsdl:output message="content:writeResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="create">
+         <wsdl:documentation>Creates new content in the repository.</wsdl:documentation>
+         <wsdl:input message="content:createRequest"/>
+         <wsdl:output message="content:createResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="delete">
+         <wsdl:documentation>Deletes content from the repository.</wsdl:documentation>
+         <wsdl:input message="content:deleteRequest"/>
+         <wsdl:output message="content:deleteResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="exists">
+         <wsdl:documentation>Determines whether content exists in the repository.</wsdl:documentation>
+         <wsdl:input message="content:existsRequest"/>
+         <wsdl:output message="content:existsResponse"/>
+         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   
+   <wsdl:binding name="ContentServiceSoapBinding" type="content:ContentServiceSoapPort">      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <wsdl:operation name="describe">
+         <wsdl:documentation>Describes one or more content streams.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/describe"/>
+         <wsdl:input name="describeRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output name="describeResponse">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="read">
+         <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/read"/>
+         <wsdl:input name="describeRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output name="describeResponse">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="readChunk">
+         <wsdl:documentation>Retrieves content from the repository in chunks.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/readChunk"/>
+         <wsdl:input>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="readNext">
+         <wsdl:documentation>Retrieves the next chunk of content from the given read session.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/readNext"/>
+         <wsdl:input>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="write">
+         <wsdl:documentation>Writes content to the repository.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/write"/>
+         <wsdl:input>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="create">
+         <wsdl:documentation>Creates new content in the repository.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/create"/>
+         <wsdl:input>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="delete">
+         <wsdl:documentation>Deletes content from the repository.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/delete"/>
+         <wsdl:input>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="exists">
+         <wsdl:documentation>Determines whether content exists in the repository.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/exists"/>
+         <wsdl:input>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="ContentFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
+         </wsdl:fault>
+      </wsdl:operation>
+    </wsdl:binding>
+
+   <wsdl:service name="ContentService">
+      <wsdl:documentation>Provides read and write access to content streams.</wsdl:documentation>
+      <wsdl:port binding="content:ContentServiceSoapBinding" name="ContentService">
+         <wsdlsoap:address location="http://localhost:8080/alfresco/api/ContentService"/>
+      </wsdl:port>
+   </wsdl:service>
+   
+</wsdl:definitions>

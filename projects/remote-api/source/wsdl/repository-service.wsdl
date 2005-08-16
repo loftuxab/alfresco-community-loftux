@@ -86,7 +86,7 @@
             <complexType>
                <sequence>
                   <element name="node" type="cms:Reference"/>
-                  <element name="association" type="cms:AssociationDefinition" maxOccurs="unbounded" minOccurs="0"/>
+                  <element name="association" type="rep:Association" maxOccurs="unbounded" minOccurs="0"/>
                </sequence>
             </complexType>
          </element>
@@ -134,7 +134,7 @@
          <element name="describe">
             <complexType>
                <sequence>
-                  <element name="node" type="cms:Predicate"/>
+                  <element name="items" type="cms:Predicate"/>
                </sequence>
             </complexType>
          </element>
@@ -164,6 +164,21 @@
             </sequence>
          </complexType>
          <element name="UpdateResult" type="rep:UpdateResult"/>
+         
+         <complexType name="Association">
+            <sequence>
+               <element name="associationType" type="cms:Name"/>
+               <element name="direction" type="rep:AssociationDirectionEnum"/>
+            </sequence>
+         </complexType>
+         <element name="Association" type="rep:Association"/>
+         
+         <xsd:simpleType name="AssociationDirectionEnum">
+            <xsd:restriction base="xsd:string">
+    		      <xsd:enumeration value="source"/>
+    		      <xsd:enumeration value="target"/>
+            </xsd:restriction>
+         </xsd:simpleType>
          
          <complexType name="RepositoryFault">
             <sequence>
@@ -302,114 +317,114 @@
    </wsdl:portType>
    
    <wsdl:binding name="RepositoryServiceSoapBinding" type="rep:RepositoryServiceSoapPort">
-        <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-        <wsdl:operation name="getStores">
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <wsdl:operation name="getStores">
          <wsdl:documentation>Retrieves a list of stores where content resources are held.</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/getStores"/>
-            <wsdl:input name="getStoresRequest">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/getStores"/>
+         <wsdl:input name="getStoresRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="getStoreResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="query">
          <wsdl:documentation>Executes a query against a store</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/query"/>
-            <wsdl:input name="queryRequest">
-                <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/query"/>
+         <wsdl:input name="queryRequest">
+            <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="queryResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="queryChildren">
          <wsdl:documentation>Executes a query to retrieve the children of the specified resource.</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/queryChildren"/>
-            <wsdl:input name="queryChildrenRequest">
-                <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/queryChildren"/>
+         <wsdl:input name="queryChildrenRequest">
+            <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="queryChildrenResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="queryParents">
          <wsdl:documentation>Executes a query to retrieve the parents of the specified resource.</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/queryParents"/>
-            <wsdl:input name="queryParentsRequest">
-                <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/queryParents"/>
+         <wsdl:input name="queryParentsRequest">
+            <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="queryParentsResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="queryAssociated">
          <wsdl:documentation>Executes a query to retrieve associated resources of the specified resource.</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/queryAssociated"/>
-            <wsdl:input name="queryAssociatedRequest">
-                <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/queryAssociated"/>
+         <wsdl:input name="queryAssociatedRequest">
+            <wsdlsoap:header use="literal" message="rep:QueryConfiguration" part="QueryConfiguration"/>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="queryAssociatedResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="fetchMore">
          <wsdl:documentation>Fetches the next batch of query results.</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/fetchMore"/>
-            <wsdl:input name="fetchMoreRequest">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/fetchMore"/>
+         <wsdl:input name="fetchMoreRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="fetchMoreResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="update">
          <wsdl:documentation>Executes a CML script to manipulate the contents of a Repository store.</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/update"/>
-            <wsdl:input name="updateRequest">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/update"/>
+         <wsdl:input name="updateRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="updateResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="describe">
          <wsdl:documentation>Describes a content resource.</wsdl:documentation>
-            <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/describe"/>
-            <wsdl:input name="describeRequest">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:input>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/describe"/>
+         <wsdl:input name="describeRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
          <wsdl:output name="describeResponse">
-                <wsdlsoap:body use="literal"/>
-            </wsdl:output>
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
          <wsdl:fault name="RepositoryFault">
-                <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
-            </wsdl:fault>
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
       </wsdl:operation>
    </wsdl:binding>
 

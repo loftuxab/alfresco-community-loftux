@@ -24,4 +24,10 @@
       </property>
    </bean>
    
+   <bean id="contentWebService" class="org.alfresco.repo.webservice.content.ContentWebService">
+      <property name="contentService">
+         <ref bean="AlfContentService"/>
+      </property>
+   </bean>
+   
 </beans>

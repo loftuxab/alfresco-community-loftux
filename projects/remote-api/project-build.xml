@@ -8,6 +8,7 @@
         <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
             <classpath refid="classpath.compile" />
         </taskdef>
+       <property name="files.delete.include" value="*Service.java,*Locator.java,*Binding*.java,undeploy.wsdd"/>
     </target>
 
     <!-- we need to override the compile-java target so that we can include the generated source -->
@@ -48,7 +49,7 @@
         </delete>
     </target>
         
-    <target name="gen-all-services" depends="gen-auth-service, gen-repo-service" />
+    <target name="gen-all-services" depends="gen-auth-service, gen-repo-service, gen-content-service" />
 
     <target name="gen-auth-service" depends="gen-auth-service-client, gen-auth-service-server" />
 
@@ -73,7 +74,7 @@
             <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
         </wsdl2java>
         <delete>
-            <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication" excludes="*Fault.java,*Result.java,*Port.java,deploy.wsdd" />
+            <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/authentication" includes="${files.delete.include}" />
         </delete>
     </target>
 
@@ -104,7 +105,34 @@
             <mapping namespace="http://www.alfresco.org/ws/headers/1.0" package="org.alfresco.repo.webservice.types" />
         </wsdl2java>
         <delete>
-            <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/repository" excludes="*Fault.java,*Result.java,*Port.java,deploy.wsdd" />
+            <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/repository" includes="${files.delete.include}" />
+        </delete>
+    </target>
+   
+    <target name="gen-content-service" depends="gen-content-service-client, gen-content-service-server" />
+
+    <target name="gen-content-service-client" depends="init">
+        <mkdir dir="${dir.src.java.generated}/org/alfresco/example/webservice/content" />
+        <delete>
+            <fileset dir="${dir.src.java.generated}/org/alfresco/example/webservice/content" />
+        </delete>
+        <wsdl2java url="${dir.src}/wsdl/content-service.wsdl" output="${dir.src.java.generated}" testcase="no" all="true">
+            <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" package="org.alfresco.example.webservice.content" />
+            <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.example.webservice.types" />
+        </wsdl2java>
+    </target>
+
+    <target name="gen-content-service-server" depends="init">
+        <mkdir dir="${dir.src.java.generated}/org/alfresco/repo/webservice/content" />
+        <delete>
+            <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/content" />
+        </delete>
+        <wsdl2java url="${dir.src}/wsdl/content-service.wsdl" output="${dir.src.java.generated}" serverSide="true" skeletondeploy="false" all="true">
+            <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" package="org.alfresco.repo.webservice.content" />
+            <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+        </wsdl2java>
+        <delete>
+            <fileset dir="${dir.src.java.generated}/org/alfresco/repo/webservice/content" includes="${files.delete.include}" />
         </delete>
     </target>
 
