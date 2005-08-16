@@ -21,16 +21,38 @@ package org.alfresco.repo.security.permissions.impl.hibernate;
 
 import org.alfresco.util.EqualsHelper;
 
+/**
+ * Persisted permission entries
+ * 
+ * @author andyh
+ */
 public class PermissionEntryImpl implements PermissionEntry
 {
+    /**
+     * The object id
+     */
     private long id;
     
+    /**
+     * The container of this permissions
+     */
     private NodePermissionEntry nodePermissionEntry;
 
+    /**
+     * The permission to which this applies
+     * (non null - all is a special string)
+     */
     private PermissionReference permissionReference;
 
+    /**
+     * The recipient to which this applies
+     * (non null - all is a special string)
+     */
     private Recipient recipient;
 
+    /**
+     * Is this permission allowed?
+     */
     private boolean allowed;
 
     public PermissionEntryImpl()
@@ -42,6 +64,8 @@ public class PermissionEntryImpl implements PermissionEntry
     {
         return id;
     }
+    
+    // Hibernate
     
     /* package */ void setId(long id)
     {
@@ -89,6 +113,15 @@ public class PermissionEntryImpl implements PermissionEntry
     }
 
 
+    /**
+     * Factory method to create an entry and wire it in to the contained nodePermissionEntry
+     * 
+     * @param nodePermissionEntry
+     * @param permissionReference
+     * @param recipient
+     * @param allowed
+     * @return
+     */
     public static PermissionEntryImpl create(NodePermissionEntry nodePermissionEntry, PermissionReference permissionReference, Recipient recipient, boolean allowed)
     {
         PermissionEntryImpl permissionEntry = new PermissionEntryImpl();
@@ -100,10 +133,17 @@ public class PermissionEntryImpl implements PermissionEntry
         return permissionEntry;
     }
 
+    /**
+     * Unwire 
+     */
     public void delete()
     {
         nodePermissionEntry.getPermissionEntries().remove(this);
     }
+    
+    //
+    // Hibernate object pattern
+    //
 
     @Override
     public boolean equals(Object o)

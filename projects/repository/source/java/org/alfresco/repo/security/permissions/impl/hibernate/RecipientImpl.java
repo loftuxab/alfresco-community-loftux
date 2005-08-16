@@ -22,6 +22,11 @@ package org.alfresco.repo.security.permissions.impl.hibernate;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * The persisted class for recipients.
+ * 
+ * @author andyh
+ */
 public class RecipientImpl implements Recipient
 {
     /**
@@ -53,10 +58,13 @@ public class RecipientImpl implements Recipient
         return externalKeys;
     }
 
+    // Hibernate
     /* package */ void setExternalKeys(Set<String> externalKeys)
     {
         this.externalKeys = externalKeys;
     }
+    
+    // Hibernate pattern
     
     @Override
     public boolean equals(Object o)

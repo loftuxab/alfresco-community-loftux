@@ -22,11 +22,30 @@ package org.alfresco.repo.security.permissions.impl.hibernate;
 import java.io.Serializable;
 import java.util.Set;
 
+/** 
+ * The interface against which recipients of permission are persisted
+ * @author andyh
+ */
 public interface Recipient extends Serializable 
 {
+    /**
+     * Get the recipient.
+     * 
+     * @return
+     */
     public String getRecipient();
     
+    /**
+     * Set the recipient
+     * 
+     * @param recipient
+     */
     public void setRecipient(String recipient);
     
+    /**
+     * Get the external keys that map to this recipient.
+     * 
+     * @return
+     */
     public Set<String> getExternalKeys();
 }

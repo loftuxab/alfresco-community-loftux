@@ -31,13 +31,21 @@ import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
+/**
+ * Support to read and store the definition of node permissions
+ * @author andyh
+ */
 public class NodePermission implements NodePermissionEntry, XMLModelInitialisable
 {
+    // XML Constants
+    
     private static final String NODE_REF = "nodeRef";
     
     private static final String NODE_PERMISSION = "nodePermission";
     
     private static final String INHERIT_FROM_PARENT = "inheritFromParent";
+    
+    // Instance variables
     
     // If null then it is the root.
     private NodeRef nodeRef;

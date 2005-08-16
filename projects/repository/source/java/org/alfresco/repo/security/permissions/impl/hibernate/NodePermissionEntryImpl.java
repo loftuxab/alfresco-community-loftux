@@ -26,12 +26,26 @@ import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 
+/**
+ * The hibernate persisted class for node permission entries.
+ * 
+ * @author andyh
+ */
 public class NodePermissionEntryImpl implements NodePermissionEntry
 {
+    /**
+     * The key to find node permission entries
+     */
     private NodeKey nodeKey;
 
+    /**
+     * Inherit permissions from the parent node?
+     */
     private boolean inherits;
 
+    /**
+     * The set of permission entries.
+     */
     private Set<PermissionEntry> permissionEntries = new HashSet<PermissionEntry>();
 
     public NodePermissionEntryImpl()
@@ -70,11 +84,15 @@ public class NodePermissionEntryImpl implements NodePermissionEntry
         return permissionEntries;
     }
     
+    // Hibernate
+    
     /* package */ void setPermissionEntries(Set<PermissionEntry> permissionEntries)
     {
         this.permissionEntries = permissionEntries;
     }
 
+    // Hibernate pattern
+    
     @Override
     public boolean equals(Object o)
     {

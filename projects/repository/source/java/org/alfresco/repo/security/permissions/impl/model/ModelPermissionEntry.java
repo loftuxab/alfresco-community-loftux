@@ -29,8 +29,15 @@ import org.alfresco.service.namespace.QName;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
+/**
+ * Support to read and store the definion of a permission entry.
+ * 
+ * @author andyh
+ */
 public class ModelPermissionEntry implements PermissionEntry, XMLModelInitialisable
 {
+    // XML Constants
+    
     private static final String PERMISSION_REFERENCE = "permissionReference";
 
     private static final String RECIPIENT = "recipient";
@@ -45,6 +52,8 @@ public class ModelPermissionEntry implements PermissionEntry, XMLModelInitialisa
     
     private static final String NAME = "name";
 
+    // Instance variables
+    
     private String recipient;
 
     private AccessStatus access;

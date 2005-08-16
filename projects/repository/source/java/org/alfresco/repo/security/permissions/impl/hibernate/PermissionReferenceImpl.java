@@ -20,7 +20,11 @@
 package org.alfresco.repo.security.permissions.impl.hibernate;
 
 
-
+/**
+ * The persisted class for permission references.
+ * 
+ * @author andyh
+ */
 public class PermissionReferenceImpl implements PermissionReference
 {   
     /**
@@ -69,6 +73,8 @@ public class PermissionReferenceImpl implements PermissionReference
         this.name = name;
     }
 
+    // Hibernate pattern
+    
     @Override
     public boolean equals(Object o)
     {

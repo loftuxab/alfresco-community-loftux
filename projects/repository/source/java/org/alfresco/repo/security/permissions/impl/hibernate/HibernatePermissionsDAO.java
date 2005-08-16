@@ -37,6 +37,13 @@ import org.hibernate.ObjectDeletedException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+/**
+ * Support for accessing persisted permission information.
+ * 
+ * This class maps between persisted objects and the external API defined in the PermissionsDAO interface.
+ * 
+ * @author andyh
+ */
 public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         PermissionsDAO
 {
@@ -48,19 +55,31 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
 
     public NodePermissionEntry getPermissions(NodeRef nodeRef)
     {
+        // Create the object if it is not found.
+        // Null objects are not cached in hibernate 
+        // If the object does not exist it will repeatedly query to check its non existence.
+        
         return createSimpleNodePermissionEntry(getHibernateNodePermissionEntry(
                 nodeRef, true));
     }
 
+    /**
+     * Get the persisted NodePermissionEntry
+     * 
+     * @param nodeRef
+     * @param create - create the object if it is missing
+     * @return
+     */
     private org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry getHibernateNodePermissionEntry(
             NodeRef nodeRef, boolean create)
     {
+        // Build the key
         NodeKey nodeKey = getNodeKey(nodeRef);
         try
         {
-
             Object obj = getHibernateTemplate().get(
                     NodePermissionEntryImpl.class, nodeKey);
+            // Create if required
             if ((obj == null) && create)
             {
                 NodePermissionEntryImpl entry = new NodePermissionEntryImpl();
@@ -91,6 +110,12 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         }
     }
 
+    /**
+     * Get a node key from a node reference 
+     * 
+     * @param nodeRef
+     * @return
+     */
     private NodeKey getNodeKey(NodeRef nodeRef)
     {
         NodeKey nodeKey = new NodeKey(nodeRef.getStoreRef().getProtocol(),
@@ -119,6 +144,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     private void deleteHibernatePermissionEntries(
             Set<org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry> permissionEntries)
     {
+        // Avoid concurrent access problems during deletion
         Set<org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry> copy = new HashSet<org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry>();
         for (org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry permissionEntry : copy)
         {
@@ -129,6 +155,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     private void deleteHibernatePermissionEntry(
             org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry permissionEntry)
     {
+        // Unhook bidirectoinal relationships
         permissionEntry.delete();
         getHibernateTemplate().delete(permissionEntry);
     }
@@ -183,6 +210,13 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         getHibernateTemplate().save(entry);
     }
 
+    /**
+     * Utility method to find or create a persisted authority
+     * 
+     * @param authority
+     * @param create
+     * @return
+     */
     private Recipient getHibernateAuthority(String authority, boolean create)
     {
         Recipient key = new RecipientImpl();
@@ -201,6 +235,13 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
 
     }
 
+    /**
+     * Utility method to find and optionally create a persisted permission reference.
+     * 
+     * @param perm
+     * @param create
+     * @return
+     */
     private org.alfresco.repo.security.permissions.impl.hibernate.PermissionReference getHibernatePermissionReference(
             PermissionReference perm, boolean create)
     {
@@ -251,6 +292,9 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
                 inheritParentPermissions);
     }
 
+    // Utility methods to create simple detached objects for the outside world
+    // We do not pass out the hibernate objects 
+    
     private static SimpleNodePermissionEntry createSimpleNodePermissionEntry(
             org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry npe)
     {

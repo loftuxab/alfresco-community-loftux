@@ -109,7 +109,7 @@ public class AuthenticationTest extends TestCase
         typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();
         Map<QName, Serializable> props = createPersonProperties("andy");
         personAndyNodeRef = nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
-
+        assertNotNull(personAndyNodeRef);
     }
 
     private Map<QName, Serializable> createPersonProperties(String userName)
@@ -188,6 +188,7 @@ public class AuthenticationTest extends TestCase
         token.setAuthenticated(false);
 
         Authentication result = authenticationManager.authenticate(token);
+        assertNotNull(result);
     }
 
     public void testAuthenticationFailure()
@@ -200,6 +201,7 @@ public class AuthenticationTest extends TestCase
         try
         {
             Authentication result = authenticationManager.authenticate(token);
+            assertNotNull(result);
             assertNotNull(null);
         }
         catch (BadCredentialsException e)
@@ -399,6 +401,7 @@ public class AuthenticationTest extends TestCase
 
         // authenticate with this user details
         Authentication result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token1);
+        assertNotNull(result);
 
         // assert the user is authenticated
         assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());

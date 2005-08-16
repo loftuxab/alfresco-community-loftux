@@ -28,6 +28,10 @@ import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.dom4j.Element;
 
+/**
+ * Store and read the definition of a permission set
+ * @author andyh
+ */
 public class PermissionSet implements XMLModelInitialisable
 {
     private static final String TYPE = "type";

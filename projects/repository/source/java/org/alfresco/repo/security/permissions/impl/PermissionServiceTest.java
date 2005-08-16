@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import net.sf.acegisecurity.Authentication;
@@ -108,10 +107,10 @@ public class PermissionServiceTest extends BaseSpringTest
     private void runAs(String userName)
     {
         Authentication woof = authenticationService.authenticate(rootNodeRef.getStoreRef(), new UsernamePasswordAuthenticationToken(userName, userName));
-        for(GrantedAuthority authority : woof.getAuthorities())
-        {
-            System.out.println("Auth = "+authority.getAuthority());
-        }
+//        for(GrantedAuthority authority : woof.getAuthorities())
+//        {
+//            System.out.println("Auth = "+authority.getAuthority());
+//        }
         
     }
     

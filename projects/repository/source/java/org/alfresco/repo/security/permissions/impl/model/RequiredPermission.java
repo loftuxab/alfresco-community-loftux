@@ -22,6 +22,11 @@ package org.alfresco.repo.security.permissions.impl.model;
 import org.alfresco.repo.security.permissions.impl.PermissionReferenceImpl;
 import org.alfresco.service.namespace.QName;
 
+/**
+ * Store and read the definition of a required permission.
+ * 
+ * @author andyh
+ */
 public class RequiredPermission extends PermissionReferenceImpl
 {
     public enum On {

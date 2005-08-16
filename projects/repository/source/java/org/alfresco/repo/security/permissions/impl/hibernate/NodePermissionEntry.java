@@ -24,18 +24,50 @@ import java.util.Set;
 import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.service.cmr.repository.NodeRef;
 
+/**
+ * The interface to support persistence of node permission entries in hibernate
+ * 
+ * @author andyh
+ */
 public interface NodePermissionEntry
 {
+    /**
+     * Get the node key.
+     * 
+     * @return
+     */
     public NodeKey getNodeKey();
 
+    /**
+     * Set the node key.
+     * 
+     * @param key
+     */
     public void setNodeKey(NodeKey key);
     
+    /**
+     * Get the node ref
+     * 
+     * @return
+     */
     public NodeRef getNodeRef();
     
+    /**
+     * Get inheritance behaviour
+     * @return
+     */
     public boolean getInherits();
     
+    /**
+     * Set inheritance behaviour
+     * @param inherits
+     */
     public void setInherits(boolean inherits);
     
+    /**
+     * Get the permission entries set for the node
+     * @return
+     */
     public Set<PermissionEntry> getPermissionEntries();
     
 }

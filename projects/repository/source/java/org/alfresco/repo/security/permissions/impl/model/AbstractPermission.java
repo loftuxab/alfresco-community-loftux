@@ -25,12 +25,16 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.alfresco.repo.security.permissions.AbstractPermissionReference;
-import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
+/**
+ * Support to read and store common properties for permissions
+ * 
+ * @author andyh
+ */
 public abstract class AbstractPermission extends AbstractPermissionReference implements XMLModelInitialisable
 {
     /* XML Constants */

@@ -21,6 +21,11 @@ package org.alfresco.repo.security.permissions.impl.model;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 
+/**
+ * Exceptions related to the permissions model
+ * 
+ * @author andyh
+ */
 public class PermissionModelException extends AlfrescoRuntimeException
 {
 

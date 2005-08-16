@@ -21,19 +21,52 @@ package org.alfresco.repo.security.permissions.impl.hibernate;
 
 import java.io.Serializable;
 
-
+/**
+ * The interface against which permission references are persisted in hibernate.
+ * 
+ * @author andyh
+ */
 public interface PermissionReference extends Serializable
 {
-    
+   /**
+    * Get the URI for the type to which this permission applies.
+    * 
+    * @return
+    */ 
     public String getTypeUri();
     
+    /**
+     * Set the URI for the type to which this permission applies.
+     * 
+     * @param typeUri
+     */
     public void setTypeUri(String typeUri);
     
+    /**
+     * Get the local name of the type to which this permission applies.
+     * 
+     * @return
+     */
     public String getTypeName();
     
+    /**
+     * Set the local name of the type to which this permission applies.
+     * 
+     * @param typeName
+     */
     public void setTypeName(String typeName);
     
+    /**
+     * Get the name of the permission.
+     * 
+     * @return
+     */
     public String getName();
     
+    /**
+     * Set the name of the permission.
+     * 
+     * @param name
+     */
     public void setName(String name);
 }

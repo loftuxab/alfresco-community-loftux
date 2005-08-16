@@ -32,8 +32,15 @@ import org.alfresco.service.namespace.QName;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 
+/**
+ * Support to read and store the defintion of permission groups.
+ * 
+ * @author andyh
+ */
 public class PermissionGroup extends AbstractPermissionReference implements XMLModelInitialisable
 {
+    // XML Constants
+    
     private static final String NAME = "name";
     
     private static final String EXTENDS = "extends";

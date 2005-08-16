@@ -49,11 +49,24 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.InitializingBean;
 
+/**
+ * The implementation of the model DAO
+ * 
+ * Reads and stores the top level model information
+ * 
+ * Encapsulates access to this information
+ * 
+ * @author andyh
+ */
 public class PermissionModel implements ModelDAO, InitializingBean
 {
+    // IOC
+
     private NodeService nodeService;
 
     private DictionaryService dictionaryService;
+
+    // XML Constants
 
     private static final String NAMESPACES = "namespaces";
 
@@ -73,6 +86,8 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
     private static final String DEFAULT_PERMISSION = "defaultPermission";
 
+    // Instance variables
+
     private String model;
 
     private Map<QName, PermissionSet> permissionSets = new HashMap<QName, PermissionSet>();
@@ -81,10 +96,21 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
     private AccessStatus defaultPermission;
 
+    // Cache granting permissions
+    private HashMap<PermissionReference, Set<PermissionReference>> grantingPermissions = new HashMap<PermissionReference, Set<PermissionReference>>();
+
+    // Cache grantees
+    private HashMap<PermissionReference, Set<PermissionReference>> granteePermissions = new HashMap<PermissionReference, Set<PermissionReference>>();
+
+    // Cache the mapping of extended groups to the base
+    private HashMap<PermissionGroup, PermissionGroup> groupsToBaseGroup = new HashMap<PermissionGroup, PermissionGroup>();
+
     public PermissionModel()
     {
         super();
     }
+
+    // IOC
 
     public void setModel(String model)
     {
@@ -100,6 +126,14 @@ public class PermissionModel implements ModelDAO, InitializingBean
     {
         this.nodeService = nodeService;
     }
+
+    /*
+     * Initialise from file
+     * 
+     * (non-Javadoc)
+     * 
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
 
     public void afterPropertiesSet()
     {
@@ -163,6 +197,9 @@ public class PermissionModel implements ModelDAO, InitializingBean
         }
     }
 
+    /*
+     * Create the XML document from the file location
+     */
     private Document createDocument(String model)
     {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(model);
@@ -232,6 +269,12 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return permissions;
     }
 
+    /**
+     * Support to add permissions for types
+     * 
+     * @param type
+     * @param permissions
+     */
     private void addTypePermissions(QName type, Set<PermissionReference> permissions)
     {
         TypeDefinition typeDef = dictionaryService.getType(type);
@@ -246,6 +289,12 @@ public class PermissionModel implements ModelDAO, InitializingBean
         mergePermissions(permissions, type);
     }
 
+    /**
+     * Support to add permissions for aspects.
+     * 
+     * @param type
+     * @param permissions
+     */
     private void addAspectPermissions(QName type, Set<PermissionReference> permissions)
     {
         AspectDefinition aspectDef = dictionaryService.getAspect(type);
@@ -256,6 +305,12 @@ public class PermissionModel implements ModelDAO, InitializingBean
         mergePermissions(permissions, type);
     }
 
+    /**
+     * Support to merge permissions together. Respects extended permissions.
+     * 
+     * @param target
+     * @param type
+     */
     private void mergePermissions(Set<PermissionReference> target, QName type)
     {
         PermissionSet permissionSet = permissionSets.get(type);
@@ -292,22 +347,21 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return permissions;
     }
 
-
-    private HashMap<PermissionReference, Set<PermissionReference>> grantingPermissions = new HashMap<PermissionReference, Set<PermissionReference>>();
-
     public synchronized Set<PermissionReference> getGrantingPermissions(PermissionReference permissionReference)
     {
+        // Cache the results
         Set<PermissionReference> granters = grantingPermissions.get(permissionReference);
-        if(granters == null)
+        if (granters == null)
         {
             granters = getGrantingPermissionsImpl(permissionReference);
             grantingPermissions.put(permissionReference, granters);
         }
-        return granters;        
+        return granters;
     }
-    
+
     private Set<PermissionReference> getGrantingPermissionsImpl(PermissionReference permissionReference)
     {
+        // Query the model
         HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
         permissions.add(permissionReference);
         for (PermissionSet ps : permissionSets.values())
@@ -345,22 +399,21 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return permissions;
     }
 
-    private HashMap<PermissionReference, Set<PermissionReference>> granteePermissions = new HashMap<PermissionReference, Set<PermissionReference>>();
-
-    
     public synchronized Set<PermissionReference> getGranteePermissions(PermissionReference permissionReference)
     {
+        // Cache the results
         Set<PermissionReference> grantees = granteePermissions.get(permissionReference);
-        if(grantees == null)
+        if (grantees == null)
         {
             grantees = getGranteePermissionsImpl(permissionReference);
             granteePermissions.put(permissionReference, grantees);
         }
-        return grantees; 
+        return grantees;
     }
-    
+
     private Set<PermissionReference> getGranteePermissionsImpl(PermissionReference permissionReference)
     {
+        // Query the model
         HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
         permissions.add(permissionReference);
         for (PermissionSet ps : permissionSets.values())
@@ -389,7 +442,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
                     {
                         ClassDefinition classDefinition = dictionaryService.getClass(pg.getQName());
                         QName parent = classDefinition.getParentName();
-                        if(parent != null)
+                        if (parent != null)
                         {
                             classDefinition = dictionaryService.getClass(parent);
                             PermissionGroup attempt = getPermissionGroupOrNull(new SimplePermissionReference(parent, pg
@@ -421,6 +474,12 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return permissions;
     }
 
+    /**
+     * Support to find permission groups
+     * 
+     * @param target
+     * @return
+     */
     private PermissionGroup getPermissionGroupOrNull(PermissionReference target)
     {
         for (PermissionSet ps : permissionSets.values())
@@ -436,6 +495,12 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return null;
     }
 
+    /**
+     * Support to get a permission group
+     * 
+     * @param target
+     * @return
+     */
     private PermissionGroup getPermissionGroup(PermissionReference target)
     {
         PermissionGroup pg = getPermissionGroupOrNull(target);
@@ -447,11 +512,15 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return pg;
     }
 
-    private HashMap<PermissionGroup, PermissionGroup> groupsToBaseGroup = new HashMap<PermissionGroup, PermissionGroup>();
-    
+    /**
+     * Get the base permission group for a given permission group.
+     * 
+     * @param pg
+     * @return
+     */
     private synchronized PermissionGroup getBasePermissionGroupOrNull(PermissionGroup pg)
     {
-        if(groupsToBaseGroup.containsKey(pg))
+        if (groupsToBaseGroup.containsKey(pg))
         {
             return groupsToBaseGroup.get(pg);
         }
@@ -462,7 +531,15 @@ public class PermissionModel implements ModelDAO, InitializingBean
             return answer;
         }
     }
-        
+
+    /**
+     * Query the model for a base permission group
+     * 
+     * Uses the Data Dictionary to reolve inheritance
+     * 
+     * @param pg
+     * @return
+     */
     private PermissionGroup getBasePermissionGroupOrNullImpl(PermissionGroup pg)
     {
         if (pg == null)
@@ -521,6 +598,15 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return getRequiredPermissions(required, qName, aspectQNames, RequiredPermission.On.PARENT);
     }
 
+    /**
+     * Utility method to determine required permissions
+     * 
+     * @param required
+     * @param qName
+     * @param aspectQNames
+     * @param on
+     * @return
+     */
     private Set<PermissionReference> getRequiredPermissions(PermissionReference required, QName qName,
             Set<QName> aspectQNames, RequiredPermission.On on)
     {
@@ -535,6 +621,13 @@ public class PermissionModel implements ModelDAO, InitializingBean
         }
     }
 
+    /**
+     * Get the requirements for a permission
+     * 
+     * @param required
+     * @param on
+     * @return
+     */
     private Set<PermissionReference> getRequirementsForPermission(PermissionReference required, RequiredPermission.On on)
     {
         HashSet<PermissionReference> requiredPermissions = new HashSet<PermissionReference>();
@@ -552,6 +645,14 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return requiredPermissions;
     }
 
+    /**
+     * Get the requirements for a permission set
+     * @param target
+     * @param on
+     * @param qName
+     * @param aspectQNames
+     * @return
+     */
     private Set<PermissionReference> getRequirementsForPermissionGroup(PermissionGroup target,
             RequiredPermission.On on, QName qName, Set<QName> aspectQNames)
     {
@@ -593,6 +694,14 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return requiredPermissions;
     }
 
+    /**
+     * Check type specifc extension of permission sets.
+     * 
+     * @param pr
+     * @param typeQname
+     * @param aspects
+     * @return
+     */
     private boolean isPartOfDynamicPermissionGroup(PermissionReference pr, QName typeQname, Set<QName> aspects)
     {
         if (dictionaryService.isSubClass(typeQname, pr.getQName()))
@@ -609,6 +718,12 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return false;
     }
 
+    /**
+     * Utility method to find a permission
+     * 
+     * @param perm
+     * @return
+     */
     private Permission getPermissionOrNull(PermissionReference perm)
     {
         for (PermissionSet ps : permissionSets.values())
