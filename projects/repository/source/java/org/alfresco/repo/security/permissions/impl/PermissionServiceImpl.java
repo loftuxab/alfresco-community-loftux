@@ -195,7 +195,15 @@ public class PermissionServiceImpl implements PermissionService
             // Build the next element of the evaluation chain
             if (car.getParentRef() != null)
             {
-                car = nodeService.getPrimaryParent(car.getParentRef());
+                NodePermissionEntry nodePermissions = permissionsDAO.getPermissions(car.getChildRef());
+                if((nodePermissions == null) || (nodePermissions.inheritPermissions()))
+                {
+                   car = nodeService.getPrimaryParent(car.getParentRef());
+                }
+                else
+                {
+                    car = null;
+                }
             }
             else
             {
@@ -358,7 +366,7 @@ public class PermissionServiceImpl implements PermissionService
                 // If we are creating an ancestor requirement we do not add the
                 // recursive element - this is taken care of
                 // in the recursive test.
-                if (!recursive && !required.equals(pr))
+                if (recursive || !required.equals(pr))
                 {
                     // Test for recursion on the parent - does it depend on its self?
                     Set<PermissionReference> requiredParentPermissionsForRequiredParentPermission = modelDAO
@@ -392,8 +400,11 @@ public class PermissionServiceImpl implements PermissionService
             // Start out true and "and" all other results
             boolean success = true;
 
-            // Check the required permissions
-            success &= checkRequired(authorisations, nodeRef, denied);
+            // Check the required permissions but not for sets they rely on their underlying permissions
+            if(modelDAO.isPermission(required))
+            {
+               success &= checkRequired(authorisations, nodeRef, denied);
+            }
             
             // Check the other permissions required on the node
             for (NodeTest nt : nodeRequirements)
@@ -408,12 +419,14 @@ public class PermissionServiceImpl implements PermissionService
                locallyDenied.addAll(getDenied(car.getParentRef()));
                for (NodeTest nt : parentRequirements)
                {
-                  success &= nt.evaluate(authorisations, car.getParentRef(), denied);
+                  success &= nt.evaluate(authorisations, car.getParentRef(), locallyDenied);
                }
             }
 
            
             // Check the ancestor dependencies 
+            // If there is no parent then the test will pass
+            // Or we run out of parents it will pass 
             NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
             while (success && (car.getParentRef() != null) && ((nodeEntry == null) || (nodeEntry.inheritPermissions())))
             {
@@ -423,7 +436,7 @@ public class PermissionServiceImpl implements PermissionService
 
                 for (NodeTest nt : ancestorRequirements)
                 {
-                    success &= nt.evaluate(authorisations, car.getChildRef(), denied);
+                    success &= nt.evaluate(authorisations, car.getChildRef(), locallyDenied);
                 }
             }
             return success;

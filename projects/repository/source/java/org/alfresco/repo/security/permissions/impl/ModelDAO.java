@@ -86,4 +86,12 @@ public interface ModelDAO
      */
     public Set<PermissionReference> getGranteePermissions(PermissionReference permissionReference);
 
+    /**
+     * Is this permission refernce to a permission and not a permissoinSet?
+     * 
+     * @param required
+     * @return
+     */
+    public boolean isPermission(PermissionReference required);
+
 }

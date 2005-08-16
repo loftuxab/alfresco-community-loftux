@@ -740,4 +740,9 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return null;
     }
 
+    public boolean isPermission(PermissionReference required)
+    {
+        return getPermissionOrNull(required) != null;
+    }
+
 }
