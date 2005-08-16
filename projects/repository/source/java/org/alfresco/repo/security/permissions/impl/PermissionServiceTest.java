@@ -963,7 +963,7 @@ public class PermissionServiceTest extends BaseSpringTest
         assertFalse(permissionService.hasPermission(rootNodeRef,READ_CONTENT));
     }
   
-    public void testPerformance() throws Exception 
+    public void doNotTestPerformance() throws Exception 
     {
         runAs("andy");
         
