@@ -20,6 +20,11 @@
 package org.alfresco.repo.security.permissions;
 
 
+/**
+ * This class provides common support for hash code and equality.
+ * 
+ * @author andyh
+ */
 public abstract class AbstractNodePermissionEntry implements
         NodePermissionEntry
 {

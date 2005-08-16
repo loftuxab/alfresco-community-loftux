@@ -25,10 +25,26 @@ import org.alfresco.repo.security.permissions.AbstractNodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.service.cmr.repository.NodeRef;
 
+/**
+ * A simple object representation of a node permission entry
+ * 
+ * @author andyh
+ */
 public class SimpleNodePermissionEntry extends AbstractNodePermissionEntry
 {
+    /*
+     * The node 
+     */
     private NodeRef nodeRef;
+    
+    /*
+     * Are permissions inherited?
+     */
     private boolean inheritPermissions;
+    
+    /*
+     * The set of permission entries.
+     */
     private Set<? extends PermissionEntry> permissionEntries;
     
     

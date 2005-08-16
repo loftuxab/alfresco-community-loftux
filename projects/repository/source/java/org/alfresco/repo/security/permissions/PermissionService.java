@@ -24,8 +24,6 @@ import java.util.Set;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
-import net.sf.acegisecurity.Authentication;
-
 /**
  * The public API for a permission service
  * 
@@ -82,7 +80,7 @@ public interface PermissionService
 
     /**
      * Check that the given authentication has a particular permission for the
-     * given node. (The default behaviour is ot inherit permissions)
+     * given node. (The default behaviour is to inherit permissions)
      * 
      * @param nodeRef
      * @param perm
@@ -91,7 +89,7 @@ public interface PermissionService
     public boolean hasPermission(NodeRef nodeRef, PermissionReference perm);
 
     /**
-     * Where is the permission set that controls the behaviour for the givent
+     * Where is the permission set that controls the behaviour for the given
      * permission for the given authentication to access the specified name.
      * 
      * @param nodeRef

@@ -22,10 +22,21 @@ package org.alfresco.repo.security.permissions.impl;
 import org.alfresco.repo.security.permissions.AbstractPermissionReference;
 import org.alfresco.service.namespace.QName;
 
+/**
+ * A simple permission reference.
+ * 
+ * @author andyh
+ */
 public class SimplePermissionReference extends AbstractPermissionReference
 {
+    /*
+     * The type
+     */
     private QName qName;
     
+    /*
+     * The name of the permission
+     */
     private String name;
     
     

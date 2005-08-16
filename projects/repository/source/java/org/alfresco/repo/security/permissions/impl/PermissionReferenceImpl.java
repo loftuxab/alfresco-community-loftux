@@ -22,6 +22,13 @@ package org.alfresco.repo.security.permissions.impl;
 import org.alfresco.repo.security.permissions.AbstractPermissionReference;
 import org.alfresco.service.namespace.QName;
 
+/**
+ * A simple permission reference (not persisted).
+ * 
+ * A permission is identified by name for a given type, which is identified by its qualified name.
+ * 
+ * @author andyh
+ */
 public class PermissionReferenceImpl extends AbstractPermissionReference
 {
     private QName qName;

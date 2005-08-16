@@ -25,16 +25,44 @@ import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
+/**
+ * A simple object representation of a permission entry.
+ *  
+ * @author andyh
+ */
 public class SimplePermissionEntry extends AbstractPermissionEntry
 {
-    private NodeRef nodeRef;
-    private SimplePermissionReference permissionReference;
-    private String authority;
-    private AccessStatus accessStatus;
-    
+    /**
+     * Encoding for all authorities.
+     */
     public static final String ALL_AUTHORITIES = "\u0000";
     
+    /**
+     * Encoding for all permissions.
+     */
     public static final SimplePermissionReference ALL_PERMISSIONS = new SimplePermissionReference(QName.createQName("\u0000", "\u0000"), "\u0000");
+    
+    /*
+     * The node ref to which the permissoin applies
+     */
+    private NodeRef nodeRef;
+    
+    /*
+     * The permission reference - as a simple permission reference
+     */
+    private SimplePermissionReference permissionReference;
+    
+    /*
+     * The authority to which the permission aplies
+     */
+    private String authority;
+    
+    /*
+     * The access mode for the permission
+     */
+    private AccessStatus accessStatus;
+    
+    
     
     public SimplePermissionEntry(NodeRef nodeRef, SimplePermissionReference permissionReference, String authority, AccessStatus accessStatus)
     {

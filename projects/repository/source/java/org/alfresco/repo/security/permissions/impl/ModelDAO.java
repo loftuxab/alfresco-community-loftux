@@ -21,26 +21,69 @@ package org.alfresco.repo.security.permissions.impl;
 
 import java.util.Set;
 
-import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
+/**
+ * The API for the alfresco permission model.
+ * 
+ * @author andyh
+ */
 public interface ModelDAO
 {
 
+    /**
+     * Get the permissions that can be set for the given type.
+     * 
+     * @param type - the type in the data dictionary.
+     * @return
+     */
     public Set<PermissionReference> getPermissions(QName type);
 
+    /**
+     * Get the permissions that can be set for the given node. 
+     * This is determined by the node type.
+     * 
+     * @param nodeRef
+     * @return
+     */
     public Set<PermissionReference> getPermissions(NodeRef nodeRef);
 
+    /**
+     * Get all the permissions that grant this permission.
+     * 
+     * @param perm
+     * @return
+     */
     public Set<PermissionReference> getGrantingPermissions(PermissionReference perm);
 
+    /**
+     * Get the permissions that must also be present on the node for the required permission to apply.
+     *  
+     * @param required
+     * @param qName
+     * @param aspectQNames
+     * @return
+     */
     public Set<PermissionReference> getRequiredNodePermissions(PermissionReference required, QName qName, Set<QName> aspectQNames);
 
+    /**
+     * Get the permissions required on the parent node for the given permission to apply.
+     * 
+     * @param required
+     * @param qName
+     * @param aspectQNames
+     * @return
+     */
     public Set<PermissionReference> getRequiredParentPermissions(PermissionReference required, QName qName, Set<QName> aspectQNames);
 
-    public AccessStatus getDefaultPermission(PermissionReference required);
-
+    /**
+     * Get the permissions which are granted by the supplied permission.
+     * 
+     * @param permissionReference
+     * @return
+     */
     public Set<PermissionReference> getGranteePermissions(PermissionReference permissionReference);
 
 }
