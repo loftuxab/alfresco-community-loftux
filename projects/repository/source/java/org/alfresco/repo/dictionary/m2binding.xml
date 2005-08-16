@@ -2,9 +2,9 @@
 
    <namespace uri="http://www.alfresco.org/dictionary/0.1" default="elements"/>
    
-   <format type="java.util.Date" serializer="org.alfresco.repo.dictionary.impl.M2XML.serialiseDate" deserializer="org.alfresco.repo.dictionary.impl.M2XML.deserialiseDate"/>
+   <format type="java.util.Date" serializer="org.alfresco.repo.dictionary.M2XML.serialiseDate" deserializer="org.alfresco.repo.dictionary.M2XML.deserialiseDate"/>
          
-   <mapping name="model" class="org.alfresco.repo.dictionary.impl.M2Model">
+   <mapping name="model" class="org.alfresco.repo.dictionary.M2Model">
       <value style="attribute" name="name" field="name"/>
       <value name="description" field="description" usage="optional"/>
       <value name="author" field="author" usage="optional"/>
@@ -12,8 +12,8 @@
       <value name="version" field="version" usage="optional"/>
       
       <structure name="imports" usage="optional">
-         <collection field="imports" factory="org.alfresco.repo.dictionary.impl.M2Model.createList">
-            <structure name="import" type="org.alfresco.repo.dictionary.impl.M2Namespace" usage="optional">
+         <collection field="imports" factory="org.alfresco.repo.dictionary.M2Model.createList">
+            <structure name="import" type="org.alfresco.repo.dictionary.M2Namespace" usage="optional">
                <value style="attribute" name="uri" field="uri"/>
                <value style="attribute" name="prefix" field="prefix"/>
             </structure>
@@ -21,8 +21,8 @@
       </structure>
 
       <structure name="namespaces" usage="optional">
-         <collection field="namespaces" factory="org.alfresco.repo.dictionary.impl.M2Model.createList">
-            <structure name="namespace" type="org.alfresco.repo.dictionary.impl.M2Namespace" usage="optional">
+         <collection field="namespaces" factory="org.alfresco.repo.dictionary.M2Model.createList">
+            <structure name="namespace" type="org.alfresco.repo.dictionary.M2Namespace" usage="optional">
                <value style="attribute" name="uri" field="uri"/>
                <value style="attribute" name="prefix" field="prefix"/>
             </structure>
@@ -30,8 +30,8 @@
       </structure>
       
       <structure name="property-types" usage="optional">
-         <collection field="propertyTypes" factory="org.alfresco.repo.dictionary.impl.M2Model.createList">
-            <structure name="property-type" type="org.alfresco.repo.dictionary.impl.M2PropertyType" usage="optional">
+         <collection field="propertyTypes" factory="org.alfresco.repo.dictionary.M2Model.createList">
+            <structure name="property-type" type="org.alfresco.repo.dictionary.M2PropertyType" usage="optional">
                <value style="attribute" name="name" field="name"/>
                <value name="title" field="title" usage="optional"/>
                <value name="description" field="description" usage="optional"/>
@@ -42,30 +42,30 @@
       </structure>
 
       <structure name="types" usage="optional">
-         <collection field="types" item-type="org.alfresco.repo.dictionary.impl.M2Type" factory="org.alfresco.repo.dictionary.impl.M2Model.createList"/>
+         <collection field="types" item-type="org.alfresco.repo.dictionary.M2Type" factory="org.alfresco.repo.dictionary.M2Model.createList"/>
       </structure>
       
       <structure name="aspects" usage="optional">
-         <collection field="aspects" item-type="org.alfresco.repo.dictionary.impl.M2Aspect" factory="org.alfresco.repo.dictionary.impl.M2Model.createList"/>
+         <collection field="aspects" item-type="org.alfresco.repo.dictionary.M2Aspect" factory="org.alfresco.repo.dictionary.M2Model.createList"/>
       </structure>
    </mapping>
 
 
-   <mapping class="org.alfresco.repo.dictionary.impl.M2Class" abstract="true">
+   <mapping class="org.alfresco.repo.dictionary.M2Class" abstract="true">
       <value style="attribute" name="name" field="name"/>
       <value name="title" field="title" usage="optional"/>
       <value name="description" field="description" usage="optional"/>
       <value name="parent" field="parentName" usage="optional"/>
       
       <structure name="properties" usage="optional">
-         <collection field="properties" item-type="org.alfresco.repo.dictionary.impl.M2Property" factory="org.alfresco.repo.dictionary.impl.M2Model.createList"/>
+         <collection field="properties" item-type="org.alfresco.repo.dictionary.M2Property" factory="org.alfresco.repo.dictionary.M2Model.createList"/>
       </structure>
       <structure name="associations" usage="optional">
-         <collection field="associations" factory="org.alfresco.repo.dictionary.impl.M2Model.createList"/>
+         <collection field="associations" factory="org.alfresco.repo.dictionary.M2Model.createList"/>
       </structure>
       <structure name="overrides" usage="optional">
-         <collection field="propertyOverrides" item-type="org.alfresco.repo.dictionary.impl.M2PropertyOverride" factory="org.alfresco.repo.dictionary.impl.M2Model.createList">
-            <structure name="property" type="org.alfresco.repo.dictionary.impl.M2PropertyOverride" usage="optional">
+         <collection field="propertyOverrides" item-type="org.alfresco.repo.dictionary.M2PropertyOverride" factory="org.alfresco.repo.dictionary.M2Model.createList">
+            <structure name="property" type="org.alfresco.repo.dictionary.M2PropertyOverride" usage="optional">
                <value style="attribute" name="name" field="name"/>
                <value name="mandatory" field="isMandatory" usage="optional"/>
                <value name="default" field="defaultValue" usage="optional"/>
@@ -74,20 +74,20 @@
       </structure>
    </mapping>
 
-   <mapping name="type" class="org.alfresco.repo.dictionary.impl.M2Type" extends="org.alfresco.repo.dictionary.impl.M2Class">
-      <structure map-as="org.alfresco.repo.dictionary.impl.M2Class"/>
+   <mapping name="type" class="org.alfresco.repo.dictionary.M2Type" extends="org.alfresco.repo.dictionary.M2Class">
+      <structure map-as="org.alfresco.repo.dictionary.M2Class"/>
       <structure name="mandatory-aspects" usage="optional">
-         <collection field="mandatoryAspects" factory="org.alfresco.repo.dictionary.impl.M2Model.createList">
+         <collection field="mandatoryAspects" factory="org.alfresco.repo.dictionary.M2Model.createList">
             <value name="aspect"/>
          </collection>
       </structure>
    </mapping>
       
-   <mapping name="aspect" class="org.alfresco.repo.dictionary.impl.M2Aspect"  extends="org.alfresco.repo.dictionary.impl.M2Class">
-      <structure map-as="org.alfresco.repo.dictionary.impl.M2Class"/>
+   <mapping name="aspect" class="org.alfresco.repo.dictionary.M2Aspect"  extends="org.alfresco.repo.dictionary.M2Class">
+      <structure map-as="org.alfresco.repo.dictionary.M2Class"/>
    </mapping>
 
-   <mapping name="property" class="org.alfresco.repo.dictionary.impl.M2Property">
+   <mapping name="property" class="org.alfresco.repo.dictionary.M2Property">
       <value style="attribute" name="name" field="name"/>
       <value name="title" field="title" usage="optional"/>
       <value name="description" field="description" usage="optional"/>
@@ -104,7 +104,7 @@
       </structure>
    </mapping>
 
-   <mapping class="org.alfresco.repo.dictionary.impl.M2ClassAssociation" abstract="true">
+   <mapping class="org.alfresco.repo.dictionary.M2ClassAssociation" abstract="true">
       <value style="attribute" name="name" field="name"/>
       <value name="title" field="title" usage="optional"/>
       <value name="description" field="description" usage="optional"/>
@@ -121,12 +121,12 @@
       </structure>         
    </mapping>
 
-   <mapping name="association" class="org.alfresco.repo.dictionary.impl.M2Association" extends="org.alfresco.repo.dictionary.impl.M2ClassAssociation">
-      <structure map-as="org.alfresco.repo.dictionary.impl.M2ClassAssociation"/>
+   <mapping name="association" class="org.alfresco.repo.dictionary.M2Association" extends="org.alfresco.repo.dictionary.M2ClassAssociation">
+      <structure map-as="org.alfresco.repo.dictionary.M2ClassAssociation"/>
    </mapping>
    
-   <mapping name="child-association" class="org.alfresco.repo.dictionary.impl.M2ChildAssociation" extends="org.alfresco.repo.dictionary.impl.M2ClassAssociation">
-      <structure map-as="org.alfresco.repo.dictionary.impl.M2ClassAssociation"/>
+   <mapping name="child-association" class="org.alfresco.repo.dictionary.M2ChildAssociation" extends="org.alfresco.repo.dictionary.M2ClassAssociation">
+      <structure map-as="org.alfresco.repo.dictionary.M2ClassAssociation"/>
       <value name="child-name" field="requiredChildName" usage="optional"/>
       <value name="duplicate" field="allowDuplicateChildName" usage="optional"/>
    </mapping>
