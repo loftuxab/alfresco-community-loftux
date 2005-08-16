@@ -1,0 +1,69 @@
+<v:view xmlns:v="http://www.alfresco.org/repository/view/0.1" xmlns:alf="http://www.alfresco.org/1.0">
+
+   <!-- TODO: Replace with decent template; this is just a place holder -->
+      
+   <alf:folder>
+      <alf:uifacets/>
+      <alf:name>Software Engineering Project</alf:name>
+      <alf:icon>space-icon-default</alf:icon>
+      <alf:contains>
+         <alf:folder>
+         	<alf:uifacets/>
+			<alf:name>Documentation</alf:name>
+		    <alf:icon>space-icon-default</alf:icon>
+      		<alf:contains>
+				<alf:folder>
+	         		<alf:uifacets/>
+					<alf:name>Drafts</alf:name>
+				    <alf:icon>space-icon-default</alf:icon>
+				</alf:folder>
+				<alf:folder>
+	         		<alf:uifacets/>
+					<alf:name>Pending Approval</alf:name>
+				    <alf:icon>space-icon-default</alf:icon>
+				</alf:folder>
+				<alf:folder>
+	         		<alf:uifacets/>
+					<alf:name>Published</alf:name>
+				    <alf:icon>space-icon-default</alf:icon>
+				</alf:folder>
+				<alf:folder>
+	         		<alf:uifacets/>
+					<alf:name>Samples</alf:name>
+				    <alf:icon>space-icon-doc</alf:icon>
+				    <alf:contains>
+						<alf:content>
+	         				<alf:uifacets/>
+				    		   <alf:title>System Overview</alf:title>
+            				<alf:name>system-overview.html</alf:name>
+            				<alf:mimetype>text/html</alf:mimetype>
+            				<alf:contentUrl>classpath:alfresco/templates/system-overview.html</alf:contentUrl>
+            	        </alf:content>
+         			</alf:contains>
+				</alf:folder>
+			</alf:contains>
+		</alf:folder>
+		<alf:folder>
+     		<alf:uifacets/>
+			<alf:name>Discussions</alf:name>
+		    <alf:icon>space-icon-default</alf:icon>
+		</alf:folder>
+		<alf:folder>
+     		<alf:uifacets/>
+			<alf:name>UI Design</alf:name>
+		    <alf:icon>space-icon-default</alf:icon>
+		</alf:folder>
+		<alf:folder>
+     		<alf:uifacets/>
+			<alf:name>Presentations</alf:name>
+		    <alf:icon>space-icon-default</alf:icon>
+		</alf:folder>
+		<alf:folder>
+     		<alf:uifacets/>
+			<alf:name>Quality Assurance</alf:name>
+		    <alf:icon>space-icon-default</alf:icon>
+		</alf:folder>
+      </alf:contains>
+   </alf:folder>
+
+</v:view>

@@ -37,7 +37,7 @@ import org.springframework.context.ApplicationContext;
  * <p>
  * To change the model being used, make changes to the <b>dictionaryDAO</b> bean in the
  * application contenxt XML file.  For now, this example is written against the
- * generic <code>org/alfresco/model/content_model.xml</code>.
+ * generic <code>alfresco/model/contentModel.xml</code>.
  * <p>
  * The content store location can also be set in the application context.
  * 

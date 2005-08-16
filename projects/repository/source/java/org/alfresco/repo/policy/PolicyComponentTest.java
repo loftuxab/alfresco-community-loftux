@@ -24,11 +24,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.dictionary.impl.DictionaryComponent;
-import org.alfresco.repo.dictionary.impl.DictionaryDAOImpl;
-import org.alfresco.repo.dictionary.impl.M2Model;
-import org.alfresco.repo.dictionary.impl.NamespaceDAO;
-import org.alfresco.repo.dictionary.impl.NamespaceDAOImpl;
+import org.alfresco.repo.dictionary.DictionaryComponent;
+import org.alfresco.repo.dictionary.DictionaryDAOImpl;
+import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.repo.dictionary.NamespaceDAO;
+import org.alfresco.repo.dictionary.NamespaceDAOImpl;
 import org.alfresco.service.namespace.QName;
 
 
@@ -62,7 +62,7 @@ public class PolicyComponentTest extends TestCase
         NamespaceDAO namespaceDAO = new NamespaceDAOImpl();
         DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
         List<String> bootstrapModels = new ArrayList<String>();
-        bootstrapModels.add("org/alfresco/model/dictionary_model.xml");
+        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
         bootstrapModels.add("org/alfresco/repo/policy/policycomponenttest_model.xml");
         dictionaryDAO.setBootstrapModels(bootstrapModels);
         dictionaryDAO.bootstrap();

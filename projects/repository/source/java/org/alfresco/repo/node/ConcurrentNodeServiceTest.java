@@ -27,9 +27,9 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.dictionary.impl.DictionaryComponent;
-import org.alfresco.repo.dictionary.impl.DictionaryDAO;
-import org.alfresco.repo.dictionary.impl.M2Model;
+import org.alfresco.repo.dictionary.DictionaryComponent;
+import org.alfresco.repo.dictionary.DictionaryDAO;
+import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -75,7 +75,7 @@ public class ConcurrentNodeServiceTest extends TestCase
         DictionaryDAO dictionaryDao = (DictionaryDAO) ctx.getBean("dictionaryDAO");
         // load the system model
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
-        InputStream modelStream = cl.getResourceAsStream("org/alfresco/model/content_model.xml");
+        InputStream modelStream = cl.getResourceAsStream("alfresco/model/contentModel.xml");
         assertNotNull(modelStream);
         M2Model model = M2Model.createModel(modelStream);
         dictionaryDao.putModel(model);

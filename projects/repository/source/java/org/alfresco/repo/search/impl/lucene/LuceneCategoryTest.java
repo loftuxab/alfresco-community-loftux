@@ -28,10 +28,10 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.dictionary.impl.DictionaryDAO;
-import org.alfresco.repo.dictionary.impl.M2Aspect;
-import org.alfresco.repo.dictionary.impl.M2Model;
-import org.alfresco.repo.dictionary.impl.M2Property;
+import org.alfresco.repo.dictionary.DictionaryDAO;
+import org.alfresco.repo.dictionary.M2Aspect;
+import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.service.ServiceRegistry;

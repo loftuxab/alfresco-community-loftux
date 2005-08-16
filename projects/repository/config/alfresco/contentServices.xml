@@ -20,11 +20,13 @@
          <ref bean="mimetypeMap" />
       </constructor-arg>
    </bean>
+   <!--
    <bean id="transformer.JMagick" class="org.alfresco.repo.content.transform.magick.JMagickContentTransformer" init-method="init">
       <property name="mimetypeMap">
          <ref bean="mimetypeMap" />
       </property>
    </bean>
+   -->
    <bean id="transformer.ImageMagick" class="org.alfresco.repo.content.transform.magick.ImageMagickContentTransformer" init-method="init">
       <property name="mimetypeMap">
          <ref bean="mimetypeMap" />
@@ -63,7 +65,7 @@
             <ref bean="transformer.Poi" />
             <ref bean="transformer.TextMining" />
             <ref bean="transformer.OpenOffice" />
-            <ref bean="transformer.JMagick" />
+<!--            <ref bean="transformer.JMagick" /> -->
             <ref bean="transformer.ImageMagick" />
          </list>
       </property>
