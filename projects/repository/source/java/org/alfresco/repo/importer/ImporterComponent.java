@@ -354,6 +354,11 @@ public class ImporterComponent
                 {
                     throw new ImporterException("Content URL " + contentUrl + " does not exist.");
                 }
+                
+                // since there really isn't any content associated with the node (yet), we should
+                // remove the URL from the node.  It will be set after the content has been
+                // uploaded
+                nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT_URL, null);
         
                 // Import the content
                 try
