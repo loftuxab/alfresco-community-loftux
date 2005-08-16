@@ -1008,18 +1008,22 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     }
     
     /**
-     * Builds 10K a node graphs, flushing after each build.  Checks that memory is being cleared
+     * Builds N node graphs, flushing after each build.  Checks that memory is being cleared
      * adequately.
+     * <p>
+     * This is also a good test of performance, so that is dumped.
      * 
      * @see BaseNodeServiceTest#buildNodeGraph()
      */
     public void testFlush() throws Exception
     {
-        int testCount = 500;
+        long testCount = 500L;
+        
+        long start = System.nanoTime();
         
         try
         {
-            for (int i = 0; i < testCount; i++)
+            for (long i = 0; i < testCount; i++)
             {
                 buildNodeGraph();
                 AlfrescoTransactionSupport.flush();
@@ -1029,5 +1033,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         {
             fail("Flush not clearing memory");
         }
+        
+        long end = System.nanoTime();
+        double timeS = (double)(end - start)/1000000000D;
+        System.out.printf("Build and flushed " + testCount + " node graphs: \n" +
+                "   total time: " + timeS + "s \n" +
+                "   average: " + (double)testCount/timeS + " graphs/s");
     }
 }

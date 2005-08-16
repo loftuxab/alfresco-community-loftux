@@ -19,32 +19,16 @@
       </property>
    </bean>
 
-   <bean id='nodeDaoService' class='org.springframework.transaction.interceptor.TransactionProxyFactoryBean'>
-      <property name='proxyInterfaces'>
+   <bean id="nodeDaoService" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces">
          <value>org.alfresco.repo.node.db.NodeDaoService</value>
-      </property>
-      <property name='transactionManager'>
-         <ref bean="transactionManager"/>
       </property>
       <property name="target">
          <ref bean="nodeDaoServiceImpl" />
       </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <property name="postInterceptors">
+      <property name="interceptorNames">
          <list>
-            <ref bean="dbNodeDaoServiceTxnRegistration" />
-            <!-- only enable for debugging
-            <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
-               <constructor-arg>
-                  <value>nodeDaoService</value>
-               </constructor-arg>
-            </bean>
-            -->
+            <value>dbNodeDaoServiceTxnRegistration</value>
          </list>
       </property>
    </bean>

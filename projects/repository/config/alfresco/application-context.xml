@@ -429,37 +429,18 @@
       </property>
    </bean>
    
-   <bean id="dictionaryService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.service.cmr.dictionary.DictionaryService</value>
-      </property>
-      <property name="transactionManager"><ref bean="transactionManager"/></property>
-      <property name="target">
-         <bean class="org.alfresco.repo.dictionary.impl.DictionaryComponent" >
-            <property name="dictionaryDAO"><ref bean="dictionaryDAO"/></property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
+   <bean id="dictionaryService"
+         class="org.alfresco.repo.dictionary.impl.DictionaryComponent" >
+      <property name="dictionaryDAO">
+         <ref bean="dictionaryDAO"/>
       </property>
    </bean>
    
-   <bean id="namespaceService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" depends-on="dictionaryDAO">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.service.namespace.NamespaceService</value>
-      </property>
-      <property name="transactionManager"><ref bean="transactionManager"/></property>
-      <property name="target">
-         <bean class="org.alfresco.repo.dictionary.impl.DictionaryNamespaceComponent" >
-            <property name="namespaceDAO"><ref bean="namespaceDAO"/></property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
+   <bean id="namespaceService"
+         class="org.alfresco.repo.dictionary.impl.DictionaryNamespaceComponent"
+         depends-on="dictionaryDAO" >
+      <property name="namespaceDAO">
+         <ref bean="namespaceDAO"/>
       </property>
    </bean>
    
