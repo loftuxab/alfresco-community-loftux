@@ -65,7 +65,8 @@
             not-null="true"
             insert="false"
             update="false" 
-            lazy="true" optimistic-lock="true"
+            lazy="true"
+            optimistic-lock="true"
             fetch="select">
          <column name="protocol" />
          <column name="identifier" />
