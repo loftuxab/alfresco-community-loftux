@@ -40,31 +40,36 @@ import org.jaxen.XPath;
 /**
  * An implementation of the Jaxen xpath against the node service API
  * 
- * This means any node service can do xpath style navigation.
- * Given any context node we can navigate between nodes using xpath.
+ * This means any node service can do xpath style navigation. Given any context
+ * node we can navigate between nodes using xpath.
  * 
  * This allows simple path navigation and much more.
  * 
  * @author andyh
- *
+ * 
  */
 public class DocumentNavigator extends DefaultNavigator
 {
     private static final long serialVersionUID = 3618984485740165427L;
 
     private DictionaryService dictionaryService;
+
     private NodeService nodeService;
+
     private SearchService searchService;
+
     private NamespacePrefixResolver nspr;
-    
+
     // Support classes to encapsulate stuff more akin to xml
-    
-    public class Property 
+
+    public class Property
     {
         public final QName qname;
+
         public final Serializable value;
+
         public final NodeRef parent;
-        
+
         public Property(QName qname, Serializable value, NodeRef parent)
         {
             this.qname = qname;
@@ -72,38 +77,40 @@ public class DocumentNavigator extends DefaultNavigator
             this.parent = parent;
         }
     }
-    
+
     public class Namespace
     {
         public final String prefix;
+
         public final String uri;
-        
+
         public Namespace(String prefix, String uri)
         {
             this.prefix = prefix;
             this.uri = uri;
         }
     }
-    
+
     private boolean followAllParentLinks;
 
     /**
-     * @param dictionaryService used to resolve the <b>subtypeOf</b> function
-     *      and other type-related functions
-     * @param nodeService the <tt>NodeService</tt> against which to execute
-     * @param searchService the service that helps resolve functions such as
-     *      <b>like</b> and <b>contains</b>
-     * @param nspr resolves namespaces in the xpath
-     * @param followAllParentLinks true if the XPath should traverse all parent
-     *      associations when going up the hierarchy; false if the only the
-     *      primary parent-child association should be traversed
+     * @param dictionaryService
+     *            used to resolve the <b>subtypeOf</b> function and other
+     *            type-related functions
+     * @param nodeService
+     *            the <tt>NodeService</tt> against which to execute
+     * @param searchService
+     *            the service that helps resolve functions such as <b>like</b>
+     *            and <b>contains</b>
+     * @param nspr
+     *            resolves namespaces in the xpath
+     * @param followAllParentLinks
+     *            true if the XPath should traverse all parent associations when
+     *            going up the hierarchy; false if the only the primary
+     *            parent-child association should be traversed
      */
-    public DocumentNavigator(
-            DictionaryService dictionaryService,
-            NodeService nodeService,
-            SearchService searchService,
-            NamespacePrefixResolver nspr,
-            boolean followAllParentLinks)
+    public DocumentNavigator(DictionaryService dictionaryService, NodeService nodeService, SearchService searchService,
+            NamespacePrefixResolver nspr, boolean followAllParentLinks)
     {
         super();
         this.dictionaryService = dictionaryService;
@@ -116,7 +123,8 @@ public class DocumentNavigator extends DefaultNavigator
     /**
      * Allow this to be set as it commonly changes from one search to the next
      * 
-     * @param followAllParentLinks true
+     * @param followAllParentLinks
+     *            true
      */
     public void setFollowAllParentLinks(boolean followAllParentLinks)
     {
@@ -126,24 +134,24 @@ public class DocumentNavigator extends DefaultNavigator
     public String getAttributeName(Object o)
     {
         // Get the local name
-        return ((Property)o).qname.getLocalName();
+        return ((Property) o).qname.getLocalName();
     }
 
     public String getAttributeNamespaceUri(Object o)
     {
-        return ((Property)o).qname.getNamespaceURI();
+        return ((Property) o).qname.getNamespaceURI();
     }
 
     public String getAttributeQName(Object o)
     {
-        return ((Property)o).qname.toString();
+        return ((Property) o).qname.toString();
     }
 
     public String getAttributeStringValue(Object o)
     {
         // Only the first property of multi-valued properties is displayed
         // A multivalue attribute makes no sense in the xml world
-        return ValueConverter.convert(String.class, ((Property)o).value);
+        return ValueConverter.convert(String.class, ((Property) o).value);
     }
 
     public String getCommentStringValue(Object o)
@@ -154,17 +162,17 @@ public class DocumentNavigator extends DefaultNavigator
 
     public String getElementName(Object o)
     {
-         return ((ChildAssociationRef)o).getQName().getLocalName();
+        return ((ChildAssociationRef) o).getQName().getLocalName();
     }
 
     public String getElementNamespaceUri(Object o)
     {
-        return ((ChildAssociationRef)o).getQName().getNamespaceURI();
+        return ((ChildAssociationRef) o).getQName().getNamespaceURI();
     }
 
     public String getElementQName(Object o)
     {
-        return ((ChildAssociationRef)o).getQName().toString();
+        return ((ChildAssociationRef) o).getQName().toString();
     }
 
     public String getElementStringValue(Object o)
@@ -174,47 +182,47 @@ public class DocumentNavigator extends DefaultNavigator
 
     public String getNamespacePrefix(Object o)
     {
-        return ((Namespace)o).prefix;
+        return ((Namespace) o).prefix;
     }
 
     public String getNamespaceStringValue(Object o)
     {
-        return ((Namespace)o).uri;
+        return ((Namespace) o).uri;
     }
 
     public String getTextStringValue(Object o)
     {
-      throw new UnsupportedOperationException("Text nodes are unsupported");
+        throw new UnsupportedOperationException("Text nodes are unsupported");
     }
 
     public boolean isAttribute(Object o)
     {
-       return (o instanceof Property);
+        return (o instanceof Property);
     }
 
     public boolean isComment(Object o)
     {
-       return false;
+        return false;
     }
 
     public boolean isDocument(Object o)
     {
-       if(!(o  instanceof ChildAssociationRef))
-       {
-           return false;
-       }
-       ChildAssociationRef car = (ChildAssociationRef)o;
-       return (car.getParentRef() == null) && (car.getQName() == null);
+        if (!(o instanceof ChildAssociationRef))
+        {
+            return false;
+        }
+        ChildAssociationRef car = (ChildAssociationRef) o;
+        return (car.getParentRef() == null) && (car.getQName() == null);
     }
 
     public boolean isElement(Object o)
     {
         return (o instanceof ChildAssociationRef);
     }
-    
+
     public boolean isNamespace(Object o)
     {
-       return (o instanceof Namespace);
+        return (o instanceof Namespace);
     }
 
     public boolean isProcessingInstruction(Object o)
@@ -233,13 +241,13 @@ public class DocumentNavigator extends DefaultNavigator
     }
 
     // Basic navigation support
-    
+
     public Iterator getAttributeAxisIterator(Object o) throws UnsupportedAxisException
     {
         ArrayList<Property> properties = new ArrayList<Property>();
-        NodeRef nodeRef = ((ChildAssociationRef)o).getChildRef();
-        Map<QName, Serializable> map = nodeService.getProperties(nodeRef);       
-        for(QName qName : map.keySet())
+        NodeRef nodeRef = ((ChildAssociationRef) o).getChildRef();
+        Map<QName, Serializable> map = nodeService.getProperties(nodeRef);
+        for (QName qName : map.keySet())
         {
             // Do not support multi value attributes - return the first
             Property property = new Property(qName, map.get(qName), nodeRef);
@@ -261,7 +269,7 @@ public class DocumentNavigator extends DefaultNavigator
     {
         // Iterator of Namespace
         ArrayList<Namespace> namespaces = new ArrayList<Namespace>();
-        for(String prefix : nspr.getPrefixes())
+        for (String prefix : nspr.getPrefixes())
         {
             String uri = nspr.getNamespaceURI(prefix);
             Namespace ns = new Namespace(prefix, uri);
@@ -274,20 +282,28 @@ public class DocumentNavigator extends DefaultNavigator
     {
         ArrayList<ChildAssociationRef> parents = new ArrayList<ChildAssociationRef>(1);
         // Iterator of ??
-        ChildAssociationRef contextRef = (ChildAssociationRef)o;
-        if(contextRef.getParentRef() != null)
+        if (o instanceof ChildAssociationRef)
         {
-            if(followAllParentLinks)
+            ChildAssociationRef contextRef = (ChildAssociationRef) o;
+            if (contextRef.getParentRef() != null)
             {
-                for(ChildAssociationRef car: nodeService.getParentAssocs(contextRef.getChildRef()))
+                if (followAllParentLinks)
                 {
-                   parents.add(nodeService.getPrimaryParent(car.getParentRef()));
+                    for (ChildAssociationRef car : nodeService.getParentAssocs(contextRef.getChildRef()))
+                    {
+                        parents.add(nodeService.getPrimaryParent(car.getParentRef()));
+                    }
+                }
+                else
+                {
+                    parents.add(nodeService.getPrimaryParent(contextRef.getParentRef()));
                 }
             }
-            else
-            {
-               parents.add(nodeService.getPrimaryParent(contextRef.getParentRef()));
-            }
+        }
+        if(o instanceof Property)
+        {
+            Property p = (Property)o;
+            parents.add(nodeService.getPrimaryParent(p.parent));   
         }
         return parents.iterator();
     }
@@ -306,14 +322,14 @@ public class DocumentNavigator extends DefaultNavigator
 
     public Boolean like(NodeRef childRef, QName qname, String sqlLikePattern, boolean includeFTS)
     {
-       return searchService.like(childRef, qname, sqlLikePattern, includeFTS);
+        return searchService.like(childRef, qname, sqlLikePattern, includeFTS);
     }
-    
+
     public Boolean contains(NodeRef childRef, QName qname, String sqlLikePattern)
     {
-       return searchService.contains(childRef, qname, sqlLikePattern);
+        return searchService.contains(childRef, qname, sqlLikePattern);
     }
-    
+
     public Boolean isSubtypeOf(NodeRef nodeRef, QName typeQName)
     {
         // get the type of the node

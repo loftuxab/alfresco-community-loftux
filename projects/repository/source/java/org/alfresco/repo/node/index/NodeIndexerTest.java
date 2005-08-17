@@ -122,7 +122,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         
         selectPropertiesPerf.start();
         List<Serializable> result =  searchService.selectProperties(rootNodeRef, "//@*[contains('monkey')]", null, namespacePrefixResolver, false);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         selectPropertiesPerf.stop();
         
         selectNodesPerf.start();
@@ -132,7 +132,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         
         selectPropertiesPerf.start();
         result =  searchService.selectProperties(rootNodeRef, "//@*[contains('mon?ey')]", null, namespacePrefixResolver, false);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         selectPropertiesPerf.stop();
         
         selectNodesPerf.start();
@@ -142,7 +142,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         
         selectPropertiesPerf.start();
         result =  searchService.selectProperties(rootNodeRef, "//@*[contains('mon*')]", null, namespacePrefixResolver, false);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         selectPropertiesPerf.stop();
         
         selectNodesPerf.start();
@@ -152,7 +152,7 @@ public class NodeIndexerTest extends BaseNodeServiceTest
         
         selectPropertiesPerf.start();
         result =  searchService.selectProperties(rootNodeRef, "//@*[contains('?onkey')]", null, namespacePrefixResolver, false);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         selectPropertiesPerf.stop();
     }
 }

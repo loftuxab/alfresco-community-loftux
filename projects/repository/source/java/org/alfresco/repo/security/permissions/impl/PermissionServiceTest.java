@@ -50,8 +50,6 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 public class PermissionServiceTest extends BaseSpringTest
 {
-    // private static ApplicationContext ctx =
-    // ApplicationContextHelper.getApplicationContext();
 
     private static final String ROLE_AUTHENTICATED = "ROLE_AUTHENTICATED";
 
