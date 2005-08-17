@@ -1,109 +1,57 @@
-<!--
-<wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
-   <wsu:Created>2005-08-03T21:04:51Z</wsu:Created>
-   <wsu:Expires>2005-08-03T21:09:51Z</wsu:Expires>
-</wsu:Timestamp>
--->
+
+
+
+
+
+
 
 <html>
    <head>
-      <title>Alfresco Web Services</title>
-
+      <title>Alfresco Web Services Example</title>
       <style>
-         body {font-family:verdana;font-size:10pt;}
+         body {font-family: verdana; font-size: 8pt;}
+         td {font-family: verdana; font-size: 8pt;}
+         input {font-family: verdana; font-size: 8pt;}
+         .title {font-family: verdana; font-size: 8pt; font-weight: bold;}
+         .loginDialog {border: 1px solid black; -moz-border-radius: 7px;}
       </style>
    </head>
 
    <body>
-      <?php 
-      require_once('SOAP/Client.php');
 
-      print("Authenticating...");
+      <form id="loginForm" name="loginForm" method="post" action="login.php" enctype="application/x-www-form-urlencoded">
+         <table border="0" width="98%" height="100%" align="center">
+            <tr >
+               <td valign="middle" align="center" width="100%">
+                  <table border="0" cellspacing="4" cellpadding="4" class="loginDialog">
+                     <tr>
+                        <td colspan="2">
+                           <img src="AlfrescoLogo200.png" width="200" height="58" alt="Alfresco" title="Alfresco">
+                        </td>
+                     </tr>
+                     <tr>
+                        <td colspan="2">
+                           <span class='title'>Enter Login details:</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>User Name:</td>
+                        <td><input name="username" type="text" style="width:150px"/></td>
+                     </tr>
+                     
+                     <tr>
+                        <td>Password:</td>
+                        <td><input name="password" type="password" style="width:150px"/></td>
+                     </tr>
+                     <tr>
+                        <td colspan="2" align="right"><input type="submit" value="Login"/></td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+         </table>
+      </form>
 
-      // get hold of the authentication service
-      $client = new SOAP_Client("http://localhost:8080/alfresco/api/AuthenticationService");
-      $namespace = array('namespace' => 'http://www.alfresco.org/ws/service/authentication/1.0', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
-      $client->__options = array('trace'=>1);
-      		
-      // authenticate with a username and password
-      $params =& new SOAP_Value('{http://www.alfresco.org/ws/service/authentication/1.0}authenticate', false,
-                                $v=array('username' => 'admin', 'password' => 'admin'));
-
-      $authResult = $client->call('authenticate', $v = array('authenticate' => $params), $namespace);
-
-      /*print "<xmp>";
-      print $client->wire;
-      print "</xmp>";*/
-
-      if (PEAR::isError($authResult))
-      {
-         print("<br><br><span style='font-weight:bold;color:red'>Error occurred: ");
-
-         if ($authResult->getMessage())
-         {
-            print($authResult->getMessage());
-         }
-         else
-         {
-            print($authResult->userinfo->AuthenticationFault->message);
-         }
-         
-         print("</span><br>\n");
-      }
-      else
-      {
-         print("<br><br>Ticket = " . $authResult->ticket);
-         print("<br><br>Successfully authenticated, retrieving stores...");
-      }
-      
-      // get hold of the repository service
-      $client = new SOAP_Client("http://localhost:8080/alfresco/api/RepositoryService");
-      $namespace = array('namespace' => 'http://www.alfresco.org/ws/service/repository/1.0', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
-      $client->__options = array('trace'=>1);
-
-      $username =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Username', false,
-                                  'admin');
-      $password =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Password', false,
-                                  $authResult->ticket, array('Type' => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText'));
-      $usernameToken =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken', false,
-                                     $v = array($username, $password));
-      $securityHeader =& new SOAP_Header('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security', null,
-                                         $usernameToken, 1);
-      // remove the actor attribute that gets added by the constructor otherwise Axis gets upset!
-      unset($securityHeader->attributes['SOAP-ENV:actor']);
-      $client->addHeader($securityHeader);
-
-      $params =& new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}getStores', false);
-      $stores = $client->call('getStores', $v = array('getStores' => $params), $namespace);
-      
-      /*print "<xmp>";
-      print $client->wire;
-      print "</xmp>";*/
-      
-      if (PEAR::isError($stores))
-      {
-         print("<br><br><span style='font-weight:bold;color:red'>Error occurred: ");
-
-         if ($stores->getMessage())
-         {
-            print($stores->getMessage());
-         }
-         else
-         {
-            print($stores->userinfo->RepositoryFault->message);
-         }
-         
-         print("</span><br>\n");
-      }
-      else
-      {
-         print("<br><br>There are " . count($stores) . " stores:<br>");
-         foreach ($stores as $store) 
-         {
-            print($store->scheme . ':' . $store->address . '<br>');
-         }
-      }
-      ?>
    </body>
 
 </html>

@@ -119,7 +119,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          
          if (langEnum.equals(QueryLanguageEnum.cql) || langEnum.equals(QueryLanguageEnum.xpath))
          {
-            throw new RepositoryFault(110, "Currently only '" + QueryLanguageEnum.lucene.getValue() + "' queries are supported!");
+            throw new RepositoryFault(110, "Only '" + QueryLanguageEnum.lucene.getValue() + "' queries are currently supported!");
          }
          
          // TODO: Return metadata if the includeMetaData flag is set
