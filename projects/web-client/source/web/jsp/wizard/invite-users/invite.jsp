@@ -137,7 +137,20 @@
                                     <td class="mainSubText"><h:outputText value="1. #{msg.select_usersgroups}" /></td>
                                  </tr>
                                  <tr>
+                                    <%-- Picker to select Users/Groups --%>
                                     <td><a:genericPicker id="picker" showAddButton="false" filters="#{InviteUsersWizard.filters}" queryCallback="#{InviteUsersWizard.pickerCallback}" /></td>
+                                 </tr>
+                                 <tr>
+                                    <td><h:outputText value="#{msg.role}" /></td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <div style="padding:4px">
+                                          <h:selectOneListbox id="roles" style="width:250px" size="3">
+                                             <f:selectItems value="#{InviteUsersWizard.roles}" />
+                                          </h:selectOneListbox>
+                                       </div>
+                                    </td>
                                  </tr>
                                  
                                  <tr><td class="paddingRow"></td></tr>
@@ -154,9 +167,18 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:selectManyListbox readonly="true" style="width:250px">
-                                          <f:selectItems value="#{InviteUsersWizard.selectedItems}" />
-                                       </h:selectManyListbox>
+                                       <table border=0 cellspacing=4 cellpadding=0>
+                                          <tr valign="top">
+                                             <td>
+                                                <h:selectManyListbox id="selection" style="width:250px" size="5">
+                                                   <f:selectItems value="#{InviteUsersWizard.selectedItems}" />
+                                                </h:selectManyListbox>
+                                             </td>
+                                             <td>
+                                                <h:commandButton value="#{msg.remove}" actionListener="#{InviteUsersWizard.removeSelection}" styleClass="wizardButton" />
+                                             </td>
+                                          </tr>
+                                       </table>
                                     </td>
                                  </tr>
                                  

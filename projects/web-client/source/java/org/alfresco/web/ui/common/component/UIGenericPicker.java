@@ -18,6 +18,7 @@
 package org.alfresco.web.ui.common.component;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -56,6 +57,8 @@ public class UIGenericPicker extends UICommand
    private final static String MSG_SEARCH   = "search";
    private final static String MSG_CLEAR    = "clear";
    private final static String MSG_ADD      = "add";
+   private final static String MSG_RESULTS1 = "results_contains";
+   private final static String MSG_RESULTS2 = "results_contains_filter";
    
    private final static int DEFAULT_HEIGHT = 100;
    private final static int DEFAULT_WIDTH = 250;
@@ -305,20 +308,39 @@ public class UIGenericPicker extends UICommand
          out.write("\">");
       }
       
-      // Search and clear buttons
-      out.write("</td><td rowspan=3>");
-      out.write("<div style='padding:1px'><input type='submit' value='");
+      // Search button
+      out.write("</td><td rowspan=4>");
+      out.write("<input type='submit' value='");
       out.write(Utils.encode(bundle.getString(MSG_SEARCH)));
       out.write("' onclick=\"");
       out.write(generateFormSubmit(context, ACTION_SEARCH));
-      out.write("\"></div><div style='padding:1px'><input type='submit' value='");
-      out.write(Utils.encode(bundle.getString(MSG_CLEAR)));
-      out.write("' onclick=\"");
-      out.write(generateFormSubmit(context, ACTION_CLEAR));
-      out.write("\"></div>");
+      out.write("\">");
       out.write("</td></tr>");
       
-      // middle row - results list
+      // information row
+      if (this.currentResults != null && getShowContains() == true)
+      {
+         out.write("<tr><td colspan=3>");
+         String resultsMsg;
+         if (getShowFilter() == false)
+         {
+            resultsMsg = MessageFormat.format(bundle.getString(MSG_RESULTS1), new Object[] {this.contains});
+         }
+         else
+         {
+            String filterMsg = this.filters[this.filterIndex].getLabel();
+            resultsMsg = MessageFormat.format(bundle.getString(MSG_RESULTS2), new Object[] {this.contains, filterMsg});
+         }
+         out.write(resultsMsg);
+         out.write("&nbsp;");
+         out.write("<a href='#' onclick=\"");
+         out.write(generateFormSubmit(context, ACTION_CLEAR));
+         out.write("\">");
+         out.write(Utils.encode(bundle.getString(MSG_CLEAR)));
+         out.write("</a></td></tr>");
+      }
+      
+      // results list row
       out.write("<tr><td colspan=2>");
       out.write("<select size='8' style='width:");
       out.write(Integer.toString(getWidth()));
@@ -511,7 +533,7 @@ public class UIGenericPicker extends UICommand
    /**
     * @param width The width to set.
     */
-   public void setWidth(Integer width)
+   public void setWidth(int width)
    {
       this.width = Integer.valueOf(width);
    }
@@ -533,7 +555,7 @@ public class UIGenericPicker extends UICommand
    /**
     * @param height The height to set.
     */
-   public void setHeight(Integer height)
+   public void setHeight(int height)
    {
       this.height = Integer.valueOf(height);
    }

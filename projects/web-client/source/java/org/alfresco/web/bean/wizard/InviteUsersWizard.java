@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.faces.component.UISelectMany;
+import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
@@ -163,11 +165,14 @@ public class InviteUsersWizard extends AbstractWizardBean
    public void addSelection(ActionEvent event)
    {
       UIGenericPicker picker = (UIGenericPicker)event.getComponent().findComponent("picker");
+      UISelectOne rolePicker = (UISelectOne)event.getComponent().findComponent("roles");
       
       String[] results = picker.getSelectedResults();
       if (results != null)
       {
-         // TODO: get Role here from selection in role list component!
+         // TODO: get Role here from selectedRole (value) in role list component!
+         String role = (String)rolePicker.getValue();
+         
          for (int i=0; i<results.length; i++)
          {
             NodeRef ref = new NodeRef(results[i]);
@@ -194,6 +199,29 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
+    * Action handler called when the Remove button is pressed to remove current selection.
+    */
+   public void removeSelection(ActionEvent event)
+   {
+      UISelectMany selector = (UISelectMany)event.getComponent().findComponent("selection");
+      Object[] selection = selector.getSelectedValues();
+      if (selection != null)
+      {
+         for (int i=0; i<selection.length; i++)
+         {
+            String value = (String)selection[i];
+            for (int n=0; n<this.selectedItems.size(); n++)
+            {
+               if (value.equals(this.selectedItems.get(n).getValue()))
+               {
+                  this.selectedItems.remove(n);
+               }
+            }
+         }
+      }
+   }
+   
+   /**
     * Property accessed by the Generic Picker component.
     * 
     * @return the array of filter options to show in the users/groups picker
@@ -205,6 +233,18 @@ public class InviteUsersWizard extends AbstractWizardBean
       return new SelectItem[] {
             new SelectItem("0", bundle.getString(MSG_USERS)),
             new SelectItem("1", bundle.getString(MSG_GROUPS)) };
+   }
+   
+   /**
+    * @return The list of available roles for the users/groups
+    */
+   public SelectItem[] getRoles()
+   {
+      // TODO: get roles from the Permission services?
+      return new SelectItem[] {
+            new SelectItem("0", "Administrator"),
+            new SelectItem("1", "Contributor"),
+            new SelectItem("2", "Guest") };
    }
    
    /**
