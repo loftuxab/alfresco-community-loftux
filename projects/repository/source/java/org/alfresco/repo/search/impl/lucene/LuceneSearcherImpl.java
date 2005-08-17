@@ -493,18 +493,18 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         {
             // build Lucene search string specific to the node
             StringBuilder sb = new StringBuilder();
-            sb.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(googleLikePattern).append(") ");
+            sb.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(googleLikePattern.toLowerCase()).append(") ");
             if (propertyQName != null)
             {
                 sb.append("@").append(LuceneQueryParser.escape(propertyQName.toString()));
-                sb.append(":(").append(googleLikePattern).append(")");
+                sb.append(":(").append(googleLikePattern.toLowerCase()).append(")");
             }
             else
             {
                 for (QName key : nodeService.getProperties(nodeRef).keySet())
                 {
                     sb.append("@").append(LuceneQueryParser.escape(key.toString()));
-                    sb.append(":(").append(googleLikePattern).append(")");
+                    sb.append(":(").append(googleLikePattern.toLowerCase()).append(")");
                 }
             }
             sb.append(")");
@@ -540,7 +540,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         if (includeFTS)
         {
             // convert the SQL-like pattern into a Lucene-compatible string
-            String pattern = SearchLanguageConversion.convertXPathLikeToLucene(sqlLikePattern);
+            String pattern = SearchLanguageConversion.convertXPathLikeToLucene(sqlLikePattern.toLowerCase());
 
             // build Lucene search string specific to the node
             sb = new StringBuilder();
@@ -574,7 +574,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         else
         {
             // convert the SQL-like pattern into a Lucene-compatible string
-            String pattern = SearchLanguageConversion.convertXPathLikeToRegex(sqlLikePattern);
+            String pattern = SearchLanguageConversion.convertXPathLikeToRegex(sqlLikePattern.toLowerCase());
 
             Serializable property = nodeService.getProperty(nodeRef, propertyQName);
             if(property == null)
@@ -586,7 +586,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 String propertyString = ValueConverter.convert(
                         String.class,
                         nodeService.getProperty(nodeRef, propertyQName));
-                return propertyString.matches(pattern);
+                return propertyString.toLowerCase().matches(pattern);
             }
         }
     }

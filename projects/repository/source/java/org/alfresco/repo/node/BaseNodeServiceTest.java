@@ -234,6 +234,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
         properties.clear();
         properties.put(QName.createQName(ns, "animal"), "monkey");
+        properties.put(QName.createQName(ns, "UPPERANIMAL"), "MONKEY");
         properties.put(QName.createQName(ns, "reference"), n2.toString());
         
         qname = QName.createQName(ns, "n1_p_n3");

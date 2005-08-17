@@ -248,7 +248,34 @@ public class SearcherComponentTest extends TestCase
                 namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[like(@test:animal, 'M__K%', false)]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[like(@test:UPPERANIMAL, 'm__k%', false)]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[like(@test:UPPERANIMAL, 'M__K%', false)]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
         answer =  searcher.selectNodes(rootNodeRef, "//*[contains('monkey')]", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(rootNodeRef, "//*[contains('MONKEY')]", null, namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(rootNodeRef, "//*[contains(lower-case('MONKEY'))]", null, namespacePrefixResolver, false);
         assertEquals(1, answer.size());
 
         // select the monkey node in the second level
