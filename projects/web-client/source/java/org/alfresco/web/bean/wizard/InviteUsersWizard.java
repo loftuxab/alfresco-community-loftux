@@ -62,13 +62,19 @@ public class InviteUsersWizard extends AbstractWizardBean
    /** I18N message strings */
    private static final String MSG_USERS  = "users";
    private static final String MSG_GROUPS = "groups";
+   private static final String MSG_INVITED_SPACE = "invite_space";
+   private static final String MSG_INVITED_ROLE  = "invite_role";
    
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
    
    /** whether to invite all or specify individual users or groups */
    private String invite = "users";
-   private List<SelectItem> selectedItems = new ArrayList<SelectItem>(8); 
+   private String notify = "yes";
+   private List<SelectItem> selectedItems = null;
+   private String subject = null;
+   private String body = null;
+   private String automaticText = null;
    
 
    /**
@@ -78,6 +84,12 @@ public class InviteUsersWizard extends AbstractWizardBean
    {
       super.init();
       
+      invite = "users";
+      notify = "yes";
+      selectedItems = new ArrayList<SelectItem>(8);
+      subject = "";
+      body = "";
+      automaticText = "";
    }
 
    /**
@@ -256,7 +268,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
-    * @return Returns the invite.
+    * @return Returns the invite listbox selection.
     */
    public String getInvite()
    {
@@ -264,13 +276,45 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
 
    /**
-    * @param invite The invite to set.
+    * @param invite The invite listbox selection to set.
     */
    public void setInvite(String invite)
    {
       this.invite = invite;
    }
    
+   /**
+    * @return Returns the notify listbox selection.
+    */
+   public String getNotify()
+   {
+      return this.notify;
+   }
+
+   /**
+    * @param notify The notify listbox selection to set.
+    */
+   public void setNotify(String notify)
+   {
+      this.notify = notify;
+   }
+
+   /**
+    * @return Returns the automaticText.
+    */
+   public String getAutomaticText()
+   {
+      return this.automaticText;
+   }
+
+   /**
+    * @param automaticText The automaticText to set.
+    */
+   public void setAutomaticText(String automaticText)
+   {
+      this.automaticText = automaticText;
+   }
+
    /**
     * @return Returns the selectedItems.
     */
@@ -287,6 +331,38 @@ public class InviteUsersWizard extends AbstractWizardBean
       this.selectedItems = selectedItems;
    }
    
+   /**
+    * @return Returns the email body text.
+    */
+   public String getBody()
+   {
+      return this.body;
+   }
+
+   /**
+    * @param body The email body text to set.
+    */
+   public void setBody(String body)
+   {
+      this.body = body;
+   }
+
+   /**
+    * @return Returns the email subject text.
+    */
+   public String getSubject()
+   {
+      return this.subject;
+   }
+
+   /**
+    * @param subject The email subject text to set.
+    */
+   public void setSubject(String subject)
+   {
+      this.subject = subject;
+   }
+
    /**
     * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getWizardDescription()
     */
@@ -380,6 +456,39 @@ public class InviteUsersWizard extends AbstractWizardBean
       }
       
       return stepInstruction;
+   }
+   
+   /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#next()
+    */
+   public String next()
+   {
+      String outcome = super.next();
+      
+      if (outcome.equals("notify"))
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         
+         // prepare automatic text for email
+         StringBuilder buf = new StringBuilder(256);
+         
+         String personName = Application.getCurrentUser(context).getFullName(getNodeService());
+         String msgInvite = Application.getMessage(context, MSG_INVITED_SPACE);
+         buf.append(MessageFormat.format(msgInvite, new Object[] {
+               getNavigator().getNodeProperties().get("name"),
+               personName}) );
+         
+         buf.append("<br>");
+         
+         // TODO: show the role label here!
+         String role = "Administrator [TBD]";
+         String msgRole = Application.getMessage(context, MSG_INVITED_ROLE);
+         buf.append(MessageFormat.format(msgRole, new Object[] {role}));
+         
+         this.automaticText = buf.toString();;
+      }
+      
+      return outcome;
    }
    
    /**

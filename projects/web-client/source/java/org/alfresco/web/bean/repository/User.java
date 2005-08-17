@@ -46,6 +46,7 @@ public final class User
    private String ticket;
    private NodeRef user;
    private NodeRef person;
+   private String fullName = null;
    
    /** cached ref to our user preferences node */
    private NodeRef preferencesFolderRef = null;
@@ -74,6 +75,24 @@ public final class User
    public String getUserName()
    {
       return this.userName;
+   }
+   
+   /**
+    * Return the full name of the Person this User represents 
+    * 
+    * @param service        NodeService to use
+    * 
+    * @return The full name
+    */
+   public String getFullName(NodeService service)
+   {
+      if (this.fullName == null)
+      {
+         this.fullName = service.getProperty(this.person, ContentModel.PROP_FIRSTNAME) + " " +
+               service.getProperty(this.person, ContentModel.PROP_LASTNAME);
+      }
+      
+      return this.fullName;
    }
    
    /**

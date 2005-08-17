@@ -32,7 +32,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form id="invite-users">
+   <h:form id="notify-users">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -98,7 +98,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
-                                    value="1" disabled="true">
+                                    value="2" disabled="true">
                                  <a:listItem value="1" label="1. #{msg.invite_step_1}" />
                                  <a:listItem value="2" label="2. #{msg.invite_step_2}" />
                               </a:modeList>
@@ -109,72 +109,49 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{InviteUsersWizard.stepTitle}" /></td>
+                                    <td colspan=2 class="mainSubTitle"><h:outputText value="#{InviteUsersWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="#{InviteUsersWizard.stepDescription}" /></td>
+                                    <td colspan=2 class="mainSubText"><h:outputText value="#{InviteUsersWizard.stepDescription}" /></td>
                                  </tr>
                                  
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{msg.i_want_to}" /></td>
+                                    <td colspan=2><h:outputText value="#{msg.send_email}" /></td>
                                  </tr>
                                  <tr>
-                                    <td>
-                                       <h:selectOneRadio value="#{InviteUsersWizard.invite}" layout="pageDirection">
-                                          <f:selectItem itemValue="all" itemLabel="#{msg.invite_all}" />
-                                          <f:selectItem itemValue="users" itemLabel="#{msg.invite_users}" />
+                                    <td colspan=2>
+                                       <h:selectOneRadio value="#{InviteUsersWizard.notify}">
+                                          <f:selectItem itemValue="yes" itemLabel="#{msg.yes}" />
+                                          <f:selectItem itemValue="no" itemLabel="#{msg.no}" />
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
                                  
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{msg.specify_usersgroups}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td class="mainSubText"><h:outputText value="1. #{msg.select_usersgroups}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <%-- Picker to select Users/Groups --%>
-                                    <td><a:genericPicker id="picker" showAddButton="false" filters="#{InviteUsersWizard.filters}" queryCallback="#{InviteUsersWizard.pickerCallback}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.role}" /></td>
-                                 </tr>
-                                 <tr>
+                                    <td><h:outputText value="#{msg.subject}" />:</td>
                                     <td>
-                                       <div style="padding:4px">
-                                          <h:selectOneListbox id="roles" style="width:250px" size="3">
-                                             <f:selectItems value="#{InviteUsersWizard.roles}" />
-                                          </h:selectOneListbox>
-                                       </div>
+                                       <h:inputText value="#{InviteUsersWizard.subject}" size="50" maxlength="256" />
+                                    </td>
+                                 </tr>
+                                 
+                                 <tr>
+                                    <td><h:outputText value="#{msg.body}" />:</td>
+                                    <td>
+                                       <h:inputTextarea value="#{InviteUsersWizard.body}" rows="2" cols="48" />
                                     </td>
                                  </tr>
                                  
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="2. #{msg.click_add}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:commandButton value="#{msg.add}" actionListener="#{InviteUsersWizard.addSelection}" styleClass="wizardButton" /></td>
-                                 </tr>
-                                 
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td class="mainSubText"><h:outputText value="3. #{msg.selected_usersgroups}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <table border=0 cellspacing=4 cellpadding=0>
+                                    <td colspan=2>
+                                       <table border=0 cellspacing=2 cellpadding=0>
                                           <tr valign="top">
                                              <td>
-                                                <h:selectManyListbox id="selection" style="width:250px" size="5">
-                                                   <f:selectItems value="#{InviteUsersWizard.selectedItems}" />
-                                                </h:selectManyListbox>
+                                                <h:outputText value="#{msg.automatic_text}" />:
                                              </td>
                                              <td>
-                                                <h:commandButton value="#{msg.remove}" actionListener="#{InviteUsersWizard.removeSelection}" styleClass="wizardButton" />
+                                                <h:outputText escape="false" value="#{InviteUsersWizard.automaticText}" />
                                              </td>
                                           </tr>
                                        </table>
@@ -183,7 +160,7 @@
                                  
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{InviteUsersWizard.stepInstructions}" /></td>
+                                    <td colspan=2><h:outputText value="#{InviteUsersWizard.stepInstructions}" /></td>
                                  </tr> 
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
