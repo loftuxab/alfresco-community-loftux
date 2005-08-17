@@ -61,7 +61,7 @@ public class ContentWebService implements ContentServiceSoapPort
    /**
     * @see org.alfresco.repo.webservice.content.ContentServiceSoapPort#read(org.alfresco.repo.webservice.types.Reference)
     */
-   public byte[] read(Reference node) throws RemoteException, ContentFault
+   public ReadResult read(Reference node) throws RemoteException, ContentFault
    {
       throw new ContentFault(1, "read() is not implemented yet!");
    }

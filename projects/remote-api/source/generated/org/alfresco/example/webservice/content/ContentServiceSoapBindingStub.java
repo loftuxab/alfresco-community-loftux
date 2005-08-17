@@ -44,8 +44,8 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
         oper.setName("read");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
         oper.addParameter(param);
-        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"));
-        oper.setReturnClass(byte[].class);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ReadResult"));
+        oper.setReturnClass(org.alfresco.example.webservice.content.ReadResult.class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -564,7 +564,7 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
     /**
      * Retrieves content from the repository.
      */
-    public byte[] read(org.alfresco.example.webservice.types.Reference node) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
+    public org.alfresco.example.webservice.content.ReadResult read(org.alfresco.example.webservice.types.Reference node) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -588,9 +588,9 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
         else {
             extractAttachments(_call);
             try {
-                return (byte[]) _resp;
+                return (org.alfresco.example.webservice.content.ReadResult) _resp;
             } catch (java.lang.Exception _exception) {
-                return (byte[]) org.apache.axis.utils.JavaUtils.convert(_resp, byte[].class);
+                return (org.alfresco.example.webservice.content.ReadResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.content.ReadResult.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {

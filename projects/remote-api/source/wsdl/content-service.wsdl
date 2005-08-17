@@ -41,7 +41,7 @@
          <element name="readResponse">
             <complexType>
                <sequence>
-                  <element name="readReturn" type="xsd:base64Binary"/>
+                  <element name="readReturn" type="content:ReadResult"/>
                </sequence>
             </complexType>
          </element>
