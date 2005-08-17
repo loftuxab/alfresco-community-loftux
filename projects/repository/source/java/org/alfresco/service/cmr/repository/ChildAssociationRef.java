@@ -36,7 +36,8 @@ import org.alfresco.util.EqualsHelper;
  * @author andyh
  * 
  */
-public class ChildAssociationRef implements EntityRef, Serializable
+public class ChildAssociationRef
+        implements EntityRef, Comparable<ChildAssociationRef>, Serializable
 {
     private static final long serialVersionUID = 4051322336257127729L;
 
@@ -97,6 +98,62 @@ public class ChildAssociationRef implements EntityRef, Serializable
     {
         this(assocTypeQName, parentRef, childQName, childRef, false, -1);
     }
+
+    /**
+     * Compares:
+     * <ul>
+     * <li>{@link #assocTypeQName}</li>
+     * <li>{@link #parentRef}</li>
+     * <li>{@link #childRef}</li>
+     * <li>{@link #childQName}</li>
+     * </ul>
+     */
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof ChildAssociationRef))
+        {
+            return false;
+        }
+        ChildAssociationRef other = (ChildAssociationRef) o;
+
+        return (EqualsHelper.nullSafeEquals(this.assocTypeQName, other.assocTypeQName)
+                && EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
+                && EqualsHelper.nullSafeEquals(this.childQName, other.childQName)
+                && EqualsHelper.nullSafeEquals(this.childRef, other.childRef));
+    }
+
+    public int hashCode()
+    {
+        int hashCode = ((getTypeQName() == null) ? 0 : getTypeQName().hashCode());
+        hashCode = 37 * hashCode + ((getParentRef() == null) ? 0 : getParentRef().hashCode());
+        hashCode = 37 * hashCode + ((getQName() == null) ? 0 : getQName().hashCode());
+        hashCode = 37 * hashCode + getChildRef().hashCode();
+        return hashCode;
+    }
+
+    /**
+     * @see #setNthSibling(int)
+     */
+    public int compareTo(ChildAssociationRef another)
+    {
+        int thisVal = this.nthSibling;
+        int anotherVal = another.nthSibling;
+        return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+    }
+
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[").append(getTypeQName()).append("]");
+        sb.append(getParentRef());
+        sb.append(" --- ").append(getQName()).append(" ---> ");
+        sb.append(getChildRef());
+        return sb.toString();
+    }
     
     /**
      * Get the qualified name of the association type
@@ -155,48 +212,18 @@ public class ChildAssociationRef implements EntityRef, Serializable
     }
 
     /**
-     * Compares:
-     * <ul>
-     * <li>{@link #assocTypeQName}</li>
-     * <li>{@link #parentRef}</li>
-     * <li>{@link #childRef}</li>
-     * <li>{@link #childQName}</li>
-     * </ul>
+     * Allows post-creation setting of the ordering index.  This is a helper
+     * so that sorted sets and lists can be easily sorted.
+     * <p>
+     * This index is <b>in no way absolute</b> and should change depending on
+     * the results that appear around this instance.  Therefore, the sibling
+     * number cannot be used to construct, say, sibling number 5.  Sibling
+     * number 5 will exist only in results where there are siblings 1 - 4.
+     * 
+     * @param nthSibling the sibling index
      */
-    public boolean equals(Object o)
+    public void setNthSibling(int nthSibling)
     {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof ChildAssociationRef))
-        {
-            return false;
-        }
-        ChildAssociationRef other = (ChildAssociationRef) o;
-
-        return (EqualsHelper.nullSafeEquals(this.assocTypeQName, other.assocTypeQName)
-                && EqualsHelper.nullSafeEquals(this.parentRef, other.parentRef)
-                && EqualsHelper.nullSafeEquals(this.childQName, other.childQName)
-                && EqualsHelper.nullSafeEquals(this.childRef, other.childRef));
-    }
-
-    public int hashCode()
-    {
-        int hashCode = ((getTypeQName() == null) ? 0 : getTypeQName().hashCode());
-        hashCode = 37 * hashCode + ((getParentRef() == null) ? 0 : getParentRef().hashCode());
-        hashCode = 37 * hashCode + ((getQName() == null) ? 0 : getQName().hashCode());
-        hashCode = 37 * hashCode + getChildRef().hashCode();
-        return hashCode;
-    }
-
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer();
-        sb.append("[").append(getTypeQName()).append("]");
-        sb.append(getParentRef());
-        sb.append(" --- ").append(getQName()).append(" ---> ");
-        sb.append(getChildRef());
-        return sb.toString();
+        this.nthSibling = nthSibling;
     }
 }

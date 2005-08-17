@@ -26,7 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.ChildAssoc;
@@ -767,9 +769,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             return Collections.emptyList();
         }
+        // sort results
+        SortedSet<ChildAssoc> filteredSet = new TreeSet<ChildAssoc>(childAssocs);
         // list of results
         List<ChildAssociationRef> results = new ArrayList<ChildAssociationRef>(childAssocs.size());
-        for (ChildAssoc assoc : childAssocs)
+        int nthSibling = 0;
+        for (ChildAssoc assoc : filteredSet)
         {
             // does the qname match the pattern?
             if (!qnamePattern.isMatch(assoc.getQName()))
@@ -777,6 +782,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                 // no match - ignore
                 continue;
             }
+            ChildAssociationRef assocRef = assoc.getChildAssocRef();
+            // slot the value in the right spot
+            assocRef.setNthSibling(nthSibling);
+            nthSibling++;
             // get the child
             results.add(assoc.getChildAssocRef());
         }

@@ -20,6 +20,7 @@ package org.alfresco.repo.version;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -401,6 +402,9 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
                 result.add(newChildAssocRef);
             }
         }
+        
+        // sort the results so that the order appears to be exactly as it was originally
+        Collections.sort(result);
         
         return result;
     }

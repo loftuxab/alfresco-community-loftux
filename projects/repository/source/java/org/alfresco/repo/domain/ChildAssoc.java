@@ -26,7 +26,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Derek Hulley
  */
-public interface ChildAssoc
+public interface ChildAssoc extends Comparable<ChildAssoc>
 {
     /**
      * Performs the necessary work on the provided nodes to ensure that a bidirectional

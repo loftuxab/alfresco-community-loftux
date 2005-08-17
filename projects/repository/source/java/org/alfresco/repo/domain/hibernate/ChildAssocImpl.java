@@ -110,6 +110,36 @@ public class ChildAssocImpl implements ChildAssoc
         return (this.getLocalName() == null ? 0 : getLocalName().hashCode());
     }
 
+    /**
+     * Orders the child associations by ID.  A smaller ID has a higher priority.
+     * This may change once we introduce a changeable index against which to order.
+     */
+    public int compareTo(ChildAssoc another)
+    {
+        if (this == another)
+        {
+            return 0;
+        }
+        
+        Long thisId = this.getId();
+        Long anotherId = another.getId();
+
+        if (thisId == null)
+        {
+            // this ID has not been set, make this instance greater
+            return -1; 
+        }
+        else if (anotherId == null)
+        {
+            // other ID has not been set, make this instance lesser
+            return 1;
+        }
+        else
+        {
+            return thisId.compareTo(anotherId);
+        }
+    }
+
     public Long getId()
     {
         return id;

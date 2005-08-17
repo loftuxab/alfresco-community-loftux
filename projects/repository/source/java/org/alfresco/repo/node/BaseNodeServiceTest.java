@@ -752,10 +752,15 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     {
         Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         NodeRef n1Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE,"root_p_n1")).getChildRef();
+        ChildAssociationRef n1pn3Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE,"n1_p_n3"));
+        ChildAssociationRef n1n4Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE,"n1_n4"));
         
         // get the parent node's children
-        Collection<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
+        List<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
         assertEquals("Incorrect number of children", 2, childAssocRefs.size());
+        // checks that the order of the children is correct
+        assertEquals("First child added to n1 was primary to n3", n1pn3Ref, childAssocRefs.get(0));
+        assertEquals("Second child added to n1 was to n4", n1pn3Ref, childAssocRefs.get(0)); 
     }
     
     public void testGetChildAssocsOnRealNode() throws Exception
