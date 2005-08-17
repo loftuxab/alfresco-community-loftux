@@ -171,13 +171,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.next}" action="#{InviteUsersWizard.next}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="#{msg.finish}" action="#{InviteUsersWizard.finish}" styleClass="wizardButton"
-                                                        disabled="true" />
+                                       <h:commandButton value="#{msg.finish}" action="#{InviteUsersWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

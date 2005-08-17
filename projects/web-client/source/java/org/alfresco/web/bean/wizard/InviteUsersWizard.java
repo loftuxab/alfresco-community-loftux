@@ -97,7 +97,7 @@ public class InviteUsersWizard extends AbstractWizardBean
     */
    public String finish()
    {
-      return null;
+      return "browse";
    }
    
    /**
