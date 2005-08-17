@@ -19,53 +19,17 @@ package org.alfresco.web.bean.wizard;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
-import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.ConfigService;
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.model.ContentModel;
-import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
-import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
-import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
-import org.alfresco.repo.action.executer.CheckInActionExecuter;
-import org.alfresco.repo.action.executer.CheckOutActionExecuter;
-import org.alfresco.repo.action.executer.CopyActionExecuter;
-import org.alfresco.repo.action.executer.ImageTransformActionExecuter;
-import org.alfresco.repo.action.executer.LinkCategoryActionExecuter;
-import org.alfresco.repo.action.executer.MailActionExecuter;
-import org.alfresco.repo.action.executer.MoveActionExecuter;
-import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
-import org.alfresco.repo.action.executer.TransformActionExecuter;
 import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ActionConditionDefinition;
-import org.alfresco.service.cmr.action.ActionDefinition;
-import org.alfresco.service.cmr.action.ActionService;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.rule.Rule;
-import org.alfresco.service.cmr.rule.RuleService;
-import org.alfresco.service.cmr.rule.RuleType;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.RulesBean;
-import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.data.IDataContainer;
-import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the New Action Wizard 

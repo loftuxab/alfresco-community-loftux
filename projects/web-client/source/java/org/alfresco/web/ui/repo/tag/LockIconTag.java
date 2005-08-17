@@ -74,7 +74,7 @@ public class LockIconTag extends HtmlComponentTag
       this.value = null;
    }
    
-      /**
+   /**
     * Set the lockImage
     *
     * @param lockImage     the lockImage
@@ -134,7 +134,7 @@ public class LockIconTag extends HtmlComponentTag
       this.value = value;
    }
    
-      /**
+   /**
     * Set the lockedOwnerTooltip
     *
     * @param lockedOwnerTooltip     the lockedOwnerTooltip

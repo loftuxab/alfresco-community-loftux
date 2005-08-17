@@ -64,6 +64,7 @@ public class UIModeList extends UICommand
       this.iconColumnWidth = (Integer)values[1];
       this.horizontal = (Boolean)values[2];
       this.disabled = (Boolean)values[3];
+      this.label = (String)values[4];
    }
    
    /**
@@ -71,12 +72,13 @@ public class UIModeList extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[4];
+      Object values[] = new Object[5];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.iconColumnWidth;
       values[2] = this.horizontal;
       values[3] = this.disabled;
+      values[4] = this.label;
       return (values);
    }
    
@@ -201,6 +203,28 @@ public class UIModeList extends UICommand
       this.disabled = disabled;
    }
    
+   /**
+    * @return Returns the label.
+    */
+   public String getLabel()
+   {
+      ValueBinding vb = getValueBinding("label");
+      if (vb != null)
+      {
+         this.label = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.label;
+   }
+
+   /**
+    * @param label The label to set.
+    */
+   public void setLabel(String label)
+   {
+      this.label = label;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Private data 
@@ -213,6 +237,9 @@ public class UIModeList extends UICommand
    
    /** disabled flag */
    private Boolean disabled = null;
+   
+   /** the label */
+   private String label;
    
    
    // ------------------------------------------------------------------------------

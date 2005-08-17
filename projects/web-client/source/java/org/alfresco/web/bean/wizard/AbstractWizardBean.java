@@ -22,6 +22,7 @@ import javax.faces.event.ActionEvent;
 
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;
@@ -36,6 +37,9 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractWizardBean
 {
    private static Log logger = LogFactory.getLog(AbstractWizardBean.class);
+   
+   /** I18N messages */
+   private static final String MSG_NOT_SET = "value_not_set";
    
    protected static final String FINISH_OUTCOME = "finish";
    protected static final String CANCEL_OUTCOME = "cancel";
@@ -279,20 +283,19 @@ public abstract class AbstractWizardBean
          throw new IllegalArgumentException("Labels and Values passed to summary must be valid and of equal length.");
       }
       
+      String msg = Application.getMessage(FacesContext.getCurrentInstance(), MSG_NOT_SET);
+      String notSetMsg = "&lt;" + msg + "&gt;";
+      
       StringBuilder buf = new StringBuilder(256);
       
       buf.append("<table cellspacing='4' cellpadding='2' border='0' class='summary'>");
       for (int i=0; i<labels.length; i++)
       {
          String value = values[i];
-         if (value == null)
-         {
-            value = "&lt;not-set&gt;";
-         }
          buf.append("<tr><td><b>");
          buf.append(labels[i]);
          buf.append(":</b></td><td>");
-         buf.append(value);
+         buf.append(value != null ? value : notSetMsg);
          buf.append("</td></tr>");
       }
       buf.append("</table>");

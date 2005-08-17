@@ -334,6 +334,10 @@ public class Application
          {
             throw new AlfrescoRuntimeException("Unable to load Alfresco messages bundle: " + MESSAGE_BUNDLE);
          }
+         
+         // apply our wrapper to catch MissingResourceException
+         bundle = new ResourceBundleWrapper(bundle);
+         
          session.put(MESSAGE_BUNDLE, bundle);
       }
       

@@ -94,7 +94,7 @@
                                  <a:actionLink value="#{msg.add_content}" image="/images/icons/add.gif" padding="4" action="addContent" actionListener="#{AddContentWizard.startWizard}" id="link3" />
                                  <a:menu id="spaceMenu" itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
                                     <a:actionLink value="#{msg.create_content}" image="/images/icons/new_content.gif" id="link3_1" action="createContent" actionListener="#{CreateContentWizard.startWizard}" />
-                                    <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" id="link4" />
+                                    <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" id="link4" action="inviteUsers" actionListener="#{InviteUsersWizard.startWizard}" />
                                     <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                     </a:actionLink>

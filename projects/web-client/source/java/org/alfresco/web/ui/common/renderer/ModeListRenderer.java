@@ -90,7 +90,7 @@ public class ModeListRenderer extends BaseRenderer
       }
       
       // output title row if present
-      if (attrs.get("label") != null)
+      if (list.getLabel() != null)
       {
          // each row is an inner table with a single row and 2 columns
          // first column contains an icon if present, second column contains text
@@ -116,7 +116,7 @@ public class ModeListRenderer extends BaseRenderer
          outputAttribute(out, attrs.get("labelStyle"), "style");
          outputAttribute(out, attrs.get("labelStyleClass"), "class");
          out.write('>');
-         out.write(Utils.encode((String)attrs.get("label")));
+         out.write(Utils.encode(list.getLabel()));
          out.write("</span></td></tr></table></td>");
          
          if (list.isHorizontal() == false)
@@ -186,7 +186,7 @@ public class ModeListRenderer extends BaseRenderer
                // if the "selectedImage" property is set and this item is selected then show it
                if (selected == true && selectedImage != null)
                {
-                  out.write( Utils.buildImageTag(context, selectedImage, (String)child.getAttributes().get("tooltip")) );
+                  out.write( Utils.buildImageTag(context, selectedImage, item.getTooltip()) );
                }
                else
                {
@@ -194,7 +194,7 @@ public class ModeListRenderer extends BaseRenderer
                   String image = (String)child.getAttributes().get("image"); 
                   if (image != null)
                   {
-                     out.write( Utils.buildImageTag(context, image, (String)child.getAttributes().get("tooltip")) );
+                     out.write( Utils.buildImageTag(context, image, item.getTooltip()) );
                   }
                }
                
@@ -230,7 +230,7 @@ public class ModeListRenderer extends BaseRenderer
             
             outputAttribute(out, child.getAttributes().get("tooltip"), "title");
             out.write('>');
-            out.write(Utils.encode((String)child.getAttributes().get("label")));
+            out.write(Utils.encode(item.getLabel()));
             if (!list.isDisabled() && !item.isDisabled())
             {
                out.write("</a>");

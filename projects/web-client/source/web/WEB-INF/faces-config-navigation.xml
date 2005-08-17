@@ -118,6 +118,10 @@
          <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>inviteUsers</from-outcome>
+         <to-view-id>/jsp/wizard/invite-users/invite.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>manageRules</from-outcome>
          <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
       </navigation-case>
@@ -413,6 +417,19 @@
       <navigation-case>
          <from-outcome>summary</from-outcome>
          <to-view-id>/jsp/wizard/add-content/summary.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- navigation rules for the Invite Users wizard -->
+   <navigation-rule>
+      <from-view-id>/jsp/wizard/invite-users/*</from-view-id>
+      <navigation-case>
+         <from-outcome>invite</from-outcome>
+         <to-view-id>/jsp/wizard/invite-users/invite.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>notify</from-outcome>
+         <to-view-id>/jsp/wizard/invite-users/notify.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

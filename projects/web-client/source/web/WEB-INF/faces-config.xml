@@ -456,6 +456,27 @@
    
    <managed-bean>
       <description>
+         The bean that backs up the Invite Users Wizard
+      </description>
+      <managed-bean-name>InviteUsersWizard</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.wizard.InviteUsersWizard</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{AlfNodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{AlfSearchService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>namespaceService</property-name>
+         <value>#{AlfNamespaceService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the Checkin and Checkout pages.
       </description>
       <managed-bean-name>CheckinCheckoutBean</managed-bean-name>

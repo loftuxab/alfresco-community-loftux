@@ -41,10 +41,12 @@ public class UIListItem extends SelfRenderingComponent
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[3];
+      Object values[] = new Object[5];
       values[0] = super.saveState(context);
       values[1] = this.value;
       values[2] = this.disabled;
+      values[3] = this.label;
+      values[4] = this.tooltip;
       return ((Object) (values));
    }
 
@@ -57,6 +59,8 @@ public class UIListItem extends SelfRenderingComponent
       super.restoreState(context, values[0]);
       this.value = values[1];
       this.disabled = (Boolean)values[2];
+      this.label = (String)values[3];
+      this.tooltip = (String)values[4];
    }
    
    
@@ -125,6 +129,51 @@ public class UIListItem extends SelfRenderingComponent
       this.disabled = disabled;
    }
    
+   /**
+    * @return Returns the label.
+    */
+   public String getLabel()
+   {
+      ValueBinding vb = getValueBinding("label");
+      if (vb != null)
+      {
+         this.label = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.label;
+   }
+
+   /**
+    * @param label The label to set.
+    */
+   public void setLabel(String label)
+   {
+      this.label = label;
+   }
+
+   /**
+    * @return Returns the tooltip.
+    */
+   public String getTooltip()
+   {
+      ValueBinding vb = getValueBinding("tooltip");
+      if (vb != null)
+      {
+         this.tooltip = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.tooltip;
+   }
+
+   /**
+    * @param tooltip The tooltip to set.
+    */
+   public void setTooltip(String tooltip)
+   {
+      this.tooltip = tooltip;
+   }
+   
+   
    // ------------------------------------------------------------------------------
    // Private data
    
@@ -133,4 +182,10 @@ public class UIListItem extends SelfRenderingComponent
    
    /** disabled flag */
    private Boolean disabled = null;
+   
+   /** the tooltip */
+   private String tooltip;
+
+   /** the label */
+   private String label;
 }
