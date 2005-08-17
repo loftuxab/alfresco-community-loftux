@@ -54,7 +54,7 @@
    
    <target name="continuous" depends="reset-database, test, distribute" />
    
-   <target name="nightly" depends="reset-database, test, package-source-distribution" />
+   <target name="nightly" depends="reset-database, test, package-source-distribution, compile-docs" />
 
    <!-- ************************* -->
    <!-- ** Compilation targets ** -->

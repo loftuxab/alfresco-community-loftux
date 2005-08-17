@@ -37,9 +37,9 @@
 
     <target name="compile-javadocs" depends="init" description="Creates the JavaDocs for the project">
         <mkdir dir="${dir.javadoc}" />
-        <javadoc sourcepath="${dir.src.java}" destdir="${dir.javadoc}" packagenames="${javadoc.packages.include}" excludepackagenames="${javadoc.packages.exclude}" author="true" version="true" doctitle="${javadoc.title.document}" windowtitle="${javadoc.title.window}" classpathref="classpath.compile">
-            <bottom>${javadoc.copyright}</bottom>
-        </javadoc>
+        <javadoc sourcepath="${dir.src.java}" destdir="${dir.javadoc}" packagenames="${javadoc.packages.include}" 
+                 excludepackagenames="${javadoc.packages.exclude}" author="true" version="true" doctitle="${javadoc.title.document}" 
+                 windowtitle="${javadoc.title.window}" classpathref="classpath.compile" bottom="${javadoc.copyright}"/>
     </target>
 
     <target name="compile-taglibdocs" depends="init" description="Creates the tag library docs for the project">
