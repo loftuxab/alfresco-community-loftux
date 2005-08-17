@@ -796,19 +796,19 @@
          <list>
             <props>
                <prop key="path">/</prop>
-               <prop key="location">/alfresco/bootstrap/systemImport.xml</prop>
+               <prop key="location">alfresco/bootstrap/systemImport.xml</prop>
             </props>
             <props>
                <prop key="path">/</prop>
-               <prop key="location">/alfresco/bootstrap/categories.xml</prop>
+               <prop key="location">alfresco/bootstrap/categories.xml</prop>
             </props>
             <props>
                <prop key="path">/alf:${companySpaceName}</prop>
-               <prop key="location">/alfresco/bootstrap/tutorial.xml</prop>
+               <prop key="location">alfresco/bootstrap/tutorial.xml</prop>
             </props>
             <props>
                <prop key="path">/alf:${companySpaceName}/alf:${glossaryName}/alf:${templatesName}</prop>
-               <prop key="location">/alfresco/templates/software_engineering_project.xml</prop>
+               <prop key="location">alfresco/templates/software_engineering_project.xml</prop>
             </props>
          </list>
       </property>
