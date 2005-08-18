@@ -45,8 +45,8 @@ import org.springframework.dao.DataAccessException;
 
 public class RepositoryAuthenticationDao implements MutableAuthenticationDao
 {
-    public static final String SYSTEM_FOLDER = "/alf:system";
-    public static final String PEOPLE_FOLDER  = SYSTEM_FOLDER + "/alf:people";
+    public static final String SYSTEM_FOLDER = "/sys:system";
+    public static final String PEOPLE_FOLDER  = SYSTEM_FOLDER + "/sys:people";
     
     private NodeService nodeService;
     private NamespacePrefixResolver namespacePrefixResolver;
@@ -89,8 +89,8 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         }
         
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-        String password = ValueConverter.convert(String.class, properties.get(QName.createQName("alf", "password", namespacePrefixResolver))); 
-        String salt = ValueConverter.convert(String.class, properties.get(QName.createQName("alf", "salt", namespacePrefixResolver))); 
+        String password = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "password", namespacePrefixResolver))); 
+        String salt = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "salt", namespacePrefixResolver))); 
         
         // TODO: Get roles correctly
         
@@ -113,8 +113,8 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
-        defs[0] = new QueryParameterDefImpl(QName.createQName("alf", "var", namespacePrefixResolver), text, true, userName);
-        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:person[@alf:userName = $alf:var ]", defs, namespacePrefixResolver, false);
+        defs[0] = new QueryParameterDefImpl(QName.createQName("cm", "var", namespacePrefixResolver), text, true, userName);
+        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/cm:person[@cm:userName = $cm:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)
         {
             return null;
@@ -127,8 +127,8 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
-        defs[0] = new QueryParameterDefImpl(QName.createQName("alf", "var", namespacePrefixResolver), text, true, userName);
-        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/alf:user[@alf:username = $alf:var ]", defs, namespacePrefixResolver, false);
+        defs[0] = new QueryParameterDefImpl(QName.createQName("usr", "var", namespacePrefixResolver), text, true, userName);
+        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/usr:user[@usr:username = $usr:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)
         {
             return null;
@@ -156,21 +156,21 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     private NodeRef getOrCreateTypeLocation()
     {
         NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
-        List<ChildAssociationRef> results = nodeService.getChildAssocs(rootNode, QName.createQName("alf", "system", namespacePrefixResolver));
+        List<ChildAssociationRef> results = nodeService.getChildAssocs(rootNode, QName.createQName("sys", "system", namespacePrefixResolver));
         NodeRef sysNode = null;
         if(results.size() == 0)
         {
-            sysNode = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN, QName.createQName("alf", "system", namespacePrefixResolver), ContentModel.TYPE_CONTAINER ).getChildRef();
+            sysNode = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN, QName.createQName("sys", "system", namespacePrefixResolver), ContentModel.TYPE_CONTAINER ).getChildRef();
         }
         else
         {
             sysNode = results.get(0).getChildRef();
         }
-        results = nodeService.getChildAssocs(sysNode, QName.createQName("alf", "people", namespacePrefixResolver));
+        results = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people", namespacePrefixResolver));
         NodeRef typesNode = null;
         if(results.size() == 0)
         {
-            typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN, QName.createQName("alf", "people", namespacePrefixResolver), ContentModel.TYPE_CONTAINER ).getChildRef();
+            typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN, QName.createQName("sys", "people", namespacePrefixResolver), ContentModel.TYPE_CONTAINER ).getChildRef();
         }
         else
         {

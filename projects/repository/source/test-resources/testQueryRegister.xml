@@ -5,7 +5,7 @@
     <namespaces>
         <namespace>
             <prefix>alf</prefix>
-            <uri>http://www.alfresco.org/1.0</uri>
+            <uri>http://www.alfresco.org</uri>
         </namespace>
         <namespace>
             <prefix>tulip</prefix>

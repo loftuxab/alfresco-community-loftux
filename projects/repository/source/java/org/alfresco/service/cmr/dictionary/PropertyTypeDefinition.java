@@ -31,21 +31,21 @@ public interface PropertyTypeDefinition
     //
     // Built-in Property Types
     //
-    public QName ANY = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "any");
-    public QName TEXT = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "text");
-    public QName CONTENT = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "content");
-    public QName INT = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "int");
-    public QName LONG = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "long");
-    public QName FLOAT = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "float");
-    public QName DOUBLE = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "double");
-    public QName DATE = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "date");
-    public QName DATETIME = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "datetime");
-    public QName BOOLEAN = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "boolean");
-    public QName QNAME = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "qname");
-    public QName GUID = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "guid");
-    public QName CATEGORY = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "category");
-    public QName NODE_REF = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "noderef");
-    public QName PATH = QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "path");
+    public QName ANY = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "any");
+    public QName TEXT = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "text");
+    public QName CONTENT = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "content");
+    public QName INT = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "int");
+    public QName LONG = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "long");
+    public QName FLOAT = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "float");
+    public QName DOUBLE = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "double");
+    public QName DATE = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "date");
+    public QName DATETIME = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "datetime");
+    public QName BOOLEAN = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "boolean");
+    public QName QNAME = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "qname");
+    public QName GUID = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "guid");
+    public QName CATEGORY = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "category");
+    public QName NODE_REF = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "noderef");
+    public QName PATH = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "path");
     
     
     /**

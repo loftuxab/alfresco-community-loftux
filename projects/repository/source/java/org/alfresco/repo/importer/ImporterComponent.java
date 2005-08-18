@@ -144,11 +144,11 @@ public class ImporterComponent
             List<NodeRef> nodeRefs = searchService.selectNodes(nodeRef, path, null, namespaceService, false);
             if (nodeRefs.size() == 0)
             {
-                throw new ImporterException("Path " + path + " with node " + nodeRef + " does not exist - the path must resolve to a valid location");
+                throw new ImporterException("Path " + path + " within node " + nodeRef + " does not exist - the path must resolve to a valid location");
             }
             if (nodeRefs.size() > 1)
             {
-                throw new ImporterException("Path " + path + " with node " + nodeRef + " found too many locations - the path must resolve to one location");
+                throw new ImporterException("Path " + path + " within node " + nodeRef + " found too many locations - the path must resolve to one location");
             }
             nodeRef = nodeRefs.get(0);
         }
@@ -282,6 +282,8 @@ public class ImporterComponent
             String childName = context.getChildName();
             if (childName != null)
             {
+                childName = bindPlaceHolder(childName, configuration);
+                childName = QName.createValidLocalName(childName);
                 childQName = QName.createQName(childName, namespaceService); 
             }
             else

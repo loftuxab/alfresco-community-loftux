@@ -60,7 +60,7 @@ public class UserShortcutsBean
    /** List of shortcut nodes */
    private List<Node> shortcuts = null;
    
-   private QName QNAME_SHORTCUTS = QName.createQName(NamespaceService.ALFRESCO_URI, "shortcuts");
+   private QName QNAME_SHORTCUTS = QName.createQName(NamespaceService.APP_MODEL_1_0_URI, "shortcuts");
    
    
    // ------------------------------------------------------------------------------

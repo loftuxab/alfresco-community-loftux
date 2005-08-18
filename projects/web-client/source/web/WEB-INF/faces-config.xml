@@ -170,6 +170,10 @@
          <property-name>nodeService</property-name>
          <value>#{AlfNodeService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>namespaceService</property-name>
+         <value>#{AlfNamespaceService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

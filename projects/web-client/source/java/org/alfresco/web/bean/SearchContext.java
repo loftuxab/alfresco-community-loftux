@@ -73,7 +73,7 @@ public final class SearchContext implements Serializable
       String query;
       
       // the QName for the well known "name" attribute
-      String nameAttr = Repository.escapeQName(QName.createQName(NamespaceService.ALFRESCO_URI, "name"));
+      String nameAttr = Repository.escapeQName(QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "name"));
       
       // match against content text
       String text = this.text.trim();
@@ -165,10 +165,10 @@ public final class SearchContext implements Serializable
       }
       
       // match against CONTENT type
-      String fileTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}content\" ";
+      String fileTypeQuery = " +TYPE:\"{" + NamespaceService.CONTENT_MODEL_1_0_URI + "}content\" ";
       
       // match against FOLDER type
-      String folderTypeQuery = " +TYPE:\"{" + NamespaceService.ALFRESCO_URI + "}folder\" ";
+      String folderTypeQuery = " +TYPE:\"{" + NamespaceService.CONTENT_MODEL_1_0_URI + "}folder\" ";
       
       switch (mode)
       {

@@ -1,27 +1,29 @@
-<v:view xmlns:v="http://www.alfresco.org/repository/view/0.1" xmlns:alf="http://www.alfresco.org/1.0">
-   
-   <alf:folder>
-      <alf:uifacets/>
-      <alf:name>${companySpaceName}</alf:name>
-      <alf:icon>space-icon-default</alf:icon>
-      <alf:title>${companySpaceName}</alf:title>
-      <alf:description>${companySpaceDescription}</alf:description>
-      <alf:contains>
-         <alf:folder>
-            <alf:uifacets/>
-            <alf:name>${glossaryName}</alf:name>
-            <alf:icon>space-icon-default</alf:icon>
-            <alf:title>${glossaryName}</alf:title>
-            <alf:contains>
-               <alf:folder>
-                  <alf:uifacets/>
-                  <alf:name>${templatesName}</alf:name>
-                  <alf:icon>space-icon-default</alf:icon>
-                  <alf:title>${templatesName}</alf:title>
-               </alf:folder>
-            </alf:contains>
-         </alf:folder>
-      </alf:contains>
-   </alf:folder>
-   
-</v:view>
+<view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
+           xmlns:cm="http://www.alfresco.org/model/content/1.0"
+           xmlns:app="http://www.alfresco.org/model/application/1.0">
+
+	<cm:folder view:childName="app:${companySpaceName}">
+		<app:uifacets />
+		<cm:name>${companySpaceName}</cm:name>
+		<app:icon>space-icon-default</app:icon>
+		<cm:title>${companySpaceName}</cm:title>
+		<cm:description>${companySpaceDescription}</cm:description>
+		<cm:contains>
+			<cm:folder view:childName="app:${glossaryName}">
+				<app:uifacets />
+				<cm:name>${glossaryName}</cm:name>
+				<app:icon>space-icon-default</app:icon>
+				<cm:title>${glossaryName}</cm:title>
+				<cm:contains>
+					<cm:folder view:childName="app:${templatesName}">
+						<app:uifacets />
+						<cm:name>${templatesName}</cm:name>
+						<app:icon>space-icon-default</app:icon>
+						<cm:title>${templatesName}</cm:title>
+					</cm:folder>
+				</cm:contains>
+			</cm:folder>
+		</cm:contains>
+	</cm:folder>
+
+</view:view>

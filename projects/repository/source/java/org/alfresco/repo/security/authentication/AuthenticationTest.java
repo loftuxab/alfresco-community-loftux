@@ -101,9 +101,9 @@ public class AuthenticationTest extends TestCase
         rootNodeRef = nodeService.getRootNode(storeRef);
 
         QName children = ContentModel.ASSOC_CHILDREN;
-        QName system = QName.createQName(NamespaceService.ALFRESCO_URI, "system");
+        QName system = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "system");
         QName container = ContentModel.TYPE_CONTAINER;
-        QName types = QName.createQName(NamespaceService.ALFRESCO_URI, "people");
+        QName types = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "people");
 
         systemNodeRef = nodeService.createNode(rootNodeRef, children, system, container).getChildRef();
         typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();
@@ -471,7 +471,7 @@ public class AuthenticationTest extends TestCase
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);
-        nspr.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        nspr.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
         nspr.addDynamicNamespace("namespace", "namespace");
         nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;

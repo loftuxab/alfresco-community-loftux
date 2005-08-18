@@ -1,101 +1,51 @@
-<model name="alf:contentmodel" xmlns="http://www.alfresco.org/dictionary/0.1">
-
-   <!-- TODO: Look at splitting some definitions out into
-              a) system level - repository internal types/aspects
-              b) application level - specific to application
-              
-              leaving content domain specific types here -->
-
-
+<model name="cm:contentmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
    <description>Alfresco Content Model</description>
    <author>Alfresco</author>
-   <published>2005-06-03</published>
+   <published>2005-08-16</published>
    <version>0.1</version>
 
    <imports>
-      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
    </imports>
    
    <namespaces>
-      <!-- TODO: Change this URI to something like http://www.alfresco.org/content/1.0 -->
-      <namespace uri="http://www.alfresco.org/1.0" prefix="alf"/>
+      <namespace uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
    </namespaces>
 
    
    <types>
    
-      <!-- system level -->
-
-      <type name="alf:base">
-         <title>Base</title>
-         <mandatory-aspects>
-            <aspect>alf:referencable</aspect>
-         </mandatory-aspects>
-      </type>
-
-      <type name="alf:container">
-         <title>Container</title>
-         <parent>alf:base</parent>
-         <associations>
-            <child-association name="alf:children">
-               <target>
-                  <class>alf:base</class>
-               </target>
-            </child-association>
-         </associations>
-      </type>
-
-      <type name="alf:store_root">
-         <title>Store Root</title>
-         <parent>alf:container</parent>
-         <mandatory-aspects>
-            <aspect>alf:aspect_root</aspect>
-         </mandatory-aspects>
-      </type>
-
-      <type name="alf:reference">
-         <title>Reference</title>
-         <parent>alf:base</parent>
-         <properties>
-            <property name="alf:reference">
-               <type>d:noderef</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>
-      </type>
-
-      <!-- application level -->
-
-      <type name="alf:cmobject">
+      <type name="cm:cmobject">
          <title>Object</title>
-         <parent>alf:base</parent>
+         <parent>sys:base</parent>
          <properties>
-            <property name="alf:name">
+            <property name="cm:name">
                <type>d:text</type>
             </property>
          </properties>
          <mandatory-aspects>
-            <aspect>alf:auditable</aspect>
+            <aspect>cm:auditable</aspect>
          </mandatory-aspects>
       </type>
       
-      <type name="alf:folder">
+      <type name="cm:folder">
          <title>Folder</title>
-         <parent>alf:cmobject</parent>
+         <parent>cm:cmobject</parent>
          <properties>
-            <property name="alf:orderedchildren">
+            <property name="cm:orderedchildren">
                <type>d:boolean</type>
             </property>
          </properties>
          <associations>
-            <child-association name="alf:contains">
+            <child-association name="cm:contains">
                <source>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </source>
                <target>
-                  <class>alf:base</class>
+                  <class>sys:base</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -104,11 +54,11 @@
          </associations>
       </type>
       
-      <type name="alf:content">
+      <type name="cm:content">
          <title>Content</title>
-         <parent>alf:cmobject</parent>
+         <parent>cm:cmobject</parent>
          <properties>
-            <property name="alf:contentUrl">
+            <property name="cm:contentUrl">
                <type>d:text</type>
                <mandatory>false</mandatory>
                <!--- Index content in the background -->
@@ -118,15 +68,15 @@
                   <tokenised>true</tokenised>
                </index>
             </property>
-            <property name="alf:mimetype">
+            <property name="cm:mimetype">
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-            <property name="alf:encoding">
+            <property name="cm:encoding">
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
-            <property name="alf:size">
+            <property name="cm:size">
                <!-- This property should be system maintained -->
                <type>d:long</type>
                <mandatory>false</mandatory>
@@ -134,417 +84,153 @@
          </properties>
       </type>
 
-      <type name="alf:linkfile">
+      <type name="cm:linkfile">
          <title>Link File</title>
-         <parent>alf:cmobject</parent>
+         <parent>cm:cmobject</parent>
          <properties>
-            <property name="alf:path">
+            <property name="cm:path">
                <type>d:path</type>
             </property>
          </properties>
       </type>
-      
-      <type name="alf:person">
-         <title>Person</title>
-         <parent>alf:base</parent>
-         <properties>
-            <property name="alf:userName">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-            <property name="alf:homeFolder">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-             <property name="alf:firstName">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-            <property name="alf:lastName">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-            <property name="alf:middleName">
-               <type>d:text</type>
-            </property>
-            <property name="alf:email">
-               <type>d:text</type>
-            </property>
-            <property name="alf:organizationId">
-               <type>d:text</type>
-            </property>
-         </properties>
-      </type>
 
-      <type name="alf:category_root">
-         <title>Category Root</title>
-         <parent>alf:cmobject</parent>
-         <associations>
-            <child-association name="alf:categories">
-               <target>
-                  <class>alf:category</class>
-               </target>
-            </child-association>
-         </associations>
-         <mandatory-aspects>
-            <aspect>alf:aspect_root</aspect>
-         </mandatory-aspects>
-      </type>
-      
-      <type name="alf:category">
-         <title>Category</title>
-         <parent>alf:cmobject</parent>
-         <associations>
-            <child-association name="alf:subcategories">
-               <target>
-                  <class>alf:base</class>
-               </target>
-            </child-association>
-         </associations>
-      </type>
-      
-      <type name="alf:permissionrole">
-         <title>Permission</title>
-         <properties>
-            <property name="alf:role">
-               <!-- need to have means to identify root instance of appropriate category -->
-               <type>d:category</type>
-            </property>
-         </properties>
-         <associations>
-            <association name="alf:person">
-               <source>
-                  <mandatory>false</mandatory>
-                  <many>true</many>
-               </source>
-               <target>
-                  <class>alf:person</class>
-                  <mandatory>true</mandatory>
-                  <many>false</many>
-               </target>
-            </association>
-         </associations>
-      </type>
-      
-      <!-- Action, conditions and rules -->
-      
-      <type name="alf:actionbase">
-	     <title>Action Base Type</title>
-	     <parent>alf:cmobject</parent> 
-	     <properties>
-            <property name="alf:definitionName">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>  
-         <associations>
-            <child-association name="alf:parameters">
-               <target>
-                  <class>alf:actionparameter</class>
-                  <mandatory>false</mandatory>
-                  <many>true</many>
-               </target>
-            </child-association>
-         </associations>  
-      </type>
-      
-	  <type name="alf:action">
-	     <title>Action</title>
-	     <parent>alf:actionbase</parent>
-	     <properties>
-            <property name="alf:actionTitle">
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
-            <property name="alf:actionDescription">
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
-         </properties>	     
-         <associations>
-            <child-association name="alf:conditions">
-               <target>
-                  <class>alf:actioncondition</class>
-                  <mandatory>false</mandatory>
-                  <many>true</many>
-               </target>
-            </child-association>
-         </associations>
-	  </type>
-	  
-	  <type name="alf:actioncondition">	  
-	     <title>Action Condition</title>
-	     <parent>alf:actionbase</parent>
-	  </type>
-	  
-	  <type name="alf:actionparameter">
-	     <title>Action/Condition Parameter</title>
-	     <parent>alf:cmobject</parent>
-	     <properties>
-            <property name="alf:parameterName">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-            <property name="alf:parameterValue">
-               <type>d:any</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>
-	  </type>
-	  
-	  <type name="alf:compositeaction">
-	     <title>Composite Action</title>
-	     <parent>alf:action</parent>
-         <associations>
-            <child-association name="alf:actions">
-               <target>
-                  <class>alf:action</class>
-                  <mandatory>true</mandatory>
-                  <many>true</many>
-               </target>
-            </child-association>
-         </associations>
-	  </type>
-	  
-	  <type name="alf:rule">
-	     <title>Rule</title>
-	     <parent>alf:compositeaction</parent>
-	     <properties>
-            <property name="alf:ruleType">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-            <property name="alf:applyToChildren">
-               <type>d:boolean</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>
-	  </type>
-
-      <!-- Application level ???? -->
-
-      <type name="alf:savedquerycontent">
+      <type name="cm:savedquery">
          <title>Saved Query</title>
-         <parent>alf:content</parent>
+         <parent>cm:content</parent>
       </type>
-
-      <type name="alf:systemfolder">
+      
+      <type name="cm:systemfolder">
          <title>System Folder</title>
-         <parent>alf:folder</parent>
+         <parent>cm:folder</parent>
       </type>
       
-      <!-- TODO: Glossary will be revisited when implementation is better understood -->
-      <type name="alf:glossary">
-         <parent>alf:folder</parent>
-         <!--
-         <mandatory-aspects>
-            <aspect>CategoryContainable</aspect>
-         </mandatory-aspects>
+      <type name="cm:person">
+         <title>Person</title>
+         <parent>sys:base</parent>
+         <properties>
+            <property name="cm:userName">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="cm:homeFolder">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+             <property name="cm:firstName">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="cm:lastName">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="cm:middleName">
+               <type>d:text</type>
+            </property>
+            <property name="cm:email">
+               <type>d:text</type>
+            </property>
+            <property name="cm:organizationId">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+
+      <!-- Classification -->
+         
+      <type name="cm:category_root">
+         <title>Category Root</title>
+         <parent>cm:cmobject</parent>
          <associations>
-            <association name="alf:namespace">
-               <target-type>Category</target-type>
-               <target-multiplicity>0..*</target-multiplicity>
-               <source-mulitplicity>0..1<source-multiplicity>
-               <duplicates-allowed>false</duplicates-allowed>
-            </association>
+            <child-association name="cm:categories">
+               <target>
+                  <class>cm:category</class>
+               </target>
+            </child-association>
          </associations>
-         -->
-      </type>
-
-      <type name="alf:configurations">
-         <title>Configurations</title>
-         <parent>alf:systemfolder</parent>
-      </type>
-
-      <type name="alf:propertyvalue">
-         <title>Property Value</title>
-         <parent>alf:cmobject</parent>
+         <mandatory-aspects>
+            <aspect>sys:aspect_root</aspect>
+         </mandatory-aspects>
       </type>
       
-      <type name="alf:valuestring">
-         <title>String Value</title>
-         <parent>alf:propertyvalue</parent>
-         <properties>
-            <property name="alf:stringValue">
-               <type>d:text</type>
-            </property>
-         </properties>
+      <type name="cm:category">
+         <title>Category</title>
+         <parent>cm:cmobject</parent>
+         <associations>
+            <child-association name="cm:subcategories">
+               <target>
+                  <class>sys:base</class>
+               </target>
+            </child-association>
+         </associations>
       </type>
-      
-      <type name="alf:valuedate">
-         <title>Date Value</title>
-         <parent>alf:propertyvalue</parent>
-         <properties>
-            <property name="alf:datevalue">
-               <type>d:datetime</type>
-            </property>
-         </properties>
-      </type>
-      
-      <type name="alf:valueinteger">
-         <title>Integer Value</title>
-         <parent>alf:propertyvalue</parent>
-         <properties>
-            <property name="alf:intvalue">
-               <type>d:int</type>
-            </property>
-         </properties>
-      </type>
-      
-      <type name="alf:valueboolean">
-         <title>Boolean Value</title>
-         <parent>alf:propertyvalue</parent>
-         <properties>
-            <property name="alf:booleanvalue">
-               <type>d:boolean</type>
-            </property>
-         </properties>
-      </type>
-      
-      <type name="alf:valuelong">
-         <title>Long Value</title>
-         <parent>alf:propertyvalue</parent>
-         <properties>
-            <property name="alf:longvalue">
-               <type>d:long</type>
-            </property>
-         </properties>
-      </type>
-      
-      <type name="alf:valuefloat">
-         <title>Float Value</title>
-         <parent>alf:propertyvalue</parent>
-         <properties>
-            <property name="alf:floatvalue">
-               <type>d:float</type>
-            </property>
-         </properties>
-      </type>
-   
-      <type name="alf:user">
-         <title>Temporary User Type</title>
-         <parent>alf:base</parent>
-         <properties>
-            <property name="alf:username">
-               <type>d:text</type>
-            </property>
-            <property name="alf:password">
-               <type>d:text</type>
-            </property>
-            <property name="alf:accountEnabled">
-               <type>d:boolean</type>
-            </property>
-            <property name="alf:accountExpiry">
-               <type>d:datetime</type>
-            </property>
-            <property name="alf:credentialsExpiry">
-               <type>d:datetime</type>
-            </property>
-            <property name="alf:accountLocked">
-               <type>d:boolean</type>
-            </property>
-            <property name="alf:salt">
-               <type>d:text</type>
-            </property>
-         </properties>
-      </type>
-      
+            
    </types>
    
    
    <aspects>
    
-      <!-- aspect to store the fundamental node identifiers -->
-      <aspect name="alf:referencable">
-         <title>Referencable</title>
+      <aspect name="cm:titled">
+         <title>Titled</title>
          <properties>
-            <property name="alf:store-protocol">
+            <property name="cm:title">
                <type>d:text</type>
-               <mandatory>true</mandatory>
             </property>
-            <property name="alf:store-identifier">
+            <property name="cm:description">
                <type>d:text</type>
-               <mandatory>true</mandatory>
             </property>
-            <property name="alf:node-uuid">
+         </properties>
+      </aspect>
+   
+      <aspect name="cm:auditable">
+         <title>Auditable</title>
+         <properties>
+            <property name="cm:created">
+               <type>d:datetime</type>
+            </property>
+            <property name="cm:creator">
                <type>d:text</type>
-               <mandatory>true</mandatory>
+            </property>
+            <property name="cm:modified">
+               <type>d:datetime</type>
+            </property>
+            <property name="cm:modifier">
+               <type>d:text</type>
+            </property>
+            <property name="cm:accessed">
+               <type>d:datetime</type>
             </property>
          </properties>
       </aspect>
 
-      <aspect name="alf:titled">
-         <title>Titled</title>
-         <properties>
-            <property name="alf:title">
-               <type>d:text</type>
-            </property>
-            <property name="alf:description">
-               <type>d:text</type>
-            </property>
-         </properties>
-      </aspect>
-   
-      <aspect name="alf:auditable">
-         <title>Auditable</title>
-         <properties>
-            <property name="alf:created">
-               <type>d:datetime</type>
-            </property>
-            <property name="alf:creator">
-               <!-- TODO: Association to User/Person? -->
-               <type>d:text</type>
-            </property>
-            <property name="alf:modified">
-               <type>d:datetime</type>
-            </property>
-            <property name="alf:modifier">
-               <!-- TODO: Association to User/Person? -->
-               <type>d:text</type>
-            </property>
-            <property name="alf:accessed">
-               <type>d:datetime</type>
-            </property>
-         </properties>
-      </aspect>
-   
-      <aspect name="alf:inlineeditable">
-         <title>Inline Editable</title>
-         <properties>
-            <property name="alf:editInline">
-               <type>d:boolean</type>
-            </property>
-         </properties>
-      </aspect>
-   
-      <aspect name="alf:localizable">
+      <aspect name="cm:localizable">
          <title>Localizable</title>
          <properties>
-            <property name="alf:locale">
+            <property name="cm:locale">
                <!-- need to have means to identify root instance of appropriate category -->
                <type>d:category</type>
             </property>
          </properties>
       </aspect>
-   
-      <aspect name="alf:translatable">
+
+      <aspect name="cm:translatable">
          <title>Translatable</title>
-         <parent>alf:localizable</parent>
+         <parent>cm:localizable</parent>
          <!-- TODO: Support mandatory-aspects on an aspect in the meta-model
          <mandatory-aspects>
-            <aspect>alf:localizable</aspect>
+            <aspect>cm:localizable</aspect>
          </mandatory-aspects>
          -->
          <associations>
-            <association name="alf:translations">
+            <association name="cm:translations">
                <source>
-                  <role>alf:translationOf</role>
+                  <role>cm:translationOf</role>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </source>
                <target>
-                  <class>alf:content</class>
-                  <role>alf:hasTranslation</role>
+                  <class>cm:content</class>
+                  <role>cm:hasTranslation</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -552,18 +238,18 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:transformable">
+      <aspect name="cm:transformable">
          <title>Transformable</title>
          <associations>
-            <association name="alf:formats">
+            <association name="cm:formats">
                <source>
-                  <role>alf:formatOf</role>
+                  <role>cm:formatOf</role>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </source>
                <target>
-                  <class>alf:content</class>
-                  <role>alf:hasFormat</role>
+                  <class>cm:content</class>
+                  <role>cm:hasFormat</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -571,83 +257,100 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:complianceable">
+      <aspect name="cm:complianceable">
          <title>Complianceable</title>
-         <parent>alf:auditable</parent>
+         <parent>cm:auditable</parent>
          <!-- TODO: Support mandatory-aspects on an aspect in the meta-model
          <mandatory-aspects>
             <aspect>Auditable</aspect>
          </mandatory-aspects>
          -->
          <properties>
-            <property name="alf:removeAfter">
+            <property name="cm:removeAfter">
                <type>d:datetime</type>
             </property>
          </properties>
       </aspect>
    
-      <aspect name="alf:dublincore">
+      <aspect name="cm:ownable">
+         <title>Ownable</title>
+         <associations>
+            <child-association name="cm:owner">
+               <source>
+                  <mandatory>true</mandatory>
+                  <many>false</many>
+               </source>
+               <target>
+                  <class>cm:person</class>
+                  <mandatory>true</mandatory>
+                  <many>false</many>
+               </target>
+            </child-association>
+         </associations>
+      </aspect>
+   
+      <aspect name="cm:dublincore">
          <title>Dublin Core</title>
-         <parent>alf:titled</parent>
+         <parent>cm:titled</parent>
          <!-- TODO: Support mandatory-aspects on an aspect in the meta-model
          <mandatory-aspects>
             <aspect>Auditable</aspect>
          </mandatory-aspects>
          -->
          <properties>
-            <property name="alf:publisher">
+            <property name="cm:publisher">
                <type>d:text</type>
             </property>
-            <property name="alf:contributor">
+            <property name="cm:contributor">
                <type>d:text</type>
             </property>
-            <property name="alf:type">
+            <property name="cm:type">
                <type>d:text</type>
             </property>
-            <property name="alf:identifier">
+            <property name="cm:identifier">
                <type>d:text</type>
             </property>
-            <property name="alf:dcsource">
+            <property name="cm:dcsource">
                <type>d:text</type>
             </property>
-            <property name="alf:coverage">
+            <property name="cm:coverage">
                <type>d:text</type>
             </property>
-            <property name="alf:rights">
+            <property name="cm:rights">
                <type>d:text</type>
             </property>
-            <property name="alf:subject">
+            <property name="cm:subject">
                <type>d:text</type>
             </property>
          </properties>
       </aspect>
    
       <!--
-      <aspect name="alf:subjectable">
+      <aspect name="cm:subjectable">
          <title>Subjectable</title>
          <mandatory-aspects>
             <aspect>Auditable</aspect>
          </mandatory-aspects>
          <properties>
-            <property name="alf:subject">
+            <property name="cm:subject">
                <type>d:text</type>
             </property>
          </properties>
       </aspect>
       -->
    
-      <aspect name="alf:basable">
+      <aspect name="cm:basable">
          <title>Basable</title>
          <associations>
-            <association name="alf:basis">
+            <association name="cm:basis">
                <source>
-                  <role>alf:basedOn</role>
+                  <role>cm:basedOn</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:content</class>
-                  <role>alf:hasBasis</role>
+                  <class>cm:content</class>
+                  <role>cm:hasBasis</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -655,18 +358,18 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:partable">
+      <aspect name="cm:partable">
          <title>Partable</title>
          <associations>
-            <association name="alf:parts">
+            <association name="cm:parts">
                <source>
-                  <role>alf:partOf</role>
+                  <role>cm:partOf</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:content</class>
-                  <role>alf:hasPart</role>
+                  <class>cm:content</class>
+                  <role>cm:hasPart</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -674,18 +377,18 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:referencing">
+      <aspect name="cm:referencing">
          <title>Referencing</title>
          <associations>
-            <association name="alf:references">
+            <association name="cm:references">
                <source>
-                  <role>alf:referencedBy</role>
+                  <role>cm:referencedBy</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:content</class>
-                  <role>alf:references</role>
+                  <class>cm:content</class>
+                  <role>cm:references</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -693,18 +396,18 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:replaceable">
+      <aspect name="cm:replaceable">
          <title>Replacable</title>
          <associations>
-            <association name="alf:replaces">
+            <association name="cm:replaces">
                <source>
-                  <role>alf:replacedBy</role>
+                  <role>cm:replacedBy</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:content</class>
-                  <role>alf:replaces</role>
+                  <class>cm:content</class>
+                  <role>cm:replaces</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -712,40 +415,40 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:effectivity">
+      <aspect name="cm:effectivity">
          <title>Effectivity</title>
          <properties>
-            <property name="alf:from">
+            <property name="cm:from">
                <type>d:datetime</type>
             </property>
-            <property name="alf:to">
+            <property name="cm:to">
                <type>d:datetime</type>
             </property>
          </properties>
       </aspect>
    
-      <aspect name="alf:summarizable">
+      <aspect name="cm:summarizable">
          <title>Summarizable</title>
          <properties>
-            <property name="alf:summary">
+            <property name="cm:summary">
                <type>d:text</type>
             </property>
          </properties>
       </aspect>
    
-      <aspect name="alf:countable">
+      <aspect name="cm:countable">
          <title>Countable</title>
          <properties>
-            <property name="alf:hits">
+            <property name="cm:hits">
                <type>d:int</type>
             </property>
          </properties>
       </aspect>
    
-      <aspect name="alf:copiedfrom">
+      <aspect name="cm:copiedfrom">
          <title>Copied From</title>
          <properties>
-            <property name="alf:source">
+            <property name="cm:source">
                <type>d:noderef</type>
                <protected>true</protected>
                <mandatory>true</mandatory>
@@ -754,10 +457,10 @@
          </properties>
       </aspect>
       
-      <aspect name="alf:workingcopy">
+      <aspect name="cm:workingcopy">
          <title>Working Copy</title>
          <properties>
-            <property name="alf:workingCopyOwner">
+            <property name="cm:workingCopyOwner">
                <type>d:noderef</type>
                <protected>true</protected>
                <mandatory>true</mandatory>
@@ -765,42 +468,42 @@
        	</properties>
       </aspect>
    
-      <aspect name="alf:versionable">
+      <aspect name="cm:versionable">
          <title>Versionable</title>
          <properties>
-            <property name="alf:versionLabel">
+            <property name="cm:versionLabel">
                <type>d:text</type>
             </property>
           </properties>
       </aspect>
       
-      <aspect name="alf:lockable">
+      <aspect name="cm:lockable">
          <title>Lockable</title>
          <properties>
-            <property name="alf:lockOwner">
+            <property name="cm:lockOwner">
                <type>d:noderef</type>
                <protected>true</protected>
             </property>
-            <property name="alf:lockType">
+            <property name="cm:lockType">
                <type>d:text</type>
                <protected>true</protected>
             </property>
-            <property name="alf:lockIsDeep">
+            <property name="cm:lockIsDeep">
                <type>d:boolean</type>
                <protected>true</protected>
             </property>
          </properties>
       </aspect>
       
-      <aspect name="alf:subscribable">
+      <aspect name="cm:subscribable">
          <associations>
-            <association name="alf:subscribedBy">
+            <association name="cm:subscribedBy">
                <source>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>alf:person</class>
+                  <class>cm:person</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -808,15 +511,15 @@
          </associations>
       </aspect>
    
-      <aspect name="alf:classifiable">
+      <aspect name="cm:classifiable">
          <title>Classifiable</title>
       </aspect>
    
-      <aspect name="alf:generalclassifiable">
+      <aspect name="cm:generalclassifiable">
          <title>General Classifiable</title>
-         <parent>alf:classifiable</parent>
+         <parent>cm:classifiable</parent>
          <properties>
-            <property name="alf:categories">
+            <property name="cm:categories">
                <type>d:category</type>
                <mandatory>false</mandatory>
                <multiple>true</multiple>
@@ -827,116 +530,6 @@
                </index>
             </property>         
          </properties>
-      </aspect>
-   
-      <aspect name="alf:permissionable">
-         <title>Permissionable</title>
-      </aspect>
-   
-      <aspect name="alf:rolepermissionable">
-         <title>Role Permissionable</title>
-         <parent>alf:permissionable</parent>
-         <associations>
-            <association name="alf:personRole">
-               <source>
-                  <mandatory>false</mandatory>
-                  <many>true</many>
-               </source>
-               <target>
-                  <class>alf:person</class>
-                  <mandatory>false</mandatory>
-                  <many>false</many>
-               </target>
-            </association>
-         </associations>
-      </aspect>
-   
-      <aspect name="alf:workflow">
-         <title>Workflow</title>
-      </aspect>
-   
-      <aspect name="alf:simpleworkflow">
-         <parent>alf:workflow</parent>
-         <properties>
-            <property name="alf:approveStep">
-               <type>d:text</type>
-               <protected>true</protected>
-            </property>
-            <property name="alf:approveFolder">
-               <type>d:path</type>
-               <protected>true</protected>
-            </property>
-            <property name="alf:approveMove">
-               <type>d:boolean</type>
-            </property>
-            <property name="alf:rejectStep">
-               <type>d:text</type>
-               <protected>true</protected>
-            </property>
-            <property name="alf:rejectFolder">
-               <type>d:path</type>
-               <protected>true</protected>
-            </property>
-            <property name="alf:rejectMove">
-               <type>d:boolean</type>
-            </property>
-         </properties>
-      </aspect>
-
-      <!-- System / Application level ??? -->
-
-      <aspect name="alf:aspect_root">
-         <title>Root</title>
-      </aspect>
-      
-      <aspect name="alf:configurable">
-         <title>Configurable</title>
-         <associations>
-            <child-association name="alf:configurations">
-               <source>
-                  <mandatory>false</mandatory>
-                  <many>false</many>
-               </source>
-               <target>
-                  <class>alf:configurations</class>
-                  <mandatory>false</mandatory>
-                  <many>false</many>
-               </target>
-            </child-association>
-         </associations>
-      </aspect>
-   
-      <aspect name="alf:actionable">
-         <title>Actionable</title>
-         <parent>alf:configurable</parent>
-      </aspect>
-         
-      <aspect name="alf:uifacets">
-         <title>UI Facets</title>
-         <parent>alf:titled</parent>
-         <properties>
-            <property name="alf:icon">
-               <type>d:text</type>
-            </property>
-         </properties>
-      </aspect>
-   
-   
-      <aspect name="alf:ownable">
-         <title>Ownable</title>
-         <associations>
-            <child-association name="alf:owner">
-               <source>
-                  <mandatory>true</mandatory>
-                  <many>false</many>
-               </source>
-               <target>
-                  <class>alf:person</class>
-                  <mandatory>true</mandatory>
-                  <many>false</many>
-               </target>
-            </child-association>
-         </associations>
       </aspect>
       
    </aspects>

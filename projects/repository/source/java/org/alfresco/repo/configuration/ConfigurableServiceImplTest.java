@@ -60,8 +60,8 @@ public class ConfigurableServiceImplTest extends BaseSpringTest
         // Create the node used for tests
         this.nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 	}
 

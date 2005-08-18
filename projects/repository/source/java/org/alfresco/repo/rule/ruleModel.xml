@@ -1,0 +1,37 @@
+<model name="rule:rulemodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <description>Alfresco Rule Model</description>
+   <author>Alfresco</author>
+   <published>2005-08-16</published>
+   <version>0.1</version>
+
+   <imports>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/action/1.0" prefix="act"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/model/rule/1.0" prefix="rule"/>
+   </namespaces>
+
+   
+   <types>
+   
+	  <type name="rule:rule">
+	     <title>Rule</title>
+	     <parent>act:compositeaction</parent>
+	     <properties>
+            <property name="rule:ruleType">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="rule:applyToChildren">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+	  </type>
+
+	</types>
+
+</model>

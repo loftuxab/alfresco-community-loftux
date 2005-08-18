@@ -1,4 +1,4 @@
-<model name="vsbt:versionstorebasetestmodel" xmlns="http://www.alfresco.org/dictionary/0.1">
+<model name="test:versionstorebasetestmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
    <description>VersionStoreBaseTest model</description>
    <author>Alfresco</author>
@@ -6,33 +6,33 @@
    <version>1.0</version>
    
    <imports>
-      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
-	  <import uri="http://www.alfresco.org/1.0" prefix="alf"/>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
    </imports>
    
    <namespaces>
-      <namespace uri="http://www.alfresco.org/test/versionstorebasetest/1.0" prefix="vsbt"/>
+      <namespace uri="http://www.alfresco.org/test/versionstorebasetest/1.0" prefix="test"/>
    </namespaces>
 
    <types>
       
-      <type name="vsbt:testtype">
+      <type name="test:testtype">
          <title>Test type</title>
          <description>The test type</description>
-         <parent>alf:content</parent>
+         <parent>cm:content</parent>
          
          <properties>
-            <property name="vsbt:prop1">
+            <property name="test:prop1">
                <type>d:text</type>
                <protected>false</protected>
                <default></default>
             </property>
-            <property name="vsbt:prop2">
+            <property name="test:prop2">
                <type>d:text</type>
                <protected>false</protected>
                <default></default>
             </property>
-            <property name="vsbt:prop3">
+            <property name="test:prop3">
                <type>d:text</type>
                <protected>false</protected>
                <default></default>
@@ -40,37 +40,37 @@
          </properties>
          
          <associations>
-            <association name="vsbt:assoc1">
+            <association name="test:assoc1">
                <source>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </source>
                <target>
-                  <class>vsbt:testtype</class>
+                  <class>test:testtype</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
             </association>
-            <child-association name="vsbt:childassoc1">
+            <child-association name="test:childassoc1">
                <source>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>vsbt:testtype</class>
+                  <class>test:testtype</class>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
                <child-name>childassoc1</child-name>
                <duplicate>true</duplicate>
             </child-association>
-            <child-association name="vsbt:childassoc2">
+            <child-association name="test:childassoc2">
                <source>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
-                  <class>vsbt:testtype</class>
+                  <class>test:testtype</class>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
@@ -83,19 +83,19 @@
 	</types>
    
    	<aspects>
-		  <aspect name="vsbt:testaspect">
+		  <aspect name="test:testaspect">
 			 <title>Test Aspect</title>
 			 <description>The test aspect</description>
 			 <parent></parent>
 			 
 			 <properties>
 
-				<property name="vsbt:aspectprop1">
+				<property name="test:aspectprop1">
 					<type>d:text</type>
 					<protected>false</protected>
 					<default></default>
 				</property>
-				<property name="vsbt:aspectprop2">
+				<property name="test:aspectprop2">
 					<type>d:text</type>
 					<protected>false</protected>
 					<default></default>

@@ -55,6 +55,7 @@ import org.alfresco.util.GUID;
  */
 public class RuleServiceImpl implements RuleService, RuntimeRuleService
 {
+    
     /** key against which to store rules pending on the current transaction */
     private static final String KEY_RULES_PENDING = "RuleServiceImpl.PendingRules";
     
@@ -64,8 +65,8 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     /**
      * Association names used internally
      */
-	private static final QName ASSOC_NAME_RULE_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "rules");
-	private static final QName ASSOC_NAME_RULES = QName.createQName(NamespaceService.ALFRESCO_URI, "rules");
+	private static final QName ASSOC_NAME_RULE_FOLDER = QName.createQName(ContentModel.RULE_MODEL_URI, "rules");
+	private static final QName ASSOC_NAME_RULES = QName.createQName(ContentModel.RULE_MODEL_URI, "rules");
     
     /**
      * The node service
@@ -412,11 +413,11 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 		NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
 		
 		DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
-		namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+		namespacePrefixResolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
 		
 		List<NodeRef> nodeRefs = searchService.selectNodes(
 				ruleFolderNodeRef, 
-				"*[@alf:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + ruleId + "']",
+				"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + ruleId + "']",
 				null,
 				namespacePrefixResolver,
 				false);

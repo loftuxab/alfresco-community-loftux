@@ -149,7 +149,7 @@ public class Node implements Serializable
       if (this.name == null)
       {
          // try and get the name from the properties first
-         this.name = (String)getProperties().get("name");
+         this.name = (String)getProperties().get("cm:name");
          
          // if we didn't find it as a property get the name from the association name
          if (this.name == null)

@@ -121,7 +121,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
                 throw new AlfrescoRuntimeException("Root path has not been configured, is 'root-path' element missing?");
             }
 
-            String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(rootPath);
+            String companyXPath = NamespaceService.APP_MODEL_PREFIX + ":" + QName.createValidLocalName(rootPath);
             List<NodeRef> nodes = searchService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
             if (nodes.size() == 0)
             {

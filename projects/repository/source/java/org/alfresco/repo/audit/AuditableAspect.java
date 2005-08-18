@@ -102,10 +102,7 @@ public class AuditableAspect
         policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateNode"), ContentModel.ASPECT_AUDITABLE, onUpdateAudit);
         
 		// Register onCopy class behaviour
-		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-				ContentModel.ASPECT_AUDITABLE,
-				new JavaBehaviour(this, "onCopy"));
+		policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"), ContentModel.ASPECT_AUDITABLE, new JavaBehaviour(this, "onCopy"));
     }
 
     /**

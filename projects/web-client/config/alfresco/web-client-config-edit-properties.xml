@@ -32,9 +32,9 @@
       </property-sheet>
    </config>
    
-   <config evaluator="aspect-name" condition="inlineeditable">
+   <config evaluator="aspect-name" condition="app:inlineeditable">
       <property-sheet>
-         <show-property name="editInline" displayLabel="Edit Inline" />
+         <show-property name="app:editInline" displayLabel="Edit Inline" />
       </property-sheet>
    </config>
    

@@ -1,0 +1,86 @@
+<model name="sys:systemmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+	<description>Alfresco Repository System Definitions</description>
+	<author>Alfresco</author>
+	<published>2005-08-16</published>
+	<version>0.1</version>
+
+	<imports>
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />
+	</imports>
+
+	<namespaces>
+		<namespace uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+	</namespaces>
+
+	<types>
+
+		<type name="sys:base">
+			<title>Base</title>
+			<mandatory-aspects>
+				<aspect>sys:referencable</aspect>
+			</mandatory-aspects>
+		</type>
+
+		<type name="sys:container">
+			<title>Container</title>
+			<parent>sys:base</parent>
+			<associations>
+				<child-association name="sys:children">
+					<target>
+						<class>sys:base</class>
+					</target>
+				</child-association>
+			</associations>
+		</type>
+
+		<type name="sys:store_root">
+			<title>Store Root</title>
+			<parent>sys:container</parent>
+			<mandatory-aspects>
+				<aspect>sys:aspect_root</aspect>
+			</mandatory-aspects>
+		</type>
+
+		<type name="sys:reference">
+			<title>Reference</title>
+			<parent>sys:base</parent>
+			<properties>
+				<property name="sys:reference">
+					<type>d:noderef</type>
+					<mandatory>true</mandatory>
+				</property>
+			</properties>
+		</type>
+
+	</types>
+
+
+	<aspects>
+
+		<aspect name="sys:aspect_root">
+			<title>Root</title>
+		</aspect>
+
+		<!-- aspect to store the fundamental node identifiers -->
+		<aspect name="sys:referencable">
+			<title>Referencable</title>
+			<properties>
+				<property name="sys:store-protocol">
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="sys:store-identifier">
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="sys:node-uuid">
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+			</properties>
+		</aspect>
+
+	</aspects>
+
+</model>

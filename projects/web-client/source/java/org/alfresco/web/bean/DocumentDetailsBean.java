@@ -301,19 +301,19 @@ public class DocumentDetailsBean
          Map<String, Object> props = getDocument().getProperties();
 
          String approveStepName = (String)props.get(
-               ContentModel.PROP_APPROVE_STEP.getLocalName());
+               ContentModel.PROP_APPROVE_STEP.toString());
          String rejectStepName = (String)props.get(
-               ContentModel.PROP_REJECT_STEP.getLocalName());
+               ContentModel.PROP_REJECT_STEP.toString());
          
          Boolean approveMove = (Boolean)props.get(
-               ContentModel.PROP_APPROVE_MOVE.getLocalName());
+               ContentModel.PROP_APPROVE_MOVE.toString());
          Boolean rejectMove = (Boolean)props.get(
-               ContentModel.PROP_REJECT_MOVE.getLocalName());
+               ContentModel.PROP_REJECT_MOVE.toString());
          
          NodeRef approveFolder = (NodeRef)props.get(
-               ContentModel.PROP_APPROVE_FOLDER.getLocalName());
+               ContentModel.PROP_APPROVE_FOLDER.toString());
          NodeRef rejectFolder = (NodeRef)props.get(
-               ContentModel.PROP_REJECT_FOLDER.getLocalName());
+               ContentModel.PROP_REJECT_FOLDER.toString());
          
          String approveFolderName = null;
          String rejectFolderName = null;
@@ -387,19 +387,19 @@ public class DocumentDetailsBean
          Map<String, Object> props = getDocument().getProperties();
          
          String approveStepName = (String)props.get(
-               ContentModel.PROP_APPROVE_STEP.getLocalName());
+               ContentModel.PROP_APPROVE_STEP.toString());
          String rejectStepName = (String)props.get(
-               ContentModel.PROP_REJECT_STEP.getLocalName());
+               ContentModel.PROP_REJECT_STEP.toString());
          
          Boolean approveMove = (Boolean)props.get(
-               ContentModel.PROP_APPROVE_MOVE.getLocalName());
+               ContentModel.PROP_APPROVE_MOVE.toString());
          Boolean rejectMove = (Boolean)props.get(
-               ContentModel.PROP_REJECT_MOVE.getLocalName());
+               ContentModel.PROP_REJECT_MOVE.toString());
          
          NodeRef approveFolder = (NodeRef)props.get(
-               ContentModel.PROP_APPROVE_FOLDER.getLocalName());
+               ContentModel.PROP_APPROVE_FOLDER.toString());
          NodeRef rejectFolder = (NodeRef)props.get(
-               ContentModel.PROP_REJECT_FOLDER.getLocalName());
+               ContentModel.PROP_REJECT_FOLDER.toString());
 
          // put the workflow properties in a separate map for use by the JSP
          this.workflowProperties = new HashMap<String, String>(6);
@@ -544,7 +544,7 @@ public class DocumentDetailsBean
       if (getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW))
       {
          approveStepName = (String)getDocument().getProperties().get(
-               ContentModel.PROP_APPROVE_STEP.getLocalName());
+               ContentModel.PROP_APPROVE_STEP.toString());
       }
       
       return approveStepName; 
@@ -576,8 +576,8 @@ public class DocumentDetailsBean
       // get the simple workflow aspect properties
       Map<String, Object> props = docNode.getProperties();
       
-      Boolean approveMove = (Boolean)props.get(ContentModel.PROP_APPROVE_MOVE.getLocalName());
-      NodeRef approveFolder = (NodeRef)props.get(ContentModel.PROP_APPROVE_FOLDER.getLocalName());
+      Boolean approveMove = (Boolean)props.get(ContentModel.PROP_APPROVE_MOVE.toString());
+      NodeRef approveFolder = (NodeRef)props.get(ContentModel.PROP_APPROVE_FOLDER.toString());
       
       UserTransaction tx = null;
       try
@@ -593,14 +593,14 @@ public class DocumentDetailsBean
             // move the document to the specified folder
             String qname = QName.createValidLocalName(docNode.getName());
             this.nodeService.moveNode(docNodeRef, approveFolder, ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, qname));
+                  QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname));
          }
          else
          {
             // copy the document to the specified folder
             String qname = QName.createValidLocalName(docNode.getName());
             this.copyService.copy(docNodeRef, approveFolder, ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, qname));
+                  QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname));
          }
          
          // commit the transaction
@@ -642,7 +642,7 @@ public class DocumentDetailsBean
       if (getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW))
       {
          approveStepName = (String)getDocument().getProperties().get(
-               ContentModel.PROP_REJECT_STEP.getLocalName());
+               ContentModel.PROP_REJECT_STEP.toString());
       }
       
       return approveStepName;
@@ -674,9 +674,9 @@ public class DocumentDetailsBean
       // get the simple workflow aspect properties
       Map<String, Object> props = docNode.getProperties();
       
-      String rejectStep = (String)props.get(ContentModel.PROP_REJECT_STEP.getLocalName());
-      Boolean rejectMove = (Boolean)props.get(ContentModel.PROP_REJECT_MOVE.getLocalName());
-      NodeRef rejectFolder = (NodeRef)props.get(ContentModel.PROP_REJECT_FOLDER.getLocalName());
+      String rejectStep = (String)props.get(ContentModel.PROP_REJECT_STEP.toString());
+      Boolean rejectMove = (Boolean)props.get(ContentModel.PROP_REJECT_MOVE.toString());
+      NodeRef rejectFolder = (NodeRef)props.get(ContentModel.PROP_REJECT_FOLDER.toString());
       
       if (rejectStep == null && rejectMove == null && rejectFolder == null)
       {
@@ -697,14 +697,14 @@ public class DocumentDetailsBean
             // move the document to the specified folder
             String qname = QName.createValidLocalName(docNode.getName());
             this.nodeService.moveNode(docNodeRef, rejectFolder, ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, qname));
+                  QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname));
          }
          else
          {
             // copy the document to the specified folder
             String qname = QName.createValidLocalName(docNode.getName());
             this.copyService.copy(docNodeRef, rejectFolder, ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, qname));
+                  QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname));
          }
          
          // commit the transaction

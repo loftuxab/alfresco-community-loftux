@@ -1,19 +1,21 @@
-<v:view xmlns:v="http://www.alfresco.org/repository/view/0.1" xmlns:alf="http://www.alfresco.org/1.0">
+<view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
+           xmlns:cm="http://www.alfresco.org/model/content/1.0"
+           xmlns:app="http://www.alfresco.org/model/application/1.0">
 
-   <alf:folder>
-       <alf:uifacets/>
-       <alf:name>Alfresco Tutorial</alf:name>
-       <alf:icon>space-icon-doc</alf:icon>
-       <alf:contains>
-       <alf:content>
-          <alf:uifacets/>
-	      <alf:title>Alfresco Tutorial</alf:title>
-	      <alf:name>Alfresco Tutorial.pdf</alf:name>
-	      <alf:description>Getting started guide</alf:description>
-          <alf:mimetype>application/pdf</alf:mimetype>
-          <alf:contentUrl>classpath:alfresco/bootstrap/Alfresco Tutorial.pdf</alf:contentUrl>
-       </alf:content>
-       </alf:contains>
-   </alf:folder>
+	<cm:folder>
+		<app:uifacets />
+		<cm:name>Alfresco Tutorial</cm:name>
+		<app:icon>space-icon-doc</app:icon>
+		<cm:contains>
+			<cm:content>
+				<app:uifacets />
+				<cm:title>Alfresco Tutorial</cm:title>
+				<cm:name>Alfresco Tutorial.pdf</cm:name>
+				<cm:description>Getting started guide</cm:description>
+				<cm:mimetype>application/pdf</cm:mimetype>
+				<cm:contentUrl>classpath:alfresco/bootstrap/Alfresco Tutorial.pdf</cm:contentUrl>
+			</cm:content>
+		</cm:contains>
+	</cm:folder>
 
-</v:view>
+</view:view>

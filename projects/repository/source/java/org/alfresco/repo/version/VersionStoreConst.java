@@ -32,7 +32,7 @@ public interface VersionStoreConst
     /**
      * Namespace
      */
-    public static final String NAMESPACE_URI = "http://www.alfresco.org/lightweightversionstore/1.0";
+    public static final String NAMESPACE_URI = "http://www.alfresco.org/model/versionstore/1.0";
     
 	 /**
      * The store protocol

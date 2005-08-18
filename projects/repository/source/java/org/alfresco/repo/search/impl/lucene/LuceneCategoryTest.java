@@ -158,8 +158,8 @@ public class LuceneCategoryTest extends TestCase
         
         // Categories
         
-        catContainer = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryContainer"), ContentModel.TYPE_CONTAINER).getChildRef();
-        catRoot = nodeService.createNode(catContainer, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryRoot"), ContentModel.TYPE_CATEGORYROOT).getChildRef();
+        catContainer = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "categoryContainer"), ContentModel.TYPE_CONTAINER).getChildRef();
+        catRoot = nodeService.createNode(catContainer, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "categoryRoot"), ContentModel.TYPE_CATEGORYROOT).getChildRef();
        
        
         
@@ -252,12 +252,12 @@ public class LuceneCategoryTest extends TestCase
     {
         M2Model model = M2Model.createModel("test:lucenecategory");
         model.createNamespace(TEST_NAMESPACE, "test");
-        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, "d");
-        model.createImport(NamespaceService.ALFRESCO_URI, "alf");
+        model.createImport(NamespaceService.DICTIONARY_MODEL_1_0_URI, NamespaceService.DICTIONARY_MODEL_PREFIX);
+        model.createImport(NamespaceService.CONTENT_MODEL_1_0_URI, NamespaceService.CONTENT_MODEL_PREFIX);
         
         regionCategorisationQName = QName.createQName(TEST_NAMESPACE, "Region");
         M2Aspect generalCategorisation = model.createAspect("test:" + regionCategorisationQName.getLocalName());
-        generalCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
+        generalCategorisation.setParentName("cm:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property genCatProp = generalCategorisation.createProperty("test:region");
         genCatProp.setIndexed(true);
         genCatProp.setIndexedAtomically(true);
@@ -269,7 +269,7 @@ public class LuceneCategoryTest extends TestCase
         
         assetClassCategorisationQName = QName.createQName(TEST_NAMESPACE, "AssetClass");
         M2Aspect assetClassCategorisation = model.createAspect("test:" + assetClassCategorisationQName.getLocalName());
-        assetClassCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
+        assetClassCategorisation.setParentName("cm:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property acProp = assetClassCategorisation.createProperty("test:assetClass");
         acProp.setIndexed(true);
         acProp.setIndexedAtomically(true);
@@ -281,7 +281,7 @@ public class LuceneCategoryTest extends TestCase
         
         investmentRegionCategorisationQName = QName.createQName(TEST_NAMESPACE, "InvestmentRegion");
         M2Aspect investmentRegionCategorisation = model.createAspect("test:" + investmentRegionCategorisationQName.getLocalName());
-        investmentRegionCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
+        investmentRegionCategorisation.setParentName("cm:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property irProp = investmentRegionCategorisation.createProperty("test:investmentRegion");
         irProp.setIndexed(true);
         irProp.setIndexedAtomically(true);
@@ -293,7 +293,7 @@ public class LuceneCategoryTest extends TestCase
         
         marketingRegionCategorisationQName = QName.createQName(TEST_NAMESPACE, "MarketingRegion");
         M2Aspect marketingRegionCategorisation = model.createAspect("test:" + marketingRegionCategorisationQName.getLocalName());
-        marketingRegionCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
+        marketingRegionCategorisation.setParentName("cm:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property mrProp =  marketingRegionCategorisation.createProperty("test:marketingRegion");
         mrProp.setIndexed(true);
         mrProp.setIndexedAtomically(true);
@@ -391,33 +391,33 @@ public class LuceneCategoryTest extends TestCase
         assertEquals(6, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot/test:AssetClass\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot/test:AssetClass\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot/test:AssetClass/member\" ", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot/test:AssetClass/member\" ", null, null);
         assertEquals(1, results.length());
         results.close();
         
         
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot/test:AssetClass/test:Fixed\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot/test:AssetClass/test:Fixed\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot/test:AssetClass/test:Equity\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot/test:AssetClass/test:Equity\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
@@ -517,7 +517,7 @@ public class LuceneCategoryTest extends TestCase
         assertEquals(2, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PATH:\"/alf:categoryContainer/alf:categoryRoot/test:AssetClass/test:Fixed/member\" AND +PATH:\"/alf:categoryContainer/alf:categoryRoot/test:Region/test:Europe/member\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PATH:\"/cm:categoryContainer/cm:categoryRoot/test:AssetClass/test:Fixed/member\" AND +PATH:\"/cm:categoryContainer/cm:categoryRoot/test:Region/test:Europe/member\"", null, null);
         //printPaths(results);
         assertEquals(2, results.length());
         results.close();
@@ -543,11 +543,11 @@ public class LuceneCategoryTest extends TestCase
         
         ResultSet 
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot/test:AssetClass/*\" ", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot/test:AssetClass/*\" ", null, null);
         assertEquals(3, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/alf:categoryContainer/alf:categoryRoot/test:AssetClass/member\" ", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/cm:categoryContainer/cm:categoryRoot/test:AssetClass/member\" ", null, null);
         assertEquals(1, results.length());
         results.close();
         
@@ -599,7 +599,7 @@ public class LuceneCategoryTest extends TestCase
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);
-        nspr.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        nspr.addDynamicNamespace(NamespaceService.CONTENT_MODEL_PREFIX, NamespaceService.CONTENT_MODEL_1_0_URI);
         nspr.addDynamicNamespace("namespace", "namespace");
         nspr.addDynamicNamespace("test", TEST_NAMESPACE);
         nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);

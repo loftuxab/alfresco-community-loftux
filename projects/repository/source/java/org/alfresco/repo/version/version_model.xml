@@ -1,4 +1,4 @@
-<model name="alf:versionmodel" xmlns="http://www.alfresco.org/dictionary/0.1">
+<model name="ver:versionmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
    <description>Alfresco Version Store Model</description>
    <author>Alfresco</author>
@@ -6,18 +6,19 @@
    <version>0.1</version>
    
    <imports>
-      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
-      <import uri="http://www.alfresco.org/1.0" prefix="alf"/>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
    </imports>
    
    <namespaces>
-      <namespace uri="http://www.alfresco.org/lightweightversionstore/1.0" prefix="ver"/>
+      <namespace uri="http://www.alfresco.org/model/versionstore/1.0" prefix="ver"/>
    </namespaces>
 
    <types>
       
 	  <type name="ver:versionMetaDataValue">
-         <parent>alf:base</parent>
+         <parent>sys:base</parent>
          
          <properties>
             <property name="ver:metaDataName">
@@ -30,7 +31,7 @@
       </type>
 	  
       <type name="ver:versionedProperty">
-         <parent>alf:base</parent>
+         <parent>sys:base</parent>
          
          <properties>
             <property name="ver:qname">
@@ -43,7 +44,7 @@
       </type>
 
       <type name="ver:versionedAssoc">
-         <parent>alf:reference</parent>
+         <parent>sys:reference</parent>
          
          <properties>
             <property name="ver:assocQName">
@@ -66,7 +67,7 @@
       </type>
 
       <type name="ver:version">
-         <parent>alf:container</parent>
+         <parent>sys:container</parent>
          
          <properties>
             <property name="ver:versionNumber">
@@ -127,12 +128,12 @@
          </associations>
 		 
          <mandatory-aspects>
-            <aspect>alf:auditable</aspect>
+            <aspect>cm:auditable</aspect>
          </mandatory-aspects>
       </type>
       
       <type name="ver:versionHistory">
-         <parent>alf:base</parent>
+         <parent>sys:base</parent>
          
          <properties>
             <property name="ver:versionedNodeId">

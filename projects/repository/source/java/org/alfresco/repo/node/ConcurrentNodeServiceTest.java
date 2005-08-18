@@ -75,7 +75,7 @@ public class ConcurrentNodeServiceTest extends TestCase
         DictionaryDAO dictionaryDao = (DictionaryDAO) ctx.getBean("dictionaryDAO");
         // load the system model
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
-        InputStream modelStream = cl.getResourceAsStream("alfresco/model/contentModel.xml");
+        InputStream modelStream = cl.getResourceAsStream("alfresco/model/systemModel.xml");
         assertNotNull(modelStream);
         M2Model model = M2Model.createModel(modelStream);
         dictionaryDao.putModel(model);
@@ -279,7 +279,9 @@ public class ConcurrentNodeServiceTest extends TestCase
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);
-        nspr.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+        nspr.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+        nspr.addDynamicNamespace(NamespaceService.CONTENT_MODEL_PREFIX, NamespaceService.CONTENT_MODEL_1_0_URI);
+        nspr.addDynamicNamespace(NamespaceService.APP_MODEL_PREFIX, NamespaceService.APP_MODEL_1_0_URI);
         nspr.addDynamicNamespace("namespace", "namespace");
         nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;

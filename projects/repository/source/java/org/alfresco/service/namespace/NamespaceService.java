@@ -31,55 +31,54 @@ import java.util.Collection;
  */
 public interface NamespaceService extends NamespacePrefixResolver
 {
-
-    /**
-     * Default Namespace URI
-     */
+    /** Default Namespace URI */
     public static final String DEFAULT_URI = "";
     
-    /**
-     * Default Namespace Prefix
-     */
+    /** Default Namespace Prefix */
     public static final String DEFAULT_PREFIX = "";
 
-    /**
-     * Alfresco Dictionary Namespace URI
-     */
-    public static final String ALFRESCO_DICTIONARY_URI = "http://www.alfresco.org/dictionary/0.1";
+    /** Default Alfresco URI */
+    public static final String ALFRESCO_URI = "http://www.alfresco.org";
     
-    /**
-     * Alfresco Dictionary Namespace Prefix
-     */
-    public static final String ALFRESCO_DICTIONARY_PREFIX = "d";
-
-    /**
-     * Alfresco View Namespace URI
-     */
-    public static final String ALFRESCO_VIEW_URI = "http://www.alfresco.org/repository/view/0.1";
-    
-    /**
-     * Alfresco View Namespace Prefix
-     */
-    public static final String ALFRESCO_VIEW_PREFIX = "v";
-    
-    /**
-     * Alfresco Namespace URI
-     */
-    public static final String ALFRESCO_URI = "http://www.alfresco.org/1.0";
-    
-    /**
-     * Alfresco Namespace Prefix
-     */
+    /** Default Alfresco Prefix */
     public static final String ALFRESCO_PREFIX = "alf";
+    
+    /** Dictionary Model URI */
+    public static final String DICTIONARY_MODEL_1_0_URI = "http://www.alfresco.org/model/dictionary/1.0";
+    
+    /** Dictionary Model Prefix */
+    public static final String DICTIONARY_MODEL_PREFIX = "d";
 
+    /** System Model URI */
+    public static final String SYSTEM_MODEL_1_0_URI = "http://www.alfresco.org/model/system/1.0";
+
+    /** System Model Prefix */
+    public static final String SYSTEM_MODEL_PREFIX = "sys";
+
+    /** Content Model URI */
+    public static final String CONTENT_MODEL_1_0_URI = "http://www.alfresco.org/model/content/1.0";
+
+    /** Content Model Prefix */
+    public static final String CONTENT_MODEL_PREFIX = "cm";
+
+    /** Application Model URI */
+    public static final String APP_MODEL_1_0_URI = "http://www.alfresco.org/model/application/1.0";
+
+    /** Application Model Prefix */
+    public static final String APP_MODEL_PREFIX = "app";
+
+    /** Alfresco View Namespace URI */
+    public static final String REPOSITORY_VIEW_1_0_URI = "http://www.alfresco.org/view/repository/1.0";
+    
+    /** Alfresco View Namespace Prefix */
+    public static final String REPOSITORY_VIEW_PREFIX = "view";
+    
     
     /**
      * Gets all registered Namespace URIs
      * 
      * @return collection of all registered namespace URIs
      */
-    Collection<String> getURIs();
-
-  
+    public Collection<String> getURIs();
     
 }

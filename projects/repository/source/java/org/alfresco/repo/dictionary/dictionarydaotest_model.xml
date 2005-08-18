@@ -1,4 +1,4 @@
-<model name="test:dictionarydaotest" xmlns="http://www.alfresco.org/dictionary/0.1">
+<model name="test:dictionarydaotest" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
    <description>Alfresco Content Model</description>
    <author>Alfresco</author>
@@ -6,7 +6,7 @@
    <version>1.0</version>
    
    <imports>
-      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
    </imports>
    
    <namespaces>

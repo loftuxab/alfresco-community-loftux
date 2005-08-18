@@ -1,0 +1,52 @@
+<model name="usr:usermodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <description>Alfresco User Model</description>
+   <author>Alfresco</author>
+   <published>2005-08-16</published>
+   <version>0.1</version>
+
+   <imports>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/model/user/1.0" prefix="usr"/>
+   </namespaces>
+
+   
+   <types>
+      
+      <type name="usr:user">
+         <title>Temporary User Type</title>
+         <parent>sys:base</parent>
+         <properties>
+            <property name="usr:username">
+               <type>d:text</type>
+            </property>
+            <property name="usr:password">
+               <type>d:text</type>
+            </property>
+            <property name="usr:accountEnabled">
+               <type>d:boolean</type>
+            </property>
+            <property name="usr:accountExpiry">
+               <type>d:datetime</type>
+            </property>
+            <property name="usr:credentialsExpiry">
+               <type>d:datetime</type>
+            </property>
+            <property name="usr:accountLocked">
+               <type>d:boolean</type>
+            </property>
+            <property name="usr:salt">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+     
+
+   </types>
+   
+   
+</model>

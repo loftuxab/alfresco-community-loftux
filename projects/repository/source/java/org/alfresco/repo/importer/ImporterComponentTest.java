@@ -26,6 +26,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 
 public class ImporterComponentTest extends BaseSpringTest
@@ -48,7 +49,7 @@ public class ImporterComponentTest extends BaseSpringTest
     }
 
     
-    public void testImport()
+    public void xtestImport()
     {
         InputStream test = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/importer/importercomponent_test.xml");
         TestProgress testProgress = new TestProgress();
@@ -69,10 +70,11 @@ public class ImporterComponentTest extends BaseSpringTest
         configuration.put("glossaryName", "glossary name");
         configuration.put("templatesName", "template name");
 
-        importerBootstrap.setStoreUrl(this.storeRef.toString());
+        StoreRef bootstrapStoreRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        importerBootstrap.setStoreUrl(bootstrapStoreRef.toString());
         importerBootstrap.setConfiguration(configuration);
         importerBootstrap.bootstrap();
-        //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
     
     
@@ -81,23 +83,23 @@ public class ImporterComponentTest extends BaseSpringTest
     {
         public void nodeCreated(NodeRef nodeRef, NodeRef parentRef, QName assocName, QName childName)
         {
-//            System.out.println("TestProgress: created node " + nodeRef + " within parent " + parentRef + " named " + childName +
-//                    " (association " + assocName + ")");
+            System.out.println("TestProgress: created node " + nodeRef + " within parent " + parentRef + " named " + childName +
+                    " (association " + assocName + ")");
         }
 
         public void contentCreated(NodeRef nodeRef, String sourceUrl)
         {
-//            System.out.println("TestProgress: created content " + nodeRef + " from url " + sourceUrl);
+            System.out.println("TestProgress: created content " + nodeRef + " from url " + sourceUrl);
         }
 
         public void propertySet(NodeRef nodeRef, QName property, Serializable value)
         {
-//            System.out.println("TestProgress: set property " + property + " on node " + nodeRef + " to value " + value);
+            System.out.println("TestProgress: set property " + property + " on node " + nodeRef + " to value " + value);
         }
 
         public void aspectAdded(NodeRef nodeRef, QName aspect)
         {
-//            System.out.println("TestProgress: added aspect " + aspect + " to node ");
+            System.out.println("TestProgress: added aspect " + aspect + " to node ");
         }
     }
     

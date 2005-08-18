@@ -55,9 +55,9 @@ public abstract class TestWithUserUtils extends BaseSpringTest
             AuthenticationService authenticationService)
     {        
         QName children = ContentModel.ASSOC_CHILDREN;
-        QName system = QName.createQName(NamespaceService.ALFRESCO_URI, "system");
+        QName system = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "system");
         QName container = ContentModel.TYPE_CONTAINER;
-        QName types = QName.createQName(NamespaceService.ALFRESCO_URI, "people");
+        QName types = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "people");
         
         NodeRef systemNodeRef = nodeService.createNode(rootNodeRef, children, system, container).getChildRef();
         NodeRef typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();

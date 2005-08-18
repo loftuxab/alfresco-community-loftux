@@ -156,7 +156,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          actionParams.put(CopyActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                ContentModel.ASSOC_CONTAINS);
          actionParams.put(CopyActionExecuter.PARAM_ASSOC_QNAME, 
-               QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+               QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "copy"));
       }
       else if (this.action.equals(MoveActionExecuter.NAME))
       {
@@ -170,7 +170,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          actionParams.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                ContentModel.ASSOC_CONTAINS);
          actionParams.put(MoveActionExecuter.PARAM_ASSOC_QNAME, 
-               QName.createQName(NamespaceService.ALFRESCO_URI, "move"));
+               QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "move"));
       }
       else if (this.action.equals(SimpleWorkflowActionExecuter.NAME))
       {
@@ -252,7 +252,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          actionParams.put(CheckOutActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                ContentModel.ASSOC_CONTAINS);
          actionParams.put(CheckOutActionExecuter.PARAM_ASSOC_QNAME, 
-               QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"));
+               QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "checkout"));
       }
       else if (this.action.equals(CheckInActionExecuter.NAME))
       {
@@ -276,7 +276,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          actionParams.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                ContentModel.ASSOC_CONTAINS);
          actionParams.put(TransformActionExecuter.PARAM_ASSOC_QNAME, 
-               QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+               QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "copy"));
       }
       else if (this.action.equals(ImageTransformActionExecuter.NAME))
       {
@@ -298,7 +298,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          actionParams.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, 
                ContentModel.ASSOC_CONTAINS);
          actionParams.put(TransformActionExecuter.PARAM_ASSOC_QNAME, 
-               QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+               QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "copy"));
       }
       else if (this.action.equals(MailActionExecuter.NAME))
       {
@@ -329,7 +329,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       if (this.action.equals(AddFeaturesActionExecuter.NAME))
       {
          QName aspect = (QName)actionProps.get(AddFeaturesActionExecuter.PARAM_ASPECT_NAME);
-         this.actionProperties.put(PROP_ASPECT, aspect.getLocalName());
+         this.actionProperties.put(PROP_ASPECT, aspect.toString());
       }
       else if (this.action.equals(CopyActionExecuter.NAME))
       {
@@ -594,8 +594,8 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                this.aspects = new ArrayList<SelectItem>();
                for (ConfigElement child : aspectsCfg.getChildren())
                {
-                  this.aspects.add(new SelectItem(child.getAttribute("id"), 
-                        child.getAttribute("description")));
+                  QName idQName = Repository.resolveToQName(child.getAttribute("id"));
+                  this.aspects.add(new SelectItem(idQName.toString(), child.getAttribute("description")));
                }
                
                // make sure the list is sorted by the label

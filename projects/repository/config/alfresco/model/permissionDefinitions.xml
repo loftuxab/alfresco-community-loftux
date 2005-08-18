@@ -9,13 +9,13 @@
     <!-- Namespaces used in type references -->
     
    <namespaces>
-      <!-- TODO: Change this URI to something like http://www.alfresco.org/content/1.0 -->
-      <namespace uri="http://www.alfresco.org/1.0" prefix="alf"/>
+      <namespace uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+      <namespace uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
    </namespaces>
     
    <!-- Base permissions available on all types of node -->
     
-   <permissionSet type="alf:base" expose="all" >
+   <permissionSet type="sys:base" expose="all" >
     
       <!-- Higher level permissions -->
     
@@ -92,7 +92,7 @@
    <!-- Permissions specific to content -->
    <!-- Note the read permission of content is the same as the node at the moment --> 
    
-   <permissionSet type="alf:content" expose="all">
+   <permissionSet type="cm:content" expose="all">
 
       <!-- Extend some base permissions -->
       <permissionGroup name="Read" extends="true" expose="true"/>
@@ -123,7 +123,7 @@
    
    <!-- Permissins associated with the Ownable aspect -->
    
-   <permissionSet type="alf:ownable" expose="all">
+   <permissionSet type="cm:ownable" expose="all">
       <!-- Read is controlled by the node -->
       
       <!-- Permission control to allow ownership of the node to be taken from others -->
@@ -144,7 +144,7 @@
    <!-- Permissions for spaces -->
    
    
-   <permissionSet type="alf:folder" expose="selected">
+   <permissionSet type="cm:folder" expose="selected">
         <permissionGroup name="Administrator" allowFullControl="true" expose="true" />
         <permissionGroup name="Coordinator" allowFullControl="false" expose="true" >
             <includePermissionGroup permissionGroup="Read"/>
@@ -167,7 +167,7 @@
    <nodePermissions>
       <!-- Everyone has full control for now -->
       <nodePermission access="allow">
-        <permissionReference type="alf:base" name="FullControl"/>
+        <permissionReference type="sys:base" name="FullControl"/>
       </nodePermission>
    </nodePermissions>
    

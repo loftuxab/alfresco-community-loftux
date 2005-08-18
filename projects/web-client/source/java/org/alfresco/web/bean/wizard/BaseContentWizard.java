@@ -141,7 +141,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             ChildAssociationRef assocRef = this.nodeService.createNode(
                   containerNodeRef,
                   ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
+                  QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, assocName),
                   ContentModel.TYPE_CONTENT,
                   contentProps);
             

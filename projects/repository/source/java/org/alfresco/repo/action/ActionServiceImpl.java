@@ -54,9 +54,11 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class ActionServiceImpl implements ActionService, RuntimeActionService, ApplicationContextAware
 { 
-	private static final QName ASSOC_NAME_ACTION_FOLDER = QName.createQName(NamespaceService.ALFRESCO_URI, "actionFolder");
-	private static final QName ASSOC_NAME_ACTIONS = QName.createQName(NamespaceService.ALFRESCO_URI, "actions");
+    // location for actions
+	private static final QName ASSOC_NAME_ACTION_FOLDER = QName.createQName(ContentModel.ACTION_MODEL_URI, "actionFolder");
+	private static final QName ASSOC_NAME_ACTIONS = QName.createQName(ContentModel.ACTION_MODEL_URI, "actions");
 	
+    
 	/**
 	 * The application context
 	 */
@@ -298,11 +300,11 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		NodeRef actionFolderNodeRef = getActionFolder(nodeRef);
 		
 		DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
-		namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+		namespacePrefixResolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
 		
 		List<NodeRef> nodeRefs = searchService.selectNodes(
 				actionFolderNodeRef, 
-				"*[@alf:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + actionId + "']",
+				"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + actionId + "']",
 				null,
 				namespacePrefixResolver,
 				false);
@@ -433,9 +435,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			
 			NodeRef actionNodeRef = this.nodeService.createNode(
 					compositeActionNodeRef,
-					ContentModel.ASSOC_ACTIONS,
-					ContentModel.ASSOC_ACTIONS,
-					ContentModel.TYPE_ACTION,
+                    ContentModel.ASSOC_ACTIONS,
+                    ContentModel.ASSOC_ACTIONS,
+                    ContentModel.TYPE_ACTION,
 					props).getChildRef();
 			
 			saveActionImpl(actionNodeRef, entry.getValue());
@@ -485,9 +487,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			
 			NodeRef conditionNodeRef = this.nodeService.createNode(
 					actionNodeRef,
-					ContentModel.ASSOC_CONDITIONS,
-					ContentModel.ASSOC_CONDITIONS,
-					ContentModel.TYPE_ACTION_CONDITION,
+                    ContentModel.ASSOC_CONDITIONS,
+                    ContentModel.ASSOC_CONDITIONS,
+                    ContentModel.TYPE_ACTION_CONDITION,
 					props).getChildRef();
 			
 			saveParameters(conditionNodeRef, entry.getValue());
@@ -534,9 +536,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			
 			this.nodeService.createNode(
 					parameterizedNodeRef,
-					ContentModel.ASSOC_PARAMETERS,
-					ContentModel.ASSOC_PARAMETERS,
-					ContentModel.TYPE_ACTION_PARAMETER,
+                    ContentModel.ASSOC_PARAMETERS,
+                    ContentModel.ASSOC_PARAMETERS,
+                    ContentModel.TYPE_ACTION_PARAMETER,
 					nodeRefProperties);
 		}
 	}

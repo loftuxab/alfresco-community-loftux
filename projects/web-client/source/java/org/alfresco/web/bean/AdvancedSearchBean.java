@@ -17,6 +17,7 @@
  */
 package org.alfresco.web.bean;
 
+import java.util.Collection;
 import java.util.Date;
 
 import javax.faces.event.ActionEvent;
@@ -69,6 +70,14 @@ public class AdvancedSearchBean
    public void setNodeService(NodeService nodeService)
    {
       this.nodeService = nodeService;
+   }
+
+   /**
+    * @param namespaceService The NamespaceService to set.
+    */
+   public void setNamespaceService(NamespaceService namespaceService)
+   {
+      this.namespaceService = namespaceService;
    }
    
    /**
@@ -450,9 +459,10 @@ public class AdvancedSearchBean
             ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
             if (elementRef.getParentRef() != null)
             {
-               if (NamespaceService.ALFRESCO_URI.equals(elementRef.getQName().getNamespaceURI()))
+               Collection prefixes = this.namespaceService.getPrefixes(elementRef.getQName().getNamespaceURI());
+               if (prefixes.size() >0)
                {
-                  elementString = '/' + NamespaceService.ALFRESCO_PREFIX + ':' + elementRef.getQName().getLocalName();
+                  elementString = '/' + (String)prefixes.iterator().next() + ':' + elementRef.getQName().getLocalName();
                }
             }
          }
@@ -487,6 +497,9 @@ public class AdvancedSearchBean
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
+   
+   /** The NamespaceService to be used by the bean */
+   private NamespaceService namespaceService;
    
    /** The NavigationBean reference */
    private NavigationBean navigator;

@@ -133,8 +133,8 @@ public class InviteUsersWizard extends AbstractWizardBean
          NodeRef peopleRef = Repository.getSystemPeopleFolderRef(context, nodeService, searchService);
          // build xpath to match 
          // NOTE: see SearchComponentTest
-         String xpath = "*[like(@" + NamespaceService.ALFRESCO_PREFIX + ":" + "firstName, '%" + contains + "%', false)" +
-                 " or " + "like(@" + NamespaceService.ALFRESCO_PREFIX + ":" + "lastName, '%" + contains + "%', false)]";
+         String xpath = "*[like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "firstName, '%" + contains + "%', false)" +
+                 " or " + "like(@" + NamespaceService.CONTENT_MODEL_1_0_URI + ":" + "lastName, '%" + contains + "%', false)]";
          
          if (logger.isDebugEnabled())
             logger.debug("User/Groups Picker Query: " + xpath);

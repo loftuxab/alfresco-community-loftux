@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.alfresco.org/dictionary/0.1" xmlns:dd="http://www.alfresco.org/dictionary/0.1" elementFormDefault="qualified" version="0.1">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.alfresco.org/model/dictionary/1.0" xmlns:dd="http://www.alfresco.org/model/dictionary/1.0" elementFormDefault="qualified" version="0.1">
 
     <xs:annotation>
     	<xs:documentation>Alfresco Data Dictionary Schema - DRAFT</xs:documentation>

@@ -490,7 +490,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         
         // we escape the local name of the path so that it conforms to the general standard of being
         // an escaped version of the name property
-        QName newAssocQName = QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(splitPaths[1]));
+        QName newAssocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(splitPaths[1]));
         
         // move it
         nodeService.moveNode(nodeToMoveRef, targetFolderRef, nodeToMoveAssoc.getTypeQName(), newAssocQName);

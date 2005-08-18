@@ -138,7 +138,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                ChildAssociationRef assocRef = this.nodeService.createNode(
                      parentNodeRef,
                      ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname),
                      ContentModel.TYPE_FOLDER);
                
                NodeRef nodeRef = assocRef.getChildRef();
@@ -167,7 +167,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
                      ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.name)),
+                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(this.name)),
                      true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
@@ -187,7 +187,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
                      ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.name)), 
+                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(this.name)), 
                      true);
                // also need to set the new description and icon properties
                // TODO: remove this when the copy also copies the name
@@ -207,9 +207,9 @@ public class NewSpaceWizard extends AbstractWizardBean
             {
                // get hold of the Templates node
                DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-               namespacePrefixResolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+               namespacePrefixResolver.addDynamicNamespace(NamespaceService.APP_MODEL_PREFIX, NamespaceService.APP_MODEL_1_0_URI);
                
-               String actNs = NamespaceService.ALFRESCO_PREFIX;
+               String actNs = NamespaceService.APP_MODEL_PREFIX;
                String xpath = actNs + ":" + 
                      QName.createValidLocalName(Application.getRootPath(FacesContext.getCurrentInstance())) + 
                      "/" + actNs + ":" + 
@@ -228,7 +228,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                   NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), newSpaceId);
                   NodeRef templateCopyNode = this.nodeOperationsService.copy(sourceNode, templateNode, 
                         ContentModel.ASSOC_CONTAINS, 
-                        QName.createQName(NamespaceService.ALFRESCO_URI, QName.createValidLocalName(this.templateName)));
+                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(this.templateName)));
                   this.nodeService.setProperty(templateCopyNode, ContentModel.PROP_NAME, this.templateName);
                }
             }
@@ -449,7 +449,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          this.templates = new ArrayList<SelectItem>();
          
          FacesContext context = FacesContext.getCurrentInstance();
-         String actNs = NamespaceService.ALFRESCO_PREFIX;
+         String actNs = NamespaceService.APP_MODEL_PREFIX;
          String xpath = actNs + ":" + 
                QName.createValidLocalName(Application.getRootPath(context)) + 
                "/" + actNs + ":" + 
@@ -460,7 +460,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+         resolver.addDynamicNamespace(NamespaceService.APP_MODEL_PREFIX, NamespaceService.APP_MODEL_1_0_URI);
          List<NodeRef> results = this.searchService.selectNodes(rootNodeRef, xpath, null, resolver, false);
          
          if (results.size() > 0)

@@ -243,11 +243,12 @@ public class CopyServiceImplTest extends BaseSpringTest
 	{
         M2Model model = M2Model.createModel("test:nodeoperations");
         model.createNamespace(TEST_TYPE_NAMESPACE, "test");
-        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, NamespaceService.ALFRESCO_DICTIONARY_PREFIX);
-        model.createImport(NamespaceService.ALFRESCO_URI, NamespaceService.ALFRESCO_PREFIX);
+        model.createImport(NamespaceService.DICTIONARY_MODEL_1_0_URI, NamespaceService.DICTIONARY_MODEL_PREFIX);
+        model.createImport(NamespaceService.SYSTEM_MODEL_1_0_URI, NamespaceService.SYSTEM_MODEL_PREFIX);
+        model.createImport(NamespaceService.CONTENT_MODEL_1_0_URI, NamespaceService.CONTENT_MODEL_PREFIX);
 
         M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
-        testType.setParentName("alf:" + ContentModel.TYPE_CONTENT.getLocalName());
+        testType.setParentName("cm:" + ContentModel.TYPE_CONTENT.getLocalName());
         
         M2Property prop1 = testType.createProperty("test:" + PROP1_QNAME_MANDATORY.getLocalName());
         prop1.setMandatory(true);
@@ -270,11 +271,11 @@ public class CopyServiceImplTest extends BaseSpringTest
 		propAnyNodeRef.setMandatory(false);
 		
 		M2ChildAssociation childAssoc = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_TYPE_QNAME.getLocalName());
-        childAssoc.setTargetClassName("alf:base");
+        childAssoc.setTargetClassName("sys:base");
 		childAssoc.setTargetMandatory(false);
 		
 		M2Association assoc = testType.createAssociation("test:" + TEST_ASSOC_TYPE_QNAME.getLocalName());
-        assoc.setTargetClassName("alf:base");
+        assoc.setTargetClassName("sys:base");
 		assoc.setTargetMandatory(false);
 		
 		M2Aspect testAspect = model.createAspect("test:" + TEST_ASPECT_QNAME.getLocalName());

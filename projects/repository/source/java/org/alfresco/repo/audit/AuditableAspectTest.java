@@ -72,7 +72,7 @@ public class AuditableAspectTest extends BaseSpringTest
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
                 ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{alf}testfolder"),
+                QName.createQName("{test}testfolder"),
                 ContentModel.TYPE_FOLDER);
 
         // Assert auditable properties exist on folder
@@ -94,7 +94,7 @@ public class AuditableAspectTest extends BaseSpringTest
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
                 ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{alf}testperson"),
+                QName.createQName("{test}testperson"),
                 ContentModel.TYPE_PERSON,
                 personProps);
 
@@ -118,7 +118,7 @@ public class AuditableAspectTest extends BaseSpringTest
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
                 ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{alf}testperson"),
+                QName.createQName("{test}testperson"),
                 ContentModel.TYPE_PERSON,
                 personProps);
 
@@ -154,7 +154,7 @@ public class AuditableAspectTest extends BaseSpringTest
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
                 ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{alf}testperson"),
+                QName.createQName("{test}testperson"),
                 ContentModel.TYPE_PERSON,
                 personProps);
 

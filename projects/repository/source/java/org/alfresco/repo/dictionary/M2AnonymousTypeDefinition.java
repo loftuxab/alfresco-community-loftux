@@ -83,7 +83,7 @@ import org.alfresco.service.namespace.QName;
      */
     public QName getName()
     {
-        return QName.createQName(NamespaceService.ALFRESCO_DICTIONARY_URI, "anonymous#" + type.getName().getLocalName());
+        return QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "anonymous#" + type.getName().getLocalName());
     }
 
     

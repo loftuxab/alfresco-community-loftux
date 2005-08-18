@@ -102,9 +102,9 @@ public class PermissionServiceTest extends BaseSpringTest
         setUpPermissions();
 
         QName children = ContentModel.ASSOC_CHILDREN;
-        QName system = QName.createQName(NamespaceService.ALFRESCO_URI, "system");
+        QName system = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "system");
         QName container = ContentModel.TYPE_CONTAINER;
-        QName types = QName.createQName(NamespaceService.ALFRESCO_URI, "people");
+        QName types = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "people");
 
         NodeRef systemNodeRef = nodeService.createNode(rootNodeRef, children, system, container).getChildRef();
         NodeRef typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();
@@ -123,17 +123,17 @@ public class PermissionServiceTest extends BaseSpringTest
 
     private void setUpPermissions()
     {
-        READ = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Read");
-        READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver),
+        READ = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Read");
+        READ_PROPERTIES = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
                 "ReadProperties");
-        READ_CHILDREN = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver),
+        READ_CHILDREN = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
                 "ReadChildren");
-        READ_CONTENT = new SimplePermissionReference(QName.createQName("alf", "content", namespacePrefixResolver),
+        READ_CONTENT = new SimplePermissionReference(QName.createQName("cm", "content", namespacePrefixResolver),
                 "ReadContent");
 
-        WRITE = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver), "Write");
+        WRITE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Write");
 
-        FULL_CONTROL = new SimplePermissionReference(QName.createQName("alf", "base", namespacePrefixResolver),
+        FULL_CONTROL = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
                 "FullControl");
 
     }
@@ -417,17 +417,17 @@ public class PermissionServiceTest extends BaseSpringTest
 
     public void testGetSettablePermissionsForType()
     {
-        Set<PermissionReference> answer = permissionService.getSettablePermissions(QName.createQName("alf", "base",
+        Set<PermissionReference> answer = permissionService.getSettablePermissions(QName.createQName("sys", "base",
                 namespacePrefixResolver));
         assertEquals(17, answer.size());
 
-        answer = permissionService.getSettablePermissions(QName.createQName("alf", "ownable", namespacePrefixResolver));
+        answer = permissionService.getSettablePermissions(QName.createQName("cm", "ownable", namespacePrefixResolver));
         assertEquals(2, answer.size());
 
-        answer = permissionService.getSettablePermissions(QName.createQName("alf", "content", namespacePrefixResolver));
+        answer = permissionService.getSettablePermissions(QName.createQName("cm", "content", namespacePrefixResolver));
         assertEquals(21, answer.size());
         
-        answer = permissionService.getSettablePermissions(QName.createQName("alf", "folder", namespacePrefixResolver));
+        answer = permissionService.getSettablePermissions(QName.createQName("cm", "folder", namespacePrefixResolver));
         assertEquals(4, answer.size());
     }
 
@@ -435,7 +435,7 @@ public class PermissionServiceTest extends BaseSpringTest
     
     public void testGetSettablePermissionsForNode()
     {
-        QName ownable = QName.createQName("alf", "ownable", namespacePrefixResolver);
+        QName ownable = QName.createQName("cm", "ownable", namespacePrefixResolver);
 
         Set<PermissionReference> answer = permissionService.getSettablePermissions(rootNodeRef);
         assertEquals(17, answer.size());
@@ -451,7 +451,7 @@ public class PermissionServiceTest extends BaseSpringTest
 
     public void testSimplePermissionOnRoot()
     {
-        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base",
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("sys", "base",
                 namespacePrefixResolver), "ReadProperties");
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -611,7 +611,7 @@ public class PermissionServiceTest extends BaseSpringTest
 
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
-        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base",
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("sys", "base",
                 namespacePrefixResolver), "ReadProperties");
 
         runAs("andy");
@@ -852,7 +852,7 @@ public class PermissionServiceTest extends BaseSpringTest
 
     public void testDenySimplePermisionOnRootNode()
     {
-        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("alf", "base",
+        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("sys", "base",
                 namespacePrefixResolver), "ReadProperties");
 
         runAs("andy");
@@ -1023,7 +1023,7 @@ public class PermissionServiceTest extends BaseSpringTest
 
         UserTransaction tx = serviceRegistry.getUserTransaction();
         tx.begin();
-        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("alf", "base",
+        SimplePermissionReference READ = new SimplePermissionReference(QName.createQName("sys", "base",
                 namespacePrefixResolver), "Read");
 
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,

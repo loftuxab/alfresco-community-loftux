@@ -536,7 +536,7 @@ public final class Repository
       {
          // get a reference to the system types folder node
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+         resolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
          
          NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
          List<NodeRef> results = searchService.selectNodes(
@@ -570,7 +570,7 @@ public final class Repository
       {
          // get a reference to the system/people folder node
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
+         resolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
     
          NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
          List<NodeRef> results = searchService.selectNodes(
@@ -635,8 +635,8 @@ public final class Repository
       }
       else
       {
-         // there's no namespace so prefix with Alfresco's
-         qname = QName.createQName(NamespaceService.ALFRESCO_URI, str);
+         // there's no namespace so prefix with Alfresco's Content Model
+         qname = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, str);
       }
       
       return qname;
@@ -680,8 +680,8 @@ public final class Repository
       }
       else if (str.charAt(0) != QName.NAMESPACE_BEGIN)
       {
-         // there's no namespace so prefix with Alfresco's
-         result = QName.NAMESPACE_BEGIN + NamespaceService.ALFRESCO_URI + 
+         // there's no namespace so prefix with Alfresco's Content Model
+         result = QName.NAMESPACE_BEGIN + NamespaceService.CONTENT_MODEL_1_0_URI + 
                   QName.NAMESPACE_END + str;
       }
       

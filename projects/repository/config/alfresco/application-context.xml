@@ -423,7 +423,14 @@
       <property name="bootstrapModels">
          <list>
             <value>alfresco/model/dictionaryModel.xml</value>
+            <value>alfresco/model/systemModel.xml</value>
             <value>alfresco/model/contentModel.xml</value>
+            <value>alfresco/model/applicationModel.xml</value>
+            
+            <!-- Implementation models -->
+            <value>org/alfresco/repo/security/authentication/userModel.xml</value>
+            <value>org/alfresco/repo/action/actionModel.xml</value>
+            <value>org/alfresco/repo/rule/ruleModel.xml</value>
             <value>org/alfresco/repo/version/version_model.xml</value>
          </list>
       </property>
@@ -803,11 +810,11 @@
                <prop key="location">alfresco/bootstrap/categories.xml</prop>
             </props>
             <props>
-               <prop key="path">/alf:${companySpaceName}</prop>
+               <prop key="path">/app:${companySpaceName}</prop>
                <prop key="location">alfresco/bootstrap/tutorial.xml</prop>
             </props>
             <props>
-               <prop key="path">/alf:${companySpaceName}/alf:${glossaryName}/alf:${templatesName}</prop>
+               <prop key="path">/app:${companySpaceName}/app:${glossaryName}/app:${templatesName}</prop>
                <prop key="location">alfresco/templates/software_engineering_project.xml</prop>
             </props>
          </list>
@@ -832,7 +839,7 @@
       
    <bean id="alfrescoService" abstract="true" class="org.alfresco.repo.service.BeanServiceDescriptor">
       <property name="namespaceService"><ref local="namespaceService"/></property>
-      <property name="namespace"><value>http://www.alfresco.org/1.0</value></property>
+      <property name="namespace"><value>http://www.alfresco.org</value></property>
    </bean>
    
    <!-- Configurable service -->

@@ -174,7 +174,7 @@ public class FileImporterImpl implements FileImporter
         ChildAssociationRef assocRef = this.nodeService.createNode(
                 parentNodeRef,
                 assocTypeQName,
-                QName.createQName(NamespaceService.ALFRESCO_URI, assocName),
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, assocName),
                 ContentModel.TYPE_CONTENT, contentProps);
 
         NodeRef fileNodeRef = assocRef.getChildRef();
@@ -227,7 +227,7 @@ public class FileImporterImpl implements FileImporter
         ChildAssociationRef assocRef = this.nodeService.createNode(
               parentNodeRef,
               assocTypeQName,
-              QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+              QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname),
               ContentModel.TYPE_FOLDER);
         
         NodeRef nodeRef = assocRef.getChildRef();

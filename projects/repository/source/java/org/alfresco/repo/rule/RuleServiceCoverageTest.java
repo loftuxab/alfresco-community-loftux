@@ -146,8 +146,8 @@ public class RuleServiceCoverageTest extends TestCase
         // Create the node used for tests
         this.nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
         
         // Create and authenticate the user used in the tests
@@ -178,13 +178,13 @@ public class RuleServiceCoverageTest extends TestCase
         // Create the test model
         M2Model model = M2Model.createModel("test:rulecategory");
         model.createNamespace(TEST_NAMESPACE, "test");
-        model.createImport(NamespaceService.ALFRESCO_DICTIONARY_URI, "d");
-        model.createImport(NamespaceService.ALFRESCO_URI, "alf");
+        model.createImport(NamespaceService.DICTIONARY_MODEL_1_0_URI, "d");
+        model.createImport(NamespaceService.CONTENT_MODEL_1_0_URI, NamespaceService.CONTENT_MODEL_PREFIX);
         
         // Create the region category
         regionCategorisationQName = QName.createQName(TEST_NAMESPACE, "Region");
         M2Aspect generalCategorisation = model.createAspect("test:" + regionCategorisationQName.getLocalName());
-        generalCategorisation.setParentName("alf:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
+        generalCategorisation.setParentName("cm:" + ContentModel.ASPECT_CLASSIFIABLE.getLocalName());
         M2Property genCatProp = generalCategorisation.createProperty("test:region");
         genCatProp.setIndexed(true);
         genCatProp.setIndexedAtomically(true);
@@ -198,8 +198,8 @@ public class RuleServiceCoverageTest extends TestCase
         dictionaryDAO.putModel(model);
         
         // Create the category value container and root
-        catContainer = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryContainer"), ContentModel.TYPE_CONTAINER).getChildRef();
-        catRoot = nodeService.createNode(catContainer, ContentModel.ASSOC_CHILDREN, QName.createQName(NamespaceService.ALFRESCO_URI, "categoryRoot"), ContentModel.TYPE_CATEGORYROOT).getChildRef();
+        catContainer = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName(TEST_NAMESPACE, "categoryContainer"), ContentModel.TYPE_CONTAINER).getChildRef();
+        catRoot = nodeService.createNode(catContainer, ContentModel.ASSOC_CHILDREN, QName.createQName(TEST_NAMESPACE, "categoryRoot"), ContentModel.TYPE_CATEGORYROOT).getChildRef();
 
         // Create the category values
         catRBase = nodeService.createNode(catRoot, ContentModel.ASSOC_CATEGORIES, QName.createQName(TEST_NAMESPACE, "Region"), ContentModel.TYPE_CATEGORY).getChildRef();
@@ -235,8 +235,8 @@ public class RuleServiceCoverageTest extends TestCase
 
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();         
         addContentToNode(newNodeRef);
@@ -255,8 +255,8 @@ public class RuleServiceCoverageTest extends TestCase
         
         NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();           
         addContentToNode(newNodeRef2);
@@ -305,8 +305,8 @@ public class RuleServiceCoverageTest extends TestCase
 				
 		NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();     
 		addContentToNode(newNodeRef);
@@ -357,8 +357,8 @@ public class RuleServiceCoverageTest extends TestCase
             // Check rule does not get fired when a node without the aspect is added
             NodeRef newNodeRef2 = this.nodeService.createNode(
                     this.nodeRef,
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "noAspect"),
+                    ContentModel.ASSOC_CHILDREN,                
+                    QName.createQName(TEST_NAMESPACE, "noAspect"),
                     ContentModel.TYPE_CONTENT,
                     getContentProperties()).getChildRef(); 
             addContentToNode(newNodeRef2);
@@ -369,8 +369,8 @@ public class RuleServiceCoverageTest extends TestCase
             tx.begin();
             NodeRef newNodeRef = this.nodeService.createNode(
                     this.nodeRef,
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "hasAspectAndValue"),
+                    ContentModel.ASSOC_CHILDREN,                
+                    QName.createQName(TEST_NAMESPACE, "hasAspectAndValue"),
                     ContentModel.TYPE_CONTENT,
                     getContentProperties()).getChildRef();
             addContentToNode(newNodeRef);
@@ -385,8 +385,8 @@ public class RuleServiceCoverageTest extends TestCase
             tx3.begin();
             NodeRef newNodeRef3 = this.nodeService.createNode(
                     this.nodeRef,
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "hasAspectAndValue"),
+                    ContentModel.ASSOC_CHILDREN,                
+                    QName.createQName(TEST_NAMESPACE, "hasAspectAndValue"),
                     ContentModel.TYPE_CONTENT,
                     getContentProperties()).getChildRef();  
             addContentToNode(newNodeRef3);
@@ -432,8 +432,8 @@ public class RuleServiceCoverageTest extends TestCase
                 
         NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "noAspect"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "noAspect"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();
         addContentToNode(newNodeRef2);
@@ -475,8 +475,8 @@ public class RuleServiceCoverageTest extends TestCase
                 
         this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();        
         
@@ -498,7 +498,7 @@ public class RuleServiceCoverageTest extends TestCase
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
         params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-        params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+        params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "copy"));
         
         Rule rule = createRule(
         		RuleType.INBOUND, 
@@ -511,8 +511,8 @@ public class RuleServiceCoverageTest extends TestCase
 
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "origional"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef(); 
         addContentToNode(newNodeRef);
@@ -522,7 +522,7 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the created node is still there
         List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
                 this.nodeRef, 
-                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"));
+                QName.createQName(TEST_NAMESPACE, "origional"));
         assertNotNull(origRefs);
         assertEquals(1, origRefs.size());
         NodeRef origNodeRef = origRefs.get(0).getChildRef();
@@ -531,7 +531,7 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the created node has been copied
         List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
                                                     this.rootNodeRef, 
-                                                    QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+                                                    QName.createQName(TEST_NAMESPACE, "copy"));
         assertNotNull(copyChildAssocRefs);
         assertEquals(1, copyChildAssocRefs.size());
         NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
@@ -558,7 +558,7 @@ public class RuleServiceCoverageTest extends TestCase
 			params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
 	        params.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
 	        params.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-	        params.put(TransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+	        params.put(TransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "transformed"));
 	        
 	        Rule rule = createRule(
 	        		RuleType.INBOUND, 
@@ -579,8 +579,8 @@ public class RuleServiceCoverageTest extends TestCase
 			// Create the node at the root
 	        NodeRef newNodeRef = this.nodeService.createNode(
 	                this.nodeRef,
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
+                    ContentModel.ASSOC_CHILDREN,                
+	                QName.createQName(TEST_NAMESPACE, "origional"),
 	                ContentModel.TYPE_CONTENT,
 	                props).getChildRef(); 
 			
@@ -596,7 +596,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        // Check that the created node is still there
 	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
 	                this.nodeRef, 
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"));
+	                QName.createQName(TEST_NAMESPACE, "origional"));
 	        assertNotNull(origRefs);
 	        assertEquals(1, origRefs.size());
 	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
@@ -605,7 +605,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        // Check that the created node has been copied
 	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
 	                                                    this.rootNodeRef, 
-	                                                    QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
 	        assertNotNull(copyChildAssocRefs);
 	        assertEquals(1, copyChildAssocRefs.size());
 	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
@@ -637,7 +637,7 @@ public class RuleServiceCoverageTest extends TestCase
 			params.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
 	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
 	        params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_JPEG);
-	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "transformed"));
 	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "-negate");
 	        
 	        Rule rule = createRule(
@@ -659,8 +659,8 @@ public class RuleServiceCoverageTest extends TestCase
 			// Create the node at the root
 	        NodeRef newNodeRef = this.nodeService.createNode(
 	                this.nodeRef,
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
+                    ContentModel.ASSOC_CHILDREN,                
+	                QName.createQName(TEST_NAMESPACE, "origional"),
 	                ContentModel.TYPE_CONTENT,
 	                props).getChildRef(); 
 			
@@ -676,7 +676,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        // Check that the created node is still there
 	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
 	                this.nodeRef, 
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"));
+	                QName.createQName(TEST_NAMESPACE, "origional"));
 	        assertNotNull(origRefs);
 	        assertEquals(1, origRefs.size());
 	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
@@ -685,7 +685,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        // Check that the created node has been copied
 	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
 	                                                    this.rootNodeRef, 
-	                                                    QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
+	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
 	        assertNotNull(copyChildAssocRefs);
 	        assertEquals(1, copyChildAssocRefs.size());
 	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
@@ -712,7 +712,7 @@ public class RuleServiceCoverageTest extends TestCase
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
         params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-        params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+        params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "copy"));
         
         Rule rule = createRule(
         		RuleType.INBOUND, 
@@ -725,8 +725,8 @@ public class RuleServiceCoverageTest extends TestCase
                 
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "origional"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef(); 
         addContentToNode(newNodeRef);
@@ -736,14 +736,14 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the created node has been moved
         List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
                 this.nodeRef, 
-                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"));
+                QName.createQName(TEST_NAMESPACE, "origional"));
         assertNotNull(origRefs);
         assertEquals(0, origRefs.size());
 
         // Check that the created node is in the new location
         List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
                                                     this.rootNodeRef, 
-                                                    QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
+                                                    QName.createQName(TEST_NAMESPACE, "copy"));
         assertNotNull(copyChildAssocRefs);
         assertEquals(1, copyChildAssocRefs.size());
         NodeRef movedNodeRef = copyChildAssocRefs.get(0).getChildRef();
@@ -778,8 +778,8 @@ public class RuleServiceCoverageTest extends TestCase
 	        // Create a new node
 	        newNodeRef = this.nodeService.createNode(
 	                this.nodeRef,
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "checkout"),
+                    ContentModel.ASSOC_CHILDREN,                
+	                QName.createQName(TEST_NAMESPACE, "checkout"),
 	                ContentModel.TYPE_CONTENT,
 	                getContentProperties()).getChildRef();
 	        addContentToNode(newNodeRef);
@@ -840,8 +840,8 @@ public class RuleServiceCoverageTest extends TestCase
         // Create a new node and check-it out
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "origional"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "origional"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();
         NodeRef workingCopy = this.cociService.checkout(newNodeRef);
@@ -850,8 +850,8 @@ public class RuleServiceCoverageTest extends TestCase
         this.nodeService.moveNode(
                 workingCopy, 
                 this.nodeRef, 
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "moved"));
+                ContentModel.ASSOC_CHILDREN,
+                QName.createQName(TEST_NAMESPACE, "moved"));
 		
 		// Check that the working copy has been removed
 		assertFalse(this.nodeService.exists(workingCopy));
@@ -884,8 +884,8 @@ public class RuleServiceCoverageTest extends TestCase
         
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();         
         addContentToNode(newNodeRef);
@@ -895,8 +895,8 @@ public class RuleServiceCoverageTest extends TestCase
         
         NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 getContentProperties()).getChildRef();        
         addContentToNode(newNodeRef2);
@@ -946,8 +946,8 @@ public class RuleServiceCoverageTest extends TestCase
             props2.put(ContentModel.PROP_NAME, "bobbins.doc");
             NodeRef newNodeRef2 = this.nodeService.createNode(
                     this.nodeRef,
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                    ContentModel.ASSOC_CHILDREN,                
+                    QName.createQName(TEST_NAMESPACE, "children"),
                     ContentModel.TYPE_CONTENT,
                     props2).getChildRef();
             addContentToNode(newNodeRef2);
@@ -994,8 +994,8 @@ public class RuleServiceCoverageTest extends TestCase
         props1.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
 		NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 props1).getChildRef();   
 		addContentToNode(newNodeRef);
@@ -1011,8 +1011,8 @@ public class RuleServiceCoverageTest extends TestCase
         props2.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
 		NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 props2).getChildRef();        
 		addContentToNode(newNodeRef2);
@@ -1025,8 +1025,8 @@ public class RuleServiceCoverageTest extends TestCase
 			// Test name not set
 			NodeRef newNodeRef3 = this.nodeService.createNode(
 	                this.nodeRef,
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-	                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                    ContentModel.ASSOC_CHILDREN,                
+	                QName.createQName(TEST_NAMESPACE, "children"),
 	                ContentModel.TYPE_CONTENT,
                     getContentProperties()).getChildRef();      
 			addContentToNode(newNodeRef3);
@@ -1048,8 +1048,8 @@ public class RuleServiceCoverageTest extends TestCase
         propsx.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefx = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 propsx).getChildRef();   
         addContentToNode(newNodeRefx);
@@ -1059,8 +1059,8 @@ public class RuleServiceCoverageTest extends TestCase
         propsy.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefy = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 propsy).getChildRef();   
         addContentToNode(newNodeRefy);
@@ -1080,8 +1080,8 @@ public class RuleServiceCoverageTest extends TestCase
         propsa.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefa = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 propsa).getChildRef(); 
         addContentToNode(newNodeRefa);
@@ -1091,8 +1091,8 @@ public class RuleServiceCoverageTest extends TestCase
         propsb.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         NodeRef newNodeRefb = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTENT,
                 propsb).getChildRef();   
         addContentToNode(newNodeRefb);
@@ -1130,8 +1130,8 @@ public class RuleServiceCoverageTest extends TestCase
         // Create a node
         NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
                 ContentModel.TYPE_CONTAINER).getChildRef();        
         assertFalse(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));
         
@@ -1139,8 +1139,8 @@ public class RuleServiceCoverageTest extends TestCase
         this.nodeService.moveNode(
                 newNodeRef, 
                 this.rootNodeRef, 
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),                
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"));
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"));
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
@@ -1197,8 +1197,8 @@ public class RuleServiceCoverageTest extends TestCase
 	        {
 	            NodeRef nodeRef = this.nodeService.createNode(
 	                    this.nodeRef,
-						QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-						QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+                        ContentModel.ASSOC_CHILDREN,
+						QName.createQName(TEST_NAMESPACE, "children"),
 	                    ContentModel.TYPE_CONTAINER).getChildRef();
 	            addContentToNode(nodeRef);
 				nodeRefs[i] = nodeRef;

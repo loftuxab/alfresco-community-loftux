@@ -2,47 +2,48 @@
 <!-- Note: The import will be performed relative to a specific path specified at import
            time -->
    
-<v:view xmlns:v="http://www.alfresco.org/repository/view/0.1" xmlns:alf="http://www.alfresco.org/1.0">
+<view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
+           xmlns:cm="http://www.alfresco.org/model/content/1.0">
    
-   <alf:systemfolder>
-      <alf:name>System</alf:name>
-      <alf:orderedchildren>true</alf:orderedchildren>
-      <alf:contains>
+   <cm:systemfolder>
+      <cm:name>System</cm:name>
+      <cm:orderedchildren>true</cm:orderedchildren>
+      <cm:contains>
          
-         <alf:systemfolder v:childName="alf:people">
-            <alf:auditable/>
-            <alf:name>People</alf:name>
-            <alf:creator>administrator</alf:creator>
-            <alf:contains>
-               <alf:person v:childName="alf:fredb">
-                  <alf:userName>${username}</alf:userName>
-                  <alf:firstName>Fred</alf:firstName>
-                  <alf:lastName>Bloggs</alf:lastName>
-                  <alf:homeFolder>/home/fredb</alf:homeFolder>
-               </alf:person>
-            </alf:contains>
-         </alf:systemfolder>
+         <cm:systemfolder view:childName="cm:people">
+            <cm:auditable/>
+            <cm:name>People</cm:name>
+            <cm:creator>administrator</cm:creator>
+            <cm:contains>
+               <cm:person view:childName="cm:fredb">
+                  <cm:userName>${username}</cm:userName>
+                  <cm:firstName>Fred</cm:firstName>
+                  <cm:lastName>Bloggs</cm:lastName>
+                  <cm:homeFolder>/home/fredb</cm:homeFolder>
+               </cm:person>
+            </cm:contains>
+         </cm:systemfolder>
          
-         <!-- note: if no explicit v:childName, take from name if one exists -->
-         <alf:cmobject>
-            <alf:translatable/>
-            <alf:name>Some Content</alf:name>
-            <alf:translations v:idref="xyz"/>
-         </alf:cmobject>
+         <!-- note: if no explicit view:childName, take from name if one exists -->
+         <cm:cmobject>
+            <cm:translatable/>
+            <cm:name>Some Content</cm:name>
+            <cm:translations view:idref="xyz"/>
+         </cm:cmobject>
    
-         <alf:cmobject v:id="xyz">
-            <alf:name>Translation of Some Content</alf:name>
-            <alf:creator></alf:creator>
-         </alf:cmobject>
+         <cm:cmobject view:id="xyz">
+            <cm:name>Translation of Some Content</cm:name>
+            <cm:creator></cm:creator>
+         </cm:cmobject>
          
-         <alf:content>
-            <alf:name>Real content</alf:name>
-            <alf:mimetype>text</alf:mimetype>
-            <alf:contentUrl>org/alfresco/repo/importer/importercomponent_testfile.txt</alf:contentUrl>
-         </alf:content>
+         <cm:content>
+            <cm:name>Real content</cm:name>
+            <cm:mimetype>text</cm:mimetype>
+            <cm:contentUrl>org/alfresco/repo/importer/importercomponent_testfile.txt</cm:contentUrl>
+         </cm:content>
 
-      </alf:contains>
+      </cm:contains>
       
-   </alf:systemfolder>
+   </cm:systemfolder>
 
-</v:view>
+</view:view>

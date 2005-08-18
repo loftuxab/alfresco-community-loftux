@@ -164,7 +164,7 @@ public final class User
             throw new IllegalStateException("Unable to find associated 'configurations' folder for node: " + person);
          }
          
-         String xpath = NamespaceService.ALFRESCO_PREFIX + ":" + "preferences";
+         String xpath = NamespaceService.APP_MODEL_PREFIX + ":" + "preferences";
          List<NodeRef> nodes = searchService.selectNodes(
                configRef,
                xpath,
@@ -183,7 +183,7 @@ public final class User
             ChildAssociationRef childRef = nodeService.createNode(
                   configRef,
                   ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.ALFRESCO_URI, "preferences"),
+                  QName.createQName(NamespaceService.APP_MODEL_1_0_URI, "preferences"),
                   ContentModel.TYPE_CMOBJECT);
             
             prefRef = childRef.getChildRef();

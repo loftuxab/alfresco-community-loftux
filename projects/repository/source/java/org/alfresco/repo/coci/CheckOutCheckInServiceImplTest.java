@@ -72,7 +72,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private static final String TEST_VALUE_1 = "myDocument.doc";
 	private static final String TEST_VALUE_2 = "UTF8";
 	private static final String TEST_VALUE_3 = "UTF16";
-	private static final QName PROP_NAME_QNAME = QName.createQName(NamespaceService.ALFRESCO_URI, "name");
+	private static final QName PROP_NAME_QNAME = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "name");
 	private static final QName PROP2_QNAME = ContentModel.PROP_ENCODING;
 	private static final String CONTENT_1 = "This is some content";
 	private static final String CONTENT_2 = "This is the cotent modified.";

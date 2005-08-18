@@ -41,7 +41,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -63,7 +62,7 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
     /**
      * The name of the spoofed root association
      */
-    private static final QName rootAssocName = QName.createQName(NamespaceService.ALFRESCO_URI, "versionedState");
+    private static final QName rootAssocName = QName.createQName(ContentModel.VERSION_MODEL_URI, "versionedState");
 	
     /**
      * The db node service, used as the version store implementation

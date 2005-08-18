@@ -240,7 +240,7 @@ public class ViewParser implements Parser
         NodeContext context = new NodeContext(typeDef.getName(), parentContext, typeDef);
         
         // Extract child name if explicitly defined
-        String childName = xpp.getAttributeValue(NamespaceService.ALFRESCO_VIEW_URI, VIEW_CHILD_NAME_ATTR);
+        String childName = xpp.getAttributeValue(NamespaceService.REPOSITORY_VIEW_1_0_URI, VIEW_CHILD_NAME_ATTR);
         if (childName != null && childName.length() > 0)
         {
             context.setChildName(childName);

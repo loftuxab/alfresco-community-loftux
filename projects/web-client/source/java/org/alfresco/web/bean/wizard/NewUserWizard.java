@@ -760,7 +760,7 @@ public class NewUserWizard extends AbstractWizardBean
       if (this.companyHomeSpaceRef == null)
       {
          String companySpaceName = Application.getRootPath(context);
-         String companyXPath = NamespaceService.ALFRESCO_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
+         String companyXPath = NamespaceService.APP_MODEL_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
          
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
          List<NodeRef> nodes = this.searchService.selectNodes(
@@ -800,7 +800,7 @@ public class NewUserWizard extends AbstractWizardBean
          ChildAssociationRef assocRef = this.nodeService.createNode(
                parentRef,
                ContentModel.ASSOC_CONTAINS,
-               QName.createQName(NamespaceService.ALFRESCO_URI, qname),
+               QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, qname),
                ContentModel.TYPE_FOLDER);
          
          NodeRef nodeRef = assocRef.getChildRef();

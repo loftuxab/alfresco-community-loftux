@@ -1,4 +1,4 @@
-<model name="test:lucenetest" xmlns="http://www.alfresco.org/dictionary/0.1">
+<model name="test:lucenetest" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
    <description>Test Model for Lucene tests</description>
    <author>Alfresco</author>
@@ -6,8 +6,8 @@
    <version>0.1</version>
 
    <imports>
-      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
-      <import uri="http://www.alfresco.org/1.0" prefix="alf"/>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
    </imports>
    
    <namespaces>
@@ -17,11 +17,11 @@
    <types>
       <type name="test:testSuperType">
          <title>Test Super Type</title>
-         <parent>alf:container</parent>
+         <parent>sys:container</parent>
          <associations>
             <child-association name="test:assoc">
                <target>
-                  <class>alf:base</class>
+                  <class>sys:base</class>
                </target>
             </child-association>
          </associations>

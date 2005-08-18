@@ -1,4 +1,4 @@
-<model name="test:integrity" xmlns="http://www.alfresco.org/dictionary/0.1">
+<model name="test:integrity" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
    <description>Test Model for Integrity tests</description>
    <author>Alfresco</author>
@@ -6,8 +6,8 @@
    <version>0.1</version>
 
    <imports>
-      <import uri="http://www.alfresco.org/dictionary/0.1" prefix="d"/>
-      <import uri="http://www.alfresco.org/1.0" prefix="alf"/>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
    </imports>
    
    <namespaces>
@@ -17,7 +17,7 @@
    <types>
       <type name="test:folder">
          <title>Content</title>
-         <parent>alf:base</parent>
+         <parent>sys:base</parent>
          <properties>
             <property name="test:name">
                <type>d:text</type>

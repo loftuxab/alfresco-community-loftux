@@ -156,8 +156,8 @@ public class NewRuleWizard extends BaseActionWizard
          rule.setDescription(this.description);
          
          // Add the action to the rule
-         Action action = this.actionService.createAction(this.getCondition());
-         action.setParameterValues(conditionParams);
+         Action action = this.actionService.createAction(this.getAction());
+         action.setParameterValues(actionParams);
          rule.addAction(action);
          
          // Add the condition to the rule

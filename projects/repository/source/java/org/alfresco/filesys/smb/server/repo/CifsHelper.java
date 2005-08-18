@@ -323,7 +323,7 @@ public class CifsHelper
                 ChildAssociationRef assocRef = nodeService.createNode(
                         currentNodeRef,
                         ContentModel.ASSOC_CONTAINS,
-                        QName.createQName(NamespaceService.ALFRESCO_URI, encodedPath),
+                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, encodedPath),
                         typeQName,
                         properties);
                 currentNodeRef = assocRef.getChildRef();
@@ -399,9 +399,9 @@ public class CifsHelper
         
         boolean wildcardSearch = WildCard.containsWildcards(pathElement);
         
-        String nameParam = "alf:name";
-        String folderTypeParam = "alf:foldertype";
-        String fileTypeParam = "alf:filetype";
+        String nameParam = "cm:name";
+        String folderTypeParam = "cm:foldertype";
+        String fileTypeParam = "cm:filetype";
         // append to the xpath
         if (wildcardSearch)
         {
@@ -410,11 +410,11 @@ public class CifsHelper
             // fix up wildcard matches for like function
             pathElement = pathElement.replace('*', '%');
             // use the like function (do not match FTS)
-            sb.append("./*[like(@alf:name, $").append(nameParam).append(", false)");
+            sb.append("./*[like(@cm:name, $").append(nameParam).append(", false)");
         }
         else
         {
-            sb.append("./*[@alf:name = $").append(nameParam);
+            sb.append("./*[@cm:name = $").append(nameParam);
         }
         sb.append(" and ")
           .append("(")

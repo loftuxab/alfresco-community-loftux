@@ -33,7 +33,7 @@
    <config evaluator="string-compare" condition="Filesystems">
       <filesystem name="Alfresco">
          <store>workspace://SpacesStore</store>
-         <rootPath>/alf:Company_Home</rootPath>
+         <rootPath>/app:Company_Home</rootPath>
 <!--
          <accessControl default="Write">
             <user name="admin" access="Write"/>
