@@ -143,6 +143,16 @@ public class FTPRequest
 
         m_cmd = FTPCommand.getCommandId(cmd);
     }
+
+    /**
+     * Update the command argument
+     * 
+     * @param arg String
+     */
+    protected final void updateArgument(String arg)
+    {
+        m_arg = arg;
+    }
     
     /**
      * Return the request as a string

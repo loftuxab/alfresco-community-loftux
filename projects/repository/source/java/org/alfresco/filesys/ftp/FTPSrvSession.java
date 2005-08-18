@@ -79,6 +79,10 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
     protected final static String CRLF = "\r\n";
 
+    // LIST command options
+    
+    protected final static String LIST_OPTION_HIDDEN    = "-a";
+    
     // Session socket
 
     private Socket m_sock;
@@ -1015,6 +1019,28 @@ public class FTPSrvSession extends SrvSession implements Runnable
             return;
         }
 
+        // Check if the client has requested hidden files, via the '-a' option
+        
+        boolean hidden = false;
+        
+        if ( req.hasArgument() && req.getArgument().startsWith(LIST_OPTION_HIDDEN))
+        {
+            // Indicate that we want hidden files in the listing
+            
+            hidden = true;
+            
+            // Remove the option from the command argument, and update the request
+            
+            String arg = req.getArgument();
+            int pos = arg.indexOf(" ");
+            if ( pos > 0)
+                arg = arg.substring( pos + 1);
+            else
+                arg = null;
+            
+            req.updateArgument( arg);
+        }
+        
         // Create the path for the file listing
 
         FTPPath ftpPath = m_cwd;
@@ -1097,7 +1123,7 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
             // Get a list of file information objects for the current directory
 
-            files = listFilesForPath(ftpPath, false);
+            files = listFilesForPath(ftpPath, false, hidden);
 
             // Output the file list to the client
 
@@ -1277,7 +1303,7 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
             // Get a list of file information objects for the current directory
 
-            files = listFilesForPath(ftpPath, false);
+            files = listFilesForPath(ftpPath, false, false);
 
             // Output the file list to the client
 
@@ -2693,9 +2719,10 @@ public class FTPSrvSession extends SrvSession implements Runnable
      * 
      * @param path FTPPath
      * @param nameOnly boolean
+     * @param hidden boolean
      * @return Vector<FileInfo>
      */
-    protected final Vector<FileInfo> listFilesForPath(FTPPath path, boolean nameOnly)
+    protected final Vector<FileInfo> listFilesForPath(FTPPath path, boolean nameOnly, boolean hidden)
     {
 
         // Check if the path is valid
@@ -2761,10 +2788,14 @@ public class FTPSrvSession extends SrvSession implements Runnable
             DiskInterface disk = null;
             SearchContext ctx = null;
 
+            int searchAttr = FileAttribute.Directory + FileAttribute.Normal;
+            if ( hidden)
+                searchAttr += FileAttribute.Hidden;
+            
             try
             {
                 disk = (DiskInterface) path.getSharedDevice().getInterface();
-                ctx = disk.startSearch(this, tree, searchPath, FileAttribute.Directory + FileAttribute.Normal);
+                ctx = disk.startSearch(this, tree, searchPath, searchAttr);
             }
             catch (Exception ex)
             {
