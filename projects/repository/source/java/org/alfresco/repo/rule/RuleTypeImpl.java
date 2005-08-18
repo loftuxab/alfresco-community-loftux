@@ -17,6 +17,13 @@
  */
 package org.alfresco.repo.rule;
 
+import java.util.List;
+
+import org.alfresco.repo.action.CommonResourceAbstractBase;
+import org.alfresco.repo.rule.ruletrigger.RuleTrigger;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 
 /**
@@ -24,31 +31,47 @@ import org.alfresco.service.cmr.rule.RuleType;
  * 
  * @author Roy Wetherall
  */
-public class RuleTypeImpl implements RuleType
+public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
 {
-    /**
-     * The name of the rule type
-     */
-    private String name;
+	/**
+	 * The rule service
+	 */
+	private RuleService ruleService;
     
     /**
-     * The display label
-     */
-    private String displayLabel;
-    
-    /**
-     * The ruleType adapter
-     */
-    private String ruleTypeAdapter;
-    
-    /**
+     * Constructor
      * 
+     * @param ruleTriggers	the rule triggers
      */
-    public RuleTypeImpl(String name)
+    public RuleTypeImpl(List<RuleTrigger> ruleTriggers)
     {
-        this.name = name;
+    	if (ruleTriggers != null)
+    	{
+	    	for (RuleTrigger trigger : ruleTriggers)
+			{
+				trigger.registerRuleType(this);
+			}
+    	}
     }
+    
+    /**
+     * Set the rule service
+     * 
+     * @param ruleService  the rule service
+     */
+    public void setRuleService(RuleService ruleService)
+	{
+		this.ruleService = ruleService;
+	}
 
+    /**
+     * Rule type initialise method
+     */
+    public void init()
+    {
+    	((RuntimeRuleService)this.ruleService).registerRuleType(this);
+    }
+    
     /**
      * @see org.alfresco.service.cmr.rule.RuleType#getName()
      */
@@ -56,42 +79,39 @@ public class RuleTypeImpl implements RuleType
     {
         return this.name;
     }
-    
-    /**
-     * Set the display label
-     * 
-     * @param displayLabel  the displaylabel
-     */
-    public void setDisplayLabel(String displayLabel)
-    {
-        this.displayLabel = displayLabel;
-    }
 
     /**
      * @see org.alfresco.service.cmr.rule.RuleType#getDisplayLabel()
      */
     public String getDisplayLabel()
     {
-        return this.displayLabel;
+        return this.properties.getProperty(this.name + "." + "display-label");
     }
-    
+
     /**
-     * Sets the rule type adapter
-     * 
-     * @param ruleTypeAdapter  the rule type adapter
+     * @see org.alfresco.service.cmr.rule.RuleType#triggerRuleType(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
      */
-    public void setRuleTypeAdapter(String ruleTypeAdapter)
-    {
-        this.ruleTypeAdapter = ruleTypeAdapter;
-    }
-    
-    /**
-     * Gets the rule type adapter
-     * 
-     * @return  the rule type adapter
-     */
-    public String getRuleTypeAdapter()
-    {
-        return ruleTypeAdapter;
-    }
+	public void triggerRuleType(NodeRef nodeRef, NodeRef actionedUponNodeRef)
+	{
+		if (this.ruleService.rulesEnabled(nodeRef) == true && this.ruleService.hasRules(nodeRef) == true)
+        {
+            List<Rule> rules = this.ruleService.getRules(
+            		nodeRef, 
+                    true,
+                    this.name);
+			
+            for (Rule rule : rules)
+            {   
+				((RuntimeRuleService)this.ruleService).addRulePendingExecution(nodeRef, actionedUponNodeRef, rule);
+            }
+        }
+	}
+	
+	/**
+	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+	 */
+	public void setBeanName(String name)
+	{
+		this.name = name;	
+	}
 }

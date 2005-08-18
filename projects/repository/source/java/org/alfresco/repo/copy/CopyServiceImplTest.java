@@ -34,7 +34,6 @@ import org.alfresco.repo.dictionary.M2ChildAssociation;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.repo.dictionary.M2Type;
-import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
@@ -51,6 +50,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
@@ -357,7 +357,7 @@ public class CopyServiceImplTest extends BaseSpringTest
         this.ruleService.makeActionable(this.sourceNodeRef);
         
         // Create a new rule and add it to the source noderef
-        Rule rule = this.ruleService.createRule(InboundRuleTypeAdapter.NAME);
+        Rule rule = this.ruleService.createRule(RuleType.INBOUND);
         
         Map<String, Serializable> props = new HashMap<String, Serializable>(1);
         props.put(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
@@ -510,7 +510,7 @@ public class CopyServiceImplTest extends BaseSpringTest
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, nodeTwo);
         params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, TEST_CHILD_ASSOC_TYPE_QNAME);
         params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName("{test}ruleCopy"));
-        Rule rule = this.ruleService.createRule(InboundRuleTypeAdapter.NAME);
+        Rule rule = this.ruleService.createRule(RuleType.INBOUND);
         ActionCondition condition = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
         rule.addActionCondition(condition);
         Action action = this.actionService.createAction(CopyActionExecuter.NAME, params);

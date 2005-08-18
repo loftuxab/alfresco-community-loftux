@@ -47,7 +47,6 @@ import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
-import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
@@ -66,6 +65,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
+import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.TestWithUserUtils;
@@ -225,7 +225,7 @@ public class RuleServiceCoverageTest extends TestCase
         params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		AddFeaturesActionExecuter.NAME, 
         		params, 
         		NoConditionEvaluator.NAME, 
@@ -295,7 +295,7 @@ public class RuleServiceCoverageTest extends TestCase
 		params.put(SimpleWorkflowActionExecuter.PARAM_REJECT_MOVE, false);
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		SimpleWorkflowActionExecuter.NAME, 
         		params, 
         		NoConditionEvaluator.NAME, 
@@ -346,7 +346,7 @@ public class RuleServiceCoverageTest extends TestCase
             params2.put("aspect-name", ContentModel.ASPECT_VERSIONABLE); 
             
             Rule rule = createRule(
-            		InboundRuleTypeAdapter.NAME, 
+            		RuleType.INBOUND, 
             		AddFeaturesActionExecuter.NAME, 
             		params2, 
             		InCategoryEvaluator.NAME, 
@@ -422,7 +422,7 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE, this.catROne); 
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		LinkCategoryActionExecuter.NAME, 
         		params, 
         		NoConditionEvaluator.NAME, 
@@ -465,7 +465,7 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(MailActionExecuter.PARAM_TEXT, "This is a test to check that the mail action is working.");
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		MailActionExecuter.NAME, 
         		params, 
         		NoConditionEvaluator.NAME, 
@@ -501,7 +501,7 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		CopyActionExecuter.NAME, 
         		params, 
         		NoConditionEvaluator.NAME, 
@@ -561,7 +561,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        params.put(TransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "transformed"));
 	        
 	        Rule rule = createRule(
-	        		InboundRuleTypeAdapter.NAME, 
+	        		RuleType.INBOUND, 
 	        		TransformActionExecuter.NAME, 
 	        		params, 
 	        		NoConditionEvaluator.NAME, 
@@ -641,7 +641,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "-negate");
 	        
 	        Rule rule = createRule(
-	        		InboundRuleTypeAdapter.NAME, 
+	        		RuleType.INBOUND, 
 	        		ImageTransformActionExecuter.NAME, 
 	        		params, 
 	        		NoConditionEvaluator.NAME, 
@@ -715,7 +715,7 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(MoveActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(NamespaceService.ALFRESCO_URI, "copy"));
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		MoveActionExecuter.NAME, 
         		params, 
         		NoConditionEvaluator.NAME, 
@@ -761,7 +761,7 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.makeActionable(this.nodeRef);
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		CheckOutActionExecuter.NAME, 
         		null, 
         		NoConditionEvaluator.NAME, 
@@ -829,7 +829,7 @@ public class RuleServiceCoverageTest extends TestCase
         params.put(CheckInActionExecuter.PARAM_DESCRIPTION, "The version description.");
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		CheckInActionExecuter.NAME, 
         		params, 
         		NoConditionEvaluator.NAME, 
@@ -873,7 +873,7 @@ public class RuleServiceCoverageTest extends TestCase
         actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		AddFeaturesActionExecuter.NAME, 
         		actionParams, 
         		NoConditionEvaluator.NAME, 
@@ -914,7 +914,7 @@ public class RuleServiceCoverageTest extends TestCase
     {
     	ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
     	assertNotNull(contentWriter);
-    	contentWriter.putContent(STANDARD_TEXT_CONTENT);
+    	contentWriter.putContent(STANDARD_TEXT_CONTENT + System.currentTimeMillis());
     }
     
     /**
@@ -931,7 +931,7 @@ public class RuleServiceCoverageTest extends TestCase
         // should be setting the condition parameter here
         
         Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		AddFeaturesActionExecuter.NAME, 
         		actionParams, 
         		MatchTextEvaluator.NAME, 
@@ -980,7 +980,7 @@ public class RuleServiceCoverageTest extends TestCase
 		condParams.put(MatchTextEvaluator.PARAM_TEXT, ".doc");        
 		
 		Rule rule = createRule(
-        		InboundRuleTypeAdapter.NAME, 
+        		RuleType.INBOUND, 
         		AddFeaturesActionExecuter.NAME, 
         		actionParams, 
         		MatchTextEvaluator.NAME, 
@@ -1180,7 +1180,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
 	        
 	        Rule rule = createRule(
-	        		InboundRuleTypeAdapter.NAME, 
+	        		RuleType.INBOUND, 
 	        		AddFeaturesActionExecuter.NAME, 
 	        		params, 
 	        		NoConditionEvaluator.NAME, 

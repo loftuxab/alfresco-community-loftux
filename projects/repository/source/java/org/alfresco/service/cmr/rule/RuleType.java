@@ -17,6 +17,8 @@
  */
 package org.alfresco.service.cmr.rule;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 
 /**
  * Rule type interface.
@@ -25,6 +27,12 @@ package org.alfresco.service.cmr.rule;
  */
 public interface RuleType
 {
+	/**
+	 * Some rule type constants
+	 */
+	public static final String INBOUND = "inbound";
+	public static final String OUTGOING = "outgoing";
+	
 	/**
 	 * Get the name of the rule type.
 	 * <p>
@@ -40,4 +48,12 @@ public interface RuleType
 	 * @return	the display label
 	 */
 	public String getDisplayLabel();
+
+	/**
+	 * Trigger the rules of the rule type for the node on the actioned upon node.
+	 * 
+	 * @param nodeRef				the node ref whos rule of rule type are to be triggered
+	 * @param actionedUponNodeRef	the node ref that the triggered rule will action upon
+	 */
+	public void triggerRuleType(NodeRef nodeRef, NodeRef actionedUponNodeRef);
 }

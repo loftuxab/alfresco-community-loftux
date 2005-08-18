@@ -45,25 +45,14 @@ public class RuleServiceImplTest extends BaseRuleTest
     public void testGetRuleType()
     {
         List<RuleType> ruleTypes = this.ruleService.getRuleTypes();
-        assertNotNull(ruleTypes);   
-    }
-    
-    /**
-     * Test getActionDefintions
-     */
-    public void testGetActionDefinitions()
-    {
-        List<ActionDefinition> actions = this.actionService.getActionDefinitions();
-        assertNotNull(actions);   	
-    }
-    
-    /**
-     * Test getConditionDefinitions
-     */
-    public void testGetConditionDefinitions()
-    {
-        List<ActionConditionDefinition> conds = this.actionService.getActionConditionDefinitions();
-        assertNotNull(conds);    
+        assertNotNull(ruleTypes);  
+        
+        // Visual check to make sure that the display labels are being returned correctly
+        //assertEquals(1, ruleTypes.size());        
+        //for (RuleType type : ruleTypes)
+		//{
+		//	System.out.println(type.getDisplayLabel());
+		//}
     }
 
     /**
@@ -380,7 +369,6 @@ public class RuleServiceImplTest extends BaseRuleTest
         assertTrue(allRules16.contains(rule6));
         
         // Add an association
-        
         this.nodeService.addChild(
                 rootWithRules2, 
                 childWithRules, 

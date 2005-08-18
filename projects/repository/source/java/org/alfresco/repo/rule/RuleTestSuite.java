@@ -17,6 +17,8 @@
  */
 package org.alfresco.repo.rule;
 
+import org.alfresco.repo.rule.ruletrigger.RuleTriggerTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -37,8 +39,7 @@ public class RuleTestSuite extends TestSuite
     {
         TestSuite suite = new TestSuite();
         suite.addTestSuite(RuleTypeImplTest.class);
-       // suite.addTestSuite(RuleXMLUtilTest.class);
-       // suite.addTestSuite(RuleStoreTest.class);
+        suite.addTestSuite(RuleTriggerTest.class);
         suite.addTestSuite(RuleServiceImplTest.class);
         suite.addTestSuite(RuleServiceCoverageTest.class);
         return suite;

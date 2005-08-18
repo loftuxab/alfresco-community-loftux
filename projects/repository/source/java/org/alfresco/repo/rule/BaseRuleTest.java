@@ -25,7 +25,6 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
-import org.alfresco.repo.rule.ruletype.InboundRuleTypeAdapter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
@@ -52,7 +51,7 @@ public class BaseRuleTest extends BaseSpringTest
     /**
      * Data used in the tests
      */
-    protected static final String RULE_TYPE_NAME = InboundRuleTypeAdapter.NAME;
+    protected static final String RULE_TYPE_NAME = RuleType.INBOUND;
 
     /**
      * Action used in tests

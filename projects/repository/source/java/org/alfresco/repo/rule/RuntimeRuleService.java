@@ -17,9 +17,9 @@
  */
 package org.alfresco.repo.rule;
 
-import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
+import org.alfresco.service.cmr.rule.RuleType;
 
 /**
  * @author Roy Wetherall
@@ -30,5 +30,5 @@ public interface RuntimeRuleService
 
 	void executePendingRules();	
 	
-	void registerRuleType(RuleTypeAdapter ruleTypeAdapter);
+	void registerRuleType(RuleType ruleType);
 }

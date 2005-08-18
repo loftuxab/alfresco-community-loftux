@@ -85,7 +85,7 @@
          <ref bean="transactionManager"/>
       </property>
       <property name="target">
-         <bean class="org.alfresco.repo.content.RoutingContentService">
+         <bean class="org.alfresco.repo.content.RoutingContentService" init-method="init">
             <property name="serviceRegistry">
                <ref bean="serviceRegistry" />
             </property>
@@ -100,6 +100,9 @@
             </property>
             <property name="store">
                <ref bean="fileContentStore" />
+            </property>
+            <property name="policyComponent">
+            	<ref bean="policyComponent"/>
             </property>
          </bean>
       </property>

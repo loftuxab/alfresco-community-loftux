@@ -28,6 +28,8 @@ import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -37,6 +39,7 @@ import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
@@ -54,6 +57,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
     private static final String TEST_NAMESPACE = "http://www.alfresco.org/test/RoutingContentServiceTest";
     
     private ContentService contentService;
+    private PolicyComponent policyComponent;
     private NodeService nodeService;
     private NodeRef rootNodeRef;
     private NodeRef contentNodeRef;
@@ -68,6 +72,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         super.onSetUpInTransaction();
         nodeService = (NodeService) applicationContext.getBean("dbNodeService");
         contentService = (ContentService) applicationContext.getBean("contentService");
+        this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
         // create a store and get the root node
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, getName());
         if (!nodeService.exists(storeRef))
@@ -152,6 +157,43 @@ public class RoutingContentServiceTest extends BaseSpringTest
 		// get the reader for the node
 		ContentReader reader = contentService.getReader(contentNodeRef);
 		assertNull("No reader should yet be available for the node", reader);
+	}
+	
+	private boolean policyFired = false;
+	
+	/**
+	 * Tests that the content update policy firs correctly
+	 */
+	public void testOnContentUpdatePolicy()
+	{
+		// Register interest in the content update event for a versionable node
+		this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onContentUpdate"),
+				ContentModel.ASPECT_VERSIONABLE,
+				new JavaBehaviour(this, "onContentUpdateBehaviourTest"));
+		
+		// First check that the policy is not fired when the versionable aspect is not present
+		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.contentNodeRef);
+		contentWriter.putContent("content update one");
+		assertFalse(this.policyFired);
+		
+		// Now check that the policy is fired when the versionable aspect is present
+		this.nodeService.addAspect(this.contentNodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+		ContentWriter contentWriter2 = this.contentService.getUpdatingWriter(this.contentNodeRef);
+		contentWriter2.putContent("content update two");
+		assertTrue(this.policyFired);
+		this.policyFired = false;
+		
+		// Check that the policy is not fired when using a non updating content writer
+		ContentWriter contentWriter3 = this.contentService.getWriter(this.contentNodeRef);
+		contentWriter3.putContent("content update three");
+		assertFalse(this.policyFired);
+	}
+	
+	public void onContentUpdateBehaviourTest(NodeRef nodeRef)
+	{
+		assertEquals(this.contentNodeRef, nodeRef);
+		assertTrue(this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
+		this.policyFired = true;
 	}
     
     public void testTempWrite() throws Exception

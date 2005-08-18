@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.RuntimeActionService;
-import org.alfresco.repo.rule.ruletype.RuleTypeAdapter;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.configuration.ConfigurableService;
@@ -676,9 +675,8 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	 * 
 	 * @param ruleTypeAdapter  the rule type adapter
 	 */
-	public void registerRuleType(RuleTypeAdapter ruleTypeAdapter) 
+	public void registerRuleType(RuleType ruleType) 
 	{
-		RuleType ruleType = ruleTypeAdapter.getRuleType();
 		this.ruleTypes.put(ruleType.getName(), ruleType);
 	}    
     

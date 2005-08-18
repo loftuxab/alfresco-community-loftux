@@ -17,18 +17,42 @@
  */
 package org.alfresco.repo.rule;
 
-import junit.framework.TestCase;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.rule.ruletrigger.RuleTrigger;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.util.BaseSpringTest;
 
 /**
  * Parameter definition implementation unit test.
  * 
  * @author Roy Wetherall
  */
-public class RuleTypeImplTest extends TestCase
+public class RuleTypeImplTest extends BaseSpringTest
 {
     private static final String NAME = "name";
-    private static final String DISPLAY_LABEL = "The display label.";
-    private static final String RULE_TYPE_ADAPTER = "org.alfresco.repo.rule.impl.TestAdapter";
+    
+    private NodeService nodeService;
+	private ContentService contentService;
+	
+	private StoreRef testStoreRef;
+	private NodeRef rootNodeRef;
+	
+	@Override
+	protected void onSetUpInTransaction() throws Exception
+	{
+		this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
+		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
+		
+		this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
+	}
     
     public void testConstructor()
     {
@@ -36,12 +60,10 @@ public class RuleTypeImplTest extends TestCase
     }
    
     private RuleTypeImpl create()
-    {
-        RuleTypeImpl temp = new RuleTypeImpl(
-                NAME);
+    {    	 
+        RuleTypeImpl temp = new RuleTypeImpl(null);
+        temp.setBeanName(NAME);
         assertNotNull(temp);
-        temp.setDisplayLabel(DISPLAY_LABEL);
-        temp.setRuleTypeAdapter(RULE_TYPE_ADAPTER);
         return temp;
     }
     
@@ -49,17 +71,66 @@ public class RuleTypeImplTest extends TestCase
     {
         RuleTypeImpl temp = create();
         assertEquals(NAME, temp.getName());
+    }   
+    
+    // TODO Test the display label, ensuring that the label is retrieved from the resource
+    
+    // TODO Test setRuleTriggers
+    
+    // TODO Test triggerRuleType
+    
+    public void testMockInboundRuleType()
+    {
+    	NodeRef nodeRef = this.nodeService.createNode(
+                this.rootNodeRef, 
+    			ContentModel.ASSOC_CHILDREN,
+    			ContentModel.ASSOC_CHILDREN,
+                ContentModel.TYPE_CONTENT).getChildRef();
+		NodeRef nodeRef2 = this.nodeService.createNode(
+                this.rootNodeRef, 
+    			ContentModel.ASSOC_CHILDREN,
+    			ContentModel.ASSOC_CHILDREN,
+                ContentModel.TYPE_CONTAINER).getChildRef();
+    	
+    	List<RuleTrigger> triggers = new ArrayList<RuleTrigger>(2);
+    	triggers.add((RuleTrigger)this.applicationContext.getBean("on-content-update-trigger"));
+    	triggers.add((RuleTrigger)this.applicationContext.getBean("on-create-child-association-trigger"));
+    	
+    	ExtendedRuleType ruleType = new ExtendedRuleType(triggers);
+    	assertFalse(ruleType.rulesTriggered);
+    	
+    	// Update some content in order to trigger the rule type
+    	ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
+    	contentWriter.putContent("any old content");
+    	assertTrue(ruleType.rulesTriggered);
+    	
+    	// Reset
+    	ruleType.rulesTriggered = false;
+    	assertFalse(ruleType.rulesTriggered);
+    	
+    	// Create a child association in order to trigger the rule type
+    	this.nodeService.addChild(
+    			nodeRef2, 
+    			nodeRef, 
+    			ContentModel.ASSOC_CHILDREN,
+    			ContentModel.ASSOC_CHILDREN);
+    	assertTrue(ruleType.rulesTriggered);
     }
     
-    public void testGetDisplayLabel()
+    private class ExtendedRuleType extends RuleTypeImpl
     {
-        RuleTypeImpl temp = create();
-        assertEquals(DISPLAY_LABEL, temp.getDisplayLabel());    
-    }
-    
-    public void testGetRuleTypeAdapter()
-    {
-        RuleTypeImpl temp = create();
-        assertEquals(RULE_TYPE_ADAPTER, temp.getRuleTypeAdapter());   
+    	public boolean rulesTriggered = false;
+    	
+		public ExtendedRuleType(List<RuleTrigger> ruleTriggers)
+		{
+			super(ruleTriggers);
+		}
+		
+		@Override
+		public void triggerRuleType(NodeRef nodeRef, NodeRef actionedUponNodeRef)
+		{
+			this.rulesTriggered = true;
+		}
+    	
     }
 }

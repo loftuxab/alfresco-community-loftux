@@ -61,6 +61,11 @@ import org.alfresco.service.namespace.QName;
     {
         BehaviourBinding generalisedBinding = null;
         ClassDefinition classDefinition = dictionary.getClass(classQName);
+        if (classDefinition == null)
+        {
+        	throw new PolicyException("Class definition " + classDefinition.getName() + " does not exist.");
+        }
+        
         QName parentClassName = classDefinition.getParentName();
         if (parentClassName != null)
         {

@@ -18,7 +18,9 @@
 package org.alfresco.repo.content;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.Status;
 import javax.transaction.SystemException;
@@ -26,9 +28,13 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy;
 import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.ContentTransformerRegistry;
+import org.alfresco.repo.policy.ClassPolicyDelegate;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
@@ -41,7 +47,9 @@ import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.EqualsHelper;
 import org.alfresco.util.TempFileProvider;
 
 /**
@@ -61,6 +69,16 @@ public class RoutingContentService implements ContentService
     private ContentStore store;
     /** the store for all temporarily created content */
     private ContentStore tempStore;
+    
+    /**
+     * The policy component
+     */
+    private PolicyComponent policyComponent;
+    
+    /**
+     * The onContentService policy delegate
+     */
+    ClassPolicyDelegate<ContentServicePolicies.OnContentUpdatePolicy> onContentUpdateDelegate;
     
     /**
      * Default constructor sets up a temporary store 
@@ -90,6 +108,49 @@ public class RoutingContentService implements ContentService
     public void setStore(ContentStore store)
     {
         this.store = store;
+    }
+    public void setPolicyComponent(PolicyComponent policyComponent)
+	{
+		this.policyComponent = policyComponent;
+	}
+    
+    /**
+     * Service initialise 
+     */
+    public void init()
+    {
+    	// Bind on update properties behaviour
+    	this.policyComponent.bindClassBehaviour(
+    			QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
+    			this,
+    			new JavaBehaviour(this, "onUpdateProperties"));
+    	
+    	// Register on content update policy
+    	this.onContentUpdateDelegate = this.policyComponent.registerClassPolicy(OnContentUpdatePolicy.class);
+    }
+    
+    /**
+     * Update properties policy behaviour
+     * 
+     * @param nodeRef	the node reference
+     * @param before	the before values of the properties
+     * @param after		the after values of the properties
+     */
+    public void onUpdateProperties(
+            NodeRef nodeRef,
+            Map<QName, Serializable> before,
+            Map<QName, Serializable> after)
+    {
+    	String beforeContentUrl = (String)before.get(ContentModel.PROP_CONTENT_URL);
+    	String afterContentUrl = (String)after.get(ContentModel.PROP_CONTENT_URL);
+    	if (EqualsHelper.nullSafeEquals(beforeContentUrl, afterContentUrl) == false)
+	    {
+    		// Fire the content update policy
+    		Set<QName> types = new HashSet<QName>(this.nodeService.getAspects(nodeRef));
+    		types.add(this.nodeService.getType(nodeRef));
+    		OnContentUpdatePolicy policy = this.onContentUpdateDelegate.get(types);
+    		policy.onContentUpdate(nodeRef);
+	    }
     }
     
     public ContentReader getReader(NodeRef nodeRef)
@@ -159,7 +220,7 @@ public class RoutingContentService implements ContentService
     }
 
    /**
-    * Add a listener to the plain writer
+    * Add a listener to the plain writer 
     * 
     * @see #getWriter(NodeRef)
     */
@@ -174,8 +235,6 @@ public class RoutingContentService implements ContentService
         
         // get the plain writer
         ContentWriter writer = getWriter(nodeRef);
-        // get URL that is going to be written to
-        String contentUrl = writer.getContentUrl();
         // need a listener to update the node when the stream closes
         WriteStreamListener listener = new WriteStreamListener(nodeRef, writer);
         listener.setServiceRegistry(serviceRegistry);
