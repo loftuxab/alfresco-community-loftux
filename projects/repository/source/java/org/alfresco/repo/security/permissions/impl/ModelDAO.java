@@ -39,7 +39,7 @@ public interface ModelDAO
      * @param type - the type in the data dictionary.
      * @return
      */
-    public Set<PermissionReference> getPermissions(QName type);
+    public Set<PermissionReference> getAllPermissions(QName type);
 
     /**
      * Get the permissions that can be set for the given node. 
@@ -48,7 +48,24 @@ public interface ModelDAO
      * @param nodeRef
      * @return
      */
-    public Set<PermissionReference> getPermissions(NodeRef nodeRef);
+    public Set<PermissionReference> getAllPermissions(NodeRef nodeRef);
+    
+    /**
+     *Get the permissions that are exposed to be set for the given type.
+     * 
+     * @param type - the type in the data dictionary.
+     * @return
+     */
+    public Set<PermissionReference> getExposedPermissions(QName type);
+
+    /**
+     * Get the permissions that are exposed to be set for the given node. 
+     * This is determined by the node type.
+     * 
+     * @param nodeRef
+     * @return
+     */
+    public Set<PermissionReference> getExposedPermissions(NodeRef nodeRef);
 
     /**
      * Get all the permissions that grant this permission.

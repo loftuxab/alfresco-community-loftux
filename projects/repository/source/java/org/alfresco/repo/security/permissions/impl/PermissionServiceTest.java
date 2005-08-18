@@ -426,8 +426,13 @@ public class PermissionServiceTest extends BaseSpringTest
 
         answer = permissionService.getSettablePermissions(QName.createQName("alf", "content", namespacePrefixResolver));
         assertEquals(21, answer.size());
+        
+        answer = permissionService.getSettablePermissions(QName.createQName("alf", "folder", namespacePrefixResolver));
+        assertEquals(4, answer.size());
     }
 
+    
+    
     public void testGetSettablePermissionsForNode()
     {
         QName ownable = QName.createQName("alf", "ownable", namespacePrefixResolver);

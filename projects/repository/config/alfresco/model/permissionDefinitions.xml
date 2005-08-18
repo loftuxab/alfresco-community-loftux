@@ -1,8 +1,10 @@
-<!DOCTYPE permissions >
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE permissions>
+<!--PUBLIC '-//ALFRECSO//DTD PERMISSIONS//EN' 'permissionSchema.dtd'-->
 
 <!-- The base permission model for the repository -->
 
-<permissions defaultPermission="deny">
+<permissions>
     
     <!-- Namespaces used in type references -->
     
@@ -13,73 +15,75 @@
     
    <!-- Base permissions available on all types of node -->
     
-   <permissionSet type="alf:base">
+   <permissionSet type="alf:base" expose="all" >
     
       <!-- Higher level permissions -->
     
       <!-- Full access -->
-      <permissionGroup name="FullControl" allowFullControl="true" />
+      <permissionGroup name="FullControl" expose="true" allowFullControl="true" />
       
       <!-- Higher level acces groupings -->
-      <permissionGroup name="Read" allowFullControl="false" />  
-      <permissionGroup name="Write" allowFullControl="false" />  
-      <permissionGroup name="Delete" allowFullControl="false" />  
-      <permissionGroup name="AddChildren" allowFullControl="false" />  
+      <permissionGroup name="Read"  expose="true" allowFullControl="false" />  
+      <permissionGroup name="Write" expose="true" allowFullControl="false" />  
+      <permissionGroup name="Delete" expose="true" allowFullControl="false" />  
+      <permissionGroup name="AddChildren" expose="true" allowFullControl="false" />  
     
       <!-- Low level access groupings -->
     
-      <permission name="ReadProperties" defaultPermission="allow">
+      <permission name="ReadProperties" expose="true" >
          <grantedToGroup permissionGroup="Read" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="ReadChildren" defaultPermission="allow">
+      <permission name="ReadChildren" expose="true" >
          <grantedToGroup permissionGroup="Read" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="WriteProperties">
+      <permission name="WriteProperties" expose="true" >
          <grantedToGroup permissionGroup="Write" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="DeleteNode">
+      <permission name="DeleteNode" expose="true" >
+         <grantedToGroup permissionGroup="Delete" />
+         <requiredPermission on="parent" name="ReadChildren" implies="false"/>
+         <requiredPermission on="node" name="DeleteChildren" implies="false"/>
+         <requiredPermission on="children" name="DeleteNode" implies="false"/>
+      </permission>
+      
+      <permission name="DeleteChildren" expose="true" >
          <grantedToGroup permissionGroup="Delete" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="DeleteChildren">
-         <grantedToGroup permissionGroup="Delete" />
-         <requiredPermission on="parent" name="ReadChildren" implies="false"/>
-      </permission>
-      
-      <permission name="CreateChildren">
+      <permission name="CreateChildren" expose="true" >
          <grantedToGroup permissionGroup="AddChildren" />
          <requiredPermission on="parent" name="ReadChildren" implies="false" />
       </permission>
       
-      <permission name="LinkChildren">
+      <permission name="LinkChildren" expose="true" >
          <grantedToGroup permissionGroup="AddChildren" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
      
-      <permission name="DeleteAssociations" >
+      <permission name="DeleteAssociations" expose="true" >
         <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="ReadAssociations" defaultPermission="allow">
+      <permission name="ReadAssociations" expose="true" >
         <requiredPermission on="parent" name="ReadChildren" implies="false" />
       </permission>
       
-      <permission name="CreateAssociations">
+      <permission name="CreateAssociations" expose="true" >
         <requiredPermission on="parent" name="ReadChildren" implies="false" />
       </permission>
       
-      <permission name="ReadPermissions" >
+      <permission name="ReadPermissions" expose="true" >
         <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="ChangePermissions" >
+      <permission name="ChangePermissions" expose="true" >
         <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
@@ -88,28 +92,28 @@
    <!-- Permissions specific to content -->
    <!-- Note the read permission of content is the same as the node at the moment --> 
    
-   <permissionSet type="alf:content">
+   <permissionSet type="alf:content" expose="all">
 
       <!-- Extend some base permissions -->
-      <permissionGroup name="Read" extends="true" />
-      <permissionGroup name="Write" extends="true" />
+      <permissionGroup name="Read" extends="true" expose="true"/>
+      <permissionGroup name="Write" extends="true" expose="true"/>
       
       <!-- Add some new -->
-      <permissionGroup name="Execute" allowFullControl="false" />
+      <permissionGroup name="Execute" allowFullControl="false" expose="true"/>
       
       <!-- Content specific permissions -->
       
-      <permission name="ReadContent" defaultPermission="allow">
+      <permission name="ReadContent" expose="true">
          <grantedToGroup permissionGroup="Read"/>
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
 
-      <permission name="WriteContent">
+      <permission name="WriteContent" expose="true">
          <grantedToGroup permissionGroup="Write" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
       
-      <permission name="ExecuteContent">
+      <permission name="ExecuteContent" expose="true">
          <grantedToGroup permissionGroup="Execute" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
       </permission>
@@ -119,13 +123,13 @@
    
    <!-- Permissins associated with the Ownable aspect -->
    
-   <permissionSet type="alf:ownable">
+   <permissionSet type="alf:ownable" expose="all">
       <!-- Read is controlled by the node -->
       
       <!-- Permission control to allow ownership of the node to be taken from others -->
       <permissionGroup name="TakeOwnership" />
       
-      <permission name="SetOwner">
+      <permission name="SetOwner" expose="true">
         <grantedToGroup permissionGroup="TakeOwnership" />
         <requiredPermission on="parent" name="ReadChildren" />
         <!-- We need these permissions to set the owner. So they are implied by having this permission -->
@@ -133,12 +137,30 @@
         <requiredPermission on="node" name="AddChildren" implies="true" />
       </permission>
       
-      <!-- Owner permssion is assigned dynamically -->
-      <!-- Special permissions applied to the owner -->
-      <dynamicPermission evaluator="org.alfresco.repo.ownable.impl.OwnablePermissionEvaluator" name="Owner" >
-        <requiredPermission on="node" name="FullControl" implies="true"></requiredPermission>
-      </dynamicPermission>
+      <!-- Owner authority is assigned dynamically -->
+      <dynamicAuthority evaluator="org.alfresco.repo.ownable.impl.OwnablePermissionEvaluator" />
    </permissionSet>
+   
+   <!-- Permissions for spaces -->
+   
+   
+   <permissionSet type="alf:folder" expose="selected">
+        <permissionGroup name="Administrator" allowFullControl="true" expose="true" />
+        <permissionGroup name="Coordinator" allowFullControl="false" expose="true" >
+            <includePermissionGroup permissionGroup="Read"/>
+            <includePermissionGroup permissionGroup="Write"/>
+            <includePermissionGroup permissionGroup="Delete"/>
+            <includePermissionGroup permissionGroup="AddChildren"/>
+        </permissionGroup>
+        <permissionGroup name="Contributor" allowFullControl="false" expose="true" >
+            <includePermissionGroup permissionGroup="Guest"/>
+            <includePermissionGroup permissionGroup="AddChildren"/>
+        </permissionGroup>
+        <permissionGroup name="Guest" allowFullControl="false" expose="true" >
+            <includePermissionGroup permissionGroup="Read"/>
+        </permissionGroup>
+   </permissionSet>
+   
    
    <!-- Set the permissions for the root node -->
    

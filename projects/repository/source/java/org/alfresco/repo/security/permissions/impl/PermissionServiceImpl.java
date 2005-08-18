@@ -128,12 +128,12 @@ public class PermissionServiceImpl implements PermissionService
 
     public Set<PermissionReference> getSettablePermissions(NodeRef nodeRef)
     {
-        return modelDAO.getPermissions(nodeRef);
+        return modelDAO.getExposedPermissions(nodeRef);
     }
 
     public Set<PermissionReference> getSettablePermissions(QName type)
     {
-        return modelDAO.getPermissions(type);
+        return modelDAO.getExposedPermissions(type);
     }
 
     public NodePermissionEntry getSetPermissions(NodeRef nodeRef)
@@ -157,7 +157,7 @@ public class PermissionServiceImpl implements PermissionService
 
         // If the node does not support the given permission there is no point
         // doing the test
-        Set<PermissionReference> available = modelDAO.getPermissions(nodeRef);
+        Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
 
         if (!(available.contains(perm)))
         {
@@ -554,7 +554,7 @@ public class PermissionServiceImpl implements PermissionService
                         // All permission excludes all permissions available for the node.
                         if (pe.getPermissionReference().equals(SimplePermissionEntry.ALL_PERMISSIONS))
                         {
-                            for (PermissionReference deny : modelDAO.getPermissions(nodeRef))
+                            for (PermissionReference deny : modelDAO.getAllPermissions(nodeRef))
                             {
                                 deniedSet.add(new Pair<String, PermissionReference>(pe.getAuthority(), deny));
                             }

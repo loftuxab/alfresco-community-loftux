@@ -55,6 +55,8 @@ public abstract class AbstractPermission extends AbstractPermissionReference imp
 
     private static final String PARENT_ENTRY = "parent";
     
+    private static final String CHILDREN_ENTRY = "children";
+    
     /* Instance variables */
     
     private String name;
@@ -98,6 +100,10 @@ public abstract class AbstractPermission extends AbstractPermissionReference imp
             else if (onString.equalsIgnoreCase(PARENT_ENTRY))
             {
                 on = RequiredPermission.On.PARENT;
+            }
+            else if (onString.equalsIgnoreCase(CHILDREN_ENTRY))
+            {
+                on = RequiredPermission.On.CHILDREN;
             }
             else
             {

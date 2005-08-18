@@ -52,6 +52,8 @@ public class PermissionGroup extends AbstractPermissionReference implements XMLM
     private static final String PERMISSION_GROUP = "permissionGroup";
 
     private static final String TYPE = "type";
+    
+    private static final String EXPOSE = "expose";
 
     private String name;
     
@@ -59,6 +61,8 @@ public class PermissionGroup extends AbstractPermissionReference implements XMLM
     
     private boolean extendz;
 
+    private boolean isExposed;
+    
     private boolean allowFullControl;
 
     private QName container;
@@ -94,6 +98,16 @@ public class PermissionGroup extends AbstractPermissionReference implements XMLM
         else
         {
             extendz = false;
+        }
+        
+        att = element.attribute(EXPOSE);
+        if (att != null)
+        {
+            isExposed = Boolean.parseBoolean(att.getStringValue());
+        }
+        else
+        {
+            isExposed = true;
         }
         
         att = element.attribute(TYPE);
@@ -156,6 +170,9 @@ public class PermissionGroup extends AbstractPermissionReference implements XMLM
     {
         return type;
     }
-    
-    
+
+    public boolean isExposed()
+    {
+        return isExposed;
+    }
 }

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -37,8 +38,14 @@ public class PermissionSet implements XMLModelInitialisable
     private static final String TYPE = "type";
     private static final String PERMISSION_GROUP = "permissionGroup";
     private static final String PERMISSION = "permission";
+    private static final String EXPOSE = "expose";
+    private static final String EXPOSE_ALL = "all";
+    private static final String EXPOSE_SELECTED = "selected";
+    
     
     private QName qname;
+    
+    private boolean exposeAll;
     
     private Set<PermissionGroup> permissionGroups = new HashSet<PermissionGroup>();
     
@@ -52,6 +59,16 @@ public class PermissionSet implements XMLModelInitialisable
     public void initialise(Element element, NamespacePrefixResolver nspr)
     {
         qname = QName.createQName(element.attributeValue(TYPE), nspr);
+        
+        Attribute exposeAttribute = element.attribute(EXPOSE);
+        if(exposeAttribute != null)
+        {
+            exposeAll = exposeAttribute.getStringValue().equalsIgnoreCase(EXPOSE_ALL);
+        }
+        else
+        {
+            exposeAll = true;
+        }
         
         for(Iterator pgit = element.elementIterator(PERMISSION_GROUP); pgit.hasNext(); /**/)
         {
@@ -84,6 +101,11 @@ public class PermissionSet implements XMLModelInitialisable
     public QName getQName()
     {
         return qname;
+    }
+
+    public boolean exposeAll()
+    {
+        return exposeAll;
     }
     
     

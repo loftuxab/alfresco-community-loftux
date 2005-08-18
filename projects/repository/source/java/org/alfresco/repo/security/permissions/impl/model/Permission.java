@@ -55,7 +55,11 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
     
     private static final String DEFAULT_PERMISSION = "defaultPermission";
 
+    private static final String EXPOSE = "expose";
+
     private AccessStatus defaultPermission;
+
+    private boolean isExposed;
 
     public Permission(QName typeQName)
     {
@@ -66,6 +70,16 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
     public void initialise(Element element, NamespacePrefixResolver nspr)
     {
         super.initialise(element, nspr);
+        
+        Attribute att = element.attribute(EXPOSE);
+        if (att != null)
+        {
+            isExposed = Boolean.parseBoolean(att.getStringValue());
+        }
+        else
+        {
+            isExposed = true;
+        }
         
         Attribute defaultPermissionAttribute = element.attribute(DEFAULT_PERMISSION);
         if(defaultPermissionAttribute != null)
@@ -117,6 +131,11 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
     public Set<PermissionReference> getGrantedToGroups()
     {
         return Collections.unmodifiableSet(grantedToGroups);
+    }
+
+    public boolean isExposed()
+    {
+        return isExposed;
     }
 
 }

@@ -255,16 +255,26 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return Collections.unmodifiableMap(permissionSets);
     }
 
-    public Set<PermissionReference> getPermissions(QName type)
+    public Set<PermissionReference> getAllPermissions(QName type)
+    {
+        return getAllPermissionsImpl(type, false);
+    }
+    
+    public Set<PermissionReference> getExposedPermissions(QName type)
+    {
+        return getAllPermissionsImpl(type, true);
+    }
+    
+    private Set<PermissionReference> getAllPermissionsImpl(QName type, boolean exposedOnly)
     {
         Set<PermissionReference> permissions = new HashSet<PermissionReference>();
         if (dictionaryService.getClass(type).isAspect())
         {
-            addAspectPermissions(type, permissions);
+            addAspectPermissions(type, permissions, exposedOnly);
         }
         else
         {
-            addTypePermissions(type, permissions);
+            addTypePermissions(type, permissions, exposedOnly);
         }
         return permissions;
     }
@@ -275,18 +285,22 @@ public class PermissionModel implements ModelDAO, InitializingBean
      * @param type
      * @param permissions
      */
-    private void addTypePermissions(QName type, Set<PermissionReference> permissions)
+    private void addTypePermissions(QName type, Set<PermissionReference> permissions, boolean exposedOnly)
     {
         TypeDefinition typeDef = dictionaryService.getType(type);
         if (typeDef.getParentName() != null)
         {
-            addTypePermissions(typeDef.getParentName(), permissions);
+            PermissionSet permissionSet = permissionSets.get(type);
+            if (!exposedOnly || (permissionSet == null) || permissionSet.exposeAll())
+            {
+               addTypePermissions(typeDef.getParentName(), permissions, exposedOnly);
+            }
         }
         for (AspectDefinition ad : typeDef.getDefaultAspects())
         {
-            addAspectPermissions(ad.getName(), permissions);
+            addAspectPermissions(ad.getName(), permissions, exposedOnly);
         }
-        mergePermissions(permissions, type);
+        mergePermissions(permissions, type, exposedOnly);
     }
 
     /**
@@ -295,14 +309,18 @@ public class PermissionModel implements ModelDAO, InitializingBean
      * @param type
      * @param permissions
      */
-    private void addAspectPermissions(QName type, Set<PermissionReference> permissions)
+    private void addAspectPermissions(QName type, Set<PermissionReference> permissions, boolean exposedOnly)
     {
         AspectDefinition aspectDef = dictionaryService.getAspect(type);
         if (aspectDef.getParentName() != null)
         {
-            addTypePermissions(aspectDef.getParentName(), permissions);
+            PermissionSet permissionSet = permissionSets.get(type);
+            if (!exposedOnly || (permissionSet == null) || permissionSet.exposeAll())
+            {
+               addTypePermissions(aspectDef.getParentName(), permissions, exposedOnly);
+            }
         }
-        mergePermissions(permissions, type);
+        mergePermissions(permissions, type, exposedOnly);
     }
 
     /**
@@ -311,26 +329,49 @@ public class PermissionModel implements ModelDAO, InitializingBean
      * @param target
      * @param type
      */
-    private void mergePermissions(Set<PermissionReference> target, QName type)
+    private void mergePermissions(Set<PermissionReference> target, QName type, boolean exposedOnly)
     {
         PermissionSet permissionSet = permissionSets.get(type);
         if (permissionSet != null)
         {
             for (PermissionGroup pg : permissionSet.getPermissionGroups())
             {
-                if (!pg.isExtends())
+                if (!exposedOnly || permissionSet.exposeAll() || pg.isExposed())
                 {
-                    target.add(pg);
+                    if(!pg.isExtends())
+                    {
+                       target.add(pg);
+                    }
+                    else if(exposedOnly)
+                    {
+                        target.add(getBasePermissionGroup(pg));
+                    }
                 }
             }
-            target.addAll(permissionSet.getPermissions());
+            for(Permission p : permissionSet.getPermissions())
+            {
+                if (!exposedOnly || permissionSet.exposeAll() || p.isExposed())
+                {
+                    target.add(p);
+                } 
+            }
         }
     }
+    
+    public Set<PermissionReference> getAllPermissions(NodeRef nodeRef)
+    {
+        return getExposedPermissionsImpl(nodeRef, false);
+    }
+    
+    public Set<PermissionReference> getExposedPermissions(NodeRef nodeRef)
+    {
+        return getExposedPermissionsImpl(nodeRef, true);
+    }
 
-    public Set<PermissionReference> getPermissions(NodeRef nodeRef)
+    public Set<PermissionReference> getExposedPermissionsImpl(NodeRef nodeRef, boolean exposedOnly)
     {
         QName typeName = nodeService.getType(nodeRef);
-        Set<PermissionReference> permissions = getPermissions(typeName);
+        Set<PermissionReference> permissions = getAllPermissions(typeName);
         // Add non mandatory aspects..
         Set<QName> defaultAspects = new HashSet<QName>();
         for (AspectDefinition aspDef : dictionaryService.getType(typeName).getDefaultAspects())
@@ -341,7 +382,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
         {
             if (!defaultAspects.contains(aspect))
             {
-                addAspectPermissions(aspect, permissions);
+                addAspectPermissions(aspect, permissions, exposedOnly);
             }
         }
         return permissions;

@@ -30,7 +30,7 @@ import org.alfresco.service.namespace.QName;
 public class RequiredPermission extends PermissionReferenceImpl
 {
     public enum On {
-        PARENT, NODE
+        PARENT, NODE, CHILDREN
     };
 
     private On on;
