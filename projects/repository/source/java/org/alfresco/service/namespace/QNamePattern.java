@@ -23,7 +23,7 @@ package org.alfresco.service.namespace;
  * <p>
  * Implementations will use different mechanisms to match against the
  * {@link org.alfresco.service.namespace.QName#getNamespaceURI() namespace} and
- * {@link org.alfresco.repo.ref.QName#getLocalName()() localname}.
+ * {@link org.alfresco.service.namespace.QName#getLocalName()() localname}.
  * 
  * @see org.alfresco.service.namespace.QName
  * 
