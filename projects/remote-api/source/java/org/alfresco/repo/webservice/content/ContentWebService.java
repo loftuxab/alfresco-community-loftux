@@ -67,22 +67,6 @@ public class ContentWebService implements ContentServiceSoapPort
    }
 
    /**
-    * @see org.alfresco.repo.webservice.content.ContentServiceSoapPort#readChunk(org.alfresco.repo.webservice.types.Reference, org.alfresco.repo.webservice.content.ContentSegment)
-    */
-   public ReadResult readChunk(Reference node, ContentSegment segment) throws RemoteException, ContentFault
-   {
-      throw new ContentFault(1, "readChunk() is not implemented yet!");
-   }
-
-   /**
-    * @see org.alfresco.repo.webservice.content.ContentServiceSoapPort#readNext(java.lang.String)
-    */
-   public ReadResult readNext(String readSession) throws RemoteException, ContentFault
-   {
-      throw new ContentFault(1, "readNext() is not implemented yet!");
-   }
-
-   /**
     * @see org.alfresco.repo.webservice.content.ContentServiceSoapPort#write(org.alfresco.repo.webservice.types.Reference, byte[])
     */
    public void write(Reference node, byte[] content) throws RemoteException, ContentFault

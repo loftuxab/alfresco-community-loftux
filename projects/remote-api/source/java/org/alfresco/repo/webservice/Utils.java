@@ -30,7 +30,9 @@ import org.alfresco.service.cmr.repository.StoreRef;
  * @author gavinc
  */
 public class Utils
-{   
+{
+   public static final String REPOSITORY_SERVICE_NAMESPACE = "http://www.alfresco.org/ws/service/repository/1.0"; 
+   
    private Utils()
    {
       // don't allow construction

@@ -72,7 +72,7 @@
    }
    else
    {
-      //print('Query Session  = ' . $queryResults->querySession);
+      print('Query Session  = ' . $queryResults->querySession . '<br/><br/>');
 
       if (isset($queryResults->resultSet->rows))
       {

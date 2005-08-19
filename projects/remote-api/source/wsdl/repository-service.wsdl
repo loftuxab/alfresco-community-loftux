@@ -149,7 +149,7 @@
          
          <complexType name="QueryResult">
             <sequence>
-               <element name="querySession" type="xsd:string"/>
+               <element name="querySession" type="xsd:string" nillable="true"/>
                <element name="resultSet" type="cms:ResultSet"/>
             </sequence>
          </complexType>

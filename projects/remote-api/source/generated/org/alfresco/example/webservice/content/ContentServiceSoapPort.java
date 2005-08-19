@@ -20,16 +20,6 @@ public interface ContentServiceSoapPort extends java.rmi.Remote {
     public org.alfresco.example.webservice.content.ReadResult read(org.alfresco.example.webservice.types.Reference node) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
 
     /**
-     * Retrieves content from the repository in chunks.
-     */
-    public org.alfresco.example.webservice.content.ReadResult readChunk(org.alfresco.example.webservice.types.Reference node, org.alfresco.example.webservice.content.ContentSegment segment) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
-
-    /**
-     * Retrieves the next chunk of content from the given read session.
-     */
-    public org.alfresco.example.webservice.content.ReadResult readNext(java.lang.String readSession) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
-
-    /**
      * Writes content to the repository.
      */
     public void write(org.alfresco.example.webservice.types.Reference node, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;

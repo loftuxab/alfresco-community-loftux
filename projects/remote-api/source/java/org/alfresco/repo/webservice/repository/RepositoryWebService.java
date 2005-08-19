@@ -17,20 +17,16 @@
  */
 package org.alfresco.repo.webservice.repository;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.CML;
-import org.alfresco.repo.webservice.types.NamedValue;
 import org.alfresco.repo.webservice.types.NodeDefinition;
 import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Query;
 import org.alfresco.repo.webservice.types.QueryLanguageEnum;
 import org.alfresco.repo.webservice.types.Reference;
-import org.alfresco.repo.webservice.types.ResultSet;
 import org.alfresco.repo.webservice.types.ResultSetRow;
 import org.alfresco.repo.webservice.types.ResultSetRowNode;
 import org.alfresco.repo.webservice.types.Store;
@@ -38,10 +34,11 @@ import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.util.GUID;
+import org.apache.axis.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,6 +54,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
    
    private NodeService nodeService;
    private SearchService searchService;
+   private QuerySessionCache querySessionCache;
    
    /**
     * Sets the instance of the NodeService to be used
@@ -76,6 +74,16 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
    public void setSearchService(SearchService searchService)
    {
       this.searchService = searchService;
+   }
+   
+   /**
+    * Sets the instance of the QuerySessionCache to be used
+    * 
+    * @param querySessionCache The QuerySessionCache
+    */
+   public void setQuerySessionCache(QuerySessionCache querySessionCache)
+   {
+      this.querySessionCache = querySessionCache;
    }
 
    /**
@@ -113,17 +121,15 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult query(Store store, Query query, boolean includeMetaData) throws RemoteException, RepositoryFault
    {
+      QueryLanguageEnum langEnum = query.getLanguage();
+         
+      if (langEnum.equals(QueryLanguageEnum.cql) || langEnum.equals(QueryLanguageEnum.xpath))
+      {
+         throw new RepositoryFault(110, "Only '" + QueryLanguageEnum.lucene.getValue() + "' queries are currently supported!");
+      }
+      
       try
       {
-         QueryLanguageEnum langEnum = query.getLanguage();
-         
-         if (langEnum.equals(QueryLanguageEnum.cql) || langEnum.equals(QueryLanguageEnum.xpath))
-         {
-            throw new RepositoryFault(110, "Only '" + QueryLanguageEnum.lucene.getValue() + "' queries are currently supported!");
-         }
-         
-         // TODO: Return metadata if the includeMetaData flag is set
-         
          // handle the special search string of * meaning, get everything
          String statement = query.getStatement();
          if (statement.equals("*"))
@@ -132,50 +138,23 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          }
          
          // perform the requested search
-         org.alfresco.service.cmr.search.ResultSet searchResults = this.searchService.query(Utils.convertToStoreRef(store), 
-               langEnum.getValue(), statement, null, null);
+         ResultSet searchResults = this.searchService.query(Utils.convertToStoreRef(store), langEnum.getValue(), statement, null, null);
          
-         ResultSet results = new ResultSet();
-         int size = searchResults.length();
+         // setup a query session and get the first batch of results
+         ResultSetQuerySession querySession = new ResultSetQuerySession(MessageContext.getCurrentContext(), this.nodeService,
+               searchResults, includeMetaData);
+         QueryResult queryResult = querySession.getNextResultsBatch();; 
          
-         // build up all the row data
-         ResultSetRow[] rows = new ResultSetRow[size];
-         for (int x = 0; x < size; x++)
+         // add the session to the cache if there are more results to come
+         if (querySession.hasMoreResults())
          {
-            org.alfresco.service.cmr.search.ResultSetRow origRow = searchResults.getRow(x);
-            NodeRef nodeRef = origRow.getNodeRef();
-            ResultSetRowNode rowNode = new ResultSetRowNode(nodeRef.getId(), nodeService.getType(nodeRef).toString(), null);
-            
-            // get the data for the row and build up the columns structure
-            Map<Path, Serializable> values = origRow.getValues();
-            NamedValue[] columns = new NamedValue[values.size()];
-            int col = 0;
-            for (Path path : values.keySet())
-            {
-               columns[col] = new NamedValue(path.toString(), values.get(path).toString());
-               col++;
-            }
-            
-            ResultSetRow row = new ResultSetRow();
-            row.setColumns(columns);
-            row.setScore(origRow.getScore());
-            row.setRowIndex(x);
-            row.setNode(rowNode);
-            
-            // add the row to the overall results
-            rows[x] = row;
+            this.querySessionCache.putQuerySession(querySession);
          }
-         
-         // TODO: build up the meta data data structure if asked to
-         
-         // add the rows to the result set and set the size
-         results.setRows(rows);
-         results.setSize(size);
-         
-         // TODO: Setup a query session and only return the number of rows specified in the query config header
-         QueryResult queryResult = new QueryResult();
-         queryResult.setQuerySession(GUID.generate());
-         queryResult.setResultSet(results);
+         else
+         {
+            // remove the query session id so the client doesn't request non-existent results
+            queryResult.setQuerySession(null);
+         }
          
          return queryResult;
       }
@@ -201,7 +180,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          NodeRef nodeRef = new NodeRef(Utils.convertToStoreRef(node.getStore()), node.getUuid());
          List<ChildAssociationRef> kids = this.nodeService.getChildAssocs(nodeRef);
          
-         ResultSet results = new ResultSet();
+         org.alfresco.repo.webservice.types.ResultSet results = new org.alfresco.repo.webservice.types.ResultSet();
          int size = kids.size();
          
          // build up all the row data
@@ -221,7 +200,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          
          // add the rows to the result set and set the size
          results.setRows(rows);
-         results.setSize(size);
+         results.setTotalRowCount(size);
          
          // TODO: Setup a query session and only return the number of rows specified in the query config header
          QueryResult queryResult = new QueryResult();
@@ -252,7 +231,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          NodeRef nodeRef = new NodeRef(Utils.convertToStoreRef(node.getStore()), node.getUuid());
          List<ChildAssociationRef> parents = this.nodeService.getParentAssocs(nodeRef);
          
-         ResultSet results = new ResultSet();
+         org.alfresco.repo.webservice.types.ResultSet results = new org.alfresco.repo.webservice.types.ResultSet();
          int size = parents.size();
          
          // build up all the row data
@@ -272,7 +251,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          
          // add the rows to the result set and set the size
          results.setRows(rows);
-         results.setSize(size);
+         results.setTotalRowCount(size);
          
          // TODO: Setup a query session and only return the number of rows specified in the query config header
          QueryResult queryResult = new QueryResult();
@@ -305,7 +284,42 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult fetchMore(String querySession) throws RemoteException, RepositoryFault
    {
-      throw new RepositoryFault(1, "fetchMore() is not implemented yet!");
+      // get the QuerySession from the cache
+      QuerySession session = this.querySessionCache.getQuerySession(querySession);
+      
+      if (session == null)
+      {
+         throw new RepositoryFault(4, "querySession with id '" + querySession + "' is invalid");
+      }
+      
+      if (session.hasMoreResults() == false)
+      {
+         throw new RepositoryFault(5, "querySession with id '" + querySession + "' does not have any more results to fetch!");
+      }
+      
+      try
+      {
+         // get the next batch of results
+         QueryResult queryResult = session.getNextResultsBatch(); 
+         
+         if (session.hasMoreResults() == false)
+         {
+            // remove the query session id so the client doesn't request non-existent results
+            queryResult.setQuerySession(null);
+            this.querySessionCache.removeQuerySession(querySession);
+         }
+         
+         return queryResult;
+      }
+      catch (Throwable e)
+      {
+         if (logger.isDebugEnabled())
+         {
+            logger.error("Unexpected error occurred", e);
+         }
+         
+         throw new RepositoryFault(0, e.getMessage());
+      }
    }
 
    /**

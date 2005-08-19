@@ -24,6 +24,7 @@ import junit.framework.AssertionFailedError;
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
 import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.Query;
+import org.alfresco.example.webservice.types.QueryConfiguration;
 import org.alfresco.example.webservice.types.QueryLanguageEnum;
 import org.alfresco.example.webservice.types.Reference;
 import org.alfresco.example.webservice.types.ResultSet;
@@ -96,20 +97,14 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       //Query query = new Query(QueryLanguageEnum.lucene, "ISROOT:T");
       Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
       
-      //QueryConfiguration queryCfg = new QueryConfiguration();
-      //queryCfg.setFetchSize(new PositiveInteger("50"));
-      
-      // add the query configuration header to the call
-      //this.repSvc.setHeader(new RepositoryServiceLocator().getServiceName().getNamespaceURI(), "QueryHeader", queryCfg);
-      
       QueryResult queryResult = this.repSvc.query(STORE, query, false);
       assertNotNull("queryResult should not be null", queryResult);
       
       ResultSet resultSet = queryResult.getResultSet();
       assertNotNull("The result set should not be null", resultSet);
-      logger.info("There are " + resultSet.getSize() + " rows:");
+      logger.info("There are " + resultSet.getRows().length + " rows:");
       
-      if (resultSet.getSize() > 0)
+      if (resultSet.getRows().length > 0)
       {
          ResultSetRow[] rows = resultSet.getRows();
          for (int x = 0; x < rows.length; x++)
@@ -129,39 +124,63 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    }
    
    /**
-    * Tests the queryChildren service method
+    * Tests the ability to retrieve the results of a query in batches
     * 
     * @throws Exception
     */
-   public void testQueryChildren() throws Exception
+   public void testQuerySession() throws Exception
    {
-      // get the id of the root node so we can build a query
-      //NodeService nodeService = (NodeService)this.applicationContext.getBean("nodeService");
-      //String rootNodeId = nodeService.getRootNode(STORE_REF).getId();
+      // define a query that will return a lot of hits i.e. EVERYTHING
+      Query query = new Query(QueryLanguageEnum.lucene, "*");
       
-      Reference node = new Reference();
-      node.setStore(STORE);
-      node.setUuid("7329c9d2-0d89-11da-90fb-fbe4cb2183e7");     // find a query to retrieve this maybe type == store_root?
-      QueryResult queryResult = this.repSvc.queryChildren(node);
+      // add the query configuration header to the call
+      int batchSize = 75;
+      QueryConfiguration queryCfg = new QueryConfiguration();
+      queryCfg.setFetchSize(batchSize);
+      this.repSvc.setHeader(new RepositoryServiceLocator().getServiceName().getNamespaceURI(), "QueryHeader", queryCfg);
       
+      // get the first set of results back
+      QueryResult queryResult = this.repSvc.query(STORE, query, false);
       assertNotNull("queryResult should not be null", queryResult);
+      String querySession = queryResult.getQuerySession();
+      String origQuerySession = querySession;
+      assertNotNull("querySession should not be null", querySession);
+      
       ResultSet resultSet = queryResult.getResultSet();
       assertNotNull("The result set should not be null", resultSet);
-      logger.info("There are " + resultSet.getSize() + " rows:");
+      logger.info("There are " + resultSet.getTotalRowCount() + " rows in total");
+      logger.info("There are " + resultSet.getRows().length + " rows in the first set");
+      assertEquals("The result set size should be " + batchSize, batchSize, resultSet.getRows().length);
       
-      if (resultSet.getSize() > 0)
+      // get the next batch of results
+      queryResult = this.repSvc.fetchMore(querySession);
+      assertNotNull("queryResult should not be null", queryResult);
+      querySession = queryResult.getQuerySession();
+      assertNotNull("querySession should not be null", querySession);
+      
+      ResultSet resultSet2 = queryResult.getResultSet();
+      assertNotNull("The second result set should not be null", resultSet2);
+      logger.info("There are " + resultSet2.getRows().length + " rows in the second set");
+      assertEquals("The result set size should be " + batchSize, batchSize, resultSet2.getRows().length);
+      
+      // get the rest of the results to make sure it finishes properly
+      while (querySession != null)
       {
-         ResultSetRow[] rows = resultSet.getRows();
-         for (int x = 0; x < rows.length; x++)
-         {
-            ResultSetRow row = rows[x];
-            ResultSetRowNode rowNode = row.getNode();
-            logger.info("id = " + rowNode.getId() + ", type = " + rowNode.getType());
-         }
+         queryResult = this.repSvc.fetchMore(querySession);
+         assertNotNull("queryResult returned in loop should not be null", queryResult);
+         querySession = queryResult.getQuerySession();
+         logger.info("There were another " + queryResult.getResultSet().getRows().length + " rows returned");
       }
-      else
+      
+      // try and fetch some more results and we should get an error
+      try
       {
-         logger.info("The query returned no results");
+         queryResult = this.repSvc.fetchMore(origQuerySession);
+         fail("We should have seen an error as all the results have been returned");
+      }
+      catch (Exception e)
+      {
+         // expected
       }
    }
    
@@ -182,7 +201,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       assertNotNull("rootChildren should not be null", rootChildren);
       ResultSet rootChildrenResults = rootChildren.getResultSet();
       assertNotNull("rootChildrenResults should not be null", rootChildrenResults);
-      assertTrue("There should be at least one child of the root node", rootChildrenResults.getSize() > 0);
+      assertTrue("There should be at least one child of the root node", 
+            rootChildrenResults.getRows().length > 0);
       
       // get hold of the id of the first child
       ResultSetRow firstRow = rootChildrenResults.getRows(0);
@@ -197,7 +217,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       assertNotNull("parents should not be null", parents);
       ResultSet parentsResults = parents.getResultSet();
       assertNotNull("parentsResults should not be null", parentsResults);
-      assertTrue("There should be at least one parent", parentsResults.getSize() > 0);
+      assertTrue("There should be at least one parent", 
+            parentsResults.getRows().length > 0);
       
       // show the results
       boolean rootFound = false;

@@ -8,83 +8,37 @@
 package org.alfresco.example.webservice.content;
 
 public class ReadResult  implements java.io.Serializable {
-    private java.lang.String readSession;
-    private byte[] stream;
-    private long bytesRead;
+    private java.lang.String url;
     private org.alfresco.example.webservice.types.Content content;
 
     public ReadResult() {
     }
 
     public ReadResult(
-           java.lang.String readSession,
-           byte[] stream,
-           long bytesRead,
+           java.lang.String url,
            org.alfresco.example.webservice.types.Content content) {
-           this.readSession = readSession;
-           this.stream = stream;
-           this.bytesRead = bytesRead;
+           this.url = url;
            this.content = content;
     }
 
 
     /**
-     * Gets the readSession value for this ReadResult.
+     * Gets the url value for this ReadResult.
      * 
-     * @return readSession
+     * @return url
      */
-    public java.lang.String getReadSession() {
-        return readSession;
+    public java.lang.String getUrl() {
+        return url;
     }
 
 
     /**
-     * Sets the readSession value for this ReadResult.
+     * Sets the url value for this ReadResult.
      * 
-     * @param readSession
+     * @param url
      */
-    public void setReadSession(java.lang.String readSession) {
-        this.readSession = readSession;
-    }
-
-
-    /**
-     * Gets the stream value for this ReadResult.
-     * 
-     * @return stream
-     */
-    public byte[] getStream() {
-        return stream;
-    }
-
-
-    /**
-     * Sets the stream value for this ReadResult.
-     * 
-     * @param stream
-     */
-    public void setStream(byte[] stream) {
-        this.stream = stream;
-    }
-
-
-    /**
-     * Gets the bytesRead value for this ReadResult.
-     * 
-     * @return bytesRead
-     */
-    public long getBytesRead() {
-        return bytesRead;
-    }
-
-
-    /**
-     * Sets the bytesRead value for this ReadResult.
-     * 
-     * @param bytesRead
-     */
-    public void setBytesRead(long bytesRead) {
-        this.bytesRead = bytesRead;
+    public void setUrl(java.lang.String url) {
+        this.url = url;
     }
 
 
@@ -119,13 +73,9 @@ public class ReadResult  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.readSession==null && other.getReadSession()==null) || 
-             (this.readSession!=null &&
-              this.readSession.equals(other.getReadSession()))) &&
-            ((this.stream==null && other.getStream()==null) || 
-             (this.stream!=null &&
-              java.util.Arrays.equals(this.stream, other.getStream()))) &&
-            this.bytesRead == other.getBytesRead() &&
+            ((this.url==null && other.getUrl()==null) || 
+             (this.url!=null &&
+              this.url.equals(other.getUrl()))) &&
             ((this.content==null && other.getContent()==null) || 
              (this.content!=null &&
               this.content.equals(other.getContent())));
@@ -140,21 +90,9 @@ public class ReadResult  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getReadSession() != null) {
-            _hashCode += getReadSession().hashCode();
+        if (getUrl() != null) {
+            _hashCode += getUrl().hashCode();
         }
-        if (getStream() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getStream());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getStream(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
-        _hashCode += new Long(getBytesRead()).hashCode();
         if (getContent() != null) {
             _hashCode += getContent().hashCode();
         }
@@ -169,21 +107,9 @@ public class ReadResult  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "ReadResult"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("readSession");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "readSession"));
+        elemField.setFieldName("url");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "url"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("stream");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "stream"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("bytesRead");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/content/1.0", "bytesRead"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();

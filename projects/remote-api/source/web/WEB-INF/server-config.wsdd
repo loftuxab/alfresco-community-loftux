@@ -441,6 +441,7 @@
 	   <requestFlow>
 	      <handler type="CreateSpringTicketCallback"/>
       	<handler type="WSSecurity"/>
+      	<handler type="java:org.alfresco.repo.webservice.repository.QueryConfigHandler"/>
   		</requestFlow>
 	   <!-- generated below here -->
 	   <parameter name="wsdlTargetNamespace" value="http://www.alfresco.org/ws/service/repository/1.0"/>
@@ -550,15 +551,6 @@
         <parameter qname="pns:node" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:Reference" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
         <fault name="ContentFault" qname="fns:ContentFault" xmlns:fns="http://www.alfresco.org/ws/service/content/1.0" class="org.alfresco.repo.webservice.content.ContentFault" type="tns:ContentFault" xmlns:tns="http://www.alfresco.org/ws/service/content/1.0"/>
       </operation>
-      <operation name="readChunk" qname="operNS:readChunk" xmlns:operNS="http://www.alfresco.org/ws/service/content/1.0" returnQName="retNS:readChunkReturn" xmlns:retNS="http://www.alfresco.org/ws/service/content/1.0" returnType="rtns:ReadResult" xmlns:rtns="http://www.alfresco.org/ws/service/content/1.0" soapAction="http://www.alfresco.org/ws/service/content/1.0/readChunk" >
-        <parameter qname="pns:node" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:Reference" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
-        <parameter qname="pns:segment" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:ContentSegment" xmlns:tns="http://www.alfresco.org/ws/service/content/1.0"/>
-        <fault name="ContentFault" qname="fns:ContentFault" xmlns:fns="http://www.alfresco.org/ws/service/content/1.0" class="org.alfresco.repo.webservice.content.ContentFault" type="tns:ContentFault" xmlns:tns="http://www.alfresco.org/ws/service/content/1.0"/>
-      </operation>
-      <operation name="readNext" qname="operNS:readNext" xmlns:operNS="http://www.alfresco.org/ws/service/content/1.0" returnQName="retNS:readNextReturn" xmlns:retNS="http://www.alfresco.org/ws/service/content/1.0" returnType="rtns:ReadResult" xmlns:rtns="http://www.alfresco.org/ws/service/content/1.0" soapAction="http://www.alfresco.org/ws/service/content/1.0/readNext" >
-        <parameter qname="pns:readSession" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <fault name="ContentFault" qname="fns:ContentFault" xmlns:fns="http://www.alfresco.org/ws/service/content/1.0" class="org.alfresco.repo.webservice.content.ContentFault" type="tns:ContentFault" xmlns:tns="http://www.alfresco.org/ws/service/content/1.0"/>
-      </operation>
       <operation name="write" qname="operNS:write" xmlns:operNS="http://www.alfresco.org/ws/service/content/1.0" soapAction="http://www.alfresco.org/ws/service/content/1.0/write" >
         <parameter qname="pns:node" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:Reference" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
         <parameter qname="pns:content" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:base64Binary" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
@@ -578,7 +570,7 @@
         <parameter qname="pns:items" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:Predicate" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
         <fault name="ContentFault" qname="fns:ContentFault" xmlns:fns="http://www.alfresco.org/ws/service/content/1.0" class="org.alfresco.repo.webservice.content.ContentFault" type="tns:ContentFault" xmlns:tns="http://www.alfresco.org/ws/service/content/1.0"/>
       </operation>
-      <parameter name="allowedMethods" value="write readChunk describe create readNext exists delete read"/>
+      <parameter name="allowedMethods" value="write describe create exists delete read"/>
       
       <typeMapping
         xmlns:ns="http://www.alfresco.org/ws/service/content/1.0"

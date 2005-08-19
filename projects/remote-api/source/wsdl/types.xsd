@@ -243,7 +243,7 @@
 	<xsd:complexType name="ResultSet">
 		<xsd:sequence>
 			<xsd:element name="rows" type="cms:ResultSetRow" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-			<xsd:element name="size" type="xsd:long"></xsd:element>
+			<xsd:element name="totalRowCount" type="xsd:long"></xsd:element>
 			<xsd:element name="metaData" type="cms:ResultSetMetaData" maxOccurs="1" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>

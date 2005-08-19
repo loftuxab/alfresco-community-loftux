@@ -9,7 +9,7 @@ package org.alfresco.repo.webservice.types;
 
 public class ResultSet  implements java.io.Serializable {
     private org.alfresco.repo.webservice.types.ResultSetRow[] rows;
-    private long size;
+    private long totalRowCount;
     private org.alfresco.repo.webservice.types.ResultSetMetaData metaData;
 
     public ResultSet() {
@@ -17,10 +17,10 @@ public class ResultSet  implements java.io.Serializable {
 
     public ResultSet(
            org.alfresco.repo.webservice.types.ResultSetRow[] rows,
-           long size,
+           long totalRowCount,
            org.alfresco.repo.webservice.types.ResultSetMetaData metaData) {
            this.rows = rows;
-           this.size = size;
+           this.totalRowCount = totalRowCount;
            this.metaData = metaData;
     }
 
@@ -54,22 +54,22 @@ public class ResultSet  implements java.io.Serializable {
 
 
     /**
-     * Gets the size value for this ResultSet.
+     * Gets the totalRowCount value for this ResultSet.
      * 
-     * @return size
+     * @return totalRowCount
      */
-    public long getSize() {
-        return size;
+    public long getTotalRowCount() {
+        return totalRowCount;
     }
 
 
     /**
-     * Sets the size value for this ResultSet.
+     * Sets the totalRowCount value for this ResultSet.
      * 
-     * @param size
+     * @param totalRowCount
      */
-    public void setSize(long size) {
-        this.size = size;
+    public void setTotalRowCount(long totalRowCount) {
+        this.totalRowCount = totalRowCount;
     }
 
 
@@ -107,7 +107,7 @@ public class ResultSet  implements java.io.Serializable {
             ((this.rows==null && other.getRows()==null) || 
              (this.rows!=null &&
               java.util.Arrays.equals(this.rows, other.getRows()))) &&
-            this.size == other.getSize() &&
+            this.totalRowCount == other.getTotalRowCount() &&
             ((this.metaData==null && other.getMetaData()==null) || 
              (this.metaData!=null &&
               this.metaData.equals(other.getMetaData())));
@@ -133,7 +133,7 @@ public class ResultSet  implements java.io.Serializable {
                 }
             }
         }
-        _hashCode += new Long(getSize()).hashCode();
+        _hashCode += new Long(getTotalRowCount()).hashCode();
         if (getMetaData() != null) {
             _hashCode += getMetaData().hashCode();
         }
@@ -156,8 +156,8 @@ public class ResultSet  implements java.io.Serializable {
         elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("size");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "size"));
+        elemField.setFieldName("totalRowCount");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "totalRowCount"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

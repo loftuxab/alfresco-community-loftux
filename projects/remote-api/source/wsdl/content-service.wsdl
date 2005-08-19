@@ -46,39 +46,6 @@
             </complexType>
          </element>
          
-         <element name="readChunk">
-            <complexType>
-               <sequence>
-                  <element name="node" type="cms:Reference"/>
-                  <element name="segment" type="content:ContentSegment"/>
-               </sequence>
-            </complexType>
-         </element>
-         
-         <element name="readChunkResponse">
-            <complexType>
-               <sequence>
-                  <element name="readChunkReturn" type="content:ReadResult"/>
-               </sequence>
-            </complexType>
-         </element>
-         
-         <element name="readNext">
-            <complexType>
-               <sequence>
-                  <element name="readSession" type="xsd:string"/>
-               </sequence>
-            </complexType>
-         </element>
-         
-         <element name="readNextResponse">
-            <complexType>
-               <sequence>
-                  <element name="readNextReturn" type="content:ReadResult"/>
-               </sequence>
-            </complexType>
-         </element>
-         
          <element name="write">
             <complexType>
                <sequence>
@@ -154,9 +121,7 @@
          
          <complexType name="ReadResult">
             <sequence>
-               <element name="readSession" type="xsd:string"/>
-               <element name="stream" type="xsd:base64Binary"/>
-               <element name="bytesRead" type="xsd:long"/>
+               <element name="url" type="xsd:string"/>
                <element name="content" type="cms:Content"/>
             </sequence>
          </complexType>
@@ -197,22 +162,6 @@
    
    <wsdl:message name="readResponse">
       <wsdl:part element="content:readResponse" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="readChunkRequest">
-      <wsdl:part element="content:readChunk" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="readChunkResponse">
-      <wsdl:part element="content:readChunkResponse" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="readNextRequest">
-      <wsdl:part element="content:readNext" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="readNextResponse">
-      <wsdl:part element="content:readNextResponse" name="parameters"/>
    </wsdl:message>
    
    <wsdl:message name="writeRequest">
@@ -263,18 +212,6 @@
          <wsdl:output message="content:readResponse" name="describeResponse"/>
          <wsdl:fault message="content:ContentFault" name="ContentFault"/>
       </wsdl:operation>
-      <wsdl:operation name="readChunk">
-         <wsdl:documentation>Retrieves content from the repository in chunks.</wsdl:documentation>
-         <wsdl:input message="content:readChunkRequest"/>
-         <wsdl:output message="content:readChunkResponse"/>
-         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
-      </wsdl:operation>
-      <wsdl:operation name="readNext">
-         <wsdl:documentation>Retrieves the next chunk of content from the given read session.</wsdl:documentation>
-         <wsdl:input message="content:readNextRequest"/>
-         <wsdl:output message="content:readNextResponse"/>
-         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
-      </wsdl:operation>
       <wsdl:operation name="write">
          <wsdl:documentation>Writes content to the repository.</wsdl:documentation>
          <wsdl:input message="content:writeRequest"/>
@@ -322,32 +259,6 @@
             <wsdlsoap:body use="literal"/>
          </wsdl:input>
          <wsdl:output name="describeResponse">
-            <wsdlsoap:body use="literal"/>
-         </wsdl:output>
-         <wsdl:fault name="ContentFault">
-            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
-         </wsdl:fault>
-      </wsdl:operation>
-      <wsdl:operation name="readChunk">
-         <wsdl:documentation>Retrieves content from the repository in chunks.</wsdl:documentation>
-         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/readChunk"/>
-         <wsdl:input>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:output>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:output>
-         <wsdl:fault name="ContentFault">
-            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
-         </wsdl:fault>
-      </wsdl:operation>
-      <wsdl:operation name="readNext">
-         <wsdl:documentation>Retrieves the next chunk of content from the given read session.</wsdl:documentation>
-         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/readNext"/>
-         <wsdl:input>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:output>
             <wsdlsoap:body use="literal"/>
          </wsdl:output>
          <wsdl:fault name="ContentFault">
