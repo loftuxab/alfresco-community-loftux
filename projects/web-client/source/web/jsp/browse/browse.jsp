@@ -449,13 +449,13 @@
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
-                              <a:booleanEvaluator value="#{r.approveStep != null && r.workingCopy == false && r.locked == false}">
-                                 <a:actionLink value="#{r.approveStep}" image="/images/icons/approve.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.approve}">
+                              <a:booleanEvaluator value='#{r["app:approveStep"] != null && r.workingCopy == false && r.locked == false}'>
+                                 <a:actionLink value='#{r["app:approveStep"]}' image="/images/icons/approve.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.approve}">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
-                              <a:booleanEvaluator value="#{r.rejectStep != null && r.workingCopy == false && r.locked == false}">
-                                 <a:actionLink value="#{r.rejectStep}" image="/images/icons/reject.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.reject}">
+                              <a:booleanEvaluator value='#{r["app:rejectStep"] != null && r.workingCopy == false && r.locked == false}'>
+                                 <a:actionLink value='#{r["app:rejectStep"]}' image="/images/icons/reject.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.reject}">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
