@@ -49,6 +49,7 @@ import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CyclicChildRelationshipException;
 import org.alfresco.service.cmr.repository.EntityRef;
+import org.alfresco.service.cmr.repository.InvalidChildAssociationRefException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.InvalidStoreRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -334,6 +335,28 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // done
         return newAssoc.getChildAssocRef();
+    }
+
+    public void setChildAssociationIndex(ChildAssociationRef childAssocRef, int index)
+    {
+        // get nodes
+        Node parentNode = getNodeNotNull(childAssocRef.getParentRef());
+        Node childNode = getNodeNotNull(childAssocRef.getChildRef());
+        
+        ChildAssoc assoc = nodeDaoService.getChildAssoc(
+                parentNode,
+                childNode,
+                childAssocRef.getTypeQName(),
+                childAssocRef.getQName());
+        if (assoc == null)
+        {
+            throw new InvalidChildAssociationRefException("Unable to set child association index: \n" +
+                    "   assoc: " + childAssocRef + "\n" +
+                    "   index: " + index,
+                    childAssocRef);
+        }
+        // set the index
+        assoc.setIndex(index);
     }
 
     public QName getType(NodeRef nodeRef) throws InvalidNodeRefException

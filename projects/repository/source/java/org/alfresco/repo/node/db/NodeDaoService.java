@@ -105,6 +105,7 @@ public interface NodeDaoService
     
     /**
      * @return Returns the persisted and filled association
+     * 
      * @see ChildAssoc
      */
     public ChildAssoc newChildAssoc(
@@ -113,6 +114,18 @@ public interface NodeDaoService
             boolean isPrimary,
             QName assocTypeQName,
             QName qname);
+
+    /**
+     * @return Returns a matching association or null if one was not found
+     * 
+     * @see ChildAssoc
+     */
+    public ChildAssoc getChildAssoc(
+            Node parentNode,
+            Node childNode,
+            QName assocTypeQName,
+            QName qname);
+            
     
     /**
      * @param assoc the child association to remove

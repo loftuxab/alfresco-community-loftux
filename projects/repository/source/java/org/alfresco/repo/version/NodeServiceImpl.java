@@ -33,6 +33,7 @@ import org.alfresco.service.cmr.repository.AssociationExistsException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.EntityRef;
+import org.alfresco.service.cmr.repository.InvalidChildAssociationRefException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -223,6 +224,14 @@ public class NodeServiceImpl implements NodeService, VersionStoreConst
      * @throws UnsupportedOperationException always
      */
     public ChildAssociationRef moveNode(NodeRef nodeToMoveRef, NodeRef newParentRef, QName assocTypeQName, QName assocQName) throws InvalidNodeRefException
+    {
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+
+    /**
+     * @throws UnsupportedOperationException always
+     */
+    public void setChildAssociationIndex(ChildAssociationRef childAssocRef, int index) throws InvalidChildAssociationRefException
     {
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
     }

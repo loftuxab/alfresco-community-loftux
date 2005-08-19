@@ -324,6 +324,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testCreateStore() throws Exception
     {
         StoreRef storeRef = createStore();
+        
+        // check that it exists
+        assertTrue("NodeService reports that store doesn't exist", nodeService.exists(storeRef));
+        
         // get the root node
         NodeRef storeRootNode = nodeService.getRootNode(storeRef);
         // make sure that it has the root aspect
@@ -591,15 +595,13 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
-        // TODO: Fix test checks
-        // int countBefore = countChildrenOfNode(rootNodeRef);
-        // assertEquals("Root children count incorrect", 1, countBefore);
+         int countBefore = countChildrenOfNode(rootNodeRef);
+         assertEquals("Root children count incorrect", 1, countBefore);
         // associate the two nodes
         nodeService.addChild(rootNodeRef, assocRef.getChildRef(), ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
         // there should now be 2 child assocs on the root
-        // TODO: Fix test checks
-        // int countAfter = countChildrenOfNode(rootNodeRef);
-        // assertEquals("Root children count incorrect", 2, countAfter);
+         int countAfter = countChildrenOfNode(rootNodeRef);
+         assertEquals("Root children count incorrect", 2, countAfter);
     }
     
     public void testRemoveChildByRef() throws Exception
@@ -638,9 +640,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 pathARef.getQName());
         // now remove the association - it will cascade to the child
         nodeService.removeChild(rootNodeRef, childRef);
-        
-        // attempt a flush
-        flushAndClear();
     }
     
     public void testProperties() throws Exception
@@ -759,8 +758,18 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         List<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(n1Ref);
         assertEquals("Incorrect number of children", 2, childAssocRefs.size());
         // checks that the order of the children is correct
-        assertEquals("First child added to n1 was primary to n3", n1pn3Ref, childAssocRefs.get(0));
-        assertEquals("Second child added to n1 was to n4", n1pn3Ref, childAssocRefs.get(0)); 
+        assertEquals("First child added to n1 was primary to n3: Order of refs is wrong",
+                n1pn3Ref, childAssocRefs.get(0));
+        assertEquals("Second child added to n1 was to n4: Order of refs is wrong",
+                n1n4Ref, childAssocRefs.get(1));
+        // now set the child ordering explicitly - change the order
+        nodeService.setChildAssociationIndex(childAssocRefs.get(0), 1);
+        nodeService.setChildAssociationIndex(childAssocRefs.get(1), 0);
+        
+        // repeat
+        childAssocRefs = nodeService.getChildAssocs(n1Ref);
+        assertEquals("Order of refs is wrong", n1pn3Ref, childAssocRefs.get(1));
+        assertEquals("Order of refs is wrong", n1n4Ref, childAssocRefs.get(0));
     }
     
     public void testGetChildAssocsOnRealNode() throws Exception

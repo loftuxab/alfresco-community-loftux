@@ -80,4 +80,16 @@ public interface ChildAssoc extends Comparable<ChildAssoc>
     public boolean getIsPrimary();
 
     public void setIsPrimary(boolean isPrimary);
+    
+    /**
+     * @return Returns the user-assigned index
+     */
+    public int getIndex();
+    
+    /**
+     * Set the index of this association
+     *  
+     * @param index the association index
+     */
+    public void setIndex(int index);
 }

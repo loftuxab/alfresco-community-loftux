@@ -36,7 +36,13 @@ public class ChildAssocImpl implements ChildAssoc
     private String namespaceUri;
     private String localName;
     private boolean isPrimary;
+    private int index;
     private transient ChildAssociationRef childAssocRef;
+    
+    public ChildAssocImpl()
+    {
+        setIndex(Integer.MAX_VALUE);              // comes last
+    }
 
     public void buildAssociation(Node parentNode, Node childNode)
     {
@@ -121,22 +127,27 @@ public class ChildAssocImpl implements ChildAssoc
             return 0;
         }
         
+        int thisIndex = this.getIndex();
+        int anotherIndex = another.getIndex();
+        
         Long thisId = this.getId();
         Long anotherId = another.getId();
 
-        if (thisId == null)
+        if (thisId == null)                     // this ID has not been set, make this instance greater
         {
-            // this ID has not been set, make this instance greater
             return -1; 
         }
-        else if (anotherId == null)
+        else if (anotherId == null)             // other ID has not been set, make this instance lesser
         {
-            // other ID has not been set, make this instance lesser
             return 1;
         }
-        else
+        else if (thisIndex == anotherIndex)     // use the explicit index
         {
             return thisId.compareTo(anotherId);
+        }
+        else                                    // fallback on order of creation 
+        {
+            return (thisIndex > anotherIndex) ? 1 : -1;     // a lower index, make this instance lesser
         }
     }
 
@@ -289,5 +300,15 @@ public class ChildAssocImpl implements ChildAssoc
     public void setIsPrimary(boolean isPrimary)
     {
         this.isPrimary = isPrimary;
+    }
+
+    public int getIndex()
+    {
+        return index;
+    }
+
+    public void setIndex(int index)
+    {
+        this.index = index;
     }
 }

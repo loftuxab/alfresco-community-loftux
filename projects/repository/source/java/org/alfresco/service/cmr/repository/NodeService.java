@@ -132,6 +132,23 @@ public interface NodeService
             throws InvalidNodeRefException;
     
     /**
+     * Set the ordering index of the child association.  This affects the ordering of
+     * of the return values of methods that return a set of children or child
+     * associations.
+     * 
+     * @param childAssocRef the child association that must be moved in the order 
+     * @param index an arbibrary index that will affect the return order
+     * 
+     * @see #getChildAssocs(NodeRef)
+     * @see #getChildAssocs(NodeRef, QNamePattern)
+     * @see ChildAssociationRef#getNthSibling()
+     */
+    public void setChildAssociationIndex(
+            ChildAssociationRef childAssocRef,
+            int index)
+            throws InvalidChildAssociationRefException;
+    
+    /**
      * @param nodeRef
      * @return Returns the type name
      * @throws InvalidNodeRefException if the node could not be found
@@ -286,13 +303,17 @@ public interface NodeService
     /**
      * Gets all parent associations where the pattern of the association qualified
      * name is a match
+     * <p>
+     * The resultant list is ordered by (a) explicit index and (b) association creation time.
      * 
      * @param nodeRef the child node
      * @param qnamePattern the pattern that the qnames of the assocs must match
      * @return Returns a list of all parent-child associations that exist where the given
      *      node is the child
      * @throws InvalidNodeRefException if the node could not be found
-     * 
+     *
+     * @see ChildAssociationRef#getNthSibling()
+     * @see #setChildAssociationIndex(ChildAssociationRef, int)
      * @see QName
      * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
      */
@@ -300,12 +321,18 @@ public interface NodeService
             throws InvalidNodeRefException;
     
     /**
+     * Get all child associations of the given node.
+     * <p>
+     * The resultant list is ordered by (a) explicit index and (b) association creation time.
+     * 
      * @param nodeRef the parent node - usually a <b>container</b>
      * @return Returns a collection of <code>ChildAssocRef</code> instances.  If the
      *      node is not a <b>container</b> then the result will be empty.
      * @throws InvalidNodeRefException if the node could not be found
      * 
      * @see #getChildAssocs(NodeRef, QNamePattern)
+     * @see #setChildAssociationIndex(ChildAssociationRef, int)
+     * @see ChildAssociationRef#getNthSibling()
      */
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException;
     

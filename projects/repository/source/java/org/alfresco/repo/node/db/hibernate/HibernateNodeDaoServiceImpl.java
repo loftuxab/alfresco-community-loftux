@@ -35,6 +35,7 @@ import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.domain.hibernate.StoreImpl;
 import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
 import org.hibernate.ObjectDeletedException;
@@ -54,6 +55,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements NodeDaoService
 {
     public static final String QUERY_GET_ALL_STORES = "store.GetAllStores";
+    public static final String QUERY_GET_CHILD_ASSOC = "node.GetChildAssoc";
     public static final String QUERY_GET_NODE_ASSOC = "node.GetNodeAssoc";
     public static final String QUERY_GET_NODE_ASSOC_TARGETS = "node.GetNodeAssocTargets";
     public static final String QUERY_GET_NODE_ASSOC_SOURCES = "node.GetNodeAssocSources";
@@ -282,6 +284,36 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return assoc;
     }
     
+    public ChildAssoc getChildAssoc(
+            Node parentNode,
+            Node childNode,
+            QName assocTypeQName,
+            QName qname)
+    {
+        ChildAssociationRef childAssocRef = new ChildAssociationRef(
+                assocTypeQName,
+                parentNode.getNodeRef(),
+                qname,
+                childNode.getNodeRef());
+        // get all the parent's child associations
+        Set<ChildAssoc> assocs = parentNode.getChildAssocs();
+        // hunt down the desired assoc
+        for (ChildAssoc assoc : assocs)
+        {
+            // is it a match?
+            if (!assoc.getChildAssocRef().equals(childAssocRef))    // not a match
+            {
+                continue;
+            }
+            else
+            {
+                return assoc;
+            }
+        }
+        // not found
+        return null;
+    }
+
     /**
      * Manually enforces cascade deletions down primary associations
      */
@@ -321,7 +353,8 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
             else if (primaryAssoc != null)
             {
                 // we have more than one somehow
-                throw new DataIntegrityViolationException("Multiple primary associations: \n" +
+                throw new DataIntegrityViolationException(
+                        "Multiple primary associations: \n" +
                         "   child: " + node + "\n" +
                         "   first primary assoc: " + primaryAssoc + "\n" +
                         "   second primary assoc: " + assoc);

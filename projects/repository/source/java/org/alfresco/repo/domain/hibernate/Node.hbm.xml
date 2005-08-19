@@ -154,6 +154,7 @@
       <property name="namespaceUri" column="namespace_uri" length="100" not-null="true" />
       <property name="localName" column="local_name" length="100" not-null="true" />
       <property name="isPrimary" />
+      <property name="index" column="assoc_index" />
       <!-- forward assoc to parent node -->
       <many-to-one 
             name="parent"
