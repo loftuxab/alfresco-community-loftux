@@ -30,8 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import javax.transaction.NotSupportedException;
-import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
@@ -127,7 +125,7 @@ public class LuceneTest extends TestCase
         queryRegisterComponent = (QueryRegisterComponent) ctx.getBean("queryRegisterComponent");
         namespacePrefixResolver = (NamespacePrefixResolver) ctx.getBean("namespaceService");
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
-        serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         
         queryRegisterComponent.loadQueryCollection("testQueryRegister.xml");
 
@@ -1969,7 +1967,7 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
         
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "( +TYPE:\"{http://www.alfresco.org}linkfile\" +@\\{http\\://www.alfresco.org\\}name:\"content woof\") OR  TEXT:\"content\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "( +TYPE:\"{http://www.alfresco.org/model/content/1.0}linkfile\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}name:\"content woof\") OR  TEXT:\"content\"", null, null);
           
         luceneFTS.resume();
         tx.rollback();
@@ -2209,6 +2207,7 @@ public class LuceneTest extends TestCase
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);
+        nspr.addDynamicNamespace(NamespaceService.ALFRESCO_PREFIX, NamespaceService.ALFRESCO_URI);
         nspr.addDynamicNamespace(NamespaceService.CONTENT_MODEL_PREFIX, NamespaceService.CONTENT_MODEL_1_0_URI);
         nspr.addDynamicNamespace("namespace", "namespace");
         nspr.addDynamicNamespace("test", TEST_NAMESPACE);
