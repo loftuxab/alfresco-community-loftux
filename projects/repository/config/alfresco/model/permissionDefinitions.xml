@@ -48,6 +48,7 @@
       <permission name="DeleteNode" expose="true" >
          <grantedToGroup permissionGroup="Delete" />
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
+         <requiredPermission on="parent" name="DeleteChildren" implies="false"/>
          <requiredPermission on="node" name="DeleteChildren" implies="false"/>
          <requiredPermission on="children" name="DeleteNode" implies="false"/>
       </permission>

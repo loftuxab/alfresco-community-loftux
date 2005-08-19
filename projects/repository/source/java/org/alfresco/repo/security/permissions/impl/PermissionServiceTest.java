@@ -78,8 +78,16 @@ public class PermissionServiceTest extends BaseSpringTest
     private SimplePermissionReference READ_CONTENT;
 
     private SimplePermissionReference WRITE;
+    
+    private SimplePermissionReference DELETE;
+    
+    private SimplePermissionReference DELETE_NODE;
+    
+    private SimplePermissionReference DELETE_CHILDREN;
 
     private SimplePermissionReference FULL_CONTROL;
+
+    private NodeRef systemNodeRef;
 
     public PermissionServiceTest()
     {
@@ -106,7 +114,7 @@ public class PermissionServiceTest extends BaseSpringTest
         QName container = ContentModel.TYPE_CONTAINER;
         QName types = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "people");
 
-        NodeRef systemNodeRef = nodeService.createNode(rootNodeRef, children, system, container).getChildRef();
+        systemNodeRef = nodeService.createNode(rootNodeRef, children, system, container).getChildRef();
         NodeRef typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();
         Map<QName, Serializable> props = createPersonProperties("andy");
         nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
@@ -120,6 +128,15 @@ public class PermissionServiceTest extends BaseSpringTest
         token = new UsernamePasswordAuthenticationToken("lemur", "lemur");
         authenticationService.createAuthentication(storeRef, token);
     }
+    
+    
+
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        super.onTearDownInTransaction();
+        flushAndClear();
+    }
 
     private void setUpPermissions()
     {
@@ -132,6 +149,12 @@ public class PermissionServiceTest extends BaseSpringTest
                 "ReadContent");
 
         WRITE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Write");
+        
+        DELETE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Delete");
+        
+        DELETE_CHILDREN = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "DeleteChildren");
+        
+        DELETE_NODE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "DeleteNode");
 
         FULL_CONTROL = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
                 "FullControl");
@@ -611,8 +634,7 @@ public class PermissionServiceTest extends BaseSpringTest
 
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
-        SimplePermissionReference READ_PROPERTIES = new SimplePermissionReference(QName.createQName("sys", "base",
-                namespacePrefixResolver), "ReadProperties");
+
 
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -622,6 +644,15 @@ public class PermissionServiceTest extends BaseSpringTest
         assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+                AccessStatus.ALLOWED));
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -1017,7 +1048,7 @@ public class PermissionServiceTest extends BaseSpringTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
     }
 
-    public void doNotTestPerformance() throws Exception
+    public void doNotTesttest() throws Exception
     {
         runAs("andy");
 
@@ -1075,7 +1106,9 @@ public class PermissionServiceTest extends BaseSpringTest
             end = System.nanoTime();
             time += (end - start);
         }
+        System.out.println("Time is "+(time / 1000000000.0));
         assertTrue((time / 1000000000.0) < 2.0);
+        
 
         tx.rollback();
     }
@@ -1501,7 +1534,7 @@ public class PermissionServiceTest extends BaseSpringTest
         permissionService.setPermission(new SimplePermissionEntry(n2, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(n2, READ));
+        assertTrue(permissionService.hasPermission(n2, READ));
         assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
         assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
@@ -1710,5 +1743,59 @@ public class PermissionServiceTest extends BaseSpringTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
+    }
+    
+    public void testChildrenRequirements()
+    {
+        assertEquals(1, nodeService.getChildAssocs(rootNodeRef).size());
+        
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy",
+                AccessStatus.ALLOWED));
+        
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, DELETE, "andy",
+                AccessStatus.ALLOWED));
+        
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
+        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE));
+        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(systemNodeRef, DELETE_CHILDREN));
+        assertTrue(permissionService.hasPermission(systemNodeRef, DELETE_NODE));
+        assertTrue(permissionService.hasPermission(systemNodeRef, DELETE));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(systemNodeRef, DELETE));
+        assertFalse(permissionService.hasPermission(systemNodeRef, DELETE_CHILDREN));
+        assertFalse(permissionService.hasPermission(systemNodeRef, DELETE_NODE));
+        
+        
+        permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, DELETE, "andy",
+                AccessStatus.DENIED));
+        
+        runAs("andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
+        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
+        runAs("lemur");
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
+        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        
     }
 }

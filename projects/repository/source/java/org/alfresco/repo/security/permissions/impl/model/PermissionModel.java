@@ -647,28 +647,8 @@ public class PermissionModel implements ModelDAO, InitializingBean
         return pg;
     }
 
-    public Set<PermissionReference> getRequiredNodePermissions(PermissionReference required, QName qName,
-            Set<QName> aspectQNames)
-    {
-        return getRequiredPermissions(required, qName, aspectQNames, RequiredPermission.On.NODE);
-    }
-
-    public Set<PermissionReference> getRequiredParentPermissions(PermissionReference required, QName qName,
-            Set<QName> aspectQNames)
-    {
-        return getRequiredPermissions(required, qName, aspectQNames, RequiredPermission.On.PARENT);
-    }
-
-    /**
-     * Utility method to determine required permissions
-     * 
-     * @param required
-     * @param qName
-     * @param aspectQNames
-     * @param on
-     * @return
-     */
-    private Set<PermissionReference> getRequiredPermissions(PermissionReference required, QName qName,
+    
+    public Set<PermissionReference> getRequiredPermissions(PermissionReference required, QName qName,
             Set<QName> aspectQNames, RequiredPermission.On on)
     {
         PermissionGroup pg = getBasePermissionGroupOrNull(getPermissionGroupOrNull(required));

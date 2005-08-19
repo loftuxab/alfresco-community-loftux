@@ -22,6 +22,7 @@ package org.alfresco.repo.security.permissions.impl;
 import java.util.Set;
 
 import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.impl.model.RequiredPermission;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
@@ -81,19 +82,10 @@ public interface ModelDAO
      * @param required
      * @param qName
      * @param aspectQNames
+     * @param on
      * @return
      */
-    public Set<PermissionReference> getRequiredNodePermissions(PermissionReference required, QName qName, Set<QName> aspectQNames);
-
-    /**
-     * Get the permissions required on the parent node for the given permission to apply.
-     * 
-     * @param required
-     * @param qName
-     * @param aspectQNames
-     * @return
-     */
-    public Set<PermissionReference> getRequiredParentPermissions(PermissionReference required, QName qName, Set<QName> aspectQNames);
+    public Set<PermissionReference> getRequiredPermissions(PermissionReference required, QName qName, Set<QName> aspectQNames, RequiredPermission.On on);
 
     /**
      * Get the permissions which are granted by the supplied permission.

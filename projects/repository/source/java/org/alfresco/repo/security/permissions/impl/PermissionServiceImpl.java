@@ -32,12 +32,15 @@ import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.impl.model.RequiredPermission;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
+
+import com.sun.org.apache.xerces.internal.impl.dtd.models.DFAContentModel;
 
 /**
  * The Alfresco implementation of a permissions service against our APIs for the
@@ -143,18 +146,6 @@ public class PermissionServiceImpl implements PermissionService
 
     public boolean hasPermission(NodeRef nodeRef, PermissionReference perm)
     {
-        /*
-         * Does the current authentication have the supplied permission on the
-         * given node.
-         */
-
-        // Get the current authentications
-        Authentication auth = authenticationService.getCurrentAuthentication();
-
-        //
-        // TODO: Dynamic permissions via evaluators
-        //
-
         // If the node does not support the given permission there is no point
         // doing the test
         Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
@@ -164,64 +155,32 @@ public class PermissionServiceImpl implements PermissionService
             return false;
         }
 
+        //
+        // TODO: Dynamic permissions via evaluators
+        //
+
+        /*
+         * Does the current authentication have the supplied permission on the
+         * given node.
+         */
+
+        // Get the current authentications
+        Authentication auth = authenticationService.getCurrentAuthentication();
+
         // Get the available authorisations
         Set<String> authorisations = getAuthorisations(auth);
-        // Keep track of permission that are denied
-        Set<Pair<String, PermissionReference>> denied = new HashSet<Pair<String, PermissionReference>>();
 
-        // Build a utility class to carry out a test on a node
-        NodeTest nodeTest = new NodeTest(perm, nodeService.getType(nodeRef), nodeService.getAspects(nodeRef));
-        // Permissions are only evaluated up the primary parent chain
-        // TODO: Do not ignore non primary permissions
-        ChildAssociationRef car = nodeService.getPrimaryParent(nodeRef);
-        // Work up the parent chain evaluating permissions.
-        while (car != null)
-        {
-            // Add any denied permission to the denied list - these can not then
-            // be used to given authentication.
-            // A -> B -> C
-            // If B denies all permissions to any - allowing all permissions to
-            // andy at node A has no effect
+        QName typeQname = nodeService.getType(nodeRef);
+        Set<QName> aspectQNames = nodeService.getAspects(nodeRef);
 
-            denied.addAll(nodeTest.getDenied(car.getChildRef()));
-
-            // If the current node allows the permission we are done
-            // The test includes any parent or ancestor requirements
-            if (nodeTest.evaluate(authorisations, car.getChildRef(), denied))
-            {
-                return true;
-            }
-
-            // Build the next element of the evaluation chain
-            if (car.getParentRef() != null)
-            {
-                NodePermissionEntry nodePermissions = permissionsDAO.getPermissions(car.getChildRef());
-                if((nodePermissions == null) || (nodePermissions.inheritPermissions()))
-                {
-                   car = nodeService.getPrimaryParent(car.getParentRef());
-                }
-                else
-                {
-                    car = null;
-                }
-            }
-            else
-            {
-                car = null;
-            }
-
-        }
-
-        // TODO: Support meta data permissions on the root node?
-
-        // We have dropped of the end without allowing any permission - so the
-        // permission is not allowed.
-        return false;
+        NodeTest nt = new NodeTest(perm, typeQname, aspectQNames);
+        return nt.evaluate(authorisations, nodeRef);
 
     }
 
     /**
      * Get the authorisatons for the currently authenticated user
+     * 
      * @param auth
      * @return
      */
@@ -229,7 +188,7 @@ public class PermissionServiceImpl implements PermissionService
     {
         HashSet<String> auths = new HashSet<String>();
         // No authenticated user then no permissions
-        if(auth == null)
+        if (auth == null)
         {
             return auths;
         }
@@ -294,7 +253,7 @@ public class PermissionServiceImpl implements PermissionService
     //
     // SUPPORT CLASSES
     //
-    
+
     /**
      * Support class to test the permission on a node.
      * 
@@ -310,17 +269,17 @@ public class PermissionServiceImpl implements PermissionService
         /*
          * The additional permissions required at the node level.
          */
-        Set<NodeTest> nodeRequirements = new HashSet<NodeTest>();
+        Set<PermissionReference> nodeRequirements = new HashSet<PermissionReference>();
 
         /*
          * The additional permissions required on the parent.
          */
-        Set<NodeTest> parentRequirements = new HashSet<NodeTest>();
+        Set<PermissionReference> parentRequirements = new HashSet<PermissionReference>();
 
         /*
-         * The permissions required on all ancestors .
+         * The permissions required on all children .
          */
-        Set<NodeTest> ancestorRequirements = new HashSet<NodeTest>();
+        Set<PermissionReference> childrenRequirements = new HashSet<PermissionReference>();
 
         /*
          * The type name of the node.
@@ -333,186 +292,211 @@ public class PermissionServiceImpl implements PermissionService
         Set<QName> aspectQNames;
 
         /*
-         * The recursive constructor
+         * Constructor just gets the additional requirements
          */
         NodeTest(PermissionReference required, QName typeQName, Set<QName> aspectQNames)
-        {
-            this(required, true, typeQName, aspectQNames);
-        }
-
-        /*
-         * The constructor with recursive control - used for ancestor
-         * requirements - or we would go round in circles.
-         */
-        NodeTest(PermissionReference required, boolean recursive, QName typeQName, Set<QName> aspectQNames)
         {
             this.required = required;
             this.typeQName = typeQName;
             this.aspectQNames = aspectQNames;
 
             // Set the required node permissions
-            Set<PermissionReference> requiredNodePermissions = modelDAO.getRequiredNodePermissions(required, typeQName,
-                    aspectQNames);
-            for (PermissionReference pr : requiredNodePermissions)
-            {
-                nodeRequirements.add(new NodeTest(pr, typeQName, aspectQNames));
-            }
+            nodeRequirements = modelDAO.getRequiredPermissions(required, typeQName, aspectQNames,
+                    RequiredPermission.On.NODE);
 
-            // Set the required parent permissions and ancestor permissions
-            Set<PermissionReference> requiredParentPermissions = modelDAO.getRequiredParentPermissions(required,
-                    typeQName, aspectQNames);
-            for (PermissionReference pr : requiredParentPermissions)
-            {
-                // If we are creating an ancestor requirement we do not add the
-                // recursive element - this is taken care of
-                // in the recursive test.
-                if (recursive || !required.equals(pr))
-                {
-                    // Test for recursion on the parent - does it depend on its self?
-                    Set<PermissionReference> requiredParentPermissionsForRequiredParentPermission = modelDAO
-                            .getRequiredParentPermissions(pr, typeQName, aspectQNames);
-                    if (requiredParentPermissionsForRequiredParentPermission.contains(pr))
-                    {
-                        ancestorRequirements.add(new NodeTest(pr, false, typeQName, aspectQNames));
-                    }
-                    else
-                    {
-                        parentRequirements.add(new NodeTest(pr, typeQName, aspectQNames));
-                    }
-                }
-            }
+            parentRequirements = modelDAO.getRequiredPermissions(required, typeQName, aspectQNames,
+                    RequiredPermission.On.PARENT);
+
+            childrenRequirements = modelDAO.getRequiredPermissions(required, typeQName, aspectQNames,
+                    RequiredPermission.On.CHILDREN);
         }
 
         /**
-         * Evaluate if a permissions is allowed
+         * External hook point
          * 
-         * @param authorisations - the available authorisations
-         * @param nodeRef - the node ref against which to do the tests
-         * @param denied - the set of specifically denied permissions
-         * @return true if allowed
+         * @param authorisations
+         * @param nodeRef
+         * @return
          */
-        boolean evaluate(Set<String> authorisations, NodeRef nodeRef, Set<Pair<String, PermissionReference>> denied)
+        boolean evaluate(Set<String> authorisations, NodeRef nodeRef)
         {
-            // If we have ancestor requirements we have to test the,m recursively and allow for denied permissions
-            Set<Pair<String, PermissionReference>> locallyDenied = new HashSet<Pair<String, PermissionReference>>();
-            locallyDenied.addAll(denied);
-            
-            // Start out true and "and" all other results
-            boolean success = true;
-
-            // Check the required permissions but not for sets they rely on their underlying permissions
-            if(modelDAO.checkPermission(required))
-            {
-               success &= checkRequired(authorisations, nodeRef, denied);
-            }
-            
-            // Check the other permissions required on the node
-            for (NodeTest nt : nodeRequirements)
-            {
-                success &= nt.evaluate(authorisations, nodeRef, denied);
-            }
-
-            // Check the permission required of the parent
-            ChildAssociationRef car = nodeService.getPrimaryParent(nodeRef);
-            if(success && (car.getParentRef() != null))
-            {
-               locallyDenied.addAll(getDenied(car.getParentRef()));
-               for (NodeTest nt : parentRequirements)
-               {
-                  success &= nt.evaluate(authorisations, car.getParentRef(), locallyDenied);
-               }
-            }
-
-           
-            // Check the ancestor dependencies 
-            // If there is no parent then the test will pass
-            // Or we run out of parents it will pass 
-            NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
-            while (success && (car.getParentRef() != null) && ((nodeEntry == null) || (nodeEntry.inheritPermissions())))
-            {
-                car = nodeService.getPrimaryParent(car.getParentRef());
-                nodeEntry = permissionsDAO.getPermissions(car.getChildRef());
-                locallyDenied.addAll(getDenied(car.getChildRef()));
-
-                for (NodeTest nt : ancestorRequirements)
-                {
-                    success &= nt.evaluate(authorisations, car.getChildRef(), locallyDenied);
-                }
-            }
-            return success;
+            Set<Pair<String, PermissionReference>> denied = new HashSet<Pair<String, PermissionReference>>();
+            return evaluate(authorisations, nodeRef, denied, null);
         }
 
         /**
-         * Check that a given authentication is available on a node
+         * Internal hook point for recursion 
          * 
          * @param authorisations
          * @param nodeRef
          * @param denied
+         * @param recursiveIn
          * @return
          */
-        boolean checkRequired(Set<String> authorisations, NodeRef nodeRef, Set<Pair<String, PermissionReference>> denied)
+        boolean evaluate(Set<String> authorisations, NodeRef nodeRef, Set<Pair<String, PermissionReference>> denied,
+                MutableBoolean recursiveIn)
         {
-            // Find all the permissions that grant the allowed permission
-            // All permissions are treated specially.
-            Set<PermissionReference> granters = modelDAO.getGrantingPermissions(required);
-            granters.add(SimplePermissionEntry.ALL_PERMISSIONS);
+            // Do we defer our required test to a parent (yes if not null)
+            MutableBoolean recursiveOut = null;
 
-            NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
+            Set<Pair<String, PermissionReference>> locallyDenied = new HashSet<Pair<String, PermissionReference>>();
+            locallyDenied.addAll(denied);
+            locallyDenied.addAll(getDenied(nodeRef));
 
-            // No permissions set - short cut to deny
-            if (nodeEntry == null)
+            // Start out true and "and" all other results
+            boolean success = true;
+
+            // Check the required permissions but not for sets they rely on
+            // their underlying permissions
+            if (modelDAO.checkPermission(required))
             {
+                if (parentRequirements.contains(required))
+                {
+                    if (checkRequired(authorisations, nodeRef, locallyDenied, required))
+                    {
+                        // No need to do the recursive test as it has been found
+                        recursiveOut = null;
+                        if (recursiveIn != null)
+                        {
+                            recursiveIn.setValue(true);
+                        }
+                    }
+                    else
+                    {
+                        // Much cheaper to do this as we go then check all the stack values for each parent
+                        recursiveOut = new MutableBoolean(false);
+                    }
+                }
+                else
+                {
+                    // We have to do the test as no parent will help us out
+                    success &= hasSinglePermission(authorisations, nodeRef, required);
+                }
+                if (!success)
+                {
+                    return false;
+                }
+            }
+
+            // Check the other permissions required on the node
+            for (PermissionReference pr : nodeRequirements)
+            {
+                // Build a new test
+                NodeTest nt = new NodeTest(pr, typeQName, aspectQNames);
+                success &= nt.evaluate(authorisations, nodeRef, locallyDenied, null);
+                if (!success)
+                {
+                    return false;
+                }
+            }
+
+            // Check the permission required of the parent
+            ChildAssociationRef car = nodeService.getPrimaryParent(nodeRef);
+            NodePermissionEntry nodePermissions = permissionsDAO.getPermissions(car.getChildRef());
+            if (success
+                    && ((nodePermissions == null) || (nodePermissions.inheritPermissions()))
+                    && (car.getParentRef() != null))
+            {
+                locallyDenied.addAll(getDenied(car.getParentRef()));
+                for (PermissionReference pr : parentRequirements)
+                {
+                    if (pr.equals(required))
+                    {
+                        success &= this.evaluate(authorisations, car.getParentRef(), locallyDenied, recursiveOut);
+                        if ((recursiveOut != null) && recursiveOut.getValue())
+                        {
+                            if (recursiveIn != null)
+                            {
+                                recursiveIn.setValue(true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        NodeTest nt = new NodeTest(pr, typeQName, aspectQNames);
+                        success &= nt.evaluate(authorisations, car.getParentRef(), locallyDenied, null);
+                    }
+                    if (!success)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if ((recursiveOut != null) && (!recursiveOut.getValue()))
+            {
+                // The required authentication was not resolved in recursion
                 return false;
             }
 
-            // Check if each permission allows - the first wins.
-            // We could have other voting style mechanisms here
-            for (PermissionEntry pe : nodeEntry.getPermissionEntries())
+            // Check permissions required of children
+
+            for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef))
             {
-                if (isGranted(pe, granters, authorisations, denied, nodeRef))
+                for (PermissionReference pr : childrenRequirements)
                 {
-                    return true;
+                    success &= hasPermission(child.getChildRef(), pr);
+                    if (!success)
+                    {
+                        return false;
+                    }
                 }
             }
-            return false;
+
+            return success;
         }
 
-        /**
-         * Is a permission granted
-         * @param pe - the permissions entry to consider
-         * @param granters - the set of granters
-         * @param authorisations - the set of authorities 
-         * @param denied - the set of denied permissions/authority pais
-         * @param nodeRef - the node ref
-         * @return
-         */
-        private boolean isGranted(PermissionEntry pe, Set<PermissionReference> granters, Set<String> authorisations,
-                Set<Pair<String, PermissionReference>> denied, NodeRef nodeRef)
+        public boolean hasSinglePermission(Set<String> authorisations, NodeRef nodeRef, PermissionReference perm)
         {
-            // If the permission entry denies then we just deny
-            if (pe.isDenied())
-            {
-                return false;
-            }
+            Set<Pair<String, PermissionReference>> denied = new HashSet<Pair<String, PermissionReference>>();
 
-            // The permission is allowed but we deny it as it is in the denied set
-            Pair<String, PermissionReference> specific = new Pair<String, PermissionReference>(pe.getAuthority(),
-                    required);
-            if (denied.contains(specific))
-            {
-                return false;
-            }
+            // Keep track of permission that are denied
 
-            // If the permission has a match in both the authorities and granters list it is allowed
-            // It applies to the current user and it is granted
-            if (authorisations.contains(pe.getAuthority()) && granters.contains(pe.getPermissionReference()))
+            // Permissions are only evaluated up the primary parent chain
+            // TODO: Do not ignore non primary permissions
+            ChildAssociationRef car = nodeService.getPrimaryParent(nodeRef);
+            // Work up the parent chain evaluating permissions.
+            while (car != null)
             {
+                // Add any denied permission to the denied list - these can not
+                // then
+                // be used to given authentication.
+                // A -> B -> C
+                // If B denies all permissions to any - allowing all permissions
+                // to
+                // andy at node A has no effect
+
+                denied.addAll(getDenied(car.getChildRef()));
+
+                // If the current node allows the permission we are done
+                // The test includes any parent or ancestor requirements
+                if (checkRequired(authorisations, car.getChildRef(), denied, perm))
                 {
                     return true;
                 }
+
+                // Build the next element of the evaluation chain
+                if (car.getParentRef() != null)
+                {
+                    NodePermissionEntry nodePermissions = permissionsDAO.getPermissions(car.getChildRef());
+                    if ((nodePermissions == null) || (nodePermissions.inheritPermissions()))
+                    {
+                        car = nodeService.getPrimaryParent(car.getParentRef());
+                    }
+                    else
+                    {
+                        car = null;
+                    }
+                }
+                else
+                {
+                    car = null;
+                }
+
             }
 
-            // Default deny
+            // TODO: Support meta data permissions on the root node?
+
             return false;
 
         }
@@ -535,7 +519,8 @@ public class PermissionServiceImpl implements PermissionService
                 {
                     if (pe.isDenied())
                     {
-                        // All the sets that grant this permission must be denied 
+                        // All the sets that grant this permission must be
+                        // denied
                         // Note that granters includes the orginal permission
                         Set<PermissionReference> granters = modelDAO
                                 .getGrantingPermissions(pe.getPermissionReference());
@@ -543,15 +528,17 @@ public class PermissionServiceImpl implements PermissionService
                         {
                             deniedSet.add(new Pair<String, PermissionReference>(pe.getAuthority(), granter));
                         }
-                        
-                        // All the things granted by this permission must be denied
+
+                        // All the things granted by this permission must be
+                        // denied
                         Set<PermissionReference> grantees = modelDAO.getGranteePermissions(pe.getPermissionReference());
                         for (PermissionReference grantee : grantees)
                         {
                             deniedSet.add(new Pair<String, PermissionReference>(pe.getAuthority(), grantee));
                         }
-                        
-                        // All permission excludes all permissions available for the node.
+
+                        // All permission excludes all permissions available for
+                        // the node.
                         if (pe.getPermissionReference().equals(SimplePermissionEntry.ALL_PERMISSIONS))
                         {
                             for (PermissionReference deny : modelDAO.getAllPermissions(nodeRef))
@@ -565,6 +552,89 @@ public class PermissionServiceImpl implements PermissionService
             return deniedSet;
         }
 
+        /**
+         * Check that a given authentication is available on a node
+         * 
+         * @param authorisations
+         * @param nodeRef
+         * @param denied
+         * @return
+         */
+        boolean checkRequired(Set<String> authorisations, NodeRef nodeRef,
+                Set<Pair<String, PermissionReference>> denied, PermissionReference required)
+        {
+            // Find all the permissions that grant the allowed permission
+            // All permissions are treated specially.
+            Set<PermissionReference> granters = modelDAO.getGrantingPermissions(required);
+            granters.add(SimplePermissionEntry.ALL_PERMISSIONS);
+
+            NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
+
+            // No permissions set - short cut to deny
+            if (nodeEntry == null)
+            {
+                return false;
+            }
+
+            // Check if each permission allows - the first wins.
+            // We could have other voting style mechanisms here
+            for (PermissionEntry pe : nodeEntry.getPermissionEntries())
+            {
+                if (isGranted(pe, granters, authorisations, denied, nodeRef, required))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Is a permission granted
+         * 
+         * @param pe -
+         *            the permissions entry to consider
+         * @param granters -
+         *            the set of granters
+         * @param authorisations -
+         *            the set of authorities
+         * @param denied -
+         *            the set of denied permissions/authority pais
+         * @param nodeRef -
+         *            the node ref
+         * @return
+         */
+        private boolean isGranted(PermissionEntry pe, Set<PermissionReference> granters, Set<String> authorisations,
+                Set<Pair<String, PermissionReference>> denied, NodeRef nodeRef, PermissionReference required)
+        {
+            // If the permission entry denies then we just deny
+            if (pe.isDenied())
+            {
+                return false;
+            }
+
+            // The permission is allowed but we deny it as it is in the denied
+            // set
+            Pair<String, PermissionReference> specific = new Pair<String, PermissionReference>(pe.getAuthority(),
+                    required);
+            if (denied.contains(specific))
+            {
+                return false;
+            }
+
+            // If the permission has a match in both the authorities and
+            // granters list it is allowed
+            // It applies to the current user and it is granted
+            if (authorisations.contains(pe.getAuthority()) && granters.contains(pe.getPermissionReference()))
+            {
+                {
+                    return true;
+                }
+            }
+
+            // Default deny
+            return false;
+
+        }
     }
 
     /**
@@ -618,5 +688,24 @@ public class PermissionServiceImpl implements PermissionService
 
     }
 
+    private static class MutableBoolean
+    {
+        private boolean value;
+
+        MutableBoolean(boolean value)
+        {
+            this.value = value;
+        }
+
+        void setValue(boolean value)
+        {
+            this.value = value;
+        }
+
+        boolean getValue()
+        {
+            return value;
+        }
+    }
 
 }
