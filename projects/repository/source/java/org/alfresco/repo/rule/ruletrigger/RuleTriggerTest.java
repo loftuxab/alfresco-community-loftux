@@ -24,8 +24,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.RuleType;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -68,8 +66,8 @@ public class RuleTriggerTest extends BaseSpringTest
 		// Try and trigger the type
         this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER);
 		
 		// Check to see if the rule type has been triggered
@@ -80,8 +78,8 @@ public class RuleTriggerTest extends BaseSpringTest
 	{
 		NodeRef nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		
 		TestRuleType ruleType = createTestRuleType(ON_UPDATE_NODE_TRIGGER);
@@ -98,8 +96,8 @@ public class RuleTriggerTest extends BaseSpringTest
 	{
 		NodeRef nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		
 		TestRuleType ruleType = createTestRuleType(ON_DELETE_NODE_TRIGGER);
@@ -116,13 +114,13 @@ public class RuleTriggerTest extends BaseSpringTest
 	{
 		NodeRef nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		NodeRef nodeRef2 = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		
 		TestRuleType ruleType = createTestRuleType(ON_CREATE_CHILD_ASSOCIATION_TRIGGER);
@@ -132,8 +130,8 @@ public class RuleTriggerTest extends BaseSpringTest
 		this.nodeService.addChild(
 				nodeRef, 
 				nodeRef2,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"));
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN);
 		
 		// Check to see if the rule type has been triggered
         assertTrue(ruleType.rulesTriggered);		
@@ -143,19 +141,19 @@ public class RuleTriggerTest extends BaseSpringTest
 	{
 		NodeRef nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		NodeRef nodeRef2 = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		this.nodeService.addChild(
 				nodeRef, 
 				nodeRef2,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"));
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN);
 		
 		TestRuleType ruleType = createTestRuleType(ON_DELETE_CHILD_ASSOCIATION_TRIGGER);
 		assertFalse(ruleType.rulesTriggered);
@@ -171,20 +169,20 @@ public class RuleTriggerTest extends BaseSpringTest
 	{
 		NodeRef nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		NodeRef nodeRef2 = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		
 		TestRuleType ruleType = createTestRuleType(ON_CREATE_ASSOCIATION_TRIGGER);
 		assertFalse(ruleType.rulesTriggered);
 		
 		// Try and trigger the type
-		this.nodeService.createAssociation(nodeRef, nodeRef2, QName.createQName(NamespaceService.ALFRESCO_URI, "children"));
+		this.nodeService.createAssociation(nodeRef, nodeRef2, ContentModel.ASSOC_CHILDREN);
 		
 		// Check to see if the rule type has been triggered
         assertTrue(ruleType.rulesTriggered);		
@@ -194,21 +192,21 @@ public class RuleTriggerTest extends BaseSpringTest
 	{
 		NodeRef nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
 		NodeRef nodeRef2 = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTAINER).getChildRef();
-		this.nodeService.createAssociation(nodeRef, nodeRef2, QName.createQName(NamespaceService.ALFRESCO_URI, "children"));
+		this.nodeService.createAssociation(nodeRef, nodeRef2, ContentModel.ASSOC_CHILDREN);
 		
 		TestRuleType ruleType = createTestRuleType(ON_DELETE_ASSOCIATION_TRIGGER);
 		assertFalse(ruleType.rulesTriggered);
 		
 		// Try and trigger the type
-		this.nodeService.removeAssociation(nodeRef, nodeRef2, QName.createQName(NamespaceService.ALFRESCO_URI, "children"));
+		this.nodeService.removeAssociation(nodeRef, nodeRef2, ContentModel.ASSOC_CHILDREN);
 		
 		// Check to see if the rule type has been triggered
         assertTrue(ruleType.rulesTriggered);		
@@ -218,8 +216,8 @@ public class RuleTriggerTest extends BaseSpringTest
 	{
 		NodeRef nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
-				QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
-                QName.createQName(NamespaceService.ALFRESCO_URI, "children"),
+				ContentModel.ASSOC_CHILDREN,
+                ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_CONTENT).getChildRef();
 		
 		TestRuleType ruleType = createTestRuleType(ON_CONTENT_UPDATE_TRIGGER);
