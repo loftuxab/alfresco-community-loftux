@@ -472,6 +472,8 @@ public class AuthenticationTest extends TestCase
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);
         nspr.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+        nspr.addDynamicNamespace(NamespaceService.CONTENT_MODEL_PREFIX, NamespaceService.CONTENT_MODEL_1_0_URI);
+        nspr.addDynamicNamespace(ContentModel.USER_MODEL_PREFIX, ContentModel.USER_MODEL_URI);
         nspr.addDynamicNamespace("namespace", "namespace");
         nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;
