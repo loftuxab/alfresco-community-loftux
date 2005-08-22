@@ -901,7 +901,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
     }
 
-    public void test() throws Exception
+    public void doNotTest() throws Exception
     {
         runAs("andy");
 
