@@ -98,19 +98,18 @@
          </associations>
 	  </type>
 	  
-	  <type name="act:rule">
-	     <title>Rule</title>
-	     <parent>act:compositeaction</parent>
-	     <properties>
-            <property name="act:ruleType">
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-            <property name="act:applyToChildren">
-               <type>d:boolean</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>
+	  <type name="act:savedactionfolder">
+	     <title>Saved Action Folder</title>
+	     <parent>cm:systemfolder</parent>
+         <associations>
+            <child-association name="act:savedActions">
+               <target>
+                  <class>act:action</class>
+                  <mandatory>true</mandatory>
+                  <many>true</many>
+               </target>
+            </child-association>
+         </associations>
 	  </type>
 
 	</types>
@@ -119,8 +118,16 @@
 	<aspects>
 	
       <aspect name="act:actionable">
-         <title>Actionable</title>
-         <parent>app:configurable</parent>
+         <title>Actionable</title>           
+         <associations>
+            <child-association name="act:savedActionFolders">
+               <target>
+                  <class>act:savedactionfolder</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </child-association>
+         </associations>  
       </aspect>
          
 	</aspects>

@@ -22,9 +22,6 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
-import org.alfresco.service.cmr.action.ActionConditionDefinition;
-import org.alfresco.service.cmr.action.ActionDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -54,31 +51,6 @@ public class RuleServiceImplTest extends BaseRuleTest
 		//	System.out.println(type.getDisplayLabel());
 		//}
     }
-
-    /**
-     * Test makeActionable
-     *
-     */
-    public void testMakeActionable()
-    {
-        this.ruleService.makeActionable(this.nodeRef);
-        assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_ACTIONABLE));
-        assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_CONFIGURABLE));
-        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(this.nodeRef, ContentModel.ASSOC_CONFIGURATIONS);
-        assertNotNull(assocs);
-        assertEquals(1, assocs.size());
-    }
-    
-    /**
-     * Test isActionable
-     *
-     */
-    public void testIsActionable()
-    {
-        assertFalse(this.ruleService.isActionable(this.nodeRef));
-        this.ruleService.makeActionable(this.nodeRef);
-        assertTrue(this.ruleService.isActionable(this.nodeRef));
-    }
     
     /**
      * Test createRule
@@ -97,7 +69,6 @@ public class RuleServiceImplTest extends BaseRuleTest
      */
     public void testAddRule()
     {
-        this.ruleService.makeActionable(this.nodeRef);
         Rule newRule = createTestRule();        
         this.ruleService.saveRule(this.nodeRef, newRule);        
     }
@@ -109,7 +80,6 @@ public class RuleServiceImplTest extends BaseRuleTest
         assertNotNull(rules1);
         assertEquals(0, rules1.size());
         
-        this.ruleService.makeActionable(this.nodeRef);
         Rule newRule = this.ruleService.createRule(ruleType.getName());        
         this.ruleService.saveRule(this.nodeRef, newRule); 
         Rule newRule2 = this.ruleService.createRule(ruleType.getName());
@@ -191,8 +161,7 @@ public class RuleServiceImplTest extends BaseRuleTest
         NodeRef newNodeRef = this.nodeService.createNode(parent,
                 ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
-                ContentModel.TYPE_CONTAINER).getChildRef();        
-        this.ruleService.makeActionable(newNodeRef);        
+                ContentModel.TYPE_CONTAINER).getChildRef();                
         return newNodeRef;
     }
     

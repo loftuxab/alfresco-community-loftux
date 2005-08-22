@@ -658,7 +658,9 @@ public class CopyServiceImpl implements CopyService
 					NodeRef childRef = childAssoc.getChildRef();
 					QName childType = this.nodeService.getType(childRef);
 					
-					if (this.dictionaryService.isSubClass(childType, ContentModel.TYPE_CONFIGURATIONS) == true)
+					// TODO will need to remove this reference to the configurations association
+					if (this.dictionaryService.isSubClass(childType, ContentModel.TYPE_CONFIGURATIONS) == true ||
+						copyDetails.isChildAssociationRefAlwaysTraversed(classRef, childAssoc) == true)
 					{
 						if (copiedChildren.containsKey(childRef) == false)
                         {

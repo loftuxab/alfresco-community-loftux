@@ -217,8 +217,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testAddFeaturesAction()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -282,8 +280,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testSimpleWorkflowAction()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -336,8 +332,6 @@ public class RuleServiceCoverageTest extends TestCase
         
         try
         {
-            this.ruleService.makeActionable(this.nodeRef);
-            
             Map<String, Serializable> params = new HashMap<String, Serializable>(1);
             params.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
             params.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, this.catROne);
@@ -415,8 +409,6 @@ public class RuleServiceCoverageTest extends TestCase
         // Create categories used in tests
         createTestCategories();
         
-        this.ruleService.makeActionable(this.nodeRef);
-        
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(LinkCategoryActionExecuter.PARAM_CATEGORY_ASPECT, this.regionCategorisationQName);
         params.put(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE, this.catROne); 
@@ -455,8 +447,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void xtestMailAction()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -493,8 +483,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testCopyAction()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
         params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
@@ -552,8 +540,6 @@ public class RuleServiceCoverageTest extends TestCase
     {
 		try
 		{
-	        this.ruleService.makeActionable(this.nodeRef);
-	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
 			params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
 	        params.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
@@ -631,8 +617,6 @@ public class RuleServiceCoverageTest extends TestCase
     {
 		try
 		{
-	        this.ruleService.makeActionable(this.nodeRef);
-	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
 			params.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
 	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
@@ -707,8 +691,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testMoveAction()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
         params.put(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
@@ -758,8 +740,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testCheckOutAction()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         Rule rule = createRule(
         		RuleType.INBOUND, 
         		CheckOutActionExecuter.NAME, 
@@ -796,7 +776,7 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the new node has been checked out
         List<ChildAssociationRef> children = this.nodeService.getChildAssocs(this.nodeRef);
         assertNotNull(children);
-        assertEquals(3, children.size()); // includes the rule folder
+        assertEquals(4, children.size()); // includes the action and the rule folder
         for (ChildAssociationRef child : children)
         {
             NodeRef childNodeRef = child.getChildRef();
@@ -823,8 +803,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testCheckInAction()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(CheckInActionExecuter.PARAM_DESCRIPTION, "The version description.");
         
@@ -867,8 +845,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testRulesDisabled()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
         actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
@@ -922,8 +898,6 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testCheckMandatoryProperties()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
         actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
@@ -970,9 +944,7 @@ public class RuleServiceCoverageTest extends TestCase
      */
 	public void testContainsTextCondition()
 	{
-		this.ruleService.makeActionable(this.nodeRef);
-        
-        Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
+		Map<String, Serializable> actionParams = new HashMap<String, Serializable>(1);
 		actionParams.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
         
         // ActionCondition parameter's 
@@ -1111,8 +1083,6 @@ public class RuleServiceCoverageTest extends TestCase
 	// TODO removed for technology preview release
     public void xtestOutboundRuleType()
     {
-        this.ruleService.makeActionable(this.nodeRef);
-        
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
@@ -1173,8 +1143,6 @@ public class RuleServiceCoverageTest extends TestCase
 				
 			userTransaction1.commit();
 	        sw.stop();
-	        
-	        this.ruleService.makeActionable(this.nodeRef);
 	        
 	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
 	        params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        

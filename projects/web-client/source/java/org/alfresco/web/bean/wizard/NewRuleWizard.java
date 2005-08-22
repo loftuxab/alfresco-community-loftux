@@ -129,10 +129,6 @@ public class NewRuleWizard extends BaseActionWizard
          // get hold of the space the rule will apply to and make sure
          // it is actionable
          Node currentSpace = browseBean.getActionSpace();
-         if (this.ruleService.isActionable(currentSpace.getNodeRef()) == false)
-         {
-            this.ruleService.makeActionable(currentSpace.getNodeRef());
-         }
          
          Rule rule = null;
          

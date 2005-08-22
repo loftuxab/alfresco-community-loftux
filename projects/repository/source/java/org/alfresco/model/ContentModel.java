@@ -169,6 +169,9 @@ public interface ContentModel
     static final QName TYPE_COMPOSITE_ACTION = QName.createQName(ACTION_MODEL_URI, "compositeaction");
     static final QName ASSOC_ACTIONS = QName.createQName(ACTION_MODEL_URI, "actions");
     static final QName ASPECT_ACTIONABLE = QName.createQName(ACTION_MODEL_URI, "actionable");
+    static final QName ASSOC_SAVED_ACTION_FOLDERS = QName.createQName(ACTION_MODEL_URI, "savedActionFolders");
+    static final QName TYPE_SAVED_ACTION_FOLDER = QName.createQName(ACTION_MODEL_URI, "savedactionfolder");
+    static final QName ASSOC_SAVED_ACTIONS = QName.createQName(ACTION_MODEL_URI, "savedActions");
 
     //
     // Rule Model Definitions

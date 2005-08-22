@@ -151,6 +151,30 @@ public class PolicyScope extends AspectDetails
 	}
 	
 	/**
+	 * 
+	 * @param classRef
+	 * @param childAssocRef
+	 * @param alwaysTraverseAssociation
+	 */
+	public void addChildAssociation(QName classRef, ChildAssociationRef childAssocRef, boolean alwaysTraverseAssociation) 
+	{
+		if (classRef.equals(this.classRef) == true)
+		{
+			addChildAssociation(childAssocRef, alwaysTraverseAssociation);
+		}
+		else
+		{
+			AspectDetails aspectDetails = this.aspectCopyDetails.get(classRef);
+			if (aspectDetails == null)
+			{
+				// Add the aspect
+				aspectDetails = addAspect(classRef);
+			}
+			aspectDetails.addChildAssociation(childAssocRef, alwaysTraverseAssociation);
+		}
+	}
+	
+	/**
 	 * Get a child association
 	 * 
 	 * @param classRef
@@ -169,6 +193,25 @@ public class PolicyScope extends AspectDetails
 			if (aspectDetails != null)
 			{
 				result = aspectDetails.getChildAssociations();
+			}
+		}
+		
+		return result;
+	}
+	
+	public boolean isChildAssociationRefAlwaysTraversed(QName classRef, ChildAssociationRef childAssocRef)
+	{
+		boolean result = false;
+		if (classRef.equals(this.classRef) == true)
+		{
+			result = isChildAssociationRefAlwaysTraversed(childAssocRef);
+		}
+		else
+		{
+			AspectDetails aspectDetails = this.aspectCopyDetails.get(classRef);
+			if (aspectDetails != null)
+			{
+				result = aspectDetails.isChildAssociationRefAlwaysTraversed(childAssocRef);
 			}
 		}
 		
@@ -199,6 +242,8 @@ public class PolicyScope extends AspectDetails
 			aspectDetails.addAssociation(nodeAssocRef);
 		}
 	}
+	
+
 	
 	/**
 	 * Get associations
@@ -269,17 +314,17 @@ public class PolicyScope extends AspectDetails
 /*package*/ class AspectDetails
 {
 	/**
-	 * The properties that should be copied
+	 * The properties
 	 */
 	protected Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
 	
 	/**
-	 * The child associations that should be copied
+	 * The child associations
 	 */
 	protected List<ChildAssociationRef> childAssocs = new ArrayList<ChildAssociationRef>();
 	
 	/**
-	 * The target associations that should be copied
+	 * The target associations
 	 */
 	protected List<AssociationRef> targetAssocs = new ArrayList<AssociationRef>();
 	
@@ -287,6 +332,11 @@ public class PolicyScope extends AspectDetails
 	 * The class ref of the aspect
 	 */
 	protected QName classRef;
+
+	/**
+	 * Map of assocs that will always be traversed
+	 */
+	protected Map<ChildAssociationRef, ChildAssociationRef> alwaysTraverseMap = new HashMap<ChildAssociationRef, ChildAssociationRef>();
 
 	/**
 	 * Constructor
@@ -299,7 +349,7 @@ public class PolicyScope extends AspectDetails
 	}
 	
 	/**
-	 * Add a property to the list of those to be copied
+	 * Add a property to the list 
 	 * 
 	 * @param qName		the qualified name of the property
 	 * @param value		the value of the property
@@ -310,7 +360,7 @@ public class PolicyScope extends AspectDetails
 	}
 	
 	/**
-	 * Remove a property from the list of thiose to be copied
+	 * Remove a property from the list
 	 * 
 	 * @param qName		the qualified name of the property
 	 */
@@ -320,7 +370,7 @@ public class PolicyScope extends AspectDetails
 	}
 	
 	/**
-	 * Gets the map of properties to be copied
+	 * Gets the map of properties
 	 * 
 	 * @return  map of property names and values
 	 */
@@ -330,14 +380,41 @@ public class PolicyScope extends AspectDetails
 	}
 	
 	/**
-	 * Add a child association to copy
+	 * Add a child association 
 	 * 
-	 * @param qname			the qualified name of the association
 	 * @param childAssocRef the child association reference
 	 */
 	protected void addChildAssociation(ChildAssociationRef childAssocRef) 
 	{
 		this.childAssocs.add(childAssocRef);
+	}
+	
+	/**
+	 * Add a child association 
+	 * 
+	 * @param childAssocRef		the child assoc reference
+	 * @param alwaysDeepCopy	indicates whether the assoc should always be traversed
+	 */
+	protected void addChildAssociation(ChildAssociationRef childAssocRef, boolean alwaysTraverseAssociation) 
+	{
+		addChildAssociation(childAssocRef);
+		
+		if (alwaysTraverseAssociation == true)
+		{
+			// Add to the list of deep copy child associations
+			this.alwaysTraverseMap.put(childAssocRef, childAssocRef);
+		}
+	}
+	
+	/**
+	 * Indicates whether a child association ref is always traversed or not
+	 * 
+	 * @param childAssocRef	the child association reference
+	 * @return				true if the assoc is always traversed, false otherwise
+	 */
+	protected boolean isChildAssociationRefAlwaysTraversed(ChildAssociationRef childAssocRef)
+	{
+		return this.alwaysTraverseMap.containsKey(childAssocRef);
 	}
 	
 	/**

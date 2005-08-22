@@ -48,7 +48,7 @@ public interface RuleService
      * 
      * @param nodeRef the node reference
      */
-    public void makeActionable(NodeRef nodeRef);
+    //public void makeActionable(NodeRef nodeRef);
 
     /**
      * Indicates whether a node is actionable.
@@ -56,7 +56,7 @@ public interface RuleService
      * @param nodeRef 	the node reference
      * @return 			true if the node is actionable, false otherwise
      */
-    public boolean isActionable(NodeRef nodeRef);    
+    //public boolean isActionable(NodeRef nodeRef);    
     
     /**
      * Indicates wether the rules for a given node are enabled or not.  If the 

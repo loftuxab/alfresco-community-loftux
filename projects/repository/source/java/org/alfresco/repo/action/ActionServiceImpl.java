@@ -32,9 +32,9 @@ import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
 import org.alfresco.service.cmr.action.ActionDefinition;
 import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.action.CompositeAction;
 import org.alfresco.service.cmr.action.ParameterizedItem;
-import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -54,11 +54,6 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class ActionServiceImpl implements ActionService, RuntimeActionService, ApplicationContextAware
 { 
-    // location for actions
-	private static final QName ASSOC_NAME_ACTION_FOLDER = QName.createQName(ContentModel.ACTION_MODEL_URI, "actionFolder");
-	private static final QName ASSOC_NAME_ACTIONS = QName.createQName(ContentModel.ACTION_MODEL_URI, "actions");
-	
-    
 	/**
 	 * The application context
 	 */
@@ -68,11 +63,6 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 * The node service
 	 */
 	private NodeService nodeService;
-	
-	/**
-	 * The configurable service
-	 */
-	private ConfigurableService configurableService;
 	
 	/**
 	 * The search service
@@ -120,13 +110,20 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	}
 	
 	/**
-	 * Set the configurable service
+	 * Gets the saved action folder reference
 	 * 
-	 * @param configurableService  the configurable service
+	 * @param nodeRef	the node reference
+	 * @return			the node reference
 	 */
-	public void setConfigurableService(ConfigurableService configurableService)
+	private NodeRef getSavedActionFolderRef(NodeRef nodeRef)
 	{
-		this.configurableService = configurableService;
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionableAspect.ASSOC_NAME_SAVEDACTIONFOLDER);
+		if (assocs.size() != 1)
+		{
+			throw new ActionServiceException("Unable to retrieve the saved action folder reference.");
+		}
+		
+		return assocs.get(0).getChildRef();
 	}
 	
 	/**
@@ -297,20 +294,22 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	private NodeRef getActionNodeRefFromId(NodeRef nodeRef, String actionId)
 	{
 		NodeRef result = null;
-		NodeRef actionFolderNodeRef = getActionFolder(nodeRef);
 		
-		DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
-		namespacePrefixResolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
-		
-		List<NodeRef> nodeRefs = searchService.selectNodes(
-				actionFolderNodeRef, 
-				"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + actionId + "']",
-				null,
-				namespacePrefixResolver,
-				false);
-		if (nodeRefs.size() != 0)
+		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
-			result = nodeRefs.get(0);
+			DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
+			namespacePrefixResolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+			
+			List<NodeRef> nodeRefs = searchService.selectNodes(
+					getSavedActionFolderRef(nodeRef),
+					"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + actionId + "']",
+					null,
+					namespacePrefixResolver,
+					false);
+			if (nodeRefs.size() != 0)
+			{
+				result = nodeRefs.get(0);
+			}
 		}
 		
 		return result;
@@ -323,9 +322,13 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, action.getId());
 		if (actionNodeRef == null)
-		{
-			NodeRef actionFolderNodeRef = getActionFolder(nodeRef); 
-
+		{		
+			if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == false)
+			{
+				// Apply the actionable aspect
+				this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
+			}
+				
 			Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
 			props.put(ContentModel.PROP_DEFINITION_NAME, action.getActionDefinitionName());
 			props.put(ContentModel.PROP_NODE_UUID, action.getId());
@@ -338,9 +341,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			
 			// Create the action node
 			actionNodeRef = this.nodeService.createNode(
-					actionFolderNodeRef,
-					ContentModel.ASSOC_CONTAINS,
-					ASSOC_NAME_ACTIONS,
+					getSavedActionFolderRef(nodeRef),
+					ContentModel.ASSOC_SAVED_ACTIONS,
+					ContentModel.ASSOC_SAVED_ACTIONS,
 					actionType,
 					props).getChildRef();
 			
@@ -544,42 +547,6 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	}
 
 	/**
-	 * Gets the folder where the actions are stored
-	 * 
-	 * @param nodeRef	the node reference
-	 * @return			the action folder node reference
-	 */
-	private NodeRef getActionFolder(NodeRef nodeRef)
-	{
-		// First check whether the node is configurable
-		if (this.configurableService.isConfigurable(nodeRef) == false)
-		{
-			this.configurableService.makeConfigurable(nodeRef);
-		}
-		
-		// Get the configurable folder and check whether the action folder is there
-		NodeRef actionFolder = null;
-		NodeRef configFolder = this.configurableService.getConfigurationFolder(nodeRef);
-		List<ChildAssociationRef> children = this.nodeService.getChildAssocs(configFolder, ASSOC_NAME_ACTION_FOLDER);
-		if (children.size() == 0)
-		{
-			// Add the actions folder to the configurable folder
-			actionFolder = this.nodeService.createNode(
-					configFolder, 
-					ContentModel.ASSOC_CONTAINS, 
-					ASSOC_NAME_ACTION_FOLDER, 
-					ContentModel.TYPE_SYSTEM_FOLDER).getChildRef();
-		}
-		else
-		{
-			// Get the existing action folder
-			actionFolder = children.get(0).getChildRef();
-		}
-		
-		return actionFolder;
-	}
-
-	/**
 	 * @see org.alfresco.service.cmr.action.ActionService#getActions(org.alfresco.service.cmr.repository.NodeRef)
 	 */
 	public List<Action> getActions(NodeRef nodeRef)
@@ -587,17 +554,13 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		List<Action> result = new ArrayList<Action>();
 		
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.configurableService.isConfigurable(nodeRef) == true)
+			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
-			NodeRef actionFolder = getActionFolder(nodeRef);
-			if (actionFolder != null)
+			List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(getSavedActionFolderRef(nodeRef), ContentModel.ASSOC_SAVED_ACTIONS);
+			for (ChildAssociationRef action : actions)
 			{
-				List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(actionFolder, ASSOC_NAME_ACTIONS);
-				for (ChildAssociationRef action : actions)
-				{
-					NodeRef actionNodeRef = action.getChildRef();
-					result.add(createAction(actionNodeRef));
-				}
+				NodeRef actionNodeRef = action.getChildRef();
+				result.add(createAction(actionNodeRef));
 			}
 		}
 		
@@ -732,7 +695,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		Action result = null;
 		
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.configurableService.isConfigurable(nodeRef) == true)
+			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
 			NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, actionId);
 			if (actionNodeRef != null)
@@ -750,13 +713,12 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	public void removeAction(NodeRef nodeRef, Action action)
 	{
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.configurableService.isConfigurable(nodeRef) == true)
+			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
 			NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, action.getId());
 			if (actionNodeRef != null)
 			{
-				NodeRef actionFolder = getActionFolder(nodeRef);
-				this.nodeService.removeChild(actionFolder, actionNodeRef);
+				this.nodeService.removeChild(getSavedActionFolderRef(nodeRef), actionNodeRef);
 			}
 		}		
 	}
@@ -767,13 +729,12 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	public void removeAllActions(NodeRef nodeRef)
 	{
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.configurableService.isConfigurable(nodeRef) == true)
+			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
-			NodeRef actionFolder = getActionFolder(nodeRef);
-			List<ChildAssociationRef> actions = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(actionFolder, ASSOC_NAME_ACTIONS));
+			List<ChildAssociationRef> actions = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(getSavedActionFolderRef(nodeRef), ContentModel.ASSOC_SAVED_ACTIONS));
 			for (ChildAssociationRef action : actions)
 			{
-				this.nodeService.removeChild(actionFolder, action.getChildRef());
+				this.nodeService.removeChild(getSavedActionFolderRef(nodeRef), action.getChildRef());
 			}
 		}		
 	}

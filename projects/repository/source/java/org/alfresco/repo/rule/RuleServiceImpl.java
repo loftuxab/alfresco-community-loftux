@@ -27,10 +27,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.ActionableAspect;
 import org.alfresco.repo.action.RuntimeActionService;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.ActionService;
-import org.alfresco.service.cmr.configuration.ConfigurableService;
+import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -55,28 +56,16 @@ import org.alfresco.util.GUID;
  */
 public class RuleServiceImpl implements RuleService, RuntimeRuleService
 {
-    
     /** key against which to store rules pending on the current transaction */
     private static final String KEY_RULES_PENDING = "RuleServiceImpl.PendingRules";
     
     /** key against which to store executed rules on the current transaction */
     private static final String KEY_RULES_EXECUTED = "RuleServiceImpl.ExecutedRules";
-
-    /**
-     * Association names used internally
-     */
-	private static final QName ASSOC_NAME_RULE_FOLDER = QName.createQName(ContentModel.RULE_MODEL_URI, "rules");
-	private static final QName ASSOC_NAME_RULES = QName.createQName(ContentModel.RULE_MODEL_URI, "rules");
     
     /**
      * The node service
      */
     private NodeService nodeService;
-    
-    /**
-     * The configurable service
-     */
-    private ConfigurableService configService;
     
     /**
      * The action service
@@ -143,6 +132,23 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	{
 		this.ruleCache = ruleCache;
 	}
+	
+	/**
+	 * Gets the saved rule folder reference
+	 * 
+	 * @param nodeRef	the node reference
+	 * @return			the node reference
+	 */
+	private NodeRef getSavedRuleFolderRef(NodeRef nodeRef)
+	{
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER);
+		if (assocs.size() != 1)
+		{
+			throw new ActionServiceException("Unable to retrieve the saved rule folder reference.");
+		}
+		
+		return assocs.get(0).getChildRef();
+	}
     
     /**
      * @see org.alfresco.repo.rule.RuleService#getRuleTypes()
@@ -158,42 +164,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     public RuleType getRuleType(String name)
     {
         return this.ruleTypes.get(name);
-    }
-    
-    /**
-     * Set the configurable service
-     * 
-     * @param configService	the configurable service
-     */
-    public void setConfigService(ConfigurableService configService)
-	{
-		this.configService = configService;
-	}
-
-    /**
-     * @see org.alfresco.repo.rule.RuleService#makeActionable(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
-     */
-    public void makeActionable(
-            NodeRef nodeRef)
-    {
-        // Make the node configurable
-    	if (this.configService.isConfigurable(nodeRef) == false)
-    	{
-    		this.configService.makeConfigurable(nodeRef);
-    	}
-    	
-    	// Apply the actionable aspect
-    	this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
-    }
-
-    /**
-     * @see org.alfresco.repo.rule.RuleService#isActionable(org.alfresco.repo.ref.NodeRef)
-     */
-    public boolean isActionable(NodeRef nodeRef)
-    {
-        // Determine whether a node is actionable or not
-        return (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true);          
-    }      
+    }    
     
     /**
      * @see org.alfresco.service.cmr.rule.RuleService#rulesEnabled(NodeRef)
@@ -268,7 +239,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     		}
     		
     		// If the node is actionable then get any rules that it might have set against it
-    		if (isActionable(nodeRef) == true)
+    		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
     		{
     			List<Rule> allRules = this.ruleCache.getRules(nodeRef);
     			if (allRules == null)
@@ -276,18 +247,15 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     				allRules = new ArrayList<Rule>();
     				
 		    		// Get the rules for this node
-		    		NodeRef rulesFolderNodeRef = getRuleFolder(nodeRef);    		
-		    		if (rulesFolderNodeRef != null)
-		    		{
-			    		List<ChildAssociationRef> ruleChildAssocRefs = this.nodeService.getChildAssocs(rulesFolderNodeRef, ASSOC_NAME_RULES);
-			    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
-						{
-			    			// Create the rule and add to the list
-							NodeRef ruleNodeRef = ruleChildAssocRef.getChildRef();
-							Rule rule = createRule(ruleNodeRef);
-							allRules.add(rule);
-						}
-		    		}
+		    		List<ChildAssociationRef> ruleChildAssocRefs = 
+		    			this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER);
+		    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
+					{
+		    			// Create the rule and add to the list
+						NodeRef ruleNodeRef = ruleChildAssocRef.getChildRef();
+						Rule rule = createRule(ruleNodeRef);
+						allRules.add(rule);
+					}
 		    		
 		    		// Add the list to the cache
 		    		this.ruleCache.setRules(nodeRef, allRules);
@@ -410,20 +378,21 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	private NodeRef getRuleNodeRefFromId(NodeRef nodeRef, String ruleId)
 	{
 		NodeRef result = null;
-		NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
-		
-		DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
-		namespacePrefixResolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
-		
-		List<NodeRef> nodeRefs = searchService.selectNodes(
-				ruleFolderNodeRef, 
-				"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + ruleId + "']",
-				null,
-				namespacePrefixResolver,
-				false);
-		if (nodeRefs.size() != 0)
+		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
-			result = nodeRefs.get(0);
+			DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
+			namespacePrefixResolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+			
+			List<NodeRef> nodeRefs = searchService.selectNodes(
+					getSavedRuleFolderRef(nodeRef), 
+					"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + ruleId + "']",
+					null,
+					namespacePrefixResolver,
+					false);
+			if (nodeRefs.size() != 0)
+			{
+				result = nodeRefs.get(0);
+			}
 		}
 		
 		return result;
@@ -477,7 +446,11 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
     	if (ruleNodeRef == null)
     	{
-    		NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
+    		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == false)
+    		{
+    			// Add the actionable aspect
+    			this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
+    		}
     		
     		Map<QName, Serializable> props = new HashMap<QName, Serializable>(3);
     		props.put(ContentModel.PROP_RULE_TYPE, rule.getRuleTypeName());
@@ -487,9 +460,9 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 			
 			// Create the action node
 			ruleNodeRef = this.nodeService.createNode(
-					ruleFolderNodeRef,
-					ContentModel.ASSOC_CONTAINS,
-					ASSOC_NAME_RULES,
+					getSavedRuleFolderRef(nodeRef),
+					ContentModel.ASSOC_SAVED_ACTIONS,
+					ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER,
 					ContentModel.TYPE_RULE,
 					props).getChildRef();
 			
@@ -507,13 +480,13 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
      */
     public void removeRule(NodeRef nodeRef, Rule rule)
     {
-    	if (this.nodeService.exists(nodeRef) == true && isActionable(nodeRef) == true)
+    	if (this.nodeService.exists(nodeRef) == true &&
+    		this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
     	{
     		NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
     		if (ruleNodeRef != null)
     		{
-    			NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
-    			this.nodeService.removeChild(ruleFolderNodeRef, ruleNodeRef);
+    			this.nodeService.removeChild(getSavedRuleFolderRef(nodeRef), ruleNodeRef);
     		}
     	}
     }	
@@ -523,53 +496,15 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
      */
     public void removeAllRules(NodeRef nodeRef)
     {
-    	if (this.nodeService.exists(nodeRef) == true && isActionable(nodeRef) == true)
+    	if (this.nodeService.exists(nodeRef) == true && 
+        	this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
     	{
-    		NodeRef ruleFolderNodeRef = getRuleFolder(nodeRef);
-    		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(ruleFolderNodeRef, ASSOC_NAME_RULES);
+    		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER);
     		for (ChildAssociationRef ruleChildAssoc : ruleChildAssocs)
 			{
-				this.nodeService.removeChild(ruleFolderNodeRef, ruleChildAssoc.getChildRef());
+				this.nodeService.removeChild(getSavedRuleFolderRef(nodeRef), ruleChildAssoc.getChildRef());
 			}
     	}
-    }
-    
-    /**
-     * Get the node reference of the folder where the rule content nodes are stored
-     * 
-     * @param nodeRef       the node reference to the actionable node
-     * @return              the node reference to the configuration folder
-     */
-    private NodeRef getRuleFolder(NodeRef nodeRef)
-    {
-        NodeRef ruleFolder = null;
-        
-        if (isActionable(nodeRef) == false)
-        {
-        	makeActionable(nodeRef);
-        }
-        
-		NodeRef configFolder = this.configService.getConfigurationFolder(nodeRef);
-		if (configFolder != null)
-		{
-			List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(
-													configFolder, 
-													ASSOC_NAME_RULE_FOLDER);
-			if (childAssocRefs.size() == 0)
-			{
-				ruleFolder = this.nodeService.createNode(
-													configFolder,
-													ContentModel.ASSOC_CONTAINS,
-													ASSOC_NAME_RULE_FOLDER,
-													ContentModel.TYPE_SYSTEM_FOLDER).getChildRef();
-			}
-			else
-			{
-				ruleFolder = childAssocRefs.get(0).getChildRef();
-			}
-		}
-		
-        return ruleFolder;
     }
 	
 	/**

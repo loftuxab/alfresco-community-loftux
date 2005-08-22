@@ -20,15 +20,12 @@
 				<property name="nodeService">
 					<ref bean="nodeService"/>
 				</property>		
-				<property name="configService">
-					<ref bean="configurableService"/>
-				</property>	
 			    <property name="actionService">
 				    <ref bean="actionService"/>
 			    </property>	
 			    <property name="searchService">
 				    <ref bean="searchService"/>
-			    </property>
+			    </property>	
 		   </bean>
       </property>
       <property name="transactionAttributes">
