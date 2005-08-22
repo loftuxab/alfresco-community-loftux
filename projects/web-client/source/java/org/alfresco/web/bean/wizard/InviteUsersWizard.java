@@ -19,8 +19,6 @@ package org.alfresco.web.bean.wizard;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -32,11 +30,9 @@ import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIGenericPicker;
@@ -132,9 +128,9 @@ public class InviteUsersWizard extends AbstractWizardBean
          
          NodeRef peopleRef = Repository.getSystemPeopleFolderRef(context, nodeService, searchService);
          // build xpath to match 
-         // NOTE: see SearchComponentTest
+         // NOTE: see SearcherComponentTest
          String xpath = "*[like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "firstName, '%" + contains + "%', false)" +
-                 " or " + "like(@" + NamespaceService.CONTENT_MODEL_1_0_URI + ":" + "lastName, '%" + contains + "%', false)]";
+                 " or " + "like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "lastName, '%" + contains + "%', false)]";
          
          if (logger.isDebugEnabled())
             logger.debug("User/Groups Picker Query: " + xpath);
