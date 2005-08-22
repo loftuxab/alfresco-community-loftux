@@ -40,7 +40,7 @@ public class PermissionSet implements XMLModelInitialisable
     private static final String PERMISSION = "permission";
     private static final String EXPOSE = "expose";
     private static final String EXPOSE_ALL = "all";
-    private static final String EXPOSE_SELECTED = "selected";
+    //private static final String EXPOSE_SELECTED = "selected";
     
     
     private QName qname;

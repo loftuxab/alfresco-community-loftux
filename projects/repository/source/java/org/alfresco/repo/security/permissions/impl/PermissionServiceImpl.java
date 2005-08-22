@@ -39,8 +39,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
-
-import com.sun.org.apache.xerces.internal.impl.dtd.models.DFAContentModel;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * The Alfresco implementation of a permissions service against our APIs for the
@@ -49,7 +48,7 @@ import com.sun.org.apache.xerces.internal.impl.dtd.models.DFAContentModel;
  * 
  * @author andyh
  */
-public class PermissionServiceImpl implements PermissionService
+public class PermissionServiceImpl implements PermissionService, InitializingBean
 {
     /*
      * Access to the mode,
@@ -113,6 +112,32 @@ public class PermissionServiceImpl implements PermissionService
         this.authenticationService = authenticationService;
     }
 
+    
+    public void afterPropertiesSet() throws Exception
+    {
+        if (dictionaryService == null)
+        {
+            throw new IllegalArgumentException("There must be a dictionary service");
+        }
+        if (modelDAO == null)
+        {
+            throw new IllegalArgumentException("There must be a permission model service");
+        }
+        if (nodeService == null)
+        {
+            throw new IllegalArgumentException("There must be a node service");
+        }
+        if (permissionsDAO == null)
+        {
+            throw new IllegalArgumentException("There must be a permission dao");
+        }
+        if (authenticationService == null)
+        {
+            throw new IllegalArgumentException("There must be an authentication");
+        }
+        
+    }
+    
     //
     // Permissions Service
     //
