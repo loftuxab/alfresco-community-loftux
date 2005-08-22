@@ -194,8 +194,9 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       // query for all the child nodes of the root
       Reference node = new Reference();
       node.setStore(STORE);
-      String rootId = "7329c9d2-0d89-11da-90fb-fbe4cb2183e7";
+      String rootId = "227f1ee2-1082-11da-8fd4-3310e1ddfea6";
       node.setUuid(rootId);     // find a query to retrieve this maybe type == store_root?
+      logger.info("Retrieving children for node: " + rootId + "....");
       QueryResult rootChildren = this.repSvc.queryChildren(node);
       
       assertNotNull("rootChildren should not be null", rootChildren);
@@ -207,7 +208,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       // get hold of the id of the first child
       ResultSetRow firstRow = rootChildrenResults.getRows(0);
       String id = firstRow.getNode().getId();
-      logger.info("Retrieving parents for id: " + id + "....");
+      logger.info("Retrieving parents for first node found: " + id + "....");
       
       node = new Reference();
       node.setStore(STORE);
@@ -228,7 +229,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
          ResultSetRow row = rows[x];
          ResultSetRowNode rowNode = row.getNode();
          String nodeId = rowNode.getId();
-         logger.info("id = " + nodeId + ", type = " + rowNode.getType());
+         logger.info("parent node = " + nodeId + ", type = " + rowNode.getType());
          
          if (nodeId.equals(rootId))
          {

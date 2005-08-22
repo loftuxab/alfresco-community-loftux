@@ -14,6 +14,7 @@
 	<handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
 	<handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
 	<handler name="CreateSpringTicketCallback" type="java:org.alfresco.repo.webservice.axis.TicketCallbackSpringHandler"/>
+	<handler name="QueryConfigHandler" type="java:org.alfresco.repo.webservice.axis.QueryConfigHandler"/>
 	<handler name="WSSecurity" type="java:org.apache.ws.axis.security.WSDoAllReceiver">
 	   <parameter name="action" value="UsernameToken"/>
 	   <!-- Uncomment the following line and comment the one above for .NET support (but only .NET support) -->
@@ -441,7 +442,7 @@
 	   <requestFlow>
 	      <handler type="CreateSpringTicketCallback"/>
       	<handler type="WSSecurity"/>
-      	<handler type="java:org.alfresco.repo.webservice.repository.QueryConfigHandler"/>
+      	<handler type="QueryConfigHandler"/>
   		</requestFlow>
 	   <!-- generated below here -->
 	   <parameter name="wsdlTargetNamespace" value="http://www.alfresco.org/ws/service/repository/1.0"/>

@@ -17,81 +17,59 @@
  */
 package org.alfresco.repo.webservice.repository;
 
-import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 import javax.xml.rpc.handler.MessageContext;
 
-import org.alfresco.repo.webservice.types.NamedValue;
+import org.alfresco.repo.webservice.types.ResultSetRow;
 import org.alfresco.repo.webservice.types.ResultSetRowNode;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.ResultSetRow;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implementation of a QuerySession that stores the results from a repository RsultSet
+ * Implementation of a QuerySession that stores the results from a query for children
  * 
  * @author gavinc
  */
-public class ResultSetQuerySession extends AbstractQuerySession
+public class ChildrenQuerySession extends AbstractQuerySession
 {
-   private static Log logger = LogFactory.getLog(ResultSetQuerySession.class);
-   private ResultSet results;
+   private static Log logger = LogFactory.getLog(ChildrenQuerySession.class);
+   private List<ChildAssociationRef> results;
    
    /**
-    * Constructs a ResultSetQuerySession
+    * Constructs a ChildrenQuerySession
     * 
     * @param context Current MessageContext
     * @param nodeService NodeService instance used to lookup node information
-    * @param results The ResultSet to cache
+    * @param results The List to cache
     * @param includeMetaData Whether the QueryResult objects returned should contain metadata
     */
-   public ResultSetQuerySession(MessageContext context, NodeService nodeService,
-         ResultSet results, boolean includeMetaData)
+   public ChildrenQuerySession(MessageContext context, NodeService nodeService,
+         List<ChildAssociationRef> results, boolean includeMetaData)
    {
-      super(context, nodeService, results.length(), includeMetaData);
+      super(context, nodeService, results.size(), includeMetaData);
       this.results = results;
    }
-
+   
    /**
     * @see org.alfresco.repo.webservice.repository.AbstractQuerySession#getRows(int, int)
     */
    @Override
-   public QueryResult getRows(int from, int to) 
+   public QueryResult getRows(int from, int to)
    {
       org.alfresco.repo.webservice.types.ResultSet batchResults = new org.alfresco.repo.webservice.types.ResultSet();      
       org.alfresco.repo.webservice.types.ResultSetRow[] rows = new org.alfresco.repo.webservice.types.ResultSetRow[to-from];
-
+         
       int arrPos = 0;
       for (int x = from; x < to; x++)
       {
-         ResultSetRow origRow = this.results.getRow(x);
-         NodeRef nodeRef = origRow.getNodeRef();
-         ResultSetRowNode rowNode = new ResultSetRowNode(nodeRef.getId(), this.nodeService.getType(nodeRef).toString(), null);
-         
-         // get the data for the row and build up the columns structure
-         Map<Path, Serializable> values = origRow.getValues();
-         NamedValue[] columns = new NamedValue[values.size()];
-         int col = 0;
-         for (Path path : values.keySet())
-         {
-            String value = null;
-            Serializable valueObj = values.get(path);
-            if (valueObj != null)
-            {
-               value = valueObj.toString();
-            }
-            columns[col] = new NamedValue(path.toString(), value);
-            col++;
-         }
-         
-         org.alfresco.repo.webservice.types.ResultSetRow row = new org.alfresco.repo.webservice.types.ResultSetRow();
-         row.setColumns(columns);
-         row.setScore(origRow.getScore());
+         ChildAssociationRef assoc = this.results.get(x);
+         NodeRef childNodeRef = assoc.getChildRef();
+         ResultSetRowNode rowNode = new ResultSetRowNode(childNodeRef.getId(), nodeService.getType(childNodeRef).toString(), null);
+         ResultSetRow row = new ResultSetRow();
          row.setRowIndex(x);
          row.setNode(rowNode);
          

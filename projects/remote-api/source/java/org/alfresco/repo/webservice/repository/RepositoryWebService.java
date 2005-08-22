@@ -27,8 +27,6 @@ import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Query;
 import org.alfresco.repo.webservice.types.QueryLanguageEnum;
 import org.alfresco.repo.webservice.types.Reference;
-import org.alfresco.repo.webservice.types.ResultSetRow;
-import org.alfresco.repo.webservice.types.ResultSetRowNode;
 import org.alfresco.repo.webservice.types.Store;
 import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -37,7 +35,6 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.util.GUID;
 import org.apache.axis.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -180,32 +177,21 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          NodeRef nodeRef = new NodeRef(Utils.convertToStoreRef(node.getStore()), node.getUuid());
          List<ChildAssociationRef> kids = this.nodeService.getChildAssocs(nodeRef);
          
-         org.alfresco.repo.webservice.types.ResultSet results = new org.alfresco.repo.webservice.types.ResultSet();
-         int size = kids.size();
+         // setup a query session and get the first batch of results
+         ChildrenQuerySession querySession = new ChildrenQuerySession(MessageContext.getCurrentContext(), this.nodeService,
+               kids, false);
+         QueryResult queryResult = querySession.getNextResultsBatch();; 
          
-         // build up all the row data
-         ResultSetRow[] rows = new ResultSetRow[size];
-         for (int x = 0; x < size; x++)
+         // add the session to the cache if there are more results to come
+         if (querySession.hasMoreResults())
          {
-            ChildAssociationRef assoc = kids.get(x);
-            NodeRef childNodeRef = assoc.getChildRef();
-            ResultSetRowNode rowNode = new ResultSetRowNode(childNodeRef.getId(), nodeService.getType(childNodeRef).toString(), null);
-            ResultSetRow row = new ResultSetRow();
-            row.setRowIndex(x);
-            row.setNode(rowNode);
-            
-            // add the row to the overall results
-            rows[x] = row;
+            this.querySessionCache.putQuerySession(querySession);
          }
-         
-         // add the rows to the result set and set the size
-         results.setRows(rows);
-         results.setTotalRowCount(size);
-         
-         // TODO: Setup a query session and only return the number of rows specified in the query config header
-         QueryResult queryResult = new QueryResult();
-         queryResult.setQuerySession(GUID.generate());
-         queryResult.setResultSet(results);
+         else
+         {
+            // remove the query session id so the client doesn't request non-existent results
+            queryResult.setQuerySession(null);
+         }
          
          return queryResult;
       }
@@ -231,32 +217,21 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          NodeRef nodeRef = new NodeRef(Utils.convertToStoreRef(node.getStore()), node.getUuid());
          List<ChildAssociationRef> parents = this.nodeService.getParentAssocs(nodeRef);
          
-         org.alfresco.repo.webservice.types.ResultSet results = new org.alfresco.repo.webservice.types.ResultSet();
-         int size = parents.size();
+         // setup a query session and get the first batch of results
+         ParentsQuerySession querySession = new ParentsQuerySession(MessageContext.getCurrentContext(), this.nodeService,
+               parents, false);
+         QueryResult queryResult = querySession.getNextResultsBatch();; 
          
-         // build up all the row data
-         ResultSetRow[] rows = new ResultSetRow[size];
-         for (int x = 0; x < size; x++)
+         // add the session to the cache if there are more results to come
+         if (querySession.hasMoreResults())
          {
-            ChildAssociationRef assoc = parents.get(x);
-            NodeRef parentNodeRef = assoc.getParentRef();
-            ResultSetRowNode rowNode = new ResultSetRowNode(parentNodeRef.getId(), nodeService.getType(parentNodeRef).toString(), null);
-            ResultSetRow row = new ResultSetRow();
-            row.setRowIndex(x);
-            row.setNode(rowNode);
-            
-            // add the row to the overall results
-            rows[x] = row;
+            this.querySessionCache.putQuerySession(querySession);
          }
-         
-         // add the rows to the result set and set the size
-         results.setRows(rows);
-         results.setTotalRowCount(size);
-         
-         // TODO: Setup a query session and only return the number of rows specified in the query config header
-         QueryResult queryResult = new QueryResult();
-         queryResult.setQuerySession(GUID.generate());
-         queryResult.setResultSet(results);
+         else
+         {
+            // remove the query session id so the client doesn't request non-existent results
+            queryResult.setQuerySession(null);
+         }
          
          return queryResult;
       }

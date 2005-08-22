@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.webservice.repository;
+package org.alfresco.repo.webservice.axis;
 
 import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.QueryConfiguration;
