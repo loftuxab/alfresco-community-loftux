@@ -118,7 +118,7 @@ public class LuceneCategoryTest extends TestCase
         searcher = (SearchService) ctx.getBean("searchService");
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
         categoryService = (CategoryService) ctx.getBean("categoryService");
-        serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         
         createTestTypes();
         

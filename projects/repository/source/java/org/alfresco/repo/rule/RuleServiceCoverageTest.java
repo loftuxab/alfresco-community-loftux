@@ -130,7 +130,7 @@ public class RuleServiceCoverageTest extends TestCase
     protected void setUp() throws Exception 
     {
         // Get the required services
-		this.serviceRegistry = (ServiceRegistry)applicationContext.getBean("serviceRegistry");
+		this.serviceRegistry = (ServiceRegistry)applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 		this.nodeService = (NodeService)applicationContext.getBean("nodeService");
         this.ruleService = (RuleService)applicationContext.getBean("ruleService");
         this.cociService = (CheckOutCheckInService)applicationContext.getBean("checkOutCheckInService");

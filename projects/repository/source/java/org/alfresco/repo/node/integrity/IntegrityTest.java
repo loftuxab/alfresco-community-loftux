@@ -66,7 +66,7 @@ public class IntegrityTest extends TestCase
         integrityChecker.setFailOnViolation(true);
         integrityChecker.setTraceOn(false);
         
-        serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         nodeService = serviceRegistry.getNodeService();
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, getName());
         if (!nodeService.exists(storeRef))

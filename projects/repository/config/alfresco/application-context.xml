@@ -4,12 +4,12 @@
 <!-- This file must be split up once the number and spread of beans increases qweqwe -->
 <beans>
    
-   <import resource="classpath:applicationServices.xml"/>
-   <import resource="classpath:alfresco/actionService.xml"/>	
-   <import resource="classpath:alfresco/ruleService.xml"/>
+   <import resource="classpath:alfresco/public-services-context.xml"/>
+   <import resource="classpath:alfresco/action-services-context.xml"/>	
+   <import resource="classpath:alfresco/rule-services-context.xml"/>
    <import resource="classpath:alfresco/node-services-context.xml"/>
-   <import resource="classpath:alfresco/networkProtocolServices.xml"/>
-   <import resource="classpath:alfresco/contentServices.xml"/>
+   <import resource="classpath:alfresco/network-protocol-context.xml"/>
+   <import resource="classpath:alfresco/content-services-context.xml"/>
    
    <!--                    -->
    <!--  PERSISTENCE       -->
@@ -789,7 +789,7 @@
    </bean>
    
    <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap" init-method="bootstrap"  depends-on="nodeIndexer">
-      <property name="serviceRegistry"><ref bean="serviceRegistry"/></property>
+      <property name="serviceRegistry"><ref bean="ServiceRegistry"/></property>
       <property name="storeUrl"><value>workspace://SpacesStore</value></property>
       <property name="configuration">
          <props>
@@ -831,15 +831,6 @@
    <!-- Referencable -->
    <bean id="referencableAspect" class="org.alfresco.repo.node.ReferencableAspect" init-method="init">
       <property name="policyComponent"><ref bean="policyComponent"/></property>
-   </bean>
-   
-   <!-- Service Registry -->
-   <bean id="serviceRegistry" class="org.alfresco.repo.service.ServiceDescriptorRegistry">
-   </bean>
-      
-   <bean id="alfrescoService" abstract="true" class="org.alfresco.repo.service.BeanServiceDescriptor">
-      <property name="namespaceService"><ref local="namespaceService"/></property>
-      <property name="namespace"><value>http://www.alfresco.org</value></property>
    </bean>
    
    <!-- Configurable service -->

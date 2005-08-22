@@ -50,10 +50,10 @@ public interface ServiceRegistry
 {
     // Service Bean Names
     
-    static final String SERVICE_REGISTRY = "AlfServiceRegistry";
+    static final String SERVICE_REGISTRY = "ServiceRegistry";
 
-    static final QName USER_TRANSACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "UserTransaction");
     static final QName REGISTRY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ServiceRegistry");
+    static final QName USER_TRANSACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "UserTransactionService");
     static final QName NAMESPACE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NamespaceService");
     static final QName DICTIONARY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "DictionaryService");
     static final QName NODE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NodeService");
@@ -67,8 +67,8 @@ public interface ServiceRegistry
     static final QName COCI_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CheckoutCheckinService");
     static final QName RULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "RuleService");
     static final QName IMPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ImporterService");
-    static final QName CONFIGURABLE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ConfigurableService");
     static final QName ACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ActionService");
+    static final QName CONFIGURABLE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ConfigurableService");
     
     /**
      * Get the list of services provided by the Repository
@@ -172,12 +172,13 @@ public interface ServiceRegistry
     RuleService getRuleService();
     
     /**
-     * @return the configurable service (or null if one is not provided)
-     */
-    ConfigurableService getConfigurableService();
-    
-    /**
      * @return the action service (or null if one is not provided)
      */
     ActionService getActionService();
+
+    /**
+     * @return the action service (or null if one is not provided)
+     */
+    ConfigurableService getConfigurableService();
+
 }

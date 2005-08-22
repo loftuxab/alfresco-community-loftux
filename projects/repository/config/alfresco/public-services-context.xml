@@ -1,0 +1,385 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+
+    <!-- Base Service Descriptor for Alfresco Services -->
+    <bean id="AlfrescoServiceDescriptor" abstract="true" class="org.alfresco.repo.service.ServiceDescriptorAdvisorFactory">
+    	<property name="namespace">
+    		<value>http://www.alfresco.org</value>
+    	</property>
+    </bean>
+
+
+    <!-- Service Registry -->
+
+    <bean id="ServiceRegistry" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.ServiceRegistry</value>
+    	</property>
+    	<property name="target">
+    		<bean class="org.alfresco.repo.service.ServiceDescriptorRegistry"/>
+    	</property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="ServiceRegistry_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="ServiceRegistry_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.ServiceRegistry</value>
+    	</property>
+    	<property name="description">
+    		<value>Repository service registry</value>
+    	</property>
+    </bean>
+
+
+    <!-- Namespace Service -->
+
+    <bean id="NamespaceService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.namespace.NamespaceService</value>
+    	</property>
+    	<property name="target"><ref bean="namespaceService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="NamespaceService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="NamespaceService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.namespace.NamespaceService</value>
+    	</property>
+    	<property name="description">
+    		<value>Namespace service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Transaction Service -->
+
+	<alias alias="UserTransactionService" name="userTransaction"/>
+	
+
+    <!-- Dictionary Service -->
+
+    <bean id="DictionaryService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.dictionary.DictionaryService</value>
+    	</property>
+    	<property name="target"><ref bean="dictionaryService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="DictionaryService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="DictionaryService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.dictionary.DictionaryService</value>
+    	</property>
+    	<property name="description">
+    		<value>Dictionary Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Node Service -->
+
+    <bean id="NodeService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.repository.NodeService</value>
+    	</property>
+    	<property name="target"><ref bean="nodeService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="NodeService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="NodeService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.repository.NodeService</value>
+    	</property>
+    	<property name="description">
+    		<value>Node Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Content Service -->
+
+    <bean id="ContentService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.repository.ContentService</value>
+    	</property>
+    	<property name="target"><ref bean="contentService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="ContentService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="ContentService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.repository.ContentService</value>
+    	</property>
+    	<property name="description">
+    		<value>Content Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Content Service -->
+
+    <bean id="MimetypeService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.repository.MimetypeService</value>
+    	</property>
+    	<property name="target"><ref bean="mimetypeMap"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="MimetypeService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="MimetypeService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.repository.MimetypeService</value>
+    	</property>
+    	<property name="description">
+    		<value>Mime Type Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Search Service -->
+
+    <bean id="SearchService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.search.SearchService</value>
+    	</property>
+    	<property name="target"><ref bean="searchService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="SearchService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="SearchService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.search.SearchService</value>
+    	</property>
+    	<property name="description">
+    		<value>Search Service</value>
+    	</property>
+    </bean>
+   
+
+    <!-- Category Service -->
+
+    <bean id="CategoryService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.search.CategoryService</value>
+    	</property>
+    	<property name="target"><ref bean="categoryService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="CategoryService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="CategoryService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.search.CategoryService</value>
+    	</property>
+    	<property name="description">
+    		<value>Category Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Copy Service -->
+
+    <bean id="CopyService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.repository.CopyService</value>
+    	</property>
+    	<property name="target"><ref bean="copyService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="CopyService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="CopyService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.repository.CopyService</value>
+    	</property>
+    	<property name="description">
+    		<value>Copy Service</value>
+    	</property>
+    </bean>
+   
+
+    <!-- Lock Service -->
+
+    <bean id="LockService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.lock.LockService</value>
+    	</property>
+    	<property name="target"><ref bean="lockService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="LockService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="LockService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.lock.LockService</value>
+    	</property>
+    	<property name="description">
+    		<value>Lock Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Version Service -->
+
+    <bean id="VersionService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.version.VersionService</value>
+    	</property>
+    	<property name="target"><ref bean="versionService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="VersionService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="VersionService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.version.VersionService</value>
+    	</property>
+    	<property name="description">
+    		<value>Version Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- COCI Service -->
+
+    <bean id="CheckoutCheckinService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.coci.CheckOutCheckInService</value>
+    	</property>
+    	<property name="target"><ref bean="checkOutCheckInService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="CheckoutCheckinService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="CheckoutCheckinService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.coci.CheckOutCheckInService</value>
+    	</property>
+    	<property name="description">
+    		<value>Version Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Rule Service -->
+
+    <bean id="RuleService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.rule.RuleService</value>
+    	</property>
+    	<property name="target"><ref bean="ruleService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="RuleService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="RuleService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.rule.RuleService</value>
+    	</property>
+    	<property name="description">
+    		<value>Rule Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Importer Service -->
+
+    <bean id="ImporterService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.repo.importer.ImporterService</value>
+    	</property>
+    	<property name="target"><ref bean="importerComponent"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="ImporterService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="ImporterService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.repo.importer.ImporterService</value>
+    	</property>
+    	<property name="description">
+    		<value>Importer Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Action Service -->
+
+    <bean id="ActionService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.action.ActionService</value>
+    	</property>
+    	<property name="target"><ref bean="actionService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="ActionService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="ActionService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.action.ActionService</value>
+    	</property>
+    	<property name="description">
+    		<value>Action Service</value>
+    	</property>
+    </bean>
+
+
+    <!-- Configrable Service -->
+    
+    <alias alias="ConfigurableService" name="configurableService"/>  
+      
+</beans>

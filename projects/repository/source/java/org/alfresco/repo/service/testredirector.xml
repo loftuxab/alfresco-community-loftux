@@ -12,7 +12,7 @@
    <bean id="type3_component" class="org.alfresco.repo.service.StoreRedirectorProxyFactoryTest$Type3Component">
    </bean>
    
-   <bean id="service1" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
+   <bean id="redirector_service1" class="org.alfresco.repo.service.StoreRedirectorProxyFactory">
       <property name="proxyInterface">
          <value>org.alfresco.repo.service.StoreRedirectorProxyFactoryTest$TestServiceInterface</value>
       </property>

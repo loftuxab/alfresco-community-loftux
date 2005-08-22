@@ -23,10 +23,10 @@
    
    <bean id="repositoryWebService" class="org.alfresco.repo.webservice.repository.RepositoryWebService">
       <property name="nodeService">
-         <ref bean="AlfNodeService"/>
+         <ref bean="NodeService"/>
       </property>
       <property name="searchService">
-         <ref bean="AlfSearchService"/>
+         <ref bean="SearchService"/>
       </property>
       <property name="querySessionCache">
          <ref bean="querySessionCache"/>
@@ -35,7 +35,7 @@
    
    <bean id="contentWebService" class="org.alfresco.repo.webservice.content.ContentWebService">
       <property name="contentService">
-         <ref bean="AlfContentService"/>
+         <ref bean="ContentService"/>
       </property>
    </bean>
    

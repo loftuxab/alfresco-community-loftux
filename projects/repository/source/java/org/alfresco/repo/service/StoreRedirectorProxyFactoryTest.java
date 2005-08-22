@@ -43,10 +43,10 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         NodeRef nodeRef1 = new NodeRef(storeRef1, "id");
         NodeRef nodeRef2 = new NodeRef(storeRef2, "id");
 
-        TestServiceInterface service = (TestServiceInterface) factory.getBean("service1");
+        TestServiceInterface service = (TestServiceInterface) factory.getBean("redirector_service1");
 
-        String result1 = service.defaultBinding("service1");
-        assertEquals("Type1:service1", result1);
+        String result1 = service.defaultBinding("redirector_service1");
+        assertEquals("Type1:redirector_service1", result1);
         String result1a = service.noArgs();
         assertEquals("Type1", result1a);
         String result2 = service.storeRef(storeRef1);
@@ -87,7 +87,7 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
         StoreRef storeRef1 = new StoreRef("InvalidType1", "id");
         NodeRef nodeRef1 = new NodeRef(storeRef1, "id");
 
-        TestServiceInterface service = (TestServiceInterface) factory.getBean("service1");
+        TestServiceInterface service = (TestServiceInterface) factory.getBean("redirector_service1");
         String result1 = service.storeRef(storeRef1);
         assertEquals("Type1:" + storeRef1, result1);
         String result2 = service.nodeRef(nodeRef1);
@@ -98,7 +98,7 @@ public class StoreRedirectorProxyFactoryTest extends TestCase
     {
         StoreRef storeRef1 = new StoreRef("Type1", "id");
         NodeRef nodeRef1 = new NodeRef(storeRef1, "id");
-        TestServiceInterface service = (TestServiceInterface) factory.getBean("service1");
+        TestServiceInterface service = (TestServiceInterface) factory.getBean("redirector_service1");
         
         try
         {

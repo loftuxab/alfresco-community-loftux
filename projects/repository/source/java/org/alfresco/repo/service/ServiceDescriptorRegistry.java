@@ -20,6 +20,7 @@ package org.alfresco.repo.service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.transaction.UserTransaction;
@@ -64,17 +65,22 @@ public class ServiceDescriptorRegistry
     // Service Descriptor map
     private Map<QName, BeanServiceDescriptor> descriptors = new HashMap<QName, BeanServiceDescriptor>();
 
-
+    
     /* (non-Javadoc)
      * @see org.springframework.beans.factory.config.BeanFactoryPostProcessor#postProcessBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
      */
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
     {
-        Map beans = beanFactory.getBeansOfType(BeanServiceDescriptor.class);
-        for (Object bean : beans.values())
+        Map beans = beanFactory.getBeansOfType(ServiceDescriptorMetaData.class);
+        Iterator iter = beans.entrySet().iterator();
+        while (iter.hasNext())
         {
-            BeanServiceDescriptor descriptor = (BeanServiceDescriptor)bean;
-            descriptors.put(descriptor.getQualifiedName(), descriptor);
+            Map.Entry entry = (Map.Entry)iter.next();
+            ServiceDescriptorMetaData metaData = (ServiceDescriptorMetaData)entry.getValue();
+            QName serviceName = QName.createQName(metaData.getNamespace(), (String)entry.getKey());
+            StoreRedirector redirector = (entry.getValue() instanceof StoreRedirector) ? (StoreRedirector)entry.getValue() : null;
+            BeanServiceDescriptor serviceDescriptor = new BeanServiceDescriptor(serviceName, metaData, redirector);
+            descriptors.put(serviceDescriptor.getQualifiedName(), serviceDescriptor);
         }
     }
 
@@ -85,7 +91,7 @@ public class ServiceDescriptorRegistry
     {
         this.beanFactory = beanFactory;
     }
-    
+        
     /* (non-Javadoc)
      * @see org.alfresco.repo.service.ServiceRegistry#getServices()
      */
@@ -115,13 +121,7 @@ public class ServiceDescriptorRegistry
      */
     public Object getService(QName service)
     {
-        Object serviceBean = null;
-        BeanServiceDescriptor descriptor = descriptors.get(service);
-        if (descriptor != null)
-        {
-            serviceBean = beanFactory.getBean(descriptor.getImplementation()); 
-        }
-        return serviceBean;
+        return beanFactory.getBean(service.getLocalName()); 
     }
 
     /* (non-Javadoc)
@@ -236,14 +236,6 @@ public class ServiceDescriptorRegistry
         return (RuleService)getService(RULE_SERVICE);
     }
     
-    /* (non-Javadoc)
-     * @see org.alfresco.service.ServiceRegistry#getConfigurableService()
-     */
-    public ConfigurableService getConfigurableService()
-    {
-    	return (ConfigurableService)getService(CONFIGURABLE_SERVICE);
-    }
-    
     /*
      *  (non-Javadoc)
      * @see org.alfresco.service.ServiceRegistry#getActionService()
@@ -252,4 +244,14 @@ public class ServiceDescriptorRegistry
     {
     	return (ActionService)getService(ACTION_SERVICE);
     }
+
+    /*
+     *  (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getActionService()
+     */
+    public ConfigurableService getConfigurableService()
+    {
+        return (ConfigurableService)getService(CONFIGURABLE_SERVICE);
+    }
+
 }

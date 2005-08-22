@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Properties;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -40,8 +41,8 @@ public class ImporterComponentTest extends BaseSpringTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
-        nodeService = (NodeService)applicationContext.getBean("AlfNodeService");
-        importerService = (ImporterService)applicationContext.getBean("importerComponent");
+        nodeService = (NodeService)applicationContext.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
+        importerService = (ImporterService)applicationContext.getBean(ServiceRegistry.IMPORTER_SERVICE.getLocalName());
         importerBootstrap = (ImporterBootstrap)applicationContext.getBean("importerBootstrap");
         
         // Create the store

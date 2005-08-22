@@ -76,7 +76,7 @@ public class FileImporterTest extends TestCase
 
     public void setUp()
     {
-        serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
 
         searcher = serviceRegistry.getSearchService();
         nodeService = serviceRegistry.getNodeService();

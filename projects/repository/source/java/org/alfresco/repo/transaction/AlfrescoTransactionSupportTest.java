@@ -47,7 +47,7 @@ public class AlfrescoTransactionSupportTest extends TestCase
     
     public void setUp() throws Exception
     {
-        serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
     }
     
     public void testTransactionId() throws Exception

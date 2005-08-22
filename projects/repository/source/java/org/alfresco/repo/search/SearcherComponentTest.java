@@ -42,7 +42,7 @@ public class SearcherComponentTest extends TestCase
     
     public void setUp() throws Exception
     {
-        serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         dictionaryService = BaseNodeServiceTest.loadModel(ctx);
         nodeService = serviceRegistry.getNodeService();
         // get the indexer and searcher factory

@@ -87,7 +87,7 @@
       <property name="target">
          <bean class="org.alfresco.repo.content.RoutingContentService" init-method="init">
             <property name="serviceRegistry">
-               <ref bean="serviceRegistry" />
+               <ref bean="ServiceRegistry" />
             </property>
             <property name="dictionaryService">
                <ref bean="dictionaryService" />

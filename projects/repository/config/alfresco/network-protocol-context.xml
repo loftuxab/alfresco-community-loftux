@@ -9,7 +9,7 @@
          destroy-method="closeConfiguration"
          depends-on="importerBootstrap">
       <constructor-arg>
-         <ref bean="serviceRegistry" />
+         <ref bean="ServiceRegistry" />
       </constructor-arg>
       <constructor-arg>
          <ref bean="authenticationManager"/>
@@ -45,7 +45,7 @@
       <property name="target">
          <bean class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
             <constructor-arg>
-               <ref bean="serviceRegistry" />
+               <ref bean="ServiceRegistry" />
             </constructor-arg>
             <constructor-arg>
                <ref bean="cifsHelper" />
@@ -73,7 +73,7 @@
 
    <bean id="contentDiskDriverNoTransactions" class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
          <constructor-arg>
-            <ref bean="serviceRegistry" />
+            <ref bean="ServiceRegistry" />
          </constructor-arg>
          <constructor-arg>
             <ref bean="cifsHelper" />

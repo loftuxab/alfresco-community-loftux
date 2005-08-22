@@ -51,7 +51,7 @@ public class ConfigurableServiceImplTest extends BaseSpringTest
 	protected void onSetUpInTransaction() throws Exception
 	{
 		this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
-		this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean("serviceRegistry");
+		this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
 		this.configurableService = (ConfigurableService)this.applicationContext.getBean("configurableService");
 		
 		this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
