@@ -111,7 +111,7 @@ public class NewUserWizard extends AbstractWizardBean
       this.email = "";
       this.companyId = "";
       this.homeSpaceName = "";
-      this.homeSpaceLocation = null;
+      this.homeSpaceLocation = getCompanyHomeSpace().getId();
    }
 
    /**
@@ -334,7 +334,7 @@ public class NewUserWizard extends AbstractWizardBean
             }
             else
             {
-               homeSpaceId = getCompanyHomeSpace(context).getId();
+               homeSpaceId = getCompanyHomeSpace().getId();
             }
             props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceId);
             props.put(ContentModel.PROP_EMAIL, this.email);
@@ -360,7 +360,7 @@ public class NewUserWizard extends AbstractWizardBean
             }
             else
             {
-               homeSpaceId = getCompanyHomeSpace(context).getId();
+               homeSpaceId = getCompanyHomeSpace().getId();
             }
             props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceId);
             props.put(ContentModel.PROP_EMAIL, this.email);
@@ -751,15 +751,13 @@ public class NewUserWizard extends AbstractWizardBean
    /**
     * Helper to return the company home space
     * 
-    * @param context
-    * 
     * @return company home space NodeRef
     */
-   private NodeRef getCompanyHomeSpace(FacesContext context)
+   private NodeRef getCompanyHomeSpace()
    {
       if (this.companyHomeSpaceRef == null)
       {
-         String companySpaceName = Application.getRootPath(context);
+         String companySpaceName = Application.getRootPath(FacesContext.getCurrentInstance());
          String companyXPath = NamespaceService.APP_MODEL_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
          
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());

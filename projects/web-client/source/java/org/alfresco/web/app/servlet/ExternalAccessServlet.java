@@ -18,6 +18,7 @@
 package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.bean.LoginBean;
 import org.alfresco.web.bean.repository.User;
 import org.apache.commons.logging.Log;
@@ -33,6 +35,13 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Servlet allowing external URL access to various global JSF views in the Web Client.
+ * <p>
+ * The servlet accepts a well formed URL that can easily be generated from a Content or Space NodeRef.
+ * The URL also specifies the JSF "outcome" to be executed which provides the correct JSF View to be
+ * displayed. The JSF "outcome" must equate to a global navigation rule or it will not be displayed.
+ * Servlet URL is of the form:
+ * <p>
+ * <pre>http://<server>/alfresco/navigate/<outcome>[/<workspace>/<store>/<nodeId>]</pre>
  * 
  * @author Kevin Roast
  */
@@ -92,4 +101,19 @@ public class ExternalAccessServlet extends HttpServlet
       // redirect to any faces URL will force the login page to appear via the Authentication Filter
       res.sendRedirect(req.getContextPath() + "/faces");
    }
+   
+   /*
+   public final static String generateExternalURL(NodeRef ref, String name)
+   {
+      return MessageFormat.format(EXTERNAL_URL, new Object[] {
+            // TODO: get context path here?
+            ref.getStoreRef().getProtocol(),
+            ref.getStoreRef().getIdentifier(),
+            ref.getId(),
+            name} );
+   }
+   
+   // example: http://<server>/alfresco/navigate/<outcome>[/<workspace>/<store>/<nodeId>]
+   private static final String EXTERNAL_URL  = "http://{0}:{1}/{2}/navigate/{3}/{4}/{5}/{6}";
+   */
 }

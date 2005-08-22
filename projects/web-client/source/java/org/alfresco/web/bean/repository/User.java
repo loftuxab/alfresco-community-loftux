@@ -128,7 +128,7 @@ public final class User
    }
    
    /**
-    * @return Returns the person.
+    * @return Returns the person NodeRef
     */
    public NodeRef getPerson()
    {

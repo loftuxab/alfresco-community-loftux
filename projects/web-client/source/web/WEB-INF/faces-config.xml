@@ -478,8 +478,16 @@
          <value>#{NamespaceService}</value>
       </managed-property>
       <managed-property>
+         <property-name>permissionService</property-name>
+         <value>#{PermissionService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>mailSender</property-name>
+         <value>#{mailService}</value>
       </managed-property>
    </managed-bean>
    

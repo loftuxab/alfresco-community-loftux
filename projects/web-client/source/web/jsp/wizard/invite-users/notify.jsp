@@ -174,6 +174,11 @@
                                        <h:commandButton value="#{msg.finish}" action="#{InviteUsersWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="#{msg.back}" action="#{InviteUsersWizard.back}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">

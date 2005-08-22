@@ -145,7 +145,7 @@
                                  <tr>
                                     <td>
                                        <div style="padding:4px">
-                                          <h:selectOneListbox id="roles" style="width:250px" size="3">
+                                          <h:selectOneListbox id="roles" style="width:250px" size="4">
                                              <f:selectItems value="#{InviteUsersWizard.roles}" />
                                           </h:selectOneListbox>
                                        </div>
@@ -169,7 +169,7 @@
                                        <table border=0 cellspacing=4 cellpadding=0>
                                           <tr valign="top">
                                              <td>
-                                                <h:selectManyListbox id="selection" style="width:250px" size="5">
+                                                <h:selectManyListbox id="selection" style="width:250px" size="4">
                                                    <f:selectItems value="#{InviteUsersWizard.selectedItems}" />
                                                 </h:selectManyListbox>
                                              </td>
@@ -195,12 +195,6 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="#{msg.next}" action="#{InviteUsersWizard.next}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="#{msg.finish}" action="#{InviteUsersWizard.finish}" styleClass="wizardButton"
-                                                        disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

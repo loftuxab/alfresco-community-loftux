@@ -381,5 +381,29 @@
     <!-- Configrable Service -->
     
     <alias alias="ConfigurableService" name="configurableService"/>  
+    
+    
+    <!-- Permission Service -->
+    
+    <bean id="PermissionService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.repo.security.permissions.PermissionService</value>
+    	</property>
+    	<property name="target"><ref bean="permissionService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    			<idref local="PermissionService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="PermissionService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.repo.security.permissions.PermissionService</value>
+    	</property>
+    	<property name="description">
+    		<value>Permission Service</value>
+    	</property>
+    </bean>
       
 </beans>

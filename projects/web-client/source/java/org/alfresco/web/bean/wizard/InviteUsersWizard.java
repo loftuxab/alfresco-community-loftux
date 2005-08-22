@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javax.faces.component.UISelectMany;
 import javax.faces.component.UISelectOne;
@@ -30,14 +31,19 @@ import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIGenericPicker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * @author Kevin Roast
@@ -64,14 +70,46 @@ public class InviteUsersWizard extends AbstractWizardBean
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
    
+   /** JavaMailSender bean reference */
+   private JavaMailSender mailSender;
+   
+   /** PermissionService bean reference */
+   private PermissionService permissionService;
+   
    /** whether to invite all or specify individual users or groups */
    private String invite = "users";
    private String notify = "yes";
    private List<SelectItem> selectedItems = null;
+   private List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
    private String subject = null;
    private String body = null;
+   private String internalSubject = null;
    private String automaticText = null;
    
+   
+   /**
+    * @param namespaceService   The NamespaceService to set.
+    */
+   public void setNamespaceService(NamespaceService namespaceService)
+   {
+      this.namespaceService = namespaceService;
+   }
+   
+   /**
+    * @param mailSender         The JavaMailSender to set.
+    */
+   public void setMailSender(JavaMailSender mailSender)
+   {
+      this.mailSender = mailSender;
+   }
+   
+   /**
+    * @param permissionService  The PermissionService to set.
+    */
+   public void setPermissionService(PermissionService permissionService)
+   {
+      this.permissionService = permissionService;
+   }
 
    /**
     * Initialises the wizard
@@ -93,7 +131,90 @@ public class InviteUsersWizard extends AbstractWizardBean
     */
    public String finish()
    {
-      return "browse";
+      String outcome = "browse";
+      
+      UserTransaction tx = null;
+      
+      try
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         
+         tx = Repository.getUserTransaction(context);
+         tx.begin();
+         
+         String subject = this.subject;
+         if (subject == null || subject.length() == 0)
+         {
+            subject = this.internalSubject;
+         }
+         
+         User user = Application.getCurrentUser(context);
+         String from = (String)this.nodeService.getProperty(user.getPerson(), ContentModel.PROP_EMAIL);
+         if (from == null || from.length() == 0)
+         {
+            // TODO: get this from spring config?
+            from = "alfresco@alfresco.org";
+         }
+         
+         // set permissions for each user and send them a mail
+         for (int i=0; i<this.userGroupRoles.size(); i++)
+         {
+            UserGroupRole userGroupRole = this.userGroupRoles.get(i);
+            
+            // apply the permissions for the specified user
+            //this.permissionService.setPermission( )
+            
+            // Create the mail message for each user to send too
+            NodeRef person = userGroupRole.UserGroup;
+            String to = (String)this.nodeService.getProperty(person, ContentModel.PROP_EMAIL);
+            
+            if (to != null && to.length() != 0)
+            {
+               String msgRole = Application.getMessage(context, MSG_INVITED_ROLE);
+               String roleText = userGroupRole.Role;
+               String roleMessage = MessageFormat.format(msgRole, new Object[] {roleText});
+               
+               String body = this.internalSubject + "\r\n\r\n" + roleMessage + "\r\n\r\n";
+               if (this.body != null && this.body.length() != 0)
+               {
+                  body += this.body;
+               }
+               
+               SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+               simpleMailMessage.setTo(to);
+               simpleMailMessage.setSubject(subject);
+               simpleMailMessage.setText(body);
+               simpleMailMessage.setFrom(from);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Sending notification email to: " + to + "\n...with subject:\n" + subject + "\n...with body:\n" + body);
+               
+               try
+               {
+                  // Send the message
+                  this.mailSender.send(simpleMailMessage);
+               }
+               catch (Throwable e)
+               {
+                  // don't stop the action but let admins know email is not getting sent
+                  logger.error("Failed to send email to " + to, e);
+               }
+            }
+         }
+         
+         // commit the transaction
+         tx.commit();
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), e.getMessage()), e);
+         outcome = null;
+      }
+      
+      return outcome;
    }
    
    /**
@@ -126,8 +247,10 @@ public class InviteUsersWizard extends AbstractWizardBean
          tx = Repository.getUserTransaction(context);
          tx.begin();
          
+         // TODO: if 'invite' drop-down is groups then select from list of groups not users!
+         
+         // build xpath to match available Person objects
          NodeRef peopleRef = Repository.getSystemPeopleFolderRef(context, nodeService, searchService);
-         // build xpath to match 
          // NOTE: see SearcherComponentTest
          String xpath = "*[like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "firstName, '%" + contains + "%', false)" +
                  " or " + "like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "lastName, '%" + contains + "%', false)]";
@@ -142,13 +265,15 @@ public class InviteUsersWizard extends AbstractWizardBean
                this.namespaceService,
                false);
          
+         // TODO: sort this list! Maybe by Last name?
+         
          items = new SelectItem[nodes.size()];
          for (int index=0; index<nodes.size(); index++)
          {
-            NodeRef ref = nodes.get(index);
-            String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
-            String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
-            SelectItem item = new SelectItem(ref, firstName + " " + lastName);
+            NodeRef personRef = nodes.get(index);
+            String firstName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_FIRSTNAME);
+            String lastName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_LASTNAME);
+            SelectItem item = new SelectItem(personRef, firstName + " " + lastName);
             items[index] = item;
          }
          
@@ -178,29 +303,40 @@ public class InviteUsersWizard extends AbstractWizardBean
       String[] results = picker.getSelectedResults();
       if (results != null)
       {
-         // TODO: get Role here from selectedRole (value) in role list component!
          String role = (String)rolePicker.getValue();
          
-         for (int i=0; i<results.length; i++)
+         if (role != null)
          {
-            NodeRef ref = new NodeRef(results[i]);
-            String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
-            String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
-            
-            // only add if ref not already present in the list
-            boolean foundExisting = false;
-            String refString = ref.toString();
-            for (int n=0; n<this.selectedItems.size(); n++)
+            for (int i=0; i<results.length; i++)
             {
-               if (refString.equals(this.selectedItems.get(n).getValue()))
+               NodeRef ref = new NodeRef(results[i]);
+               String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
+               String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
+               
+               // only add if user ref not already present in the list
+               boolean foundExisting = false;
+               String refString = ref.toString();
+               for (int n=0; n<this.selectedItems.size(); n++)
                {
-                  foundExisting = true;
-                  break;
+                  if (refString.equals(this.selectedItems.get(n).getValue()))
+                  {
+                     foundExisting = true;
+                     break;
+                  }
                }
-            }
-            if (foundExisting == false)
-            {
-               this.selectedItems.add(new SelectItem(refString, firstName + " " + lastName));
+               if (foundExisting == false)
+               {
+                  // build a display label showing the user and their role for the space
+                  StringBuilder label = new StringBuilder(64);
+                  label.append(firstName)
+                  .append(" ")
+                  .append(lastName)
+                  .append(" (")
+                  .append(Application.getMessage(FacesContext.getCurrentInstance(), role))
+                  .append(")");
+                  this.selectedItems.add(new SelectItem(refString, label.toString()));
+                  this.userGroupRoles.add(new UserGroupRole(ref, role));
+               }
             }
          }
       }
@@ -223,6 +359,7 @@ public class InviteUsersWizard extends AbstractWizardBean
                if (value.equals(this.selectedItems.get(n).getValue()))
                {
                   this.selectedItems.remove(n);
+                  this.userGroupRoles.remove(n);
                }
             }
          }
@@ -248,19 +385,20 @@ public class InviteUsersWizard extends AbstractWizardBean
     */
    public SelectItem[] getRoles()
    {
-      // TODO: get roles from the Permission services?
-      return new SelectItem[] {
-            new SelectItem("0", "Administrator"),
-            new SelectItem("1", "Contributor"),
-            new SelectItem("2", "Guest") };
-   }
-   
-   /**
-    * @param namespaceService The namespaceService to set.
-    */
-   public void setNamespaceService(NamespaceService namespaceService)
-   {
-      this.namespaceService = namespaceService;
+      ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
+      
+      // get available roles (grouped permissions) from the permission service
+      Set<PermissionReference> perms = this.permissionService.getSettablePermissions(ContentModel.TYPE_FOLDER);
+      SelectItem[] roles = new SelectItem[perms.size()];
+      int index = 0;
+      for (PermissionReference permission : perms)
+      {
+         String name = permission.getName();
+         String displayLabel = bundle.getString(name);
+         roles[index++] = new SelectItem(name, displayLabel);
+      }
+      
+      return roles;
    }
    
    /**
@@ -465,7 +603,7 @@ public class InviteUsersWizard extends AbstractWizardBean
       {
          FacesContext context = FacesContext.getCurrentInstance();
          
-         // prepare automatic text for email
+         // prepare automatic text for email and screen
          StringBuilder buf = new StringBuilder(256);
          
          String personName = Application.getCurrentUser(context).getFullName(getNodeService());
@@ -474,14 +612,16 @@ public class InviteUsersWizard extends AbstractWizardBean
                getNavigator().getNodeProperties().get("name"),
                personName}) );
          
+         this.internalSubject = buf.toString();
+         
          buf.append("<br>");
          
-         // TODO: show the role label here!
-         String role = "Administrator [TBD]";
          String msgRole = Application.getMessage(context, MSG_INVITED_ROLE);
-         buf.append(MessageFormat.format(msgRole, new Object[] {role}));
+         String roleText = MessageFormat.format(msgRole, "[role]");
          
-         this.automaticText = buf.toString();;
+         buf.append(roleText);
+         
+         this.automaticText = buf.toString();
       }
       
       return outcome;
@@ -513,5 +653,21 @@ public class InviteUsersWizard extends AbstractWizardBean
       }
       
       return outcome;
+   }
+   
+   
+   /**
+    * Simple wrapper class to represent a user/group and a role combination
+    */
+   private static class UserGroupRole
+   {
+      public UserGroupRole(NodeRef usergroup, String role)
+      {
+         this.UserGroup = usergroup;
+         this.Role = role;
+      }
+      
+      public NodeRef UserGroup;
+      public String Role;
    }
 }
