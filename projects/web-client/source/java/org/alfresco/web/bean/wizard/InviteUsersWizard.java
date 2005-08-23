@@ -33,6 +33,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
@@ -75,6 +76,9 @@ public class InviteUsersWizard extends AbstractWizardBean
    
    /** PermissionService bean reference */
    private PermissionService permissionService;
+   
+   /** Cache of available folder permissions */
+   Set<PermissionReference> folderPermissions = null;
    
    /** whether to invite all or specify individual users or groups */
    private String invite = "users";
@@ -160,12 +164,23 @@ public class InviteUsersWizard extends AbstractWizardBean
          for (int i=0; i<this.userGroupRoles.size(); i++)
          {
             UserGroupRole userGroupRole = this.userGroupRoles.get(i);
+            NodeRef person = userGroupRole.UserGroup;
             
-            // apply the permissions for the specified user
-            //this.permissionService.setPermission( )
+            // find the selected permission ref from it's name and apply for the specified user
+            Set<PermissionReference> perms = getFolderPermissions();
+            for (PermissionReference permission : perms)
+            {
+               if (userGroupRole.Role.equals(permission.getName()))
+               {
+                  this.permissionService.setPermission(this.navigator.getCurrentNode().getNodeRef(),
+                        (String)this.nodeService.getProperty(person, ContentModel.PROP_USERNAME),
+                        permission,
+                        true);
+                  break;
+               }
+            }
             
             // Create the mail message for each user to send too
-            NodeRef person = userGroupRole.UserGroup;
             String to = (String)this.nodeService.getProperty(person, ContentModel.PROP_EMAIL);
             
             if (to != null && to.length() != 0)
@@ -388,7 +403,7 @@ public class InviteUsersWizard extends AbstractWizardBean
       ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
       
       // get available roles (grouped permissions) from the permission service
-      Set<PermissionReference> perms = this.permissionService.getSettablePermissions(ContentModel.TYPE_FOLDER);
+      Set<PermissionReference> perms = getFolderPermissions();
       SelectItem[] roles = new SelectItem[perms.size()];
       int index = 0;
       for (PermissionReference permission : perms)
@@ -653,6 +668,19 @@ public class InviteUsersWizard extends AbstractWizardBean
       }
       
       return outcome;
+   }
+   
+   /**
+    * @return a cached list of available folder permissions
+    */
+   private Set<PermissionReference> getFolderPermissions()
+   {
+      if (this.folderPermissions == null)
+      {
+         this.folderPermissions = this.permissionService.getSettablePermissions(ContentModel.TYPE_FOLDER);
+      }
+      
+      return this.folderPermissions;
    }
    
    

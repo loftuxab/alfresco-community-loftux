@@ -453,6 +453,10 @@
          <value>#{authenticationService}</value>
       </managed-property>
       <managed-property>
+         <property-name>permissionService</property-name>
+         <value>#{PermissionService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>namespaceService</property-name>
          <value>#{NamespaceService}</value>
       </managed-property>

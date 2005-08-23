@@ -35,6 +35,9 @@ import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionEntry;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -45,6 +48,7 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.log4j.Logger;
@@ -86,6 +90,9 @@ public class NewUserWizard extends AbstractWizardBean
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
    
+   /** PermissionService bean reference */
+   private PermissionService permissionService;
+   
    /** action context */
    private Node person = null;
    
@@ -95,6 +102,30 @@ public class NewUserWizard extends AbstractWizardBean
    /** ref to the company home space folder */
    private NodeRef companyHomeSpaceRef = null;
    
+   
+   /**
+    * @param authenticationService  The AuthenticationService to set.
+    */
+   public void setAuthenticationService(AuthenticationService authenticationService)
+   {
+      this.authenticationService = authenticationService;
+   }
+   
+   /**
+    * @param namespaceService The namespaceService to set.
+    */
+   public void setNamespaceService(NamespaceService namespaceService)
+   {
+      this.namespaceService = namespaceService;
+   }
+   
+   /**
+    * @param permissionService  The PermissionService to set.
+    */
+   public void setPermissionService(PermissionService permissionService)
+   {
+      this.permissionService = permissionService;
+   }
    
    /**
     * Initialises the wizard
@@ -330,7 +361,7 @@ public class NewUserWizard extends AbstractWizardBean
             String homeSpaceId;
             if (this.homeSpaceLocation != null)
             {
-               homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName);
+               homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName, false);
             }
             else
             {
@@ -356,7 +387,7 @@ public class NewUserWizard extends AbstractWizardBean
             String homeSpaceId;
             if (this.homeSpaceLocation != null)
             {
-               homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName);
+               homeSpaceId = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName, true);
             }
             else
             {
@@ -657,38 +688,6 @@ public class NewUserWizard extends AbstractWizardBean
       this.person = person;
    }
    
-   /**
-    * @return Returns the AuthenticationService.
-    */
-   public AuthenticationService getAuthenticationService()
-   {
-      return this.authenticationService;
-   }
-   
-   /**
-    * @param authenticationService  The AuthenticationService to set.
-    */
-   public void setAuthenticationService(AuthenticationService authenticationService)
-   {
-      this.authenticationService = authenticationService;
-   }
-   
-   /**
-    * @return Returns the namespaceService.
-    */
-   public NamespaceService getNamespaceService()
-   {
-      return this.namespaceService;
-   }
-   
-   /**
-    * @param namespaceService The namespaceService to set.
-    */
-   public void setNamespaceService(NamespaceService namespaceService)
-   {
-      this.namespaceService = namespaceService;
-   }
-   
    public boolean getEditMode()
    {
       return this.editMode;
@@ -781,10 +780,11 @@ public class NewUserWizard extends AbstractWizardBean
     * 
     * @param locationId    Parent location
     * @param spaceName     Home space to create, can be null to simply return the parent
+    * @param error         True to throw an error if the space already exists, else ignore and return
     * 
     * @return ID of the home space
     */
-   private String createHomeSpace(String locationId, String spaceName)
+   private String createHomeSpace(String locationId, String spaceName, boolean error)
    {
       String homeSpaceId = locationId;
       if (spaceName != null && spaceName.length() != 0)
@@ -792,8 +792,28 @@ public class NewUserWizard extends AbstractWizardBean
          StoreRef storeRef = Repository.getStoreRef();
          
          NodeRef parentRef = new NodeRef(Repository.getStoreRef(), locationId);
-
-         // found the parent, create a new Space under it with the specified name
+         
+         // check for existance of home space with same name - return immediately
+         // if it exists or throw an exception an give user chance to enter another name
+         // TODO: this might be better replaced with an XPath query!
+         List<ChildAssociationRef> children = this.nodeService.getChildAssocs(parentRef);
+         for (ChildAssociationRef ref : children)
+         {
+            String childNodeName = (String)this.nodeService.getProperty(ref.getChildRef(), ContentModel.PROP_NAME);
+            if (spaceName.equals(childNodeName))
+            {
+               if (error)
+               {
+                  throw new AlfrescoRuntimeException("A Home Space with the same name already exists.");
+               }
+               else
+               {
+                  return ref.getChildRef().getId();
+               }
+            }
+         }
+         
+         // space does not exist already, create a new Space under it with the specified name
          String qname = QName.createValidLocalName(spaceName);
          ChildAssociationRef assocRef = this.nodeService.createNode(
                parentRef,
@@ -814,6 +834,13 @@ public class NewUserWizard extends AbstractWizardBean
          uiFacetsProps.put(ContentModel.PROP_ICON, NewSpaceWizard.SPACE_ICON_DEFAULT);
          uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
          this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
+         
+         // apply the default permissions model
+         // first set no inheritance so we can setup new permissions
+         this.permissionService.setInheritParentPermissions(nodeRef, false);
+         // then we set maximium permissions to the owner of the space
+         // so by default other users will NOT have access to the space
+         this.permissionService.setPermission(nodeRef, this.userName, SimplePermissionEntry.ALL_PERMISSIONS, true);
          
          // return the ID of the created space
          homeSpaceId = nodeRef.getId();

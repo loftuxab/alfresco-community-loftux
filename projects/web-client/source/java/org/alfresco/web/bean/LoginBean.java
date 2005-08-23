@@ -180,6 +180,12 @@ public class LoginBean
             // setup User object and Home space ID
             User user = new User(principal.getUserNodeRef(), this.username, this.authenticationService.getCurrentTicket(), principal.getPersonNodeRef());
             String homeSpaceId = (String)this.nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
+            NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
+            // check that the home space node exists - else user cannot login
+            if (this.nodeService.exists(homeSpaceRef) == false)
+            {
+               throw new InvalidNodeRefException(homeSpaceRef);
+            }
             user.setHomeSpaceId(homeSpaceId);
             
             // put the User object in the Session - the authentication servlet will then allow
@@ -235,7 +241,7 @@ public class LoginBean
          catch (InvalidNodeRefException refErr)
          {
             Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-                  fc, Repository.ERROR_NOHOME), Application.getCurrentUser(fc).getHomeSpaceId()), refErr );
+                  fc, Repository.ERROR_NOHOME), refErr.getNodeRef().getId()));
          }
       }
       else
