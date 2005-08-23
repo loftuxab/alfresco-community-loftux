@@ -67,7 +67,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 {
     private static Log logger = LogFactory.getLog(ContextListener.class);
 
-    private static final String ADMIN = "admin";
+    public static final String ADMIN = "admin";
 
     private static final String ADMIN_FIRSTNAME = "Repository";
 
