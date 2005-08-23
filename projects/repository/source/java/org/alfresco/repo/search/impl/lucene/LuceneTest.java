@@ -116,7 +116,7 @@ public class LuceneTest extends TestCase
         super();
     }
 
-    public void setUp() throws IOException, InterruptedException
+    public void setUp() throws Exception
     {
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         luceneIndexLock = (LuceneIndexLock) ctx.getBean("luceneIndexLock");
@@ -135,6 +135,9 @@ public class LuceneTest extends TestCase
         assertEquals(true, ctx.isSingleton("luceneIndexLock"));
         assertEquals(true, ctx.isSingleton("LuceneFullTextSearchIndexer"));
 
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
+ 
         // load in the test model
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
         InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/search/impl/lucene/LuceneTest_model.xml");
@@ -243,6 +246,8 @@ public class LuceneTest extends TestCase
         nodeService.addChild(n6, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n12, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n13, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
+        
+        tx.commit();        
     }
 
     public LuceneTest(String arg0)
@@ -1893,8 +1898,8 @@ public class LuceneTest extends TestCase
 
     public void testWaitForIndex() throws Exception
     {
-        //UserTransaction tx = serviceRegistry.getUserTransaction();
-        //tx.begin();
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1941,7 +1946,7 @@ public class LuceneTest extends TestCase
         results.close();
         
         runBaseTests();
-        //tx.rollback();
+        tx.rollback();
     }
 
     private String escapeQName(QName qname)
@@ -1986,8 +1991,10 @@ public class LuceneTest extends TestCase
         // So we add something, add and delete someting repeatedly and then check we can still do the search.
 
         // Running in autocommit against the index
-        
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
         ChildAssociationRef testFind = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}testFind"), testSuperType);
+        tx.commit();
         
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         searcher.setNodeService(nodeService);
@@ -2001,13 +2008,23 @@ public class LuceneTest extends TestCase
         
         for(int i = 0; i < 100; i++)
         {
+           UserTransaction tx1 = transactionService.getUserTransaction();
+           tx1.begin();
            ChildAssociationRef test = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}test"), testSuperType);
+           tx1.commit();
+           
+           UserTransaction tx2 = transactionService.getUserTransaction();
+           tx2.begin();
            nodeService.deleteNode(test.getChildRef());
+           tx2.commit();
         }
         
+        UserTransaction tx3 = transactionService.getUserTransaction();
+        tx3.begin();
         results = searcher.query(rootNodeRef.getStoreRef(),  "lucene", "QNAME:\"namespace:testFind\"");
         assertEquals(1, results.length());
         results.close();
+        tx3.commit();
     }
     
     // Ignore the following test until implementation is completed
