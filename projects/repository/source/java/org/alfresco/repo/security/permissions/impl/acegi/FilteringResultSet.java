@@ -1,0 +1,229 @@
+/*
+ * Copyright (C) 2005 Alfresco, Inc.
+ *
+ * Licensed under the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/lgpl.txt
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ *
+ * Created on 22-Aug-2005
+ */
+package org.alfresco.repo.security.permissions.impl.acegi;
+
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
+
+import org.alfresco.repo.search.ResultSetRowIterator;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
+
+public class FilteringResultSet extends ACLEntryAfterInvocationProvider implements ResultSet
+{
+    private ResultSet unfiltered;
+
+    private BitSet inclusionMask;
+
+    FilteringResultSet(ResultSet unfiltered)
+    {
+        super();
+        this.unfiltered = unfiltered;
+        inclusionMask = new BitSet(unfiltered.length());
+    }
+
+    /* package */ResultSet getUnFilteredResultSet()
+    {
+        return unfiltered;
+    }
+
+    /* package */void setIncluded(int i, boolean excluded)
+    {
+        inclusionMask.set(i, excluded);
+    }
+
+    /* package */boolean getIncluded(int i)
+    {
+        return inclusionMask.get(i);
+    }
+
+    public Path[] getPropertyPaths()
+    {
+        return unfiltered.getPropertyPaths();
+    }
+
+    public int length()
+    {
+        return inclusionMask.cardinality();
+    }
+
+    private int translateIndex(int n)
+    {
+        if (n > length())
+        {
+            throw new IndexOutOfBoundsException();
+        }
+        int count = -1;
+        for (int i = 0, l = unfiltered.length(); i < l; i++)
+        {
+            if (inclusionMask.get(i))
+            {
+                count++;
+            }
+            if(count == n)
+            {
+                return i;
+            }
+
+        }
+        throw new IndexOutOfBoundsException();
+    }
+
+    public NodeRef getNodeRef(int n)
+    {
+        return unfiltered.getNodeRef(translateIndex(n));
+    }
+
+    public float getScore(int n)
+    {
+        return unfiltered.getScore(translateIndex(n));
+    }
+
+    public void close()
+    {
+        unfiltered.close();
+    }
+
+    public ResultSetRow getRow(int i)
+    {
+        return unfiltered.getRow(translateIndex(i));
+    }
+
+    public List<NodeRef> getNodeRefs()
+    {
+        List<NodeRef> answer = unfiltered.getNodeRefs();
+        for (int i = unfiltered.length() - 1; i >= 0; i--)
+        {
+            if (!inclusionMask.get(i))
+            {
+                answer.remove(i);
+            }
+        }
+        return answer;
+    }
+
+    public List<ChildAssociationRef> getChildAssocRefs()
+    {
+        List<ChildAssociationRef> answer = unfiltered.getChildAssocRefs();
+        for (int i = unfiltered.length() - 1; i >= 0; i--)
+        {
+            if (!inclusionMask.get(i))
+            {
+                answer.remove(i);
+            }
+        }
+        return answer;
+    }
+
+    public ChildAssociationRef getChildAssocRef(int n)
+    {
+        return unfiltered.getChildAssocRef(translateIndex(n));
+    }
+
+    public Iterator<ResultSetRow> iterator()
+    {
+        return new FilteringIterator();
+    }
+
+    class FilteringIterator implements ResultSetRowIterator
+    {
+        int underlyingPosition = 0;
+
+        public boolean hasNext()
+        {
+            return (inclusionMask.nextSetBit(underlyingPosition) != -1);
+        }
+
+        public ResultSetRow next()
+        {
+            underlyingPosition = inclusionMask.nextSetBit(underlyingPosition);
+            return unfiltered.getRow(underlyingPosition);
+        }
+
+        public boolean hasPrevious()
+        {
+            for (int i = underlyingPosition - 1; i >= 0; i--)
+            {
+                if (inclusionMask.get(i))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public ResultSetRow previous()
+        {
+            for (int i = underlyingPosition - 1; i >= 0; i--)
+            {
+                if (inclusionMask.get(i))
+                {
+                    underlyingPosition = i;
+                }
+            }
+            return unfiltered.getRow(underlyingPosition);
+        }
+
+        public int nextIndex()
+        {
+            return inclusionMask.nextSetBit(underlyingPosition);
+        }
+
+        public int previousIndex()
+        {
+            for (int i = underlyingPosition - 1; i >= 0; i--)
+            {
+                if (inclusionMask.get(i))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        /*
+         * Mutation is not supported
+         */
+
+        public void remove()
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public void set(ResultSetRow o)
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        public void add(ResultSetRow o)
+        {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+    }
+
+}

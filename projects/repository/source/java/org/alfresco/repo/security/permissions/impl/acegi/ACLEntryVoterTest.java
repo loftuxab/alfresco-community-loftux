@@ -50,7 +50,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneNodeRef", new Class[] { NodeRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -78,7 +78,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneNodeRef", new Class[] { NodeRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -98,7 +98,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -118,7 +118,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -138,7 +138,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -158,7 +158,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -185,7 +185,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -214,7 +214,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneNodeRef", new Class[] { NodeRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -235,7 +235,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -256,7 +256,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -277,7 +277,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, READ, "andy", AccessStatus.ALLOWED));
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -308,7 +308,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
                 AccessStatus.ALLOWED));
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
@@ -328,7 +328,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testManyNodeRef",
                 new Class[] { NodeRef.class, NodeRef.class, NodeRef.class, NodeRef.class });
 
@@ -359,7 +359,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testManyNodeRef",
                 new Class[] { NodeRef.class, NodeRef.class, NodeRef.class, NodeRef.class });
 
@@ -390,7 +390,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testManyNodeRef",
                 new Class[] { NodeRef.class, NodeRef.class, NodeRef.class, NodeRef.class });
 
@@ -421,7 +421,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testManyNodeRef",
                 new Class[] { NodeRef.class, NodeRef.class, NodeRef.class, NodeRef.class });
 
@@ -452,7 +452,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod(
                 "testManyChildAssociationRef",
                 new Class[] { ChildAssociationRef.class, ChildAssociationRef.class, ChildAssociationRef.class,
@@ -485,7 +485,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod(
                 "testManyChildAssociationRef",
                 new Class[] { ChildAssociationRef.class, ChildAssociationRef.class, ChildAssociationRef.class,
@@ -518,7 +518,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod(
                 "testManyChildAssociationRef",
                 new Class[] { ChildAssociationRef.class, ChildAssociationRef.class, ChildAssociationRef.class,
@@ -551,7 +551,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        Object o = new ClassWithMethod();
+        Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod(
                 "testManyChildAssociationRef",
                 new Class[] { ChildAssociationRef.class, ChildAssociationRef.class, ChildAssociationRef.class,
@@ -580,7 +580,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
         method.invoke(proxy, new Object[] { null, null, null, nodeService.getPrimaryParent(rootNodeRef) });
     }
 
-    public static class ClassWithMethod
+    public static class ClassWithMethods
     {
         public void testOneNodeRef(NodeRef nodeRef)
         {
@@ -631,6 +631,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
             ACLEntryVoter voter = new ACLEntryVoter();
             voter.setNamespacePrefixResolver(namespacePrefixResolver);
             voter.setPermissionService(permissionService);
+            voter.setNodeService(nodeService);
 
             if (!(voter.vote(null, invocation, cad) == AccessDecisionVoter.ACCESS_DENIED))
             {

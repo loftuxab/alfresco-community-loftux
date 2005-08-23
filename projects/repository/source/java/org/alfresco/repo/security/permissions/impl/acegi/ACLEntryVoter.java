@@ -33,6 +33,7 @@ import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInvocation;
@@ -52,6 +53,8 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
     private PermissionService permissionService;
 
     private NamespacePrefixResolver nspr;
+    
+    private NodeService nodeService;
 
     public ACLEntryVoter()
     {
@@ -80,6 +83,16 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         this.nspr = nspr;
     }
+    
+    public NodeService getNodeService()
+    {
+        return nodeService;
+    }
+
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
 
     public void afterPropertiesSet() throws Exception
     {
@@ -90,6 +103,10 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         if (nspr == null)
         {
             throw new IllegalArgumentException("There must be a namespace service");
+        }
+        if (nodeService == null)
+        {
+            throw new IllegalArgumentException("There must be a node service");
         }
 
     }
@@ -184,7 +201,15 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
                 }
                 else if (typeString.equals(ACL_PARENT))
                 {
-                    if (ChildAssociationRef.class.isAssignableFrom(params[parameter]))
+                    if (NodeRef.class.isAssignableFrom(params[parameter]))
+                    {
+                        NodeRef child = (NodeRef) invocation.getArguments()[parameter];
+                        if(child != null)
+                        {
+                           testNodeRef = nodeService.getPrimaryParent(child).getParentRef();
+                        }
+                    }
+                    else if (ChildAssociationRef.class.isAssignableFrom(params[parameter]))
                     {
                         if (invocation.getArguments()[parameter] != null)
                         {
