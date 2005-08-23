@@ -38,6 +38,12 @@ public class SimplePermissionEntry extends AbstractPermissionEntry
     public static final String ALL_AUTHORITIES = "\u0000";
     
     /**
+     * Encoding for owner
+     */
+    
+    public static final String OWNER_AUTHORITY = "\u0000owner";
+    
+    /**
      * Encoding for all permissions.
      */
     public static final SimplePermissionReference ALL_PERMISSIONS = new SimplePermissionReference(QName.createQName("\u0000", "\u0000"), "\u0000");
