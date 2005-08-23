@@ -96,7 +96,7 @@ public class AbstractPermissionTest extends BaseSpringTest
         permissionService = (PermissionService) applicationContext.getBean("permissionService");
         namespacePrefixResolver = (NamespacePrefixResolver) applicationContext.getBean("namespaceService");
         authenticationService = (AuthenticationService) applicationContext.getBean("authenticationService");
-        serviceRegistry = (ServiceRegistry) applicationContext.getBean("serviceRegistry");
+        serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
     
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
