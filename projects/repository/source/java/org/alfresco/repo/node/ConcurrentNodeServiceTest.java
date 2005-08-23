@@ -30,6 +30,7 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -58,8 +59,6 @@ public class ConcurrentNodeServiceTest extends TestCase
 
     static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
-    private DictionaryComponent dictionaryService;
-    private ContentService contentService;
     private NodeService nodeService;
     private PlatformTransactionManager transactionManager;
 
@@ -85,12 +84,7 @@ public class ConcurrentNodeServiceTest extends TestCase
         model = M2Model.createModel(modelStream);
         dictionaryDao.putModel(model);
 
-        DictionaryComponent dictionary = new DictionaryComponent();
-        dictionary.setDictionaryDAO(dictionaryDao);
-        dictionaryService = dictionary;
-
         nodeService = (NodeService) ctx.getBean("dbNodeService");
-        contentService = (ContentService) ctx.getBean("contentService");
         transactionManager = (PlatformTransactionManager) ctx.getBean("transactionManager");
 
         // create a first store directly
@@ -217,7 +211,7 @@ public class ConcurrentNodeServiceTest extends TestCase
             }
         }
 
-        SearchService searcher = (SearchService) ctx.getBean("searchService");
+        SearchService searcher = (SearchService) ctx.getBean(ServiceRegistry.SEARCH_SERVICE.getLocalName());
         assertEquals(2 * ((count * repeats) + 1), searcher.selectNodes(rootNodeRef, "/*", null, getNamespacePrefixReolsver(""), false).size());
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*\"");
         // n6 has root aspect - there are three things at the root level in the index
