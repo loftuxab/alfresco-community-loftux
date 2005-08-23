@@ -66,6 +66,8 @@ public class ResultSetQuerySession extends AbstractQuerySession
       org.alfresco.repo.webservice.types.ResultSet batchResults = new org.alfresco.repo.webservice.types.ResultSet();      
       org.alfresco.repo.webservice.types.ResultSetRow[] rows = new org.alfresco.repo.webservice.types.ResultSetRow[to-from];
 
+      // TODO: make sure the rows array is not null when there are no results
+      
       int arrPos = 0;
       for (int x = from; x < to; x++)
       {

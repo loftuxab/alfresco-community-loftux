@@ -34,6 +34,9 @@
    </bean>
    
    <bean id="contentWebService" class="org.alfresco.repo.webservice.content.ContentWebService">
+      <property name="nodeService">
+         <ref bean="AlfNodeService"/>
+      </property>
       <property name="contentService">
          <ref bean="ContentService"/>
       </property>

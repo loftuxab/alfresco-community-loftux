@@ -17,16 +17,12 @@
  */
 package org.alfresco.repo.webservice.axis;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
+import org.alfresco.repo.webservice.Utils;
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.RPCProvider;
-import org.apache.axis.transport.http.HTTPConstants;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * A custom Axis RPC Provider that retrieves services via Spring
@@ -100,10 +96,7 @@ public class SpringBeanRPCProvider extends RPCProvider
    {
       if (this.webAppCtx == null && msgCtx != null)
       {
-         // get hold of the web application context via the message context
-         HttpServletRequest req = (HttpServletRequest)msgCtx.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-         ServletContext servletCtx = req.getSession().getServletContext();
-         this.webAppCtx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletCtx);
+         this.webAppCtx = Utils.getSpringContext(msgCtx);
       }
       
       if (this.webAppCtx == null)

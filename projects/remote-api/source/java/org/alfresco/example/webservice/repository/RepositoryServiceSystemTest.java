@@ -81,8 +81,9 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    {
       Store[] stores = this.repSvc.getStores();
       assertNotNull("stores array should not be null", stores);
-      logger.info("store1 = " + stores[0].getScheme() + ":" + stores[0].getAddress());
-      logger.info("store2 = " + stores[1].getScheme() + ":" + stores[1].getAddress());
+      logger.debug("store1 = " + stores[0].getScheme() + ":" + stores[0].getAddress());
+      logger.debug("store2 = " + stores[1].getScheme() + ":" + stores[1].getAddress());
+      assertTrue("There should be 2 stores", stores.length == 2);
    }
    
    /**
@@ -93,8 +94,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    public void testQuery() throws Exception
    {
       //Query query = new Query(QueryLanguageEnum.lucene, "*");
-      //Query query = new Query(QueryLanguageEnum.lucene, "PATH:\"/.\"");
-      //Query query = new Query(QueryLanguageEnum.lucene, "ISROOT:T");
       Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
       
       QueryResult queryResult = this.repSvc.query(STORE, query, false);
@@ -102,9 +101,9 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       
       ResultSet resultSet = queryResult.getResultSet();
       assertNotNull("The result set should not be null", resultSet);
-      logger.info("There are " + resultSet.getRows().length + " rows:");
+      logger.debug("There are " + resultSet.getTotalRowCount() + " rows:");
       
-      if (resultSet.getRows().length > 0)
+      if (resultSet.getTotalRowCount() > 0)
       {
          ResultSetRow[] rows = resultSet.getRows();
          for (int x = 0; x < rows.length; x++)
@@ -113,13 +112,14 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
             NamedValue[] columns = row.getColumns();
             for (int y = 0; y < columns.length; y++)
             {
-               logger.info("row " + x + ": " + row.getColumns(y).getName() + " = " + row.getColumns(y).getValue());
+               logger.debug("row " + x + ": " + row.getColumns(y).getName() + " = " + row.getColumns(y).getValue());
             }
          }
       }
       else
       {
-         logger.info("The query returned no results");
+         logger.debug("The query returned no results");
+         fail("The query returned no results");
       }
    }
    
@@ -148,8 +148,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       
       ResultSet resultSet = queryResult.getResultSet();
       assertNotNull("The result set should not be null", resultSet);
-      logger.info("There are " + resultSet.getTotalRowCount() + " rows in total");
-      logger.info("There are " + resultSet.getRows().length + " rows in the first set");
+      logger.debug("There are " + resultSet.getTotalRowCount() + " rows in total");
+      logger.debug("There are " + resultSet.getRows().length + " rows in the first set");
       assertEquals("The result set size should be " + batchSize, batchSize, resultSet.getRows().length);
       
       // get the next batch of results
@@ -160,7 +160,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       
       ResultSet resultSet2 = queryResult.getResultSet();
       assertNotNull("The second result set should not be null", resultSet2);
-      logger.info("There are " + resultSet2.getRows().length + " rows in the second set");
+      logger.debug("There are " + resultSet2.getRows().length + " rows in the second set");
       assertEquals("The result set size should be " + batchSize, batchSize, resultSet2.getRows().length);
       
       // get the rest of the results to make sure it finishes properly
@@ -169,7 +169,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
          queryResult = this.repSvc.fetchMore(querySession);
          assertNotNull("queryResult returned in loop should not be null", queryResult);
          querySession = queryResult.getQuerySession();
-         logger.info("There were another " + queryResult.getResultSet().getRows().length + " rows returned");
+         logger.debug("There were another " + queryResult.getResultSet().getRows().length + " rows returned");
       }
       
       // try and fetch some more results and we should get an error
@@ -196,7 +196,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       node.setStore(STORE);
       String rootId = "227f1ee2-1082-11da-8fd4-3310e1ddfea6";
       node.setUuid(rootId);     // find a query to retrieve this maybe type == store_root?
-      logger.info("Retrieving children for node: " + rootId + "....");
+      logger.debug("Retrieving children for node: " + rootId + "....");
       QueryResult rootChildren = this.repSvc.queryChildren(node);
       
       assertNotNull("rootChildren should not be null", rootChildren);
@@ -208,7 +208,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       // get hold of the id of the first child
       ResultSetRow firstRow = rootChildrenResults.getRows(0);
       String id = firstRow.getNode().getId();
-      logger.info("Retrieving parents for first node found: " + id + "....");
+      logger.debug("Retrieving parents for first node found: " + id + "....");
       
       node = new Reference();
       node.setStore(STORE);
@@ -218,8 +218,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       assertNotNull("parents should not be null", parents);
       ResultSet parentsResults = parents.getResultSet();
       assertNotNull("parentsResults should not be null", parentsResults);
-      assertTrue("There should be at least one parent", 
-            parentsResults.getRows().length > 0);
+      assertTrue("There should be at least one parent", parentsResults.getRows().length > 0);
       
       // show the results
       boolean rootFound = false;
@@ -229,7 +228,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
          ResultSetRow row = rows[x];
          ResultSetRowNode rowNode = row.getNode();
          String nodeId = rowNode.getId();
-         logger.info("parent node = " + nodeId + ", type = " + rowNode.getType());
+         logger.debug("parent node = " + nodeId + ", type = " + rowNode.getType());
          
          if (nodeId.equals(rootId))
          {

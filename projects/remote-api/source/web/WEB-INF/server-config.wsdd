@@ -559,6 +559,7 @@
       </operation>
       <operation name="create" qname="operNS:create" xmlns:operNS="http://www.alfresco.org/ws/service/content/1.0" returnQName="retNS:createReturn" xmlns:retNS="http://www.alfresco.org/ws/service/content/1.0" returnType="rtns:Content" xmlns:rtns="http://www.alfresco.org/ws/model/content/1.0" soapAction="http://www.alfresco.org/ws/service/content/1.0/create" >
         <parameter qname="pns:parent" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:ParentReference" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
+        <parameter qname="pns:name" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:format" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:ContentFormat" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
         <parameter qname="pns:content" xmlns:pns="http://www.alfresco.org/ws/service/content/1.0" type="tns:base64Binary" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="ContentFault" qname="fns:ContentFault" xmlns:fns="http://www.alfresco.org/ws/service/content/1.0" class="org.alfresco.repo.webservice.content.ContentFault" type="tns:ContentFault" xmlns:tns="http://www.alfresco.org/ws/service/content/1.0"/>

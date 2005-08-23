@@ -174,7 +174,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
       try
       {
          // create the node ref and get the children from the repository
-         NodeRef nodeRef = new NodeRef(Utils.convertToStoreRef(node.getStore()), node.getUuid());
+         NodeRef nodeRef = Utils.convertToNodeRef(node);
          List<ChildAssociationRef> kids = this.nodeService.getChildAssocs(nodeRef);
          
          // setup a query session and get the first batch of results
@@ -214,7 +214,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
       try
       {
          // create the node ref and get the children from the repository
-         NodeRef nodeRef = new NodeRef(Utils.convertToStoreRef(node.getStore()), node.getUuid());
+         NodeRef nodeRef = Utils.convertToNodeRef(node);
          List<ChildAssociationRef> parents = this.nodeService.getParentAssocs(nodeRef);
          
          // setup a query session and get the first batch of results

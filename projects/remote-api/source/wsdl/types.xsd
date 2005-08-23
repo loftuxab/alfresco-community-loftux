@@ -198,7 +198,7 @@
 					</xsd:restriction>
 				</xsd:simpleType>
     		</xsd:element>
-    		<xsd:element name="encoding">
+    		<xsd:element name="encoding" minOccurs="0">
     			<xsd:annotation>
     				<xsd:documentation>
     					TODO: MinOccurs = 0?
@@ -273,12 +273,11 @@
 
 	<xsd:complexType name="Predicate">
 		<xsd:choice>
-			<xsd:element name="nodes" type="cms:Reference" maxOccurs="unbounded" minOccurs="1">
+			<xsd:element name="nodes" type="cms:Reference" maxOccurs="unbounded" minOccurs="0" nillable="true">
 			</xsd:element>
 			<xsd:sequence>
-				<xsd:element name="store" type="cms:Store"></xsd:element>
-				<xsd:element name="query" type="cms:Query">
-				</xsd:element>
+				<xsd:element name="store" type="cms:Store" minOccurs="0" nillable="true"></xsd:element>
+				<xsd:element name="query" type="cms:Query" minOccurs="0" nillable="true"></xsd:element>
 			</xsd:sequence>
 		</xsd:choice>
 	</xsd:complexType>

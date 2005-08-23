@@ -83,6 +83,7 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
       String ticket = result.getTicket();
       assertNotNull("ticket is null", ticket);
       TicketHolder.ticket = ticket;
-      logger.info("Retrieved and stored ticket: " + TicketHolder.ticket);
+      if (logger.isDebugEnabled())
+         logger.debug("Retrieved and stored ticket: " + TicketHolder.ticket);
    }
 }

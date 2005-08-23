@@ -12,7 +12,7 @@ public interface ContentServiceSoapPort extends java.rmi.Remote {
     /**
      * Describes one or more content streams.
      */
-    public org.alfresco.repo.webservice.types.Content[] describe(org.alfresco.repo.webservice.types.Predicate[] items) throws java.rmi.RemoteException, org.alfresco.repo.webservice.content.ContentFault;
+    public org.alfresco.repo.webservice.types.Content[] describe(org.alfresco.repo.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.repo.webservice.content.ContentFault;
 
     /**
      * Retrieves content from the repository.
@@ -27,7 +27,7 @@ public interface ContentServiceSoapPort extends java.rmi.Remote {
     /**
      * Creates new content in the repository.
      */
-    public org.alfresco.repo.webservice.types.Content create(org.alfresco.repo.webservice.types.ParentReference parent, org.alfresco.repo.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.repo.webservice.content.ContentFault;
+    public org.alfresco.repo.webservice.types.Content create(org.alfresco.repo.webservice.types.ParentReference parent, java.lang.String name, org.alfresco.repo.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.repo.webservice.content.ContentFault;
 
     /**
      * Deletes content from the repository.

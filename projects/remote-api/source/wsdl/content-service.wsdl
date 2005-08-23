@@ -17,7 +17,7 @@
          <element name="describe">
             <complexType>
                <sequence>
-                  <element name="items" type="cms:Predicate" maxOccurs="unbounded" minOccurs="0"/>
+                  <element name="items" type="cms:Predicate"/>
                </sequence>
             </complexType>
          </element>
@@ -65,6 +65,7 @@
             <complexType>
                <sequence>
                   <element name="parent" type="cms:ParentReference"/>
+                  <element name="name" type="xsd:string"/>
                   <element name="format" type="cms:ContentFormat"/>
                   <element name="content" type="xsd:base64Binary"/>
                </sequence>

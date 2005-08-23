@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.TempFileProvider;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.FileUploadBean;
 import org.apache.commons.fileupload.FileItem;
@@ -96,7 +97,7 @@ public class UploadFileServlet extends HttpServlet
                      filename = filename.substring(idx + File.separator.length());
                   }
                   
-                  File tempFile = File.createTempFile("alfresco", ".upload");
+                  File tempFile = TempFileProvider.createTempFile("alfresco", ".upload");
                   item.write(tempFile);
                   bean.setFile(tempFile);
                   bean.setFileName(filename);

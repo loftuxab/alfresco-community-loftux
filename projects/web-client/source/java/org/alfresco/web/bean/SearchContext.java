@@ -26,6 +26,8 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Holds the context required to build a search query and can return the populated query.
@@ -61,7 +63,9 @@ public final class SearchContext implements Serializable
    /** any additional attribute to add to the search */
    private Map<QName, String> additionalAttributes = new HashMap<QName, String>(5, 1.0f);
    
-   
+   /** logger */
+   private static Log logger = LogFactory.getLog(SearchContext.class);
+      
    /**
     * Build the search query string based on the current search context members.
     * 
@@ -203,6 +207,9 @@ public final class SearchContext implements Serializable
       {
          query = pathQuery + " AND (" + query + ')';
       }
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Query: " + query);
       
       return query;
    }
