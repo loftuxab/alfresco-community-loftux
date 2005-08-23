@@ -25,6 +25,7 @@ import javax.transaction.UserTransaction;
 import net.sf.ehcache.CacheManager;
 
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -114,7 +115,8 @@ public class CacheTest extends TestCase
         backingCache.put(newGlobalTwo, newGlobalTwo);
         backingCache.put(newGlobalThree, newGlobalThree);
         
-        UserTransaction txn = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction txn = transactionService.getUserTransaction();
         // begin a transaction
         txn.begin();
         
@@ -196,7 +198,8 @@ public class CacheTest extends TestCase
             long timePlain = runPerformanceTestOnCache(standaloneCache, count);
             
             // do transactional cache in a transaction
-            UserTransaction txn = serviceRegistry.getUserTransaction();
+            TransactionService transactionService = serviceRegistry.getTransactionService();
+            UserTransaction txn = transactionService.getUserTransaction();
             txn.begin();
             long timeTxn = runPerformanceTestOnCache(transactionalCache, count);
             long commitStart = System.nanoTime();

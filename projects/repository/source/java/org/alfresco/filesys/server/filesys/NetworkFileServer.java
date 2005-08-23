@@ -19,7 +19,6 @@ package org.alfresco.filesys.server.filesys;
 
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.config.ServerConfiguration;
-import org.alfresco.service.ServiceRegistry;
 
 /**
  * Network File Server Class
@@ -36,8 +35,8 @@ public abstract class NetworkFileServer extends NetworkServer
      * @param serviceRegistry repository connection
      * @param config ServerConfiguration
      */
-    public NetworkFileServer(String proto, ServiceRegistry serviceRegistry, ServerConfiguration config)
+    public NetworkFileServer(String proto, ServerConfiguration config)
     {
-        super(proto, serviceRegistry, config);
+        super(proto, config);
     }
 }

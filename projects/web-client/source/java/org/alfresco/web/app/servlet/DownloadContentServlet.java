@@ -32,9 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -115,13 +116,14 @@ public class DownloadContentServlet extends HttpServlet
          }
          
          // get the content mimetype from the node properties
-         NodeService nodeService = (NodeService)context.getBean("nodeService");
+         ServiceRegistry serviceRegistry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
+         NodeService nodeService = serviceRegistry.getNodeService();
          String mimetype = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_MIME_TYPE);
          
          // fall back if unable to resolve mimetype property
          if (mimetype == null || mimetype.length() == 0)
          {
-            MimetypeMap mimetypeMap = (MimetypeMap)context.getBean("mimetypeMap");
+            MimetypeService mimetypeMap = serviceRegistry.getMimetypeService();
             mimetype = "application/octet-stream";
             int extIndex = filename.lastIndexOf('.');
             if (extIndex != -1)
@@ -139,7 +141,7 @@ public class DownloadContentServlet extends HttpServlet
          // get the content and stream directly to the response output stream
          // assuming the repo is capable of streaming in chunks, this should allow large files
          // to be streamed directly to the browser response stream.
-         ContentService contentService = (ContentService)context.getBean("contentService");
+         ContentService contentService = serviceRegistry.getContentService();
          ContentReader reader = contentService.getReader(nodeRef);
          reader.getContent( res.getOutputStream() );
       }

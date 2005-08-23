@@ -125,14 +125,6 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     {
 		super.initialise();
 		
-		//	Ensure that the version store has been created
-        if (this.dbNodeService.exists(getVersionStoreReference()) == false)
-        {
-            this.dbNodeService.createStore(
-                    StoreRef.PROTOCOL_WORKSPACE,
-					VersionStoreConst.STORE_ID);
-        }
-		
 		// Regiseter the serial version label behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "calculateVersionLabel"),

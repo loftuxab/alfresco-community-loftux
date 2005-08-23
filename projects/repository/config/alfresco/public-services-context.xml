@@ -46,9 +46,19 @@
     	<property name="target"><ref bean="namespaceService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="NamespaceService_transaction" />
     			<idref local="NamespaceService_descriptor" />
     		</list>
     	</property>
+    </bean>
+    
+    <bean id="NamespaceService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.namespace.NamespaceService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="NamespaceService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -63,7 +73,7 @@
 
     <!-- Transaction Service -->
 
-	<alias alias="UserTransactionService" name="userTransaction"/>
+	<alias alias="TransactionService" name="transactionComponent"/>
 	
 
     <!-- Dictionary Service -->
@@ -75,9 +85,19 @@
     	<property name="target"><ref bean="dictionaryService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="DictionaryService_transaction" />
     			<idref local="DictionaryService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="DictionaryService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.dictionary.DictionaryService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="DictionaryService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -99,9 +119,19 @@
     	<property name="target"><ref bean="nodeService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="NodeService_transaction" />
     			<idref local="NodeService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="NodeService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.repository.NodeService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="NodeService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -123,9 +153,19 @@
     	<property name="target"><ref bean="contentService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="ContentService_transaction" />
     			<idref local="ContentService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="ContentService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.repository.ContentService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="ContentService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -138,7 +178,7 @@
     </bean>
 
 
-    <!-- Content Service -->
+    <!-- Mime Type Service -->
 
     <bean id="MimetypeService" class="org.springframework.aop.framework.ProxyFactoryBean">
     	<property name="proxyInterfaces">
@@ -147,9 +187,19 @@
     	<property name="target"><ref bean="mimetypeMap"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="MimetypeService_transaction" />
     			<idref local="MimetypeService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="MimetypeService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.repository.MimetypeService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="MimetypeService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -171,9 +221,19 @@
     	<property name="target"><ref bean="searchService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="SearchService_transaction" />
     			<idref local="SearchService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="SearchService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.search.SearchService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="SearchService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -195,9 +255,19 @@
     	<property name="target"><ref bean="categoryService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="CategoryService_transaction" />
     			<idref local="CategoryService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="CategoryService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.search.CategoryService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="CategoryService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -219,9 +289,19 @@
     	<property name="target"><ref bean="copyService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="CopyService_transaction" />
     			<idref local="CopyService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="CopyService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.repository.CopyService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="CopyService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -243,9 +323,19 @@
     	<property name="target"><ref bean="lockService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="LockService_transaction" />
     			<idref local="LockService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="LockService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.lock.LockService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="LockService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -267,9 +357,19 @@
     	<property name="target"><ref bean="versionService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="VersionService_transaction" />
     			<idref local="VersionService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="VersionService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.version.VersionService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="VersionService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -291,9 +391,19 @@
     	<property name="target"><ref bean="checkOutCheckInService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="CheckoutCheckinService_transaction" />
     			<idref local="CheckoutCheckinService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="CheckoutCheckinService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.coci.CheckOutCheckInService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="CheckoutCheckinService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -315,9 +425,19 @@
     	<property name="target"><ref bean="ruleService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="RuleService_transaction" />
     			<idref local="RuleService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="RuleService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.rule.RuleService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="RuleService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -339,9 +459,19 @@
     	<property name="target"><ref bean="importerComponent"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="ImporterService_transaction" />
     			<idref local="ImporterService_descriptor" />
     		</list>
     	</property>
+    </bean>
+
+    <bean id="ImporterService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.repo.importer.ImporterService.*=PROPAGATION_REQUIRED</value> 
+        </property>
     </bean>
 
     <bean id="ImporterService_descriptor" parent="AlfrescoServiceDescriptor">
@@ -363,11 +493,21 @@
     	<property name="target"><ref bean="actionService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="ActionService_transaction" />
     			<idref local="ActionService_descriptor" />
     		</list>
     	</property>
     </bean>
 
+    <bean id="ActionService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.action.ActionService.*=PROPAGATION_REQUIRED</value> 
+        </property>
+    </bean>
+    
     <bean id="ActionService_descriptor" parent="AlfrescoServiceDescriptor">
     	<property name="interface">
     		<value>org.alfresco.service.cmr.action.ActionService</value>
@@ -392,11 +532,21 @@
     	<property name="target"><ref bean="permissionService"/></property>
     	<property name="interceptorNames">
     		<list>
+    		    <idref local="PermissionService_transaction" />
     			<idref local="PermissionService_descriptor" />
     		</list>
     	</property>
     </bean>
 
+    <bean id="PermissionService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.repo.security.permissions.PermissionService.*=PROPAGATION_REQUIRED</value> 
+        </property>
+    </bean>
+    
     <bean id="PermissionService_descriptor" parent="AlfrescoServiceDescriptor">
     	<property name="interface">
     		<value>org.alfresco.repo.security.permissions.PermissionService</value>

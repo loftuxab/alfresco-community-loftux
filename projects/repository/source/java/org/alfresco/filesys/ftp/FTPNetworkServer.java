@@ -17,15 +17,18 @@
  */
 package org.alfresco.filesys.ftp;
 
-import java.net.*;
-import java.util.*;
-import java.io.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.Enumeration;
 
-import org.alfresco.filesys.server.*;
-import org.alfresco.filesys.server.filesys.*;
-import org.alfresco.filesys.server.config.*;
-import org.alfresco.filesys.server.core.*;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.filesys.server.ServerListener;
+import org.alfresco.filesys.server.SrvSession;
+import org.alfresco.filesys.server.config.ServerConfiguration;
+import org.alfresco.filesys.server.core.SharedDeviceList;
+import org.alfresco.filesys.server.filesys.NetworkFileServer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -90,9 +93,9 @@ public class FTPNetworkServer extends NetworkFileServer implements Runnable
      * @param serviceResgistry ServiceRegistry
      * @param config ServerConfiguration
      */
-    public FTPNetworkServer(ServiceRegistry serviceRegistry, ServerConfiguration config)
+    public FTPNetworkServer(ServerConfiguration config)
     {
-        super("FTP", serviceRegistry, config);
+        super("FTP", config);
 
         // Set the server version
 

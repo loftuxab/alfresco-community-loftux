@@ -31,6 +31,7 @@ import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.springframework.web.context.WebApplicationContext;
@@ -144,6 +145,7 @@ public class Utils
       ServiceRegistry svcReg = (ServiceRegistry)getSpringContext(msgContext).
          getBean(ServiceRegistry.SERVICE_REGISTRY);
       
-      return svcReg.getUserTransaction();
+      TransactionService transactionService = svcReg.getTransactionService();
+      return transactionService.getUserTransaction();
    }
 }

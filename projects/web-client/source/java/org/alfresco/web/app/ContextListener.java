@@ -46,6 +46,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
@@ -84,6 +85,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
         this.servletContext = event.getServletContext();
         WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         ServiceRegistry registry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
+        TransactionService transactionService = registry.getTransactionService();
         NodeService nodeService = registry.getNodeService();
         SearchService searchService = registry.getSearchService();
         NamespaceService namespaceService = registry.getNamespaceService();
@@ -99,7 +101,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
         String companySpaceId = null;
         try
         {
-            tx = registry.getUserTransaction();
+            tx = transactionService.getUserTransaction();
             tx.begin();
 
             // get and setup the initial store ref from config

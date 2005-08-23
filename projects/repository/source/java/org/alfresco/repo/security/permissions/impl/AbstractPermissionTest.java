@@ -92,9 +92,9 @@ public class AbstractPermissionTest extends BaseSpringTest
     protected void onSetUpInTransaction() throws Exception
     {
         nodeService = (NodeService) applicationContext.getBean("dbNodeService");
-        dictionaryService = (DictionaryService) applicationContext.getBean("dictionaryService");
+        dictionaryService = (DictionaryService) applicationContext.getBean(ServiceRegistry.DICTIONARY_SERVICE.getLocalName());
         permissionService = (PermissionService) applicationContext.getBean("permissionService");
-        namespacePrefixResolver = (NamespacePrefixResolver) applicationContext.getBean("namespaceService");
+        namespacePrefixResolver = (NamespacePrefixResolver) applicationContext.getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName());
         authenticationService = (AuthenticationService) applicationContext.getBean("authenticationService");
         serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
     

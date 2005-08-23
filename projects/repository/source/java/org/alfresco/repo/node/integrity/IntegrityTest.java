@@ -19,6 +19,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
@@ -75,7 +76,8 @@ public class IntegrityTest extends TestCase
         }
         rootNodeRef = nodeService.getRootNode(storeRef);
         // begin a transaction
-        txn = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        txn = transactionService.getUserTransaction();
         txn.begin();
     }
     

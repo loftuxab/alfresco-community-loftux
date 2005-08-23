@@ -30,6 +30,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -41,6 +42,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -71,7 +73,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
     {
         super.onSetUpInTransaction();
         nodeService = (NodeService) applicationContext.getBean("dbNodeService");
-        contentService = (ContentService) applicationContext.getBean("contentService");
+        contentService = (ContentService) applicationContext.getBean(ServiceRegistry.CONTENT_SERVICE.getLocalName());
         this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
         // create a store and get the root node
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, getName());
@@ -95,7 +97,8 @@ public class RoutingContentServiceTest extends BaseSpringTest
     
     private UserTransaction getUserTransaction()
     {
-        return (UserTransaction) applicationContext.getBean("userTransaction");
+        TransactionService transactionService = (TransactionService)applicationContext.getBean("transactionComponent");
+        return (UserTransaction) transactionService.getUserTransaction();
     }
     
     public void testSetUp() throws Exception

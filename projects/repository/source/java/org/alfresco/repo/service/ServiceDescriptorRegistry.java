@@ -43,6 +43,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -179,13 +180,13 @@ public class ServiceDescriptorRegistry
     {
         return (SearchService)getService(SEARCH_SERVICE);
     }
-
+    
     /* (non-Javadoc)
-     * @see org.alfresco.service.ServiceRegistry#getUserTransaction()
+     * @see org.alfresco.service.ServiceRegistry#getTransactionService()
      */
-    public UserTransaction getUserTransaction()
+    public TransactionService getTransactionService()
     {
-        return (UserTransaction)getService(USER_TRANSACTION);
+        return (TransactionService)getService(TRANSACTION_SERVICE);
     }
 
     /* (non-Javadoc)

@@ -50,46 +50,36 @@
    
    <!-- NodeService implemented to persist to Database -->
 
-   <bean id="dbNodeServiceImpl" class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
-      <constructor-arg>
-         <ref bean="policyComponent"/>
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="dictionaryService" />
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="nodeDaoService" />
-      </constructor-arg>
-   </bean>
-   
-   <bean id="dbNodeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+   <bean id="dbNodeService" class="org.springframework.aop.framework.ProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.service.cmr.repository.NodeService</value>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
+    	<value>org.alfresco.service.cmr.repository.NodeService</value>
       </property>
       <property name="target">
-         <ref bean="dbNodeServiceImpl" />     
+        <bean class="org.alfresco.repo.node.db.DbNodeServiceImpl" init-method="init" >
+          <constructor-arg>
+             <ref bean="policyComponent"/>
+          </constructor-arg>
+          <constructor-arg>
+             <ref bean="dictionaryService" />
+          </constructor-arg>
+          <constructor-arg>
+             <ref bean="nodeDaoService" />
+          </constructor-arg>
+        </bean>
       </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
-      <property name="postInterceptors">
+      <property name="interceptorNames">
          <list>
-            <!-- only enable for debugging
-            <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
-               <constructor-arg>
-                  <value>dbNodeService</value>
-               </constructor-arg>
-            </bean>
-            -->
+<!--            <idref bean="methodCallLogAdvice" />-->
+<!--            <idref bean="dbNodeService_PerformanceMonitorAdvice" />-->
          </list>
       </property>
    </bean>   
+
+   <bean id="dbNodeService_PerformanceMonitorAdvice" class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
+       <constructor-arg>
+          <value>dbNodeService</value>
+       </constructor-arg>
+   </bean>
    
    <!-- Handles policy callbacks to ensure that node hierarchy gets indexed -->
    <bean id="nodeIndexer" class="org.alfresco.repo.node.index.NodeIndexer" init-method="init">

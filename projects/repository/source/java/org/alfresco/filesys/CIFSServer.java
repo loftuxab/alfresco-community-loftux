@@ -96,11 +96,11 @@ public class CIFSServer
                 // Create the NetBIOS name server if NetBIOS SMB is enabled
                 
                 if (filesysConfig.hasNetBIOSSMB())
-                    serverList.add(new NetBIOSNameServer(filesysConfig.getServiceRegistry(), filesysConfig));
+                    serverList.add(new NetBIOSNameServer(filesysConfig));
 
                 // Create the SMB server
                 
-                serverList.add(new SMBServer(filesysConfig.getServiceRegistry(), filesysConfig));
+                serverList.add(new SMBServer(filesysConfig));
                 
                 // Add the servers to the configuration
                 

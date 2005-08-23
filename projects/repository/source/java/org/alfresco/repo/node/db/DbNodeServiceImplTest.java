@@ -20,11 +20,14 @@ package org.alfresco.repo.node.db;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.UserTransaction;
+
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 
 /**
  * @see org.alfresco.repo.node.db.DbNodeServiceImpl
@@ -50,18 +53,33 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
         setComplete();
         endTransaction();
 
-        ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
-        NodeRef n6Ref = n6pn8Ref.getParentRef();
-        NodeRef n8Ref = n6pn8Ref.getChildRef();
+        TransactionService trxService = (TransactionService)applicationContext.getBean("transactionComponent");
+        UserTransaction userTransaction = trxService.getUserTransaction();
         
-        // delete n8
-        nodeService.deleteNode(n8Ref);
-        
-        // get the parent children
-        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(n6Ref);
-        for (ChildAssociationRef assoc : assocs)
+        try
         {
-            // just checking
+            userTransaction.begin();
+            
+            ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
+            NodeRef n6Ref = n6pn8Ref.getParentRef();
+            NodeRef n8Ref = n6pn8Ref.getChildRef();
+            
+            // delete n8
+            nodeService.deleteNode(n8Ref);
+            
+            // get the parent children
+            List<ChildAssociationRef> assocs = nodeService.getChildAssocs(n6Ref);
+            for (ChildAssociationRef assoc : assocs)
+            {
+                // just checking
+            }
+            
+            userTransaction.commit();
+        }
+        catch(Exception e)
+        {
+            userTransaction.rollback();
+            throw e;
         }
     }
 }

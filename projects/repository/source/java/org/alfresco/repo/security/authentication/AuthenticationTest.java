@@ -21,6 +21,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.transaction.UserTransaction;
+
 import junit.framework.TestCase;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationManager;
@@ -30,6 +32,7 @@ import net.sf.acegisecurity.providers.dao.SaltSource;
 import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -39,6 +42,7 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
@@ -82,7 +86,7 @@ public class AuthenticationTest extends TestCase
         super(arg0);
     }
 
-    public void setUp()
+    public void setUp() throws Exception
     {
 
         nodeService = (NodeService) ctx.getBean("nodeService");
@@ -95,6 +99,10 @@ public class AuthenticationTest extends TestCase
         dao = (RepositoryAuthenticationDao) ctx.getBean("alfDaoImpl");
         authenticationManager = (AuthenticationManager) ctx.getBean("authenticationManager");
         saltSource = (SaltSource) ctx.getBean("saltSource");
+
+        TransactionService transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName());
+        UserTransaction userTransaction = transactionService.getUserTransaction();
+        userTransaction.begin();
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         StoreContextHolder.setContext(storeRef);

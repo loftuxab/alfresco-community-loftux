@@ -41,7 +41,6 @@ import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.smb.mailslot.HostAnnouncer;
 import org.alfresco.filesys.smb.server.win32.Win32NetBIOSLanaMonitor;
 import org.alfresco.filesys.smb.server.win32.Win32NetBIOSSessionSocketHandler;
-import org.alfresco.service.ServiceRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -98,9 +97,9 @@ public class SMBServer extends NetworkFileServer implements Runnable
      * @param serviceRegistry repository connection
      * @param cfg ServerConfiguration
      */
-    public SMBServer(ServiceRegistry serviceRegistry, ServerConfiguration cfg) throws IOException
+    public SMBServer(ServerConfiguration cfg) throws IOException
     {
-        super("SMB", serviceRegistry, cfg);
+        super("SMB", cfg);
 
         // Call the common constructor
         CommonConstructor();

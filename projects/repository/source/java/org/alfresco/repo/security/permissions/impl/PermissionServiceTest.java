@@ -33,6 +33,7 @@ import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 
 public class PermissionServiceTest extends AbstractPermissionTest
 {
@@ -905,7 +906,8 @@ public class PermissionServiceTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
       
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,

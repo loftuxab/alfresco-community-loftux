@@ -16,6 +16,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.GUID;
 import org.alfresco.util.debug.NodeStoreInspector;
@@ -53,13 +54,14 @@ public class SimpleExampleWithContent
         // initialise app content 
         ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
         // get registry of services
-        ServiceRegistry serviceRegistry = (ServiceRegistry) ctx.getBean("serviceRegistry");
+        ServiceRegistry serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         
         // begin a UserTransaction
         // All the services are set to create or propogate the transaction.
         // This transaction will be recognised and propogated
         // The usual try-catch-finally code has been ommitted
-        UserTransaction txn = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService(); 
+        UserTransaction txn = transactionService.getUserTransaction();
         try
         {
             txn.begin();

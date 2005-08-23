@@ -70,7 +70,6 @@ import org.alfresco.filesys.smb.Dialect;
 import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.util.IPAddress;
-import org.alfresco.service.ServiceRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -128,9 +127,6 @@ public class ServerConfiguration
 
     // Path to configuration file
     private String configLocation;
-
-    /** connection to database */
-    private ServiceRegistry serviceRegistry;
 
     /** the device to connect use */
     private DiskInterface diskInterface;
@@ -281,12 +277,10 @@ public class ServerConfiguration
      * 
      * @param config ConfigService
      */
-    public ServerConfiguration(ServiceRegistry serviceRegistry, AuthenticationManager authMgr, String configPath,
-            DiskInterface diskInterface)
+    public ServerConfiguration(AuthenticationManager authMgr, String configPath, DiskInterface diskInterface)
     {
         // Save details
 
-        this.serviceRegistry = serviceRegistry;
         this.diskInterface = diskInterface;
         this.acegiAuthMgr = authMgr;
         this.configLocation = configPath;
@@ -1720,16 +1714,6 @@ public class ServerConfiguration
         return m_srvType;
     }
 
-    /**
-     * Return the service registry
-     * 
-     * @return ServiceRegistry
-     */
-    public final ServiceRegistry getServiceRegistry()
-    {
-        return serviceRegistry;
-    }
-    
     /**
      * Return the server debug flags.
      * 

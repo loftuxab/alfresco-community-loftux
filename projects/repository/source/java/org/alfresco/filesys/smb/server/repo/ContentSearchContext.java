@@ -17,16 +17,16 @@
  */
 package org.alfresco.filesys.smb.server.repo;
 
-import java.io.FileNotFoundException;
 import java.util.List;
+
+import javax.transaction.UserTransaction;
 
 import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.SearchContext;
 import org.alfresco.filesys.server.filesys.cache.FilePathCache;
-import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,8 +40,8 @@ import org.apache.commons.logging.LogFactory;
 public class ContentSearchContext extends SearchContext
 {
     private static final Log logger = LogFactory.getLog(ContentSearchContext.class);
-    
-    private ServiceRegistry serviceRegistry;
+
+    private TransactionService transactionService;
     private CifsHelper cifsHelper;
     private List<NodeRef> results;
     private int index = -1;
@@ -60,7 +60,7 @@ public class ContentSearchContext extends SearchContext
      * @return Returns a search context with the results of the search
      */
     public static ContentSearchContext search(
-            ServiceRegistry serviceRegistry,
+            TransactionService transactionService,
             CifsHelper cifsHelper,
             NodeRef searchRootNodeRef,
             String searchStr,
@@ -72,7 +72,7 @@ public class ContentSearchContext extends SearchContext
         List<NodeRef> results = cifsHelper.getNodeRefs(searchRootNodeRef, searchStr);
         
         // build the search context to store the results
-        ContentSearchContext searchCtx = new ContentSearchContext(serviceRegistry, cifsHelper, results, searchStr);
+        ContentSearchContext searchCtx = new ContentSearchContext(transactionService, cifsHelper, results, searchStr);
         
         // done
         if (logger.isDebugEnabled())
@@ -85,17 +85,17 @@ public class ContentSearchContext extends SearchContext
     }
     
     /**
-     * @see ContentSearchContext#search(ServiceRegistry, FilePathCache, NodeRef, String, int)
+     * @see ContentSearchContext#search(FilePathCache, NodeRef, String, int)
      */
     private ContentSearchContext(
-            ServiceRegistry serviceRegistry,
+            TransactionService transactionService,
             CifsHelper cifsHelper,
             List<NodeRef> results,
             String searchStr)
     {
         super();
         super.setSearchString(searchStr);
-        this.serviceRegistry = serviceRegistry;
+        this.transactionService = transactionService;
         this.cifsHelper = cifsHelper;
         this.results = results;
     }
@@ -135,22 +135,24 @@ public class ContentSearchContext extends SearchContext
         // get the next file info
         NodeRef nextNodeRef = results.get(index);
         // get the file info
+
+        UserTransaction userTransaction = transactionService.getUserTransaction();
         try
         {
+            userTransaction.begin();
+            
             FileInfo nextInfo = cifsHelper.getFileInformation(nextNodeRef, "", true);
             // copy to info handle
             info.copyFrom(nextInfo);
+            
+            userTransaction.commit();
+            
             // success
             return true;
         }
-        catch (InvalidNodeRefException e)
+        catch (Exception e)
         {
-            // node is no longer valid
-            return false;
-        }
-        catch (FileNotFoundException e)
-        {
-            // node no longer available
+            try { if (userTransaction != null) {userTransaction.rollback();} } catch (Exception ex) {}
             return false;
         }
     }

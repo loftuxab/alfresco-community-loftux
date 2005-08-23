@@ -35,7 +35,6 @@ import org.alfresco.repo.content.transform.ContentTransformerRegistry;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -49,8 +48,10 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.EqualsHelper;
 import org.alfresco.util.TempFileProvider;
+
 
 /**
  * A content service that determines at runtime the store that the
@@ -60,7 +61,7 @@ import org.alfresco.util.TempFileProvider;
  */
 public class RoutingContentService implements ContentService
 {
-    private ServiceRegistry serviceRegistry;
+    private TransactionService transactionService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
     /** a registry of all available content transformers */
@@ -88,27 +89,31 @@ public class RoutingContentService implements ContentService
         this.tempStore = new FileContentStore(TempFileProvider.getTempDir().getAbsolutePath());
     }
 
-    // setter for injection
-    public void setServiceRegistry(ServiceRegistry serviceRegistry)
+    public void setTransactionService(TransactionService transactionService)
     {
-        this.serviceRegistry = serviceRegistry;
+        this.transactionService = transactionService;
     }
+    
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
     }
+    
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
+    
     public void setTransformerRegistry(ContentTransformerRegistry transformerRegistry)
     {
         this.transformerRegistry = transformerRegistry;
     }
+    
     public void setStore(ContentStore store)
     {
         this.store = store;
     }
+    
     public void setPolicyComponent(PolicyComponent policyComponent)
 	{
 		this.policyComponent = policyComponent;
@@ -236,8 +241,7 @@ public class RoutingContentService implements ContentService
         // get the plain writer
         ContentWriter writer = getWriter(nodeRef);
         // need a listener to update the node when the stream closes
-        WriteStreamListener listener = new WriteStreamListener(nodeRef, writer);
-        listener.setServiceRegistry(serviceRegistry);
+        WriteStreamListener listener = new WriteStreamListener(transactionService, nodeService, nodeRef, writer);
         writer.addListener(listener);
         // give back to the client
         return writer;
@@ -311,27 +315,23 @@ public class RoutingContentService implements ContentService
      */
     private static class WriteStreamListener implements ContentStreamListener
     {
-        private ServiceRegistry serviceRegistry;
+        private TransactionService transactionService;
+        private NodeService nodeService;
         private NodeRef nodeRef;
         private ContentWriter writer;
         
-        public WriteStreamListener(NodeRef nodeRef, ContentWriter writer)
+        public WriteStreamListener(TransactionService transactionService, NodeService nodeService, NodeRef nodeRef, ContentWriter writer)
         {
+            this.transactionService = transactionService;
+            this.nodeService = nodeService;
             this.nodeRef = nodeRef;
             this.writer = writer;
         }
         
-        public void setServiceRegistry(ServiceRegistry serviceRegistry)
-        {
-            this.serviceRegistry = serviceRegistry;
-        }
-
         public void contentStreamClosed() throws ContentIOException
         {
-            NodeService nodeService = serviceRegistry.getNodeService();
-            
             // begin a txn
-            UserTransaction txn = serviceRegistry.getUserTransaction();
+            UserTransaction txn = transactionService.getUserTransaction();
             try
             {
                 txn.begin();
@@ -368,4 +368,5 @@ public class RoutingContentService implements ContentService
             }
         }
     }
+
 }

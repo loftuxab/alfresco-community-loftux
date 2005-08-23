@@ -30,7 +30,6 @@ import org.alfresco.filesys.server.filesys.FileOpenParams;
 import org.alfresco.filesys.server.filesys.NetworkFile;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.RandomAccessContent;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.Content;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -48,7 +47,8 @@ public class ContentNetworkFile extends NetworkFile
 {
     private static final Log logger = LogFactory.getLog(ContentNetworkFile.class);
     
-    private ServiceRegistry serviceRegistry;
+    private NodeService nodeService;
+    private ContentService contentService;
     private CifsHelper cifsHelper;
     private NodeRef nodeRef;
     /** keeps track of the read/write access */
@@ -68,7 +68,8 @@ public class ContentNetworkFile extends NetworkFile
      * @return Returns a new instance of the network file
      */
     public static ContentNetworkFile createFile(
-            ServiceRegistry serviceRegistry,
+            NodeService nodeService,
+            ContentService contentService,
             CifsHelper cifsHelper,
             NodeRef nodeRef,
             FileOpenParams params)
@@ -79,7 +80,7 @@ public class ContentNetworkFile extends NetworkFile
         // TODO: Check access writes and compare to write requirements
         
         // create the file
-        ContentNetworkFile netFile = new ContentNetworkFile(serviceRegistry, cifsHelper, nodeRef, path);
+        ContentNetworkFile netFile = new ContentNetworkFile(nodeService, contentService, cifsHelper, nodeRef, path);
         // set relevant parameters
         if (params.isReadOnlyAccess())
         {
@@ -133,11 +134,12 @@ public class ContentNetworkFile extends NetworkFile
         return netFile;
     }
 
-    private ContentNetworkFile(ServiceRegistry serviceRegistry, CifsHelper cifsHelper, NodeRef nodeRef, String name)
+    private ContentNetworkFile(NodeService nodeService, ContentService contentService, CifsHelper cifsHelper, NodeRef nodeRef, String name)
     {
         super(name);
         setFullName(name);
-        this.serviceRegistry = serviceRegistry;
+        this.nodeService = nodeService;
+        this.contentService = contentService;
         this.cifsHelper = cifsHelper;
         this.nodeRef = nodeRef;
     }
@@ -205,8 +207,6 @@ public class ContentNetworkFile extends NetworkFile
         }
         
         // we need to create the channel
-        ContentService contentService = serviceRegistry.getContentService();
-        
         if (write && !isWritable())
         {
             throw new AccessDeniedException("The network file was created for read-only: " + this);
@@ -252,7 +252,6 @@ public class ContentNetworkFile extends NetworkFile
         else if (modified)              // file was modified
         {
             // write properties
-            NodeService nodeService = serviceRegistry.getNodeService();
             nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT_URL, content.getContentUrl());
             nodeService.setProperty(nodeRef, ContentModel.PROP_SIZE, channel.size());
             // close it

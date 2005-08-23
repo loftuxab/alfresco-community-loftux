@@ -33,7 +33,6 @@ import org.alfresco.filesys.netbios.RFCNetBIOSProtocol;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.ServerListener;
 import org.alfresco.filesys.server.config.ServerConfiguration;
-import org.alfresco.service.ServiceRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -681,9 +680,9 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
      * @param config ServerConfiguration
      * @exception SocketException If a network setup error occurs
      */
-    public NetBIOSNameServer(ServiceRegistry serviceRegistry, ServerConfiguration config) throws SocketException
+    public NetBIOSNameServer(ServerConfiguration config) throws SocketException
     {
-        super("NetBIOS", serviceRegistry, config);
+        super("NetBIOS", config);
 
         // Perform common constructor code
         commonConstructor();

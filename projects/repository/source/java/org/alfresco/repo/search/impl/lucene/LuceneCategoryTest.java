@@ -49,6 +49,7 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
@@ -108,7 +109,7 @@ public class LuceneCategoryTest extends TestCase
         super(arg0);
     }
 
-    public void setUp()
+    public void setUp() throws Exception
     {
         nodeService = (NodeService)ctx.getBean("dbNodeService");
         luceneIndexLock = (LuceneIndexLock)ctx.getBean("luceneIndexLock");
@@ -121,6 +122,10 @@ public class LuceneCategoryTest extends TestCase
         serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         
         createTestTypes();
+        
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
         
         StoreRef storeRef = nodeService.createStore(
                 StoreRef.PROTOCOL_WORKSPACE,
@@ -215,6 +220,7 @@ public class LuceneCategoryTest extends TestCase
         nodeService.addAspect(n13, marketingRegionCategorisationQName, createMap("marketingRegion", catRBase));
         nodeService.addAspect(n14, marketingRegionCategorisationQName, createMap("marketingRegion", catRBase));
         
+        tx.commit();
     }
     
     private HashMap<QName, Serializable> createMap(String name, NodeRef[] nodeRefs)
@@ -349,7 +355,8 @@ public class LuceneCategoryTest extends TestCase
     
     public void testMulti() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         buildBaseIndex();
         
@@ -369,7 +376,8 @@ public class LuceneCategoryTest extends TestCase
     
     public void testBasic() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         buildBaseIndex();
         
@@ -531,7 +539,8 @@ public class LuceneCategoryTest extends TestCase
     
     public void testCategoryServiceImpl() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         buildBaseIndex();
         
@@ -608,7 +617,8 @@ public class LuceneCategoryTest extends TestCase
     
     public void testCategoryService() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         buildBaseIndex();
         assertEquals(1, categoryService.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE).size());

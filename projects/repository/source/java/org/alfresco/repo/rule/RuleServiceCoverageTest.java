@@ -68,6 +68,7 @@ import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.TestWithUserUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -86,6 +87,7 @@ public class RuleServiceCoverageTest extends TestCase
 	/**
 	 * Services used during the tests
 	 */
+    private TransactionService transactionService;
     private RuleService ruleService;
     private NodeService nodeService;
     private StoreRef testStoreRef;
@@ -131,15 +133,16 @@ public class RuleServiceCoverageTest extends TestCase
     {
         // Get the required services
 		this.serviceRegistry = (ServiceRegistry)applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-		this.nodeService = (NodeService)applicationContext.getBean("nodeService");
-        this.ruleService = (RuleService)applicationContext.getBean("ruleService");
-        this.cociService = (CheckOutCheckInService)applicationContext.getBean("checkOutCheckInService");
-        this.lockService = (LockService)applicationContext.getBean("lockService");
-		this.contentService = (ContentService)applicationContext.getBean("contentService");
+		this.nodeService = serviceRegistry.getNodeService();
+        this.ruleService = serviceRegistry.getRuleService();
+        this.cociService = serviceRegistry.getCheckOutCheckInService();
+        this.lockService = serviceRegistry.getLockService();
+		this.contentService = serviceRegistry.getContentService();
         this.dictionaryDAO = (DictionaryDAO)applicationContext.getBean("dictionaryDAO");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
-        this.actionService = (ActionService)applicationContext.getBean("actionService");
-        
+        this.actionService = serviceRegistry.getActionService();
+        this.transactionService = serviceRegistry.getTransactionService();
+            
         this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
         
@@ -359,7 +362,7 @@ public class RuleServiceCoverageTest extends TestCase
             assertFalse(this.nodeService.hasAspect(newNodeRef2, ContentModel.ASPECT_VERSIONABLE));
             
             // Check rule gets fired when node contains category value
-            UserTransaction tx = serviceRegistry.getUserTransaction();
+            UserTransaction tx = transactionService.getUserTransaction();
             tx.begin();
             NodeRef newNodeRef = this.nodeService.createNode(
                     this.nodeRef,
@@ -375,7 +378,7 @@ public class RuleServiceCoverageTest extends TestCase
             assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));  
             
             // Check rule does not get fired when the node has the incorrect category value
-            UserTransaction tx3 = serviceRegistry.getUserTransaction();
+            UserTransaction tx3 = transactionService.getUserTransaction();
             tx3.begin();
             NodeRef newNodeRef3 = this.nodeService.createNode(
                     this.nodeRef,
@@ -555,7 +558,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        
 	        this.ruleService.saveRule(this.nodeRef, rule);
 	
-	        UserTransaction tx = serviceRegistry.getUserTransaction();
+	        UserTransaction tx = transactionService.getUserTransaction();
 			tx.begin();
 			
 			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
@@ -633,7 +636,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        
 	        this.ruleService.saveRule(this.nodeRef, rule);
 	
-	        UserTransaction tx = serviceRegistry.getUserTransaction();
+	        UserTransaction tx = transactionService.getUserTransaction();
 			tx.begin();
 			
 			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
@@ -750,7 +753,7 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.saveRule(this.nodeRef, rule);
          
         NodeRef newNodeRef = null;
-        UserTransaction tx = this.serviceRegistry.getUserTransaction();
+        UserTransaction tx = this.transactionService.getUserTransaction();
         try
         {
         	tx.begin();     
@@ -1128,7 +1131,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        
 	        // Create actionable nodes
 	        sw.start("create nodes with no rule executed");		
-			UserTransaction userTransaction1 = this.serviceRegistry.getUserTransaction();
+			UserTransaction userTransaction1 = this.transactionService.getUserTransaction();
 			userTransaction1.begin();
 			
 			for (int i = 0; i < 100; i++)
@@ -1157,7 +1160,7 @@ public class RuleServiceCoverageTest extends TestCase
 	        this.ruleService.saveRule(this.nodeRef, rule);
 	        
 	        sw.start("create nodes with one rule run (apply versionable aspect)");
-			UserTransaction userTransaction2 = this.serviceRegistry.getUserTransaction();
+			UserTransaction userTransaction2 = this.transactionService.getUserTransaction();
 			userTransaction2.begin();
 			
 			NodeRef[] nodeRefs = new NodeRef[100];

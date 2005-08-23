@@ -35,6 +35,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -138,9 +139,10 @@ public class ServiceDescriptorRegistryTest extends TestCase
         assertNotNull(s7);
         SearchService s8 = registry.getSearchService();
         assertNotNull(s8);
-        UserTransaction s9 = registry.getUserTransaction();
+        TransactionService transactionService = registry.getTransactionService();
+        UserTransaction s9 = transactionService.getUserTransaction();
         assertNotNull(s9);
-        UserTransaction s10 = registry.getUserTransaction();
+        UserTransaction s10 = transactionService.getUserTransaction();
         assertNotNull(s10);
         assertFalse(s9.equals(s10));
         VersionService s11 = registry.getVersionService();

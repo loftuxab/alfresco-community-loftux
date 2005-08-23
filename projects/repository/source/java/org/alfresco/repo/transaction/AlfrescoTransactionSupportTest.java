@@ -25,6 +25,7 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.springframework.context.ApplicationContext;
@@ -53,7 +54,8 @@ public class AlfrescoTransactionSupportTest extends TestCase
     public void testTransactionId() throws Exception
     {
         // get a user transaction
-        UserTransaction txn = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction txn = transactionService.getUserTransaction();
         assertNull("Thread shouldn't have a txn ID", AlfrescoTransactionSupport.getTransactionId());
         
         // begine the txn
@@ -77,7 +79,7 @@ public class AlfrescoTransactionSupportTest extends TestCase
         
         // begin a new, inner transaction
         {
-            SpringAwareUserTransaction txnInner = (SpringAwareUserTransaction) serviceRegistry.getUserTransaction();
+            SpringAwareUserTransaction txnInner = (SpringAwareUserTransaction) transactionService.getUserTransaction();
             txnInner.setPropogationBehviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             
             String txnIdInner = AlfrescoTransactionSupport.getTransactionId();
@@ -100,7 +102,7 @@ public class AlfrescoTransactionSupportTest extends TestCase
         assertNull("Thread shouldn't have a txn ID after rollback", AlfrescoTransactionSupport.getTransactionId());
         
         // start a new transaction
-        txn = serviceRegistry.getUserTransaction();
+        txn = transactionService.getUserTransaction();
         txn.begin();
         txnIdCheck = AlfrescoTransactionSupport.getTransactionId();
         assertNotSame("New transaction has same ID", txnId, txnIdCheck);
@@ -140,7 +142,8 @@ public class AlfrescoTransactionSupportTest extends TestCase
         };
         
         // begin a transaction
-        UserTransaction txn = serviceRegistry.getUserTransaction();
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        UserTransaction txn = transactionService.getUserTransaction();
         txn.begin();
         
         // register it

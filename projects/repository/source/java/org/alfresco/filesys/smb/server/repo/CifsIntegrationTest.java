@@ -3,6 +3,7 @@ package org.alfresco.filesys.smb.server.repo;
 import junit.framework.TestCase;
 
 import org.alfresco.filesys.CIFSServer;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.util.ApplicationContextHelper;
@@ -42,7 +43,7 @@ public class CifsIntegrationTest extends TestCase
         assertNotNull("No share name available", shareName);
         assertTrue("No share name available (zero length)", shareName.length() > 0);
         
-        NodeService nodeService = (NodeService) ctx.getBean("nodeService");
+        NodeService nodeService = (NodeService) ctx.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
         // get the share root node and check that it exists
         NodeRef shareNodeRef = diskInterface.getContextRootNodeRef();
         assertNotNull("No share root node available", shareNodeRef);

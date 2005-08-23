@@ -19,8 +19,6 @@ package org.alfresco.service;
 
 import java.util.Collection;
 
-import javax.transaction.UserTransaction;
-
 import org.alfresco.repo.importer.ImporterService;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -37,6 +35,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 
 
 /**
@@ -53,7 +52,7 @@ public interface ServiceRegistry
     static final String SERVICE_REGISTRY = "ServiceRegistry";
 
     static final QName REGISTRY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ServiceRegistry");
-    static final QName USER_TRANSACTION = QName.createQName(NamespaceService.ALFRESCO_URI, "UserTransactionService");
+    static final QName TRANSACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "TransactionService");
     static final QName NAMESPACE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NamespaceService");
     static final QName DICTIONARY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "DictionaryService");
     static final QName NODE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NodeService");
@@ -102,9 +101,9 @@ public interface ServiceRegistry
     Object getService(QName service);
     
     /**
-     * @return the user transaction
+     * @return the transaction service
      */
-    UserTransaction getUserTransaction();
+    TransactionService getTransactionService();
 
     /**
      * @return the namespace service (or null, if one is not provided)

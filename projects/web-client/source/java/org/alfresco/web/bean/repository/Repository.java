@@ -45,6 +45,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.log4j.Logger;
@@ -436,7 +437,8 @@ public final class Repository
     */
    public static UserTransaction getUserTransaction(FacesContext context)
    {
-      return getServiceRegistry(context).getUserTransaction();
+       TransactionService transactionService = getServiceRegistry(context).getTransactionService(); 
+       return transactionService.getUserTransaction();
    }
 
    /**

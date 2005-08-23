@@ -20,6 +20,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
@@ -33,6 +34,7 @@ public class SearcherComponentTest extends TestCase
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     
     private ServiceRegistry serviceRegistry;
+    private TransactionService transactionService;
     private DictionaryService dictionaryService;
     private SearcherComponent searcher;
     private NodeService nodeService;
@@ -43,6 +45,7 @@ public class SearcherComponentTest extends TestCase
     public void setUp() throws Exception
     {
         serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
+        transactionService = serviceRegistry.getTransactionService();
         dictionaryService = BaseNodeServiceTest.loadModel(ctx);
         nodeService = serviceRegistry.getNodeService();
         // get the indexer and searcher factory
@@ -55,7 +58,7 @@ public class SearcherComponentTest extends TestCase
                 getName() + "_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
         // begin a transaction
-        txn = serviceRegistry.getUserTransaction();
+        txn = transactionService.getUserTransaction();
         txn.begin();
     }
     
@@ -237,6 +240,9 @@ public class SearcherComponentTest extends TestCase
         Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.addDynamicNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);

@@ -63,6 +63,7 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.CachingDateFormat;
 import org.springframework.context.ApplicationContext;
@@ -78,6 +79,7 @@ public class LuceneTest extends TestCase
 
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
+    TransactionService transactionService;
     NodeService nodeService;
     DictionaryService dictionaryService;
     LuceneIndexLock luceneIndexLock;
@@ -125,6 +127,7 @@ public class LuceneTest extends TestCase
         queryRegisterComponent = (QueryRegisterComponent) ctx.getBean("queryRegisterComponent");
         namespacePrefixResolver = (NamespacePrefixResolver) ctx.getBean("namespaceService");
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
+        transactionService = (TransactionService) ctx.getBean("transactionComponent");
         serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         
         queryRegisterComponent.loadQueryCollection("testQueryRegister.xml");
@@ -250,7 +253,7 @@ public class LuceneTest extends TestCase
     
     public void testSort() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -310,7 +313,7 @@ public class LuceneTest extends TestCase
     
     public void test1() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -321,7 +324,7 @@ public class LuceneTest extends TestCase
 
     public void test2() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -332,7 +335,7 @@ public class LuceneTest extends TestCase
 
     public void test3() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -343,7 +346,7 @@ public class LuceneTest extends TestCase
 
     public void test4() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -359,7 +362,7 @@ public class LuceneTest extends TestCase
 
     public void test5() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -370,7 +373,7 @@ public class LuceneTest extends TestCase
 
     public void test6() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -381,7 +384,7 @@ public class LuceneTest extends TestCase
 
     public void testNoOp() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1", indexerAndSearcher);
@@ -407,7 +410,7 @@ public class LuceneTest extends TestCase
 
     public void testStandAloneIndexerCommit() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1", indexerAndSearcher);
@@ -547,7 +550,7 @@ public class LuceneTest extends TestCase
 
     public void testStandAlonePathIndexer() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -626,7 +629,7 @@ public class LuceneTest extends TestCase
 
     public void testAllPathSearch() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -976,7 +979,7 @@ public class LuceneTest extends TestCase
 
     public void testPathSearch() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1032,7 +1035,7 @@ public class LuceneTest extends TestCase
 
     public void testXPathSearch() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1060,7 +1063,7 @@ public class LuceneTest extends TestCase
 
     public void testMissingIndex() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "_missing_");
@@ -1081,7 +1084,7 @@ public class LuceneTest extends TestCase
 
     public void testUpdateIndex() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1120,7 +1123,7 @@ public class LuceneTest extends TestCase
 
     public void testDeleteLeaf() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1327,7 +1330,7 @@ public class LuceneTest extends TestCase
 
     public void testDeleteContainer() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1537,7 +1540,7 @@ public class LuceneTest extends TestCase
 
     public void testDeleteAndAddReference() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1774,7 +1777,7 @@ public class LuceneTest extends TestCase
 
     public void testRenameReference() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1836,7 +1839,7 @@ public class LuceneTest extends TestCase
 
     public void testDelayIndex() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -1948,7 +1951,7 @@ public class LuceneTest extends TestCase
 
     public void testForKev() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -2011,7 +2014,7 @@ public class LuceneTest extends TestCase
     
     public void testReadAgainstDelta() throws Exception
     {
-        UserTransaction tx = serviceRegistry.getUserTransaction();
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
@@ -2020,7 +2023,7 @@ public class LuceneTest extends TestCase
         
         // Delete
         
-        tx = serviceRegistry.getUserTransaction();
+        tx = transactionService.getUserTransaction();
         tx.begin();
         
         runBaseTests();
@@ -2057,7 +2060,7 @@ public class LuceneTest extends TestCase
         
         // Create
         
-        tx = serviceRegistry.getUserTransaction();
+        tx = transactionService.getUserTransaction();
         tx.begin();
         
         runBaseTests();
@@ -2087,7 +2090,7 @@ public class LuceneTest extends TestCase
         
         // update property
         
-        tx = serviceRegistry.getUserTransaction();
+        tx = transactionService.getUserTransaction();
         tx.begin();
         
         runBaseTests();
@@ -2129,7 +2132,7 @@ public class LuceneTest extends TestCase
         // Add and delete
         
 
-        tx = serviceRegistry.getUserTransaction();
+        tx = transactionService.getUserTransaction();
         tx.begin();
         
         runBaseTests();

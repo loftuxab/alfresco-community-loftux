@@ -25,12 +25,12 @@ import java.util.Properties;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,23 +50,58 @@ public class ImporterBootstrap
     private static final Log logger = LogFactory.getLog(ImporterBootstrap.class);
 
     // Dependencies
-    private ServiceRegistry serviceRegistry;
+    private TransactionService transactionService;
+    private NamespaceService namespaceService;
+    private NodeService nodeService;
+    private ImporterService importerService;
     private List<Properties> bootstrapViews;
     private StoreRef storeRef;
     private Properties configuration;
     
+
     /**
-     * Sets the service providing repository access
+     * Sets the Transaction Service
      * 
-     * @param serviceRegistry
+     * @param userTransaction the transaction service
      */
-    public void setServiceRegistry(ServiceRegistry serviceRegistry)
+    public void setTransactionService(TransactionService transactionService)
     {
-        this.serviceRegistry = serviceRegistry;
+        this.transactionService = transactionService;
+    }
+    
+    /**
+     * Sets the namespace service
+     * 
+     * @param namespaceService the namespace service
+     */
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
     }
 
     /**
+     * Sets the node service
+     * 
+     * @param nodeService the node service
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    /**
+     * Sets the importer service
+     * 
+     * @param importerService the importer service
+     */
+    public void setImporterService(ImporterService importerService)
+    {
+        this.importerService = importerService;
+    }
+        
+    /**
      * Sets the bootstrap views
+     * 
      * @param bootstrapViews
      */
     public void setBootstrapViews(List<Properties> bootstrapViews)
@@ -100,10 +135,10 @@ public class ImporterBootstrap
      */
     public void bootstrap()
     {
-        NamespaceService namespaceService = serviceRegistry.getNamespaceService();
-        NodeService nodeService = serviceRegistry.getNodeService();
-        ImporterService importerService = serviceRegistry.getImporterService();
-        
+        if (transactionService == null)
+        {
+            throw new ImporterException("Transaction Service must be provided");
+        }
         if (namespaceService == null)
         {
             throw new ImporterException("Namespace Service must be provided");
@@ -121,68 +156,69 @@ public class ImporterBootstrap
             throw new ImporterException("Store URL must be provided");
         }
         
-        UserTransaction txn = null;
+        UserTransaction userTransaction = transactionService.getUserTransaction();
+
         try
         {
-           txn = serviceRegistry.getUserTransaction();
-           txn.begin();
-           
+            userTransaction.begin();
+        
             // check the repository exists, create if it doesn't
-            if (!nodeService.exists(storeRef))
+            if (nodeService.exists(storeRef))
             {
-               storeRef = nodeService.createStore(storeRef.getProtocol(), storeRef.getIdentifier());
-               
-               if (logger.isDebugEnabled())
-                  logger.debug("Created store: " + storeRef);
+                if (logger.isDebugEnabled())
+                    logger.debug("Store exists - bootstrap ignored: " + storeRef);
+                
+                userTransaction.rollback();
             }
             else
             {
-                // the store exists and we therefore
+                // create the store           
+                storeRef = nodeService.createStore(storeRef.getProtocol(), storeRef.getIdentifier());
+       
                 if (logger.isDebugEnabled())
-                    logger.debug("Store exists - bootstrap ignored: " + storeRef);
-                txn.rollback();
-                return;
-            }
-            
-            for (Properties bootstrapView : bootstrapViews)
-            {
-                // Create input stream onto view file
-                String view = bootstrapView.getProperty(VIEW_LOCATION_VIEW);
-                if (view == null || view.length() == 0)
+                    logger.debug("Created store: " + storeRef);
+    
+                // bootstrap the store contents
+                for (Properties bootstrapView : bootstrapViews)
                 {
-                    throw new ImporterException("View file location must be provided");
-                }
-                InputStream viewStream = getClass().getClassLoader().getResourceAsStream(view);
-                if (viewStream == null)
-                {
-                    throw new ImporterException("Could not find view file " + view);
+                    // Create input stream onto view file
+                    String view = bootstrapView.getProperty(VIEW_LOCATION_VIEW);
+                    if (view == null || view.length() == 0)
+                    {
+                        throw new ImporterException("View file location must be provided");
+                    }
+                    InputStream viewStream = getClass().getClassLoader().getResourceAsStream(view);
+                    if (viewStream == null)
+                    {
+                        throw new ImporterException("Could not find view file " + view);
+                    }
+                    
+                    // Create import location
+                    Location importLocation = new Location(storeRef);
+                    String path = bootstrapView.getProperty(VIEW_PATH_PROPERTY);
+                    if (path != null && path.length() > 0)
+                    {
+                        importLocation.setPath(path);
+                    }
+                    String childAssocType = bootstrapView.getProperty(VIEW_CHILDASSOCTYPE_PROPERTY);
+                    if (childAssocType != null && childAssocType.length() > 0)
+                    {
+                        importLocation.setChildAssocType(QName.createQName(childAssocType, namespaceService));
+                    }
+        
+                    // Now import...
+                    importerService.importNodes(viewStream, importLocation, configuration, new BootstrapProgress());
                 }
                 
-                // Create import location
-                Location importLocation = new Location(storeRef);
-                String path = bootstrapView.getProperty(VIEW_PATH_PROPERTY);
-                if (path != null && path.length() > 0)
-                {
-                    importLocation.setPath(path);
-                }
-                String childAssocType = bootstrapView.getProperty(VIEW_CHILDASSOCTYPE_PROPERTY);
-                if (childAssocType != null && childAssocType.length() > 0)
-                {
-                    importLocation.setChildAssocType(QName.createQName(childAssocType, namespaceService));
-                }
-    
-                // Now import...
-                importerService.importNodes(viewStream, importLocation, configuration, new BootstrapProgress());
+                userTransaction.commit();
             }
-            // commit txn
-            txn.commit();
         }
-        catch (Throwable e)
+        catch(Throwable e)
         {
-           // rollback the transaction
-           try { if (txn != null) {txn.rollback();} } catch (Exception ex) {}
-           throw new AlfrescoRuntimeException("Bootstrap failed", e);
-        }
+            // rollback the transaction
+            try { if (userTransaction != null) {userTransaction.rollback();} } catch (Exception ex) {}
+            throw new AlfrescoRuntimeException("Bootstrap failed", e);
+        }            
     }
     
     
@@ -228,5 +264,6 @@ public class ImporterBootstrap
         }
 
     }
+
     
 }

@@ -93,7 +93,7 @@ public class FTPServer
             {
                 // Create the FTP server
                 
-                ftpServer = new FTPNetworkServer(filesysConfig.getServiceRegistry(), filesysConfig);
+                ftpServer = new FTPNetworkServer(filesysConfig);
                 filesysConfig.addServer(ftpServer);
             }
 

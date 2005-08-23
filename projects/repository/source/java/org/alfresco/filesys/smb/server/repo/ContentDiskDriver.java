@@ -40,7 +40,6 @@ import org.alfresco.filesys.server.filesys.SearchContext;
 import org.alfresco.filesys.server.filesys.SrvDiskInfo;
 import org.alfresco.filesys.server.filesys.TreeConnection;
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -51,6 +50,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,7 +67,7 @@ public class ContentDiskDriver implements ContentDiskInterface
     private static final Log logger = LogFactory.getLog(ContentDiskDriver.class);
     
     private CifsHelper cifsHelper;
-    private ServiceRegistry serviceRegistry;
+    private TransactionService transactionService;
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
@@ -77,14 +77,69 @@ public class ContentDiskDriver implements ContentDiskInterface
 
     private String shareName;
     private NodeRef rootNodeRef;
-    
+
     /**
      * @param serviceRegistry to connect to the repository services
      */
-    public ContentDiskDriver(ServiceRegistry serviceRegistry, CifsHelper cifsHelper)
+    public ContentDiskDriver(CifsHelper cifsHelper)
     {
-        this.serviceRegistry = serviceRegistry;
         this.cifsHelper = cifsHelper;
+    }
+
+    /**
+     * @param contentService the content service
+     */
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+
+    /**
+     * @param dictionaryService the dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+
+    /**
+     * @param mimetypeService the mimetype service
+     */
+    public void setMimetypeService(MimetypeService mimetypeService)
+    {
+        this.mimetypeService = mimetypeService;
+    }
+
+    /**
+     * @param namespaceService the namespace service
+     */
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
+    }
+
+    /**
+     * @param nodeService the node service
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    /**
+     * @param searchService the search service
+     */
+    public void setSearchService(SearchService searchService)
+    {
+        this.searchService = searchService;
+    }
+
+    /**
+     * @param transactionService the transaction service
+     */
+    public void setTransactionService(TransactionService transactionService)
+    {
+        this.transactionService = transactionService;
     }
     
     /**
@@ -92,14 +147,6 @@ public class ContentDiskDriver implements ContentDiskInterface
      */
     public DeviceContext createContext(ConfigElement cfg) throws DeviceContextException
     {
-        // connect to the repository
-        namespaceService = serviceRegistry.getNamespaceService();
-        dictionaryService = serviceRegistry.getDictionaryService();
-        nodeService = serviceRegistry.getNodeService();
-        searchService = serviceRegistry.getSearchService();
-        contentService = serviceRegistry.getContentService();
-        mimetypeService = serviceRegistry.getMimetypeService();
-        
         // get the name of the share
         shareName = cfg.getAttribute("name");
         
@@ -199,7 +246,7 @@ public class ContentDiskDriver implements ContentDiskInterface
     /**
      * Device method
      * 
-     * @see ContentDiskDriver#getFileInformation(ServiceRegistry, NodeRef, boolean)
+     * @see ContentDiskDriver#getFileInformation(NodeRef, boolean)
      */
     public FileInfo getFileInformation(SrvSession session, TreeConnection tree, String path) throws IOException
     {
@@ -243,7 +290,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         // get the device root
         NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
         
-        SearchContext ctx = ContentSearchContext.search(serviceRegistry, cifsHelper, deviceRootNodeRef, searchPath, attributes);
+        SearchContext ctx = ContentSearchContext.search(transactionService, cifsHelper, deviceRootNodeRef, searchPath, attributes);
         // done
         if (logger.isDebugEnabled())
         {
@@ -307,7 +354,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         // get the file info
         NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, path);
         
-        NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, cifsHelper, nodeRef, params);
+        NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
         // done
         if (logger.isDebugEnabled())
         {
@@ -335,7 +382,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
         
         // create the network file
-        NetworkFile netFile = ContentNetworkFile.createFile(serviceRegistry, cifsHelper, nodeRef, params);
+        NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
         // done
         if (logger.isDebugEnabled())
         {
@@ -598,4 +645,5 @@ public class ContentDiskDriver implements ContentDiskInterface
     public void treeOpened(SrvSession sess, TreeConnection tree)
     {
     }
+
 }

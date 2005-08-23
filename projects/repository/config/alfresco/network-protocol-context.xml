@@ -9,9 +9,6 @@
          destroy-method="closeConfiguration"
          depends-on="importerBootstrap">
       <constructor-arg>
-         <ref bean="ServiceRegistry" />
-      </constructor-arg>
-      <constructor-arg>
          <ref bean="authenticationManager"/>
       </constructor-arg>
       <constructor-arg>
@@ -45,11 +42,15 @@
       <property name="target">
          <bean class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
             <constructor-arg>
-               <ref bean="ServiceRegistry" />
-            </constructor-arg>
-            <constructor-arg>
                <ref bean="cifsHelper" />
             </constructor-arg>
+            <property name="transactionService"><ref bean="transactionComponent" /></property>
+            <property name="nodeService"><ref bean="nodeService" /></property>
+            <property name="searchService"><ref bean="searchService" /></property>
+            <property name="dictionaryService"><ref bean="dictionaryService" /></property>
+            <property name="namespaceService"><ref bean="namespaceService" /></property>
+            <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
+            <property name="contentService"><ref bean="contentService" /></property>
          </bean>
       </property>
       <property name="transactionAttributes">
@@ -73,11 +74,14 @@
 
    <bean id="contentDiskDriverNoTransactions" class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
          <constructor-arg>
-            <ref bean="ServiceRegistry" />
-         </constructor-arg>
-         <constructor-arg>
             <ref bean="cifsHelper" />
          </constructor-arg>
+         <property name="nodeService"><ref bean="nodeService" /></property>
+         <property name="searchService"><ref bean="searchService" /></property>
+         <property name="dictionaryService"><ref bean="dictionaryService" /></property>
+         <property name="namespaceService"><ref bean="namespaceService" /></property>
+         <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
+         <property name="contentService"><ref bean="contentService" /></property>
    </bean>
    
    <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">

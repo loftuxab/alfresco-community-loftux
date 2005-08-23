@@ -5,34 +5,16 @@
 	
    <!-- Rules Service -->
    
-   <bean id="ruleService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-      	 <list>
-         	<value>org.alfresco.service.cmr.rule.RuleService</value>
-         	<value>org.alfresco.repo.rule.RuntimeRuleService</value>
-         </list>
-      </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager"/>
-      </property>
-      <property name="target">
-           <bean class="org.alfresco.repo.rule.RuleServiceImpl">
-				<property name="nodeService">
-					<ref bean="nodeService"/>
-				</property>		
-			    <property name="actionService">
-				    <ref bean="actionService"/>
-			    </property>	
-			    <property name="searchService">
-				    <ref bean="searchService"/>
-			    </property>	
-		   </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
-         </props>
-      </property>
+   <bean id="ruleService" class="org.alfresco.repo.rule.RuleServiceImpl">
+		<property name="nodeService">
+			<ref bean="nodeService"/>
+		</property>		
+	    <property name="actionService">
+		    <ref bean="actionService"/>
+	    </property>	
+	    <property name="searchService">
+		    <ref bean="searchService"/>
+	    </property>
    </bean>
          
    <!-- Rule types -->

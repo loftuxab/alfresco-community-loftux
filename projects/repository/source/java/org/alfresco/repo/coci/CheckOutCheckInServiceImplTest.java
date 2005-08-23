@@ -171,7 +171,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		assertEquals(this.userNodeRef, this.nodeService.getProperty(workingCopy, ContentModel.PROP_WORKING_COPY_OWNER));
 		
 		// Check that the working copy name has been set correctly
-		String workingCopyLabel = ((CheckOutCheckInServiceImpl)this.applicationContext.getBean("checkOutCheckInServiceImpl")).getWorkingCopyLabel();
+		String workingCopyLabel = ((CheckOutCheckInServiceImpl)this.cociService).getWorkingCopyLabel();
 		String workingCopyName = (String)this.nodeService.getProperty(workingCopy, PROP_NAME_QNAME);
 		if (workingCopyLabel == null || workingCopyLabel.length() == 0)
 		{

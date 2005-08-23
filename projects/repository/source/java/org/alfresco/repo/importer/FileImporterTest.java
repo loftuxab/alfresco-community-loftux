@@ -45,6 +45,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
@@ -188,7 +189,8 @@ public class FileImporterTest extends TestCase
             FileImporterTest test = new FileImporterTest();
             test.setUp();
 
-            UserTransaction tx = test.serviceRegistry.getUserTransaction();
+            TransactionService transactionService = test.serviceRegistry.getTransactionService();
+            UserTransaction tx = transactionService.getUserTransaction(); 
             tx.begin();
 
             try
