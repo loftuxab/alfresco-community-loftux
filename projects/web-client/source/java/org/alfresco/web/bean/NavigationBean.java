@@ -254,10 +254,8 @@ public class NavigationBean
          // early init properties for this node (by getProperties() call)
          // resolve icon in-case one has not been set
          Map<String, Object> props = node.getProperties();
-         if (props.get("icon") == null)
-         {
-            props.put("icon", NewSpaceWizard.SPACE_ICON_DEFAULT);
-         }
+         String icon = (String)props.get("app:icon");
+         props.put("icon", icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
          Path path = this.nodeService.getPath(nodeRef);
 
          // resolve CIFS network folder location for this node

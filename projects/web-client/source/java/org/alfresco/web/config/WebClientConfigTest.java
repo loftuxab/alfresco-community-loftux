@@ -98,7 +98,7 @@ public class WebClientConfigTest extends BaseTest
       assertEquals("display label for createddate should be null", null, createdDataProp.getDisplayLabel());
       assertTrue("read only for createddate should be 'true'", createdDataProp.isReadOnly());
 
-      PropertyConfig iconProp = props.get("icon");
+      PropertyConfig iconProp = props.get("app:icon");
       assertNotNull("icon property config should not be null", iconProp);
       assertEquals("display label for icon should be null", null, iconProp.getDisplayLabel());
       assertFalse("read only for icon should be 'false'", iconProp.isReadOnly());

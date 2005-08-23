@@ -409,7 +409,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       
       this.name = (String)props.get("name");
       this.description = (String)props.get("description");
-      this.icon = (String)props.get("icon");
+      this.icon = (String)props.get("app:icon");
    }
 
    /**

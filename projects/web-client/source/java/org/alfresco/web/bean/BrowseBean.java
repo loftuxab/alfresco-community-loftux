@@ -624,7 +624,7 @@ public class BrowseBean implements IContextListener
    private NodePropertyResolver resolverSpaceIcon = new NodePropertyResolver() {
       public Object get(Node node) {
          QNameMap props = (QNameMap)node.getProperties();
-         String icon = (String)props.getRaw("icon");
+         String icon = (String)props.getRaw("app:icon");
          return (icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
       }
    };
