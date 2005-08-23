@@ -467,8 +467,6 @@ public class BrowseBean implements IContextListener
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
-         if (logger.isDebugEnabled())
-            logger.debug("Searching using query: " + query);
          results = this.searchService.query(
                Repository.getStoreRef(), 
                "lucene", query, null, null);
