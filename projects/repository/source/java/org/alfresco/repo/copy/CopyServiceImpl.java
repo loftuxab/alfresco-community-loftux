@@ -35,7 +35,7 @@ import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -249,9 +249,9 @@ public class CopyServiceImpl implements CopyService
             Map<QName,PropertyDefinition> propertyDefinitions = classDefinition.getProperties();
             for (Map.Entry<QName,PropertyDefinition> entry : propertyDefinitions.entrySet()) 
             {
-            	QName propertyTypeDefinition = entry.getValue().getPropertyType().getName();
-            	if (PropertyTypeDefinition.NODE_REF.equals(propertyTypeDefinition) == true ||
-            		PropertyTypeDefinition.ANY.equals(propertyTypeDefinition) == true)
+            	QName propertyTypeDefinition = entry.getValue().getDataType().getName();
+            	if (DataTypeDefinition.NODE_REF.equals(propertyTypeDefinition) == true ||
+            		DataTypeDefinition.ANY.equals(propertyTypeDefinition) == true)
             	{
             		// Re-set the node ref so that it is still relative (if appropriate)
             		Serializable value = this.nodeService.getProperty(destinationNodeRef, entry.getKey());

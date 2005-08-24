@@ -19,10 +19,9 @@ package org.alfresco.service;
 
 import java.util.Collection;
 
-import org.alfresco.repo.importer.ImporterService;
+import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
-import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -33,6 +32,7 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -67,7 +67,6 @@ public interface ServiceRegistry
     static final QName RULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "RuleService");
     static final QName IMPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ImporterService");
     static final QName ACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ActionService");
-    static final QName CONFIGURABLE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ConfigurableService");
     
     /**
      * Get the list of services provided by the Repository
@@ -174,10 +173,5 @@ public interface ServiceRegistry
      * @return the action service (or null if one is not provided)
      */
     ActionService getActionService();
-
-    /**
-     * @return the action service (or null if one is not provided)
-     */
-    ConfigurableService getConfigurableService();
 
 }

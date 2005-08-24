@@ -42,7 +42,7 @@ import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -1390,7 +1390,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 LinkedList<Pair<Path, QName>> aspectPaths = new LinkedList<Pair<Path, QName>>();
                 for (PropertyDefinition propDef : aspDef.getProperties().values())
                 {
-                    if (propDef.getPropertyType().getName().equals(PropertyTypeDefinition.CATEGORY))
+                    if (propDef.getDataType().getName().equals(DataTypeDefinition.CATEGORY))
                     {
                         for (NodeRef catRef : ValueConverter.getCollection(NodeRef.class, properties.get(propDef.getName())))
                         {

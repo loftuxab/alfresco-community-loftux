@@ -20,7 +20,7 @@ package org.alfresco.repo.dictionary;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
@@ -36,7 +36,7 @@ import org.alfresco.service.namespace.QName;
     private M2Property property;
     private QName name;
     private QName propertyTypeName;
-    private PropertyTypeDefinition propertyType;
+    private DataTypeDefinition dataType;
     
     
     /*package*/ M2PropertyDefinition(ClassDefinition classDef, M2Property m2Property, NamespacePrefixResolver resolver)
@@ -55,8 +55,8 @@ import org.alfresco.service.namespace.QName;
         this.classDef = classDef;
         this.property = createOverriddenProperty(propertyDef, override);
         this.name = propertyDef.getName();
-        this.propertyType = propertyDef.getPropertyType();
-        this.propertyTypeName = this.propertyType.getName();
+        this.dataType = propertyDef.getDataType();
+        this.propertyTypeName = this.dataType.getName();
     }
     
     
@@ -66,8 +66,8 @@ import org.alfresco.service.namespace.QName;
         {
             throw new DictionaryException("Property type of property " + name.toPrefixString() + " must be specified");
         }
-        propertyType = query.getPropertyType(propertyTypeName);
-        if (propertyType == null)
+        dataType = query.getDataType(propertyTypeName);
+        if (dataType == null)
         {
             throw new DictionaryException("Property type " + propertyTypeName.toPrefixString() + " of property " + name.toPrefixString() + " is not found");
         }
@@ -153,9 +153,9 @@ import org.alfresco.service.namespace.QName;
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#getPropertyType()
      */
-    public PropertyTypeDefinition getPropertyType()
+    public DataTypeDefinition getDataType()
     {
-        return propertyType;
+        return dataType;
     }
     
 

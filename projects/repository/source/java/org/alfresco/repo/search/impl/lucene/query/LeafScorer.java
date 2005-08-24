@@ -28,7 +28,7 @@ import org.alfresco.repo.search.SearcherException;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 import org.apache.lucene.document.Document;
@@ -566,7 +566,7 @@ public class LeafScorer extends Scorer
                             {
                                 for (PropertyDefinition propDef : aspDef.getProperties().values())
                                 {
-                                    if (propDef.getPropertyType().getName().equals(PropertyTypeDefinition.CATEGORY))
+                                    if (propDef.getDataType().getName().equals(DataTypeDefinition.CATEGORY))
                                     {
                                         // get field and compare to ID
                                         // Check in path as QName

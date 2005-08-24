@@ -39,6 +39,10 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.view.ImporterException;
+import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
@@ -119,9 +123,9 @@ public class ImporterComponent
 
     
     /* (non-Javadoc)
-     * @see org.alfresco.repo.importer.ImporterService#importNodes(java.io.InputStream, org.alfresco.repo.importer.Location, java.util.Properties, org.alfresco.repo.importer.Progress)
+     * @see org.alfresco.repo.importer.ImporterService#importView(java.io.InputStream, org.alfresco.repo.importer.Location, java.util.Properties, org.alfresco.repo.importer.Progress)
      */
-    public void importNodes(InputStream inputStream, Location location, Properties configuration, Progress progress)
+    public void importView(InputStream inputStream, Location location, Properties configuration, ImporterProgress progress)
     {
         ParameterCheck.mandatory("Input stream", inputStream);
         ParameterCheck.mandatory("Location", location);
@@ -233,7 +237,7 @@ public class ImporterComponent
         private NodeRef rootRef;
         private QName rootAssocType;
         private Properties configuration;
-        private Progress progress;
+        private ImporterProgress progress;
 
         
         /**
@@ -244,7 +248,7 @@ public class ImporterComponent
          * @param configuration
          * @param progress
          */
-        private DefaultImporter(NodeRef rootRef, QName rootAssocType, Properties configuration, Progress progress)
+        private DefaultImporter(NodeRef rootRef, QName rootAssocType, Properties configuration, ImporterProgress progress)
         {
             this.rootRef = rootRef;
             this.rootAssocType = rootAssocType;
@@ -395,7 +399,7 @@ public class ImporterComponent
                     throw new ImporterException("Property " + property + " does not exist in the repository dictionary");
                 }
                 String value = bindPlaceHolder(properties.get(property), configuration);
-                Serializable object = (Serializable)ValueConverter.convert(propDef.getPropertyType(), value);
+                Serializable object = (Serializable)ValueConverter.convert(propDef.getDataType(), value);
                 boundProperties.put(property, object);
             }
             return boundProperties;

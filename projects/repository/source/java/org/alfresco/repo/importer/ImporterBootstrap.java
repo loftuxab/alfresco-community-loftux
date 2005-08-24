@@ -28,6 +28,10 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.view.ImporterException;
+import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -207,7 +211,7 @@ public class ImporterBootstrap
                     }
         
                     // Now import...
-                    importerService.importNodes(viewStream, importLocation, configuration, new BootstrapProgress());
+                    importerService.importView(viewStream, importLocation, configuration, new BootstrapProgress());
                 }
                 
                 userTransaction.commit();
@@ -225,7 +229,7 @@ public class ImporterBootstrap
     /**
      * Bootstrap Progress (debug logging)
      */
-    private class BootstrapProgress implements Progress
+    private class BootstrapProgress implements ImporterProgress
     {
         /* (non-Javadoc)
          * @see org.alfresco.repo.importer.Progress#nodeCreated(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, org.alfresco.service.namespace.QName)

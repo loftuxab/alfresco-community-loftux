@@ -52,19 +52,19 @@ public interface DictionaryService
     /**
      * @return the names of all property types that have been registered with the Repository
      */
-    Collection<QName> getAllPropertyTypes();
+    Collection<QName> getAllDataTypes();
 
     /**
      * @param model the model to retrieve property types for
      * @return the names of all property types defined within the specified model
      */
-    Collection<QName> getPropertyTypes(QName model);
+    Collection<QName> getDataTypes(QName model);
     
     /**
      * @param name the name of the property type to retrieve
      * @return the property type definition (or null, if it doesn't exist)
      */
-    PropertyTypeDefinition getPropertyType(QName name);
+    DataTypeDefinition getDataType(QName name);
 
     /**
      * @return the names of all types that have been registered with the Repository

@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.importer;
+package org.alfresco.service.cmr.view;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;

@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.importer;
+package org.alfresco.service.cmr.view;
 
 import java.io.Serializable;
 
@@ -29,7 +29,7 @@ import org.alfresco.service.namespace.QName;
  * @author David Caruana
  *
  */
-public interface Progress
+public interface ImporterProgress
 {
     /**
      * Report creation of a node.

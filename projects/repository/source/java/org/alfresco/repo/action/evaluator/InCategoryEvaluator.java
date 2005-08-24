@@ -28,7 +28,7 @@ import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
@@ -84,8 +84,8 @@ public class InCategoryEvaluator extends ActionConditionEvaluatorAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_ASPECT, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_CATEGORY_ASPECT)));
-        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_VALUE, PropertyTypeDefinition.NODE_REF, true, getParamDisplayLabel(PARAM_CATEGORY_VALUE)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_ASPECT, DataTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_CATEGORY_ASPECT)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_CATEGORY_VALUE, DataTypeDefinition.NODE_REF, true, getParamDisplayLabel(PARAM_CATEGORY_VALUE)));
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class InCategoryEvaluator extends ActionConditionEvaluatorAbstractBase
 				Map<QName, PropertyDefinition> propertyDefs = this.dictionaryService.getAspect(categoryAspect).getProperties();
 				for (Map.Entry<QName, PropertyDefinition> entry : propertyDefs.entrySet()) 
 				{
-					if (PropertyTypeDefinition.CATEGORY.equals(entry.getValue().getPropertyType().getName()) == true)
+					if (DataTypeDefinition.CATEGORY.equals(entry.getValue().getDataType().getName()) == true)
 					{
 						// Found the category property
 						categoryProperty = entry.getKey();

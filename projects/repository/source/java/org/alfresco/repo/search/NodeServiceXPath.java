@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
@@ -73,23 +73,23 @@ public class NodeServiceXPath extends BaseXPath
                     throw new AlfrescoRuntimeException("Parameter must have default value");
                 }
                 Object value = null;
-                if (paramDefs[i].getPropertyTypeDefinition().getName().equals(PropertyTypeDefinition.BOOLEAN))
+                if (paramDefs[i].getDataTypeDefinition().getName().equals(DataTypeDefinition.BOOLEAN))
                 {
                     value = Boolean.valueOf(paramDefs[i].getDefault());
                 }
-                else if (paramDefs[i].getPropertyTypeDefinition().getName().equals(PropertyTypeDefinition.DOUBLE))
+                else if (paramDefs[i].getDataTypeDefinition().getName().equals(DataTypeDefinition.DOUBLE))
                 {
                     value = Double.valueOf(paramDefs[i].getDefault());
                 }
-                else if (paramDefs[i].getPropertyTypeDefinition().getName().equals(PropertyTypeDefinition.FLOAT))
+                else if (paramDefs[i].getDataTypeDefinition().getName().equals(DataTypeDefinition.FLOAT))
                 {
                     value = Float.valueOf(paramDefs[i].getDefault());
                 }
-                else if (paramDefs[i].getPropertyTypeDefinition().getName().equals(PropertyTypeDefinition.INT))
+                else if (paramDefs[i].getDataTypeDefinition().getName().equals(DataTypeDefinition.INT))
                 {
                     value = Integer.valueOf(paramDefs[i].getDefault());
                 }
-                else if (paramDefs[i].getPropertyTypeDefinition().getName().equals(PropertyTypeDefinition.LONG))
+                else if (paramDefs[i].getDataTypeDefinition().getName().equals(DataTypeDefinition.LONG))
                 {
                     value = Long.valueOf(paramDefs[i].getDefault());
                 }

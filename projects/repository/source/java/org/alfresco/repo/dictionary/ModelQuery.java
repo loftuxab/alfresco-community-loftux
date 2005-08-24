@@ -21,7 +21,7 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 
@@ -41,7 +41,7 @@ import org.alfresco.service.namespace.QName;
      * @param name  name of the property type
      * @return  property type definition
      */
-    public PropertyTypeDefinition getPropertyType(QName name);
+    public DataTypeDefinition getDataType(QName name);
 
     /**
      * Gets the specified type

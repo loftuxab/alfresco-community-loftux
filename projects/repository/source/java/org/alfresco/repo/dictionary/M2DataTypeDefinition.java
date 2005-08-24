@@ -18,7 +18,7 @@
 package org.alfresco.repo.dictionary;
 
 import org.alfresco.service.cmr.dictionary.DictionaryException;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
@@ -29,26 +29,26 @@ import org.alfresco.service.namespace.QName;
  * @author David Caruana
  *
  */
-/*package*/ class M2PropertyTypeDefinition implements PropertyTypeDefinition
+/*package*/ class M2DataTypeDefinition implements DataTypeDefinition
 {
     private QName name;
-    private M2PropertyType propertyType;
+    private M2DataType dataType;
     
     
-    /*package*/ M2PropertyTypeDefinition(M2PropertyType propertyType, NamespacePrefixResolver resolver)
+    /*package*/ M2DataTypeDefinition(M2DataType propertyType, NamespacePrefixResolver resolver)
     {
         this.name = QName.createQName(propertyType.getName(), resolver);
-        this.propertyType = propertyType;
+        this.dataType = propertyType;
     }
 
 
     /*package*/ void resolveDependencies(ModelQuery query)
     {
         // Ensure java class has been specified
-        String javaClass = propertyType.getJavaClassName();
+        String javaClass = dataType.getJavaClassName();
         if (javaClass == null)
         {
-            throw new DictionaryException("Java class of property type " + name.toPrefixString() + " must be specified");
+            throw new DictionaryException("Java class of data type " + name.toPrefixString() + " must be specified");
         }
         
         // Ensure java class is valid and referencable
@@ -58,7 +58,7 @@ import org.alfresco.service.namespace.QName;
         }
         catch (ClassNotFoundException e)
         {
-            throw new DictionaryException("Java class " + javaClass + " of property type " + name.toPrefixString() + " is invalid", e);
+            throw new DictionaryException("Java class " + javaClass + " of data type " + name.toPrefixString() + " is invalid", e);
         }
     }
     
@@ -77,7 +77,7 @@ import org.alfresco.service.namespace.QName;
      */
     public String getTitle()
     {
-        return propertyType.getTitle();
+        return dataType.getTitle();
     }
     
 
@@ -86,7 +86,7 @@ import org.alfresco.service.namespace.QName;
      */
     public String getDescription()
     {
-        return propertyType.getDescription();
+        return dataType.getDescription();
     }
     
 
@@ -95,7 +95,7 @@ import org.alfresco.service.namespace.QName;
      */
     public String getAnalyserClassName()
     {
-       return propertyType.getAnalyserClassName();
+       return dataType.getAnalyserClassName();
     }
 
 
@@ -104,7 +104,7 @@ import org.alfresco.service.namespace.QName;
      */
     public String getJavaClassName()
     {
-        return propertyType.getJavaClassName();
+        return dataType.getJavaClassName();
     }
     
 }

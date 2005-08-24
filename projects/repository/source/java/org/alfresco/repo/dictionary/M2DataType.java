@@ -24,7 +24,7 @@ package org.alfresco.repo.dictionary;
  * @author David Caruana
  *
  */
-public class M2PropertyType
+public class M2DataType
 {
     private String name = null;
     private String title = null;
@@ -33,7 +33,7 @@ public class M2PropertyType
     private String javaClassName = null;
     
     
-    /*package*/ M2PropertyType()
+    /*package*/ M2DataType()
     {
         super();
     }

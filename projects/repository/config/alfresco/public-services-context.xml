@@ -454,7 +454,7 @@
 
     <bean id="ImporterService" class="org.springframework.aop.framework.ProxyFactoryBean">
     	<property name="proxyInterfaces">
-    		<value>org.alfresco.repo.importer.ImporterService</value>
+    		<value>org.alfresco.service.cmr.view.ImporterService</value>
     	</property>
     	<property name="target"><ref bean="importerComponent"/></property>
     	<property name="interceptorNames">
@@ -470,13 +470,13 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="transactionAttributeSource">
-            <value>org.alfresco.repo.importer.ImporterService.*=PROPAGATION_REQUIRED</value> 
+            <value>org.alfresco.service.cmr.view.ImporterService.*=PROPAGATION_REQUIRED</value> 
         </property>
     </bean>
 
     <bean id="ImporterService_descriptor" parent="AlfrescoServiceDescriptor">
     	<property name="interface">
-    		<value>org.alfresco.repo.importer.ImporterService</value>
+    		<value>org.alfresco.service.cmr.view.ImporterService</value>
     	</property>
     	<property name="description">
     		<value>Importer Service</value>
@@ -518,11 +518,6 @@
     </bean>
 
 
-    <!-- Configrable Service -->
-    
-    <alias alias="ConfigurableService" name="configurableService"/>  
-    
-    
     <!-- Permission Service -->
     
     <bean id="PermissionService" class="org.springframework.aop.framework.ProxyFactoryBean">

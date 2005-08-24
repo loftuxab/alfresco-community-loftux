@@ -38,7 +38,7 @@ import org.alfresco.filesys.util.WildCard;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -426,17 +426,17 @@ public class CifsHelper
         QueryParameterDefinition[] params = new QueryParameterDefinition[3];
         params[0] = new QueryParameterDefImpl(
                 QName.createQName(nameParam, namespaceService),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
+                dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 pathElement);
         params[1] = new QueryParameterDefImpl(
                 QName.createQName(folderTypeParam, namespaceService),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
+                dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 ContentModel.TYPE_FOLDER.toString());
         params[2] = new QueryParameterDefImpl(
                 QName.createQName(fileTypeParam, namespaceService),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
+                dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 ContentModel.TYPE_CONTENT.toString());
     

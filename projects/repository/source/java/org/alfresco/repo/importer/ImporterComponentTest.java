@@ -25,6 +25,9 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
@@ -58,7 +61,7 @@ public class ImporterComponentTest extends BaseSpringTest
         Properties configuration = new Properties();
         configuration.put("username", "fredb");
         
-        importerService.importNodes(test, location, configuration, testProgress);
+        importerService.importView(test, location, configuration, testProgress);
         //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
     
@@ -80,7 +83,7 @@ public class ImporterComponentTest extends BaseSpringTest
     
     
     
-    private static class TestProgress implements Progress
+    private static class TestProgress implements ImporterProgress
     {
         public void nodeCreated(NodeRef nodeRef, NodeRef parentRef, QName assocName, QName childName)
         {

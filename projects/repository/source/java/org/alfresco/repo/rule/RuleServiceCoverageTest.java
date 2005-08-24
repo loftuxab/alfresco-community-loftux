@@ -53,7 +53,7 @@ import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -195,7 +195,7 @@ public class RuleServiceCoverageTest extends TestCase
         genCatProp.setMultiValued(true);
         genCatProp.setStoredInIndex(true);
         genCatProp.setTokenisedInIndex(true);
-        genCatProp.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());        
+        genCatProp.setType("d:" + DataTypeDefinition.CATEGORY.getLocalName());        
 
         // Save the mode
         dictionaryDAO.putModel(model);

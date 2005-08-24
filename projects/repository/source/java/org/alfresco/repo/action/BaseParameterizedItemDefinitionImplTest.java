@@ -23,7 +23,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -39,8 +39,8 @@ public abstract class BaseParameterizedItemDefinitionImplTest extends TestCase
     
     private static final String PARAM1_DISPLAYNAME = "param1-displayname";
     private static final String PARAM1_NAME = "param1-name";
-    private static final QName PARAM1_TYPE = PropertyTypeDefinition.TEXT;
-    private static final QName PARAM2_TYPE = PropertyTypeDefinition.TEXT;
+    private static final QName PARAM1_TYPE = DataTypeDefinition.TEXT;
+    private static final QName PARAM2_TYPE = DataTypeDefinition.TEXT;
     private static final String PARAM2_DISPLAYNAME = "param2-displaname";
     private static final String PARAM2_NAME = "param2-name";
     

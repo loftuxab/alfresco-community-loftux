@@ -21,7 +21,7 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 
@@ -55,12 +55,12 @@ import org.alfresco.service.namespace.QName;
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.ModelQuery#getPropertyType(org.alfresco.repo.ref.QName)
      */
-    public PropertyTypeDefinition getPropertyType(QName name)
+    public DataTypeDefinition getDataType(QName name)
     {
-        PropertyTypeDefinition def = query.getPropertyType(name);
+        DataTypeDefinition def = query.getDataType(name);
         if (def == null)
         {
-            def = delegate.getPropertyType(name);
+            def = delegate.getDataType(name);
         }
         return def;
     }

@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.service.cmr.configuration;
+package org.alfresco.repo.configuration;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
@@ -26,6 +26,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface ConfigurableService 
 {
+    
+    
 	/**
 	 * Indicates whether a node is configurable or not
 	 * 

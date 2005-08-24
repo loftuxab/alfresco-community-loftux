@@ -26,7 +26,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -56,12 +56,12 @@ public class SimpleWorkflowActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_STEP, PropertyTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_APPROVE_STEP)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_FOLDER, PropertyTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_APPROVE_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_MOVE, PropertyTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_APPROVE_MOVE)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_STEP, PropertyTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_REJECT_STEP)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_FOLDER, PropertyTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_REJECT_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_MOVE, PropertyTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_REJECT_MOVE)));		
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_STEP, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_APPROVE_STEP)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_FOLDER, DataTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_APPROVE_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_APPROVE_MOVE, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_APPROVE_MOVE)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_STEP, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_REJECT_STEP)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_FOLDER, DataTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_REJECT_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_REJECT_MOVE, DataTypeDefinition.BOOLEAN, false, getParamDisplayLabel(PARAM_REJECT_MOVE)));		
 	}
 
 	/**

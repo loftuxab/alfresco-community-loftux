@@ -30,6 +30,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
@@ -451,6 +452,16 @@ public final class Repository
    {
        return (ServiceRegistry)FacesContextUtils.getRequiredWebApplicationContext(
                context).getBean(ServiceRegistry.SERVICE_REGISTRY);
+   }
+
+   /**
+    * Return the Configurable Service
+    * 
+    * @return the configurable service
+    */
+   public static ConfigurableService getConfigurableService(FacesContext context)
+   {
+       return (ConfigurableService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("configurableService");
    }
    
    /**

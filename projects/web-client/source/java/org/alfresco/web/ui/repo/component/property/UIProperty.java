@@ -32,7 +32,7 @@ import javax.faces.convert.Converter;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.DataDictionary;
@@ -328,8 +328,8 @@ public class UIProperty extends UIPanel implements NamingContainer
       
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();
       
-      PropertyTypeDefinition propTypeDef = propDef.getPropertyType();
-      QName typeName = propTypeDef.getName();
+      DataTypeDefinition dataTypeDef = propDef.getDataType();
+      QName typeName = dataTypeDef.getName();
          
       if (propSheet.getMode().equalsIgnoreCase(UIPropertySheet.VIEW_MODE))
       {
@@ -338,8 +338,8 @@ public class UIProperty extends UIPanel implements NamingContainer
          control.setRendererType("javax.faces.Text");
          
          // if it is a date or datetime property add the converter
-         if (typeName.equals(PropertyTypeDefinition.DATE) || 
-                  typeName.equals(PropertyTypeDefinition.DATETIME))
+         if (typeName.equals(DataTypeDefinition.DATE) || 
+                  typeName.equals(DataTypeDefinition.DATETIME))
          {
             XMLDateConverter conv = (XMLDateConverter)context.getApplication().
                createConverter("org.alfresco.faces.XMLDataConverter");
@@ -351,19 +351,19 @@ public class UIProperty extends UIPanel implements NamingContainer
       else
       {
          // generate the appropriate input field 
-         if (typeName.equals(PropertyTypeDefinition.BOOLEAN))
+         if (typeName.equals(DataTypeDefinition.BOOLEAN))
          {
             control = (UISelectBoolean)context.getApplication().
                   createComponent("javax.faces.SelectBoolean");
             control.setRendererType("javax.faces.Checkbox");
          }
-         else if (typeName.equals(PropertyTypeDefinition.CATEGORY))
+         else if (typeName.equals(DataTypeDefinition.CATEGORY))
          {
             control = (UICategorySelector)context.getApplication().
                   createComponent("org.alfresco.faces.CategorySelector");
          }
-         else if (typeName.equals(PropertyTypeDefinition.DATE) || 
-                  typeName.equals(PropertyTypeDefinition.DATETIME))
+         else if (typeName.equals(DataTypeDefinition.DATE) || 
+                  typeName.equals(DataTypeDefinition.DATETIME))
          {
             control = (UIInput)context.getApplication().
                   createComponent("javax.faces.Input");

@@ -21,13 +21,10 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -101,13 +98,4 @@ public class ConfigurableServiceImplTest extends BaseSpringTest
 		assertEquals(nodeRef, parentNodeRef);
 	}
 	
-	/**
-	 * Test service registry to ensure that the configurable service can be retrieved
-	 *
-	 */
-	public void testServiceRegister()
-	{
-		ConfigurableService service = this.serviceRegistry.getConfigurableService();
-		assertNotNull(service);
-	}
 }

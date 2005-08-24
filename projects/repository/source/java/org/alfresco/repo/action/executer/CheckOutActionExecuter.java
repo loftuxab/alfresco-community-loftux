@@ -24,7 +24,7 @@ import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -77,9 +77,9 @@ public class CheckOutActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, PropertyTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, PropertyTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, PropertyTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, DataTypeDefinition.NODE_REF, false, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, DataTypeDefinition.QNAME, false, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
 	}
 
     /**

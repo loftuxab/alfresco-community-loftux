@@ -30,7 +30,7 @@ import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 
@@ -173,20 +173,20 @@ public class DictionaryDAOImpl implements DictionaryDAO
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.ModelQuery#getPropertyType(org.alfresco.repo.ref.QName)
      */
-    public PropertyTypeDefinition getPropertyType(QName typeName)
+    public DataTypeDefinition getDataType(QName typeName)
     {
         CompiledModel model = getCompiledModelForNamespace(typeName.getNamespaceURI());
-        return (model == null) ? null : model.getPropertyType(typeName);
+        return (model == null) ? null : model.getDataType(typeName);
     }
 
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.DictionaryDAO#getPropertyTypes(org.alfresco.repo.ref.QName)
      */
-    public Collection<PropertyTypeDefinition> getPropertyTypes(QName modelName)
+    public Collection<DataTypeDefinition> getDataTypes(QName modelName)
     {
         CompiledModel model = getCompiledModel(modelName);
-        return model.getPropertyTypes();
+        return model.getDataTypes();
     }
 
 

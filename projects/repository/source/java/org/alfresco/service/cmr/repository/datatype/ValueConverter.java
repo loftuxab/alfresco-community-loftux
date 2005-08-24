@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.service.cmr.dictionary.DictionaryException;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.QName;
@@ -70,7 +70,7 @@ public class ValueConverter
      * @param value - the value to be converted
      * @return - the converted value as the correct type
      */
-    public static Object convert(PropertyTypeDefinition propertyType, Object value)
+    public static Object convert(DataTypeDefinition propertyType, Object value)
     {
         ParameterCheck.mandatory("Property type definition", propertyType);
         

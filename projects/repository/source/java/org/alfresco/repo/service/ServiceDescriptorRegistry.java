@@ -25,12 +25,11 @@ import java.util.Map;
 
 import javax.transaction.UserTransaction;
 
-import org.alfresco.repo.importer.ImporterService;
+import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.service.ServiceDescriptor;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
-import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -41,6 +40,7 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -244,15 +244,6 @@ public class ServiceDescriptorRegistry
     public ActionService getActionService()
     {
     	return (ActionService)getService(ACTION_SERVICE);
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see org.alfresco.service.ServiceRegistry#getActionService()
-     */
-    public ConfigurableService getConfigurableService()
-    {
-        return (ConfigurableService)getService(CONFIGURABLE_SERVICE);
     }
 
 }

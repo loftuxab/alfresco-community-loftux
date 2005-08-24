@@ -30,7 +30,7 @@ import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceException;
@@ -61,7 +61,7 @@ import org.apache.commons.logging.LogFactory;
     
     private M2Model model;
     private ModelDefinition modelDefinition;
-    private Map<QName, PropertyTypeDefinition> propertyTypes = new HashMap<QName, PropertyTypeDefinition>();
+    private Map<QName, DataTypeDefinition> dataTypes = new HashMap<QName, DataTypeDefinition>();
     private Map<QName, ClassDefinition> classes = new HashMap<QName, ClassDefinition>();
     private Map<QName, TypeDefinition> types = new HashMap<QName, TypeDefinition>();
     private Map<QName, AspectDefinition> aspects = new HashMap<QName, AspectDefinition>();
@@ -123,14 +123,14 @@ import org.apache.commons.logging.LogFactory;
         modelDefinition = new M2ModelDefinition(model, localPrefixes);
         
         // Construct Property Types
-        for (M2PropertyType propType : model.getPropertyTypes())
+        for (M2DataType propType : model.getPropertyTypes())
         {
-            M2PropertyTypeDefinition def = new M2PropertyTypeDefinition(propType, localPrefixes);
-            if (propertyTypes.containsKey(def.getName()))
+            M2DataTypeDefinition def = new M2DataTypeDefinition(propType, localPrefixes);
+            if (dataTypes.containsKey(def.getName()))
             {
                 throw new DictionaryException("Found duplicate property type definition " + propType.getName());
             }
-            propertyTypes.put(def.getName(), def);
+            dataTypes.put(def.getName(), def);
         }
         
         // Construct Type Definitions
@@ -199,9 +199,9 @@ import org.apache.commons.logging.LogFactory;
      */
     private void resolveDependencies(ModelQuery query)
     {
-        for (PropertyTypeDefinition def : propertyTypes.values())
+        for (DataTypeDefinition def : dataTypes.values())
         {
-            ((M2PropertyTypeDefinition)def).resolveDependencies(query);
+            ((M2DataTypeDefinition)def).resolveDependencies(query);
         }
         for (ClassDefinition def : classes.values())
         {
@@ -271,9 +271,9 @@ import org.apache.commons.logging.LogFactory;
     /**
      * @return  the compiled property types
      */
-    public Collection<PropertyTypeDefinition> getPropertyTypes()
+    public Collection<DataTypeDefinition> getDataTypes()
     {
-        return propertyTypes.values();
+        return dataTypes.values();
     }
 
 
@@ -298,9 +298,9 @@ import org.apache.commons.logging.LogFactory;
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.ModelQuery#getPropertyType(org.alfresco.repo.ref.QName)
      */
-    public PropertyTypeDefinition getPropertyType(QName name)
+    public DataTypeDefinition getDataType(QName name)
     {
-        return propertyTypes.get(name);
+        return dataTypes.get(name);
     }
 
     

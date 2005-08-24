@@ -18,7 +18,7 @@
 package org.alfresco.service.cmr.search;
 
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 
 public interface QueryParameterDefinition extends NamedQueryParameterDefinition
 {   
@@ -39,7 +39,7 @@ public interface QueryParameterDefinition extends NamedQueryParameterDefinition
      * 
      * @return
      */
-    public PropertyTypeDefinition getPropertyTypeDefinition();
+    public DataTypeDefinition getDataTypeDefinition();
     
     /**
      * Get the default value for this parameter.

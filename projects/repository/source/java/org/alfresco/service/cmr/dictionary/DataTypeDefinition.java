@@ -22,11 +22,11 @@ import org.alfresco.service.namespace.QName;
 
 
 /**
- * Read-only definition of a Property Type
+ * Read-only definition of a Data Type
  * 
  * @author David Caruana
  */
-public interface PropertyTypeDefinition
+public interface DataTypeDefinition
 {
     //
     // Built-in Property Types
@@ -49,7 +49,7 @@ public interface PropertyTypeDefinition
     
     
     /**
-     * @return the qualified name of the property type
+     * @return the qualified name of the data type
      */
     public QName getName();
     

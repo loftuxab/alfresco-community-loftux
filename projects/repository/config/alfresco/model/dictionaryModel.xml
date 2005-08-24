@@ -16,86 +16,86 @@
       <namespace uri="http://www.alfresco.org/view/repository/1.0" prefix="view"/>
    </namespaces>
 
-   <property-types>
+   <data-types>
 
-      <property-type name="d:any">
+      <data-type name="d:any">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>java.lang.Object</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:text">
+      <data-type name="d:text">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>java.lang.String</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:content">
+      <data-type name="d:content">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <!-- URL reference is a string -->
          <java-class>java.lang.String</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:int">
+      <data-type name="d:int">
          <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.IntegerAnalyser</analyser-class>
          <java-class>java.lang.Integer</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:long">
+      <data-type name="d:long">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>java.lang.Long</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:float">
+      <data-type name="d:float">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>java.lang.Float</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:double">
+      <data-type name="d:double">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>java.lang.Double</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:date">
+      <data-type name="d:date">
          <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.DateAnalyser</analyser-class>
          <java-class>java.util.Date</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:datetime">
+      <data-type name="d:datetime">
          <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.DateAnalyser</analyser-class>
          <java-class>java.util.Date</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:boolean">
+      <data-type name="d:boolean">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>java.lang.Boolean</java-class>
-      </property-type>
+      </data-type>
       
-      <property-type name="d:qname">
+      <data-type name="d:qname">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>org.alfresco.service.namespace.QName</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:guid">
+      <data-type name="d:guid">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>java.lang.String</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:category">
+      <data-type name="d:category">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <!-- TODO: Check this is correct -->
          <java-class>java.lang.String</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:noderef">
+      <data-type name="d:noderef">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>org.alfresco.service.cmr.repository.NodeRef</java-class>
-      </property-type>
+      </data-type>
 
-      <property-type name="d:path">
+      <data-type name="d:path">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>org.alfresco.service.cmr.repository.Path</java-class>
-      </property-type>
+      </data-type>
 
-   </property-types>
+   </data-types>
 
 
    <!-- TODO: Define dictionary meta model -->

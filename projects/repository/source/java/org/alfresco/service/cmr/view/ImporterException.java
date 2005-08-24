@@ -15,30 +15,26 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.importer;
-
-import java.io.InputStream;
-import java.util.Properties;
+package org.alfresco.service.cmr.view;
 
 
 /**
- * Importer Service.  Entry point for importing xml data sources into the Repository.
+ * Base Exception of Import Exceptions.
  * 
  * @author David Caruana
- *
  */
-public interface ImporterService
+public class ImporterException extends RuntimeException
 {
+    private static final long serialVersionUID = 3257008761007847733L;
 
-    /**
-     * Import Nodes into the Repository Location
-     * 
-     * @param inputStream  input stream containing xml to parse
-     * @param location  the location to import under
-     * @param configuration  property values used for binding property place holders in import stream
-     * @param progress  progress monitor (optional)
-     */
-    public void importNodes(InputStream inputStream, Location location, Properties configuration, Progress progress);
+    public ImporterException(String msg)
+    {
+       super(msg);
+    }
     
+    public ImporterException(String msg, Throwable cause)
+    {
+       super(msg, cause);
+    }
 
 }

@@ -31,7 +31,7 @@ import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -112,7 +112,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     {
         NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
-        PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
+        DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
         defs[0] = new QueryParameterDefImpl(QName.createQName("cm", "var", namespacePrefixResolver), text, true, userName);
         List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/cm:person[@cm:userName = $cm:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)
@@ -126,7 +126,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     {
         NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
-        PropertyTypeDefinition text = dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT);
+        DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
         defs[0] = new QueryParameterDefImpl(QName.createQName("usr", "var", namespacePrefixResolver), text, true, userName);
         List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/usr:user[@usr:username = $usr:var ]", defs, namespacePrefixResolver, false);
         if(results.size() != 1)

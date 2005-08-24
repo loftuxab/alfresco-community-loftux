@@ -19,7 +19,7 @@ package org.alfresco.repo.search;
 
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -45,7 +45,7 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
 
     private PropertyDefinition propertyDefintion;
 
-    private PropertyTypeDefinition propertyTypeDefintion;
+    private DataTypeDefinition dataTypeDefintion;
     
     private boolean hasDefaultValue;
     
@@ -55,7 +55,7 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
     {
         this(qName, hasDefaultValue, defaultValue);
         this.propertyDefintion = propertyDefinition;
-        this.propertyTypeDefintion = propertyDefinition.getPropertyType();
+        this.dataTypeDefintion = propertyDefinition.getDataType();
     }
 
     private QueryParameterDefImpl(QName qName, boolean hasDefaultValue, String defaultValue)
@@ -66,11 +66,11 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
         this.defaultValue = defaultValue;
     }
     
-    public QueryParameterDefImpl(QName qName, PropertyTypeDefinition propertyTypeDefintion, boolean hasDefaultValue, String defaultValue)
+    public QueryParameterDefImpl(QName qName, DataTypeDefinition dataTypeDefintion, boolean hasDefaultValue, String defaultValue)
     {
         this(qName, hasDefaultValue, defaultValue);
         this.propertyDefintion = null;
-        this.propertyTypeDefintion = propertyTypeDefintion;
+        this.dataTypeDefintion = dataTypeDefintion;
     }
 
     public QName getQName()
@@ -83,9 +83,9 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
         return propertyDefintion;
     }
 
-    public PropertyTypeDefinition getPropertyTypeDefinition()
+    public DataTypeDefinition getDataTypeDefinition()
     {
-        return propertyTypeDefintion;
+        return dataTypeDefintion;
     }
 
     public static QueryParameterDefinition createParameterDefinition(Element element, DictionaryService dictionaryService,  NamespacePrefixResolver nspr)
@@ -107,11 +107,11 @@ public class QueryParameterDefImpl implements QueryParameterDefinition
                 propDef = dictionaryService.getProperty(QName.createQName(propDefElement.getText(), nspr));
             }
 
-            PropertyTypeDefinition typeDef = null;
+            DataTypeDefinition typeDef = null;
             Element typeDefElement = element.element(PROPERTY_TYPE_QNAME.getName());
             if (typeDefElement != null)
             {
-                typeDef = dictionaryService.getPropertyType(QName.createQName(typeDefElement.getText(), nspr));
+                typeDef = dictionaryService.getDataType(QName.createQName(typeDefElement.getText(), nspr));
             }
 
             boolean hasDefault = false;

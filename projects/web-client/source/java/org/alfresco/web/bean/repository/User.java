@@ -22,13 +22,11 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.configuration.ConfigurableService;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -148,7 +146,7 @@ public final class User
          NodeService nodeService = registry.getNodeService();
          SearchService searchService = registry.getSearchService();
          NamespaceService namespaceService = registry.getNamespaceService();
-         ConfigurableService configurableService = registry.getConfigurableService();
+         ConfigurableService configurableService = Repository.getConfigurableService(fc);
          
          NodeRef person = Application.getCurrentUser(fc).getPerson();
          if (nodeService.hasAspect(person, ContentModel.ASPECT_CONFIGURABLE) == false)

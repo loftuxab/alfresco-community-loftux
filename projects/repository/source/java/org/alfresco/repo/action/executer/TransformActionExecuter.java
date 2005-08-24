@@ -25,7 +25,7 @@ import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -121,10 +121,10 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_MIME_TYPE, PropertyTypeDefinition.TEXT, true, getParamDisplayLabel(PARAM_MIME_TYPE)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, PropertyTypeDefinition.NODE_REF, true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_MIME_TYPE, DataTypeDefinition.TEXT, true, getParamDisplayLabel(PARAM_MIME_TYPE)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, DataTypeDefinition.NODE_REF, true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_TYPE_QNAME, DataTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_TYPE_QNAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASSOC_QNAME, DataTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASSOC_QNAME)));
 	}
 
 	/**

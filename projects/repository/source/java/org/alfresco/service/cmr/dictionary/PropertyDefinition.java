@@ -49,7 +49,7 @@ public interface PropertyDefinition
     /**
      * @return the qualified name of the property type
      */
-    public PropertyTypeDefinition getPropertyType();
+    public DataTypeDefinition getDataType();
 
     /**
      * @return Returns the owning class's defintion

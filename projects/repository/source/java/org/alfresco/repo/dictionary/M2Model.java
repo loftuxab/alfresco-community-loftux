@@ -48,7 +48,7 @@ public class M2Model
 
     private List<M2Namespace> namespaces = new ArrayList<M2Namespace>();
     private List<M2Namespace> imports = new ArrayList<M2Namespace>();
-    private List<M2PropertyType> propertyTypes = new ArrayList<M2PropertyType>();
+    private List<M2DataType> dataTypes = new ArrayList<M2DataType>();
     private List<M2Type> types = new ArrayList<M2Type>();
     private List<M2Aspect> aspects = new ArrayList<M2Aspect>();
     
@@ -265,34 +265,34 @@ public class M2Model
     }
     
     
-    public M2PropertyType createPropertyType(String name)
+    public M2DataType createPropertyType(String name)
     {
-        M2PropertyType type = new M2PropertyType();
+        M2DataType type = new M2DataType();
         type .setName(name);
-        propertyTypes.add(type);
+        dataTypes.add(type);
         return type;
     }
     
 
     public void removePropertyType(String name)
     {
-        M2PropertyType type = getPropertyType(name);
+        M2DataType type = getPropertyType(name);
         if (type != null)
         {
-            propertyTypes.remove(name);
+            dataTypes.remove(name);
         }
     }
 
 
-    public List<M2PropertyType> getPropertyTypes()
+    public List<M2DataType> getPropertyTypes()
     {
-        return Collections.unmodifiableList(propertyTypes);
+        return Collections.unmodifiableList(dataTypes);
     }
 
     
-    public M2PropertyType getPropertyType(String name)
+    public M2DataType getPropertyType(String name)
     {
-        for (M2PropertyType candidate : propertyTypes)
+        for (M2DataType candidate : dataTypes)
         {
             if (candidate.getName().equals(name))
             {
@@ -381,6 +381,7 @@ public class M2Model
     }
 
     
+    // Do not delete: referenced by m2binding.xml
     private static List createList()
     {
         return new ArrayList();

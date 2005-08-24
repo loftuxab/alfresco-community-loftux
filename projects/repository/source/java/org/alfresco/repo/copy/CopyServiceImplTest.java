@@ -37,7 +37,7 @@ import org.alfresco.repo.dictionary.M2Type;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -249,22 +249,22 @@ public class CopyServiceImplTest extends BaseSpringTest
         
         M2Property prop1 = testType.createProperty("test:" + PROP1_QNAME_MANDATORY.getLocalName());
         prop1.setMandatory(true);
-        prop1.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
+        prop1.setType("d:" + DataTypeDefinition.TEXT.getLocalName());
         prop1.setMultiValued(false);
         
 		M2Property prop2 = testType.createProperty("test:" + PROP2_QNAME_OPTIONAL.getLocalName());
 		prop2.setMandatory(false);
-        prop2.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
+        prop2.setType("d:" + DataTypeDefinition.TEXT.getLocalName());
 		prop2.setMandatory(false);
 		
 		M2Property propNodeRef = testType.createProperty("test:" + PROP_QNAME_MY_NODE_REF.getLocalName());
 		propNodeRef.setMandatory(false);
-		propNodeRef.setType("d:" + PropertyTypeDefinition.NODE_REF.getLocalName());
+		propNodeRef.setType("d:" + DataTypeDefinition.NODE_REF.getLocalName());
 		propNodeRef.setMandatory(false);
 		
 		M2Property propAnyNodeRef = testType.createProperty("test:" + PROP_QNAME_MY_ANY.getLocalName());
 		propAnyNodeRef.setMandatory(false);
-		propAnyNodeRef.setType("d:" + PropertyTypeDefinition.ANY.getLocalName());
+		propAnyNodeRef.setType("d:" + DataTypeDefinition.ANY.getLocalName());
 		propAnyNodeRef.setMandatory(false);
 		
 		M2ChildAssociation childAssoc = testType.createChildAssociation("test:" + TEST_CHILD_ASSOC_TYPE_QNAME.getLocalName());
@@ -279,17 +279,17 @@ public class CopyServiceImplTest extends BaseSpringTest
 		
 		M2Property prop3 = testAspect.createProperty("test:" + PROP3_QNAME_MANDATORY.getLocalName());
 		prop3.setMandatory(true);
-        prop3.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
+        prop3.setType("d:" + DataTypeDefinition.TEXT.getLocalName());
 		prop3.setMultiValued(false);
 		
 		M2Property prop4 = testAspect.createProperty("test:" + PROP4_QNAME_OPTIONAL.getLocalName());
 		prop4.setMandatory(false);
-        prop4.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
+        prop4.setType("d:" + DataTypeDefinition.TEXT.getLocalName());
 		prop4.setMultiValued(false);
 
         M2Aspect testMandatoryAspect = model.createAspect("test:" + TEST_MANDATORY_ASPECT_QNAME.getLocalName());
         M2Property prop5 = testMandatoryAspect.createProperty("test:" + PROP5_QNAME_MANDATORY.getLocalName());
-        prop5.setType("d:" + PropertyTypeDefinition.TEXT.getLocalName());
+        prop5.setType("d:" + DataTypeDefinition.TEXT.getLocalName());
         prop5.setMandatory(true);
 
         testType.addMandatoryAspect("test:" + TEST_MANDATORY_ASPECT_QNAME.getLocalName());

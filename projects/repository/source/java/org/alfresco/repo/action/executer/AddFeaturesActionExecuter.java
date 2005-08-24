@@ -25,7 +25,7 @@ import java.util.Map;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -105,7 +105,7 @@ public class AddFeaturesActionExecuter extends ActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_ASPECT_NAME, PropertyTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASPECT_NAME)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_ASPECT_NAME, DataTypeDefinition.QNAME, true, getParamDisplayLabel(PARAM_ASPECT_NAME)));
 	}
 
 }

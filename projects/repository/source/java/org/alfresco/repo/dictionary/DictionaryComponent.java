@@ -28,7 +28,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
@@ -77,7 +77,7 @@ public class DictionaryComponent implements DictionaryService
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.DictionaryService#getAllPropertyTypes()
      */
-    public Collection<QName> getAllPropertyTypes()
+    public Collection<QName> getAllDataTypes()
     {
         Collection<QName> propertyTypes = new ArrayList<QName>();
         for (QName model : getAllModels())
@@ -91,11 +91,11 @@ public class DictionaryComponent implements DictionaryService
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.DictionaryService#getPropertyTypes(org.alfresco.repo.ref.QName)
      */
-    public Collection<QName> getPropertyTypes(QName model)
+    public Collection<QName> getDataTypes(QName model)
     {
-        Collection<PropertyTypeDefinition> propertyTypes = dictionaryDAO.getPropertyTypes(model);
+        Collection<DataTypeDefinition> propertyTypes = dictionaryDAO.getDataTypes(model);
         Collection<QName> qnames = new ArrayList<QName>(propertyTypes.size());
-        for (PropertyTypeDefinition def : propertyTypes)
+        for (DataTypeDefinition def : propertyTypes)
         {
             qnames.add(def.getName());
         }
@@ -204,9 +204,9 @@ public class DictionaryComponent implements DictionaryService
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.DictionaryService#getPropertyType(org.alfresco.repo.ref.QName)
      */
-    public PropertyTypeDefinition getPropertyType(QName name)
+    public DataTypeDefinition getDataType(QName name)
     {
-        return dictionaryDAO.getPropertyType(name);
+        return dictionaryDAO.getDataType(name);
     }
 
     

@@ -23,12 +23,12 @@ import java.util.Set;
 
 import org.alfresco.repo.importer.ImportParent;
 import org.alfresco.repo.importer.Importer;
-import org.alfresco.repo.importer.ImporterException;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.QName;
 
 

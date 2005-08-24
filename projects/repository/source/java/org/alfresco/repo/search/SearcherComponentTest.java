@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -146,7 +146,7 @@ public class SearcherComponentTest extends TestCase
         
         paramDef = new QueryParameterDefImpl(
                 QName.createQName("test:test", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
+                dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 "monkey");
         xpathStr = "//.[@test:animal=$test:test]";
@@ -195,7 +195,7 @@ public class SearcherComponentTest extends TestCase
         // test 'subtypeOf' function
         paramDef = new QueryParameterDefImpl(
                 QName.createQName("test:type", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.QNAME),
+                dictionaryService.getDataType(DataTypeDefinition.QNAME),
                 true,
                 BaseNodeServiceTest.TYPE_QNAME_TEST_CONTENT.toString());
         xpathStr = "//.[subtypeOf($test:type)]";
@@ -288,12 +288,12 @@ public class SearcherComponentTest extends TestCase
         QueryParameterDefinition[] paramDefs = new QueryParameterDefinition[2];
         paramDefs[0] = new QueryParameterDefImpl(
                 QName.createQName("test:animal", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
+                dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 "monkey%");
         paramDefs[1] = new QueryParameterDefImpl(
                 QName.createQName("test:type", namespacePrefixResolver),
-                dictionaryService.getPropertyType(PropertyTypeDefinition.TEXT),
+                dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 BaseNodeServiceTest.TYPE_QNAME_TEST_CONTENT.toString());
         answer = searcher.selectNodes(

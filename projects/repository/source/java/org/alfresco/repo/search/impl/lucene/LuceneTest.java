@@ -46,7 +46,7 @@ import org.alfresco.repo.search.results.DetachedResultSet;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -968,12 +968,12 @@ public class LuceneTest extends TestCase
         results.close();
 
         // TODO: should not have a null property type definition
-        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:lemur", namespacePrefixResolver), (PropertyTypeDefinition) null, true, "fox");
+        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:lemur", namespacePrefixResolver), (DataTypeDefinition) null, true, "fox");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"${alf:lemur}\"", null, new QueryParameterDefinition[] { paramDef });
         assertEquals(1, results.length());
         results.close();
 
-        paramDef = new QueryParameterDefImpl(QName.createQName("alf:intvalue", namespacePrefixResolver), (PropertyTypeDefinition) null, true, "1");
+        paramDef = new QueryParameterDefImpl(QName.createQName("alf:intvalue", namespacePrefixResolver), (DataTypeDefinition) null, true, "1");
         qname = QName.createQName(TEST_NAMESPACE, "int-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"${alf:intvalue}\"", null, new QueryParameterDefinition[] { paramDef });
         assertEquals(1, results.length());
@@ -1059,7 +1059,7 @@ public class LuceneTest extends TestCase
         results.close();
         luceneFTS.resume();
         
-        QueryParameterDefinition paramDef = new QueryParameterDefImpl(QName.createQName("alf:query", namespacePrefixResolver), (PropertyTypeDefinition) null, true, "//./*");
+        QueryParameterDefinition paramDef = new QueryParameterDefImpl(QName.createQName("alf:query", namespacePrefixResolver), (DataTypeDefinition) null, true, "//./*");
         results = searcher.query(rootNodeRef.getStoreRef(), "xpath", "${alf:query}", null, new QueryParameterDefinition[] { paramDef });
         assertEquals(14, results.length());
         results.close();

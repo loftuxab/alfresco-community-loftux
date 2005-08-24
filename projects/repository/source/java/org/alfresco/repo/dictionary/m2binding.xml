@@ -29,9 +29,9 @@
          </collection>
       </structure>
       
-      <structure name="property-types" usage="optional">
-         <collection field="propertyTypes" factory="org.alfresco.repo.dictionary.M2Model.createList">
-            <structure name="property-type" type="org.alfresco.repo.dictionary.M2PropertyType" usage="optional">
+      <structure name="data-types" usage="optional">
+         <collection field="dataTypes" factory="org.alfresco.repo.dictionary.M2Model.createList">
+            <structure name="data-type" type="org.alfresco.repo.dictionary.M2DataType" usage="optional">
                <value style="attribute" name="name" field="name"/>
                <value name="title" field="title" usage="optional"/>
                <value name="description" field="description" usage="optional"/>

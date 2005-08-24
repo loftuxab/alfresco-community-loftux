@@ -21,7 +21,7 @@ import java.util.Collection;
 
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 
@@ -49,7 +49,7 @@ public interface DictionaryDAO extends ModelQuery
      * @param model the model to retrieve property types for
      * @return the property types of the model
      */
-    public Collection<PropertyTypeDefinition> getPropertyTypes(QName model);
+    public Collection<DataTypeDefinition> getDataTypes(QName model);
     
     /**
      * @param model the model to retrieve types for

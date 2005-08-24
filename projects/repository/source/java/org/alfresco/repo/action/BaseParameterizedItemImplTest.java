@@ -26,7 +26,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 
 /**
  * @author Roy Wetherall
@@ -51,8 +51,8 @@ public abstract class BaseParameterizedItemImplTest extends TestCase
     protected void setUp() throws Exception
     {
         // Create param defs
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, PropertyTypeDefinition.TEXT, false,  PARAM_DISPLAYLABEL));
-        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, PropertyTypeDefinition.TEXT, false,  PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_1, DataTypeDefinition.TEXT, false,  PARAM_DISPLAYLABEL));
+        paramDefs.add(new ParameterDefinitionImpl(PARAM_2, DataTypeDefinition.TEXT, false,  PARAM_DISPLAYLABEL));
         
         // Create param values
         paramValues.put(PARAM_1, VALUE_1);

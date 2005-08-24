@@ -20,7 +20,6 @@ package org.alfresco.repo.configuration;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.configuration.ConfigurableService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;

@@ -36,7 +36,7 @@ import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -271,7 +271,7 @@ public class LuceneCategoryTest extends TestCase
         genCatProp.setMultiValued(true);
         genCatProp.setStoredInIndex(true);
         genCatProp.setTokenisedInIndex(true);
-        genCatProp.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());
+        genCatProp.setType("d:" + DataTypeDefinition.CATEGORY.getLocalName());
         
         assetClassCategorisationQName = QName.createQName(TEST_NAMESPACE, "AssetClass");
         M2Aspect assetClassCategorisation = model.createAspect("test:" + assetClassCategorisationQName.getLocalName());
@@ -283,7 +283,7 @@ public class LuceneCategoryTest extends TestCase
         acProp.setMultiValued(true);
         acProp.setStoredInIndex(true);
         acProp.setTokenisedInIndex(true);
-        acProp.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());
+        acProp.setType("d:" + DataTypeDefinition.CATEGORY.getLocalName());
         
         investmentRegionCategorisationQName = QName.createQName(TEST_NAMESPACE, "InvestmentRegion");
         M2Aspect investmentRegionCategorisation = model.createAspect("test:" + investmentRegionCategorisationQName.getLocalName());
@@ -295,7 +295,7 @@ public class LuceneCategoryTest extends TestCase
         irProp.setMultiValued(true);
         irProp.setStoredInIndex(true);
         irProp.setTokenisedInIndex(true);
-        irProp.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());
+        irProp.setType("d:" + DataTypeDefinition.CATEGORY.getLocalName());
         
         marketingRegionCategorisationQName = QName.createQName(TEST_NAMESPACE, "MarketingRegion");
         M2Aspect marketingRegionCategorisation = model.createAspect("test:" + marketingRegionCategorisationQName.getLocalName());
@@ -307,7 +307,7 @@ public class LuceneCategoryTest extends TestCase
         mrProp.setMultiValued(true);
         mrProp.setStoredInIndex(true);
         mrProp.setTokenisedInIndex(true);
-        mrProp.setType("d:" + PropertyTypeDefinition.CATEGORY.getLocalName());
+        mrProp.setType("d:" + DataTypeDefinition.CATEGORY.getLocalName());
 
         dictionaryDAO.putModel(model);
     }
