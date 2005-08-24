@@ -31,6 +31,7 @@ import org.alfresco.repo.security.permissions.impl.AbstractPermissionTest;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionEntry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
@@ -73,6 +74,35 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
         }
 
     }
+    
+    
+    public void testBasicDenyStore() throws Exception
+    {
+        runAs("andy");
+
+        Object o = new ClassWithMethods();
+        Method method = o.getClass().getMethod("testOneStoreRef", new Class[] { StoreRef.class });
+
+        AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.addAdvisor(advisorAdapterRegistry.wrap(new Interceptor("ACL_NODE.0.sys:base.Read")));
+
+        proxyFactory.setTargetSource(new SingletonTargetSource(o));
+
+        Object proxy = proxyFactory.getProxy();
+
+        try
+        {
+            method.invoke(proxy, new Object[] { rootNodeRef.getStoreRef() });
+            assertNotNull(null);
+        }
+        catch (InvocationTargetException e)
+        {
+
+        }
+
+    }
 
     public void testAllowNullNode() throws Exception
     {
@@ -80,6 +110,26 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneNodeRef", new Class[] { NodeRef.class });
+
+        AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.addAdvisor(advisorAdapterRegistry.wrap(new Interceptor("ACL_NODE.0.sys:base.Read")));
+
+        proxyFactory.setTargetSource(new SingletonTargetSource(o));
+
+        Object proxy = proxyFactory.getProxy();
+
+        method.invoke(proxy, new Object[] { null });
+
+    }
+    
+    public void testAllowNullStore() throws Exception
+    {
+        runAs("andy");
+
+        Object o = new ClassWithMethods();
+        Method method = o.getClass().getMethod("testOneStoreRef", new Class[] { StoreRef.class });
 
         AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
 
@@ -227,6 +277,27 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
         Object proxy = proxyFactory.getProxy();
 
         method.invoke(proxy, new Object[] { rootNodeRef });
+    }
+    
+    public void testBasicAllowStore() throws Exception
+    {
+        runAs("andy");
+
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+
+        Object o = new ClassWithMethods();
+        Method method = o.getClass().getMethod("testOneStoreRef", new Class[] { StoreRef.class });
+
+        AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.addAdvisor(advisorAdapterRegistry.wrap(new Interceptor("ACL_NODE.0.sys:base.Read")));
+
+        proxyFactory.setTargetSource(new SingletonTargetSource(o));
+
+        Object proxy = proxyFactory.getProxy();
+
+        method.invoke(proxy, new Object[] { rootNodeRef.getStoreRef() });
     }
 
     public void testBasicAllowChildAssocNode() throws Exception
@@ -582,6 +653,11 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
     public static class ClassWithMethods
     {
+        public void testOneStoreRef(StoreRef storeRef)
+        {
+            
+        }
+        
         public void testOneNodeRef(NodeRef nodeRef)
         {
 

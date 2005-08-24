@@ -34,6 +34,7 @@ import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInvocation;
@@ -53,7 +54,7 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
     private PermissionService permissionService;
 
     private NamespacePrefixResolver nspr;
-    
+
     private NodeService nodeService;
 
     public ACLEntryVoter()
@@ -83,7 +84,7 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         this.nspr = nspr;
     }
-    
+
     public NodeService getNodeService()
     {
         return nodeService;
@@ -182,7 +183,14 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 
                 if (typeString.equals(ACL_NODE))
                 {
-                    if (NodeRef.class.isAssignableFrom(params[parameter]))
+                    if (StoreRef.class.isAssignableFrom(params[parameter]))
+                    {
+                        if (invocation.getArguments()[parameter] != null)
+                        {
+                            testNodeRef = nodeService.getRootNode((StoreRef) invocation.getArguments()[parameter]);
+                        }
+                    }
+                    else if (NodeRef.class.isAssignableFrom(params[parameter]))
                     {
                         testNodeRef = (NodeRef) invocation.getArguments()[parameter];
                     }
@@ -201,12 +209,14 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
                 }
                 else if (typeString.equals(ACL_PARENT))
                 {
+                    // There is no point having parent permissions for store
+                    // refs
                     if (NodeRef.class.isAssignableFrom(params[parameter]))
                     {
                         NodeRef child = (NodeRef) invocation.getArguments()[parameter];
-                        if(child != null)
+                        if (child != null)
                         {
-                           testNodeRef = nodeService.getPrimaryParent(child).getParentRef();
+                            testNodeRef = nodeService.getPrimaryParent(child).getParentRef();
                         }
                     }
                     else if (ChildAssociationRef.class.isAssignableFrom(params[parameter]))

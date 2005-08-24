@@ -40,6 +40,7 @@ import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -119,7 +120,11 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         {
             return null;
         }
-        if (NodeRef.class.isAssignableFrom(returnedObject.getClass()))
+        else if (StoreRef.class.isAssignableFrom(returnedObject.getClass()))
+        {
+            return decide(authentication, object, config, nodeService.getRootNode((StoreRef) returnedObject)).getStoreRef();
+        }
+        else if (NodeRef.class.isAssignableFrom(returnedObject.getClass()))
         {
             return decide(authentication, object, config, (NodeRef) returnedObject);
         }
@@ -145,7 +150,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         }
     }
 
-    public Object decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+    public NodeRef decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
             NodeRef returnedObject) throws AccessDeniedException
 
     {
@@ -203,7 +208,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         throw new AccessDeniedException("Access Denied");
     }
 
-    public Object decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+    public ChildAssociationRef decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
             ChildAssociationRef returnedObject) throws AccessDeniedException
 
     {
@@ -259,7 +264,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         throw new AccessDeniedException("Access Denied");
     }
 
-    public Object decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+    public ResultSet decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
             ResultSet returnedObject) throws AccessDeniedException
 
     {
@@ -331,7 +336,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         return filteringResultSet;
     }
 
-    public Object decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+    public Collection decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
             Collection returnedObject) throws AccessDeniedException
 
     {
@@ -407,7 +412,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         return returnedObject;
     }
 
-    public Object decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+    public Object[] decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
             Object[] returnedObject) throws AccessDeniedException
 
     {
