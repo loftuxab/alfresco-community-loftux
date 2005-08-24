@@ -50,13 +50,15 @@
                   <r:shortcutsShelfItem id="shortcut-shelf" value="#{UserShortcutsBean.shortcuts}" clickActionListener="#{UserShortcutsBean.click}" removeActionListener="#{UserShortcutsBean.removeShortcut}" />
                </r:shelfGroup>
                
+               <%-- TBD
                <r:shelfGroup label="Drop Zone" id="shelf-group-4" expanded="#{NavigationBean.shelfItemExpanded[3]}">
-                  <%-- TBD --%>
+                  
                </r:shelfGroup>
                
                <r:shelfGroup label="Actions in Progress" id="shelf-group-5" expanded="#{NavigationBean.shelfItemExpanded[4]}">
-                  <%-- TBD --%>
+                  
                </r:shelfGroup>
+               --%>
             </r:shelf>
             
          </td>

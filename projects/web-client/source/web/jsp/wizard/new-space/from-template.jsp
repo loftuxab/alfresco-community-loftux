@@ -147,9 +147,10 @@
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
+                                 <%-- TBD
                                  <tr><td class="details-separator" /></tr>
                                  <tr>
-                                    <td>Copy existing space [TBD]</td>
+                                    <td>Copy existing space</td>
                                  </tr>
                                  <tr>
                                     <td>
@@ -159,6 +160,7 @@
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
+                                 --%>
                                  <tr><td class="details-separator" /></tr>
                                  <tr>
                                     <td>Note: Any content rules for spaces will also be copied.</td>

@@ -209,16 +209,18 @@
                                  </a:richList>
                               </a:panel>
                               <br/>
+                              <%-- TBD
                               <a:panel label="Preferences" id="preferences-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 <div>[TBD]</div>
+                                 <div></div>
                               </a:panel>
                               <br/>
                               <a:panel label="Space Members" id="members-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 <div>[TBD]</div>
+                                 <div></div>
                               </a:panel>
                               <br/>
+                               --%>
                            </td>
                            
                            <td valign="top">

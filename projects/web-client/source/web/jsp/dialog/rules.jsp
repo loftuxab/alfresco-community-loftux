@@ -88,7 +88,7 @@
                                     value="#{RulesBean.viewMode}" actionListener="#{RulesBean.viewModeChanged}"
                                     selectedImage="/images/icons/Details.gif">
                                  <a:listItem value="local" label="Local" />
-                                 <a:listItem value="inherited" label="Inherited [TBD]" />
+                                 <%-- TBD <a:listItem value="inherited" label="Inherited" /> --%>
                               </a:modeList>
                            </td>
                         </tr>

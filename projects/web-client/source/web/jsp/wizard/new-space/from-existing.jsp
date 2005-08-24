@@ -130,9 +130,10 @@
                                                         style="border: 1px dashed #cccccc; padding: 6px;" />
                                     </td>
                                  </tr>
+                                 <%-- TBD
                                  <tr><td class="paddingRow" /></tr>
                                  <tr>
-                                    <td>Copy existing space [TBD]</td>
+                                    <td>Copy existing space</td>
                                  </tr>
                                  <tr>
                                     <td>
@@ -142,6 +143,7 @@
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
+                                 --%>
                                  <tr><td class="paddingRow" /></tr>
                                  <tr>
                                     <td>Note: Any content rules for spaces will also be copied.</td>

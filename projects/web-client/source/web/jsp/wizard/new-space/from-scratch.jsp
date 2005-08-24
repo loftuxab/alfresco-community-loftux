@@ -132,10 +132,12 @@
                                                              onclick="javascript:itemSelected(this);">
                                           <a:listItem value="container" label="Container" tooltip="Container"
                                                             image="/images/icons/space.gif" />
-                                          <a:listItem value="wiki" label="Wiki [TBD]" tooltip="Wiki"
+                                          <%-- TBD
+                                          <a:listItem value="wiki" label="Wiki" tooltip="Wiki"
                                                             image="/images/icons/wiki.gif" />
-                                          <a:listItem value="discussion" label="Discussion [TBD]" tooltip="Discussion"
+                                          <a:listItem value="discussion" label="Discussion" tooltip="Discussion"
                                                             image="/images/icons/discussion.gif" />
+                                          --%>
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>
@@ -167,7 +169,7 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       Note:<br/>If you can only see one type of space then other space
+                                       <b>Note:</b> If you can only see one type of space then other space
                                        types may not be enabled. See your System Administrator for further help.
                                     </td>
                                  </tr>
