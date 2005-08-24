@@ -19,6 +19,7 @@ package org.alfresco.web.bean.wizard;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -84,7 +85,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    private String invite = "users";
    private String notify = "yes";
    private List<SelectItem> selectedItems = null;
-   private List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
+   private List<UserGroupRole> userGroupRoles = null;
    private String subject = null;
    private String body = null;
    private String internalSubject = null;
@@ -125,9 +126,11 @@ public class InviteUsersWizard extends AbstractWizardBean
       invite = "users";
       notify = "yes";
       selectedItems = new ArrayList<SelectItem>(8);
+      userGroupRoles = new ArrayList<UserGroupRole>(8);
       subject = "";
       body = "";
       automaticText = "";
+      internalSubject = null;
    }
 
    /**
@@ -181,38 +184,41 @@ public class InviteUsersWizard extends AbstractWizardBean
             }
             
             // Create the mail message for each user to send too
-            String to = (String)this.nodeService.getProperty(person, ContentModel.PROP_EMAIL);
-            
-            if (to != null && to.length() != 0)
+            if ("yes".equals(this.notify))
             {
-               String msgRole = Application.getMessage(context, MSG_INVITED_ROLE);
-               String roleText = userGroupRole.Role;
-               String roleMessage = MessageFormat.format(msgRole, new Object[] {roleText});
+               String to = (String)this.nodeService.getProperty(person, ContentModel.PROP_EMAIL);
                
-               String body = this.internalSubject + "\r\n\r\n" + roleMessage + "\r\n\r\n";
-               if (this.body != null && this.body.length() != 0)
+               if (to != null && to.length() != 0)
                {
-                  body += this.body;
-               }
-               
-               SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-               simpleMailMessage.setTo(to);
-               simpleMailMessage.setSubject(subject);
-               simpleMailMessage.setText(body);
-               simpleMailMessage.setFrom(from);
-               
-               if (logger.isDebugEnabled())
-                  logger.debug("Sending notification email to: " + to + "\n...with subject:\n" + subject + "\n...with body:\n" + body);
-               
-               try
-               {
-                  // Send the message
-                  this.mailSender.send(simpleMailMessage);
-               }
-               catch (Throwable e)
-               {
-                  // don't stop the action but let admins know email is not getting sent
-                  logger.error("Failed to send email to " + to, e);
+                  String msgRole = Application.getMessage(context, MSG_INVITED_ROLE);
+                  String roleText = userGroupRole.Role;
+                  String roleMessage = MessageFormat.format(msgRole, new Object[] {roleText});
+                  
+                  String body = this.internalSubject + "\r\n\r\n" + roleMessage + "\r\n\r\n";
+                  if (this.body != null && this.body.length() != 0)
+                  {
+                     body += this.body;
+                  }
+                  
+                  SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+                  simpleMailMessage.setTo(to);
+                  simpleMailMessage.setSubject(subject);
+                  simpleMailMessage.setText(body);
+                  simpleMailMessage.setFrom(from);
+                  
+                  if (logger.isDebugEnabled())
+                     logger.debug("Sending notification email to: " + to + "\n...with subject:\n" + subject + "\n...with body:\n" + body);
+                  
+                  try
+                  {
+                     // Send the message
+                     this.mailSender.send(simpleMailMessage);
+                  }
+                  catch (Throwable e)
+                  {
+                     // don't stop the action but let admins know email is not getting sent
+                     logger.error("Failed to send email to " + to, e);
+                  }
                }
             }
          }
@@ -288,9 +294,10 @@ public class InviteUsersWizard extends AbstractWizardBean
             NodeRef personRef = nodes.get(index);
             String firstName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_FIRSTNAME);
             String lastName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_LASTNAME);
-            SelectItem item = new SelectItem(personRef, firstName + " " + lastName);
+            SelectItem item = new SortablePersonSelectItem(personRef, firstName + " " + lastName, lastName);
             items[index] = item;
          }
+         Arrays.sort(items);
          
          // commit the transaction
          tx.commit();
@@ -697,5 +704,27 @@ public class InviteUsersWizard extends AbstractWizardBean
       
       public NodeRef UserGroup;
       public String Role;
+   }
+   
+   /**
+    * Wrapper class to facilitate specific sorting functionality against Person SelectItem objects
+    */
+   private static class SortablePersonSelectItem extends SelectItem implements Comparable
+   {
+      public SortablePersonSelectItem(Object value, String label, String sort)
+      {
+         super(value, label);
+         this.sort = sort;
+      }
+      
+      public int compareTo(Object obj2)
+      {
+         if (this.sort == null && obj2 == null) return 0;
+         if (this.sort == null) return -1;
+         if (obj2 == null) return 1;
+         return this.sort.compareToIgnoreCase( ((SortablePersonSelectItem)obj2).sort );
+      }
+      
+      private String sort;
    }
 }
