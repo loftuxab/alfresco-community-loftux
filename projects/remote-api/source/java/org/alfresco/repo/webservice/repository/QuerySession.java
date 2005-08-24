@@ -17,15 +17,17 @@
  */
 package org.alfresco.repo.webservice.repository;
 
+import java.io.Serializable;
+
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
+
 /**
- * Interface definition for a QuerySession, implementations are expected to 
- * store the results of a query and maintain a pointer to the current set of
- * results as defined by the batch size passed as a SOAP header to the initiating
- * service call.
+ * Interface definition for a QuerySession.
  * 
  * @author gavinc
  */
-public interface QuerySession
+public interface QuerySession extends Serializable
 {
    /**
     * Retrieves the id this query session can be identified as
@@ -35,32 +37,18 @@ public interface QuerySession
    public String getId();
    
    /**
-    * The timestamp of when the session was last touched
-    * 
-    * @return Timestamp of when the session was last touched
-    */
-   public long getLastAccessedTimestamp();
-   
-   /**
-    * Updates the last accessed timestamp for this session to now
-    */
-   public void touch();
-   
-   /**
-    * Determines whether this query session has any more results
-    * 
-    * @return true if there are more resutls, false otherwise
-    */
-   public boolean hasMoreResults();
-   
-   /**
     * Returns a QueryResult object representing the next batch of results.
     * QueryResult will contain a maximum of items as determined by the 
     * <code>fetchSize</code> element of the QueryConfiguration SOAP header.
     * 
+    * When the last batch of results is being returned the querySession of
+    * QueryResult will be null.
+    * 
     * @see org.alfresco.repo.webservice.repository.QuerySession#getId()
+    * @param searchService The SearchService to use for gathering the results
+    * @param nodeService The NodeService to use for gathering the results
     * @return QueryResult containing the next batch of results or null if there
     * are no more results
     */
-   public QueryResult getNextResultsBatch();
+   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService);
 }

@@ -20,6 +20,9 @@ package org.alfresco.repo.webservice.repository;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import javax.transaction.UserTransaction;
+
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.CML;
 import org.alfresco.repo.webservice.types.NodeDefinition;
@@ -33,7 +36,6 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.apache.axis.MessageContext;
 import org.apache.commons.logging.Log;
@@ -51,7 +53,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
    
    private NodeService nodeService;
    private SearchService searchService;
-   private QuerySessionCache querySessionCache;
+   private SimpleCache<String, QuerySession> querySessionCache; 
    
    /**
     * Sets the instance of the NodeService to be used
@@ -74,11 +76,11 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
    }
    
    /**
-    * Sets the instance of the QuerySessionCache to be used
+    * Sets the instance of the SimpleCache to be used
     * 
-    * @param querySessionCache The QuerySessionCache
+    * @param querySessionCache The SimpleCache
     */
-   public void setQuerySessionCache(QuerySessionCache querySessionCache)
+   public void setQuerySessionCache(SimpleCache<String, QuerySession> querySessionCache)
    {
       this.querySessionCache = querySessionCache;
    }
@@ -88,8 +90,13 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public Store[] getStores() throws RemoteException, RepositoryFault
    {
+      UserTransaction tx = null;
+      
       try
       {
+         tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
+         tx.begin();
+
          List<StoreRef> stores = this.nodeService.getStores();
          Store[] returnStores = new Store[stores.size()];
          for (int x = 0; x < stores.size(); x++)
@@ -100,10 +107,16 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
             returnStores[x] = store;
          }
          
+         // commit the transaction
+         tx.commit();
+         
          return returnStores;
       }
       catch (Throwable e)
       {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         
          if (logger.isDebugEnabled())
          {
             logger.error("Unexpected error occurred", e);
@@ -125,38 +138,35 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          throw new RepositoryFault(110, "Only '" + QueryLanguageEnum.lucene.getValue() + "' queries are currently supported!");
       }
       
+      UserTransaction tx = null;
+      MessageContext msgContext = MessageContext.getCurrentContext();
+      
       try
       {
-         // handle the special search string of * meaning, get everything
-         String statement = query.getStatement();
-         if (statement.equals("*"))
-         {
-            statement = " ISNODE:*";
-         }
-         
-         // perform the requested search
-         ResultSet searchResults = this.searchService.query(Utils.convertToStoreRef(store), langEnum.getValue(), statement, null, null);
+         tx = Utils.getUserTransaction(msgContext);
+         tx.begin();
          
          // setup a query session and get the first batch of results
-         ResultSetQuerySession querySession = new ResultSetQuerySession(MessageContext.getCurrentContext(), this.nodeService,
-               searchResults, includeMetaData);
-         QueryResult queryResult = querySession.getNextResultsBatch();; 
+         QuerySession querySession = new ResultSetQuerySession(Utils.getBatchSize(msgContext), store, query, includeMetaData);
+         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService);
          
          // add the session to the cache if there are more results to come
-         if (querySession.hasMoreResults())
+         if (queryResult.getQuerySession() != null)
          {
-            this.querySessionCache.putQuerySession(querySession);
+            //this.querySessionCache.putQuerySession(querySession);
+            this.querySessionCache.put(queryResult.getQuerySession(), querySession);
          }
-         else
-         {
-            // remove the query session id so the client doesn't request non-existent results
-            queryResult.setQuerySession(null);
-         }
+         
+         // commit the transaction
+         tx.commit();
          
          return queryResult;
       }
       catch (Throwable e)
       {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         
          if (logger.isDebugEnabled())
          {
             logger.error("Unexpected error occurred", e);
@@ -171,32 +181,34 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult queryChildren(Reference node) throws RemoteException, RepositoryFault
    {
+      UserTransaction tx = null;
+      
       try
       {
-         // create the node ref and get the children from the repository
-         NodeRef nodeRef = Utils.convertToNodeRef(node);
-         List<ChildAssociationRef> kids = this.nodeService.getChildAssocs(nodeRef);
+         tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
+         tx.begin();
          
          // setup a query session and get the first batch of results
-         ChildrenQuerySession querySession = new ChildrenQuerySession(MessageContext.getCurrentContext(), this.nodeService,
-               kids, false);
-         QueryResult queryResult = querySession.getNextResultsBatch();; 
+         QuerySession querySession = new ChildrenQuerySession(Utils.getBatchSize(MessageContext.getCurrentContext()), node);
+         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService);
          
          // add the session to the cache if there are more results to come
-         if (querySession.hasMoreResults())
+         if (queryResult.getQuerySession() != null)
          {
-            this.querySessionCache.putQuerySession(querySession);
+            //this.querySessionCache.putQuerySession(querySession);
+            this.querySessionCache.put(queryResult.getQuerySession(), querySession);
          }
-         else
-         {
-            // remove the query session id so the client doesn't request non-existent results
-            queryResult.setQuerySession(null);
-         }
+         
+         // commit the transaction
+         tx.commit();
          
          return queryResult;
       }
       catch (Throwable e)
       {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         
          if (logger.isDebugEnabled())
          {
             logger.error("Unexpected error occurred", e);
@@ -211,32 +223,34 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult queryParents(Reference node) throws RemoteException, RepositoryFault
    {
+      UserTransaction tx = null;
+      
       try
       {
-         // create the node ref and get the children from the repository
-         NodeRef nodeRef = Utils.convertToNodeRef(node);
-         List<ChildAssociationRef> parents = this.nodeService.getParentAssocs(nodeRef);
+         tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
+         tx.begin();
          
          // setup a query session and get the first batch of results
-         ParentsQuerySession querySession = new ParentsQuerySession(MessageContext.getCurrentContext(), this.nodeService,
-               parents, false);
-         QueryResult queryResult = querySession.getNextResultsBatch();; 
+         QuerySession querySession = new ParentsQuerySession(Utils.getBatchSize(MessageContext.getCurrentContext()), node);
+         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService); 
          
          // add the session to the cache if there are more results to come
-         if (querySession.hasMoreResults())
+         if (queryResult.getQuerySession() != null)
          {
-            this.querySessionCache.putQuerySession(querySession);
+            //this.querySessionCache.putQuerySession(querySession);
+            this.querySessionCache.put(queryResult.getQuerySession(), querySession);
          }
-         else
-         {
-            // remove the query session id so the client doesn't request non-existent results
-            queryResult.setQuerySession(null);
-         }
+         
+         // commit the transaction
+         tx.commit();
          
          return queryResult;
       }
       catch (Throwable e)
       {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         
          if (logger.isDebugEnabled())
          {
             logger.error("Unexpected error occurred", e);
@@ -259,42 +273,59 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
     */
    public QueryResult fetchMore(String querySession) throws RemoteException, RepositoryFault
    {
-      // get the QuerySession from the cache
-      QuerySession session = this.querySessionCache.getQuerySession(querySession);
+      QueryResult queryResult = null;
       
-      if (session == null)
-      {
-         throw new RepositoryFault(4, "querySession with id '" + querySession + "' is invalid");
-      }
-      
-      if (session.hasMoreResults() == false)
-      {
-         throw new RepositoryFault(5, "querySession with id '" + querySession + "' does not have any more results to fetch!");
-      }
+      UserTransaction tx = null;
       
       try
       {
-         // get the next batch of results
-         QueryResult queryResult = session.getNextResultsBatch(); 
+         tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
+         tx.begin();
          
-         if (session.hasMoreResults() == false)
+         // try and get the QuerySession with the given id from the cache
+         QuerySession session = this.querySessionCache.get(querySession);
+         
+         if (session == null)
          {
-            // remove the query session id so the client doesn't request non-existent results
-            queryResult.setQuerySession(null);
-            this.querySessionCache.removeQuerySession(querySession);
+            if (logger.isDebugEnabled())
+               logger.debug("Invalid querySession id requested: " + querySession);
+            
+            throw new RepositoryFault(4, "querySession with id '" + querySession + "' is invalid");
+         }
+      
+         // get the next batch of results
+         queryResult = session.getNextResultsBatch(this.searchService, this.nodeService); 
+         
+         // remove the QuerySession from the cache if there are no more results to come
+         if (queryResult.getQuerySession() == null)
+         {
+            this.querySessionCache.remove(querySession);
          }
          
-         return queryResult;
+         // commit the transaction
+         tx.commit();
       }
       catch (Throwable e)
       {
-         if (logger.isDebugEnabled())
-         {
-            logger.error("Unexpected error occurred", e);
-         }
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          
-         throw new RepositoryFault(0, e.getMessage());
+         if (e instanceof RepositoryFault)
+         {
+            throw (RepositoryFault)e;
+         }
+         else
+         {
+            if (logger.isDebugEnabled())
+            {
+               logger.error("Unexpected error occurred", e);
+            }
+            
+            throw new RepositoryFault(0, e.getMessage());
+         }
       }
+      
+      return queryResult;
    }
 
    /**

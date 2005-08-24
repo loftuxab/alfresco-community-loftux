@@ -19,13 +19,14 @@ package org.alfresco.repo.webservice.repository;
 
 import java.util.List;
 
-import javax.xml.rpc.handler.MessageContext;
-
+import org.alfresco.repo.webservice.Utils;
+import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.ResultSetRow;
 import org.alfresco.repo.webservice.types.ResultSetRowNode;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,54 +37,91 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ChildrenQuerySession extends AbstractQuerySession
 {
-   private static Log logger = LogFactory.getLog(ChildrenQuerySession.class);
-   private List<ChildAssociationRef> results;
+   private transient static Log logger = LogFactory.getLog(ChildrenQuerySession.class);
+   
+   private Reference node;
    
    /**
     * Constructs a ChildrenQuerySession
     * 
-    * @param context Current MessageContext
-    * @param nodeService NodeService instance used to lookup node information
-    * @param results The List to cache
-    * @param includeMetaData Whether the QueryResult objects returned should contain metadata
+    * @param batchSize The batch size to use for this session
+    * @param node The node to retrieve the parents
     */
-   public ChildrenQuerySession(MessageContext context, NodeService nodeService,
-         List<ChildAssociationRef> results, boolean includeMetaData)
+   public ChildrenQuerySession(int batchSize, Reference node)
    {
-      super(context, nodeService, results.size(), includeMetaData);
-      this.results = results;
+      super(batchSize);
+      
+      this.node = node;
    }
    
    /**
-    * @see org.alfresco.repo.webservice.repository.AbstractQuerySession#getRows(int, int)
+    * @see org.alfresco.repo.webservice.repository.QuerySession#getNextResultsBatch(org.alfresco.service.cmr.search.SearchService, org.alfresco.service.cmr.repository.NodeService)
     */
-   @Override
-   public QueryResult getRows(int from, int to)
+   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService)
    {
-      org.alfresco.repo.webservice.types.ResultSet batchResults = new org.alfresco.repo.webservice.types.ResultSet();      
-      org.alfresco.repo.webservice.types.ResultSetRow[] rows = new org.alfresco.repo.webservice.types.ResultSetRow[to-from];
-         
-      int arrPos = 0;
-      for (int x = from; x < to; x++)
+      QueryResult queryResult = null;
+      
+      if (this.position != -1)
       {
-         ChildAssociationRef assoc = this.results.get(x);
-         NodeRef childNodeRef = assoc.getChildRef();
-         ResultSetRowNode rowNode = new ResultSetRowNode(childNodeRef.getId(), nodeService.getType(childNodeRef).toString(), null);
-         ResultSetRow row = new ResultSetRow();
-         row.setRowIndex(x);
-         row.setNode(rowNode);
+         if (logger.isDebugEnabled())
+            logger.debug("Before getNextResultsBatch: " + toString());
          
-         // add the row to the overall results
-         rows[arrPos] = row;
-         arrPos++;
+         // create the node ref and get the children from the repository
+         NodeRef nodeRef = Utils.convertToNodeRef(this.node);
+         List<ChildAssociationRef> kids = nodeService.getChildAssocs(nodeRef);
+         
+         int totalRows = kids.size();
+         int lastRow = calculateLastRowIndex(totalRows);
+         int currentBatchSize = lastRow - this.position;
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Total rows = " + totalRows + ", current batch size = " + currentBatchSize);
+         
+         org.alfresco.repo.webservice.types.ResultSet batchResults = new org.alfresco.repo.webservice.types.ResultSet();      
+         org.alfresco.repo.webservice.types.ResultSetRow[] rows = new org.alfresco.repo.webservice.types.ResultSetRow[currentBatchSize];
+            
+         int arrPos = 0;
+         for (int x = this.position; x < lastRow; x++)
+         {
+            ChildAssociationRef assoc = kids.get(x);
+            NodeRef childNodeRef = assoc.getChildRef();
+            ResultSetRowNode rowNode = new ResultSetRowNode(childNodeRef.getId(), nodeService.getType(childNodeRef).toString(), null);
+            ResultSetRow row = new ResultSetRow();
+            row.setRowIndex(x);
+            row.setNode(rowNode);
+            
+            // add the row to the overall results
+            rows[arrPos] = row;
+            arrPos++;
+         }
+         
+         // add the rows to the result set and set the total row count
+         batchResults.setRows(rows);
+         batchResults.setTotalRowCount(totalRows);
+         
+         queryResult = new QueryResult(getId(), batchResults);
+         
+         // move the position on
+         updatePosition(totalRows, queryResult);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("After getNextResultsBatch: " + toString());
       }
       
-      // TODO: build up the meta data data structure if asked to
-      
-      // add the rows to the result set and set the total row count
-      batchResults.setRows(rows);
-      batchResults.setTotalRowCount(this.totalRowCount);
-      
-      return new QueryResult(getId(), batchResults);
+      return queryResult;
+   }
+   
+   /**
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString()
+   {
+      StringBuilder builder = new StringBuilder(super.toString());
+      builder.append(" (id=").append(getId());
+      builder.append(" batchSize=").append(this.batchSize);
+      builder.append(" position=").append(this.position);
+      builder.append(" node-id=").append(this.node.getUuid()).append(")");
+      return builder.toString();
    }
 }

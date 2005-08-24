@@ -24,6 +24,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.repo.webservice.axis.QueryConfigHandler;
 import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.Store;
@@ -147,5 +148,25 @@ public class Utils
       
       TransactionService transactionService = svcReg.getTransactionService();
       return transactionService.getUserTransaction();
+   }
+   
+   /**
+    * Returns the value of the <code>fetchSize</code> from the QueryConfiguration
+    * SOAP header (if present)
+    * 
+    * @param msgContext The SOAP MessageContext
+    * @return The current batch size or -1 if the header is not present
+    */
+   public static int getBatchSize(MessageContext msgContext)
+   {
+      int batchSize = -1;
+      
+      Integer batchConfigSize = (Integer)MessageContext.getCurrentContext().getProperty(QueryConfigHandler.ALF_FETCH_SIZE);
+      if (batchConfigSize != null)
+      {
+         batchSize = batchConfigSize.intValue();
+      }
+      
+      return batchSize;
    }
 }

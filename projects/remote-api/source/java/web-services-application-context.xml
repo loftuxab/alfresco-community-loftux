@@ -10,8 +10,16 @@
       </property>
    </bean>
    
-   <!-- Implementation of QuerySessionCache to store query results across web service calls -->
-   <bean id="querySessionCache" class="org.alfresco.repo.webservice.repository.InMemoryQuerySessionCache"/>
+   <!-- Cache to use to store QuerySession instances -->
+   <bean id="querySessionCache" class="org.alfresco.repo.cache.EhCacheAdapter">
+      <property name="cache">
+         <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
+            <property name="cacheName">
+               <value>webservice.QuerySessionCache</value>
+            </property>
+         </bean>
+      </property>
+   </bean>
    
    <!-- Implementations of each exposed web service -->
    
@@ -41,5 +49,5 @@
          <ref bean="ContentService"/>
       </property>
    </bean>
-   
+ 
 </beans>
