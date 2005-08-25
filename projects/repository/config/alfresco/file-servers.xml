@@ -51,20 +51,6 @@
       </authenticator>
 
 <!--
-		<authenticator type="acegi">
-		  	<allowGuest/>
-		</authenticator>
-		  
-      <authenticator type="passthru">
-        	<NOallowGuest/>
-         <LocalServer/>
-         <LocalDomain/>
-         <Server>ALFRESCO</Server>
-         <Domain>ALFRESCO</Domain>
-      </authenticator>
--->
-
-<!--
       <globalAccessControl default="None">
          <user name="admin" access="Write"/>
          <address ip="90.1.0.90" access="Write"/>

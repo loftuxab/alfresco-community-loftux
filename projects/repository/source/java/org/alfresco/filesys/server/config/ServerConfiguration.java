@@ -55,8 +55,6 @@ import org.alfresco.filesys.server.auth.acl.AccessControlManager;
 import org.alfresco.filesys.server.auth.acl.AccessControlParser;
 import org.alfresco.filesys.server.auth.acl.DefaultAccessControlManager;
 import org.alfresco.filesys.server.auth.acl.InvalidACLTypeException;
-import org.alfresco.filesys.server.auth.passthru.AcegiPassthruAuthenticator;
-import org.alfresco.filesys.server.auth.passthru.PassthruAuthenticator;
 import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.core.ShareMapper;
@@ -232,6 +230,10 @@ public class ServerConfiguration
     // Send out host announcements via the Win32 NetBIOS interface
     private boolean m_win32NBAnnounce = false;
     private int m_win32NBAnnounceInterval;
+    
+    // Use Winsock NetBIOS interface if true, else use the Netbios() API interface
+    
+    private boolean m_win32NBUseWinsock = true;
 
     // --------------------------------------------------------------------------------
     // FTP specific configuration parameters
@@ -1278,9 +1280,21 @@ public class ServerConfiguration
             if (authType.equalsIgnoreCase("local"))
                 auth = new LocalAuthenticator();
             else if (authType.equalsIgnoreCase("passthru"))
-                auth = new PassthruAuthenticator();
+            {
+                // Load the passthru authenticator dynamically
+                
+                auth = loadAuthenticatorClass("org.alfrsesco.filesys.server.auth.passthru.PassthruAuthenticator");
+                if ( auth == null)
+                    throw new AlfrescoRuntimeException("Failed to load passthru authenticator");
+            }
             else if (authType.equalsIgnoreCase("acegi"))
-                auth = new AcegiPassthruAuthenticator();
+            {
+                // Load the Acegi authenticator dynamically
+                
+                auth = loadAuthenticatorClass("org.alfrsesco.filesys.server.auth.passthru.AcegiPassthruAuthenticator");
+                if ( auth == null)
+                    throw new AlfrescoRuntimeException("Failed to load Acegi passthru authenticator");
+            }
             else
                 throw new AlfrescoRuntimeException("Invalid authenticator type, " + authType);
 
@@ -1795,6 +1809,16 @@ public class ServerConfiguration
         return m_win32NBLANA;
     }
 
+    /**
+     * Determine if the Win32 Netbios() API or Winsock Netbios calls should be used
+     * 
+     * @return boolean
+     */
+    public final boolean useWinsockNetBIOS()
+    {
+        return m_win32NBUseWinsock;
+    }
+    
     /**
      * Return the timezone name
      * 
@@ -2412,6 +2436,16 @@ public class ServerConfiguration
     }
 
     /**
+     * Set the Win32 NetBIOS interface to use either Winsock NetBIOS or the Netbios() API calls
+     * 
+     * @param useWinsock boolean
+     */
+    public final void setWin32WinsockNetBIOS(boolean useWinsock)
+    {
+        m_win32NBUseWinsock = useWinsock;
+    }
+    
+    /**
      * Set the server timezone name
      * 
      * @param name String
@@ -2636,5 +2670,39 @@ public class ServerConfiguration
                     devCtx.CloseContext();
             }
         }
+    }
+    
+    /**
+     * Load an authenticator using dyanmic loading
+     * 
+     * @param className String
+     * @return SrvAuthenticator
+     */
+    private final SrvAuthenticator loadAuthenticatorClass(String className)
+    {
+        SrvAuthenticator srvAuth = null;
+        
+        try
+        {
+            // Load the authenticator class
+            
+            Object authObj = Class.forName(className).newInstance();
+            
+            // Verify that the class is an authenticator
+            
+            if ( authObj instanceof SrvAuthenticator)
+                srvAuth = (SrvAuthenticator) authObj;
+        }
+        catch (Exception ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Failed to load authenticator class " + className, ex);
+        }
+        
+        // Return the authenticator class, or null if not available or invalid
+        
+        return srvAuth;
     }
 }
