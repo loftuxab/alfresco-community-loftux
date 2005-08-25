@@ -41,8 +41,14 @@ public class PageTag extends TagSupport
    private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
    private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
    private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
+   private final static String ALF_URL   = "http://www.alfresco.org";
+   private final static String ALF_LOGO  = "http://www.alfresco.org/webclient/alfresco_logo.gif";
+   private final static String ALF_TEXT  = "Content managed by Alfresco";
+   private final static String ALF_COPY  = "Alfresco Software Inc. © 2005 All rights reserved.";
    
    private static Log logger = LogFactory.getLog(PageTag.class);
+   private static String alfresco = null;
+   private static String loginPage = null;
    
    private long startTime = 0;
    private String title;
@@ -111,16 +117,22 @@ public class PageTag extends TagSupport
     */
    public int doEndTag() throws JspException
    {
-      if (Application.inPortalServer() == false)
+      try
       {
-         try
+         HttpServletRequest req = (HttpServletRequest)pageContext.getRequest();
+         if (req.getRequestURI().endsWith(getLoginPage()) == false)
+         {
+            pageContext.getOut().write(getAlfrescoButton());
+         }
+         
+         if (Application.inPortalServer() == false)
          {
             pageContext.getOut().write("\n</body></html>");
          }
-         catch (IOException ioe)
-         {
-            throw new JspException(ioe.toString());
-         }
+      }
+      catch (IOException ioe)
+      {
+         throw new JspException(ioe.toString());
       }
       
       if (logger.isDebugEnabled())
@@ -130,5 +142,30 @@ public class PageTag extends TagSupport
       }
       
       return super.doEndTag();
+   }
+   
+   private String getLoginPage()
+   {
+      if (loginPage == null)
+      {
+         loginPage = Application.getLoginPage(pageContext.getServletContext());
+      }
+      
+      return loginPage;
+   }
+   
+   private String getAlfrescoButton()
+   {
+      if (alfresco == null)
+      {
+         alfresco = "<center>" +
+                    "<a href='" + ALF_URL + "'>" +
+                    "<img border=0 alt='' title='" + ALF_TEXT + "' align=absmiddle src='" + ALF_LOGO + "'>" +
+                    "</a>&nbsp;" +
+                    "<span style='font-family:Arial,Helvetica,sans-serif;font-size:10px'>" + ALF_COPY +
+                    "</span></center>";
+      }
+      
+      return alfresco;
    }
 }
