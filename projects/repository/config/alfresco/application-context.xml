@@ -573,7 +573,6 @@
     <bean id="authenticationManager" class="net.sf.acegisecurity.providers.ProviderManager">
         <property name="providers">
             <list>
-                <ref bean="ntlmAuthenticationProvider" />
                 <ref bean="daoAuthenticationProvider" />
             </list>
         </property>
@@ -661,30 +660,6 @@
 
     <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true"
         lazy-init="default" autowire="default" dependency-check="default" />
-
-    <bean id="ntlmAuthenticationProvider"
-        class="org.alfresco.repo.security.authentication.ntlm.NTLMAuthenticationProvider">
-        <property name="JCEProvider">
-            <value>cryptix.jce.provider.CryptixCrypto</value>
-        </property>
-        <property name="useLocalServer">
-            <value>true</value>
-        </property>
-        <!--
-            <property name="servers">
-            <value>TEST02</value>
-            </property>
-            <property name="domain">
-            <value>ALFRESCO</value>
-            </property>
-        -->
-        <property name="guestAccess">
-            <value>true</value>
-        </property>
-        <property name="sessionTimeout">
-            <value>30</value>
-        </property>
-    </bean>
 
     <!-- Importer -->
 
