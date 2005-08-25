@@ -200,6 +200,7 @@
    <wsdl:message name="ContentFault">
       <wsdl:part element="content:ContentFault" name="fault"/>
    </wsdl:message>
+   
    <wsdl:portType name="ContentServiceSoapPort">
       <wsdl:operation name="describe">
          <wsdl:documentation>Describes one or more content streams.</wsdl:documentation>
@@ -243,10 +244,10 @@
       <wsdl:operation name="describe">
          <wsdl:documentation>Describes one or more content streams.</wsdl:documentation>
          <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/describe"/>
-         <wsdl:input name="describeRequest">
+         <wsdl:input>
             <wsdlsoap:body use="literal"/>
          </wsdl:input>
-         <wsdl:output name="describeResponse">
+         <wsdl:output>
             <wsdlsoap:body use="literal"/>
          </wsdl:output>
          <wsdl:fault name="ContentFault">
@@ -256,10 +257,10 @@
       <wsdl:operation name="read">
          <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
          <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/read"/>
-         <wsdl:input name="describeRequest">
+         <wsdl:input>
             <wsdlsoap:body use="literal"/>
          </wsdl:input>
-         <wsdl:output name="describeResponse">
+         <wsdl:output>
             <wsdlsoap:body use="literal"/>
          </wsdl:output>
          <wsdl:fault name="ContentFault">

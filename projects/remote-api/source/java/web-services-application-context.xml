@@ -52,5 +52,14 @@
          <ref bean="ContentService"/>
       </property>
    </bean>
+   
+   <bean id="authoringWebService" class="org.alfresco.repo.webservice.authoring.AuthoringWebService">
+      <property name="nodeService">
+         <ref bean="NodeService"/>
+      </property>
+      <property name="contentService">
+         <ref bean="ContentService"/>
+      </property>
+   </bean>
  
 </beans>

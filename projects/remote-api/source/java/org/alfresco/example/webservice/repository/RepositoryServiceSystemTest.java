@@ -69,7 +69,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
          throw new AssertionFailedError("JAX-RPC ServiceException caught: " + jre);
       }
       
-      assertNotNull("authSvc is null", this.repoService);
+      assertNotNull("repoService is null", this.repoService);
       
       // Time out after a minute
       this.repoService.setTimeout(60000);
@@ -348,5 +348,23 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       assertTrue("Aspect2 should be an aspect", aspect2.isIsAspect());
       assertNotNull("Aspect2 should have properties", aspect2.getProperties());
       assertEquals("Aspect2 has wrong number of properties", 5, aspect2.getProperties().length);
+   }
+   
+   /**
+    * Tests the update service method
+    * 
+    * @throws Exception
+    */
+   public void testUpdate() throws Exception
+   {
+      try
+      {
+         this.repoService.update(null);
+         fail("This method should have thrown a repository fault");
+      }
+      catch (RepositoryFault rf)
+      {
+         // expected to get this
+      }
    }
 }

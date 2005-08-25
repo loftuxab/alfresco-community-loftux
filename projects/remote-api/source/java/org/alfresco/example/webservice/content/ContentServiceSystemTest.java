@@ -68,7 +68,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
          throw new AssertionFailedError("JAX-RPC ServiceException caught: " + jre);
       }
       
-      assertNotNull("authSvc is null", this.contentService);
+      assertNotNull("contentService is null", this.contentService);
       
       // Time out after a minute
       this.contentService.setTimeout(60000);
