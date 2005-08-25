@@ -13,8 +13,8 @@ public class ClassDefinition  implements java.io.Serializable {
     private java.lang.String description;
     private java.lang.String superClass;
     private boolean isAspect;
-    private org.alfresco.example.webservice.types.PropertyDefinition properties;
-    private org.alfresco.example.webservice.types.AssociationDefinition associations;
+    private org.alfresco.example.webservice.types.PropertyDefinition[] properties;
+    private org.alfresco.example.webservice.types.AssociationDefinition[] associations;
 
     public ClassDefinition() {
     }
@@ -25,8 +25,8 @@ public class ClassDefinition  implements java.io.Serializable {
            java.lang.String description,
            java.lang.String superClass,
            boolean isAspect,
-           org.alfresco.example.webservice.types.PropertyDefinition properties,
-           org.alfresco.example.webservice.types.AssociationDefinition associations) {
+           org.alfresco.example.webservice.types.PropertyDefinition[] properties,
+           org.alfresco.example.webservice.types.AssociationDefinition[] associations) {
            this.name = name;
            this.title = title;
            this.description = description;
@@ -142,7 +142,7 @@ public class ClassDefinition  implements java.io.Serializable {
      * 
      * @return properties
      */
-    public org.alfresco.example.webservice.types.PropertyDefinition getProperties() {
+    public org.alfresco.example.webservice.types.PropertyDefinition[] getProperties() {
         return properties;
     }
 
@@ -152,8 +152,16 @@ public class ClassDefinition  implements java.io.Serializable {
      * 
      * @param properties
      */
-    public void setProperties(org.alfresco.example.webservice.types.PropertyDefinition properties) {
+    public void setProperties(org.alfresco.example.webservice.types.PropertyDefinition[] properties) {
         this.properties = properties;
+    }
+
+    public org.alfresco.example.webservice.types.PropertyDefinition getProperties(int i) {
+        return this.properties[i];
+    }
+
+    public void setProperties(int i, org.alfresco.example.webservice.types.PropertyDefinition _value) {
+        this.properties[i] = _value;
     }
 
 
@@ -162,7 +170,7 @@ public class ClassDefinition  implements java.io.Serializable {
      * 
      * @return associations
      */
-    public org.alfresco.example.webservice.types.AssociationDefinition getAssociations() {
+    public org.alfresco.example.webservice.types.AssociationDefinition[] getAssociations() {
         return associations;
     }
 
@@ -172,8 +180,16 @@ public class ClassDefinition  implements java.io.Serializable {
      * 
      * @param associations
      */
-    public void setAssociations(org.alfresco.example.webservice.types.AssociationDefinition associations) {
+    public void setAssociations(org.alfresco.example.webservice.types.AssociationDefinition[] associations) {
         this.associations = associations;
+    }
+
+    public org.alfresco.example.webservice.types.AssociationDefinition getAssociations(int i) {
+        return this.associations[i];
+    }
+
+    public void setAssociations(int i, org.alfresco.example.webservice.types.AssociationDefinition _value) {
+        this.associations[i] = _value;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -203,10 +219,10 @@ public class ClassDefinition  implements java.io.Serializable {
             this.isAspect == other.isIsAspect() &&
             ((this.properties==null && other.getProperties()==null) || 
              (this.properties!=null &&
-              this.properties.equals(other.getProperties()))) &&
+              java.util.Arrays.equals(this.properties, other.getProperties()))) &&
             ((this.associations==null && other.getAssociations()==null) || 
              (this.associations!=null &&
-              this.associations.equals(other.getAssociations())));
+              java.util.Arrays.equals(this.associations, other.getAssociations())));
         __equalsCalc = null;
         return _equals;
     }
@@ -232,10 +248,26 @@ public class ClassDefinition  implements java.io.Serializable {
         }
         _hashCode += (isIsAspect() ? Boolean.TRUE : Boolean.FALSE).hashCode();
         if (getProperties() != null) {
-            _hashCode += getProperties().hashCode();
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getProperties());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getProperties(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         if (getAssociations() != null) {
-            _hashCode += getAssociations().hashCode();
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getAssociations());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getAssociations(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -284,13 +316,17 @@ public class ClassDefinition  implements java.io.Serializable {
         elemField.setFieldName("properties");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "properties"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "PropertyDefinition"));
-        elemField.setNillable(false);
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("associations");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "associations"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "AssociationDefinition"));
-        elemField.setNillable(false);
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
     }
 

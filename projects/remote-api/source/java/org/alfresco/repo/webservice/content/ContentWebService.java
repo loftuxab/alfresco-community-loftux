@@ -98,8 +98,7 @@ public class ContentWebService implements ContentServiceSoapPort
          
          for (int x = 0; x < nodes.size(); x++)
          {
-            NodeRef nodeRef = nodes.get(x);
-            descriptions[x] = setupContentObject(nodeRef);
+            descriptions[x] = setupContentObject(nodes.get(x));
          }
          
          // commit the transaction

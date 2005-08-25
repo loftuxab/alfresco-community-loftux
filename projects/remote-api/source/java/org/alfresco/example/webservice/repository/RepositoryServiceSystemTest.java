@@ -22,7 +22,10 @@ import javax.xml.rpc.ServiceException;
 import junit.framework.AssertionFailedError;
 
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
+import org.alfresco.example.webservice.types.ClassDefinition;
 import org.alfresco.example.webservice.types.NamedValue;
+import org.alfresco.example.webservice.types.NodeDefinition;
+import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Query;
 import org.alfresco.example.webservice.types.QueryConfiguration;
 import org.alfresco.example.webservice.types.QueryLanguageEnum;
@@ -44,7 +47,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    private static Store STORE = new Store(StoreEnum.workspace, "SpacesStore");
    private static StoreRef STORE_REF = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
    
-   private RepositoryServiceSoapBindingStub repSvc;
+   private RepositoryServiceSoapBindingStub repoService;
 
    @Override
    protected void setUp() throws Exception
@@ -54,7 +57,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       try 
       {
          EngineConfiguration config = new FileProvider(getResourcesDir(), "client-deploy.wsdd");
-         this.repSvc = (RepositoryServiceSoapBindingStub)new RepositoryServiceLocator(config).getRepositoryService();
+         this.repoService = (RepositoryServiceSoapBindingStub)new RepositoryServiceLocator(config).getRepositoryService();
       }
       catch (ServiceException jre) 
       {
@@ -66,10 +69,10 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
          throw new AssertionFailedError("JAX-RPC ServiceException caught: " + jre);
       }
       
-      assertNotNull("authSvc is null", this.repSvc);
+      assertNotNull("authSvc is null", this.repoService);
       
       // Time out after a minute
-      this.repSvc.setTimeout(60000);
+      this.repoService.setTimeout(60000);
    }
 
    /**
@@ -79,7 +82,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     */
    public void testGetStores() throws Exception
    {
-      Store[] stores = this.repSvc.getStores();
+      Store[] stores = this.repoService.getStores();
       assertNotNull("stores array should not be null", stores);
       logger.debug("store1 = " + stores[0].getScheme() + ":" + stores[0].getAddress());
       logger.debug("store2 = " + stores[1].getScheme() + ":" + stores[1].getAddress());
@@ -96,7 +99,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       //Query query = new Query(QueryLanguageEnum.lucene, "*");
       Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
       
-      QueryResult queryResult = this.repSvc.query(STORE, query, false);
+      QueryResult queryResult = this.repoService.query(STORE, query, false);
       assertNotNull("queryResult should not be null", queryResult);
       
       ResultSet resultSet = queryResult.getResultSet();
@@ -137,10 +140,10 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       int batchSize = 75;
       QueryConfiguration queryCfg = new QueryConfiguration();
       queryCfg.setFetchSize(batchSize);
-      this.repSvc.setHeader(new RepositoryServiceLocator().getServiceName().getNamespaceURI(), "QueryHeader", queryCfg);
+      this.repoService.setHeader(new RepositoryServiceLocator().getServiceName().getNamespaceURI(), "QueryHeader", queryCfg);
       
       // get the first set of results back
-      QueryResult queryResult = this.repSvc.query(STORE, query, false);
+      QueryResult queryResult = this.repoService.query(STORE, query, false);
       assertNotNull("queryResult should not be null", queryResult);
       String querySession = queryResult.getQuerySession();
       String origQuerySession = querySession;
@@ -153,7 +156,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       assertEquals("The result set size should be " + batchSize, batchSize, resultSet.getRows().length);
       
       // get the next batch of results
-      queryResult = this.repSvc.fetchMore(querySession);
+      queryResult = this.repoService.fetchMore(querySession);
       assertNotNull("queryResult should not be null", queryResult);
       querySession = queryResult.getQuerySession();
       assertNotNull("querySession should not be null", querySession);
@@ -166,7 +169,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       // get the rest of the results to make sure it finishes properly
       while (querySession != null)
       {
-         queryResult = this.repSvc.fetchMore(querySession);
+         queryResult = this.repoService.fetchMore(querySession);
          assertNotNull("queryResult returned in loop should not be null", queryResult);
          querySession = queryResult.getQuerySession();
          logger.debug("There were another " + queryResult.getResultSet().getRows().length + " rows returned");
@@ -175,7 +178,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       // try and fetch some more results and we should get an error
       try
       {
-         queryResult = this.repSvc.fetchMore(origQuerySession);
+         queryResult = this.repoService.fetchMore(origQuerySession);
          fail("We should have seen an error as all the results have been returned");
       }
       catch (Exception e)
@@ -197,7 +200,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       String rootId = "227f1ee2-1082-11da-8fd4-3310e1ddfea6";
       node.setUuid(rootId);     // find a query to retrieve this maybe type == store_root?
       logger.debug("Retrieving children for node: " + rootId + "....");
-      QueryResult rootChildren = this.repSvc.queryChildren(node);
+      QueryResult rootChildren = this.repoService.queryChildren(node);
       
       assertNotNull("rootChildren should not be null", rootChildren);
       ResultSet rootChildrenResults = rootChildren.getResultSet();
@@ -213,7 +216,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       node = new Reference();
       node.setStore(STORE);
       node.setUuid(id);
-      QueryResult parents = this.repSvc.queryParents(node);
+      QueryResult parents = this.repoService.queryParents(node);
       
       assertNotNull("parents should not be null", parents);
       ResultSet parentsResults = parents.getResultSet();
@@ -249,12 +252,101 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    {
       try
       {
-         this.repSvc.queryAssociated(null, null);
+         this.repoService.queryAssociated(null, null);
          fail("This method should have thrown a repository fault");
       }
       catch (RepositoryFault rf)
       {
          // expected to get this
       }
+   }
+   
+   /**
+    * Tests the describe service method
+    * 
+    * @throws Exception
+    */
+   public void testDescribe() throws Exception
+   {
+      // get hold of a node we know some info about so we can test the returned values (the Alfresco Tutorial PDF)
+      Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
+      QueryResult queryResult = this.repoService.query(STORE, query, false);
+      assertNotNull("queryResult should not be null", queryResult);
+      ResultSet resultSet = queryResult.getResultSet();
+      assertNotNull("The result set should not be null", resultSet);
+      assertTrue("There should be at least one result", resultSet.getTotalRowCount() > 0);
+      String id = resultSet.getRows(0).getNode().getId();
+      assertNotNull("Id of Alfresco Tutorial PDF should not be null", id);
+      
+      // create a predicate object to to send to describe method
+      Reference ref = new Reference();
+      ref.setStore(STORE);
+      ref.setUuid(id);
+      Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
+      
+      // make the service call
+      NodeDefinition[] nodeDefs = this.repoService.describe(predicate);
+      assertNotNull("nodeDefs should not be null", nodeDefs);
+      assertTrue("There should only be one result", nodeDefs.length == 1);
+      
+      // get the result
+      NodeDefinition nodeDef = nodeDefs[0];
+      assertNotNull("The nodeDef should not be null", nodeDef);
+      ClassDefinition typeDef = nodeDef.getType();
+      assertNotNull("Type definition should not be null", typeDef);
+      
+      assertEquals("Type name is incorrect", "{http://www.alfresco.org/model/content/1.0}content", typeDef.getName());
+      assertEquals("Superclass type name is incorrect", "{http://www.alfresco.org/model/content/1.0}cmobject", typeDef.getSuperClass());
+      assertEquals("Type title is incorrect", "Content", typeDef.getTitle());
+      assertEquals("Type description is incorrect", null, typeDef.getDescription());
+      assertFalse("Type is an aspect and it shouldn't be", typeDef.isIsAspect());
+      assertNull("There should not be any associations", typeDef.getAssociations());
+      assertNotNull("Properties should not be null", typeDef.getProperties());
+      assertEquals("There should be 5 properties", 5, typeDef.getProperties().length);
+      
+      // check the name and type of each of the properties
+      assertEquals("Property1 name is incorrect", "{http://www.alfresco.org/model/content/1.0}encoding", 
+            typeDef.getProperties(0).getName());
+      assertEquals("Property1 type name is incorrect", "{http://www.alfresco.org/model/dictionary/1.0}text", 
+            typeDef.getProperties(0).getDataType());
+      
+      assertEquals("Property2 name is incorrect", "{http://www.alfresco.org/model/content/1.0}size", 
+            typeDef.getProperties(1).getName());
+      assertEquals("Property2 type name is incorrect", "{http://www.alfresco.org/model/dictionary/1.0}long", 
+            typeDef.getProperties(1).getDataType());
+      
+      assertEquals("Property3 name is incorrect", "{http://www.alfresco.org/model/content/1.0}contentUrl", 
+            typeDef.getProperties(2).getName());
+      assertEquals("Property3 type name is incorrect", "{http://www.alfresco.org/model/dictionary/1.0}text", 
+            typeDef.getProperties(2).getDataType());
+      
+      assertEquals("Property4 name is incorrect", "{http://www.alfresco.org/model/content/1.0}name", 
+            typeDef.getProperties(3).getName());
+      assertEquals("Property4 type name is incorrect", "{http://www.alfresco.org/model/dictionary/1.0}text", 
+            typeDef.getProperties(3).getDataType());
+      
+      assertEquals("Property5 name is incorrect", "{http://www.alfresco.org/model/content/1.0}mimetype", 
+            typeDef.getProperties(4).getName());
+      assertEquals("Property5 type name is incorrect", "{http://www.alfresco.org/model/dictionary/1.0}text", 
+            typeDef.getProperties(4).getDataType());
+      
+      // check the aspects
+      ClassDefinition[] aspects = nodeDef.getAspects();
+      assertNotNull("aspects should not be null", aspects);
+      assertEquals("There should be 2 aspects", 2, aspects.length);
+      
+      // check the first aspect
+      ClassDefinition aspect1 = aspects[0];
+      assertEquals("Aspect1 name is incorrect", "{http://www.alfresco.org/model/system/1.0}referencable", aspect1.getName());
+      assertTrue("Aspect1 should be an aspect", aspect1.isIsAspect());
+      assertNotNull("Aspect1 should have properties", aspect1.getProperties());
+      assertEquals("Aspect1 has wrong number of properties", 3, aspect1.getProperties().length);
+      
+      // check the second aspect
+      ClassDefinition aspect2 = aspects[1];
+      assertEquals("Aspect2 name is incorrect", "{http://www.alfresco.org/model/content/1.0}auditable", aspect2.getName());
+      assertTrue("Aspect2 should be an aspect", aspect2.isIsAspect());
+      assertNotNull("Aspect2 should have properties", aspect2.getProperties());
+      assertEquals("Aspect2 has wrong number of properties", 5, aspect2.getProperties().length);
    }
 }

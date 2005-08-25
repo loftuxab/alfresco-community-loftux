@@ -87,8 +87,8 @@
 			<xsd:group ref="cms:TextualDescription"></xsd:group>
 			<xsd:element name="superClass" type="cms:Name" maxOccurs="1" minOccurs="0"></xsd:element>
 			<xsd:element name="isAspect" type="xsd:boolean"></xsd:element>
-			<xsd:element name="properties" type="cms:PropertyDefinition"></xsd:element>
-			<xsd:element name="associations" type="cms:AssociationDefinition"></xsd:element>
+			<xsd:element name="properties" type="cms:PropertyDefinition" minOccurs="0" maxOccurs="unbounded" nillable="true"></xsd:element>
+			<xsd:element name="associations" type="cms:AssociationDefinition" minOccurs="0" maxOccurs="unbounded" nillable="true"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 

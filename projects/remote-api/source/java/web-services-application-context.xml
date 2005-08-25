@@ -36,6 +36,9 @@
       <property name="searchService">
          <ref bean="SearchService"/>
       </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
+      </property>
       <property name="querySessionCache">
          <ref bean="querySessionCache"/>
       </property>
