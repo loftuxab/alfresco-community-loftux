@@ -221,8 +221,8 @@
    
    <tag>
       <name>nodePath</name>
-      <tagclass>org.alfresco.web.ui.repo.tag.NodePathTag</tagclass>
-      <bodycontent>JSP</bodycontent>
+      <tag-class>org.alfresco.web.ui.repo.tag.NodePathTag</tag-class>
+      <body-content>JSP</body-content>
       
       <attribute>
          <name>id</name>

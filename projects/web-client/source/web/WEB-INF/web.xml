@@ -98,6 +98,16 @@
    </filter-mapping>
    
    <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/uploadFileServlet</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/download/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
       <filter-name>Mode Detection Filter</filter-name>
       <url-pattern>/faces/*</url-pattern>
    </filter-mapping>
