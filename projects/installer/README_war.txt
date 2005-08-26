@@ -7,11 +7,13 @@ snapshot of where we are currently in the development of the Alfresco
 system.  It is intended for preview use only and should not be used for
 any other purpose.  Not all functionality is available or complete.
 
+
 ===================================
 Installing Alfresco Preview Release
 ===================================
 
 The Alfresco Preview Release is intended for evaluation purposes only.
+
 
 =========================
 Alfresco WAR Installation
@@ -29,7 +31,6 @@ Optional:
 ===================
 Simple Installation
 ===================
-
 
 Install JDK 5.0
 ---------------
@@ -64,6 +65,10 @@ Install Alfresco WAR
 - Unzip alfrescoWAR.zip in C:\
 
 This will create a folder 'C:\alfresco'
+
+
+Create Database
+---------------
 
 Navigate to the 'C:\alfresco' folder and run 'db_setup.bat' if you did a new
 install of MySQL above.  This creates a MySQL database named 'alfresco' with a user 
@@ -120,6 +125,41 @@ Closing the Alfresco Server
 Navigate to the 'C:\alfresco' folder and run 'alf_stop_jb.bat'
 
 
+=====================
+Using the CIFS Server
+=====================
+
+The Preview release with CIFS is configured for ease of deployment.  To enable the CIFS
+server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' needs to be copied
+into a folder on the system path, such as \windows\system32.  The Alfresco server will 
+need to be re-started once the dll has been copied.
+
+Once the Alfresco server is running, it should be possible to connect to it by mapping a
+drive to it.  The name to use for the mapping is based on the name of the server on which
+Alfresco is running, with '_A' on the end.  For example, if the PC name is 'MYPC01', then 
+the CIFS server name will be 'MYPC01_A'.  To map the drive, open Windows Explorer, go
+to the Tools menu and select 'Map Network Drive...'.  In the Map Network Drive dialog,
+choose the drive letter you wish to use.  To locate the CIFS server, click the 'Browse...' 
+button and find the server name as described above.  You should then have the option to
+select a folder within it called 'alfresco'.  Click 'OK' to select the folder, then click
+'Finish' to map the drive.  You should now have access to the Alfresco repository from
+the mapped drive.  If the CIFS server name does not show in the browse dialog, you may also
+enter the folder location directly in the dialog, for example '\\MYPC01_A\alfresco'.
+
+To check the CIFS server name and whether it is running, enter the command 'nbtstat -n'
+from a Command Prompt.  One of the listed names should be the CIFS server name.
+
+If you are unable to connect to the CIFS server, then depending on your network, you may need 
+to configure the domain for CIFS to use.  You will need to have started the Alfresco server
+at least once to be able to do this.  To set the domain, edit the 'file-servers.xml' 
+file in the 'c:\alfresco\tomcat\webapps\alfresco\WEB-INF\classes\alfresco' directory and add the 
+domain into the following line:
+   <host name="${localname}_A"/>
+so that it is something like:
+   <host name="${localname}_A" domain="MYDOMAIN"/>
+
+You will need to restart the Alfresco server for this to take effect.
+
 
 ====================
 Manual Installations
@@ -140,3 +180,47 @@ c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
 
 The Alfresco 'alf_start_jb.bat' starts the database and runs JBoss's 'run.bat'.
 The 'alf_stop_jb.bat' runs JBoss's 'shutdown.bat' and shutsdown the database.
+
+
+================
+Trouble-Shooting
+================
+
+If you have problems with your installation, please look for help on the Installation
+forum at http://www.alfresco.org/forums and ask for any additional help you may need.
+
+. The JAVA_HOME variable must be set correctly to your Java5 installation.
+
+. Most installation issues can be resolved by following advice in this forum article:
+ - http://www.alfresco.org/forums/viewtopic.php?t=7
+  and in this forum generally:
+ - http://www.alfresco.org/forums/viewforum.php?f=8
+
+. WAR file name is now called alfresco.war
+NOTE: If you deployed the war previously from source (rather than use a standard Alfresco installation package) then you must clear out the web-client stuff from your appservers before deploying the new WAR file:
+
+Tomcat:
+- Delete <tomcat-home>/webapps/web-client.war
+- Delete <tomcat-home>/webapps/web-client
+- Delete <tomcat-home>/work
+
+JBoss:
+- Delete <jboss-home>/server/default/deploy/web-client.war
+
+. If the following errors are reported on the console:
+ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
+ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available: Failed to execute command: imconvert ...
+  The are not issues which will cause the server to fail, Alfresco is reporting the fact that various external document transformation engines are not available for use by the server. Either follow the instructions at the bottom of the Release Notes Wiki page:
+ - http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
+  or remove the transformer references completely if you don't require them:
+ - http://www.alfresco.org/forums/viewtopic.php?t=90
+
+. If you see this error on server startup:
+ ERROR [protocol] FTP Socket error
+    java.net.BindException: Address already in use: JVM_Bind
+         at java.net.PlainSocketImpl.socketBind(Native Method)
+ Check to see if you have any services running against port 8080 for the Alfresco server and port 21 for the Alfresco FTP integration.
+
+. To access the CIFS repository directly from the FireFox browser, you need to install the Alfresco FireFox Extension from here:
+ - http://sourceforge.net/projects/alfresco
+ Internet Explorer does not require the extension to see display CIFS folders directly.

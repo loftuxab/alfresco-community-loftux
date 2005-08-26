@@ -1,31 +1,34 @@
-This license file applies to the Alfresco software library (the "Alfresco Software"),
-except as described below.  
+This license file applies to the Alfresco software library (the "Alfresco 
+Software"), except as described below.  
 
-This product Copyright 2005 Alfresco Software, Inc.  For detailed notice, see the
-"NOTICE" file with this distribution.
+This product Copyright 2005 Alfresco Software, Inc.  For detailed notice, see 
+the "NOTICE" file with this distribution.
 
-This library is free software; you can redistribute it and/or modify it under the
-terms of the GNU Lesser General Public License as published by the Free Software 
-Foundation; either version 2.1 of the License, or (at your option) any later version.
+This product is free software; you can redistribute it and/or modify it under 
+the terms of the Open Source Initiative (OSI) approved Mozilla Public License
+v.1.1 with a permitted attribution clause (Alfresco Public License 
+www.alfresco.org/legal/license.txt) 
 
-This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-See the GNU Lesser General Public License for more details.
+This product is distributed in the hope that it will be useful, but WITHOUT ANY 
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+PARTICULAR PURPOSE. See the Alfresco Public License 
+(www.alfresco.org/legal/license.txt) for more details.
 
-You should have received a copy of the GNU Lesser General Public License along with this 
-library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
-Boston, MA 02111-1307 USA.  You can also find the terms of the LGPL here:
-http://www.opensource.org/licenses/lgpl-license.php 
+You should have received a copy of the Alfresco Public License along with this 
+product; if not, write to Alfresco Software Inc Park House Park Street, 
+Maidenhead, SL6 1SL United Kingdom. You can also find the terms of the Alfresco 
+Public License here: http://www.alfresco.org/legal/license.txt 
 
-Some portions of the Alfresco Software are provided by third parties and thus are not
-available under LGPL, but are available under other licensing terms.  In this distribution, 
-they are: Junit module, available at www.junit.org, and wsdl4j, available at http://sourceforge.net/projects/wsdl4j, are licensed under the terms of the Common Public 
-License.  You can find the terms of the CPL here:
+Some portions of the Alfresco Software are provided by third parties and thus 
+are not available under the Alfresco Public License, but are available under 
+other licensing terms.  In this distribution, they are: Junit module, available 
+at www.junit.org, and wsdl4j, available at 
+http://sourceforge.net/projects/wsdl4j, are licensed under the terms of the 
+Common Public License.  You can find the terms of the CPL here: 
 http://www.opensource.org/licenses/cpl1.0.php 
 
-Jsp, jva, servlet, saaj and jax-rpc are available under Sun’s binary license, which you can 
-find here: 
-http://java.sun.com/j2se/1.5.0/jdk-1_5_0_01-license.txt
+Jsp, jva, servlet, saaj and jax-rpc are available under Sun’s binary license, 
+which you can find here: http://java.sun.com/j2se/1.5.0/jdk-1_5_0_01-license.txt
 
-If you have questions about the licensing terms for the Alfresco Software, please contact 
-us at: info@alfresco.org.
+If you have questions about the licensing terms for the Alfresco Software, 
+please contact us at: info@alfresco.org.
