@@ -17,7 +17,9 @@
  *
  * Created on 03-Aug-2005
  */
-package org.alfresco.repo.security.permissions;
+package org.alfresco.repo.security.permissions.impl;
+
+import org.alfresco.repo.security.permissions.NodePermissionEntry;
 
 
 /**

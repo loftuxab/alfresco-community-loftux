@@ -34,6 +34,27 @@ import org.alfresco.service.namespace.QName;
 public interface PermissionService
 {
     /**
+     * Get the Owner Authority
+     * 
+     * @return the owner authority
+     */
+    public String getOwnerAuthority();
+    
+    /**
+     * Get the All Authorities
+     * 
+     * @return the All authorities
+     */
+    public String getAllAuthorities();
+    
+    /**
+     * Get the All Permission
+     * 
+     * @return the All permission
+     */
+    public PermissionReference getAllPermission();
+    
+    /**
      * Get all the AccessPermissions that are granted to the given
      * authentication for the given node
      * 

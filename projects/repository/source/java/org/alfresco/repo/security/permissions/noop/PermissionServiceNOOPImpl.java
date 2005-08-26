@@ -21,6 +21,46 @@ public class PermissionServiceNOOPImpl
     implements PermissionService
 {
 
+    /**
+     * ALL Permission
+     */
+    private static PermissionReference ALL_PERMISSION = new PermissionReference()
+    {
+        public String getName()
+        {
+            return "All";
+        }
+    
+        public QName getQName()
+        {
+            return ContentModel.TYPE_BASE;
+        }
+    };    
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.security.permissions.PermissionService#getOwnerAuthority()
+     */
+    public String getOwnerAuthority()
+    {
+        return "owner";
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.security.permissions.PermissionService#getAllAuthorities()
+     */
+    public String getAllAuthorities()
+    {
+        return "all";
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.security.permissions.PermissionService#getAllPermission()
+     */
+    public PermissionReference getAllPermission()
+    {
+        return ALL_PERMISSION;
+    }    
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#getPermissions(org.alfresco.service.cmr.repository.NodeRef)
      */
@@ -51,19 +91,7 @@ public class PermissionServiceNOOPImpl
     public Set<PermissionReference> getSettablePermissions(QName type)
     {
         HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
-        permissions.add(new PermissionReference()
-        {
-            public String getName()
-            {
-                return "All";
-            }
-        
-            public QName getQName()
-            {
-                return ContentModel.TYPE_BASE;
-            }
-        });
-        
+        permissions.add(ALL_PERMISSION);
         return permissions;
     }
 

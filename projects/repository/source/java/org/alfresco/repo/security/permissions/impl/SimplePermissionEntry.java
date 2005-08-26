@@ -19,7 +19,6 @@
  */
 package org.alfresco.repo.security.permissions.impl;
 
-import org.alfresco.repo.security.permissions.AbstractPermissionEntry;
 import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -32,21 +31,6 @@ import org.alfresco.service.namespace.QName;
  */
 public class SimplePermissionEntry extends AbstractPermissionEntry
 {
-    /**
-     * Encoding for all authorities.
-     */
-    public static final String ALL_AUTHORITIES = "\u0000";
-    
-    /**
-     * Encoding for owner
-     */
-    
-    public static final String OWNER_AUTHORITY = "\u0000owner";
-    
-    /**
-     * Encoding for all permissions.
-     */
-    public static final SimplePermissionReference ALL_PERMISSIONS = new SimplePermissionReference(QName.createQName("\u0000", "\u0000"), "\u0000");
     
     /*
      * The node ref to which the permissoin applies
@@ -56,7 +40,7 @@ public class SimplePermissionEntry extends AbstractPermissionEntry
     /*
      * The permission reference - as a simple permission reference
      */
-    private SimplePermissionReference permissionReference;
+    private PermissionReference permissionReference;
     
     /*
      * The authority to which the permission aplies
@@ -70,7 +54,7 @@ public class SimplePermissionEntry extends AbstractPermissionEntry
     
     
     
-    public SimplePermissionEntry(NodeRef nodeRef, SimplePermissionReference permissionReference, String authority, AccessStatus accessStatus)
+    public SimplePermissionEntry(NodeRef nodeRef, PermissionReference permissionReference, String authority, AccessStatus accessStatus)
     {
         super();
         this.nodeRef = nodeRef;

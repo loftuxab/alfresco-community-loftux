@@ -51,7 +51,12 @@ import org.springframework.beans.factory.InitializingBean;
 public class PermissionServiceImpl implements PermissionService, InitializingBean
 {
     /*
-     * Access to the mode,
+     * ALL Permission
+     */
+    private static final PermissionReference ALL_PERMISSION = new SimplePermissionReference(QName.createQName("\u0000", "\u0000"), "\u0000");
+    
+    /*
+     * Access to the model
      */
     private ModelDAO modelDAO;
 
@@ -73,8 +78,8 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
     /*
      * Access to the authentication service
      */
-    private AuthenticationService authenticationService;
-
+    private AuthenticationService authenticationService;    
+    
     /*
      * Standard spring construction.
      */
@@ -142,6 +147,21 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
     // Permissions Service
     //
 
+    public String getOwnerAuthority()
+    {
+        return "\u0000owner";
+    }
+
+    public String getAllAuthorities()
+    {
+        return "\u0000";
+    }
+
+    public PermissionReference getAllPermission()
+    {
+        return ALL_PERMISSION;
+    }
+    
     public Set<AccessPermission> getPermissions(NodeRef nodeRef)
     {
         // TODO Auto-generated method stub
@@ -220,7 +240,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         // TODO: Refactor and use the authentication service for this.
         User user = (User) auth.getPrincipal();
         auths.add(user.getUsername());
-        auths.add(SimplePermissionEntry.ALL_AUTHORITIES);
+        auths.add(getAllAuthorities());
         for (GrantedAuthority authority : auth.getAuthorities())
         {
             auths.add(authority.getAuthority());
@@ -564,7 +584,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
                         // All permission excludes all permissions available for
                         // the node.
-                        if (pe.getPermissionReference().equals(SimplePermissionEntry.ALL_PERMISSIONS))
+                        if (pe.getPermissionReference().equals(getAllPermission()))
                         {
                             for (PermissionReference deny : modelDAO.getAllPermissions(nodeRef))
                             {
@@ -591,7 +611,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
             // Find all the permissions that grant the allowed permission
             // All permissions are treated specially.
             Set<PermissionReference> granters = modelDAO.getGrantingPermissions(required);
-            granters.add(SimplePermissionEntry.ALL_PERMISSIONS);
+            granters.add(getAllPermission());
 
             NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
 

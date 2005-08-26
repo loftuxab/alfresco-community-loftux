@@ -24,8 +24,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.alfresco.repo.security.permissions.AbstractPermissionReference;
 import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.impl.AbstractPermissionReference;
 import org.alfresco.repo.security.permissions.impl.PermissionReferenceImpl;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;

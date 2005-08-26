@@ -19,7 +19,6 @@
  */
 package org.alfresco.repo.security.permissions.impl;
 
-import org.alfresco.repo.security.permissions.AbstractPermissionReference;
 import org.alfresco.service.namespace.QName;
 
 /**

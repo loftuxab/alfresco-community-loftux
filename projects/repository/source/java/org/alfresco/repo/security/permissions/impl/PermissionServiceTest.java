@@ -35,6 +35,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 
+
 public class PermissionServiceTest extends AbstractPermissionTest
 {
 
@@ -95,12 +96,12 @@ public class PermissionServiceTest extends AbstractPermissionTest
         Set<SimplePermissionEntry> entries = new HashSet<SimplePermissionEntry>();
         entries.add(new SimplePermissionEntry(rootNodeRef, new SimplePermissionReference(QName.createQName("A", "B"),
                 "C"), "user-one", AccessStatus.ALLOWED));
-        entries.add(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS, "user-two",
+        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(), "user-two",
                 AccessStatus.ALLOWED));
         entries.add(new SimplePermissionEntry(rootNodeRef, new SimplePermissionReference(QName.createQName("D", "E"),
-                "F"), SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.ALLOWED));
-        entries.add(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+                "F"), permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
+        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+                permissionService.getAllAuthorities(), AccessStatus.DENIED));
 
         SimpleNodePermissionEntry entry = new SimpleNodePermissionEntry(rootNodeRef, false, entries);
 
@@ -115,8 +116,8 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testSetNodePermissionEntry2()
     {
         Set<SimplePermissionEntry> entries = new HashSet<SimplePermissionEntry>();
-        entries.add(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.ALLOWED));
+        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+                permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
 
         SimpleNodePermissionEntry entry = new SimpleNodePermissionEntry(rootNodeRef, false, entries);
 
@@ -138,7 +139,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testSetPermissionEntryElements()
     {
-        permissionService.setPermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, true);
+        permissionService.setPermission(rootNodeRef, "andy", permissionService.getAllPermission(), true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -147,14 +148,14 @@ public class PermissionServiceTest extends AbstractPermissionTest
         {
             assertEquals("andy", pe.getAuthority());
             assertTrue(pe.isAllowed());
-            assertTrue(pe.getPermissionReference().getQName().equals(SimplePermissionEntry.ALL_PERMISSIONS.getQName()));
-            assertTrue(pe.getPermissionReference().getName().equals(SimplePermissionEntry.ALL_PERMISSIONS.getName()));
+            assertTrue(pe.getPermissionReference().getQName().equals(permissionService.getAllPermission().getQName()));
+            assertTrue(pe.getPermissionReference().getName().equals(permissionService.getAllPermission().getName()));
             assertEquals(rootNodeRef, pe.getNodeRef());
         }
 
         // Set duplicate
 
-        permissionService.setPermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, true);
+        permissionService.setPermission(rootNodeRef, "andy", permissionService.getAllPermission(), true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -162,7 +163,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // Set new
 
-        permissionService.setPermission(rootNodeRef, "other", SimplePermissionEntry.ALL_PERMISSIONS, true);
+        permissionService.setPermission(rootNodeRef, "other", permissionService.getAllPermission(), true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -170,7 +171,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // Add deny
 
-        permissionService.setPermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, false);
+        permissionService.setPermission(rootNodeRef, "andy", permissionService.getAllPermission(), false);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -194,19 +195,19 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
-        permissionService.deletePermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, false);
+        permissionService.deletePermission(rootNodeRef, "andy", permissionService.getAllPermission(), false);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
-        permissionService.deletePermission(rootNodeRef, "other", SimplePermissionEntry.ALL_PERMISSIONS, true);
+        permissionService.deletePermission(rootNodeRef, "other", permissionService.getAllPermission(), true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(1, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
-        permissionService.deletePermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, true);
+        permissionService.deletePermission(rootNodeRef, "andy", permissionService.getAllPermission(), true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -216,9 +217,9 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testSetPermissionEntry()
     {
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
                 "andy", AccessStatus.ALLOWED));
-        permissionService.setPermission(rootNodeRef, "andy", SimplePermissionEntry.ALL_PERMISSIONS, true);
+        permissionService.setPermission(rootNodeRef, "andy", permissionService.getAllPermission(), true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -227,14 +228,14 @@ public class PermissionServiceTest extends AbstractPermissionTest
         {
             assertEquals("andy", pe.getAuthority());
             assertTrue(pe.isAllowed());
-            assertTrue(pe.getPermissionReference().getQName().equals(SimplePermissionEntry.ALL_PERMISSIONS.getQName()));
-            assertTrue(pe.getPermissionReference().getName().equals(SimplePermissionEntry.ALL_PERMISSIONS.getName()));
+            assertTrue(pe.getPermissionReference().getQName().equals(permissionService.getAllPermission().getQName()));
+            assertTrue(pe.getPermissionReference().getName().equals(permissionService.getAllPermission().getName()));
             assertEquals(rootNodeRef, pe.getNodeRef());
         }
 
         // Set duplicate
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
                 "andy", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -243,7 +244,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // Set new
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
                 "other", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -252,7 +253,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // Deny
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
                 "andy", AccessStatus.DENIED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -276,21 +277,21 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef,
-                SimplePermissionEntry.ALL_PERMISSIONS, "andy", AccessStatus.DENIED));
+                permissionService.getAllPermission(), "andy", AccessStatus.DENIED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef,
-                SimplePermissionEntry.ALL_PERMISSIONS, "other", AccessStatus.ALLOWED));
+                permissionService.getAllPermission(), "other", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(1, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef,
-                SimplePermissionEntry.ALL_PERMISSIONS, "andy", AccessStatus.ALLOWED));
+                permissionService.getAllPermission(), "andy", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -981,7 +982,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
                 "andy", AccessStatus.ALLOWED));
         runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef, READ));
@@ -1010,7 +1011,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
                 "andy", AccessStatus.DENIED));
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ));
@@ -1109,7 +1110,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.ALLOWED));
+                permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
         runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef, READ));
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -1122,7 +1123,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+                permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ));
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -1135,7 +1136,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+                permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef, READ));
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -1148,7 +1149,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.ALLOWED));
+                permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ));
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -1177,8 +1178,8 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+                permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
         runAs("andy");
         assertTrue(permissionService.hasPermission(rootNodeRef, READ));
         assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
@@ -1193,7 +1194,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+                permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ));
         assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
@@ -1207,8 +1208,8 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, SimplePermissionEntry.ALL_PERMISSIONS,
-                SimplePermissionEntry.ALL_AUTHORITIES, AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+                permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ));
         assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));

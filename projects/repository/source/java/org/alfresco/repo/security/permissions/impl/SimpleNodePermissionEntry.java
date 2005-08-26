@@ -21,7 +21,6 @@ package org.alfresco.repo.security.permissions.impl;
 
 import java.util.Set;
 
-import org.alfresco.repo.security.permissions.AbstractNodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.service.cmr.repository.NodeRef;
 

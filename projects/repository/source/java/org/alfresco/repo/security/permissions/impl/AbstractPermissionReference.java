@@ -17,19 +17,20 @@
  *
  * Created on 03-Aug-2005
  */
-package org.alfresco.repo.security.permissions;
+package org.alfresco.repo.security.permissions.impl;
 
-import org.alfresco.util.EqualsHelper;
+import org.alfresco.repo.security.permissions.PermissionReference;
+
 
 /**
  * This class provides common support for hash code and equality.
  * 
  * @author andyh
  */
-public abstract class AbstractAuthorityReference implements AuthorityReference
+public abstract class AbstractPermissionReference implements PermissionReference
 {
 
-    public AbstractAuthorityReference()
+    public AbstractPermissionReference()
     {
         super();
     }
@@ -41,19 +42,17 @@ public abstract class AbstractAuthorityReference implements AuthorityReference
         {
             return true;
         }
-        if(!(o instanceof AbstractAuthorityReference ))
+        if(!(o instanceof AbstractPermissionReference))
         {
             return false;
         }
-        AbstractAuthorityReference other = (AbstractAuthorityReference)o;
-        return EqualsHelper.nullSafeEquals(this.getAuthority(), other.getAuthority());
+        AbstractPermissionReference other = (AbstractPermissionReference)o;
+        return this.getName().equals(other.getName()) && this.getQName().equals(other.getQName());
     }
 
     @Override
     public int hashCode()
     {
-        return getAuthority().hashCode();
+        return getQName().hashCode() * 37 + getName().hashCode();
     }
-
-
 }
