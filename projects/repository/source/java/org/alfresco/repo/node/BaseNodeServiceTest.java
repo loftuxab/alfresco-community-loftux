@@ -642,6 +642,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         nodeService.removeChild(rootNodeRef, childRef);
     }
     
+    public enum TestEnum
+    {
+        TEST_ONE,
+        TEST_TWO
+    }
+    
     public void testProperties() throws Exception
     {
         QName qnameProperty1 = QName.createQName("PROPERTY1");
@@ -649,6 +655,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         QName qnameProperty2 = QName.createQName("PROPERTY2");
         String valueProperty2 = "VALUE2";
         QName qnameProperty3 = QName.createQName("PROPERTY3");
+        QName qnameProperty4 = QName.createQName("PROPERTY4");
         
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         properties.put(qnameProperty1, valueProperty1);
@@ -658,6 +665,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         nodeService.setProperty(rootNodeRef, qnameProperty2, valueProperty2);
         // set a null property
         nodeService.setProperty(rootNodeRef, qnameProperty3, null);
+        // set an enum property
+        nodeService.setProperty(rootNodeRef, qnameProperty4, TestEnum.TEST_ONE);
         
         // force a flush
         getSession().flush();
@@ -670,6 +679,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals("Property value incorrect", valueProperty2, checkMap.get(qnameProperty2));
         assertTrue("Null property not persisted", checkMap.containsKey(qnameProperty3));
         assertNull("Null value not persisted correctly", checkMap.get(qnameProperty3));
+        assertEquals("Enum property not retrieved", TestEnum.TEST_ONE, checkMap.get(qnameProperty4));
         
         // get a single property direct from the node
         Serializable valueCheck = nodeService.getProperty(rootNodeRef, qnameProperty2);
