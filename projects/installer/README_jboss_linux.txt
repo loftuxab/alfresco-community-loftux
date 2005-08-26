@@ -7,11 +7,13 @@ snapshot of where we are currently in the development of the Alfresco
 system.  It is intended for preview use only and should not be used for
 any other purpose.  Not all functionality is available or complete.
 
+
 ===================================
 Installing Alfresco Preview Release
 ===================================
 
 The Alfresco Preview Release is intended for evaluation purposes only.
+
 
 ===================================
 Alfresco JBoss Bundled Installation
@@ -30,11 +32,10 @@ Optional:
 Simple Installation on Linux
 ============================
 
-
 Install JDK 5.0
 ---------------
 
-- If you already have J2SE Development Kit 5.0 installed, skip to "Install MySQL"
+- If you already have J2SE Development Kit 5.0 installed, skip to "Create Database"
 
 - Browse to http://java.sun.com/j2se/1.5.0/download.jsp
 - Select the "JDK 5.0 Update x" option
@@ -52,6 +53,10 @@ Install MySQL
 - Download the approprate MySQL Max for your platform
 - Install by following MySQL's installation instructions
 
+
+Create Database
+---------------
+
 Then create a database schema named 'alfresco', e.g.:
    mysqladmin -u root create alfresco
 
@@ -63,6 +68,7 @@ To check that this is working correctly, start MySQL and connect to the database
    mysql> use alfresco;
    Database changed
    mysql> quit
+
 
 Install Alfresco JBoss Bundle
 -----------------------------
@@ -144,9 +150,10 @@ enter the folder location directly in the dialog, for example '\\MYPC01_A\alfres
 To check the CIFS server is running, try connecting from the Alfresco server using smbclient.
 
 If you are unable to connect to the CIFS server, then depending on your network, you may need 
-to configure the domain for CIFS to use.  To set this, edit the 'alfresco-file-servers.xml' 
-file in the  '~/alfresco/jboss/server/default/conf' directory and add the domain into the 
-following line:
+to configure the domain for CIFS to use.  You will need to have started the Alfresco server
+at least once to be able to do this.  To set the domain, edit the 'file-servers.xml' 
+file in the '~/alfresco/jboss/server/default/conf/alfresco' directory and add the 
+domain into the following line:
    <host name="${localname}_A"/>
 so that it is something like:
    <host name="${localname}_A" domain="MYDOMAIN"/>
@@ -161,3 +168,38 @@ Trouble-Shooting
 If you have problems with your installation, please look for help on the Installation
 forum at http://www.alfresco.org/forums and ask for any additional help you may need.
 
+. The JAVA_HOME variable must be set correctly to your Java5 installation.
+
+. Most installation issues can be resolved by following advice in this forum article:
+ - http://www.alfresco.org/forums/viewtopic.php?t=7
+  and in this forum generally:
+ - http://www.alfresco.org/forums/viewforum.php?f=8
+
+. WAR file name is now called alfresco.war
+NOTE: If you deployed the war previously from source (rather than use a standard Alfresco installation package) then you must clear out the web-client stuff from your appservers before deploying the new WAR file:
+
+Tomcat:
+- Delete <tomcat-home>/webapps/web-client.war
+- Delete <tomcat-home>/webapps/web-client
+- Delete <tomcat-home>/work
+
+JBoss:
+- Delete <jboss-home>/server/default/deploy/web-client.war
+
+. If the following errors are reported on the console:
+ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
+ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available: Failed to execute command: imconvert ...
+  The are not issues which will cause the server to fail, Alfresco is reporting the fact that various external document transformation engines are not available for use by the server. Either follow the instructions at the bottom of the Release Notes Wiki page:
+ - http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
+  or remove the transformer references completely if you don't require them:
+ - http://www.alfresco.org/forums/viewtopic.php?t=90
+
+. If you see this error on server startup:
+ ERROR [protocol] FTP Socket error
+    java.net.BindException: Address already in use: JVM_Bind
+         at java.net.PlainSocketImpl.socketBind(Native Method)
+ Check to see if you have any services running against port 8080 for the Alfresco server and port 21 for the Alfresco FTP integration.
+
+. To access the CIFS repository directly from the FireFox browser, you need to install the Alfresco FireFox Extension from here:
+ - http://sourceforge.net/projects/alfresco
+ Internet Explorer does not require the extension to see display CIFS folders directly.
