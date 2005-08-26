@@ -31,6 +31,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * A <code>UserTransaction</code> that will allow the thread using it to participate
@@ -49,7 +52,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  * 
  * @author Derek Hulley
  */
-public class SpringAwareUserTransaction implements UserTransaction
+public class SpringAwareUserTransaction extends TransactionSynchronizationAdapter implements UserTransaction
 {
     /*
      * The transaction status is stored in a threadlocal for two reasons:
@@ -83,7 +86,7 @@ public class SpringAwareUserTransaction implements UserTransaction
      * 
      * @param transactionManager the transaction manager to use
      * 
-     * @see #setPropogationBehviour(int)
+     * @see #setPropagationBehviour(int)
      */
     public SpringAwareUserTransaction(PlatformTransactionManager transactionManager)
     {
@@ -93,20 +96,54 @@ public class SpringAwareUserTransaction implements UserTransaction
     }
     
     /**
-     * Set the propogation mode for when the transaction is started.  The constants are
+     * Set the propagation mode for when the transaction is started.  The constants are
      * defined by the {@link TransactionDefinition SpringFramework}. 
      * 
-     * @param propogationBehaviour the type of transaction propogation required
+     * @param propagationBehaviour the type of transaction propagation required
      * 
      * @see TransactionDefinition#PROPAGATION_REQUIRED
      */
-    public void setPropogationBehviour(int propogationBehaviour)
+    public void setPropagationBehviour(int propagationBehaviour)
     {
-        transactionDef.setPropagationBehavior(propogationBehaviour);
+        transactionDef.setPropagationBehavior(propagationBehaviour);
+    }
+
+    @Override
+    public void afterCompletion(int status)
+    {
+        switch (status)
+        {
+            case TransactionSynchronization.STATUS_ROLLED_BACK:
+                status = Status.STATUS_ROLLEDBACK;
+                break;
+            case TransactionSynchronization.STATUS_COMMITTED:
+                status = Status.STATUS_COMMITTED;
+                break;
+            default:
+                // no idea what has happened to the txn, but it has finished
+                status = Status.STATUS_NO_TRANSACTION;
+        }
     }
 
     public synchronized int getStatus() throws SystemException
     {
+        if (threadLocalTxnStatus == null)
+        {
+            // no txn started
+            return Status.STATUS_NO_TRANSACTION;
+        }
+        // check that this instance has not been used by another thread
+        TransactionStatus txnStatus = threadLocalTxnStatus.get();
+        if (txnStatus == null)
+        {
+            throw new RuntimeException("UserTransaction may not be accessed by multiple threads");
+        }
+        
+        // ensure that our internal status is in synch with the Spring txn
+        if (txnStatus.isRollbackOnly())
+        {
+            status = Status.STATUS_MARKED_ROLLBACK;
+        }
         return status;
     }
 
@@ -158,6 +195,11 @@ public class SpringAwareUserTransaction implements UserTransaction
         threadLocalTxnStatus = new ThreadLocal<TransactionStatus>();
         threadLocalTxnStatus.set(txnStatus);
         status = Status.STATUS_ACTIVE;
+        
+        // register this UserTransaction as a synchronization so that we get the
+        // callbacks required to know when the transaction is rolledback or committed, etc
+        TransactionSynchronizationManager.registerSynchronization(this);
+        
         // done
         if (logger.isDebugEnabled())
         {
@@ -202,14 +244,30 @@ public class SpringAwareUserTransaction implements UserTransaction
         // we definitely began a transaction on this thread
         try
         {
+            // is this going to commit or rollback?
+            boolean willCommit = true;
+            if (txnStatus.isRollbackOnly())
+            {
+                willCommit = false;
+            }
+            // will commit or rollback
             transactionManager.commit(txnStatus);
-            status = Status.STATUS_COMMITTED;
+            if (willCommit)
+            {
+                status = Status.STATUS_COMMITTED;
+            }
+            else
+            {
+                status = Status.STATUS_ROLLEDBACK;
+                throw new RollbackException("The transaction was rolled back");
+            }
         }
         catch (RuntimeException e)
         {
             // the transaction will be rolled back automatically
             status = Status.STATUS_ROLLEDBACK;
-            throw e;
+            e.printStackTrace();
+            throw new RollbackException("The transaction was not committed - " + e.getMessage());
         }
         
         // done

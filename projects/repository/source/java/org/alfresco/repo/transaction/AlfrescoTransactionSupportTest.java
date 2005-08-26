@@ -80,7 +80,7 @@ public class AlfrescoTransactionSupportTest extends TestCase
         // begin a new, inner transaction
         {
             SpringAwareUserTransaction txnInner = (SpringAwareUserTransaction) transactionService.getUserTransaction();
-            txnInner.setPropogationBehviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            txnInner.setPropagationBehviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             
             String txnIdInner = AlfrescoTransactionSupport.getTransactionId();
             assertEquals("Inner transaction not started, so txn ID should not change", txnId, txnIdInner);

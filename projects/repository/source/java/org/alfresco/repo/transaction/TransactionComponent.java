@@ -5,14 +5,14 @@ import javax.transaction.UserTransaction;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 
 /**
  * Default implementation of Transaction Service
  * 
  * @author David Caruana
  */
-public class TransactionComponent
-    implements TransactionService
+public class TransactionComponent implements TransactionService
 {
     private PlatformTransactionManager transactionManager;
     
@@ -26,11 +26,21 @@ public class TransactionComponent
         this.transactionManager = transactionManager;
     }
     
-    /* (non-Javadoc)
-     * @see org.alfresco.util.transaction.TransactionService#getUserTransaction()
+    /**
+     * @see org.springframework.transaction.TransactionDefinition#PROPAGATION_REQUIRED
      */
     public UserTransaction getUserTransaction()
     {
         return new SpringAwareUserTransaction(transactionManager);
+    }
+
+    /**
+     * @see org.springframework.transaction.TransactionDefinition#PROPAGATION_REQUIRES_NEW
+     */
+    public UserTransaction getNonPropagatingUserTransaction()
+    {
+        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(transactionManager);
+        txn.setPropagationBehviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return txn;
     }
 }

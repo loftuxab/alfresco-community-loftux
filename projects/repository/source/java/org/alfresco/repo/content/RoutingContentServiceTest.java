@@ -45,7 +45,6 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
-import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * @see org.alfresco.repo.content.RoutingContentService
@@ -372,7 +371,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
             txn.commit();
             fail("Multiple commits after inserts of same data should have been detected");
         }
-        catch (DataIntegrityViolationException e)
+        catch (RollbackException e)
         {
             // expected
         }
