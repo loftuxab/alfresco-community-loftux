@@ -841,9 +841,9 @@ public class NewUserWizard extends AbstractWizardBean
          this.permissionService.setInheritParentPermissions(nodeRef, false);
          // then we set maximium permissions to the owner of the space
          // so by default other users (except admin) will NOT have access to the space
-         this.permissionService.setPermission(nodeRef, ContextListener.ADMIN, SimplePermissionEntry.ALL_PERMISSIONS, true);
-         this.permissionService.setPermission(nodeRef, this.userName, SimplePermissionEntry.ALL_PERMISSIONS, true);
-         this.permissionService.setPermission(nodeRef, SimplePermissionEntry.OWNER_AUTHORITY, SimplePermissionEntry.ALL_PERMISSIONS, true);
+         this.permissionService.setPermission(nodeRef, ContextListener.ADMIN, permissionService.getAllPermission(), true);
+         this.permissionService.setPermission(nodeRef, this.userName, permissionService.getAllPermission(), true);
+         this.permissionService.setPermission(nodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
          
          // return the ID of the created space
          homeSpaceId = nodeRef.getId();
