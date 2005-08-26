@@ -41,8 +41,8 @@ public class PageTag extends TagSupport
    private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
    private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
    private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
-   private final static String ALF_URL   = "http://www.alfresco.org";
-   private final static String ALF_LOGO  = "http://www.alfresco.org/webclient/alfresco_logo.gif";
+   private final static String ALF_URL   = "http://www.alfrescosoftware.com";
+   private final static String ALF_LOGO  = "http://www.alfresco.org/alfresco_logo.gif";
    private final static String ALF_TEXT  = "Content managed by Alfresco";
    private final static String ALF_COPY  = "Alfresco Software Inc. © 2005 All rights reserved.";
    
