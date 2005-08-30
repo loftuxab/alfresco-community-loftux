@@ -51,6 +51,7 @@ public class PageTag extends TagSupport
    
    private long startTime = 0;
    private String title;
+   private String titleId;
    
    /**
     * @return The title for the page
@@ -66,6 +67,29 @@ public class PageTag extends TagSupport
    public void setTitle(String title)
    {
       this.title = title;
+   }
+   
+   /**
+    * @return The title message Id for the page
+    */
+   public String getTitleId()
+   {
+      return titleId;
+   }
+
+   /**
+    * @param titleId Sets the page title message Id
+    */
+   public void setTitleId(String titleId)
+   {
+      this.titleId = titleId;
+   }
+   
+   public void release()
+   {
+      super.release();
+      title = null;
+      titleId = null;
    }
 
    /**
@@ -83,13 +107,17 @@ public class PageTag extends TagSupport
          if (Application.inPortalServer() == false)
          {
             out.write("<html><head><title>");
-            if (this.title == null)
+            if (this.titleId != null && this.titleId.length() != 0)
             {
-               out.write("Alfresco Web Client");
+               out.write(Application.getMessage(pageContext.getSession(), this.titleId));
+            }
+            else if (this.title != null && this.title.length() != 0)
+            {
+               out.write(this.title);
             }
             else
             {
-               out.write(this.title);
+               out.write("Alfresco Web Client");
             }
             out.write("</title></head>");
             out.write("<body>\n");

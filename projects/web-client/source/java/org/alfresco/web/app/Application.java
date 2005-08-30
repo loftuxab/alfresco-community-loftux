@@ -17,6 +17,7 @@
 package org.alfresco.web.app;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -313,6 +314,35 @@ public class Application
    }
    
    /**
+    * Get the specified I18N message string from the default message bundle for this user
+    * 
+    * @param session        HttpSession
+    * @param msg            Message ID
+    * 
+    * @return String from message bundle or null if not found
+    */
+   public static String getMessage(HttpSession session, String msg)
+   {
+      ResourceBundle bundle = (ResourceBundle)session.getAttribute(MESSAGE_BUNDLE);
+      if (bundle == null)
+      {
+         // TODO: get Locale from language selected by each user on login
+         bundle = ResourceBundle.getBundle(MESSAGE_BUNDLE, Locale.getDefault());
+         if (bundle == null)
+         {
+            throw new AlfrescoRuntimeException("Unable to load Alfresco messages bundle: " + MESSAGE_BUNDLE);
+         }
+         
+         // apply our wrapper to catch MissingResourceException
+         bundle = new ResourceBundleWrapper(bundle);
+         
+         session.setAttribute(MESSAGE_BUNDLE, bundle);
+      }
+      
+      return bundle.getString(msg);
+   }
+   
+   /**
     * Get the specified the default message bundle for this user
     * 
     * @param context        FacesContext
@@ -328,6 +358,7 @@ public class Application
       ResourceBundle bundle = (ResourceBundle)session.get(MESSAGE_BUNDLE);
       if (bundle == null)
       {
+         // TODO: get Locale from language selected by each user on login
          bundle = ResourceBundle.getBundle(MESSAGE_BUNDLE, context.getApplication().getDefaultLocale());
          if (bundle == null)
          {
