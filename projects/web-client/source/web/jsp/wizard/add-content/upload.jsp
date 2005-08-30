@@ -26,6 +26,8 @@
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 <%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
 <%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
+<%@ page import="org.alfresco.web.app.Application" %>
+<%@ page import="javax.faces.context.FacesContext" %>
 
 <r:page titleId="title_add_content_upload">
 
@@ -140,7 +142,7 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <input style="margin-left:12px;" type="submit" value="Upload" />
+                                       <input style="margin-left:12px;" type="submit" value="<%=Application.getMessage(FacesContext.getCurrentInstance(), "upload")%>" />
                                     </td>
                                  </tr>
                                  </r:uploadForm>
@@ -157,7 +159,7 @@
                                  %>
                                     <tr>
                                        <td>
-                                          <img alt="#{msg.information}" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          <img alt="" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
                                           <%=wiz.getFileUploadSuccessMsg()%>
                                        </td>
                                     </tr>

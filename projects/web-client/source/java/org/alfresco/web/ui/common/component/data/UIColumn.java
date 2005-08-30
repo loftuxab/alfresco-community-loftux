@@ -19,6 +19,7 @@ package org.alfresco.web.ui.common.component.data;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
+import javax.faces.el.ValueBinding;
 
 /**
  * @author Kevin Roast
@@ -110,6 +111,11 @@ public class UIColumn extends UIComponentBase
     */
    public boolean getPrimary()
    {
+      ValueBinding vb = getValueBinding("primary");
+      if (vb != null)
+      {
+         this.primary = (Boolean)vb.getValue(getFacesContext());
+      }
       return this.primary;
    }
    
@@ -126,6 +132,11 @@ public class UIColumn extends UIComponentBase
     */
    public boolean getActions()
    {
+      ValueBinding vb = getValueBinding("actions");
+      if (vb != null)
+      {
+         this.actions = (Boolean)vb.getValue(getFacesContext());
+      }
       return this.actions;
    }
    

@@ -24,6 +24,7 @@ import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.el.ValueBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
@@ -227,6 +228,48 @@ public class UISortLink extends UICommand
    }
    
    /**
+    * @return Returns the label.
+    */
+   public String getLabel()
+   {
+      ValueBinding vb = getValueBinding("label");
+      if (vb != null)
+      {
+         this.label = (String)vb.getValue(getFacesContext());
+      }
+      return this.label;
+   }
+
+   /**
+    * @param label The label to set.
+    */
+   public void setLabel(String label)
+   {
+      this.label = label;
+   }
+
+   /**
+    * @return Returns the tooltip.
+    */
+   public String getTooltip()
+   {
+      ValueBinding vb = getValueBinding("tooltip");
+      if (vb != null)
+      {
+         this.tooltip = (String)vb.getValue(getFacesContext());
+      }
+      return this.tooltip;
+   }
+
+   /**
+    * @param tooltip The tooltip to set.
+    */
+   public void setTooltip(String tooltip)
+   {
+      this.tooltip = tooltip;
+   }
+
+   /**
     * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
     */
    public void restoreState(FacesContext context, Object state)
@@ -235,6 +278,9 @@ public class UISortLink extends UICommand
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
       this.descending = ((Boolean)values[1]).booleanValue();
+      this.mode = (String)values[2];
+      this.label = (String)values[3];
+      this.tooltip = (String)values[4];
    }
    
    /**
@@ -242,10 +288,13 @@ public class UISortLink extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[2];
+      Object values[] = new Object[5];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = (this.descending ? Boolean.TRUE : Boolean.FALSE);
+      values[2] = this.mode;
+      values[3] = this.label;
+      values[4] = this.tooltip;
       return values;
    }
    
@@ -283,6 +332,10 @@ public class UISortLink extends UICommand
    
    /** sorting mode */
    private String mode = IDataContainer.SORT_CASEINSENSITIVE;
+   
+   private String label;
+   
+   private String tooltip;
    
    /** true for descending sort, false for ascending */
    private boolean descending = true;

@@ -25,8 +25,10 @@
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 <%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
 <%@ page import="org.alfresco.web.bean.CheckinCheckoutBean" %>
+<%@ page import="org.alfresco.web.app.Application" %>
+<%@ page import="javax.faces.context.FacesContext" %>
 
-<r:page>
+<r:page titleId="title_checkin_file">
 
 <f:view>
    
@@ -73,7 +75,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Check In '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.check_in}" /> '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.checkinfile_description}" /></div>
                            </td>
                         </tr>
@@ -104,13 +106,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Check In" action="#{CheckinCheckoutBean.checkinFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.check_in}" action="#{CheckinCheckoutBean.checkinFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{CheckinCheckoutBean.cancel}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.cancel}" action="#{CheckinCheckoutBean.cancel}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
@@ -122,37 +124,35 @@
                            <td>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="wizardSectionHeading">Check In options</td>
+                                    <td class="wizardSectionHeading"><h:outputText value="#{msg.checkin_options}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:outputText value="Version Notes<br/>" escape="false"
-                                                     rendered="#{CheckinCheckoutBean.versionable}" />
-                                       <h:inputTextarea value="#{CheckinCheckoutBean.versionNotes}" rows="2" cols="50" 
-                                                        rendered="#{CheckinCheckoutBean.versionable}"/>
+                                       <h:outputText value="#{msg.version_notes}<br/>" escape="false" rendered="#{CheckinCheckoutBean.versionable}" />
+                                       <h:inputTextarea value="#{CheckinCheckoutBean.versionNotes}" rendered="#{CheckinCheckoutBean.versionable}" rows="2" cols="50" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>
                                        <h:selectBooleanCheckbox value="#{CheckinCheckoutBean.keepCheckedOut}" />
-                                       <span style="vertical-align:20%">Check in changes and keep file checked out</span>
+                                       <span style="vertical-align:20%"><h:outputText value="#{msg.checkin_changes_info}" /></span>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="wizardSectionHeading">Working copy location</td>
+                                    <td class="wizardSectionHeading"><h:outputText value="#{msg.workingcopy_location}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       Which copy do you want to check-in?
+                                       <h:outputText value="#{msg.which_copy_checkin}" />
                                     </td>
                                  </tr>
                                  
                                  <tr>
                                     <td>
                                        <h:selectOneRadio value="#{CheckinCheckoutBean.copyLocation}" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemDisabled="#{CheckinCheckoutBean.fileName != null}" itemLabel="Use copy in current space" />
-                                          <f:selectItem itemValue="other" itemLabel="Use copy uploaded from my computer" />
+                                          <f:selectItem itemValue="current" itemDisabled="#{CheckinCheckoutBean.fileName != null}" itemLabel="#{msg.which_copy_current}" />
+                                          <f:selectItem itemValue="other" itemLabel="#{msg.which_copy_other}" />
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
@@ -169,21 +169,21 @@
                               <r:uploadForm>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%" style="padding-left: 27px;">
                                  <tr>
-                                    <td>1. Locate document to upload</td>
+                                    <td>1. <h:outputText value="#{msg.locate_doc_upload}" /></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
+                                       <h:outputText value="#{msg.file_location}" />:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">2. Click upload</td>
+                                    <td class="mainSubText">2. <h:outputText value="#{msg.click_upload}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       <input style="margin-left:12px;" type="submit" value="Upload" />
+                                       <input style="margin-left:12px;" type="submit" value="<%=Application.getMessage(FacesContext.getCurrentInstance(), "upload")%>" />
                                     </td>
                                  </tr>
                                  <%
@@ -197,8 +197,8 @@
                                     <tr><td class="paddingRow"></td></tr>
                                     <tr>
                                        <td>
-                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<%=bean.getFileName()%>" was uploaded successfully.
+                                          <img alt="" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          <%=bean.getFileUploadSuccessMsg()%>
                                        </td>
                                     </tr>
                                  <% } %>
@@ -218,7 +218,7 @@
                </tr>
                
                <h:form id="checkin-file2">
-                            
+               
                <%-- Error Messages --%>
                <tr valign="top">
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>

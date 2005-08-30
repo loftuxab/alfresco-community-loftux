@@ -41,7 +41,7 @@ public class PageTag extends TagSupport
    private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
    private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
    private final static String ALF_URL   = "http://www.alfrescosoftware.com";
-   private final static String ALF_LOGO  = "http://www.alfresco.org/alfresco_logo.gif";
+   private final static String ALF_LOGO  = "/images/logo/alfresco_logo.gif";
    private final static String ALF_TEXT  = "Content managed by Alfresco";
    private final static String ALF_COPY  = "Alfresco Software Inc. © 2005 All rights reserved.";
    
@@ -185,9 +185,10 @@ public class PageTag extends TagSupport
    {
       if (alfresco == null)
       {
+         String reqPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath();
          alfresco = "<center>" +
                     "<a href='" + ALF_URL + "'>" +
-                    "<img border=0 alt='' title='" + ALF_TEXT + "' align=absmiddle src='" + ALF_LOGO + "'>" +
+                    "<img border=0 alt='' title='" + ALF_TEXT + "' align=absmiddle src='" + reqPath + ALF_LOGO + "'>" +
                     "</a>&nbsp;" +
                     "<span style='font-family:Arial,Helvetica,sans-serif;font-size:10px'>" + ALF_COPY +
                     "</span></center>";

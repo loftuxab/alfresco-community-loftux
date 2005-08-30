@@ -127,7 +127,7 @@
                                  <tr>
                                     <td><h:outputText value="#{msg.destination}"/>:</td>
                                     <td>
-                                       <r:spaceSelector label="#{msg.click_here_destination}" 
+                                       <r:spaceSelector label="#{msg.select_destination_prompt}" 
                                                         value="#{NewActionWizard.actionProperties.destinationLocation}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>

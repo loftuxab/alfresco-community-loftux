@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.el.ValueBinding;
 
 import org.alfresco.web.ui.common.Utils;
 
@@ -58,14 +59,15 @@ public class UIMenu extends SelfRenderingComponent
       out.write("');return false;\"");
       outputAttribute(out, getAttributes().get("style"), "style");
       outputAttribute(out, getAttributes().get("styleClass"), "class");
-      outputAttribute(out, getAttributes().get("tooltip"), "title");
+      outputAttribute(out, getTooltip(), "title");
       out.write('>');
       
       // output label text
-      if (getAttributes().get("label") != null)
+      String label = getLabel();
+      if (label != null)
       {
          out.write("<span>");
-         out.write(Utils.encode((String)getAttributes().get("label")));
+         out.write(Utils.encode(label));
          out.write("</span>");
       }
       
@@ -110,9 +112,76 @@ public class UIMenu extends SelfRenderingComponent
       out.write("</table></div>");
    }
    
+   /**
+    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+    */
+   public void restoreState(FacesContext context, Object state)
+   {
+      Object values[] = (Object[])state;
+      // standard component attributes are restored by the super class
+      super.restoreState(context, values[0]);
+      this.label = (String)values[1];
+      this.tooltip = (String)values[2];
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+    */
+   public Object saveState(FacesContext context)
+   {
+      Object values[] = new Object[3];
+      // standard component attributes are saved by the super class
+      values[0] = super.saveState(context);
+      values[1] = this.label;
+      values[2] = this.tooltip;
+      return values;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Strongly typed component property accessors
+   
+   /**
+    * @return Returns the label.
+    */
+   public String getLabel()
+   {
+      ValueBinding vb = getValueBinding("label");
+      if (vb != null)
+      {
+         this.label = (String)vb.getValue(getFacesContext());
+      }
+      return this.label;
+   }
+
+   /**
+    * @param label The label to set.
+    */
+   public void setLabel(String label)
+   {
+      this.label = label;
+   }
+
+   /**
+    * @return Returns the tooltip.
+    */
+   public String getTooltip()
+   {
+      ValueBinding vb = getValueBinding("tooltip");
+      if (vb != null)
+      {
+         this.tooltip = (String)vb.getValue(getFacesContext());
+      }
+      return this.tooltip;
+   }
+
+   /**
+    * @param tooltip The tooltip to set.
+    */
+   public void setTooltip(String tooltip)
+   {
+      this.tooltip = tooltip;
+   }
    
    
    // ------------------------------------------------------------------------------
@@ -148,4 +217,8 @@ public class UIMenu extends SelfRenderingComponent
    // Private members
    
    private final static String MENU_ID_KEY = "__awc_menu_id";
+   
+   private String label;
+   
+   private String tooltip;
 }

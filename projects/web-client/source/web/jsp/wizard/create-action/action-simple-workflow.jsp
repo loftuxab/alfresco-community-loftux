@@ -186,7 +186,7 @@
                                              <td valign="top" style="padding-top:10px;">To:</td>
                                              <td style="padding-left:6px;"></td>
                                              <td style="padding-top:6px;">
-                                                <r:spaceSelector label="#{msg.click_here_destination}" 
+                                                <r:spaceSelector label="#{msg.select_destination_prompt}" 
                                                         value="#{NewActionWizard.actionProperties.approveFolder}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
@@ -241,7 +241,7 @@
                                                                <td valign="top" style="padding-top:10px;">To:</td>
                                                                <td style="padding-left:6px;"></td>
                                                                <td style="padding-top:6px;">
-                                                                  <r:spaceSelector label="#{msg.click_here_destination}" 
+                                                                  <r:spaceSelector label="#{msg.select_destination_prompt}" 
                                                                           value="#{NewActionWizard.actionProperties.rejectFolder}" 
                                                                           initialSelection="#{NavigationBean.currentNodeId}"
                                                                           style="border: 1px dashed #cccccc; padding: 6px;"/>

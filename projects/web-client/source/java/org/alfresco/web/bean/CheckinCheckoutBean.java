@@ -233,6 +233,15 @@ public class CheckinCheckoutBean
    }
    
    /**
+    * @return Returns the message to display when a file has been uploaded
+    */
+   public String getFileUploadSuccessMsg()
+   {
+      String msg = Application.getMessage(FacesContext.getCurrentInstance(), "file_upload_success");
+      return MessageFormat.format(msg, new Object[] {getFileName()});
+   }
+   
+   /**
     * @return Returns the name of the file
     */
    public String getFileName()

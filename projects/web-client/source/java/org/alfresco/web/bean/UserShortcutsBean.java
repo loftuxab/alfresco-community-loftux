@@ -104,31 +104,37 @@ public class UserShortcutsBean
                this.shortcuts = new ArrayList<Node>(shortcuts.size());
                for (int i=0; i<shortcuts.size(); i++)
                {
-                  Node node = new Node(new NodeRef(Repository.getStoreRef(), shortcuts.get(i)), this.nodeService);
-                  try
+                  NodeRef ref = new NodeRef(Repository.getStoreRef(), shortcuts.get(i));
+                  if (this.nodeService.exists(ref) == true)
                   {
+                     Node node = new Node(ref, this.nodeService);
+                     
                      // quick init properties while in the usertransaction
                      node.getProperties();
                      
                      // save ref to the Node for rendering
                      this.shortcuts.add(node);
                   }
-                  catch (InvalidNodeRefException nodeErr)
+                  else
                   {
                      // ignore this shortcut node - no longer exists in the system!
                      // we write the node list back again afterwards to correct this
                      if (logger.isDebugEnabled())
-                        logger.debug("Found invalid shortcut node Id: " + node.getId());
+                        logger.debug("Found invalid shortcut node Id: " + ref.getId());
                   }
                }
                
+               // if the count of accessable shortcuts is different to our original list then
                // write the valid shortcut IDs back to correct invalid node refs
-               shortcuts = new ArrayList<String>(this.shortcuts.size());
-               for (int i=0; i<this.shortcuts.size(); i++)
+               if (this.shortcuts.size() != shortcuts.size())
                {
-                  shortcuts.add(this.shortcuts.get(i).getId());
+                  shortcuts = new ArrayList<String>(this.shortcuts.size());
+                  for (int i=0; i<this.shortcuts.size(); i++)
+                  {
+                     shortcuts.add(this.shortcuts.get(i).getId());
+                  }
+                  this.nodeService.setProperty(prefRef, QNAME_SHORTCUTS, (Serializable)shortcuts);
                }
-               this.nodeService.setProperty(prefRef, QNAME_SHORTCUTS, (Serializable)shortcuts);
             }
             else
             {

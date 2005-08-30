@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_advanced_search">
 
 <f:view>
    
@@ -114,56 +114,56 @@
                                        <table cellpadding="2" cellspacing="2" border="0">
                                           <tr><td class="paddingRow"></td></tr>
                                           <tr>
-                                             <td>Look in:</td>
+                                             <td><h:outputText value="#{msg.look_in}" />:</td>
                                           </tr>
                                           <tr>
                                              <td>
                                                 <h:selectOneRadio value="#{AdvancedSearchBean.lookin}" layout="pageDirection">
-                                                   <f:selectItem itemValue="all" itemLabel="All Spaces" />
-                                                   <f:selectItem itemValue="other" itemLabel="Specify Space:" />
+                                                   <f:selectItem itemValue="all" itemLabel="#{msg.all_spaces}" />
+                                                   <f:selectItem itemValue="other" itemLabel="#{msg.specify_space}:" />
                                                 </h:selectOneRadio>
                                              </td>
                                           </tr>
                                           <tr>
                                              <td style="padding-left:26px">
-                                                <r:spaceSelector label="Click here to select a Space" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                <r:spaceSelector label="#{msg.select_space_prompt}" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 4px;"/>
                                              </td>
                                           </tr>
                                           <tr>
                                              <td style="padding-left:22px">
                                                 <h:selectBooleanCheckbox value="#{AdvancedSearchBean.locationChildren}" />
-                                                <span style="vertical-align:20%">Include child spaces</span>
+                                                <span style="vertical-align:20%"><h:outputText value="#{msg.include_child_spaces}" /></span>
                                              </td>
                                           </tr>
                                           
                                           <tr><td class="paddingRow"></td></tr>
                                           <tr>
-                                             <td>Show me results for:</td>
+                                             <td><h:outputText value="#{msg.show_results_for}" />:</td>
                                           </tr>
                                           <tr>
                                              <td>
                                                 <h:selectOneRadio value="#{AdvancedSearchBean.mode}" layout="pageDirection">
-                                                   <f:selectItem itemValue="all" itemLabel="All Items" />
-                                                   <f:selectItem itemValue="files_text" itemLabel="File names and contents" />
-                                                   <f:selectItem itemValue="files" itemLabel="File names only" />
-                                                   <f:selectItem itemValue="folders" itemLabel="Space names only" />
+                                                   <f:selectItem itemValue="all" itemLabel="#{msg.all_items}" />
+                                                   <f:selectItem itemValue="files_text" itemLabel="#{msg.file_names_contents}" />
+                                                   <f:selectItem itemValue="files" itemLabel="#{msg.file_names}" />
+                                                   <f:selectItem itemValue="folders" itemLabel="#{msg.space_names}" />
                                                 </h:selectOneRadio>
                                              </td>
                                           </tr>
                                           
                                           <tr><td class="paddingRow"></td></tr>
                                           <tr>
-                                             <td>Show me results in the categories:</td>
+                                             <td><h:outputText value="#{msg.show_results_categories}" />:</td>
                                           </tr>
                                           <tr>
                                              <td style="padding-left:8px;padding-top:8px">
-                                                <r:categorySelector label="Click here to select a Category" value="#{AdvancedSearchBean.category}" style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                <r:categorySelector label="#{msg.select_category_prompt}" value="#{AdvancedSearchBean.category}" style="border: 1px dashed #cccccc; padding: 4px;"/>
                                              </td>
                                           </tr>
                                           <tr>
                                              <td style="padding-left:4px">
                                                 <h:selectBooleanCheckbox value="#{AdvancedSearchBean.categoryChildren}" />
-                                                <span style="vertical-align:20%">Include sub-categories</span>
+                                                <span style="vertical-align:20%"><h:outputText value="#{msg.include_sub_categories}" /></span>
                                              </td>
                                           </tr>
                                        </table>
@@ -175,19 +175,19 @@
                                        <table cellpadding="2" cellspacing="2" border="0">
                                           <tr><td class="paddingRow"></td></tr>
                                           <tr>
-                                             <td>Also search for:</td>
+                                             <td><h:outputText value="#{msg.also_search_results}" />:</td>
                                           </tr>
                                           <tr>
                                              <td>
                                                 <table cellpadding="2" cellspacing="2" border="0">
                                                    <tr>
-                                                      <td style="padding-left:8px">Title:</td><td><h:inputText value="#{AdvancedSearchBean.title}" size="28" maxlength="1024" id="title" /></td>
+                                                      <td style="padding-left:8px"><h:outputText value="#{msg.title}" />:</td><td><h:inputText value="#{AdvancedSearchBean.title}" size="28" maxlength="1024" id="title" /></td>
                                                    </tr>
                                                    <tr>
-                                                      <td style="padding-left:8px">Description:</td><td><h:inputText value="#{AdvancedSearchBean.description}" size="28" maxlength="1024" id="desc" /></td>
+                                                      <td style="padding-left:8px"><h:outputText value="#{msg.description}" />:</td><td><h:inputText value="#{AdvancedSearchBean.description}" size="28" maxlength="1024" id="desc" /></td>
                                                    </tr>
                                                    <tr>
-                                                      <td style="padding-left:8px">Author:</td><td><h:inputText value="#{AdvancedSearchBean.author}" size="28" maxlength="1024" id="author" /></td>
+                                                      <td style="padding-left:8px"><h:outputText value="#{msg.author}" />:</td><td><h:inputText value="#{AdvancedSearchBean.author}" size="28" maxlength="1024" id="author" /></td>
                                                    </tr>
                                                 </table>
                                                 <table cellpadding="1" cellspacing="0" border="0">
@@ -196,20 +196,20 @@
                                                       <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.modifiedDateChecked}" /><span style="vertical-align:20%">Modified Date:</span></td>
                                                    </tr>
                                                    <tr>
-                                                      <td style="padding-left:8px">From:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateFrom}" startYear="1985" yearCount="21" /></td>
+                                                      <td style="padding-left:8px"><h:outputText value="#{msg.from}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateFrom}" startYear="1985" yearCount="21" /></td>
                                                    </tr>
                                                    <tr>
-                                                      <td style="padding-left:8px">To:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateTo}" startYear="1985" yearCount="21" /><td>
+                                                      <td style="padding-left:8px"><h:outputText value="#{msg.to}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateTo}" startYear="1985" yearCount="21" /><td>
                                                    </tr>
                                                    
                                                    <tr>
                                                       <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.createdDateChecked}" /><span style="vertical-align:20%">Created Date:</span></td>
                                                    </tr>
                                                    <tr>
-                                                      <td style="padding-left:8px">From:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateFrom}" startYear="1985" yearCount="21" /></td>
+                                                      <td style="padding-left:8px"><h:outputText value="#{msg.from}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateFrom}" startYear="1985" yearCount="21" /></td>
                                                    </tr>
                                                    <tr>
-                                                      <td style="padding-left:8px">To:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateTo}" startYear="1985" yearCount="21" /><td>
+                                                      <td style="padding-left:8px"><h:outputText value="#{msg.to}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateTo}" startYear="1985" yearCount="21" /><td>
                                                    </tr>
                                                 </table>
                                              </td>
@@ -227,12 +227,12 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Search" action="#{AdvancedSearchBean.search}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.search}" action="#{AdvancedSearchBean.search}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
