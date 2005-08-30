@@ -600,12 +600,13 @@ public class InviteUsersWizard extends AbstractWizardBean
       {
          case 2:
          {
+            //stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             stepInstruction = FINISH_INSTRUCTION;
             break;
          }
          default:
          {
-            stepInstruction = DEFAULT_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), DEFAULT_INSTRUCTION_ID);
          }
       }
       

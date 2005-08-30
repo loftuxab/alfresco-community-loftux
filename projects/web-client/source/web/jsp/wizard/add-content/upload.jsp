@@ -27,7 +27,7 @@
 <%@ page import="org.alfresco.web.bean.wizard.AddContentWizard" %>
 <%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
 
-<r:page>
+<r:page titleId="title_add_content_upload">
 
 <f:view>
    
@@ -98,12 +98,12 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                           value="1" disabled="true">
-                                 <a:listItem value="1" label="1. Upload Document" />
-                                 <a:listItem value="2" label="2. Properties" />
-                                 <a:listItem value="3" label="3. Summary" />
+                                <a:listItem value="1" label="1. #{msg.upload_document}" />
+                                 <a:listItem value="2" label="2. #{msg.properties}" />
+                                 <a:listItem value="3" label="3. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>   
@@ -124,19 +124,19 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">1. Locate document to upload</td>
+                                    <td class="mainSubText">1. <h:outputText value="#{msg.locate_document}"/></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  
                                  <r:uploadForm>
                                  <tr>
                                     <td>
-                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
+                                       <h:outputText value="#{msg.location}"/>:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">2. Click upload</td>
+                                    <td class="mainSubText">2. <h:outputText value="#{msg.click_upload}"/></td>
                                  </tr>
                                  <tr>
                                     <td>
@@ -151,14 +151,14 @@
                                  AddContentWizard wiz = (AddContentWizard)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "AddContentWizard");
                                  if (wiz == null)
                                  {
-                                 	wiz = (AddContentWizard)session.getAttribute("AddContentWizard");
+                                    wiz = (AddContentWizard)session.getAttribute("AddContentWizard");
                                  }
                                  if (wiz != null && wiz.getFileName() != null) {
                                  %>
                                     <tr>
                                        <td>
-                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<%=wiz.getFileName()%>" was uploaded successfully.
+                                          <img alt="#{msg.information}" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          <%=wiz.getFileUploadSuccessMsg()%>
                                        </td>
                                     </tr>
                                  <% } %>
@@ -174,18 +174,18 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{AddContentWizard.next}" styleClass="wizardButton" disabled="#{AddContentWizard.fileName == null}" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{AddContentWizard.next}" styleClass="wizardButton" disabled="#{AddContentWizard.fileName == null}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{AddContentWizard.finish}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.finish_button}" action="#{AddContentWizard.finish}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

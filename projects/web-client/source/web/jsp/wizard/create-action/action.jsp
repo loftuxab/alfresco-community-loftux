@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_create_action_action">
 
 <f:view>
    
@@ -95,12 +95,12 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
                                           value="1" disabled="true">
-                                 <a:listItem value="1" label="1. Action" />
-                                 <a:listItem value="2" label="2. Action Settings" />
-                                 <a:listItem value="3" label="3. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.action}" />
+                                 <a:listItem value="2" label="2. #{msg.action_settings}" />
+                                 <a:listItem value="3" label="3. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -113,7 +113,7 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>Action:</td>
+                                    <td><h:outputText value="#{msg.action}"/>:</td>
                                     <td width="90%">
                                        <h:selectOneMenu value="#{NewActionWizard.action}"
                                           onchange="javascript:itemSelected(this);">
@@ -123,7 +123,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td valign="top">Description:</td>
+                                    <td valign="top"><h:outputText value="#{msg.description}"/>:</td>
                                     <td>
                                        <div style="width: 300px">
                                           <a:dynamicDescription selected="#{NewActionWizard.action}">
@@ -145,24 +145,24 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewActionWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewActionWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewActionWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewActionWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewActionWizard.finish}" styleClass="wizardButton" 
+                                       <h:commandButton value="#{msg.finish_button}" action="#{NewActionWizard.finish}" styleClass="wizardButton" 
                                                         disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewActionWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewActionWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

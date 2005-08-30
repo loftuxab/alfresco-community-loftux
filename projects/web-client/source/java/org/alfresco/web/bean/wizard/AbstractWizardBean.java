@@ -42,9 +42,9 @@ public abstract class AbstractWizardBean
    
    protected static final String FINISH_OUTCOME = "finish";
    protected static final String CANCEL_OUTCOME = "cancel";
-   protected static final String DEFAULT_INSTRUCTION = "To continue click Next.";
-   protected static final String SUMMARY_TITLE = "Summary";
-   protected static final String SUMMARY_DESCRIPTION = "The information you entered is shown below.";
+   protected static final String DEFAULT_INSTRUCTION_ID = "default_instruction";
+   protected static final String SUMMARY_TITLE_ID = "summary";
+   protected static final String SUMMARY_DESCRIPTION_ID = "summary_desc";
    
    // common wizard properties
    protected int currentStep = 1;

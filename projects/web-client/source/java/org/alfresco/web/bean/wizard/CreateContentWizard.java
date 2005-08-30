@@ -18,6 +18,7 @@ package org.alfresco.web.bean.wizard;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -90,7 +91,7 @@ public class CreateContentWizard extends BaseContentWizard
          }
          case 3:
          {
-            stepDesc = SUMMARY_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_DESCRIPTION_ID);
             break;
          }
          default:
@@ -123,7 +124,7 @@ public class CreateContentWizard extends BaseContentWizard
          }
          case 3:
          {
-            stepTitle = SUMMARY_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_TITLE_ID);
             break;
          }
          default:

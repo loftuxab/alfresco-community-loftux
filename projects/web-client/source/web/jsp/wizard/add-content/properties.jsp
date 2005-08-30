@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_add_content_props">
 
 <script language="JavaScript1.2">
    function checkButtonState()
@@ -48,7 +48,6 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
    <h:form id="add-content-properties">
    
    <%-- Main outer table --%>
@@ -113,12 +112,12 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="2" disabled="true">
-                                 <a:listItem value="1" label="1. Upload Document" />
-                                 <a:listItem value="2" label="2. Properties" />
-                                 <a:listItem value="3" label="3. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.upload_document}" />
+                                 <a:listItem value="2" label="2. #{msg.properties}" />
+                                 <a:listItem value="3" label="3. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -136,17 +135,17 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">General</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.general}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>File Name:</td>
+                                    <td><h:outputText value="#{msg.file_name}"/>:</td>
                                     <td width="85%">
                                        <h:inputText id="file-name" value="#{AddContentWizard.fileName}" size="35" maxlength="1024" 
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Content Type:</td>
+                                    <td><h:outputText value="#{msg.content_type}"/>:</td>
                                     <td>
                                        <h:selectOneMenu value="#{AddContentWizard.contentType}">
                                           <f:selectItems value="#{AddContentWizard.contentTypes}" />
@@ -154,20 +153,20 @@
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Title:</td>
+                                    <td><h:outputText value="#{msg.title}"/>:</td>
                                     <td>
                                        <h:inputText id="title" value="#{AddContentWizard.title}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Description:</td>
+                                    <td><h:outputText value="#{msg.description}"/>:</td>
                                     <td>
                                        <h:inputText value="#{AddContentWizard.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Author:</td>
+                                    <td><h:outputText value="#{msg.author}"/>:</td>
                                     <td>
                                        <h:inputText value="#{AddContentWizard.author}" size="35" maxlength="1024" />
                                     </td>
@@ -177,12 +176,12 @@
                                     <td></td>
                                     <td><table cellspacing=0 cellpadding=0>
                                           <tr>
-                                             <td><nobr>Inline Editable:&nbsp;</nobr></td>
+                                             <td><nobr><h:outputText value="#{msg.inline_editable}"/>:&nbsp;</nobr></td>
                                              <td width=100%><h:selectBooleanCheckbox value="#{AddContentWizard.inlineEdit}" /></td>
                                           </tr>
                                           <tr>
                                              <td colspan=2>
-                                                <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                                <img alt="#{msg.information}" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
                                                 <h:outputText value="#{msg.warning_inline}" />
                                              </td>
                                           </tr>
@@ -201,25 +200,25 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="next-button" value="Next" action="#{AddContentWizard.next}" 
+                                       <h:commandButton id="next-button" value="#{msg.next_button}" action="#{AddContentWizard.next}" 
                                                         styleClass="wizardButton" disabled="#{AddContentWizard.nextFinishDisabled}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{AddContentWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{AddContentWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="finish-button" value="Finish" action="#{AddContentWizard.finish}" 
+                                       <h:commandButton id="finish-button" value="#{msg.finish_button}" action="#{AddContentWizard.finish}" 
                                                         styleClass="wizardButton" disabled="#{AddContentWizard.nextFinishDisabled}" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{AddContentWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

@@ -29,7 +29,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
@@ -297,7 +296,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          }
          case 4:
          {
-            stepDesc = SUMMARY_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_DESCRIPTION_ID);
             break;
          }
          default:
@@ -335,7 +334,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          }
          case 4:
          {
-            stepTitle = SUMMARY_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_TITLE_ID);
             break;
          }
          default:
@@ -363,7 +362,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          }
          default:
          {
-            stepInstruction = DEFAULT_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), DEFAULT_INSTRUCTION_ID);
          }
       }
       

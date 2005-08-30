@@ -42,11 +42,11 @@ public class NewActionWizard extends BaseActionWizard
    private static final String ERROR = "error_action";
    
    // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE = "Custom Action Wizard";
-   private static final String WIZARD_DESC = "This wizard helps you create a custom action for";
-   private static final String STEP1_TITLE = "Step One - Select Action";
-   private static final String STEP2_TITLE = "Step Two - Action Settings";
-   private static final String FINISH_INSTRUCTION = "To execute the action click Finish.";
+   private static final String WIZARD_TITLE_ID = "create_action_title";
+   private static final String WIZARD_DESC_ID = "create_action_desc";
+   private static final String STEP1_TITLE_ID = "create_action_step1_title";
+   private static final String STEP2_TITLE_ID = "create_action_step2_title";
+   private static final String FINISH_INSTRUCTION_ID = "create_action_finish_instruction";
    
    /**
     * Deals with the finish button being pressed
@@ -105,7 +105,7 @@ public class NewActionWizard extends BaseActionWizard
     */
    public String getWizardDescription()
    {
-      return WIZARD_DESC;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_ID);
    }
 
    /**
@@ -113,7 +113,7 @@ public class NewActionWizard extends BaseActionWizard
     */
    public String getWizardTitle()
    {
-      return WIZARD_TITLE;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_ID);
    }
    
    /**
@@ -135,17 +135,17 @@ public class NewActionWizard extends BaseActionWizard
       {
          case 1:
          {
-            stepTitle = STEP1_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_TITLE_ID);
             break;
          }
          case 2:
          {
-            stepTitle = STEP2_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_TITLE_ID);
             break;
          }
          case 3:
          {
-            stepTitle = SUMMARY_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_TITLE_ID);
             break;
          }
          default:
@@ -169,12 +169,12 @@ public class NewActionWizard extends BaseActionWizard
          case 2:
          case 3:
          {
-            stepInstruction = FINISH_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             break;
          }
          default:
          {
-            stepInstruction = DEFAULT_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), DEFAULT_INSTRUCTION_ID);
          }
       }
       

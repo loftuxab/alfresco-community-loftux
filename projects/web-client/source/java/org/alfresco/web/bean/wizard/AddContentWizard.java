@@ -17,10 +17,13 @@
 package org.alfresco.web.bean.wizard;
 
 import java.io.File;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.apache.commons.logging.Log;
@@ -36,12 +39,12 @@ public class AddContentWizard extends BaseContentWizard
    private static Log logger = LogFactory.getLog(AddContentWizard.class);
 
    // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE = "Add Content Wizard";
-   private static final String WIZARD_DESC = "This wizard helps you to add a document to a space.";
-   private static final String STEP1_TITLE = "Step One - Upload Document";
-   private static final String STEP1_DESCRIPTION = "Locate and upload your document to the repository.";
-   private static final String STEP2_TITLE = "Step Two - Properties";
-   private static final String STEP2_DESCRIPTION = "Enter information about this content.";
+   private static final String WIZARD_TITLE_ID = "add_content_title";
+   private static final String WIZARD_DESC_ID = "add_content_desc";
+   private static final String STEP1_TITLE_ID = "add_conent_step1_title";
+   private static final String STEP1_DESCRIPTION_ID = "add_conent_step1_desc";
+   private static final String STEP2_TITLE_ID = "add_conent_step2_title";
+   private static final String STEP2_DESCRIPTION_ID = "add_conent_step2_desc";
    
    // add content wizard specific properties
    private File file;
@@ -100,7 +103,7 @@ public class AddContentWizard extends BaseContentWizard
     */
    public String getWizardDescription()
    {
-      return WIZARD_DESC;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_ID);
    }
 
    /**
@@ -108,7 +111,7 @@ public class AddContentWizard extends BaseContentWizard
     */
    public String getWizardTitle()
    {
-      return WIZARD_TITLE;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_ID);
    }
    
    /**
@@ -122,17 +125,17 @@ public class AddContentWizard extends BaseContentWizard
       {
          case 1:
          {
-            stepDesc = STEP1_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_DESCRIPTION_ID);
             break;
          }
          case 2:
          {
-            stepDesc = STEP2_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_DESCRIPTION_ID);
             break;
          }
          case 3:
          {
-            stepDesc = SUMMARY_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_DESCRIPTION_ID);
             break;
          }
          default:
@@ -155,17 +158,17 @@ public class AddContentWizard extends BaseContentWizard
       {
          case 1:
          {
-            stepTitle = STEP1_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_TITLE_ID);
             break;
          }
          case 2:
          {
-            stepTitle = STEP2_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_TITLE_ID);
             break;
          }
          case 3:
          {
-            stepTitle = SUMMARY_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_TITLE_ID);
             break;
          }
          default:
@@ -189,6 +192,15 @@ public class AddContentWizard extends BaseContentWizard
       this.file = null;
    }
 
+   /**
+    * @return Returns the message to display when a file has been uploaded
+    */
+   public String getFileUploadSuccessMsg()
+   {
+      String msg = Application.getMessage(FacesContext.getCurrentInstance(), "file_upload_success");
+      return MessageFormat.format(msg, new Object[] {getFileName()});
+   }
+   
    /**
     * @return Returns the name of the file
     */
@@ -230,8 +242,12 @@ public class AddContentWizard extends BaseContentWizard
     */
    public String getSummary()
    {
+      ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
+      
       return buildSummary(
-            new String[] {"File Name", "Content Type", "Title", "Description", "Author", "Inline Editable"},
+            new String[] {bundle.getString("file_name"), bundle.getString("content_type"), 
+                          bundle.getString("title"), bundle.getString("description"), 
+                          bundle.getString("author"), bundle.getString("inline_editable")},
             new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author, Boolean.toString(this.inlineEdit)});
    }
    

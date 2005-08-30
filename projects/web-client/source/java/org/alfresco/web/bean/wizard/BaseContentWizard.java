@@ -28,7 +28,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -56,8 +55,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
 {
    private static Log logger = LogFactory.getLog(BaseContentWizard.class);
 
-   protected static final String FINISH_INSTRUCTION = "To add the content to this space click Finish.<br/>" +
-                                                      "To review or change your selections click Back.";
+   protected static final String FINISH_INSTRUCTION_ID = "content_finish_instruction";
    
    // content wizard specific attributes
    protected String fileName;
@@ -207,12 +205,12 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       {
          case 3:
          {
-            stepInstruction = FINISH_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             break;
          }
          default:
          {
-            stepInstruction = DEFAULT_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), DEFAULT_INSTRUCTION_ID);
          }
       }
       

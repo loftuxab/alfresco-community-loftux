@@ -170,18 +170,18 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.finish}" action="#{InviteUsersWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.finish_button}" action="#{InviteUsersWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.back}" action="#{InviteUsersWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{InviteUsersWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel}" action="#{InviteUsersWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{InviteUsersWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

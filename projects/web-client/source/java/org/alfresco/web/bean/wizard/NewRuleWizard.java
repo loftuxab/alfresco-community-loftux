@@ -271,7 +271,7 @@ public class NewRuleWizard extends BaseActionWizard
       {
          case 6:
          {
-            stepDesc = SUMMARY_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_DESCRIPTION_ID);
             break;
          }
          default:
@@ -319,7 +319,7 @@ public class NewRuleWizard extends BaseActionWizard
          }
          case 6:
          {
-            stepTitle = SUMMARY_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_TITLE_ID);
             break;
          }
          default:
@@ -366,7 +366,7 @@ public class NewRuleWizard extends BaseActionWizard
          }
          default:
          {
-            stepInstruction = DEFAULT_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), DEFAULT_INSTRUCTION_ID);
          }
       }
       
