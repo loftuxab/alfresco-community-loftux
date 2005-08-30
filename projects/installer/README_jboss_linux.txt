@@ -58,7 +58,7 @@ Create Database
 ---------------
 
 Then create a database schema named 'alfresco', e.g.:
-   mysqladmin -u root create alfresco
+   mysqladmin -u root create database alfresco
 
 Then create a new user with full rights on this database, e.g.:
    mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost' identified by 'alfresco' with grant option;"
