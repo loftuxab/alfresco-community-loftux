@@ -18,6 +18,7 @@ package org.alfresco.repo.rule;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,9 @@ import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
@@ -141,6 +144,9 @@ public class RuleServiceCoverageTest extends TestCase
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         this.actionService = serviceRegistry.getActionService();
         this.transactionService = serviceRegistry.getTransactionService();
+        
+        AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
+        authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
             
         this.testStoreRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
@@ -153,8 +159,8 @@ public class RuleServiceCoverageTest extends TestCase
                 ContentModel.TYPE_CONTAINER).getChildRef();
         
         // Create and authenticate the user used in the tests
-        TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
-        TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);        
+        //TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
+        //TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);        
     }
 	
 	private Rule createRule(
@@ -803,7 +809,8 @@ public class RuleServiceCoverageTest extends TestCase
      *          condition:  no-condition()
      *          action:     checkin()
      */
-    public void testCheckInAction()
+    @SuppressWarnings("unchecked")
+	public void testCheckInAction()
     {
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(CheckInActionExecuter.PARAM_DESCRIPTION, "The version description.");
@@ -817,27 +824,44 @@ public class RuleServiceCoverageTest extends TestCase
         
         this.ruleService.saveRule(this.nodeRef, rule);
          
-        // Create a new node and check-it out
-        NodeRef newNodeRef = this.nodeService.createNode(
-                this.rootNodeRef,
-                ContentModel.ASSOC_CHILDREN,                
-                QName.createQName(TEST_NAMESPACE, "origional"),
-                ContentModel.TYPE_CONTENT,
-                getContentProperties()).getChildRef();
-        NodeRef workingCopy = this.cociService.checkout(newNodeRef);
-        
-        // Move the working copy into the actionable folder
-        this.nodeService.moveNode(
-                workingCopy, 
-                this.nodeRef, 
-                ContentModel.ASSOC_CHILDREN,
-                QName.createQName(TEST_NAMESPACE, "moved"));
+        List<NodeRef> list = (List<NodeRef>)TransactionUtil.executeInUserTransaction(
+        		this.transactionService,
+        		new TransactionUtil.TransactionWork()
+        		{
+					public Object doWork()
+					{
+						// Create a new node and check-it out
+				        NodeRef newNodeRef = RuleServiceCoverageTest.this.nodeService.createNode(
+				        		RuleServiceCoverageTest.this.rootNodeRef,
+				                ContentModel.ASSOC_CHILDREN,                
+				                QName.createQName(TEST_NAMESPACE, "origional"),
+				                ContentModel.TYPE_CONTENT,
+				                getContentProperties()).getChildRef();
+				        NodeRef workingCopy = RuleServiceCoverageTest.this.cociService.checkout(newNodeRef);
+				        
+				        // Move the working copy into the actionable folder
+				        RuleServiceCoverageTest.this.nodeService.moveNode(
+				                workingCopy, 
+				                RuleServiceCoverageTest.this.nodeRef, 
+				                ContentModel.ASSOC_CHILDREN,
+				                QName.createQName(TEST_NAMESPACE, "moved"));
+				        
+				        List<NodeRef> result = new ArrayList<NodeRef>();
+				        result.add(newNodeRef);
+				        result.add(workingCopy);				        
+						return result;
+					}
+        			
+        		},
+        		false);        
 		
 		// Check that the working copy has been removed
-		assertFalse(this.nodeService.exists(workingCopy));
+		assertFalse(this.nodeService.exists(list.get(1)));
 		
 		// Check that the origional is no longer locked
-		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(newNodeRef, TestWithUserUtils.getCurrentUser(this.authenticationService)));
+		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(
+				list.get(0), 
+				TestWithUserUtils.getCurrentUser(this.authenticationService)));
 		
 		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }
@@ -929,7 +953,7 @@ public class RuleServiceCoverageTest extends TestCase
             addContentToNode(newNodeRef2);
             fail("An exception should have been thrown since a mandatory parameter was missing from the condition.");
         }
-        catch (Exception ruleServiceException)
+        catch (Throwable ruleServiceException)
         {
             // Success since we where expecting the exception
         }
