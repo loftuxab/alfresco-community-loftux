@@ -15,7 +15,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry exported="true" sourcepath="src/lucene-1.4.3-dev-src.zip" kind="lib" path="lib/lucene-1.4.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.0.16-ga-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/quartz.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar"/>
@@ -74,5 +73,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-system.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jgroups.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.10-bin.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
