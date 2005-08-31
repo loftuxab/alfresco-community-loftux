@@ -19,6 +19,7 @@ package org.alfresco.repo.action;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.repo.action.executer.CompositeActionExecuter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.CompositeAction;
 
@@ -33,11 +34,6 @@ public class CompositeActionImpl extends ActionImpl implements CompositeAction
 	 * Serial version UID
 	 */
 	private static final long serialVersionUID = -5348203599304776812L;
-
-	/**
-	 * Composite action defintion name
-	 */
-	public static final String COMPOSITE_ACTION = "composite-action";
 	
 	/**
 	 * The action list
@@ -51,7 +47,7 @@ public class CompositeActionImpl extends ActionImpl implements CompositeAction
 	 */
 	public CompositeActionImpl(String id)
 	{
-		super(id, COMPOSITE_ACTION);
+		super(id, CompositeActionExecuter.NAME);
 	}
 
 	/**

@@ -111,6 +111,17 @@ public interface ActionService
 	void executeAction(Action action, NodeRef actionedUponNodeRef);
 	
 	/**
+	 * The action is sexecuted based on the asynchronous attribute of the action.
+	 * 
+	 * @see ActionService#executeAction(Action, NodeRef, boolean, boolean)
+	 * 
+	 * @param action				the action
+	 * @param actionedUponNodeRef	the actioned upon node reference
+	 * @param checkConditions		indicates whether the conditions should be checked
+	 */
+	void executeAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions);
+	
+	/**
 	 * Executes the specified action upon the node reference provided.
 	 * <p>
 	 * If specified that the conditions should be checked then any conditions
@@ -126,8 +137,10 @@ public interface ActionService
 	 * @param actionedUponNodeRef	the actioned upon node reference
 	 * @param checkConditions		indicates whether the conditions should be checked before
 	 * 								executing the action
+	 * @param executeAsynchronously	indicates whether the action should be executed asychronously or not, this value overrides
+	 * 								the value set on the action its self
 	 */
-	void executeAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions);
+	void executeAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions, boolean executeAsynchronously);
 	
 	/**
 	 * Evaluted the conditions set on an action.
@@ -197,4 +210,13 @@ public interface ActionService
 	 * @param nodeRef	the node reference
 	 */
 	void removeAllActions(NodeRef nodeRef);
+	
+	/**
+	 * Gets the action execution history.  The action execution detail objects are retrieved in 
+	 * assending chronological order.
+	 * 
+	 * @param nodeRef	the node reference
+	 * @return			a list of action execution details that make up the action execution history
+	 */
+	List<ActionExecutionDetails> getActionExecutionHistory(NodeRef nodeRef);
 }

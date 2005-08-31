@@ -22,7 +22,7 @@ import java.util.HashMap;
 import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.version.VersionStoreConst;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.repo.version.common.VersionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -46,7 +46,7 @@ public class SerialVersionLabelPolicyTest extends TestCase
         NodeRef dummyNodeRef = new NodeRef(new StoreRef("", ""), "");
         
         HashMap<String, Serializable> versionProp1 = new HashMap<String, Serializable>();
-        versionProp1.put(VersionStoreConst.PROP_VERSION_TYPE, VersionType.MINOR);
+        versionProp1.put(VersionModel.PROP_VERSION_TYPE, VersionType.MINOR);
         
         String initialVersion = policy.calculateVersionLabel(
 				ContentModel.TYPE_CMOBJECT,
@@ -56,7 +56,7 @@ public class SerialVersionLabelPolicyTest extends TestCase
         assertEquals("1.0", initialVersion);
         
         HashMap<String, Serializable> versionProp2 = new HashMap<String, Serializable>();
-        versionProp2.put(VersionStoreConst.PROP_VERSION_LABEL, "1.0");
+        versionProp2.put(VersionModel.PROP_VERSION_LABEL, "1.0");
         Version version1 = new VersionImpl(versionProp2, dummyNodeRef);
         
         String verisonLabel1 = policy.calculateVersionLabel(
@@ -67,11 +67,11 @@ public class SerialVersionLabelPolicyTest extends TestCase
         assertEquals("1.1", verisonLabel1);
         
         HashMap<String, Serializable> versionProp3 = new HashMap<String, Serializable>();
-        versionProp3.put(VersionStoreConst.PROP_VERSION_LABEL, "1.1");
+        versionProp3.put(VersionModel.PROP_VERSION_LABEL, "1.1");
         Version version2 = new VersionImpl(versionProp3, dummyNodeRef);
         
         HashMap<String, Serializable> versionProp4 = new HashMap<String, Serializable>();
-        versionProp4.put(VersionStoreConst.PROP_VERSION_TYPE, VersionType.MAJOR);
+        versionProp4.put(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR);
         
         String verisonLabel2 = policy.calculateVersionLabel(
 				ContentModel.TYPE_CMOBJECT,

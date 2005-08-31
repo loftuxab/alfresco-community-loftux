@@ -275,7 +275,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         assertEquals(
                 "The expected version number was not used.",
                 Integer.toString(expectedVersionNumber), 
-                newVersion.getVersionProperty(VersionStoreConst.PROP_VERSION_NUMBER));
+                newVersion.getVersionProperty(VersionModel.PROP_VERSION_NUMBER));
 		assertEquals(
 				"The expected version label was not used.",
 				expectedVersionLabel,
@@ -308,10 +308,10 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         NodeRef nodeRef = newVersion.getNodeRef();
         assertNotNull(nodeRef);
         assertEquals(
-                VersionStoreConst.STORE_ID, 
+                VersionModel.STORE_ID, 
                 nodeRef.getStoreRef().getIdentifier());
         assertEquals(
-                VersionStoreConst.STORE_PROTOCOL, 
+                VersionModel.STORE_PROTOCOL, 
                 nodeRef.getStoreRef().getProtocol());
         assertNotNull(nodeRef.getId());        
         

@@ -11,7 +11,19 @@
         </property>
         <property name="searchService">
             <ref bean="searchService" />
-        </property>
+        </property>  
+    	<property name="transactionService">
+    		<ref bean="transactionComponent"/>
+    	</property>
+		<property name="asynchronousActionExecutionQueue">
+	       <ref bean="asynchronousActionExecutionQueue"/>
+		</property> 
+    </bean>
+    
+    <bean id="asynchronousActionExecutionQueue" class="org.alfresco.repo.action.AsynchronousActionExecutionQueueImpl">
+    	<property name="transactionService">
+    		<ref bean="transactionComponent"/>
+    	</property>
     </bean>
 
    <!-- Actionable Aspect -->
@@ -78,6 +90,15 @@
             <ref bean="actionService" />
         </property>
     </bean>
+    
+    <bean id="composite-action" class="org.alfresco.repo.action.executer.CompositeActionExecuter" parent="action-executer">
+      <property name="publicAction">
+         <value>false</value>
+      </property>
+	  <property name="actionService">
+         <ref bean="actionService"/>
+	  </property>
+   </bean>
 
     <bean id="add-features" class="org.alfresco.repo.action.executer.AddFeaturesActionExecuter"
         parent="action-executer">

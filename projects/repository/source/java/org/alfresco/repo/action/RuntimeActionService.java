@@ -16,6 +16,9 @@
  */
 package org.alfresco.repo.action;
 
+import java.util.List;
+
+import org.alfresco.repo.action.ActionServiceImpl.PendingAction;
 import org.alfresco.repo.action.evaluator.ActionConditionEvaluator;
 import org.alfresco.repo.action.executer.ActionExecuter;
 import org.alfresco.service.cmr.action.Action;
@@ -27,6 +30,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface RuntimeActionService
 {
+	AsynchronousActionExecutionQueue getAsynchronousActionExecutionQueue();
+	
 	void registerActionConditionEvaluator(ActionConditionEvaluator actionConditionEvaluator);
 	
 	void registerActionExecuter(ActionExecuter actionExecuter);
@@ -37,7 +42,25 @@ public interface RuntimeActionService
 	 * Save action, used internally to store the details of an action on the aciton node.
 	 * 
 	 * @param actionNodeRef	the action node reference
-	 * @param action		the action
+	 * @param action		the action 
 	 */
 	void saveActionImpl(NodeRef actionNodeRef, Action action);
+	
+	/**
+	 * 
+	 * @param action
+	 * @param actionedUponNodeRef
+	 * @param checkConditions
+	 * @param actionExecutionHistoryNodeRef
+	 */
+	public void executeActionImpl(
+			Action action, 
+			NodeRef actionedUponNodeRef, 
+			boolean checkConditions, 
+			NodeRef actionExecutionHistoryNodeRef,
+			boolean executedAsynchronously);
+	
+	public void directActionExecution(Action action, NodeRef actionedUponNodeRef);
+	
+	public List<PendingAction> getPostTransactionPendingActions();
 }

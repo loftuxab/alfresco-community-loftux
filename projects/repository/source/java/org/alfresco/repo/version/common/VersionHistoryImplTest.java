@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 import junit.framework.TestCase;
 
-import org.alfresco.repo.version.VersionStoreConst;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;
@@ -55,20 +55,20 @@ public class VersionHistoryImplTest extends TestCase
         NodeRef nodeRef = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test"), "test");
         
         HashMap<String, Serializable> versionProperties1 = new HashMap<String, Serializable>();
-        versionProperties1.put(VersionStoreConst.PROP_VERSION_LABEL, "1");
-        versionProperties1.put(VersionStoreConst.PROP_CREATED_DATE, new Date());
+        versionProperties1.put(VersionModel.PROP_VERSION_LABEL, "1");
+        versionProperties1.put(VersionModel.PROP_CREATED_DATE, new Date());
         versionProperties1.put("testProperty", "testValue");
         this.rootVersion = new VersionImpl(versionProperties1, nodeRef);
         
         HashMap<String, Serializable> versionProperties2 = new HashMap<String, Serializable>();
-        versionProperties2.put(VersionStoreConst.PROP_VERSION_LABEL, "2");
-        versionProperties2.put(VersionStoreConst.PROP_CREATED_DATE, new Date());
+        versionProperties2.put(VersionModel.PROP_VERSION_LABEL, "2");
+        versionProperties2.put(VersionModel.PROP_CREATED_DATE, new Date());
         versionProperties2.put("testProperty", "testValue");
         this.childVersion1 = new VersionImpl(versionProperties2, nodeRef);
         
         HashMap<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
-        versionProperties3.put(VersionStoreConst.PROP_VERSION_LABEL, "3");
-        versionProperties3.put(VersionStoreConst.PROP_CREATED_DATE, new Date());
+        versionProperties3.put(VersionModel.PROP_VERSION_LABEL, "3");
+        versionProperties3.put(VersionModel.PROP_CREATED_DATE, new Date());
         versionProperties3.put("testProperty", "testValue");
         this.childVersion2 = new VersionImpl(versionProperties3, nodeRef);                
     }

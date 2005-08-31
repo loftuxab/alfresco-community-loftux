@@ -29,6 +29,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ActionableAspect;
 import org.alfresco.repo.action.RuntimeActionService;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.repo.transaction.TransactionListener;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -90,7 +91,12 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	/**
 	 * All the rule type currently registered
 	 */
-	private Map<String, RuleType> ruleTypes = new HashMap<String, RuleType>();      
+	private Map<String, RuleType> ruleTypes = new HashMap<String, RuleType>();
+
+	/**
+	 * The rule transaction listener
+	 */
+	private TransactionListener ruleTransactionListener = new RuleTransactionListener(this);      
     
     /**
      * Set the node service 
@@ -528,8 +534,8 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
                     // bind pending rules to the current transaction
     				pendingRules = new HashSet<PendingRuleData>();
                     AlfrescoTransactionSupport.bindResource(KEY_RULES_PENDING, pendingRules);
-                    // bind this RuleService to receive callbacks when the transaction flushes
-                    AlfrescoTransactionSupport.bindRuleService(this);
+                    // bind the rule transaction listener
+                    AlfrescoTransactionSupport.bindListener(this.ruleTransactionListener);
     			}
     			
     			pendingRules.add(pendingRuleData);		

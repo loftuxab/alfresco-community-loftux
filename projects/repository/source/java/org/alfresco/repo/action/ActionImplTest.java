@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.util.GUID;
 
 /**
  * @author Roy Wetherall
@@ -49,6 +50,28 @@ public class ActionImplTest extends BaseParameterizedItemImplTest
     {
         Action temp = (Action)create();
         assertEquals(NAME, temp.getActionDefinitionName());
+    }
+    
+    public void testSimpleProperties()
+    {
+    	Action action = (Action)create();
+    	
+    	// Check the default values
+    	assertFalse(action.getExecuteAsychronously());
+    	assertNull(action.getCompensatingAction());
+    	
+    	// Set some values
+    	action.setTitle("title");
+    	action.setDescription("description");
+    	action.setExecuteAsynchronously(true);
+    	Action compensatingAction = new ActionImpl(GUID.generate(), "actionDefintionName");
+    	action.setCompensatingAction(compensatingAction);
+    	
+    	// Check the values have been set
+    	assertEquals("title", action.getTitle());
+    	assertEquals("description", action.getDescription());
+    	assertTrue(action.getExecuteAsychronously());
+    	assertEquals(compensatingAction, action.getCompensatingAction());
     }
     
     public void testActionConditions()

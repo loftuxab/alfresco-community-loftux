@@ -63,6 +63,53 @@ public interface Action extends ParameterizedItem
 	void setDescription(String description);
 	
 	/**
+	 * Gets a value indicating whether the action should be executed asychronously or not.
+	 * <p>
+	 * The default is to execute the action synchronously.
+	 * 
+	 * @return	true if the action is executed asychronously, false otherwise.  
+	 */
+	boolean getExecuteAsychronously();
+	
+	/**
+	 * Set the value that indicates whether the action should be executed asychronously or not.
+	 * 
+	 * @param executeAsynchronously		true if the action is to be executed asychronously, false otherwise.
+	 */
+	void setExecuteAsynchronously(boolean executeAsynchronously);
+	
+	/**
+	 * Gets the action failure behaviour.
+	 * 
+	 * @return	the action failure bahaviour
+	 */
+	//ActionFailureBehaviour getFailureBehaviour();
+	
+	/**
+	 * Sets the action failure behaviour.
+	 * 
+	 * @param failureBehaviour	the action failure behaviour
+	 */
+	//void setFailureBehaviour(ActionFailureBehaviour failureBehaviour);
+	
+	/**
+	 * Get the compensating action.
+	 * <p>
+	 * This action is executed if the failure behaviour is to compensate and the action being executed 
+	 * fails.
+	 * 
+	 * @return	the compensating action
+	 */
+	Action getCompensatingAction();
+	
+	/**
+	 * Set the compensating action.
+	 * 
+	 * @param action	the compensating action
+	 */
+	void setCompensatingAction(Action action);
+	
+	/**
 	 * Get the date the action was created
 	 * 
 	 * @return	action creation date

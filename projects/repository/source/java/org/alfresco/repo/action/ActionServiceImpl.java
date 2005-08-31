@@ -26,10 +26,14 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.ActionConditionEvaluator;
 import org.alfresco.repo.action.executer.ActionExecuter;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
 import org.alfresco.service.cmr.action.ActionDefinition;
+import org.alfresco.service.cmr.action.ActionExecutionDetails;
+import org.alfresco.service.cmr.action.ActionExecutionStatus;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.action.CompositeAction;
@@ -41,7 +45,10 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.GUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -54,9 +61,29 @@ import org.springframework.context.ApplicationContextAware;
 public class ActionServiceImpl implements ActionService, RuntimeActionService, ApplicationContextAware
 { 
 	/**
+	 * Transaction resource name
+	 */
+	private static final String POST_TRANSACTION_PENDING_ACTIONS = "postTransactionPendingActions";
+	
+	/**
+	 * Error message
+	 */
+	private static final String ERR_FAIL = "The action failed to execute due to an error.";
+	
+	/**
+     * The logger
+     */
+	private static Log logger = LogFactory.getLog(ActionServiceImpl.class); 
+	
+	/**
 	 * The application context
 	 */
 	private ApplicationContext applicationContext;
+	
+	/**
+	 * The transacton service
+	 */
+	private TransactionService transactionService;
 	
 	/**
 	 * The node service
@@ -67,6 +94,16 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 * The search service
 	 */
 	private SearchService searchService;
+	
+	/**
+	 * The asynchronous action execution queue
+	 */
+	private AsynchronousActionExecutionQueue asynchronousActionExecutionQueue;
+	
+	/**
+	 * Action transaction listener
+	 */
+	private ActionTransactionListener transactionListener = new ActionTransactionListener(this);
 	
 	/**
 	 * All the condition definitions currently registered
@@ -106,6 +143,37 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	public void setSearchService(SearchService searchService)
 	{
 		this.searchService = searchService;
+	}
+	
+	/**
+	 * Set the transaction service
+	 * 
+	 * @param transactionService	the transaction service
+	 */
+	public void setTransactionService(TransactionService transactionService)
+	{
+		this.transactionService = transactionService;
+	}
+	
+	/**
+	 * Set the asynchronous action execution queue
+	 * 
+	 * @param asynchronousActionExecutionQueue	the asynchronous action execution queue
+	 */
+	public void setAsynchronousActionExecutionQueue(
+			AsynchronousActionExecutionQueue asynchronousActionExecutionQueue)
+	{
+		this.asynchronousActionExecutionQueue = asynchronousActionExecutionQueue;
+	}
+	
+	/**
+	 * Get the asychronous action execution queue
+	 * 
+	 * @return	the asynchronous action execution queue
+	 */
+	public AsynchronousActionExecutionQueue getAsynchronousActionExecutionQueue()
+	{
+		return asynchronousActionExecutionQueue;
 	}
 	
 	/**
@@ -225,10 +293,26 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	public boolean evaluateActionCondition(ActionCondition condition, NodeRef actionedUponNodeRef)
 	{
-		ActionConditionDefinitionImpl actionConditionDefinition = (ActionConditionDefinitionImpl)getActionConditionDefinition(condition.getActionConditionDefinitionName());
-		String beanName = actionConditionDefinition.getConditionEvaluator();
-		ActionConditionEvaluator evaluator = (ActionConditionEvaluator)this.applicationContext.getBean(beanName);
-		return evaluator.evaluate(condition, actionedUponNodeRef);
+		boolean result = false;
+		
+		try
+		{
+			// Evaluate the condition
+			ActionConditionEvaluator evaluator = (ActionConditionEvaluator)this.applicationContext.getBean(condition.getActionConditionDefinitionName());
+			result = evaluator.evaluate(condition, actionedUponNodeRef);
+		}
+		catch (RuntimeException exception)
+		{
+			// Log the exception
+			logger.error(
+						"An error was encountered whilst evaluating the action condition '" + condition.getActionConditionDefinitionName() + "'.",
+						exception);
+			
+			// An exception raised here is interpreted as a failure of the condition
+			result = false;
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -236,27 +320,105 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	public void executeAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions)
 	{
-		if (checkConditions == false || evaluateAction(action, actionedUponNodeRef) == true)
+		executeAction(action, actionedUponNodeRef, checkConditions, action.getExecuteAsychronously());
+	}
+	
+	/**
+	 * @see org.alfresco.service.cmr.action.ActionService#executeAction(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef, boolean)
+	 */
+	public void executeAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions, boolean executeAsychronously)
+	{
+		// TODO When do we create this and when don't we create this??
+		
+		// Create the action execution details node
+		NodeRef actionExecutionDetailsNodeRef = createActionExecutionDetails(action, actionedUponNodeRef);
+		
+		if (executeAsychronously == false)
 		{
-			if (action instanceof CompositeAction)
+			executeActionImpl(action, actionedUponNodeRef, checkConditions, actionExecutionDetailsNodeRef, false);
+		}
+		else
+		{
+			// Add to the post transaction pending action list
+			addPostTransactionPendingAction(action, actionedUponNodeRef, checkConditions, actionExecutionDetailsNodeRef);
+		}
+	}
+
+	/**
+	 * @see org.alfresco.repo.action.RuntimeActionService#executeActionImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef, boolean, org.alfresco.service.cmr.repository.NodeRef)
+	 */
+	public void executeActionImpl(
+			Action action, 
+			NodeRef actionedUponNodeRef, 
+			boolean checkConditions, 
+			NodeRef actionExecutionDetailsNodeRef,
+			boolean executedAsynchronously)
+	{	
+		try
+		{
+			// Check and execute now
+			if (checkConditions == false || evaluateAction(action, actionedUponNodeRef) == true)
 			{
-				for (Action subAction : ((CompositeAction)action).getActions())
-				{
-					// TODO should we check each individual actions conditions and only potentially
-					// execute some of them .. not for now
-					executeAction(subAction, actionedUponNodeRef);
+				// Update the execution status
+				updateExecutionStatus(ActionExecutionStatus.RUNNING, actionExecutionDetailsNodeRef);
+				
+				// Execute the action
+				directActionExecution(action, actionedUponNodeRef);
+				
+				// Update the execution status
+				updateExecutionStatus(ActionExecutionStatus.SUCCEEDED, actionExecutionDetailsNodeRef);
+			}
+		}
+		catch (Throwable exception)
+		{
+			// Log the exception
+			logger.error(
+						"An error was encountered whilst executing the action '" + action.getActionDefinitionName() + "'.",
+						exception);
+			
+			// Update the execution status
+			updateExecutionFailure(exception, actionExecutionDetailsNodeRef);			
+			
+			if (executedAsynchronously == true)
+			{				
+				// If one is specified, queue the compensating action ready for execution
+				Action compensatingAction = action.getCompensatingAction();
+				if (compensatingAction != null)
+				{					
+					// Queue the compensating action ready for execution
+					NodeRef compensatingActionExecutionDetailsNodeRef = createActionExecutionDetails(
+							compensatingAction, 
+							actionedUponNodeRef);
+					this.asynchronousActionExecutionQueue.executeAction(this, compensatingAction, actionedUponNodeRef, false, compensatingActionExecutionDetailsNodeRef);
+					
+					// Indicate that a compensating action has been queued
+					updateExecutionStatus(ActionExecutionStatus.COMPENSATED, actionExecutionDetailsNodeRef);
 				}
+			}
+				
+			// Rethrow the exception
+			if (exception instanceof RuntimeException)
+			{
+				throw (RuntimeException)exception;
 			}
 			else
 			{
-				ActionDefinitionImpl actionDefinition = (ActionDefinitionImpl)getActionDefinition(action.getActionDefinitionName());
-				String beanName = actionDefinition.getRuleActionExecutor();
-				ActionExecuter executer = (ActionExecuter)this.applicationContext.getBean(beanName);
-				executer.execute(action, actionedUponNodeRef);
+				throw new ActionServiceException(ERR_FAIL, exception);
 			}
+			
 		}
 	}
-	
+
+	/**
+	 * @see org.alfresco.repo.action.RuntimeActionService#directActionExecution(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+	 */
+	public void directActionExecution(Action action, NodeRef actionedUponNodeRef)
+	{
+		// Get the action executer and execute
+		ActionExecuter executer = (ActionExecuter)this.applicationContext.getBean(action.getActionDefinitionName());
+		executer.execute(action, actionedUponNodeRef);
+	}
+
 	/**
 	 * @see org.alfresco.service.cmr.action.ActionService#executeAction(org.alfresco.service.cmr.action.Action, NodeRef)
 	 */
@@ -279,7 +441,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	public void registerActionExecuter(ActionExecuter actionExecuter) 
 	{
-		ActionDefinition action = actionExecuter.getRuleActionDefinition();
+		ActionDefinition action = actionExecuter.getActionDefinition();
 		this.actionDefinitions.put(action.getName(), action);
 	}
 	
@@ -391,7 +553,42 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		Map<QName, Serializable> props = this.nodeService.getProperties(actionNodeRef);
 		props.put(ContentModel.PROP_ACTION_TITLE, action.getTitle());
 		props.put(ContentModel.PROP_ACTION_DESCRIPTION, action.getDescription());
+		props.put(ContentModel.PROP_EXECUTE_ASYNCHRONOUSLY, action.getExecuteAsychronously());
 		this.nodeService.setProperties(actionNodeRef, props);
+		
+		// Update the compensating action (model should enforce the singularity of this association)
+		Action compensatingAction = action.getCompensatingAction();
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ContentModel.ASSOC_COMPENSATING_ACTION);
+		if (assocs.size() == 0)
+		{
+			if (compensatingAction != null)
+			{
+				Map<QName, Serializable> props2 = new HashMap<QName, Serializable>(2);
+				props2.put(ContentModel.PROP_DEFINITION_NAME, compensatingAction.getActionDefinitionName());
+				props2.put(ContentModel.PROP_NODE_UUID, compensatingAction.getId());
+				
+				NodeRef compensatingActionNodeRef = this.nodeService.createNode(
+						actionNodeRef,
+	                    ContentModel.ASSOC_COMPENSATING_ACTION,
+	                    ContentModel.ASSOC_COMPENSATING_ACTION,
+	                    ContentModel.TYPE_ACTION,
+	                    props2).getChildRef();
+				
+				saveActionImpl(compensatingActionNodeRef, compensatingAction);
+			}
+		}
+		else
+		{
+			ChildAssociationRef assoc = assocs.get(0);
+			if (compensatingAction == null)
+			{
+				this.nodeService.removeChild(actionNodeRef, assoc.getChildRef());
+			}
+			else
+			{
+				saveActionImpl(assoc.getChildRef(), compensatingAction);
+			}
+		}
 	}
 
 	/**
@@ -627,12 +824,23 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	private void populateActionProperties(NodeRef actionNodeRef, Action action)
 	{
 		Map<QName, Serializable> props = this.nodeService.getProperties(actionNodeRef);
+		
 		action.setTitle((String)props.get(ContentModel.PROP_ACTION_TITLE));
 		action.setDescription((String)props.get(ContentModel.PROP_ACTION_DESCRIPTION));
+		action.setExecuteAsynchronously(((Boolean)props.get(ContentModel.PROP_EXECUTE_ASYNCHRONOUSLY)).booleanValue());	
+		
 		((ActionImpl)action).setCreator((String)props.get(ContentModel.PROP_CREATOR));
 		((ActionImpl)action).setCreatedDate((Date)props.get(ContentModel.PROP_CREATED));
 		((ActionImpl)action).setModifier((String)props.get(ContentModel.PROP_MODIFIER));
 		((ActionImpl)action).setModifiedDate((Date)props.get(ContentModel.PROP_MODIFIED));
+		
+		// Get the compensating action
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ContentModel.ASSOC_COMPENSATING_ACTION);
+		if (assocs.size() != 0)
+		{
+			Action compensatingAction = createAction(assocs.get(0).getChildRef());
+			action.setCompensatingAction(compensatingAction);
+		}
 	}
 
 	/**
@@ -736,5 +944,348 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 				this.nodeService.removeChild(getSavedActionFolderRef(nodeRef), action.getChildRef());
 			}
 		}		
+	}
+	
+	/**
+	 * @see org.alfresco.service.cmr.action.ActionService#getActionExecutionHistory(org.alfresco.service.cmr.repository.NodeRef)
+	 */
+	public List<ActionExecutionDetails> getActionExecutionHistory(NodeRef nodeRef)
+	{
+		List<ActionExecutionDetails> result = new ArrayList<ActionExecutionDetails>();
+		
+		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY) == true)
+		{
+			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_ACTION_EXECUTION_DETAILS);
+			for (ChildAssociationRef assoc : assocs)
+			{
+				NodeRef actionExecutionDetailsNodeRef = assoc.getChildRef();
+				result.add(getActionExecutionDetails(actionExecutionDetailsNodeRef));
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Create an action executions details object from the corresponding node reference
+	 * 
+	 * @param actionExecutionDetailsNodeRef		the action execution details node reference
+	 * @return									the action executions details object
+	 */
+	private ActionExecutionDetails getActionExecutionDetails(NodeRef actionExecutionDetailsNodeRef)
+	{
+		Map<QName, Serializable> props = this.nodeService.getProperties(actionExecutionDetailsNodeRef);
+		
+		ActionExecutionDetailsImpl executionDetails = new ActionExecutionDetailsImpl();
+		
+		// Set the basic properties
+		executionDetails.setTitle((String)props.get(ContentModel.PROP_ACTION_EXECUTION_TITLE));
+		executionDetails.setExecutionStatus(ActionExecutionStatus.valueOf((String)props.get(ContentModel.PROP_EXECUTION_STATUS)));
+		
+		// Set the error details if present
+		String errorMessage = (String)props.get(ContentModel.PROP_ERROR_MESSAGE);
+		if (errorMessage != null)
+		{
+			executionDetails.setErrorMessage(errorMessage);
+		}
+		String errorDetails = (String)props.get(ContentModel.PROP_ERROR_DETAILS);
+		if (errorDetails != null)
+		{
+			executionDetails.setErrorDetails(errorDetails);
+		}
+		
+		// Set the action reference
+		// TODO need to get the reference to the action node ref and convert into an Action object (if not null)
+		
+		return executionDetails;
+	}
+
+	/**
+	 * 
+	 * @param action
+	 * @param actionedUponNodeRef
+	 * @return
+	 */
+	private NodeRef createActionExecutionDetails(final Action action, final NodeRef actionedUponNodeRef)
+	{
+		TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork() 
+		{
+			public Object doWork()
+			{
+				NodeRef actionExecutionDetailsNodeRef = null;
+				
+				if (ActionServiceImpl.this.nodeService.exists(actionedUponNodeRef) == true)
+				{				
+					if (ActionServiceImpl.this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY) == false)
+					{
+						ActionServiceImpl.this.nodeService.addAspect(actionedUponNodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY, null);
+					}
+					
+					Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+					props.put(ContentModel.PROP_ACTION_EXECUTION_TITLE, action.getTitle());
+					props.put(ContentModel.PROP_EXECUTION_STATUS, ActionExecutionStatus.PENDING.toString());
+							
+					actionExecutionDetailsNodeRef = ActionServiceImpl.this.nodeService.createNode(
+							actionedUponNodeRef, 
+							ContentModel.ASSOC_ACTION_EXECUTION_DETAILS, 
+							ContentModel.ASSOC_ACTION_EXECUTION_DETAILS,
+							ContentModel.TYPE_ACTION_EXECUTION_DETAILS,
+							props).getChildRef();
+				}
+				
+				return actionExecutionDetailsNodeRef;
+				
+			}					
+		};
+		
+		NodeRef actionExecutionDetailsNodeRef = (NodeRef)TransactionUtil.executeInNonPropigatingUserTransaction(
+				this.transactionService,
+				work,
+				true);
+		
+		if (actionExecutionDetailsNodeRef == null)
+		{
+			// Re-do the work in this transaction (since the node is also in this transaction)
+			actionExecutionDetailsNodeRef = (NodeRef)work.doWork();
+		}
+		
+		return actionExecutionDetailsNodeRef;
+	}
+	
+	/**
+	 * 
+	 * @param executionStatus
+	 * @param actionExecutionDetailsNodeRef
+	 */
+	private void updateExecutionStatus(final ActionExecutionStatus executionStatus, final NodeRef actionExecutionDetailsNodeRef)
+	{
+		if (actionExecutionDetailsNodeRef != null)
+		{		
+			TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork() 
+			{
+				public Object doWork()
+				{
+					boolean result = false;
+					if (ActionServiceImpl.this.nodeService.exists(actionExecutionDetailsNodeRef) == true)
+					{
+						ActionServiceImpl.this.nodeService.setProperty(
+								actionExecutionDetailsNodeRef, 
+								ContentModel.PROP_EXECUTION_STATUS, 
+								executionStatus.toString());
+						result = true;
+					}
+					return Boolean.valueOf(result);
+				}					
+			};
+			
+			boolean result = ((Boolean)TransactionUtil.executeInNonPropigatingUserTransaction(
+					this.transactionService,
+					work,
+					true)).booleanValue();
+			
+			if (result == false)
+			{
+				// Re-do the work in this transaction (since the node is also in this transaction)
+				work.doWork();
+			}
+		}
+	}
+	
+	private void updateExecutionFailure(final Throwable exception, final NodeRef actionExecutionDetailsNodeRef)
+	{
+		if (actionExecutionDetailsNodeRef != null)
+		{		
+			TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork() 
+			{
+				public Object doWork()
+				{
+					boolean result = false;
+					if (ActionServiceImpl.this.nodeService.exists(actionExecutionDetailsNodeRef) == true)
+					{
+						Map<QName, Serializable> props = ActionServiceImpl.this.nodeService.getProperties(actionExecutionDetailsNodeRef);
+						props.put(ContentModel.PROP_EXECUTION_STATUS, ActionExecutionStatus.FAILED.toString());
+						props.put(ContentModel.PROP_ERROR_MESSAGE, exception.getMessage());
+					
+						StringBuilder builder = new StringBuilder(); 
+						for (StackTraceElement stackTraceElement : exception.getStackTrace())
+						{
+							builder.append(stackTraceElement.toString()).append("\n");
+						} 
+						props.put(ContentModel.PROP_ERROR_DETAILS, builder.toString());
+						
+						ActionServiceImpl.this.nodeService.setProperties(actionExecutionDetailsNodeRef, props);
+						result = true;
+					}
+					return Boolean.valueOf(result);
+				}					
+			};
+			
+			boolean result = ((Boolean)TransactionUtil.executeInNonPropigatingUserTransaction(
+					this.transactionService,
+					work,
+					true)).booleanValue();
+			
+			if (result == false)
+			{
+				// Re-do the work in this transaction (since the node is also in this transaction)
+				work.doWork();
+			}
+		}
+	}
+	
+	/**
+	 * Add a pending action to the list to be queued for execution once the transaction is completed.
+	 * 
+	 * @param action				the action
+	 * @param actionedUponNodeRef	the actioned upon node reference
+	 * @param checkConditions		indicates whether to check the conditions before execution
+	 */
+	@SuppressWarnings("unchecked")
+	private void addPostTransactionPendingAction(
+			Action action, 
+			NodeRef actionedUponNodeRef, 
+			boolean checkConditions, 
+			NodeRef actionExecutionDetailsNodeRef)
+	{
+		// Ensure that the transaction listener is bound to the transaction
+		AlfrescoTransactionSupport.bindListener(this.transactionListener);
+		
+		// Add the pending action to the transaction resource
+		List<PendingAction> pendingActions = (List<PendingAction>)AlfrescoTransactionSupport.getResource(POST_TRANSACTION_PENDING_ACTIONS);
+		if (pendingActions == null)
+		{
+			pendingActions = new ArrayList<PendingAction>();
+			AlfrescoTransactionSupport.bindResource(POST_TRANSACTION_PENDING_ACTIONS, pendingActions);
+		}
+		
+		// Check that action has only been added to the list once
+		PendingAction pendingAction = new PendingAction(action, actionedUponNodeRef, checkConditions, actionExecutionDetailsNodeRef);
+		if (pendingActions.contains(pendingAction) == false)
+		{
+			pendingActions.add(pendingAction);
+		}		
+	}
+	
+	/**
+	 * @see org.alfresco.repo.action.RuntimeActionService#getPostTransactionPendingActions()
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PendingAction> getPostTransactionPendingActions()
+	{
+		return (List<PendingAction>)AlfrescoTransactionSupport.getResource(POST_TRANSACTION_PENDING_ACTIONS);
+	}
+	
+	/**
+	 * Pending action details class
+	 */
+	public class PendingAction
+	{
+		/**
+		 * The action
+		 */
+		private Action action;
+		
+		/**
+		 * The actioned upon node reference
+		 */
+		private NodeRef actionedUponNodeRef;
+		
+		/**
+		 * Indicates whether the conditions should be checked before the action is executed
+		 */
+		private boolean checkConditions;
+		
+		/**
+		 * Node reference to the action execution detils node
+		 */
+		private NodeRef actionExecutionDetailsNodeRef;
+		
+		/**
+		 * Constructor 
+		 * 
+		 * @param action						the action
+		 * @param actionedUponNodeRef			the actioned upon node reference
+		 * @param checkConditions				indicated whether the conditions need to be checked
+		 * @param actionExecutionDetailsNodeRef	the action execution history node reference
+		 */
+		public PendingAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions, NodeRef actionExecutionDetailsNodeRef)
+		{
+			this.action = action;
+			this.actionedUponNodeRef = actionedUponNodeRef;
+			this.checkConditions = checkConditions;
+			this.actionExecutionDetailsNodeRef = actionExecutionDetailsNodeRef;
+		}
+		
+		/**
+		 * Get the action
+		 * 
+		 * @return  the action
+		 */
+		public Action getAction()
+		{
+			return action;
+		}
+		
+		/**
+		 * Get the actioned upon node reference
+		 * 
+		 * @return  the actioned upon node reference
+		 */
+		public NodeRef getActionedUponNodeRef()
+		{
+			return actionedUponNodeRef;
+		}
+		
+		/**
+		 * Get the check conditions value
+		 * 
+		 * @return	indicates whether the condition should be checked
+		 */
+		public boolean getCheckConditions()
+		{
+			return this.checkConditions;
+		}
+		
+		/**
+		 * Get the action execution history node reference
+		 * 
+		 * @return	the action execution history node reference
+		 */
+		public NodeRef getActionExecutionDetailsNodeRef()
+		{
+			return actionExecutionDetailsNodeRef;
+		}
+		
+		/**
+		 * @see java.lang.Object#hashCode()
+		 */
+		@Override
+		public int hashCode()
+		{
+			int hashCode = 37 * this.actionedUponNodeRef.hashCode(); 
+			hashCode += 37 * this.action.hashCode();
+			return hashCode;
+		}
+		
+		/**
+		 * @see java.lang.Object#equals(java.lang.Object)
+		 */
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (this == obj)
+	        {
+	            return true;
+	        }
+	        if (obj instanceof PendingAction)
+	        {
+	        	PendingAction that = (PendingAction) obj;
+	            return (this.action.equals(that.action) && this.actionedUponNodeRef.equals(that.actionedUponNodeRef));
+	        }
+	        else
+	        {
+	            return false;
+	        }
+		}
 	}
 }

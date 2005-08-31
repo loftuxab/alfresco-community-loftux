@@ -25,13 +25,20 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface ActionExecuter
 {
-	public ActionDefinition getRuleActionDefinition();
+	/**
+	 * Get the action definition for the action
+	 * 
+	 * @return  the action definition
+	 */
+	public ActionDefinition getActionDefinition();
 	
     /**
+     * Execute the action executer
      * 
-     * @param actionedUponNodeRef TODO
+     * @param action				the action
+     * @param actionedUponNodeRef	the actioned upon node reference
      */
     public void execute(
-			Action ruleAction,
+			Action action,
             NodeRef actionedUponNodeRef);
 }

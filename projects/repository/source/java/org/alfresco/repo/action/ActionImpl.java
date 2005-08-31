@@ -47,6 +47,16 @@ public class ActionImpl extends ParameterizedItemImpl
      * The description 
      */
     private String description;
+
+    /**
+     * Inidcates whether the action should be executed asynchronously or not
+     */
+	private boolean executeAsynchronously = false;
+	
+	/**
+	 * The compensating action
+	 */
+	private Action compensatingAction;
     
     /**
      * The created date 
@@ -135,6 +145,38 @@ public class ActionImpl extends ParameterizedItemImpl
 	public void setDescription(String description)
 	{
 		this.description = description;
+	}
+	
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getExecuteAsychronously()
+	 */
+	public boolean getExecuteAsychronously()
+	{
+		return this.executeAsynchronously ;
+	}
+
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#setExecuteAsynchronously(boolean)
+	 */
+	public void setExecuteAsynchronously(boolean executeAsynchronously)
+	{
+		this.executeAsynchronously = executeAsynchronously;
+	}
+	
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#getCompensatingAction()
+	 */
+	public Action getCompensatingAction()
+	{
+		return this.compensatingAction;
+	}
+	
+	/**
+	 * @see org.alfresco.service.cmr.action.Action#setCompensatingAction(org.alfresco.service.cmr.action.Action)
+	 */
+	public void setCompensatingAction(Action action)
+	{
+		this.compensatingAction = action;
 	}
 
 	/**

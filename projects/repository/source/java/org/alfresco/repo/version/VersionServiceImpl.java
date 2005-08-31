@@ -57,7 +57,7 @@ import org.alfresco.util.ParameterCheck;
  * @author Roy Wetheral
  */
 public class VersionServiceImpl extends AbstractVersionServiceImpl
-								implements VersionService, VersionStoreConst
+								implements VersionService, VersionModel
 {
     /**
      * Error messages
@@ -124,7 +124,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     {
 		super.initialise();
 		
-		// Regiseter the serial version label behaviour
+		// Register the serial version label behaviour
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "calculateVersionLabel"),
 				ContentModel.TYPE_CMOBJECT,
@@ -140,7 +140,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     {
         return new StoreRef(
                 StoreRef.PROTOCOL_WORKSPACE,
-				VersionStoreConst.STORE_ID);
+				VersionModel.STORE_ID);
     }
 	
     /**
@@ -407,30 +407,30 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         Map<QName, Serializable> result = new HashMap<QName, Serializable>(10);
         
 		// Set the version number for the new version
-        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_VERSION_NUMBER), Integer.toString(versionNumber));
+        result.put(QName.createQName(NAMESPACE_URI, VersionModel.PROP_VERSION_NUMBER), Integer.toString(versionNumber));
 		
 		// Set the versionable node id
-        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_ID), nodeRef.getId());
+        result.put(QName.createQName(NAMESPACE_URI, VersionModel.PROP_FROZEN_NODE_ID), nodeRef.getId());
 		
 		// Set the versionable node store protocol
-        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_STORE_PROTOCOL), nodeRef.getStoreRef().getProtocol());
+        result.put(QName.createQName(NAMESPACE_URI, VersionModel.PROP_FROZEN_NODE_STORE_PROTOCOL), nodeRef.getStoreRef().getProtocol());
 		
 		// Set the versionable node store id
-        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_STORE_ID), nodeRef.getStoreRef().getIdentifier());
+        result.put(QName.createQName(NAMESPACE_URI, VersionModel.PROP_FROZEN_NODE_STORE_ID), nodeRef.getStoreRef().getIdentifier());
         
         // Store the current node type
         QName nodeType = this.nodeService.getType(nodeRef);
-		result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_NODE_TYPE), nodeType);
+		result.put(QName.createQName(NAMESPACE_URI, VersionModel.PROP_FROZEN_NODE_TYPE), nodeType);
         
         // Store the current aspects
         Set<QName> aspects = this.nodeService.getAspects(nodeRef);
-        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_FROZEN_ASPECTS), (Serializable)aspects);
+        result.put(QName.createQName(NAMESPACE_URI, VersionModel.PROP_FROZEN_ASPECTS), (Serializable)aspects);
         
         // Calculate the version label
 		QName classRef = this.nodeService.getType(nodeRef);
 		Version preceedingVersion = getVersion(preceedingNodeRef);
         String versionLabel = invokeCalculateVersionLabel(classRef, preceedingVersion, versionNumber, versionProperties);
-        result.put(QName.createQName(NAMESPACE_URI, VersionStoreConst.PROP_VERSION_LABEL), versionLabel);
+        result.put(QName.createQName(NAMESPACE_URI, VersionModel.PROP_VERSION_LABEL), versionLabel);
         
         return result;
 	}	
@@ -633,7 +633,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             
             List<AssociationRef> preceedingVersions = this.dbNodeService.getSourceAssocs(
 																				currentVersion, 
-																				VersionStoreConst.ASSOC_SUCCESSOR);
+																				VersionModel.ASSOC_SUCCESSOR);
             if (preceedingVersions.size() == 1)
             {
                 preceedingVersion = (AssociationRef)preceedingVersions.toArray()[0];
@@ -735,7 +735,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         Collection<ChildAssociationRef> versionHistories = this.dbNodeService.getChildAssocs(getRootNode());
         for (ChildAssociationRef versionHistory : versionHistories)
         {
-            String nodeId = (String)this.dbNodeService.getProperty(versionHistory.getChildRef(), VersionStoreConst.PROP_QNAME_VERSIONED_NODE_ID);
+            String nodeId = (String)this.dbNodeService.getProperty(versionHistory.getChildRef(), VersionModel.PROP_QNAME_VERSIONED_NODE_ID);
             if (nodeId != null && nodeId.equals(nodeRef.getId()) == true)
             {
                 result = versionHistory.getChildRef();
@@ -763,7 +763,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         Collection<ChildAssociationRef> versions = this.dbNodeService.getChildAssocs(versionHistory);
         for (ChildAssociationRef version : versions)
         {
-            String tempLabel = (String)this.dbNodeService.getProperty(version.getChildRef(), VersionStoreConst.PROP_QNAME_VERSION_LABEL);
+            String tempLabel = (String)this.dbNodeService.getProperty(version.getChildRef(), VersionModel.PROP_QNAME_VERSION_LABEL);
             if (tempLabel != null && tempLabel.equals(versionLabel) == true)
             {
                 result = version.getChildRef(); 

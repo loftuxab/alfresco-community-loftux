@@ -18,7 +18,7 @@ package org.alfresco.repo.version.common;
 
 import java.util.Collection;
 
-import org.alfresco.repo.version.VersionStoreConst;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.version.ReservedVersionNameException;
 
 /**
@@ -32,14 +32,14 @@ public class VersionUtil
      * Reserved property names
      */
     public static final String[] RESERVED_PROPERTY_NAMES = new String[]{
-        VersionStoreConst.PROP_CREATED_DATE, 
-        VersionStoreConst.PROP_FROZEN_NODE_ID, 
-        VersionStoreConst.PROP_FROZEN_NODE_STORE_ID, 
-        VersionStoreConst.PROP_FROZEN_NODE_STORE_PROTOCOL,
-        VersionStoreConst.PROP_FROZEN_NODE_TYPE,
-        VersionStoreConst.PROP_FROZEN_ASPECTS,
-        VersionStoreConst.PROP_VERSION_LABEL,
-        VersionStoreConst.PROP_VERSION_NUMBER};
+        VersionModel.PROP_CREATED_DATE, 
+        VersionModel.PROP_FROZEN_NODE_ID, 
+        VersionModel.PROP_FROZEN_NODE_STORE_ID, 
+        VersionModel.PROP_FROZEN_NODE_STORE_PROTOCOL,
+        VersionModel.PROP_FROZEN_NODE_TYPE,
+        VersionModel.PROP_FROZEN_ASPECTS,
+        VersionModel.PROP_VERSION_LABEL,
+        VersionModel.PROP_VERSION_NUMBER};
     
     /**
      * Checks that the names of the additional version properties are valid and that they do not clash

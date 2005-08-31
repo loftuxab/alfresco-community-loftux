@@ -41,21 +41,6 @@ public interface RuleService
      * @return 		the rule type, null if not found
      */
     public RuleType getRuleType(String name);
-
-    /**
-     * Makes a specified node Actionable.
-     * 
-     * @param nodeRef the node reference
-     */
-    //public void makeActionable(NodeRef nodeRef);
-
-    /**
-     * Indicates whether a node is actionable.
-     * 
-     * @param nodeRef 	the node reference
-     * @return 			true if the node is actionable, false otherwise
-     */
-    //public boolean isActionable(NodeRef nodeRef);    
     
     /**
      * Indicates wether the rules for a given node are enabled or not.  If the 

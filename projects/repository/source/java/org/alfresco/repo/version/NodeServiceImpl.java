@@ -51,7 +51,7 @@ import org.alfresco.service.namespace.RegexQNamePattern;
  * 
  * @author Roy Wetherall
  */
-public class NodeServiceImpl implements NodeService, VersionStoreConst 
+public class NodeServiceImpl implements NodeService, VersionModel 
 {
     /**
      * Error messages

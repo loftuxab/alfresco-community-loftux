@@ -52,6 +52,10 @@
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
+            <property name="act:executeAsynchronously">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+            </property>
          </properties>	     
          <associations>
             <child-association name="act:conditions">
@@ -59,6 +63,13 @@
                   <class>act:actioncondition</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
+               </target>
+            </child-association>
+            <child-association name="act:compensatingAction">
+               <target>
+                  <class>act:action</class>
+                  <mandatory>false</mandatory>
+                  <many>false</many>
                </target>
             </child-association>
          </associations>
@@ -111,6 +122,32 @@
             </child-association>
          </associations>
 	  </type>
+	  
+	  <type name="act:actionexecutiondetails">
+	     <title>Action Execution Details</title>
+	     <parent>cm:cmobject</parent>
+	     <properties>
+            <property name="act:actionExecutionTitle">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>          
+            <property name="act:executionStatus">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="act:errorMessage">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="act:errorDetails">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+         
+         <!-- TODO add a relationship to the action if its been saved -->
+         
+	  </type>
 
 	</types>
 
@@ -123,6 +160,19 @@
             <child-association name="act:savedActionFolders">
                <target>
                   <class>act:savedactionfolder</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </child-association>
+         </associations>  
+      </aspect>
+      
+      <aspect name="act:actionexecutionhistory">
+         <title>Action Execution History</title>           
+         <associations>
+            <child-association name="act:actionExecutionDetails">
+               <target>
+                  <class>act:actionexecutiondetails</class>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>

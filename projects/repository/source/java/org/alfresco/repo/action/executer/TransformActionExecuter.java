@@ -195,7 +195,7 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
         }
         catch(NoTransformerException e)
         {
-            if (logger.isDebugEnabled())
+        	if (logger.isDebugEnabled())
             {
                 logger.debug("No transformer found to execute rule: \n" +
                         "   reader: " + contentReader + "\n" +

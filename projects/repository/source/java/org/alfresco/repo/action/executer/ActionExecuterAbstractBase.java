@@ -35,11 +35,29 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
 	protected ActionDefinition actionDefinition;
 	
 	/**
+	 * Indicated whether the action is public or internal
+	 */
+	protected boolean publicAction = true;
+	
+	/**
 	 * Init method	 
 	 */
 	public void init()
 	{
-		this.runtimeActionService.registerActionExecuter(this);
+		if (this.publicAction == true)
+		{
+			this.runtimeActionService.registerActionExecuter(this);
+		}
+	}
+	
+	/**
+	 * Set whether the action is public or not.
+	 * 
+	 * @param publicAction	true if the action is public, false otherwise
+	 */
+	public void setPublicAction(boolean publicAction)
+	{
+		this.publicAction = publicAction;
 	}
 	
 	/**
@@ -47,7 +65,7 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
 	 * 
 	 * @return	the action definition object
 	 */
-	public ActionDefinition getRuleActionDefinition() 
+	public ActionDefinition getActionDefinition() 
 	{
 		if (this.actionDefinition == null)
 		{
@@ -67,7 +85,7 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
     public void execute(Action action, NodeRef actionedUponNodeRef)
     {        
         // Check the mandatory properties
-        checkMandatoryProperties(action, this.actionDefinition);
+        checkMandatoryProperties(action, getActionDefinition());
         
         // Execute the implementation
         executeImpl(action, actionedUponNodeRef);        

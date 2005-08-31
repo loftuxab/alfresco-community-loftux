@@ -159,7 +159,9 @@ public interface ContentModel
     static final QName PROP_DEFINITION_NAME = QName.createQName(ACTION_MODEL_URI, "definitionName");
     static final QName PROP_ACTION_TITLE = QName.createQName(ACTION_MODEL_URI, "actionTitle");
     static final QName PROP_ACTION_DESCRIPTION = QName.createQName(ACTION_MODEL_URI, "actionDescription");
+    static final QName PROP_EXECUTE_ASYNCHRONOUSLY = QName.createQName(ACTION_MODEL_URI, "executeAsynchronously");
     static final QName ASSOC_CONDITIONS = QName.createQName(ACTION_MODEL_URI, "conditions");
+    static final QName ASSOC_COMPENSATING_ACTION = QName.createQName(ACTION_MODEL_URI, "compensatingAction");
     static final QName ASSOC_PARAMETERS = QName.createQName(ACTION_MODEL_URI, "parameters");
     static final QName TYPE_ACTION_CONDITION = QName.createQName(ACTION_MODEL_URI, "actioncondition");
     static final QName TYPE_ACTION_PARAMETER = QName.createQName(ACTION_MODEL_URI, "actionparameter");
@@ -171,6 +173,18 @@ public interface ContentModel
     static final QName ASSOC_SAVED_ACTION_FOLDERS = QName.createQName(ACTION_MODEL_URI, "savedActionFolders");
     static final QName TYPE_SAVED_ACTION_FOLDER = QName.createQName(ACTION_MODEL_URI, "savedactionfolder");
     static final QName ASSOC_SAVED_ACTIONS = QName.createQName(ACTION_MODEL_URI, "savedActions");
+    
+    //
+    // Action Execution History Model Defintions
+    //
+    
+    static final QName ASPECT_ACTION_EXECUTION_HISTORY = QName.createQName(ACTION_MODEL_URI, "actionexecutionhistory");
+    static final QName ASSOC_ACTION_EXECUTION_DETAILS = QName.createQName(ACTION_MODEL_URI, "actionExecutionDetails");
+    static final QName TYPE_ACTION_EXECUTION_DETAILS = QName.createQName(ACTION_MODEL_URI, "actionexecutiondetails");
+    static final QName PROP_ACTION_EXECUTION_TITLE = QName.createQName(ACTION_MODEL_URI, "actionExecutionTitle");
+    static final QName PROP_EXECUTION_STATUS = QName.createQName(ACTION_MODEL_URI, "executionStatus");
+    static final QName PROP_ERROR_MESSAGE = QName.createQName(ACTION_MODEL_URI, "errorMessage");
+    static final QName PROP_ERROR_DETAILS = QName.createQName(ACTION_MODEL_URI, "errorDetails");
 
     //
     // Rule Model Definitions

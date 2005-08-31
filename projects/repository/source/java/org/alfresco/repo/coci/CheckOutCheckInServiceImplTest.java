@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.version.VersionStoreConst;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -78,7 +78,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
     /**
      * User details 
      */
-    private static final String USER_NAME = "userName";
+    private static final String USER_NAME = "userNameCoCiTest";
     private static final String PWD = "password";
 	
 	/**
@@ -217,7 +217,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		String contentUrl = tempWriter.getContentUrl();
 		Map<String, Serializable> versionProperties3 = new HashMap<String, Serializable>();
 		versionProperties3.put(Version.PROP_DESCRIPTION, "description");
-		versionProperties3.put(VersionStoreConst.PROP_VERSION_TYPE, VersionType.MAJOR);
+		versionProperties3.put(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR);
 		NodeRef origNodeRef = this.cociService.checkin(workingCopy3, versionProperties3, contentUrl, true);
 		assertNotNull(origNodeRef);
 		

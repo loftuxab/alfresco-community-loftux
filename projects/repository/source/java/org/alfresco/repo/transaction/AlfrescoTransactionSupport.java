@@ -24,7 +24,6 @@ import java.util.Set;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.repo.node.integrity.IntegrityChecker;
-import org.alfresco.repo.rule.RuntimeRuleService;
 import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.util.GUID;
@@ -171,31 +170,6 @@ public abstract class AlfrescoTransactionSupport
         if (logger.isDebugEnabled())
         {
             logBoundService(nodeDaoService, bound); 
-        }
-    }
-
-    /**
-     * Method that registers a <tt>RuleService</tt> against the transaction.
-     * Setting this will ensure that the pre- and post-commit operations perform
-     * the necessary cleanups against the <tt>RuleService</tt>.
-     * <p>
-     * This method can be called repeatedly as long as the service being bound
-     * implements <tt>equals</tt> and <tt>hashCode</tt>.
-     * 
-     * @param ruleService
-     */
-    public static void bindRuleService(RuntimeRuleService ruleService)
-    {
-        // get transaction-local synchronization
-        TransactionSynchronizationImpl synch = getSynchronization();
-        
-        // bind the service in
-        boolean bound = synch.getRuleServices().add(ruleService);
-        
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logBoundService(ruleService, bound); 
         }
     }
 
@@ -407,7 +381,6 @@ public abstract class AlfrescoTransactionSupport
     {
         private String txnId;
         private Set<NodeDaoService> nodeDaoServices;
-        private Set<RuntimeRuleService> ruleServices;
         private Set<IntegrityChecker> integrityCheckers;
         private Set<LuceneIndexerAndSearcherFactory> lucenes;
         private Set<TransactionListener> listeners;
@@ -422,7 +395,6 @@ public abstract class AlfrescoTransactionSupport
         {
             this.txnId = txnId;
             nodeDaoServices = new HashSet<NodeDaoService>(3);
-            ruleServices = new HashSet<RuntimeRuleService>(3);
             integrityCheckers = new HashSet<IntegrityChecker>(3);
             lucenes = new HashSet<LuceneIndexerAndSearcherFactory>(3);
             listeners = new HashSet<TransactionListener>(5);
@@ -441,15 +413,6 @@ public abstract class AlfrescoTransactionSupport
         public Set<NodeDaoService> getNodeDaoServices()
         {
             return nodeDaoServices;
-        }
-
-        /**
-         * @return Returns a set of <tt>RuleService</tt> instances that will be called
-         *      during end-of-transaction processing
-         */
-        public Set<RuntimeRuleService> getRuleServices()
-        {
-            return ruleServices;
         }
         
         /**
@@ -486,7 +449,6 @@ public abstract class AlfrescoTransactionSupport
               .append("[ txnId=").append(txnId)
               .append(", node service=").append(nodeDaoServices.size())
               .append(", integrity=").append(integrityCheckers.size())
-              .append(", rule service=").append(ruleServices.size())
               .append(", indexers=").append(lucenes.size())
               .append(", resources=").append(resources)
               .append("]");
@@ -499,11 +461,6 @@ public abstract class AlfrescoTransactionSupport
          */
         public void flush()
         {
-            // execute pending rules
-            for (RuntimeRuleService ruleService : ruleServices)
-            {
-                ruleService.executePendingRules();
-            }
             // check integrity
             for (IntegrityChecker integrityChecker : integrityCheckers)
             {
@@ -571,17 +528,18 @@ public abstract class AlfrescoTransactionSupport
                 throw new AlfrescoRuntimeException("No synchronization bound to thread");
             }
 
+            // These are still considered part of the transaction so are executed here
+            for (TransactionListener listener : listeners)
+            {
+                listener.beforeCommit(readOnly);
+            }
+
             // flush
             flush();
             // prepare the indexes
             for (LuceneIndexerAndSearcherFactory lucene : lucenes)
             {
                 lucene.prepare();
-            }
-            // notify listeners
-            for (TransactionListener listener : listeners)
-            {
-                listener.beforeCommit(readOnly);
             }
         }
         
@@ -598,6 +556,7 @@ public abstract class AlfrescoTransactionSupport
                 listener.beforeCompletion();
             }
         }
+               
 
         @Override
         public void afterCompletion(int status)
