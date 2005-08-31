@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -56,16 +57,15 @@ public class NewUserWizard extends AbstractWizardBean
    private static Logger logger = Logger.getLogger(NewUserWizard.class);
    
    // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE_NEW = "New User Wizard";
-   private static final String WIZARD_DESC_NEW = "This wizard helps you to add a user to the repository.";
-   private static final String WIZARD_TITLE_EDIT = "Edit User Wizard";
-   private static final String WIZARD_DESC_EDIT = "This wizard helps you modify a user in the repository.";
-   private static final String STEP1_TITLE = "Step One - Person Properties";
-   private static final String STEP1_DESCRIPTION = "Enter information about this person.";
-   private static final String STEP2_TITLE = "Step Two - User Properties";
-   private static final String STEP2_DESCRIPTION = "Enter information about this user.";
-   private static final String FINISH_INSTRUCTION = "To add the user to this space click Finish.<br/>" +
-                                                    "To review or change your selections click Back.";
+   private static final String WIZARD_TITLE_NEW_ID = "new_user_title";
+   private static final String WIZARD_DESC_NEW_ID = "new_user_desc";
+   private static final String WIZARD_TITLE_EDIT_ID = "new_user_title_edit";
+   private static final String WIZARD_DESC_EDIT_ID = "new_user_desc_edit";
+   private static final String STEP1_TITLE_ID = "new_user_step1_title";
+   private static final String STEP1_DESCRIPTION_ID = "new_user_step1_desc";
+   private static final String STEP2_TITLE_ID = "new_user_step2_title";
+   private static final String STEP2_DESCRIPTION_ID = "new_user_step2_desc";
+   private static final String FINISH_INSTRUCTION_ID = "new_user_finish_instruction";
    
    private static final String ERROR = "error_person";
    
@@ -183,11 +183,11 @@ public class NewUserWizard extends AbstractWizardBean
    {
       if (this.editMode)
       {
-         return WIZARD_DESC_EDIT;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_EDIT_ID);
       }
       else
       {
-         return WIZARD_DESC_NEW;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_NEW_ID);
       }
    }
 
@@ -198,11 +198,11 @@ public class NewUserWizard extends AbstractWizardBean
    {
       if (this.editMode)
       {
-         return WIZARD_TITLE_EDIT;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_EDIT_ID);
       }
       else
       {
-         return WIZARD_TITLE_NEW;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_NEW_ID);
       }
    }
 
@@ -217,12 +217,12 @@ public class NewUserWizard extends AbstractWizardBean
       {
          case 1:
          {
-            stepTitle = STEP1_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_TITLE_ID);
             break;
          }
          case 2:
          {
-            stepTitle = STEP2_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_TITLE_ID);
             break;
          }
          case 3:
@@ -250,12 +250,12 @@ public class NewUserWizard extends AbstractWizardBean
       {
          case 1:
          {
-            stepDesc = STEP1_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_DESCRIPTION_ID);
             break;
          }
          case 2:
          {
-            stepDesc = STEP2_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_DESCRIPTION_ID);
             break;
          }
          case 3:
@@ -283,7 +283,7 @@ public class NewUserWizard extends AbstractWizardBean
       {
          case 3:
          {
-            stepInstruction = FINISH_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             break;
          }
          default:
@@ -440,8 +440,11 @@ public class NewUserWizard extends AbstractWizardBean
          homeSpaceLabel = Repository.getNameForNode(this.nodeService, new NodeRef(Repository.getStoreRef(), this.homeSpaceLocation));
       }
       
+      ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
+      
       return buildSummary(
-            new String[] {"Name", "User Name", "Password", "Home Space"},
+            new String[] {bundle.getString("name"), bundle.getString("username"), 
+                          bundle.getString("password"), bundle.getString("homespace")},
             new String[] {this.firstName + " " + this.lastName, this.userName, "********", homeSpaceLabel});
    }
    

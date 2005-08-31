@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
@@ -58,15 +59,15 @@ public class NewSpaceWizard extends AbstractWizardBean
    private static Log logger = LogFactory.getLog(NewSpaceWizard.class);
    
    // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE = "New Space Wizard";
-   private static final String WIZARD_DESC = "This wizard helps you to create a new space.";
-   private static final String STEP1_TITLE = "Step One - Starting Space";
-   private static final String STEP1_DESCRIPTION = "Choose how you want to create your space.";
-   private static final String STEP2_TITLE = "Step Two - Space Options";
-   private static final String STEP2_DESCRIPTION = "Select space options.";
-   private static final String STEP3_TITLE = "Step Three - Space Details";
-   private static final String STEP3_DESCRIPTION = "Enter information about the space.";
-   private static final String FINISH_INSTRUCTION = "To close this wizard and create your space click Finish.";
+   private static final String WIZARD_TITLE_ID = "new_space_title";
+   private static final String WIZARD_DESC_ID = "new_space_desc";
+   private static final String STEP1_TITLE_ID = "new_space_step1_title";
+   private static final String STEP1_DESCRIPTION_ID = "new_space_step1_desc";
+   private static final String STEP2_TITLE_ID = "new_space_step2_title";
+   private static final String STEP2_DESCRIPTION_ID = "new_space_step2_desc";
+   private static final String STEP3_TITLE_ID = "new_space_step3_title";
+   private static final String STEP3_DESCRIPTION_ID = "new_space_step3_desc";
+   private static final String FINISH_INSTRUCTION_ID = "new_space_finish_instruction";
    
    private static final String ERROR = "error_space";
    
@@ -259,7 +260,7 @@ public class NewSpaceWizard extends AbstractWizardBean
     */
    public String getWizardDescription()
    {
-      return WIZARD_DESC;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_ID);
    }
 
    /**
@@ -267,7 +268,7 @@ public class NewSpaceWizard extends AbstractWizardBean
     */
    public String getWizardTitle()
    {
-      return WIZARD_TITLE;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_ID);
    }
    
    /**
@@ -281,17 +282,17 @@ public class NewSpaceWizard extends AbstractWizardBean
       {
          case 1:
          {
-            stepDesc = STEP1_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_DESCRIPTION_ID);
             break;
          }
          case 2:
          {
-            stepDesc = STEP2_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_DESCRIPTION_ID);
             break;
          }
          case 3:
          {
-            stepDesc = STEP3_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP3_DESCRIPTION_ID);
             break;
          }
          case 4:
@@ -319,17 +320,17 @@ public class NewSpaceWizard extends AbstractWizardBean
       {
          case 1:
          {
-            stepTitle = STEP1_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_TITLE_ID);
             break;
          }
          case 2:
          {
-            stepTitle = STEP2_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_TITLE_ID);
             break;
          }
          case 3:
          {
-            stepTitle = STEP3_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP3_TITLE_ID);
             break;
          }
          case 4:
@@ -357,7 +358,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       {
          case 4:
          {
-            stepInstruction = FINISH_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             break;
          }
          default:
@@ -416,24 +417,27 @@ public class NewSpaceWizard extends AbstractWizardBean
    public String getSummary()
    {
       String summaryCreateType = null;
+      ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
       
       if (this.createFrom.equals("scratch"))
       {
-         summaryCreateType = "Scratch";
+         summaryCreateType = bundle.getString("scratch");
       }
       else if (this.createFrom.equals("existing"))
       {
-         summaryCreateType = "An existing space";
+         summaryCreateType = bundle.getString("an_existing_space");
       }
       else if (this.createFrom.equals("template"))
       {
-         summaryCreateType = "A template";
+         summaryCreateType = bundle.getString("a_template");
       }
       
-      String summarySaveAsTemplate = this.saveAsTemplate ? "Yes" : "No";
+      String summarySaveAsTemplate = this.saveAsTemplate ? bundle.getString("yes") : bundle.getString("no");
       
       return buildSummary(
-            new String[] {"Name", "Description", "Creating From", "Save As Template", "Template Name"},
+            new String[] {bundle.getString("name"), bundle.getString("description"), 
+                          bundle.getString("creating_from"), bundle.getString("save_as_template"), 
+                          bundle.getString("template_name")},
             new String[] {this.name, this.description, summaryCreateType, summarySaveAsTemplate, this.templateName});
    }
    
@@ -475,7 +479,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          }
          
          // add an entry (at the start) to instruct the user to select a template
-         this.templates.add(0, new SelectItem("none", "Select a template..."));
+         this.templates.add(0, new SelectItem("none", Application.getMessage(FacesContext.getCurrentInstance(), "select_a_template")));
       }
       
       return this.templates;

@@ -118,7 +118,7 @@
                                  <tr>
                                     <td><nobr><h:outputText value="#{msg.checkout_location}"/>:</nobr></td>
                                     <td width="100%">
-                                       <r:spaceSelector label="Click here to select the check out location" 
+                                       <r:spaceSelector label="#{msg.select_checkout_prompt}" 
                                                         value="#{NewActionWizard.actionProperties.destinationLocation}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>

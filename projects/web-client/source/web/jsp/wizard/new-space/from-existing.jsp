@@ -24,14 +24,13 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_new_space_existing">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
    <h:form id="new-space-from-existing">
    
    <%-- Main outer table --%>
@@ -96,13 +95,13 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="2" disabled="true">
-                                 <a:listItem value="1" label="1. Starting Space" />
-                                 <a:listItem value="2" label="2. Space Options" />
-                                 <a:listItem value="3" label="3. Space Details" />
-                                 <a:listItem value="4" label="4. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.starting_space}" />
+                                 <a:listItem value="2" label="2. #{msg.space_options}" />
+                                 <a:listItem value="3" label="3. #{msg.space_details}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -118,12 +117,12 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="wizardSectionHeading">Existing Space</td>
+                                    <td class="wizardSectionHeading"><h:outputText value="#{msg.existing_space}"/></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       <r:spaceSelector label="Click here to select an existing Space" 
+                                       <r:spaceSelector label="#{msg.select_existing_space_prompt}" 
                                                         value="#{NewSpaceWizard.existingSpaceId}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;" />
@@ -132,20 +131,20 @@
                                  <%-- TBD
                                  <tr><td class="paddingRow" /></tr>
                                  <tr>
-                                    <td>Copy existing space</td>
+                                    <td><h:outputText value="#{msg.copy_existing_space}"/></td>
                                  </tr>
                                  <tr>
                                     <td>
                                        <h:selectOneRadio value="#{NewSpaceWizard.copyPolicy}" layout="pageDirection">
-                                          <f:selectItem itemValue="structure" itemLabel="Structure" />
-                                          <f:selectItem itemValue="contents" itemLabel="Structure and contents" />
+                                          <f:selectItem itemValue="structure" itemLabel="#{msg.structure}" />
+                                          <f:selectItem itemValue="contents" itemLabel="#{msg.structure_contents}" />
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
                                  --%>
                                  <tr><td class="paddingRow" /></tr>
                                  <tr>
-                                    <td>Note: Any content rules for spaces will also be copied.</td>
+                                    <td><h:outputText value="#{msg.space_copy_note}"/></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
@@ -160,25 +159,25 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" 
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewSpaceWizard.next}" styleClass="wizardButton" 
                                                         disabled="#{NewSpaceWizard.existingSpaceId == null}"/>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
+                                       <h:commandButton value="#{msg.finish_button}" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
                                                         disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="button-group-separator"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

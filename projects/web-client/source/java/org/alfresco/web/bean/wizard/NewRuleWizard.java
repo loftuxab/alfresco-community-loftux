@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -64,17 +65,17 @@ public class NewRuleWizard extends BaseActionWizard
    private static final String ERROR = "error_rule";
    
    // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE = "New Rule Wizard";
-   private static final String WIZARD_TITLE_EDIT = "Edit Rule Wizard";
-   private static final String WIZARD_DESC = "This wizard helps you create a new rule.";
-   private static final String WIZARD_DESC_EDIT = "This wizard helps you modify a rule.";
-   private static final String STEP1_TITLE = "Step One - Enter Details";
-   private static final String STEP2_TITLE = "Step Two - Select ActionCondition";
-   private static final String STEP3_TITLE = "Step Three - ActionCondition Settings";
-   private static final String STEP4_TITLE = "Step Four - Select Action";
-   private static final String STEP5_TITLE = "Step Five - Action Settings";
-   private static final String FINISH_INSTRUCTION = "To create the rule click Finish.";
-   private static final String FINISH_INSTRUCTION_EDIT = "To update the rule click Finish.";
+   private static final String WIZARD_TITLE_ID = "new_rule_title";
+   private static final String WIZARD_TITLE_EDIT_ID = "new_rule_title_edit";
+   private static final String WIZARD_DESC_ID = "new_rule_desc";
+   private static final String WIZARD_DESC_EDIT_ID = "new_rule_desc_edit";
+   private static final String STEP1_TITLE_ID = "new_rule_step1_title";
+   private static final String STEP2_TITLE_ID = "new_rule_step2_title";
+   private static final String STEP3_TITLE_ID = "new_rule_step3_title";
+   private static final String STEP4_TITLE_ID = "new_rule_step4_title";
+   private static final String STEP5_TITLE_ID = "new_rule_step5_title";
+   private static final String FINISH_INSTRUCTION_ID = "new_rule_finish_instruction";
+   private static final String FINISH_INSTRUCTION_EDIT_ID = "new_rule_finish_instruction_edit";
    
    // new rule wizard specific properties
    private String title;
@@ -237,11 +238,11 @@ public class NewRuleWizard extends BaseActionWizard
    {
       if (this.editMode)
       {
-         return WIZARD_DESC_EDIT;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_EDIT_ID);
       }
       else
       {
-         return WIZARD_DESC;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_ID);
       }
    }
 
@@ -252,11 +253,11 @@ public class NewRuleWizard extends BaseActionWizard
    {
       if (this.editMode)
       {
-         return WIZARD_TITLE_EDIT;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_EDIT_ID);
       }
       else
       {
-         return WIZARD_TITLE;
+         return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_ID);
       }
    }
    
@@ -294,27 +295,27 @@ public class NewRuleWizard extends BaseActionWizard
       {
          case 1:
          {
-            stepTitle = STEP1_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_TITLE_ID);
             break;
          }
          case 2:
          {
-            stepTitle = STEP2_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_TITLE_ID);
             break;
          }
          case 3:
          {
-            stepTitle = STEP3_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP3_TITLE_ID);
             break;
          }
          case 4:
          {
-            stepTitle = STEP4_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP4_TITLE_ID);
             break;
          }
          case 5:
          {
-            stepTitle = STEP5_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP5_TITLE_ID);
             break;
          }
          case 6:
@@ -344,11 +345,11 @@ public class NewRuleWizard extends BaseActionWizard
          {
             if (this.editMode)
             {
-               stepInstruction = FINISH_INSTRUCTION_EDIT;
+               stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_EDIT_ID);
             }
             else
             {
-               stepInstruction = FINISH_INSTRUCTION;
+               stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             }
             break;
          }
@@ -356,11 +357,11 @@ public class NewRuleWizard extends BaseActionWizard
          {
             if (this.editMode)
             {
-               stepInstruction = FINISH_INSTRUCTION_EDIT;
+               stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_EDIT_ID);
             }
             else
             {
-               stepInstruction = FINISH_INSTRUCTION;
+               stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             }
             break;
          }
@@ -466,8 +467,11 @@ public class NewRuleWizard extends BaseActionWizard
       String summaryAction = this.actionService.getActionDefinition(
             this.action).getTitle();
       
+      ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
+      
       return buildSummary(
-            new String[] {"Name", "Description", "ActionCondition", "Action"},
+            new String[] {bundle.getString("name"), bundle.getString("description"),
+                          bundle.getString("condition"), bundle.getString("action")},
             new String[] {this.title, this.description, summaryCondition, summaryAction});
    }
    

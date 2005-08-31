@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_new_user_user_props">
 
 <script language="JavaScript1.2">
    function updateButtonState()
@@ -112,12 +112,12 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="2" disabled="true">
-                                 <a:listItem value="1" label="1. Person Properties" />
-                                 <a:listItem value="2" label="2. User Properties" />
-                                 <a:listItem value="3" label="3. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.person_properties}" />
+                                 <a:listItem value="2" label="2. #{msg.user_properties}" />
+                                 <a:listItem value="3" label="3. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -137,17 +137,17 @@
                                  
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">User Properties</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.user_properties}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>User Name:</td>
+                                    <td><h:outputText value="#{msg.username}"/>:</td>
                                     <td>
                                        <h:inputText id="userName" value="#{NewUserWizard.userName}" size="35" maxlength="1024" validator="#{LoginBean.validateUsername}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" />&nbsp;*
                                        &nbsp;<h:message id="errors1" for="userName" style="color:red" />
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>User Password:</td>
+                                    <td><h:outputText value="#{msg.password}"/>:</td>
                                     <td>
                                        <h:inputSecret id="password" value="#{NewUserWizard.password}" size="35" maxlength="1024" validator="#{LoginBean.validatePassword}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" redisplay="true" />&nbsp;*
                                        &nbsp;<h:message id="errors2" for="password" style="color:red" />
@@ -156,16 +156,16 @@
                                  
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Home Space</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.homespace}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>Home Space Location:</td>
+                                    <td><h:outputText value="#{msg.home_space_location}"/>:</td>
                                     <td>
-                                       <r:spaceSelector label="Click here to select the Home Space location" value="#{NewUserWizard.homeSpaceLocation}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 2px;"/>
+                                       <r:spaceSelector label="#{msg.select_home_space_prompt}" value="#{NewUserWizard.homeSpaceLocation}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 2px;"/>
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Home Space Name:</td>
+                                    <td><h:outputText value="#{msg.home_space_name}"/>:</td>
                                     <td>
                                        <h:inputText id="homeSpaceName" value="#{NewUserWizard.homeSpaceName}" size="35" maxlength="1024" onkeyup="updateButtonState();" />
                                     </td>
@@ -184,23 +184,23 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" id="next-button" action="#{NewUserWizard.next}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.next_button}" id="next-button" action="#{NewUserWizard.next}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewUserWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewUserWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" id="finish-button" action="#{NewUserWizard.finish}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.finish_button}" id="finish-button" action="#{NewUserWizard.finish}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewUserWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewUserWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

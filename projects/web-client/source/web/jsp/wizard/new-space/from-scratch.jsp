@@ -24,14 +24,13 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_new_space_scratch">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
    <h:form id="new-space-from-scratch">
    
    <%-- Main outer table --%>
@@ -96,13 +95,13 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="2" disabled="true">
-                                 <a:listItem value="1" label="1. Starting Space" />
-                                 <a:listItem value="2" label="2. Space Options" />
-                                 <a:listItem value="3" label="3. Space Details" />
-                                 <a:listItem value="4" label="4. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.starting_space}" />
+                                 <a:listItem value="2" label="2. #{msg.space_options}" />
+                                 <a:listItem value="3" label="3. #{msg.space_details}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -118,18 +117,18 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="wizardSectionHeading">Space Type</td>
+                                    <td class="wizardSectionHeading"><h:outputText value="#{msg.space_type}"/></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>Select the type of space you want to create.</td>
+                                    <td><h:outputText value="#{msg.space_type_create}"/></td>
                                  </tr>
                                  <tr>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                                        <a:imagePickerRadio columns="4" spacing="4" value="#{NewSpaceWizard.spaceType}"
                                                              onclick="javascript:itemSelected(this);">
-                                          <a:listItem value="container" label="Container" tooltip="Container"
+                                          <a:listItem value="container" label="#{msg.container}" tooltip="#{msg.container}"
                                                             image="/images/icons/space.gif" />
                                           <%-- TBD
                                           <a:listItem value="wiki" label="Wiki" tooltip="Wiki"
@@ -152,11 +151,13 @@
                                              <td valign='top' align='left'>
                                                 <a:dynamicDescription selected="#{NewSpaceWizard.spaceType}">
                                                    <a:description controlValue="container" 
-                                                      text="A place for keeping and organising documents and other spaces." />
+                                                      text="#{msg.container_desc}" />
+                                                   <%-- TBD
                                                    <a:description controlValue="discussion" 
                                                       text="A place for discussing the subject of this space." />
                                                    <a:description controlValue="wiki" 
                                                       text="A place to store wiki pages." />
+                                                   --%>
                                                 </a:dynamicDescription>
                                              </td>
                                           </tr>
@@ -167,10 +168,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>
-                                       <b>Note:</b> If you can only see one type of space then other space
-                                       types may not be enabled. See your System Administrator for further help.
-                                    </td>
+                                    <td><h:outputText value="#{msg.space_type_note}"/></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
@@ -185,24 +183,24 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
+                                       <h:commandButton value="#{msg.finish_button}" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
                                                         disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="button-group-separator"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_create_content">
 
 <script language="javascript" type="text/javascript" src="<%=request.getContextPath()%>/scripts/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript">
@@ -100,8 +100,8 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Create New Content</div>
-                              <div class="mainSubText"><h:outputText value="#{msg.createfile_description}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{CreateContentWizard.wizardTitle}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{CreateContentWizard.wizardDescription}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -125,12 +125,12 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="1" disabled="true">
-                                 <a:listItem value="1" label="1. Enter Content" />
-                                 <a:listItem value="2" label="2. Properties" />
-                                 <a:listItem value="3" label="3. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.enter_content}" />
+                                 <a:listItem value="2" label="2. #{msg.properties}" />
+                                 <a:listItem value="3" label="3. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -151,18 +151,18 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{CreateContentWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{CreateContentWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{CreateContentWizard.finish}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.finish_button}" action="#{CreateContentWizard.finish}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{CreateContentWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{CreateContentWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

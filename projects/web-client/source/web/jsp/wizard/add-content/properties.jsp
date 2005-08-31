@@ -181,7 +181,7 @@
                                           </tr>
                                           <tr>
                                              <td colspan=2>
-                                                <img alt="#{msg.information}" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                                <img alt="" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
                                                 <h:outputText value="#{msg.warning_inline}" />
                                              </td>
                                           </tr>

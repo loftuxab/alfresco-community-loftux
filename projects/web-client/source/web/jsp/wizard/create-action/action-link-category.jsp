@@ -118,7 +118,7 @@
                                  <tr>
                                     <td valign="top"><h:outputText value="#{msg.category}"/>:</td>
                                     <td width="90%">
-                                       <r:categorySelector label="Click here to select a category" 
+                                       <r:categorySelector label="#{msg.select_category_prompt}" 
                                                         value="#{NewActionWizard.actionProperties.category}" 
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                     </td>

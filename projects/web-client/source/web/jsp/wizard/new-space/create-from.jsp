@@ -24,14 +24,13 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_new_space_create-from">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
-   
-   <%-- REPLACE ME: set the form name here --%>
+
    <h:form id="new-space-create-from">
    
    <%-- Main outer table --%>
@@ -96,13 +95,13 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="1" disabled="true">
-                                 <a:listItem value="1" label="1. Starting Space" />
-                                 <a:listItem value="2" label="2. Space Options" />
-                                 <a:listItem value="3" label="3. Space Details" />
-                                 <a:listItem value="4" label="4. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.starting_space}" />
+                                 <a:listItem value="2" label="2. #{msg.space_options}" />
+                                 <a:listItem value="3" label="3. #{msg.space_details}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -118,14 +117,14 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>How do you want to create your space?</td>
+                                    <td><h:outputText value="#{msg.how_to_create_space}"/></td>
                                  </tr>
                                  <tr>
                                     <td>
                                        <h:selectOneRadio value="#{NewSpaceWizard.createFrom}" layout="pageDirection">
-                                          <f:selectItem itemValue="scratch" itemLabel="From scratch" />
-                                          <f:selectItem itemValue="existing" itemLabel="Based on an existing space" />
-                                          <f:selectItem itemValue="template" itemLabel="Using a template" />
+                                          <f:selectItem itemValue="scratch" itemLabel="#{msg.from_scratch}" />
+                                          <f:selectItem itemValue="existing" itemLabel="#{msg.based_on_existing_space}" />
+                                          <f:selectItem itemValue="template" itemLabel="#{msg.using_a_template}" />
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
@@ -142,19 +141,19 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewSpaceWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
+                                       <h:commandButton value="#{msg.finish_button}" action="#{NewSpaceWizard.finish}" styleClass="wizardButton"
                                                         disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

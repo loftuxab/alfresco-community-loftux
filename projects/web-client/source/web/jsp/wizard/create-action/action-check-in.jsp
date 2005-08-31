@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_create_action_add_feature">
+<r:page titleId="title_create_action_checkin">
 
 <f:view>
    

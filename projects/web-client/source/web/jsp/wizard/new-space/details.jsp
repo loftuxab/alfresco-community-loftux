@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_new_space_details">
 
 <script language="JavaScript1.2">
    function checkButtonState()
@@ -62,7 +62,6 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
    <h:form id="new-space-details">
    
    <%-- Main outer table --%>
@@ -127,13 +126,13 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="3" disabled="true">
-                                 <a:listItem value="1" label="1. Starting Space" />
-                                 <a:listItem value="2" label="2. Space Options" />
-                                 <a:listItem value="3" label="3. Space Details" />
-                                 <a:listItem value="4" label="4. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.starting_space}" />
+                                 <a:listItem value="2" label="2. #{msg.space_options}" />
+                                 <a:listItem value="3" label="3. #{msg.space_details}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -151,26 +150,26 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Space Details</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.title_space_details}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>Name:</td>
+                                    <td><h:outputText value="#{msg.name}"/>:</td>
                                     <td>
                                        <h:inputText id="name" value="#{NewSpaceWizard.name}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Description:</td>
+                                    <td><h:outputText value="#{msg.description}"/>:</td>
                                     <td>
                                        <h:inputText value="#{NewSpaceWizard.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">&nbsp;Other Options</td>
+                                    <td colspan="2" class="wizardSectionHeading">&nbsp;<h:outputText value="#{msg.other_options}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>Choose space icon:</td>
+                                    <td><h:outputText value="#{msg.choose_space_icon}"/>:</td>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                                        <a:imagePickerRadio columns="6" spacing="4" value="#{NewSpaceWizard.icon}">
@@ -188,11 +187,11 @@
                                     <td colspan="2">
                                        <h:selectBooleanCheckbox id="saveAsTemplate" value="#{NewSpaceWizard.saveAsTemplate}" 
                                           onclick="javascript:toggleTemplateName();" />&nbsp;
-                                       <span style="vertical-align:20%">Save as template</span>
+                                       <span style="vertical-align:20%"><h:outputText value="#{msg.save_as_template}"/></span>
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td align="middle">Name:</td>
+                                    <td align="middle"><h:outputText value="#{msg.name}"/>:</td>
                                     <td>
                                        <h:inputText id="templateName" value="#{NewSpaceWizard.templateName}" 
                                                      size="35" disabled="#{!NewSpaceWizard.saveAsTemplate}" 
@@ -213,25 +212,25 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="next-button" value="Next" action="#{NewSpaceWizard.next}" 
+                                       <h:commandButton id="next-button" value="#{msg.next_button}" action="#{NewSpaceWizard.next}" 
                                                         styleClass="wizardButton" disabled="#{NewSpaceWizard.name == null}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewSpaceWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="finish-button" value="Finish" action="#{NewSpaceWizard.finish}" 
+                                       <h:commandButton id="finish-button" value="#{msg.finish_button}" action="#{NewSpaceWizard.finish}" 
                                                         styleClass="wizardButton" disabled="#{NewSpaceWizard.name == null}"/>
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewSpaceWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_new_user_person_props">
 
 <script language="JavaScript1.2">
    function updateButtonState()
@@ -112,12 +112,12 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="1" disabled="true">
-                                 <a:listItem value="1" label="1. Person Properties" />
-                                 <a:listItem value="2" label="2. User Properties" />
-                                 <a:listItem value="3" label="3. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.person_properties}" />
+                                 <a:listItem value="2" label="2. #{msg.user_properties}" />
+                                 <a:listItem value="3" label="3. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -134,22 +134,22 @@
                                  
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Person Properties</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.person_properties}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>First Name:</td>
+                                    <td><h:outputText value="#{msg.first_name}"/>:</td>
                                     <td>
                                        <h:inputText id="firstName" value="#{NewUserWizard.firstName}" size="35" maxlength="1024" onkeyup="updateButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Last Name:</td>
+                                    <td><h:outputText value="#{msg.last_name}"/>:</td>
                                     <td>
                                        <h:inputText id="lastName" value="#{NewUserWizard.lastName}" size="35" maxlength="1024" onkeyup="updateButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Email:</td>
+                                    <td><h:outputText value="#{msg.email}"/>:</td>
                                     <td>
                                        <h:inputText id="email" value="#{NewUserWizard.email}" size="35" maxlength="1024" onkeyup="updateButtonState();" />&nbsp;*
                                     </td>
@@ -157,10 +157,10 @@
                                  
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Other Options</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.other_options}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>Company ID:</td>
+                                    <td><h:outputText value="#{msg.company_id}"/>:</td>
                                     <td>
                                        <h:inputText value="#{NewUserWizard.companyId}" size="35" maxlength="1024" />
                                     </td>
@@ -179,18 +179,18 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" id="next-button" action="#{NewUserWizard.next}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.next_button}" id="next-button" action="#{NewUserWizard.next}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" id="finish-button" action="#{NewUserWizard.finish}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.finish_button}" id="finish-button" action="#{NewUserWizard.finish}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewUserWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewUserWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

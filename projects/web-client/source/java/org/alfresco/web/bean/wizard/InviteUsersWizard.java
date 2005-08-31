@@ -52,20 +52,18 @@ public class InviteUsersWizard extends AbstractWizardBean
 {
    private static Log logger = LogFactory.getLog(InviteUsersWizard.class);
    
-   // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE = "Invite Users Wizard";
-   private static final String WIZARD_DESC = "This wizard helps you to give other users access to your space.";
-   private static final String STEP1_TITLE = "Step One - Invite Users";
-   private static final String STEP1_DESCRIPTION = "Select the users and roles they will play in this space.";
-   private static final String STEP2_TITLE = "Step Two - Notify Users";
-   private static final String STEP2_DESCRIPTION = "Notify the selected users.";
-   private static final String FINISH_INSTRUCTION = "To close this wizard and apply your changes click Finish.";
-   
    /** I18N message strings */
    private static final String MSG_USERS  = "users";
    private static final String MSG_GROUPS = "groups";
    private static final String MSG_INVITED_SPACE = "invite_space";
    private static final String MSG_INVITED_ROLE  = "invite_role";
+   private static final String WIZARD_TITLE_ID = "invite_title";
+   private static final String WIZARD_DESC_ID = "invite_desc";
+   private static final String STEP1_TITLE_ID = "invite_step1_title";
+   private static final String STEP1_DESCRIPTION_ID = "invite_step1_desc";
+   private static final String STEP2_TITLE_ID = "invite_step2_title";
+   private static final String STEP2_DESCRIPTION_ID = "invite_step2_desc";
+   private static final String FINISH_INSTRUCTION_ID = "invite_finish_instruction";
    
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
@@ -522,7 +520,7 @@ public class InviteUsersWizard extends AbstractWizardBean
     */
    public String getWizardDescription()
    {
-      return WIZARD_DESC;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_ID);
    }
 
    /**
@@ -530,7 +528,7 @@ public class InviteUsersWizard extends AbstractWizardBean
     */
    public String getWizardTitle()
    {
-      return WIZARD_TITLE;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_ID);
    }
 
       /**
@@ -544,12 +542,12 @@ public class InviteUsersWizard extends AbstractWizardBean
       {
          case 1:
          {
-            stepDesc = STEP1_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_DESCRIPTION_ID);
             break;
          }
          case 2:
          {
-            stepDesc = STEP2_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_DESCRIPTION_ID);
             break;
          }
          default:
@@ -572,12 +570,12 @@ public class InviteUsersWizard extends AbstractWizardBean
       {
          case 1:
          {
-            stepTitle = STEP1_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_TITLE_ID);
             break;
          }
          case 2:
          {
-            stepTitle = STEP2_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_TITLE_ID);
             break;
          }
          default:
@@ -600,8 +598,7 @@ public class InviteUsersWizard extends AbstractWizardBean
       {
          case 2:
          {
-            //stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
-            stepInstruction = FINISH_INSTRUCTION;
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
             break;
          }
          default:

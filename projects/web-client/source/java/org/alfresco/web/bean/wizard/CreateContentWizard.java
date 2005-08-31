@@ -16,6 +16,8 @@
  */
 package org.alfresco.web.bean.wizard;
 
+import java.util.ResourceBundle;
+
 import javax.faces.context.FacesContext;
 
 import org.alfresco.web.app.Application;
@@ -33,12 +35,12 @@ public class CreateContentWizard extends BaseContentWizard
    private static Log logger = LogFactory.getLog(CreateContentWizard.class);
 
    // TODO: retrieve these from the config service
-   private static final String WIZARD_TITLE = "Create Content Wizard";
-   private static final String WIZARD_DESC = "This wizard helps you to create a new document in a space.";
-   private static final String STEP1_TITLE = "Step One - Enter Content";
-   private static final String STEP1_DESCRIPTION = "Enter your document content into the repository.";
-   private static final String STEP2_TITLE = "Step Two - Properties";
-   private static final String STEP2_DESCRIPTION = "Enter information about this content.";
+   private static final String WIZARD_TITLE_ID = "create_content_title";
+   private static final String WIZARD_DESC_ID = "create_content_desc";
+   private static final String STEP1_TITLE_ID = "create_content_step1_title";
+   private static final String STEP1_DESCRIPTION_ID = "create_content_step1_desc";
+   private static final String STEP2_TITLE_ID = "create_content_step2_title";
+   private static final String STEP2_DESCRIPTION_ID = "create_content_step2_desc";
    
    // create content wizard specific properties
    private String content;
@@ -59,7 +61,7 @@ public class CreateContentWizard extends BaseContentWizard
     */
    public String getWizardDescription()
    {
-      return WIZARD_DESC;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_DESC_ID);
    }
 
    /**
@@ -67,7 +69,7 @@ public class CreateContentWizard extends BaseContentWizard
     */
    public String getWizardTitle()
    {
-      return WIZARD_TITLE;
+      return Application.getMessage(FacesContext.getCurrentInstance(), WIZARD_TITLE_ID);
    }
    
    /**
@@ -81,12 +83,12 @@ public class CreateContentWizard extends BaseContentWizard
       {
          case 1:
          {
-            stepDesc = STEP1_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_DESCRIPTION_ID);
             break;
          }
          case 2:
          {
-            stepDesc = STEP2_DESCRIPTION;
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_DESCRIPTION_ID);
             break;
          }
          case 3:
@@ -114,12 +116,12 @@ public class CreateContentWizard extends BaseContentWizard
       {
          case 1:
          {
-            stepTitle = STEP1_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP1_TITLE_ID);
             break;
          }
          case 2:
          {
-            stepTitle = STEP2_TITLE;
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP2_TITLE_ID);
             break;
          }
          case 3:
@@ -174,9 +176,13 @@ public class CreateContentWizard extends BaseContentWizard
     */
    public String getSummary()
    {
+      ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
+      
       // TODO: show first few lines of content here?
       return buildSummary(
-            new String[] {"File Name", "Content Type", "Title", "Description", "Author"},
+            new String[] {bundle.getString("file_name"), bundle.getString("content_type"), 
+                          bundle.getString("title"), bundle.getString("description"), 
+                          bundle.getString("author")},
             new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author});
    }
    

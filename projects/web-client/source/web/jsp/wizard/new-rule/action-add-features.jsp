@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_new_rule_add_feature">
 
 <f:view>
    
@@ -95,15 +95,15 @@
                         <tr>
                            <td width="20%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="Steps"/><br>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
                                           value="5" disabled="true">
-                                 <a:listItem value="1" label="1. Details" />
-                                 <a:listItem value="2" label="2. Condition" />
-                                 <a:listItem value="3" label="3. Condition Settings" />
-                                 <a:listItem value="4" label="4. Action" />
-                                 <a:listItem value="5" label="5. Action Settings" />
-                                 <a:listItem value="6" label="6. Summary" />
+                                 <a:listItem value="1" label="1. #{msg.details}" />
+                                 <a:listItem value="2" label="2. #{msg.condition}" />
+                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
+                                 <a:listItem value="4" label="4. #{msg.action}" />
+                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
+                                 <a:listItem value="6" label="6. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -119,7 +119,7 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>Select&nbsp;required&nbsp;feature:&nbsp;</td>
+                                    <td><nobr><h:outputText value="#{msg.select_feature}"/></nobr></td>
                                     <td width="90%">
                                        <h:selectOneMenu value="#{NewRuleWizard.actionProperties.aspect}">
                                           <f:selectItems value="#{NewRuleWizard.aspects}" />
@@ -139,23 +139,23 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Next" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Back" action="#{NewRuleWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewRuleWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Finish" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.finish_button}" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewRuleWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewRuleWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
