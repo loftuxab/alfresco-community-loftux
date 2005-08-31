@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_users">
 
 <f:view>
    
@@ -70,7 +70,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainTitle">Manage Users</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.manage_users}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.manageusers_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
@@ -84,7 +84,7 @@
                               <%-- View mode settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif" value="0">
-                                 <a:listItem value="0" label="User Details" />
+                                 <a:listItem value="0" label="#{msg.user_details}" />
                               </a:modeList>
                            </td>
                         </tr>
@@ -120,7 +120,7 @@
                                  <%-- Primary column with full name --%>
                                  <a:column primary="true" width="200" style="padding:2px;text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="Name" value="fullName" mode="case-insensitive" styleClass="header"/>
+                                       <a:sortLink label="#{msg.name}" value="fullName" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
                                        <h:graphicImage url="/images/icons/person.gif" />
@@ -131,7 +131,7 @@
                                  <%-- Username column --%>
                                  <a:column style="text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="User Name" value="userName" styleClass="header"/>
+                                       <a:sortLink label="#{msg.username}" value="userName" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.userName}" />
                                  </a:column>
@@ -168,7 +168,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

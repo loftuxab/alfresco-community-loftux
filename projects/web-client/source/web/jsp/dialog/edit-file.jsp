@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_edit_file">
 
 <f:view>
    
@@ -99,7 +99,9 @@
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
                                     <td class="mainSubText">
-                                       To edit the file '<h:outputText value="#{CheckinCheckoutBean.document.name}" />', click the link below. Depending on your browser settings, you may want to right click on the link and select Save As Target.
+                                       <h:outputFormat value="#{msg.edit_file_prompt}">
+                                          <f:param value="#{CheckinCheckoutBean.document.name}" />
+                                       </h:outputFormat>
                                     </td>
                                  </tr>
                                  <tr>
@@ -110,7 +112,7 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       When download is complete, click Close.
+                                       <h:outputText value="#{msg.edit_download_complete}" />
                                     </td>
                                  </tr>
                                  
@@ -122,14 +124,14 @@
                                     
                                     <tr>
                                        <td class="mainSubText">
-                                          You may want to:
+                                          <h:outputText value="#{msg.you_may_want}" />:
                                           <div style="padding-top:6px"></div>
                                           &nbsp;&nbsp;
                                           <a:actionLink value="#{msg.checkout_document}" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
                                              <f:param name="id" value="#{CheckinCheckoutBean.document.id}" />
                                           </a:actionLink>
                                           <div style="padding-top:6px"></div>
-                                          Hint: Check out a document to lock it and prevent other users from editing it. When you check out a document a copy is made for you to work with. When you have finished editing the copy you need to check it in to release the lock and allow other users to view the changes.
+                                          <h:outputText value="#{msg.checkout_hint}" />
                                        </td>
                                     </tr>
                                  </a:panel>
@@ -142,7 +144,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="#{CheckinCheckoutBean.editFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.close}" action="#{CheckinCheckoutBean.editFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>

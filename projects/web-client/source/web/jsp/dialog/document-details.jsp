@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_file_details">
 
 <f:view>
    
@@ -71,7 +71,7 @@
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainTitle">
-                                 Details of '<h:outputText value="#{DocumentDetailsBean.name}" />'<r:lockIcon value="#{DocumentDetailsBean.document.nodeRef}" align="absmiddle" />
+                                 <h:outputText value="#{msg.details_of}" /> '<h:outputText value="#{DocumentDetailsBean.name}" />'<r:lockIcon value="#{DocumentDetailsBean.document.nodeRef}" align="absmiddle" />
                               </div>
                               <div class="mainSubText"><h:outputText value="#{msg.location}" />: <r:nodePath value="#{DocumentDetailsBean.document.nodeRef}" breadcrumb="true" actionListener="#{BrowseBean.clickSpacePath}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.documentdetails_description}" /></div>
@@ -116,7 +116,7 @@
                               </a:booleanEvaluator>
                               
                               <a:menu itemSpacing="4" image="/images/icons/more.gif" menuStyleClass="moreActionsMenu"
-                                      label="More..." tooltip="More Actions for this document" style="padding-left:20px">
+                                      label="#{msg.more_options}" tooltip="#{msg.more_options_file}" style="padding-left:20px">
                                  <%-- edit and update --%>
                                  <a:booleanEvaluator value="#{(DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false) || DocumentDetailsBean.owner == true}">
                                     <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif"
@@ -190,7 +190,7 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="Preview" id="preview-panel" progressive="true"
+                              <a:panel label="#{msg.preview}" id="preview-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  <table width=100% cellspacing=0 cellpadding=0 border=0>
                                     <tr>
@@ -201,11 +201,11 @@
                                  </table>
                               </a:panel>
                               <br/>
-                              <a:panel label="Properties" id="properties-panel" progressive="true"
+                              <a:panel label="#{msg.properties}" id="properties-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
                                        actionListener="#{EditDocPropsDialog.setupDocumentForAction}"
-                                       linkTooltip="Modify" rendered="#{DocumentDetailsBean.locked == false}">
+                                       linkTooltip="#{msg.modify}" rendered="#{DocumentDetailsBean.locked == false}">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
                                        <td width=80 align=center>
@@ -229,9 +229,9 @@
                                           <r:propertySheetGrid id="document-props" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
-                                          <h:outputText id="no-inline-msg" value="<br/>This document is not inline editable.<br/><br/>"
+                                          <h:outputText id="no-inline-msg" value="<br/>#{msg.not_inline_editable}<br/><br/>"
                                                rendered="#{DocumentDetailsBean.inlineEditable == false}" escape="false" />
-                                          <a:actionLink id="make-inline" value="Allow Inline Editing" 
+                                          <a:actionLink id="make-inline" value="#{msg.allow_inline_editing}" 
                                                action="#{DocumentDetailsBean.applyInlineEditable}"
                                                rendered="#{DocumentDetailsBean.inlineEditable == false}" />
                                           <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
@@ -239,7 +239,7 @@
                                     </tr>
                                  </table>
                               </a:panel>
-                              <a:panel label="Properties" id="properties-panel-locked" progressive="true"
+                              <a:panel label="#{msg.properties}" id="properties-panel-locked" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.locked}">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -264,7 +264,7 @@
                                           <r:propertySheetGrid id="document-props-locked" value="#{DocumentDetailsBean.document}" var="documentProps" 
                                                       columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                       externalConfig="true" />
-                                          <h:outputText id="no-inline-msg2" value="<br/>This document is not inline editable.<br/>"
+                                          <h:outputText id="no-inline-msg2" value="<br/>#{msg.not_inline_editable}<br/>"
                                                rendered="#{DocumentDetailsBean.inlineEditable == false}" escape="false" />
                                           <h:messages id="props-locked-msgs" styleClass="errorMessage" layout="table" />
                                        </td>
@@ -272,41 +272,41 @@
                                  </table>
                               </a:panel>
                               <br/>
-                              <a:panel label="Workflow" id="workflow-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.workflow}" id="workflow-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editSimpleWorkflow" linkIcon="/images/icons/Change_details.gif"
-                                       rendered="#{DocumentDetailsBean.approveStepName != null}" linkTooltip="Modify">
+                                       rendered="#{DocumentDetailsBean.approveStepName != null}" linkTooltip="#{msg.workflow}">
                                  <h:outputText id="workflow-overview" value="#{DocumentDetailsBean.workflowOverviewHTML}" 
                                                escape="false" />
                               </a:panel>
-                              <a:panel label="Workflow" id="no-workflow-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.workflow}" id="no-workflow-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.approveStepName == null}">
-                                 <h:outputText id="no-workflow-msg" value="This document is not part of any workflow." />
+                                 <h:outputText id="no-workflow-msg" value="#{msg.not_in_workflow}" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Category" id="category-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.category}" id="category-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editCategory" actionListener="#{DocumentDetailsBean.setupCategoryForEdit}"
-                                       linkIcon="/images/icons/Change_details.gif" linkTooltip="Change Category"
+                                       linkIcon="/images/icons/Change_details.gif" linkTooltip="#{msg.change_category}"
                                        rendered="#{DocumentDetailsBean.categorised}">
                                  <h:outputText id="category-overview" value="#{DocumentDetailsBean.categoriesOverviewHTML}" 
                                                escape="false" />
                               </a:panel>
-                              <a:panel label="Category" id="no-category-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.category}" id="no-category-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.categorised == false}">
-                                 <h:outputText id="no-category-msg" value="This document is not categorised.<br/><br/>" 
+                                 <h:outputText id="no-category-msg" value="#{msg.not_in_category}<br/><br/>" 
                                                escape="false"/>
-                                 <a:actionLink id="make-classifiable" value="Allow Categorization" 
+                                 <a:actionLink id="make-classifiable" value="#{msg.allow_categorization}" 
                                                action="#{DocumentDetailsBean.applyClassifiable}"
                                                rendered="#{DocumentDetailsBean.locked == false}" />
                               </a:panel>
                               <br/>
-                              <a:panel label="Version History" id="version-history-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.version_history}" id="version-history-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.versionable}">
-                                       
+                                 
                                  <a:richList id="versionHistoryList" viewMode="details" value="#{DocumentDetailsBean.versionHistory}" 
                                              var="r" styleClass="recordSet" headerStyleClass="recordSetHeader" 
                                              rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%" 
@@ -315,7 +315,7 @@
                                     <%-- Primary column for details view mode --%>
                                     <a:column id="col1" primary="true" width="100" style="padding:2px;text-align:left">
                                        <f:facet name="header">
-                                          <a:sortLink label="Version" value="versionLabel" mode="case-insensitive" styleClass="header"/>
+                                          <a:sortLink label="#{msg.version}" value="versionLabel" mode="case-insensitive" styleClass="header"/>
                                        </f:facet>
                                        <a:actionLink id="label" value="#{r.versionLabel}" href="#{r.url}" />
                                     </a:column>
@@ -323,7 +323,7 @@
                                     <%-- Description columns --%>
                                     <a:column id="col2" style="text-align:left">
                                        <f:facet name="header">
-                                          <a:sortLink label="Author" value="author" styleClass="header"/>
+                                          <a:sortLink label="#{msg.author}" value="author" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="author" value="#{r.author}" />
                                     </a:column>
@@ -331,7 +331,7 @@
                                     <%-- Created Date column for details view mode --%>
                                     <a:column id="col3" style="text-align:left">
                                        <f:facet name="header">
-                                          <a:sortLink label="Date" value="versionDate" styleClass="header"/>
+                                          <a:sortLink label="#{msg.date}" value="versionDate" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="date" value="#{r.versionDate}">
                                           <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
@@ -349,12 +349,12 @@
                                     <a:dataPager/>
                                  </a:richList>
                               </a:panel>
-                              <a:panel label="Version History" id="no-version-history-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.version_history}" id="no-version-history-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.versionable == false}">
-                                 <h:outputText id="no-history-msg" value="This document has no version history.<br/><br/>" 
+                                 <h:outputText id="no-history-msg" value="#{msg.not_versioned}<br/><br/>" 
                                                escape="false" />
-                                 <a:actionLink id="make-versionable" value="Allow Versioning"
+                                 <a:actionLink id="make-versionable" value="#{msg.allow_versioning}"
                                                action="#{DocumentDetailsBean.applyVersionable}" 
                                                rendered="#{DocumentDetailsBean.locked == false}" />
                               </a:panel>
@@ -366,7 +366,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

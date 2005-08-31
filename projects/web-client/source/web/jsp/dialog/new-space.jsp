@@ -46,7 +46,6 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
    <h:form id="new-space">
    
    <%-- Main outer table --%>
@@ -86,7 +85,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
-                              <div class="mainTitle">Create Space</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.new_space}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.newspace_description}" /></div>
                            </td>
                         </tr>
@@ -116,27 +115,27 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Space Properties</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.space_props}" /></td>
                                  </tr>
                                  <tr>
-                                    <td>Name:</td>
+                                    <td><h:outputText value="#{msg.name}" />:</td>
                                     <td>
                                        <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" maxlength="1024" 
                                                     onkeyup="javascript:checkButtonState();" onchange="javascript:checkButtonState();"/>&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Description:</td>
+                                    <td><h:outputText value="#{msg.description}" />:</td>
                                     <td>
                                        <h:inputText value="#{NewSpaceDialog.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">&nbsp;Other Options</td>
+                                    <td colspan="2" class="wizardSectionHeading">&nbsp;<h:outputText value="#{msg.other_options}" /></td>
                                  </tr>
                                  <tr>
-                                    <td>Choose space icon:</td>
+                                    <td><h:outputText value="#{msg.choose_space_icon}" />:</td>
                                     <td>
                                        <table border="0" cellpadding="0" cellspacing="0"><tr><td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
@@ -154,7 +153,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2">To create your space click Create Space.</td>
+                                    <td colspan="2"><h:outputText value="#{msg.create_space_finish}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -165,13 +164,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="Create Space" action="#{NewSpaceDialog.finish}" 
+                                       <h:commandButton id="ok-button" value="#{msg.new_space}" action="#{NewSpaceDialog.finish}" 
                                                         styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

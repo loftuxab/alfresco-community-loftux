@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_edit_file_inline">
 
 <script language="javascript" type="text/javascript" src="<%=request.getContextPath()%>/scripts/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript">
@@ -131,13 +131,13 @@
                                     <tr>
                                        <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="16" height="16"/></td>
                                        <td><td class="mainSubText">
-                                             You may want to
+                                             <h:outputText value="#{msg.you_may_want}" />
                                              <a:actionLink value="#{msg.checkout_document}" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
                                                 <f:param name="id" value="#{CheckinCheckoutBean.document.id}" />
                                              </a:actionLink>
-                                             to prevent the possibility of other users overwriting your changes.
+                                             <h:outputText value="#{msg.checkout_want_to}" />
                                              <br>
-                                             Note: You will lose any changes already made to this document.
+                                             <h:outputText value="#{msg.checkout_warn}" />
                                           </td>
                                        </td>
                                     </tr>
@@ -151,13 +151,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Save" action="#{CheckinCheckoutBean.editInlineOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.save}" action="#{CheckinCheckoutBean.editInlineOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.cancel}" action="browse" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>

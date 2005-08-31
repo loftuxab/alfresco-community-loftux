@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_edit_simple_workflow">
 
 <script language="JavaScript1.2">
    
@@ -112,8 +112,8 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/edit_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainTitle">Modify Properties of Simple Workflow</div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.modify_workflow_props}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.editworkflow_description}" /></div>
                            </td>
                         </tr>
@@ -140,17 +140,17 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Approve Flow</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.approve_flow}" /></td>
                                  </tr>
                                  <tr>
-                                    <td>Name&nbsp;for&nbsp;approve&nbsp;step:</td>
+                                    <td><nobr><h:outputText value="#{msg.name_approve_step}" />:</nobr></td>
                                     <td width="90%">
                                        <h:inputText id="approve-step-name" value="#{DocumentDetailsBean.workflowProperties.approveStepName}" 
                                                     onkeyup="javascript:checkButtonState();" />
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr><td colspan="2">Choose whether you want to move or copy the content and also the location.</td>
+                                 <tr><td colspan="2"><h:outputText value="#{msg.choose_copy_move_location}" /></td>
                                  <tr>
                                     <td colspan="2">
                                        <table cellpadding="2" cellspacing="2" border="0">
@@ -162,11 +162,11 @@
                                                 </h:selectOneRadio>
                                              </td>
                                              <td style="padding-left:6px;"></td>
-                                             <td valign="top" style="padding-top:10px;">To:</td>
+                                             <td valign="top" style="padding-top:10px;"><h:outputText value="#{msg.to}" />:</td>
                                              <td style="padding-left:6px;"></td>
                                              <td style="padding-top:6px;">
-                                                <r:spaceSelector label="Click here to select the destination" 
-                                                        value="#{DocumentDetailsBean.workflowProperties.approveFolder}" 
+                                                <r:spaceSelector label="#{msg.select_destination_prompt}"
+                                                        value="#{DocumentDetailsBean.workflowProperties.approveFolder}"
                                                         initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                              </td>
@@ -176,17 +176,17 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Reject Flow</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.reject_flow}" /></td>
                                  </tr>
                                  <tr>
-                                    <td colspan="2">Do you want to provide a reject step?</td>
+                                    <td colspan="2"><h:outputText value="#{msg.select_reject_step}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
                                        <h:selectOneRadio id="reject-step-present" value="#{DocumentDetailsBean.workflowProperties.rejectStepPresent}"
-                                                         onclick="javascript:checkButtonState();" >
-                                          <f:selectItem itemValue="yes" itemLabel="Yes" />
-                                          <f:selectItem itemValue="no" itemLabel="No" />
+                                                         onclick="javascript:checkButtonState();">
+                                          <f:selectItem itemValue="yes" itemLabel="#{msg.yes}" />
+                                          <f:selectItem itemValue="no" itemLabel="#{msg.no}" />
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
@@ -198,29 +198,29 @@
                                              <td>
                                                 <table cellpadding="2" cellspacing="2" border="0">
                                                    <tr>
-                                                      <td>
-                                                         Name&nbsp;for&nbsp;reject&nbsp;step:&nbsp;
+                                                      <td><nobr>
+                                                         <h:outputText value="#{msg.name_reject_step}" />:&nbsp;
                                                          <h:inputText id="reject-step-name" value="#{DocumentDetailsBean.workflowProperties.rejectStepName}" 
                                                                       onkeyup="javascript:checkButtonState();" />
-                                                      </td>
+                                                      </nobr></td>
                                                    </tr>
                                                    <tr><td class="paddingRow"></td></tr>
-                                                   <tr><td>Choose whether you want to move or copy the content and also the location.</td>
+                                                   <tr><td><h:outputText value="#{msg.choose_copy_move_location}" /></td>
                                                    <tr>
                                                       <td>
                                                          <table cellpadding="2" cellspacing="2" border="0">
                                                             <tr>
                                                                <td valign="top">
                                                                   <h:selectOneRadio value="#{DocumentDetailsBean.workflowProperties.rejectAction}">
-                                                                     <f:selectItem itemValue="move" itemLabel="Move" />
-                                                                     <f:selectItem itemValue="copy" itemLabel="Copy" />
+                                                                     <f:selectItem itemValue="move" itemLabel="#{msg.move}" />
+                                                                     <f:selectItem itemValue="copy" itemLabel="#{msg.copy}" />
                                                                   </h:selectOneRadio>
                                                                </td>
                                                                <td style="padding-left:6px;"></td>
-                                                               <td valign="top" style="padding-top:10px;">To:</td>
+                                                               <td valign="top" style="padding-top:10px;"><h:outputText value="#{msg.to}" />:</td>
                                                                <td style="padding-left:6px;"></td>
                                                                <td style="padding-top:6px;">
-                                                                  <r:spaceSelector label="Click here to select the destination" 
+                                                                  <r:spaceSelector label="#{msg.select_destination_prompt}" 
                                                                           value="#{DocumentDetailsBean.workflowProperties.rejectFolder}" 
                                                                           initialSelection="#{NavigationBean.currentNodeId}"
                                                                           style="border: 1px dashed #cccccc; padding: 6px;"/>
@@ -244,14 +244,14 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="OK" action="#{DocumentDetailsBean.saveWorkflow}" 
+                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{DocumentDetailsBean.saveWorkflow}" 
                                                         styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="cancel" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="cancel" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

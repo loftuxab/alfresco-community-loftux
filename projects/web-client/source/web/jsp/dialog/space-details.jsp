@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_space_details">
 
 <f:view>
    
@@ -70,7 +70,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{SpaceDetailsBean.name}" /></div>
-                              <div class="mainTitle">Details of '<h:outputText value="#{SpaceDetailsBean.name}" />'</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.details_of}" /> '<h:outputText value="#{SpaceDetailsBean.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.location}" />: <r:nodePath value="#{SpaceDetailsBean.space.nodeRef}" breadcrumb="true" actionListener="#{BrowseBean.clickSpacePath}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.spacedetails_description}" /></div>
                            </td>
@@ -88,7 +88,7 @@
                               <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
                                  <f:param name="id" value="#{SpaceDetailsBean.id}" />
                               </a:actionLink>
-                              <a:menu itemSpacing="4" label="More..." image="/images/icons/more.gif" tooltip="More Actions for this Space" menuStyleClass="moreActionsMenu" style="padding-left:20px">
+                              <a:menu itemSpacing="4" label="#{msg.more_options}" image="/images/icons/more.gif" tooltip="#{msg.more_options_space}" menuStyleClass="moreActionsMenu" style="padding-left:20px">
                                  <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
                                     <f:param name="id" value="#{SpaceDetailsBean.id}" />
                                  </a:actionLink>
@@ -126,9 +126,9 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="Properties" id="properties-panel" border="white" bgcolor="white" 
+                              <a:panel label="#{msg.properties}" id="properties-panel" border="white" bgcolor="white" 
                                        titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       progressive="true" action="editSpaceProperties" linkTooltip="Modify"
+                                       progressive="true" action="editSpaceProperties" linkTooltip="#{msg.modify}"
                                        actionListener="#{EditSpaceDialog.startWizardForEdit}"
                                        linkIcon="/images/icons/Change_details.gif">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -160,9 +160,9 @@
                                  </table>
                               </a:panel>
                               <br/>
-                              <a:panel label="Rules" id="rules-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.rules}" id="rules-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       action="manageRules" linkTooltip="Modify" linkIcon="/images/icons/Change_details.gif">
+                                       action="manageRules" linkTooltip="#{msg.modify}" linkIcon="/images/icons/Change_details.gif">
                                  <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
                                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
                                           altRowStyleClass="recordSetRowAlt" width="100%" pageSize="10"
@@ -171,7 +171,7 @@
                                     <%-- Primary column for details view mode --%>
                                     <a:column id="col1" primary="true" width="200" style="padding:2px;text-align:left">
                                        <f:facet name="header">
-                                          <a:sortLink label="Title" value="title" mode="case-insensitive" styleClass="header"/>
+                                          <a:sortLink label="#{msg.title}" value="title" mode="case-insensitive" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="title" value="#{r.title}" />
                                     </a:column>
@@ -179,7 +179,7 @@
                                     <%-- Description columns --%>
                                     <a:column id="col2" style="text-align:left">
                                        <f:facet name="header">
-                                          <a:sortLink label="Description" value="description" styleClass="header"/>
+                                          <a:sortLink label="#{msg.description}" value="description" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="description" value="#{r.description}" />
                                     </a:column>
@@ -187,7 +187,7 @@
                                     <%-- Created Date column for details view mode --%>
                                     <a:column id="col3" style="text-align:left">
                                        <f:facet name="header">
-                                          <a:sortLink label="Created Date" value="createdDate" styleClass="header"/>
+                                          <a:sortLink label="#{msg.created_date}" value="createdDate" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="createddate" value="#{r.createdDate}">
                                           <a:convertXMLDate dateStyle="long" />
@@ -197,10 +197,10 @@
                                     <%-- Modified Date column for details/icons view modes --%>
                                     <a:column id="col4" style="text-align:left">
                                        <f:facet name="header">
-                                          <a:sortLink label="Modified Date" value="modifiedDate" styleClass="header"/>
+                                          <a:sortLink label="#{msg.modified_date}" value="modifiedDate" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="modifieddate" value="#{r.modifiedDate}">
-                                          <a:convertXMLDate dateStyle="long" />
+                                          <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
                                        </h:outputText>
                                     </a:column>
                                     
@@ -227,7 +227,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="#{SpaceDetailsBean.closeDialog}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.close}" action="#{SpaceDetailsBean.closeDialog}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

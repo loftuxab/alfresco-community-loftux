@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_delete_file">
 
 <f:view>
    
@@ -121,13 +121,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Delete" action="#{BrowseBean.deleteFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.delete}" action="#{BrowseBean.deleteFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.cancel}" action="browse" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>

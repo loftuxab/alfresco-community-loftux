@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_edit_category">
 
 <f:view>
    
@@ -69,8 +69,8 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/edit_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainTitle">Modify category of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.modify_category_of}" /> '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.editcategory_description}" /></div>
                            </td>
                         </tr>
@@ -98,9 +98,9 @@
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td valign="top">Category:</td>
+                                    <td valign="top"><h:outputText value="#{msg.category}" />:</td>
                                     <td width="90%">
-                                       <r:categorySelector label="Click here to select a category" 
+                                       <r:categorySelector label="#{msg.select_category_prompt}" 
                                                         value="#{DocumentDetailsBean.category}" 
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                     </td>
@@ -115,14 +115,14 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="OK" action="#{DocumentDetailsBean.saveCategory}" styleClass="wizardButton" 
+                                       <h:commandButton value="#{msg.ok}" action="#{DocumentDetailsBean.saveCategory}" styleClass="wizardButton" 
                                                         disabled="#{DocumentDetailsBean.category == null}"/>
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="cancel" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="cancel" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

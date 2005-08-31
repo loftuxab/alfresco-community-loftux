@@ -28,8 +28,8 @@
                   <a:modeList itemSpacing="3" iconColumnWidth="0" horizontal="true"
                         itemStyleClass="topToolbar" itemLinkStyleClass="topToolbarLink" selectedStyleClass="topToolbarHighlight" selectedLinkStyleClass="topToolbarLinkHighlight"
                         value="#{NavigationBean.toolbarLocation}" actionListener="#{NavigationBean.toolbarLocationChanged}">
-                     <a:listItem value="company" label="Company Home" />
-                     <a:listItem value="home" label="My Home" />
+                     <a:listItem value="company" label="#{msg.company_home}" />
+                     <a:listItem value="home" label="#{msg.my_home}" />
                   </a:modeList>
                </td>
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width=8 height=30></td>

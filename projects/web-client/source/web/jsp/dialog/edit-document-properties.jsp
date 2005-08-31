@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_edit_doc_props">
 
 <script language="JavaScript1.2">
    function checkButtonState()
@@ -46,7 +46,6 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <%-- REPLACE ME: set the form name here --%>
    <h:form id="edit-doc-properties">
    
    <%-- Main outer table --%>
@@ -85,8 +84,8 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/details_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle">Modify Properties of '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.modify_props_of}" /> '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.editdocument_description}" /></div>
                            </td>
                         </tr>
@@ -113,18 +112,18 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Document Properties</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.document_properties}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>File&nbsp;Name:</td>
+                                    <td><nobr><h:outputText value="#{msg.file_name}" />:</nobr></td>
                                     <td width="90%">
                                        <h:inputText id="file-name" value="#{EditDocPropsDialog.properties.name}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Content&nbsp;Type:</td>
+                                    <td><nobr><h:outputText value="#{msg.content_type}" />:</nobr></td>
                                     <td>
                                        <h:selectOneMenu value="#{EditDocPropsDialog.properties.mimetype}">
                                           <f:selectItems value="#{EditDocPropsDialog.contentTypes}" />
@@ -132,27 +131,27 @@
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Title:</td>
+                                    <td><nobr><h:outputText value="#{msg.title}" />:</nobr></td>
                                     <td>
                                        <h:inputText id="title" value="#{EditDocPropsDialog.properties.title}" size="35" maxlength="1024"
                                                     onkeyup="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Description:</td>
+                                    <td><nobr><h:outputText value="#{msg.description}" />:</nobr></td>
                                     <td>
                                        <h:inputText value="#{EditDocPropsDialog.properties.description}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>Author:</td>
+                                    <td><nobr><h:outputText value="#{msg.author}" />:</nobr></td>
                                     <td>
                                        <h:inputText value="#{EditDocPropsDialog.properties.creator}" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading">Other Properties</td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.other_properties}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
@@ -161,7 +160,7 @@
                                                             var="editDocProps" columns="1" 
                                                             rendered="#{EditDocPropsDialog.otherPropertiesPresent}"
                                                             externalConfig="true" configArea="edit-properties" />
-                                       <h:outputText value="This document does not have any other properties to show." 
+                                       <h:outputText value="#{msg.no_other_properties}" 
                                                      rendered="#{EditDocPropsDialog.otherPropertiesPresent == false}" />
                                     </td>
                                  </tr>
@@ -174,12 +173,12 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="OK" action="#{EditDocPropsDialog.save}" styleClass="wizardButton" />
+                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{EditDocPropsDialog.save}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="cancel" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="cancel" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

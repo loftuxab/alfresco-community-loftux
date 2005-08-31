@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_system_info">
 
 <f:view>
    
@@ -70,9 +70,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/file_large.gif" />
                            </td>
                            <td>
-                              <div class="mainTitle">System Information</div>
-                              <div class="mainSubTitle">Current User: <h:outputText value="#{NavigationBean.currentUser.userName}" /></div>
-                              <div class="mainSubText">Version: <h:outputText value="#{version.major}.#{version.minor}.#{version.revision}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.system_info}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{msg.current_user}" />: <h:outputText value="#{NavigationBean.currentUser.userName}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.version}" />: <h:outputText value="#{version.major}.#{version.minor}.#{version.revision}" /></div>
                            </td>
                            <!--
                            <td bgcolor="#465F7D" width=1></td>
@@ -108,37 +108,37 @@
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
                                     <td colspan="2">
-                                       <a:panel label="HTTP Application State" id="http-application-state" border="white" bgcolor="white" 
+                                       <a:panel label="#{msg.http_app_state}" id="http-application-state" border="white" bgcolor="white" 
                                                 titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true" styleClass="mainSubTitle"
                                                 expanded="false">
                                        	<a:httpApplicationState id="has" />
                                        </a:panel>
                                        <br/>
-                                       <a:panel label="HTTP Session State" id="http-session-state" border="white" bgcolor="white" 
+                                       <a:panel label="#{msg.http_session_state}" id="http-session-state" border="white" bgcolor="white" 
                                                 titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true" styleClass="mainSubTitle"
                                                 expanded="false">
                                        	<a:httpSessionState id="hss" />
                                        </a:panel>
                                        <br/>
-                                       <a:panel label="HTTP Request State" id="http-request-state" border="white" bgcolor="white" 
+                                       <a:panel label="#{msg.http_request_state}" id="http-request-state" border="white" bgcolor="white" 
                                                 titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true" styleClass="mainSubTitle"
                                                 expanded="false">
                                        	<a:httpRequestState id="hrs" />
                                        </a:panel>
                                        <br/>
-                                       <a:panel label="HTTP Request Parameters" id="http-request-params" border="white" bgcolor="white" 
+                                       <a:panel label="#{msg.http_request_params}" id="http-request-params" border="white" bgcolor="white" 
                                                 titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true" styleClass="mainSubTitle"
                                                 expanded="false">
                                        	<a:httpRequestParams id="hrp" />
                                        </a:panel>
                                        <br/>
-                                       <a:panel label="HTTP Request Headers" id="http-request-headers" border="white" bgcolor="white" 
+                                       <a:panel label="#{msg.http_request_headers}" id="http-request-headers" border="white" bgcolor="white" 
                                                 titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true" styleClass="mainSubTitle"
                                                 expanded="false">
                                        	<a:httpRequestHeaders id="hrh" />
                                        </a:panel>
                                        <br/>
-                                       <a:panel label="System Properties" id="system-props" border="white" bgcolor="white" 
+                                       <a:panel label="#{msg.system_props}" id="system-props" border="white" bgcolor="white" 
                                                 titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true" styleClass="mainSubTitle"
                                                 expanded="false">
                                        	<a:systemProperties id="sp" />
@@ -154,7 +154,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

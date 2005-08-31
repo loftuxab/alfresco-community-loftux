@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_delete_space">
 
 <f:view>
    
@@ -121,13 +121,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Delete" action="#{BrowseBean.deleteSpaceOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.delete}" action="#{BrowseBean.deleteSpaceOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.cancel}" action="browse" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>

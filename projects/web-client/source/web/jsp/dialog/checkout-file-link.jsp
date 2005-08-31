@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_checkout_file_link">
 
 <f:view>
    
@@ -71,7 +71,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Check Out of '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' Complete</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.check_out_of}" /> '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' Complete</div>
                               <div class="mainSubText"><h:outputText value="#{msg.checkoutfilelink_description}" /></div>
                            </td>
                         </tr>
@@ -99,9 +99,14 @@
                               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
                                     <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="16" height="16"/></td>
-                                    <td class="mainSubText">A copy of the file '<h:outputText value="#{CheckinCheckoutBean.document.name}" />' is now checked out to you for editing.<br>
-                                        To edit the file follow the instructions below then click OK.<br>
-                                        To undo the checkout click Undo Checkout.
+                                    <td class="mainSubText">
+                                       <h:outputFormat value="#{msg.copy_file_checkedout}">
+                                          <f:param value="#{CheckinCheckoutBean.document.name}" />
+                                       </h:outputFormat>
+                                       <br>
+                                       <h:outputText value="#{msg.copy_edit_info}" />
+                                       <br>
+                                       <h:outputText value="#{msg.copy_undo_checkout}" />
                                     </td>
                                  </tr>
                               </table>
@@ -113,13 +118,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="OK" action="#{CheckinCheckoutBean.checkoutFileOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.ok}" action="#{CheckinCheckoutBean.checkoutFileOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Undo Checkout" action="#{CheckinCheckoutBean.undoCheckout}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.undocheckout}" action="#{CheckinCheckoutBean.undoCheckout}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
@@ -133,8 +138,7 @@
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
                                     <td class="mainSubText">
-                                       To edit the working copy of the file, click the link below.
-                                       Depending on your browser settings, you may want to right click on the link and select Save As Target.
+                                       <h:outputText value="#{msg.edit_workingcopy_info}" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -145,7 +149,7 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       When download is complete, click OK.
+                                       <h:outputText value="#{msg.download_complete}" />
                                     </td>
                                  </tr>
                               </table>

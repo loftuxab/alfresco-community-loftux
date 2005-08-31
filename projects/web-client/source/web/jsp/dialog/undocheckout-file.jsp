@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_undo_checkout">
 
 <f:view>
    
@@ -71,7 +71,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Undo Check Out for '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.undo_checkout_for}" /> '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.undocheckoutfile_description}" /></div>
                            </td>
                         </tr>
@@ -99,8 +99,7 @@
                               <table cellpadding="0" cellspacing="0" border="0" width="100%">
                                  <tr>
                                     <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="16" height="16"/></td>
-                                    <td class="mainSubText">If you undo the check out of a document, the associated working copy will be deleted and all changes to it since the Check Out will be lost.
-                                    </td>
+                                    <td class="mainSubText"><h:outputText value="#{msg.undo_checkout_info}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
@@ -111,13 +110,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Undo Check Out" action="#{CheckinCheckoutBean.undoCheckoutFile}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.undo_checkout}" action="#{CheckinCheckoutBean.undoCheckoutFile}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="browse" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.cancel}" action="browse" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>

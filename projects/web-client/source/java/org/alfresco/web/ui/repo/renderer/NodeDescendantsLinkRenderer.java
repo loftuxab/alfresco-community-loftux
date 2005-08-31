@@ -111,46 +111,49 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
             }
             
             // calculate the number of displayed child refs
-            List<ChildAssociationRef> childRefs = service.getChildAssocs(parentRef);
-            List<ChildAssociationRef> refs = new ArrayList<ChildAssociationRef>(childRefs.size());
-            for (int index=0; index<childRefs.size(); index++)
+            if (service.exists(parentRef) == true)
             {
-               ChildAssociationRef ref = childRefs.get(index);
-               if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
-                   dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
+               List<ChildAssociationRef> childRefs = service.getChildAssocs(parentRef);
+               List<ChildAssociationRef> refs = new ArrayList<ChildAssociationRef>(childRefs.size());
+               for (int index=0; index<childRefs.size(); index++)
                {
-                  refs.add(ref);
-               }
-            }
-            
-            // walk each child ref and output a descendant link control for each item
-            int total = 0;
-            int maximum = refs.size() > control.getMaxChildren() ? control.getMaxChildren() : refs.size();
-            for (int index=0; index<maximum; index++)
-            {
-               ChildAssociationRef ref = refs.get(index);
-               if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
-                   dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
-               {
-                  // output separator if appropriate
-                  if (total > 0)
+                  ChildAssociationRef ref = childRefs.get(index);
+                  if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
+                      dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
                   {
-                     out.write( separator );
+                     refs.add(ref);
                   }
-                  
-                  out.write(renderDescendant(context, control, ref, false));
-                  total++;
                }
-            }
-            
-            // do we need to render ellipses to indicate more items than the maximum
-            if (control.getShowEllipses() == true && refs.size() > maximum)
-            {
-               out.write( separator );
-               // TODO: is this the correct way to get the information we need?
-               //       e.g. primary parent may not be the correct path? how do we make sure we find
-               //       the correct parent and more importantly the correct Display Name value!
-               out.write( renderDescendant(context, control, service.getPrimaryParent(parentRef), true) );
+               
+               // walk each child ref and output a descendant link control for each item
+               int total = 0;
+               int maximum = refs.size() > control.getMaxChildren() ? control.getMaxChildren() : refs.size();
+               for (int index=0; index<maximum; index++)
+               {
+                  ChildAssociationRef ref = refs.get(index);
+                  if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
+                      dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
+                  {
+                     // output separator if appropriate
+                     if (total > 0)
+                     {
+                        out.write( separator );
+                     }
+                     
+                     out.write(renderDescendant(context, control, ref, false));
+                     total++;
+                  }
+               }
+               
+               // do we need to render ellipses to indicate more items than the maximum
+               if (control.getShowEllipses() == true && refs.size() > maximum)
+               {
+                  out.write( separator );
+                  // TODO: is this the correct way to get the information we need?
+                  //       e.g. primary parent may not be the correct path? how do we make sure we find
+                  //       the correct parent and more importantly the correct Display Name value!
+                  out.write( renderDescendant(context, control, service.getPrimaryParent(parentRef), true) );
+               }
             }
             
             tx.commit();

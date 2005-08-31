@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page>
+<r:page titleId="title_rules">
 
 <f:view>
    
@@ -69,9 +69,9 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/rule_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainTitle"><h:outputText value='#{msg.content_rules}' /></div>
-                              <div class="mainSubText">This view shows you all the rules to be applied to content in this space.</div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.content_rules}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.space_rules_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
                            <td width="100" style="padding-left:2px">
@@ -86,7 +86,7 @@
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
                                     value="#{RulesBean.viewMode}" actionListener="#{RulesBean.viewModeChanged}"
                                     selectedImage="/images/icons/Details.gif">
-                                 <a:listItem value="local" label="Local" />
+                                 <a:listItem value="local" label="#{msg.local}" />
                                  <%-- TBD <a:listItem value="inherited" label="Inherited" /> --%>
                               </a:modeList>
                            </td>
@@ -142,7 +142,7 @@
                                  <%-- Primary column for details view mode --%>
                                  <a:column primary="true" width="200" style="padding:2px;text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="Title" value="title" mode="case-insensitive" styleClass="header"/>
+                                       <a:sortLink label="#{msg.title}" value="title" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
                                        <a:actionLink value="#{r.title}" image="/images/icons/rule.gif" 
@@ -160,7 +160,7 @@
                                  <%-- Description column --%>
                                  <a:column style="text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="Description" value="description" styleClass="header"/>
+                                       <a:sortLink label="#{msg.description}" value="description" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.description}" />
                                  </a:column>
@@ -168,7 +168,7 @@
                                  <%-- Created Date column for details view mode --%>
                                  <a:column style="text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="Created Date" value="createdDate" styleClass="header"/>
+                                       <a:sortLink label="#{msg.created_date}" value="createdDate" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.createdDate}">
                                        <a:convertXMLDate type="both" dateStyle="long" timeStyle="short" />
@@ -178,7 +178,7 @@
                                  <%-- Modified Date column for details/icons view modes --%>
                                  <a:column style="text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="Modified Date" value="modifiedDate" styleClass="header"/>
+                                       <a:sortLink label="#{msg.modified_date}" value="modifiedDate" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.modifiedDate}">
                                        <a:convertXMLDate type="both" dateStyle="long" timeStyle="short" />
@@ -211,7 +211,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Close" action="browse" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

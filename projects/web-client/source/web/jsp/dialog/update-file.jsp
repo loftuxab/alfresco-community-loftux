@@ -25,8 +25,10 @@
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 <%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
 <%@ page import="org.alfresco.web.bean.CheckinCheckoutBean" %>
+<%@ page import="org.alfresco.web.app.Application" %>
+<%@ page import="javax.faces.context.FacesContext" %>
 
-<r:page>
+<r:page titleId="title_update_file">
 
 <f:view>
    
@@ -73,7 +75,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">Update '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.update}" /> '<h:outputText value="#{CheckinCheckoutBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.updatefile_description}" /></div>
                            </td>
                         </tr>
@@ -100,11 +102,11 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="wizardSectionHeading">Local copy location</td>
+                                    <td class="wizardSectionHeading"><h:outputText value="#{msg.local_copy_location}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       1. Locate and upload your document to the repository
+                                       1. <h:outputText value="#{msg.locate_content_upload}" />
                                     </td>
                                  </tr>
                                  </h:form>
@@ -113,16 +115,16 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       Location:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
+                                       <h:outputText value="#{msg.location}" />:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText">2. Click upload</td>
+                                    <td class="mainSubText">2. <h:outputText value="#{msg.click_upload}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       <input style="margin-left:12px;" type="submit" value="Upload" />
+                                       <input style="margin-left:12px;" type="submit" value="<%=Application.getMessage(FacesContext.getCurrentInstance(), "upload")%>" />
                                     </td>
                                  </tr>
                                  <%
@@ -135,8 +137,8 @@
                                  %>
                                     <tr>
                                        <td>
-                                          <img alt="Information icon" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                          The file "<%=bean.getFileName()%>" was uploaded successfully.
+                                          <img alt="" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          <%=bean.getFileUploadSuccessMsg()%>
                                        </td>
                                     </tr>
                                  <% } %>
@@ -152,13 +154,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Update" action="#{CheckinCheckoutBean.updateFileOK}" disabled="#{CheckinCheckoutBean.fileName == null}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.update}" action="#{CheckinCheckoutBean.updateFileOK}" disabled="#{CheckinCheckoutBean.fileName == null}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="Cancel" action="#{CheckinCheckoutBean.cancel}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.cancel}" action="#{CheckinCheckoutBean.cancel}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
