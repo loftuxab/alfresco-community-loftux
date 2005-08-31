@@ -104,7 +104,7 @@
       <copy file="${dir.common}/version.properties" todir="${dir.deploy.jboss}/../conf/alfresco" />
       <!-- ensure mysql drivers are present -->
       <copy todir="${dir.deploy.jboss}/../lib"
-            file="${dir.common.lib}/mysql-connector-java-3.0.16-ga-bin.jar" />
+            file="${dir.common.lib}/mysql-connector-java-3.1.10-bin.jar" />
    </target>
 
    <target name="deploy-tomcat" depends="init" description="Deploys to Tomcat">
@@ -121,7 +121,7 @@
       </war>
       <!-- ensure mysql drivers are present -->
       <copy todir="${home.tomcat}/common/lib"
-            file="${dir.common.lib}/mysql-connector-java-3.0.16-ga-bin.jar" />
+            file="${dir.common.lib}/mysql-connector-java-3.1.10-bin.jar" />
    </target>
 
    <target name="deploy-exploded-web-client-jboss" depends="init">
