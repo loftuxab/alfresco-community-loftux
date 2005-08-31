@@ -56,7 +56,7 @@ public class LoginBean
 {
    // ------------------------------------------------------------------------------
    // Managed bean properties 
-   
+
    /**
     * @param authenticationService  The AuthenticationService to set.
     */
@@ -114,7 +114,7 @@ public class LoginBean
       String pass = (String)value;
       if (pass.length() < 5 || pass.length() > 12)
       {
-         String err = "Password must be between 5 and 12 characters in length.";
+         String err = Application.getMessage(context, MSG_PASSWORD_LENGTH);
          throw new ValidatorException(new FacesMessage(err));
       }
       
@@ -122,7 +122,7 @@ public class LoginBean
       {
          if (Character.isLetterOrDigit( pass.charAt(i) ) == false)
          {
-            String err = "Password can only contain characters or digits.";
+            String err = Application.getMessage(context, MSG_PASSWORD_CHARS);
             throw new ValidatorException(new FacesMessage(err));
          }
       }
@@ -137,7 +137,7 @@ public class LoginBean
       String pass = (String)value;
       if (pass.length() < 5 || pass.length() > 12)
       {
-         String err = "Username must be between 5 and 12 characters in length.";
+         String err = Application.getMessage(context, MSG_USERNAME_LENGTH);
          throw new ValidatorException(new FacesMessage(err));
       }
       
@@ -145,7 +145,7 @@ public class LoginBean
       {
          if (Character.isLetterOrDigit( pass.charAt(i) ) == false)
          {
-            String err = "Username can only contain characters or digits.";
+            String err = Application.getMessage(context, MSG_USERNAME_CHARS);
             throw new ValidatorException(new FacesMessage(err));
          }
       }
@@ -274,6 +274,10 @@ public class LoginBean
    /** I18N messages */
    private static final String MSG_ERROR_MISSING = "error_login_missing";
    private static final String MSG_ERROR_UNKNOWN_USER = "error_login_user";
+   private static final String MSG_USERNAME_CHARS = "login_err_username_chars";
+   private static final String MSG_USERNAME_LENGTH = "login_err_username_length";
+   private static final String MSG_PASSWORD_CHARS = "login_err_password_chars";
+   private static final String MSG_PASSWORD_LENGTH = "login_err_password_length";
    
    public static final String LOGIN_OUTCOME_KEY  = "_alfOutcome";
    public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";

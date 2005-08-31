@@ -19,8 +19,9 @@
 
 <%@ page buffer="32kb" %>
 <%@ page isELIgnored="false" %>
+<%@ page import="org.alfresco.web.app.Application" %>
 
-<r:page>
+<r:page titleId="title_error">
 
 <table cellspacing="0" cellpadding="2" width="100%">
    <tr>
@@ -31,7 +32,7 @@
                <td><a href="http://www.alfresco.org" target="new"><img src="<%=request.getContextPath()%>/images/logo/AlfrescoLogo32.png" width=32 height=30 alt="Alfresco" title="Alfresco" border=0 style="padding-right:4px"></a></td>
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_begin.gif" width="10" height="30"></td>
                <td width=100% style="background-image: url(<%=request.getContextPath()%>/images/parts/titlebar_bg.gif)">
-                  <span class="topToolbarTitle">System Error</span>
+                  <span class="topToolbarTitle"><%=Application.getMessage(session, "system_error")%></span>
                </td>
                <td><img src="<%=request.getContextPath()%>/images/parts/titlebar_end.gif" width="8" height="30"></td>
             </tr>
@@ -40,8 +41,7 @@
    </tr>
    <tr>
       <td>
-         <r:systemError styleClass="errorMessage" detailsStyleClass="mainSubTextSmall" 
-                        showDetails="false" />
+         <r:systemError styleClass="errorMessage" detailsStyleClass="mainSubTextSmall" showDetails="false" />
       </td>
    </tr>
 </table>

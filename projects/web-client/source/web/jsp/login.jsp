@@ -23,7 +23,7 @@
 <%@ page buffer="16kb" %>
 <%@ page isELIgnored="false" %>
 
-<r:page>
+<r:page titleId="title_login">
 
 <f:view>
    <%-- load a bundle of properties I18N strings here --%>
@@ -53,7 +53,7 @@
                
                <tr>
                   <td colspan=2>
-                     <span class='mainSubTitle'>Enter Login details:</span>
+                     <span class='mainSubTitle'><h:outputText value="#{msg.login_details}" />:</span>
                   </td>
                </tr>
                
