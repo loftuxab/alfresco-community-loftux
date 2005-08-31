@@ -103,8 +103,10 @@
       </copy>
       <copy file="${dir.common}/version.properties" todir="${dir.deploy.jboss}/../conf/alfresco" />
       <!-- ensure mysql drivers are present -->
-      <copy todir="${dir.deploy.jboss}/../lib"
-            file="${dir.common.lib}/mysql-connector-java-3.1.10-bin.jar" />
+      <delete>
+         <fileset dir="${home.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+      </delete>
+      <copy todir="${dir.deploy.jboss}/../lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
    </target>
 
    <target name="deploy-tomcat" depends="init" description="Deploys to Tomcat">
@@ -120,8 +122,10 @@
          <classes file="${dir.common}/version.properties" prefix="WEB-INF/classes/alfresco"/>
       </war>
       <!-- ensure mysql drivers are present -->
-      <copy todir="${home.tomcat}/common/lib"
-            file="${dir.common.lib}/mysql-connector-java-3.1.10-bin.jar" />
+      <delete>
+         <fileset dir="${home.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+      </delete>
+      <copy todir="${home.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
    </target>
 
    <target name="deploy-exploded-web-client-jboss" depends="init">
@@ -235,6 +239,11 @@
            description="Creates the distibution files for Tomcat"/>
            
    <target name="package-jboss-binary-distribution-windows" depends="init">
+      <!-- make sure the MySQL connector is present and up to date -->
+      <delete>
+         <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+      </delete>
+      <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
       <mkdir dir="${dir.dist}" />
       <zip destfile="${dir.dist}/${file.name.dist.bin.jboss}.zip">
          <zipfileset dir="${dir.project.installer}" 
@@ -253,6 +262,11 @@
    </target>
    
    <target name="package-jboss-binary-distribution-linux" depends="init">
+      <!-- make sure the MySQL connector is present and up to date -->
+      <delete>
+         <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+      </delete>
+      <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
       <mkdir dir="${dir.dist}" />
       <tar destfile="${dir.dist}/${file.name.dist.bin.jboss}.tar" longfile="gnu">
          <tarfileset dir="${dir.project.installer}" 
@@ -269,6 +283,11 @@
    </target>
 
    <target name="package-tomcat-binary-distribution-windows" depends="init">
+      <!-- make sure the MySQL connector is present and up to date -->
+      <delete>
+         <fileset dir="${dir.distribution.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+      </delete>
+      <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
       <mkdir dir="${dir.dist}" />
       <zip destfile="${dir.dist}/${file.name.dist.bin.tomcat}.zip">
          <zipfileset dir="${dir.project.installer}" 
@@ -283,6 +302,11 @@
    </target>
    
    <target name="package-tomcat-binary-distribution-linux" depends="init">
+      <!-- make sure the MySQL connector is present and up to date -->
+      <delete>
+         <fileset dir="${dir.distribution.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+      </delete>
+      <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
       <mkdir dir="${dir.dist}" />
       <tar destfile="${dir.dist}/${file.name.dist.bin.tomcat}.tar" longfile="gnu">
          <tarfileset dir="${dir.project.installer}"
