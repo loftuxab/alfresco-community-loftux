@@ -193,7 +193,7 @@
                                                 <table cellpadding="1" cellspacing="0" border="0">
                                                    <tr><td colspan=2 class="paddingRow"></td></tr>
                                                    <tr>
-                                                      <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.modifiedDateChecked}" /><span style="vertical-align:20%">Modified Date:</span></td>
+                                                      <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.modifiedDateChecked}" /><span style="vertical-align:20%"><h:outputText value="#{msg.modified_date}" />:</span></td>
                                                    </tr>
                                                    <tr>
                                                       <td style="padding-left:8px"><h:outputText value="#{msg.from}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateFrom}" startYear="1985" yearCount="21" /></td>
@@ -203,7 +203,7 @@
                                                    </tr>
                                                    
                                                    <tr>
-                                                      <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.createdDateChecked}" /><span style="vertical-align:20%">Created Date:</span></td>
+                                                      <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.createdDateChecked}" /><span style="vertical-align:20%"><h:outputText value="#{msg.created_date}" />:</span></td>
                                                    </tr>
                                                    <tr>
                                                       <td style="padding-left:8px"><h:outputText value="#{msg.from}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateFrom}" startYear="1985" yearCount="21" /></td>

@@ -27,6 +27,12 @@
          <initial-password>admin</initial-password>
       </admin>
       <client>
+         <!-- specifies the list of available language files -->
+         <languages>
+            <language locale="en_US">English</language>
+            <!--<language locale="fr">French</language>-->
+         </languages>
+         
          <!-- specifies the maximum page size for each view mode in the browse screen -->
          <page-size>
             <list>10</list>

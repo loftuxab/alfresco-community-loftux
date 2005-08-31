@@ -17,15 +17,18 @@
 package org.alfresco.web.bean;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.faces.validator.ValidatorException;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -36,6 +39,7 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
+import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
 
 /**
@@ -74,6 +78,14 @@ public class LoginBean
       this.browseBean = browseBean;
    }
    
+   /**
+    * @param configService The ConfigService to set.
+    */
+   public void setConfigService(ConfigService configService)
+   {
+      this.configService = configService;
+   }
+   
    public void setUsername(String val)
    {
       this.username = val;
@@ -94,10 +106,64 @@ public class LoginBean
       return this.password;
    }
    
+   /**
+    * @return the available languages
+    */
+   public SelectItem[] getLanguages()
+   {
+      ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement("client");
+      Map<String, String> languages = config.getLanguageMap();
+      SelectItem[] items = new SelectItem[languages.size()];
+      int count = 0;
+      for (Iterator<String> i=languages.keySet().iterator(); i.hasNext(); /**/)
+      {
+         // get a locale and associated label
+         String locale = i.next();
+         String label = languages.get(locale);
+         
+         // set default selection
+         if (count == 0 && this.language == null)
+         {
+            // first try to get the language that the current user is using
+            Locale lastLocale = Application.getLanguage(FacesContext.getCurrentInstance());
+            if (lastLocale != null)
+            {
+               this.language = lastLocale.toString();
+            }
+            // else we default to the first item in the list
+            else
+            {
+               this.language = locale;
+            }
+         }
+         
+         items[count++] = new SelectItem(locale, label);
+      }
+      
+      return items;
+   }
+   
+   /**
+    * @return Returns the language selection.
+    */
+   public String getLanguage()
+   {
+      return this.language;
+   }
+
+   /**
+    * @param language The language selection to set.
+    */
+   public void setLanguage(String language)
+   {
+      this.language = language;
+      Application.setLanguage(FacesContext.getCurrentInstance(), this.language);
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Validator methods 
-   
+
    /**
     * Validate password field data is acceptable 
     */
@@ -247,13 +313,25 @@ public class LoginBean
     */
    public String logout()
    {
-      Map session = FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
+      FacesContext context = FacesContext.getCurrentInstance();
+      
+      // invalidate User ticket
+      Map session = context.getExternalContext().getSessionMap();
       User user = (User)session.get(AuthenticationFilter.AUTHENTICATION_USER);
       if (user != null)
       {
          this.authenticationService.invalidateTicket(user.getTicket());
+      
       }
-      FacesContext.getCurrentInstance().getExternalContext().getSessionMap().clear();
+      
+      // clear Session for this user
+      context.getExternalContext().getSessionMap().clear();
+      
+      // set language to last used
+      if (this.language != null && this.language.length() != 0)
+      {
+         Application.setLanguage(context, this.language);
+      }
       
       return "logout";
    }
@@ -282,6 +360,9 @@ public class LoginBean
    /** password */
    private String password = null;
    
+   /** language locale selection */
+   private String language = null;
+   
    /** AuthenticationService bean reference */
    private AuthenticationService authenticationService;
    
@@ -293,4 +374,7 @@ public class LoginBean
    
    /** The BrowseBean reference */
    private BrowseBean browseBean;
+   
+   /** ConfigService bean reference */
+   private ConfigService configService;
 }

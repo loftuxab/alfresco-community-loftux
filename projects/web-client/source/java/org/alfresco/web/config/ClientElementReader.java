@@ -16,6 +16,8 @@
  */
 package org.alfresco.web.config;
 
+import java.util.Iterator;
+
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
@@ -35,6 +37,9 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_ICONS = "icons";
    public static final String ELEMENT_DEFAULTVIEW = "default-view";
    public static final String ELEMENT_RECENTSPACESITEMS = "recent-spaces-items";
+   public static final String ELEMENT_LANGUAGES = "languages";
+   public static final String ELEMENT_LANGUAGE = "language";
+   public static final String ATTRIBUTE_LOCALE = "locale";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -77,6 +82,26 @@ public class ClientElementReader implements ConfigElementReader
                if (viewPageSize != null)
                {
                   configElement.setIconsPageSize(Integer.parseInt(viewPageSize.getTextTrim()));
+               }
+            }
+         }
+         
+         // get the languages sub-element
+         Element languages = element.element(ELEMENT_LANGUAGES);
+         if (languages != null)
+         {
+            Iterator<Element> langsItr = languages.elementIterator(ELEMENT_LANGUAGE);
+            while (langsItr.hasNext())
+            {
+               Element language = langsItr.next();
+               String localeCode = language.attributeValue(ATTRIBUTE_LOCALE);
+               String label = language.getTextTrim();
+               
+               if (localeCode != null && localeCode.length() != 0 &&
+                   label != null && label.length() != 0)
+               {
+                  // store the language code against the display label
+                  configElement.addLanguage(localeCode, label);
                }
             }
          }

@@ -32,6 +32,10 @@
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
       </managed-property>
+      <managed-property>
+         <property-name>configService</property-name>
+         <value>#{configService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

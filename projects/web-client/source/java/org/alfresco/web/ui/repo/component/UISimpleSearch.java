@@ -207,19 +207,19 @@ public class UISimpleSearch extends UICommand
       out.write(" VALUE='0'");
       int searchMode = getSearchMode();
       if (searchMode == 0) out.write(" CHECKED");
-      out.write("><nobr>All Items</nobr></td></tr>");
+      out.write("><nobr>" + bundle.getString(MSG_ALL_ITEMS) + "</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='1'");
       if (searchMode == 1) out.write(" CHECKED");
-      out.write("><nobr>File Names and Contents</nobr></td></tr>");
+      out.write("><nobr>" + bundle.getString(MSG_FILE_NAMES_CONTENTS) + "</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='2'");
       if (searchMode == 2) out.write(" CHECKED");
-      out.write("><nobr>File Names only</nobr></td></tr>");
+      out.write("><nobr>" + bundle.getString(MSG_FILE_NAMES_ONLY) + "</nobr></td></tr>");
       out.write(radioOption);
       out.write(" VALUE='3'");
       if (searchMode == 3) out.write(" CHECKED");
-      out.write("><nobr>Space Names only</nobr></td></tr>");
+      out.write("><nobr>" + bundle.getString(MSG_SPACE_NAMES_ONLY) + "</nobr></td></tr>");
       
       // row with table containing advanced search link and Search Go button 
       out.write("<tr><td><table width=100%><tr><td>");
@@ -297,9 +297,14 @@ public class UISimpleSearch extends UICommand
    
    private static Log logger = LogFactory.getLog(UISimpleSearch.class);
    
+   /** I18N message Ids */
    private static final String MSG_ADVANCED_SEARCH = "advanced_search";
    private static final String MSG_OPTIONS = "options";
    private static final String MSG_GO = "go";
+   private static final String MSG_SPACE_NAMES_ONLY = "space_names";
+   private static final String MSG_FILE_NAMES_ONLY = "file_names";
+   private static final String MSG_FILE_NAMES_CONTENTS = "file_names_contents";
+   private static final String MSG_ALL_ITEMS = "all_items";
    
    private static final String OPTION_PARAM = "_option";
    private static final String ADVSEARCH_PARAM = "_advsearch";

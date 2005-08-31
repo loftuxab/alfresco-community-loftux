@@ -16,6 +16,9 @@
  */
 package org.alfresco.web.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.element.ConfigElementAdapter;
 
@@ -32,6 +35,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    private int iconsPageSize = 9;
    private String defaultView = "list";
    private int recentSpacesItems = 6;
+   private Map<String, String> languages = new HashMap<String, String>();
    
    
    /**
@@ -138,5 +142,26 @@ public class ClientConfigElement extends ConfigElementAdapter
    public void setRecentSpacesItems(int recentSpacesItems)
    {
       this.recentSpacesItems = recentSpacesItems;
+   }
+   
+   /**
+    * Add a language locale and display label to the list.
+    * 
+    * @param locale     Locale code
+    * @param label      Display label
+    */
+   public void addLanguage(String locale, String label)
+   {
+      this.languages.put(locale, label);
+   }
+   
+   /**
+    * Return the Map of supported locales to display labels
+    * 
+    * @return Map of supported locales to display labels
+    */
+   public Map<String, String> getLanguageMap()
+   {
+      return this.languages;
    }
 }

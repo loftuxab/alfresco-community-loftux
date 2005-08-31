@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletContext;
@@ -48,6 +49,8 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public class Application
 {
+   private static final String LOCALE = "locale";
+   
    public static final String BEAN_CONFIG_SERVICE = "configService";
    public static final String BEAN_DATA_DICTIONARY = "dataDictionary";
    
@@ -301,6 +304,53 @@ public class Application
    }
    
    /**
+    * Set the language locale for the current user context
+    * 
+    * @param context        FacesContext for current user
+    * @param code           The ISO locale code to set
+    */
+   public static void setLanguage(FacesContext context, String code)
+   {
+      Locale locale = Locale.getDefault();
+      
+      StringTokenizer t = new StringTokenizer(code, "-");
+      int tokens = t.countTokens();
+      if (tokens == 1)
+      {
+         locale = new Locale(code);
+      }
+      else if (tokens == 2)
+      {
+         locale = new Locale(t.nextToken(), t.nextToken());
+      }
+      else if (tokens == 3)
+      {
+         locale = new Locale(t.nextToken(), t.nextToken(), t.nextToken());
+      }
+      
+      // set locale for JSF framework usage
+      context.getViewRoot().setLocale(locale);
+      
+      // set locale for our framework usage
+      context.getExternalContext().getSessionMap().put(LOCALE, locale);
+      
+      // clear the current message bundle - so it's reloaded with new locale
+      context.getExternalContext().getSessionMap().remove(MESSAGE_BUNDLE);
+   }
+   
+   /**
+    * Return the language Locale for the current user context
+    * 
+    * @param context        FacesContext for the current user
+    * 
+    * @return Current language Locale set or null if none set 
+    */
+   public static Locale getLanguage(FacesContext context)
+   {
+      return (Locale)context.getExternalContext().getSessionMap().get(LOCALE);
+   }
+   
+   /**
     * Get the specified I18N message string from the default message bundle for this user
     * 
     * @param context        FacesContext
@@ -326,8 +376,13 @@ public class Application
       ResourceBundle bundle = (ResourceBundle)session.getAttribute(MESSAGE_BUNDLE);
       if (bundle == null)
       {
-         // TODO: get Locale from language selected by each user on login
-         bundle = ResourceBundle.getBundle(MESSAGE_BUNDLE, Locale.getDefault());
+         // get Locale from language selected by each user on login
+         Locale locale = (Locale)session.getAttribute(LOCALE);
+         if (locale == null)
+         {
+            locale = Locale.getDefault();
+         }
+         bundle = ResourceBundle.getBundle(MESSAGE_BUNDLE, locale);
          if (bundle == null)
          {
             throw new AlfrescoRuntimeException("Unable to load Alfresco messages bundle: " + MESSAGE_BUNDLE);
@@ -358,8 +413,13 @@ public class Application
       ResourceBundle bundle = (ResourceBundle)session.get(MESSAGE_BUNDLE);
       if (bundle == null)
       {
-         // TODO: get Locale from language selected by each user on login
-         bundle = ResourceBundle.getBundle(MESSAGE_BUNDLE, context.getApplication().getDefaultLocale());
+         // get Locale from language selected by each user on login
+         Locale locale = (Locale)session.get(LOCALE);
+         if (locale == null)
+         {
+            locale = Locale.getDefault();
+         }
+         bundle = ResourceBundle.getBundle(MESSAGE_BUNDLE, locale);
          if (bundle == null)
          {
             throw new AlfrescoRuntimeException("Unable to load Alfresco messages bundle: " + MESSAGE_BUNDLE);

@@ -79,8 +79,20 @@
                </tr>
                
                <tr>
+                  <td>
+                     <h:outputText value="#{msg.language}"/>:
+                  </td>
+                  <td>
+                     <%-- language selection drop-down --%>
+                     <h:selectOneMenu value="#{LoginBean.language}" style="width:150px">
+                        <f:selectItems value="#{LoginBean.languages}" />
+                     </h:selectOneMenu>
+                  </td>
+               </tr>
+               
+               <tr>
                   <td colspan=2 align=right>
-                     <h:commandButton id="submit" action="#{LoginBean.login}" value="Login" />
+                     <h:commandButton id="submit" action="#{LoginBean.login}" value="#{msg.login}" />
                   </td>
                </tr>
             </table>

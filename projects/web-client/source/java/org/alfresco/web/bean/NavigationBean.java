@@ -238,38 +238,53 @@ public class NavigationBean
    {
       if (this.currentNode == null)
       {
-         if (currentNodeId == null)
+         if (this.currentNodeId == null)
          {
             throw new AlfrescoRuntimeException("Cannot retrieve current Node if NodeId is null!");
          }
-
+         
          if (s_logger.isDebugEnabled())
             s_logger.debug("Caching properties for node id: " + this.currentNodeId);
-
-         // build a node which components on the JSP page can bind too
-         NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
-         Node node = new Node(nodeRef, this.nodeService);
-
-         // early init properties for this node (by getProperties() call)
-         // resolve icon in-case one has not been set
-         Map<String, Object> props = node.getProperties();
+         
+         NodeRef nodeRef;
+         Node node;
+         Map<String, Object> props;
+         try
+         {
+            // build a node which components on the JSP page can bind too
+            nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
+            node = new Node(nodeRef, this.nodeService);
+            
+            // early init properties for this node (by getProperties() call)
+            // resolve icon in-case one has not been set
+            props = node.getProperties();
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+                  FacesContext.getCurrentInstance(), ERROR_DELETED_FOLDER), new Object[] {this.currentNodeId}) );
+            
+            nodeRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
+            node = new Node(nodeRef, this.nodeService);
+            props = node.getProperties();
+         }
          String icon = (String)props.get("app:icon");
          props.put("icon", icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
          Path path = this.nodeService.getPath(nodeRef);
-
+         
          // resolve CIFS network folder location for this node
          if (this.contentDiskDriver != null)
          {
-	         NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
-	         String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
-	         
-	         node.getProperties().put("cifsPath", cifsPath);
-	         node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
+            NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
+            String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
+              
+            node.getProperties().put("cifsPath", cifsPath);
+            node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
          }
-
+         
          this.currentNode = node;
       }
-
+      
       return this.currentNode;
    }
 
@@ -281,8 +296,7 @@ public class NavigationBean
       if (this.location == null)
       {
          // init the location from the User object for the first time
-         FacesContext fc = FacesContext.getCurrentInstance();
-         User user = (User)fc.getExternalContext().getSessionMap().get(AuthenticationFilter.AUTHENTICATION_USER);
+         User user = Application.getCurrentUser(FacesContext.getCurrentInstance());
          
          NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), user.getHomeSpaceId());
          String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
@@ -469,6 +483,8 @@ public class NavigationBean
    /** constant values used by the toolbar location modelist control */
    private static final String LOCATION_COMPANY = "company";
    private static final String LOCATION_HOME = "home";
+   
+   private static final String ERROR_DELETED_FOLDER = "error_deleted_folder";
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
