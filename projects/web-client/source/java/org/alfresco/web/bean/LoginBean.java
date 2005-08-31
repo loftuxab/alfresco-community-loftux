@@ -366,9 +366,6 @@ public class LoginBean
    /** AuthenticationService bean reference */
    private AuthenticationService authenticationService;
    
-   /** AuthenticationService bean reference */
-   AuthenticationComponent authComponent;
-   
    /** NodeService bean reference */
    private NodeService nodeService;
    
