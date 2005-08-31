@@ -16,98 +16,98 @@
  */
 package org.alfresco.repo.security.authentication;
 
-import net.sf.acegisecurity.Authentication;
+import java.util.Set;
 
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 
 /**
  * The authentication service defines the API for managing authentication information 
  * against a userid. 
- * 
- * This service follows the acegi pattern for authentication.
- * It makes the acegi authentication available as a service.
  *  
- * @author andyh
+ * @author Andy Hind
  *
  */
 public interface AuthenticationService
 {
     /**
-     * Create an authentication entry based upon the supplied authentication object if supported
-     * GrantedAuthorities will be found from the repository. 
-     *  
-     * @param authentication
+     * Create an authentication for the given user.
+     * 
+     * @param userName
+     * @param password
      * @throws AuthenticationException
      */
-    public void createAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException;
+    public void createAuthentication(String userName, char[] password) throws AuthenticationException;
     
     /**
-     * Update the credentials held. The GrantedAuthorities held in the repository will be unaffected.
+     * Update the login information for the user (typically called by the user)
      * 
-     * @param authentication
+     * @param userName
+     * @param oldPassword
+     * @param newPassword
      * @throws AuthenticationException
      */
-    public void updateAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException;
+    public void updateAuthentication(String userName, char[] oldPassword, char[] newPassword) throws AuthenticationException;
     
     /**
-     * Delete the authentication entry. Only the authentication entry is removed - the person information in the repository 
-     * will remain unchanged. 
+     * Set the login information for a user (typically called by an admin user) 
      * 
-     * @param authentication
+     * @param userName
+     * @param newPassword
      * @throws AuthenticationException
      */
-    public void deleteAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException;
+    public void setAuthentication(String userName, char[] newPassword) throws AuthenticationException;
+    
+
+    /**
+     * Delete an authentication entry
+     * 
+     * @param userName
+     * @throws AuthenticationException
+     */
+    public void deleteAuthentication(String userName) throws AuthenticationException;
     
     /**
-     * Wrap an ACEGI authentication call
+     * Carry out an authentication attempt. If successful the user is set to the current user.
+     * The current user is a part of the thread context.
      * 
-     * @param authentication
+     * @param userName
+     * @param password
+     * @throws AuthenticationException
+     */
+    public void authenticate(String userName, char[] password) throws AuthenticationException;
+    
+    /**
+     * Get the name of the currently authenticated user.
+     * 
      * @return
      * @throws AuthenticationException
      */
-    public Authentication authenticate(StoreRef storeRef, Authentication authentication) throws AuthenticationException;
+    public String getCurrentUserName() throws AuthenticationException;
     
     /**
-     * Support to get the current authentication object
+     * Invlidate any tickets held by the user.
      * 
-     * @return
+     * @param userName
      * @throws AuthenticationException
      */
-    public Authentication getCurrentAuthentication() throws AuthenticationException;
+    public void invalidateUserSession(String userName) throws AuthenticationException;
     
-    /**
-     * Invalidate any ticket associated with the given authentication
-     *  
-     * @param authentication
-     * @throws AuthenticationException
-     */
-    public void invalidate(Authentication authentication) throws AuthenticationException;
+   /**
+    * Invalidate a single ticket by ID
+    * 
+    * @param ticket
+    * @throws AuthenticationException
+    */
+    public void invalidateTicket(String ticket) throws AuthenticationException;
     
-    /**
-     * Invalidate any ticket associated with the given authentication
-     *  
-     * @param authentication
-     * @throws AuthenticationException
-     */
-    public void invalidate(String ticket) throws AuthenticationException;
-    
-    /**
-     * Invalidate any ticket associated with the given authentication
-     *  
-     * @param authentication
-     * @return
-     * @throws AuthenticationException
-     */
-    public Authentication validate(String ticket) throws AuthenticationException;
-    
-    /**
-     * Invalidate any ticket associated with the given authentication
-     *  
-     * @param authentication
-     * @return
-     * @throws AuthenticationException
-     */
-    public Authentication validate(Authentication authentication) throws AuthenticationException;
+   /**
+    * Validate a ticket. Set the current user name accordingly. 
+    * 
+    * @param ticket
+    * @throws AuthenticationException
+    */
+    public void validate(String ticket) throws AuthenticationException;
     
     /**
      * Get the current ticket as a string
@@ -121,11 +121,84 @@ public interface AuthenticationService
      */
     public void clearCurrentSecurityContext();
     
+    
     /**
-     * Temporary method to set the current context by user name key
-     * This is only for the preview to do pass through authentication in the CIFS integratrion
+     * Get all the roles for the currently authenticated user.
+     * 
+     * @return
+     */
+    public Set<String> getCurrentUserRoles();
+    
+    /**
+     * Get all the groups for the currently authenticated user.
+     * 
+     * @return
+     */
+    public Set<String> getCurrentUserGroups();
+    
+    /**
+     * Get all the roles for the given userName.
+     * 
+     * @param userName
+     * @return
+     */
+    public Set<String> getUserRoles(String userName);
+    
+    /**
+     * Get all the groups for the given userName.
+     * 
+     * @param userName
+     * @return
+     */
+    public Set<String> getUserGroups(String userName);
+    
+    /**
+     * Get all the roles the authentication service knows about.
+     * 
+     * @return
+     */
+    public Set<String> getAllUserRoles();
+    
+    /**
+     * Get all the groups the authentication service knows about.
+     * 
+     * @return
+     */
+    public Set<String> getAllUserGroups();
+    
+    /**
+     * Get all the user names the authentication knows about.
+     * 
+     * @return
+     */
+    public Set<String> getAllUserNames();
+    
+    /**
+     * Create or update a basic person entry for the given user name.
+     * Depending on the implementation this may set properties derived from the authenication store. 
+     * 
+     * @param storeRef
+     * @param userName
+     * @return
+     */
+    public NodeRef synchronisePerson(StoreRef storeRef, String userName);
+    
+    /**
+     * Get a user by userName
+     * 
+     * @param storeRef
+     * @param userName
+     * @return
+     */
+    public NodeRef getPersonNodeRef(StoreRef storeRef, String userName);
+    
+    /**
+     * Is the current user the system user
+     * 
+     * @return
      */
     
-    public Authentication setAuthenticatedUser(String userName);
+    public boolean isCurrentUserTheSystemUser();
+    
 }
 

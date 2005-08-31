@@ -33,13 +33,11 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
-import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -205,7 +203,6 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
                   WebApplicationContext ctx = (WebApplicationContext)getPortletContext().getAttribute(
                         WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
                   AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
-                  StoreContextHolder.setContext(Repository.getStoreRef());
                   auth.validate(user.getTicket());
                }
                

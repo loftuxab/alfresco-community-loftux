@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE permissions>
-<!--PUBLIC '-//ALFRECSO//DTD PERMISSIONS//EN' 'permissionSchema.dtd'-->
+
+<!--PUBLIC '-//ALFRECSO//DTD PERMISSIONS//EN' 'permissionSchema.dtd' -->
 
 <!-- The base permission model for the repository -->
 
@@ -148,17 +149,16 @@
    <permissionSet type="cm:folder" expose="selected">
         <permissionGroup name="Administrator" allowFullControl="true" expose="true" />
         <permissionGroup name="Coordinator" allowFullControl="false" expose="true" >
-            <includePermissionGroup permissionGroup="Read"/>
-            <includePermissionGroup permissionGroup="Write"/>
-            <includePermissionGroup permissionGroup="Delete"/>
-            <includePermissionGroup permissionGroup="AddChildren"/>
+            <includePermissionGroup permissionGroup="Contributor" type="cm:folder"/>
+            <includePermissionGroup permissionGroup="Write" type="sys:base"/>
+            <includePermissionGroup permissionGroup="Delete" type="sys:base"/>
         </permissionGroup>
         <permissionGroup name="Contributor" allowFullControl="false" expose="true" >
-            <includePermissionGroup permissionGroup="Guest"/>
-            <includePermissionGroup permissionGroup="AddChildren"/>
+            <includePermissionGroup permissionGroup="Guest" type="cm:folder"/>
+            <includePermissionGroup permissionGroup="AddChildren" type="sys:base"/>
         </permissionGroup>
         <permissionGroup name="Guest" allowFullControl="false" expose="true" >
-            <includePermissionGroup permissionGroup="Read"/>
+            <includePermissionGroup permissionGroup="Read" type="sys:base" />
         </permissionGroup>
    </permissionSet>
    

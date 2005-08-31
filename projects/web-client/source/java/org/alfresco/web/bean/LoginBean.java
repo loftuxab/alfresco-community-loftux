@@ -17,8 +17,6 @@
 package org.alfresco.web.bean;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
@@ -26,24 +24,19 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.RepositoryUserDetails;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
-import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
-import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 
 /**
  * JSF Managed Bean. Backs the "login.jsp" view to provide the form fields used
@@ -172,13 +165,11 @@ public class LoginBean
          // in the session - this is used by the servlet filter etc. on each page to check for login
          try
          {
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.username, this.password);
-            Authentication auth = this.authenticationService.authenticate(Repository.getStoreRef(), token);
-            RepositoryUserDetails principal = (RepositoryUserDetails)auth.getPrincipal();
+            this.authenticationService.authenticate(this.username, this.password.toCharArray());
             
             // setup User object and Home space ID
-            User user = new User(principal.getUserNodeRef(), this.username, this.authenticationService.getCurrentTicket(), principal.getPersonNodeRef());
-            String homeSpaceId = (String)this.nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
+            User user = new User(this.username, this.authenticationService.getCurrentTicket(), authenticationService.getPersonNodeRef(Repository.getStoreRef(), this.username));
+            String homeSpaceId = (String)this.nodeService.getProperty(authenticationService.getPersonNodeRef(Repository.getStoreRef(), this.username), ContentModel.PROP_HOMEFOLDER);
             NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
             // check that the home space node exists - else user cannot login
             if (this.nodeService.exists(homeSpaceRef) == false)
@@ -260,7 +251,7 @@ public class LoginBean
       User user = (User)session.get(AuthenticationFilter.AUTHENTICATION_USER);
       if (user != null)
       {
-         this.authenticationService.invalidate(user.getTicket());
+         this.authenticationService.invalidateTicket(user.getTicket());
       }
       FacesContext.getCurrentInstance().getExternalContext().getSessionMap().clear();
       
@@ -293,6 +284,9 @@ public class LoginBean
    
    /** AuthenticationService bean reference */
    private AuthenticationService authenticationService;
+   
+   /** AuthenticationService bean reference */
+   AuthenticationComponent authComponent;
    
    /** NodeService bean reference */
    private NodeService nodeService;

@@ -29,8 +29,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.validator.ValidatorException;
 import javax.transaction.UserTransaction;
 
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationService;
@@ -407,8 +405,7 @@ public class NewUserWizard extends AbstractWizardBean
                logger.debug("Created Person node for username: " + this.userName);
             
             // create the ACEGI Authentication instance for this user
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(this.userName, this.password);
-            this.authenticationService.createAuthentication(Repository.getStoreRef(), token);
+            this.authenticationService.createAuthentication(this.userName, this.password.toCharArray());
             
             if (logger.isDebugEnabled())
                logger.debug("Created User Authentication instance for username: " + this.userName);

@@ -39,7 +39,6 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.TestWithUserUtils;
-import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
 
 /**
  * Version operations service implementation unit tests
@@ -63,7 +62,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private StoreRef storeRef;
 	private NodeRef rootNodeRef;	
 	private NodeRef nodeRef;
-	private NodeRef userNodeRef;
+	private String userNodeRef;
 	
 	/**
 	 * Types and properties used by the tests
@@ -124,7 +123,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
         // Create and authenticate the user
         TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
         TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);
-        this.userNodeRef = TestWithUserUtils.getCurrentUserRef(this.authenticationService);
+        this.userNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);
         
 	}
 	

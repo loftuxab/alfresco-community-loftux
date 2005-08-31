@@ -46,7 +46,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testAuthenticatedRoleIsPresent()
     {
         runAs("andy");
-        Authentication auth = authenticationService.getCurrentAuthentication();
+        Authentication auth = authenticationComponent.getCurrentAuthentication();
         for (GrantedAuthority authority : auth.getAuthorities())
         {
             if (authority.getAuthority().equals(ROLE_AUTHENTICATED))
@@ -310,8 +310,6 @@ public class PermissionServiceTest extends AbstractPermissionTest
         answer = permissionService.getSettablePermissions(QName.createQName("cm", "folder", namespacePrefixResolver));
         assertEquals(4, answer.size());
     }
-
-    
     
     public void testGetSettablePermissionsForNode()
     {

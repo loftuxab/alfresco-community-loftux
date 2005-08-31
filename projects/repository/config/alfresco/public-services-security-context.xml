@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+    
+    <!--                         -->
+    <!-- Support for permissions -->
+    <!--                         -->
+
+    <!-- TODO: Move to public-services-context - Permission Service -->
+
+    <bean id='permissionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.repo.security.permissions.PermissionService</value>
+        </property>
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.alfresco.repo.security.permissions.impl.PermissionServiceImpl">
+                <property name="nodeService">
+                    <ref bean="nodeService" />
+                </property>
+                <property name="dictionaryService">
+                    <ref bean="dictionaryService" />
+                </property>
+                <property name="permissionsDAO">
+                    <ref bean="permissionsDAO" />
+                </property>
+                <property name="modelDAO">
+                    <ref bean="permissionsModelDAO" />
+                </property>
+                <property name="authenticationService">
+                    <ref bean="authenticationService" />
+                </property>
+                <property name="authenticationComponent">
+                    <ref bean="authenticationComponent" />
+                </property>
+            </bean>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Permissions DAO -->
+
+    <bean id="permissionsDAO" class="org.alfresco.repo.security.permissions.impl.hibernate.HibernatePermissionsDAO">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory" />
+        </property>
+    </bean>
+
+    <!-- Permissions Model DAO -->
+
+    <bean id='permissionsModelDAO' class="org.alfresco.repo.security.permissions.impl.model.PermissionModel">
+        <property name="model">
+            <value>alfresco/model/permissionDefinitions.xml</value>
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+    </bean>
+    
+    <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true"
+        lazy-init="default" autowire="default" dependency-check="default" />
+        
+    <bean id="aclEntryVoter" class="org.alfresco.repo.security.permissions.impl.acegi.ACLEntryVoter" abstract="false" singleton="true"
+        lazy-init="default" autowire="default" dependency-check="default" >
+       <property name="permissionService">
+           <ref bean="permissionService"></ref>
+       </property>
+       <property name="namespacePrefixResolver">
+           <ref bean="namespaceService"></ref>
+       </property>
+       <property name="nodeService">
+           <ref bean="nodeService"></ref>
+       </property>    
+       <property name="authenticationService">
+            <ref bean="authenticationService" />
+       </property>
+    </bean>
+    
+    <bean id="accessDecisionManager" class="net.sf.acegisecurity.vote.AffirmativeBased">
+      <property name="allowIfAllAbstainDecisions"><value>false</value></property>
+      <property name="decisionVoters">
+         <list>
+            <ref local="roleVoter"/>
+            <ref local="aclEntryVoter"/>
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="afterAcl" class="org.alfresco.repo.security.permissions.impl.acegi.ACLEntryAfterInvocationProvider" abstract="false" singleton="true"
+        lazy-init="default" autowire="default" dependency-check="default" >
+       <property name="permissionService">
+           <ref bean="permissionService"></ref>
+       </property>
+       <property name="namespacePrefixResolver">
+           <ref bean="namespaceService"></ref>
+       </property>
+       <property name="nodeService">
+           <ref bean="nodeService"></ref>
+       </property>  
+       <property name="authenticationService">
+            <ref bean="authenticationService" />
+       </property>  
+    </bean>
+   
+   <bean id="afterInvocationManager" class="net.sf.acegisecurity.afterinvocation.AfterInvocationProviderManager">
+      <property name="providers">
+         <list>
+            <ref local="afterAcl"/>
+         </list>
+      </property>
+   </bean>
+    
+    
+    
+    <bean id="NamespaceService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="DictionaryService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="NodeService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
+      <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+      <property name="objectDefinitionSource">
+         <value>
+				org.alfresco.service.cmr.repository.NodeService.getStores=ROLE_ADMINISTRATOR,AFTER_ACL_NODE.sys:base.Read
+				org.alfresco.service.cmr.repository.NodeService.createStore=ROLE_ADMINISTRATOR
+				org.alfresco.service.cmr.repository.NodeService.exists=ACL_NODE.0.sys:base.Read
+				org.alfresco.service.cmr.repository.NodeService.getRootNode=ACL_NODE.0.sys:base.Read
+				org.alfresco.service.cmr.repository.NodeService.createNode=ACL_NODE.0.sys:base.CreateChildren
+				org.alfresco.service.cmr.repository.NodeService.moveNode=ACL_NODE.0.sys:base.WriteProperties,ACL_PARENT.0.sys:base.DeleteChildren,ACL_NODE.1.sys:base.CreateChildren
+				org.alfresco.service.cmr.repository.NodeService.setChildAssociationIndex=ACL_PARENT.0.sys:base.WriteProperties
+                org.alfresco.service.cmr.repository.NodeService.getType=ACL_NODE.0.sys:base.ReadProperties
+                org.alfresco.service.cmr.repository.NodeService.addAspect=ACL_NODE.0.sys:base.Write
+                org.alfresco.service.cmr.repository.NodeService.removeAspect=ACL_NODE.0.sys:base.Write
+                org.alfresco.service.cmr.repository.NodeService.hasAspect=ACL_NODE.0.sys:base.ReadProperties
+                org.alfresco.service.cmr.repository.NodeService.getAspects=ACL_NODE.0.sys:base.ReadProperties
+                org.alfresco.service.cmr.repository.NodeService.deleteNode=ACL_NODE.0.sys:base.Delete
+                org.alfresco.service.cmr.repository.NodeService.addChild=ACL_NODE.0.sys:base.CreateChildren,ACL_NODE.1.sys:base.ReadProperties
+                org.alfresco.service.cmr.repository.NodeService.removeChild=ACL_NODE.1.sys:base.Delete
+                org.alfresco.service.cmr.repository.NodeService.getProperties=ACL_NODE.0.sys:base.ReadProperties
+                org.alfresco.service.cmr.repository.NodeService.getProperty=ACL_NODE.0.sys:base.ReadProperties
+                org.alfresco.service.cmr.repository.NodeService.setProperties=ACL_NODE.0.sys:base.WriteProperties
+                org.alfresco.service.cmr.repository.NodeService.setProperty=ACL_NODE.0.sys:base.WriteProperties
+                org.alfresco.service.cmr.repository.NodeService.getParentAssocs=ACL_NODE.0.sys:base.ReadProperties,AFTER_ACL_PARENT.sys:base.Read
+                org.alfresco.service.cmr.repository.NodeService.getChildAssocs=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.Read
+                org.alfresco.service.cmr.repository.NodeService.getPrimaryParent=ACL_NODE.0.sys:base.ReadProperties,AFTER_ACL_PARENT.sys:base.Read
+                org.alfresco.service.cmr.repository.NodeService.createAssociation=ROLE_AUTHENTICATED
+                org.alfresco.service.cmr.repository.NodeService.removeAssociation=ROLE_AUTHENTICATED
+                org.alfresco.service.cmr.repository.NodeService.getTargetAssocs=ROLE_AUTHENTICATED
+                org.alfresco.service.cmr.repository.NodeService.getSourceAssocs=ROLE_AUTHENTICATED
+                org.alfresco.service.cmr.repository.NodeService.getPath=ACL_NODE.0.sys:base.ReadProperties
+                org.alfresco.service.cmr.repository.NodeService.getPaths=ACL_NODE.0.sys:base.ReadProperties
+         </value>
+      </property>
+   </bean>
+    
+   <bean id="ContentService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="MimetypeService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="SearchService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="CategoryService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="CopyService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="LockService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="VersionService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="CheckoutCheckinService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="RuleService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="ImporterService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="ActionService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+   <bean id="PermissionService_security" class="org.alfresco.repo.security.permissions.impl.acegi.AlwaysProcedeMethodInterceptor" />
+    
+</beans>

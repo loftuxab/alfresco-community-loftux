@@ -148,7 +148,7 @@ public class UILockIcon extends SelfRenderingComponent
          }
          else
          {
-            NodeRef lockUser = (NodeRef)nodeService.getProperty(ref, ContentModel.PROP_LOCK_OWNER);
+            String lockingUser = (String)nodeService.getProperty(ref, ContentModel.PROP_LOCK_OWNER);
             msg = Application.getMessage(context, MSG_LOCKED_USER);
             if (getLockedUserTooltip() != null)
             {
@@ -156,7 +156,7 @@ public class UILockIcon extends SelfRenderingComponent
             }
             StringBuilder buf = new StringBuilder(32);
             msg = buf.append(msg).append(" '")
-                     .append((String)nodeService.getProperty(lockUser, ContentModel.PROP_USER_USERNAME))
+                     .append(lockingUser)
                      .append("'").toString();
          }
          

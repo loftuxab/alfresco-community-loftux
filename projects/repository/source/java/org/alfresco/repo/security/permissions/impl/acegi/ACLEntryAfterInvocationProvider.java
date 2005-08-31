@@ -31,8 +31,10 @@ import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.afterinvocation.AfterInvocationProvider;
 
+import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.impl.PermissionServiceImpl;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -42,10 +44,15 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+
+import com.mysql.jdbc.Debug;
 
 public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider, InitializingBean
 {
+    private static Log log = LogFactory.getLog(ACLEntryAfterInvocationProvider.class);
 
     private static final String AFTER_ACL_NODE = "AFTER_ACL_NODE";
 
@@ -56,6 +63,8 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
     private NamespacePrefixResolver nspr;
 
     private NodeService nodeService;
+
+    private AuthenticationService authenticationService;
 
     public ACLEntryAfterInvocationProvider()
     {
@@ -92,6 +101,16 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         this.nodeService = nodeService;
     }
 
+    public AuthenticationService getAuthenticationService()
+    {
+        return authenticationService;
+    }
+
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService;
+    }
+
     public void afterPropertiesSet() throws Exception
     {
         if (permissionService == null)
@@ -106,240 +125,161 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         {
             throw new IllegalArgumentException("There must be a node service");
         }
+        if (authenticationService == null)
+        {
+            throw new IllegalArgumentException("There must be an authentication service");
+        }
 
     }
 
     public Object decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
             Object returnedObject) throws AccessDeniedException
     {
+        if (log.isDebugEnabled())
+        {
+            MethodInvocation mi = (MethodInvocation) object;
+            log.debug("Method: " + mi.getMethod().toString());
+        }
+        try
+        {
+            if (authenticationService.isCurrentUserTheSystemUser())
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Allowing system user access");
+                }
+                return returnedObject;
+            }
+            else if (returnedObject == null)
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Allowing null object access");
+                }
+                return null;
+            }
+            else if (StoreRef.class.isAssignableFrom(returnedObject.getClass()))
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Store access");
+                }
+                return decide(authentication, object, config, nodeService.getRootNode((StoreRef) returnedObject))
+                        .getStoreRef();
+            }
+            else if (NodeRef.class.isAssignableFrom(returnedObject.getClass()))
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Node access");
+                }
+                return decide(authentication, object, config, (NodeRef) returnedObject);
+            }
+            else if (ChildAssociationRef.class.isAssignableFrom(returnedObject.getClass()))
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Child Association access");
+                }
+                return decide(authentication, object, config, (ChildAssociationRef) returnedObject);
+            }
+            else if (ResultSet.class.isAssignableFrom(returnedObject.getClass()))
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Result Set access");
+                }
+                return decide(authentication, object, config, (ResultSet) returnedObject);
+            }
+            else if (Collection.class.isAssignableFrom(returnedObject.getClass()))
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Collection Access");
+                }
+                return decide(authentication, object, config, (Collection) returnedObject);
+            }
+            else if (returnedObject.getClass().isArray())
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Array Access");
+                }
+                return decide(authentication, object, config, (Object[]) returnedObject);
+            }
+            else
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Uncontrolled object - access allowed for " + object.getClass().getName());
+                }
+                return returnedObject;
+            }
+        }
+        catch (AccessDeniedException ade)
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug("Access denied");
+                ade.printStackTrace();
+            }
+            throw ade;
+        }
+        catch (RuntimeException re)
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug("Access denied by runtime exception");
+                re.printStackTrace();
+            }
+            throw re;
+        }
 
-        if(returnedObject == null)
-        {
-            return null;
-        }
-        else if (StoreRef.class.isAssignableFrom(returnedObject.getClass()))
-        {
-            return decide(authentication, object, config, nodeService.getRootNode((StoreRef) returnedObject)).getStoreRef();
-        }
-        else if (NodeRef.class.isAssignableFrom(returnedObject.getClass()))
-        {
-            return decide(authentication, object, config, (NodeRef) returnedObject);
-        }
-        else if (ChildAssociationRef.class.isAssignableFrom(returnedObject.getClass()))
-        {
-            return decide(authentication, object, config, (ChildAssociationRef) returnedObject);
-        }
-        else if (ResultSet.class.isAssignableFrom(returnedObject.getClass()))
-        {
-            return decide(authentication, object, config, (ResultSet) returnedObject);
-        }
-        else if (Collection.class.isAssignableFrom(returnedObject.getClass()))
-        {
-            return decide(authentication, object, config, (Collection) returnedObject);
-        }
-        else if (returnedObject.getClass().isArray())
-        {
-            return decide(authentication, object, config, (Object[]) returnedObject);
-        }
-        else
-        {
-            return returnedObject;
-        }
     }
 
     public NodeRef decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
             NodeRef returnedObject) throws AccessDeniedException
 
     {
-
-        Iterator iter = config.getConfigAttributes();
-
-        while (iter.hasNext())
+        if (returnedObject == null)
         {
-            ConfigAttribute attr = (ConfigAttribute) iter.next();
-
-            if (this.supports(attr))
-            {
-                if (returnedObject == null)
-                {
-                    return null;
-                }
-
-                StringTokenizer st = new StringTokenizer(attr.getAttribute(), ".", false);
-                if (st.countTokens() != 3)
-                {
-                    throw new ACLEntryVoterException("There must be three . separated tokens in each config attribute");
-                }
-                String typeString = st.nextToken();
-                String qNameString = st.nextToken();
-                String permissionString = st.nextToken();
-
-                if (!(typeString.equals(AFTER_ACL_NODE) || typeString.equals(AFTER_ACL_PARENT)))
-                {
-                    throw new ACLEntryVoterException("Invalid type: must be ACL_NODE or ACL_PARENT");
-                }
-
-                QName qName = QName.createQName(qNameString, nspr);
-
-                PermissionReference required = new SimplePermissionReference(qName, permissionString);
-
-                NodeRef testNodeRef = null;
-
-                if (typeString.equals(AFTER_ACL_NODE))
-                {
-                    testNodeRef = returnedObject;
-                }
-                else if (typeString.equals(AFTER_ACL_PARENT))
-                {
-                    testNodeRef = nodeService.getPrimaryParent(returnedObject).getParentRef();
-                }
-
-                if ((testNodeRef == null) || permissionService.hasPermission(testNodeRef, required))
-                {
-                    return returnedObject;
-                }
-
-            }
+            return null;
         }
 
-        throw new AccessDeniedException("Access Denied");
-    }
+        List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
 
-    public ChildAssociationRef decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
-            ChildAssociationRef returnedObject) throws AccessDeniedException
-
-    {
-        Iterator iter = config.getConfigAttributes();
-
-        while (iter.hasNext())
+        if (supportedDefinitions.size() == 0)
         {
-            ConfigAttribute attr = (ConfigAttribute) iter.next();
-
-            if (this.supports(attr))
-            {
-                if (returnedObject == null)
-                {
-                    return null;
-                }
-
-                StringTokenizer st = new StringTokenizer(attr.getAttribute(), ".", false);
-                if (st.countTokens() != 3)
-                {
-                    throw new ACLEntryVoterException("There must be three . separated tokens in each config attribute");
-                }
-                String typeString = st.nextToken();
-                String qNameString = st.nextToken();
-                String permissionString = st.nextToken();
-
-                if (!(typeString.equals(AFTER_ACL_NODE) || typeString.equals(AFTER_ACL_PARENT)))
-                {
-                    throw new ACLEntryVoterException("Invalid type: must be ACL_NODE or ACL_PARENT");
-                }
-
-                QName qName = QName.createQName(qNameString, nspr);
-
-                PermissionReference required = new SimplePermissionReference(qName, permissionString);
-
-                NodeRef testNodeRef = null;
-
-                if (typeString.equals(AFTER_ACL_NODE))
-                {
-                    testNodeRef = ((ChildAssociationRef) returnedObject).getChildRef();
-                }
-                else if (typeString.equals(AFTER_ACL_PARENT))
-                {
-                    testNodeRef = ((ChildAssociationRef) returnedObject).getParentRef();
-                }
-
-                if ((testNodeRef == null) || permissionService.hasPermission(testNodeRef, required))
-                {
-                    return returnedObject;
-                }
-            }
+            return returnedObject;
         }
 
-        throw new AccessDeniedException("Access Denied");
-    }
-
-    public ResultSet decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
-            ResultSet returnedObject) throws AccessDeniedException
-
-    {
-        FilteringResultSet filteringResultSet = new FilteringResultSet((ResultSet) returnedObject);
-
-        Iterator iter = config.getConfigAttributes();
-
-        while (iter.hasNext())
+        for (ConfigAttributeDefintion cad : supportedDefinitions)
         {
-            ConfigAttribute attr = (ConfigAttribute) iter.next();
+            NodeRef testNodeRef = null;
 
-            if (this.supports(attr))
+            if (cad.typeString.equals(AFTER_ACL_NODE))
             {
-                if (returnedObject == null)
-                {
-                    return null;
-                }
-
-                StringTokenizer st = new StringTokenizer(attr.getAttribute(), ".", false);
-                if (st.countTokens() != 3)
-                {
-                    throw new ACLEntryVoterException("There must be three . separated tokens in each config attribute");
-                }
-                String typeString = st.nextToken();
-                String qNameString = st.nextToken();
-                String permissionString = st.nextToken();
-
-                if (!(typeString.equals(AFTER_ACL_NODE) || typeString.equals(AFTER_ACL_PARENT)))
-                {
-                    throw new ACLEntryVoterException("Invalid type: must be ACL_NODE or ACL_PARENT");
-                }
-
-                QName qName = QName.createQName(qNameString, nspr);
-
-                PermissionReference required = new SimplePermissionReference(qName, permissionString);
-
-                if (typeString.equals(AFTER_ACL_NODE))
-                {
-
-                    for (int i = 0; i < returnedObject.length(); i++)
-                    {
-                        if (!filteringResultSet.getIncluded(i))
-                        {
-                            if (permissionService.hasPermission(returnedObject.getNodeRef(i), required))
-                            {
-                                filteringResultSet.setIncluded(i, true);
-                            }
-                        }
-                    }
-                }
-                else if (typeString.equals(AFTER_ACL_PARENT))
-                {
-                    for (int i = 0; i < returnedObject.length(); i++)
-                    {
-                        if (!filteringResultSet.getIncluded(i))
-                        {
-                            NodeRef parentRef = returnedObject.getChildAssocRef(i).getParentRef();
-                            if ((parentRef == null) || permissionService.hasPermission(parentRef,
-                                    required))
-                            {
-                                filteringResultSet.setIncluded(i, true);
-                            }
-                        }
-                    }
-                }
+                testNodeRef = returnedObject;
             }
+            else if (cad.typeString.equals(AFTER_ACL_PARENT))
+            {
+                testNodeRef = nodeService.getPrimaryParent(returnedObject).getParentRef();
+            }
+
+            if ((testNodeRef != null) && !permissionService.hasPermission(testNodeRef, cad.required))
+            {
+                throw new AccessDeniedException("Access Denied");
+            }
+
         }
 
-        return filteringResultSet;
+        return returnedObject;
     }
 
-    public Collection decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
-            Collection returnedObject) throws AccessDeniedException
-
+    private List<ConfigAttributeDefintion> extractSupportedDefinitions(ConfigAttributeDefinition config)
     {
         List<ConfigAttributeDefintion> definitions = new ArrayList<ConfigAttributeDefintion>();
         Iterator iter = config.getConfigAttributes();
-        Set<Object> removed = new HashSet<Object>();
 
         while (iter.hasNext())
         {
@@ -351,11 +291,120 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
             }
 
         }
+        return definitions;
+    }
+
+    public ChildAssociationRef decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+            ChildAssociationRef returnedObject) throws AccessDeniedException
+
+    {
+        if (returnedObject == null)
+        {
+            return null;
+        }
+
+        List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
+
+        if (supportedDefinitions.size() == 0)
+        {
+            return returnedObject;
+        }
+
+        for (ConfigAttributeDefintion cad : supportedDefinitions)
+        {
+            NodeRef testNodeRef = null;
+
+            if (cad.typeString.equals(AFTER_ACL_NODE))
+            {
+                testNodeRef = ((ChildAssociationRef) returnedObject).getChildRef();
+            }
+            else if (cad.typeString.equals(AFTER_ACL_PARENT))
+            {
+                testNodeRef = ((ChildAssociationRef) returnedObject).getParentRef();
+            }
+
+            if ((testNodeRef != null) && !permissionService.hasPermission(testNodeRef, cad.required))
+            {
+                throw new AccessDeniedException("Access Denied");
+            }
+
+        }
+
+        return returnedObject;
+    }
+
+    public ResultSet decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+            ResultSet returnedObject) throws AccessDeniedException
+
+    {
+        FilteringResultSet filteringResultSet = new FilteringResultSet((ResultSet) returnedObject);
+
+        if (returnedObject == null)
+        {
+            return null;
+        }
+
+        List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
+
+        if (supportedDefinitions.size() == 0)
+        {
+            return returnedObject;
+        }
+
+        for (int i = 0; i < returnedObject.length(); i++)
+        {
+            for (ConfigAttributeDefintion cad : supportedDefinitions)
+            {
+                filteringResultSet.setIncluded(i, true);
+                NodeRef testNodeRef = null;
+                if (cad.typeString.equals(AFTER_ACL_NODE))
+                {
+                    testNodeRef = returnedObject.getNodeRef(i);
+                }
+                else if (cad.typeString.equals(AFTER_ACL_PARENT))
+                {
+                    testNodeRef = returnedObject.getChildAssocRef(i).getParentRef();
+                }
+
+                if (filteringResultSet.getIncluded(i)
+                        && (testNodeRef != null)
+                        && !permissionService.hasPermission(returnedObject.getNodeRef(i), cad.required))
+                {
+                    filteringResultSet.setIncluded(i, false);
+                }
+            }
+        }
+
+        return filteringResultSet;
+    }
+
+    public Collection decide(Authentication authentication, Object object, ConfigAttributeDefinition config,
+            Collection returnedObject) throws AccessDeniedException
+
+    {
+        if (returnedObject == null)
+        {
+            return null;
+        }
+
+        List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
+
+        if (supportedDefinitions.size() == 0)
+        {
+            return returnedObject;
+        }
+
+        Set<Object> removed = new HashSet<Object>();
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("Entries are " + supportedDefinitions);
+        }
 
         for (Object nextObject : returnedObject)
         {
-            boolean allowed = false;
-            for (ConfigAttributeDefintion cad : definitions)
+            boolean allowed = true;
+            for (ConfigAttributeDefintion cad : supportedDefinitions)
             {
                 NodeRef testNodeRef = null;
 
@@ -364,10 +413,18 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     if (NodeRef.class.isAssignableFrom(nextObject.getClass()))
                     {
                         testNodeRef = (NodeRef) nextObject;
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tNode Test on node " + nodeService.getPath(testNodeRef));
+                        }
                     }
                     else if (ChildAssociationRef.class.isAssignableFrom(nextObject.getClass()))
                     {
                         testNodeRef = ((ChildAssociationRef) nextObject).getChildRef();
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tNode Test on child association ref using " + nodeService.getPath(testNodeRef));
+                        }
                     }
                     else
                     {
@@ -380,10 +437,19 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     if (NodeRef.class.isAssignableFrom(nextObject.getClass()))
                     {
                         testNodeRef = nodeService.getPrimaryParent((NodeRef) nextObject).getParentRef();
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tParent test on node " + nodeService.getPath(testNodeRef));
+                        }
                     }
                     else if (ChildAssociationRef.class.isAssignableFrom(nextObject.getClass()))
                     {
                         testNodeRef = ((ChildAssociationRef) nextObject).getParentRef();
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tParent Test on child association ref using "
+                                    + nodeService.getPath(testNodeRef));
+                        }
                     }
                     else
                     {
@@ -392,9 +458,9 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     }
                 }
 
-                if (!allowed && ((testNodeRef == null) || permissionService.hasPermission(testNodeRef, cad.required)))
+                if (allowed && (testNodeRef != null) && !permissionService.hasPermission(testNodeRef, cad.required))
                 {
-                    allowed = true;
+                    allowed = false;
                 }
             }
             if (!allowed)
@@ -404,7 +470,8 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         }
         for (Object toRemove : removed)
         {
-            while(returnedObject.remove(toRemove));
+            while (returnedObject.remove(toRemove))
+                ;
         }
         return returnedObject;
     }
@@ -415,74 +482,80 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
     {
         BitSet incudedSet = new BitSet(returnedObject.length);
 
-        Iterator iter = config.getConfigAttributes();
-
-        while (iter.hasNext())
+        if (returnedObject == null)
         {
-            ConfigAttribute attr = (ConfigAttribute) iter.next();
+            return null;
+        }
 
-            if (this.supports(attr))
-            {
-                ConfigAttributeDefintion cad = new ConfigAttributeDefintion(attr);
+        List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
 
-                for (int i = 0, l = returnedObject.length; i < l; i++)
-                {
-                    if (!incudedSet.get(i))
-                    {
-                        Object current = returnedObject[i];
-
-                        NodeRef testNodeRef = null;
-
-                        if (cad.typeString.equals(AFTER_ACL_NODE))
-                        {
-                            if (NodeRef.class.isAssignableFrom(current.getClass()))
-                            {
-                                testNodeRef = (NodeRef) current;
-                            }
-                            else if (ChildAssociationRef.class.isAssignableFrom(current.getClass()))
-                            {
-                                testNodeRef = ((ChildAssociationRef) current).getChildRef();
-                            }
-                            else
-                            {
-                                throw new ACLEntryVoterException(
-                                        "The specified array is not of NodeRef or ChildAssociationRef");
-                            }
-                        }
-                        else if (cad.typeString.equals(AFTER_ACL_PARENT))
-                        {
-                            if (NodeRef.class.isAssignableFrom(current.getClass()))
-                            {
-                                testNodeRef = nodeService.getPrimaryParent((NodeRef) current).getParentRef();
-                            }
-                            else if (ChildAssociationRef.class.isAssignableFrom(current.getClass()))
-                            {
-                                testNodeRef = ((ChildAssociationRef) current).getParentRef();
-                            }
-                            else
-                            {
-                                throw new ACLEntryVoterException(
-                                        "The specified array is not of NodeRef or ChildAssociationRef");
-                            }
-                        }
-
-                        if ((testNodeRef == null) || permissionService.hasPermission(testNodeRef, cad.required))
-                        {
-                            incudedSet.set(i);
-                        }
-                    }
-                }
-            }
+        if (supportedDefinitions.size() == 0)
+        {
+            return returnedObject;
         }
         
-        if(incudedSet.cardinality() == returnedObject.length)
+        
+        for (int i = 0, l = returnedObject.length; i < l; i++)
+        {
+            Object current = returnedObject[i];
+            boolean allowed = true;
+            for (ConfigAttributeDefintion cad : supportedDefinitions)
+            {
+                incudedSet.set(i, true);
+                NodeRef testNodeRef = null;
+                if (cad.typeString.equals(AFTER_ACL_NODE))
+                {
+                    if (NodeRef.class.isAssignableFrom(current.getClass()))
+                    {
+                        testNodeRef = (NodeRef) current;
+                    }
+                    else if (ChildAssociationRef.class.isAssignableFrom(current.getClass()))
+                    {
+                        testNodeRef = ((ChildAssociationRef) current).getChildRef();
+                    }
+                    else
+                    {
+                        throw new ACLEntryVoterException(
+                                "The specified array is not of NodeRef or ChildAssociationRef");
+                    }
+                }
+                
+                    else if (cad.typeString.equals(AFTER_ACL_PARENT))
+                    {
+                        if (NodeRef.class.isAssignableFrom(current.getClass()))
+                        {
+                            testNodeRef = nodeService.getPrimaryParent((NodeRef) current).getParentRef();
+                        }
+                        else if (ChildAssociationRef.class.isAssignableFrom(current.getClass()))
+                        {
+                            testNodeRef = ((ChildAssociationRef) current).getParentRef();
+                        }
+                        else
+                        {
+                            throw new ACLEntryVoterException(
+                                    "The specified array is not of NodeRef or ChildAssociationRef");
+                        }
+                    }
+                
+
+                if (incudedSet.get(i)
+                        && (testNodeRef != null)
+                        && !permissionService.hasPermission(testNodeRef, cad.required))
+                {
+                    incudedSet.set(i, false);
+                }
+                
+            }
+        }
+
+        if (incudedSet.cardinality() == returnedObject.length)
         {
             return returnedObject;
         }
         else
         {
             Object[] answer = new Object[incudedSet.cardinality()];
-            for(int i = incudedSet.nextSetBit(0), p = 0; i >= 0; i = incudedSet.nextSetBit(++i), p++)
+            for (int i = incudedSet.nextSetBit(0), p = 0; i >= 0; i = incudedSet.nextSetBit(++i), p++)
             {
                 answer[p] = returnedObject[i];
             }

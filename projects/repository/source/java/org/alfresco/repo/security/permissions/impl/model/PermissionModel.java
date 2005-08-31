@@ -313,7 +313,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
             PermissionSet permissionSet = permissionSets.get(type);
             if (!exposedOnly || (permissionSet == null) || permissionSet.exposeAll())
             {
-               addTypePermissions(aspectDef.getParentName(), permissions, exposedOnly);
+                addAspectPermissions(aspectDef.getParentName(), permissions, exposedOnly);
             }
         }
         mergePermissions(permissions, type, exposedOnly);
@@ -405,7 +405,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
         {
             for (PermissionGroup pg : ps.getPermissionGroups())
             {
-                if (pg.getIncludedPermissionGroups().contains(permissionReference))
+                if (grants(pg, permissionReference))
                 {
                     permissions.add(getBasePermissionGroup(pg));
                 }
@@ -434,6 +434,26 @@ public class PermissionModel implements ModelDAO, InitializingBean
             }
         }
         return permissions;
+    }
+    
+    private boolean grants(PermissionGroup pg, PermissionReference permissionReference)
+    {
+        if (pg.getIncludedPermissionGroups().contains(permissionReference))
+        {
+            return true;
+        }
+        if(getGranteePermissions(pg).contains(permissionReference))
+        {
+            return true;
+        }
+        for(PermissionReference nested : pg.getIncludedPermissionGroups())
+        {
+            if(grants(getPermissionGroup(nested), permissionReference))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public synchronized Set<PermissionReference> getGranteePermissions(PermissionReference permissionReference)

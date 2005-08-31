@@ -24,9 +24,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.repo.webservice.authentication.AuthenticationFault;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ws.security.WSPasswordCallback;
@@ -74,8 +72,6 @@ public class TicketCallbackHandler implements CallbackHandler
             // ensure the ticket is valid
             try
             {
-               StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-               StoreContextHolder.setContext(storeRef);
                this.authenticationService.validate(ticket);
             }
             catch (AuthenticationException ae)

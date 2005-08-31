@@ -28,17 +28,18 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import javax.transaction.UserTransaction;
 
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import net.sf.acegisecurity.providers.dao.UsernameNotFoundException;
-
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
-import org.alfresco.repo.security.authentication.StoreContextHolder;
+import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -78,7 +79,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
     /**
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
-    public void contextInitialized(ServletContextEvent event)
+public void contextInitialized(ServletContextEvent event)
     {
         // make sure that the spaces store in the repository exists
         this.servletContext = event.getServletContext();
@@ -88,11 +89,13 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
         NodeService nodeService = registry.getNodeService();
         SearchService searchService = registry.getSearchService();
         NamespaceService namespaceService = registry.getNamespaceService();
+        AuthenticationComponent authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
 
         String repoStoreUrl = Application.getRepositoryStoreUrl(servletContext);
         if (repoStoreUrl == null)
         {
-            throw new AlfrescoRuntimeException("Repository store URL has not been configured, is 'store-url' element missing?");
+            throw new AlfrescoRuntimeException(
+                    "Repository store URL has not been configured, is 'store-url' element missing?");
         }
 
         // repo bootstrap code for our client
@@ -101,6 +104,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
         try
         {
             tx = transactionService.getUserTransaction();
+            authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
             tx.begin();
 
             // get and setup the initial store ref from config
@@ -133,16 +137,12 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             companySpaceId = nodes.get(0).getId();
             Application.setCompanyRootId(companySpaceId);
 
+            
             // check the admin user exists, create if it doesn't
-            RepositoryAuthenticationDao dao = (RepositoryAuthenticationDao) ctx.getBean("alfDaoImpl");
+            MutableAuthenticationDao dao = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
             // this is required to setup the ACEGI context before we can check
             // for the user
-            StoreContextHolder.setContext(storeRef);
-            try
-            {
-                dao.loadUserByUsername(ADMIN);
-            }
-            catch (UsernameNotFoundException ne)
+            if(!dao.userExists(ADMIN))
             {
                 ConfigService configService = (ConfigService) ctx.getBean(Application.BEAN_CONFIG_SERVICE);
                 // default to password of "admin" if we don't find config for it
@@ -164,9 +164,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
                 }
 
                 // create the Authentication instance for the "admin" user
-                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(ADMIN, password);
                 AuthenticationService authService = (AuthenticationService) ctx.getBean("authenticationService");
-                authService.createAuthentication(storeRef, token);
+                authService.createAuthentication(ADMIN, password.toCharArray());
 
                 // create the node to represent the Person instance for the
                 // admin user
@@ -181,24 +180,59 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
                 // Create the person under the special people system folder
                 // This is required to allow authenticate() to succeed during
                 // login
-                List<NodeRef> results = searchService.selectNodes(
-                        rootNodeRef,
-                        RepositoryAuthenticationDao.PEOPLE_FOLDER,
-                        null,
-                        namespaceService,
-                        false);
-                if (results.size() != 1)
+                List<NodeRef> results = searchService.selectNodes(rootNodeRef,
+                        RepositoryAuthenticationDao.PEOPLE_FOLDER, null, namespaceService, false);
+                NodeRef typesNode = null;
+                if (results.size() == 0)
                 {
-                    throw new Exception("Unable to find system types folder path: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
+                    List<ChildAssociationRef> result = nodeService.getChildAssocs(rootNodeRef, QName.createQName("sys",
+                            "system", namespaceService));
+                    NodeRef sysNode = null;
+                    if (result.size() == 0)
+                    {
+                        sysNode = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
+                                QName.createQName("sys", "system", namespaceService),
+                                ContentModel.TYPE_CONTAINER).getChildRef();
+                    }
+                    else
+                    {
+                        sysNode = result.get(0).getChildRef();
+                    }
+                    result = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people",
+                            namespaceService));
+                    
+                    if (result.size() == 0)
+                    {
+                        typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN,
+                                QName.createQName("sys", "people", namespaceService),
+                                ContentModel.TYPE_CONTAINER).getChildRef();
+                    }
+                    else
+                    {
+                        typesNode = result.get(0).getChildRef();
+                    }
+                    
+                }
+                else
+                {
+                    typesNode = results.get(0);
                 }
 
-                nodeService.createNode(
-                        results.get(0),
-                        ContentModel.ASSOC_CHILDREN,
-                        ContentModel.TYPE_PERSON, // expecting this qname path in the authentication methods
+                nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, // expecting
+                                                                                                                // this
+                                                                                                                // qname
+                                                                                                                // path
+                                                                                                                // in
+                                                                                                                // the
+                                                                                                                // authentication
+                                                                                                                // methods
                         ContentModel.TYPE_PERSON, props);
             }
 
+            PermissionService permissionService = (PermissionService)ctx.getBean("permissionService");
+            permissionService.setPermission(rootNodeRef, ADMIN, permissionService.getAllPermission(), true);
+            permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), new SimplePermissionReference(QName.createQName("sys", "base", registry.getNamespaceService()), "Read"), true);
+            
             // commit the transaction
             tx.commit();
         }
@@ -215,11 +249,11 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             catch (Exception ex)
             {
             }
+            try{ authenticationComponent.clearCurrentSecurityContext(); }  catch (Exception ex) {} 
             logger.error("Failed to initialise ", e);
             throw new AlfrescoRuntimeException("Failed to initialise ", e);
         }
     }
-
     /**
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
@@ -261,7 +295,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             // invalidate ticket
             WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
             AuthenticationService authService = (AuthenticationService) ctx.getBean("authenticationService");
-            authService.invalidate(user.getTicket());
+            authService.invalidateTicket(user.getTicket());
             event.getSession().removeAttribute(AuthenticationFilter.AUTHENTICATION_USER);
         }
     }

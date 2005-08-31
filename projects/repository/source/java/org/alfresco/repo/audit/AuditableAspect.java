@@ -18,15 +18,12 @@ package org.alfresco.repo.audit;
 
 import java.util.Date;
 
-import net.sf.acegisecurity.Authentication;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -174,14 +171,10 @@ public class AuditableAspect
      */
     private String getUsername()
     {
-        Authentication auth = authenticationService.getCurrentAuthentication();
-        if (auth != null)
+        String currentUserName = authenticationService.getCurrentUserName();
+        if (currentUserName != null)
         {
-            RepositoryUser user = (RepositoryUser)auth.getPrincipal();
-            if (user != null)
-            {
-                return user.getUsername();
-            }
+           return currentUserName;
         }
         return USERNAME_UNKNOWN;
     }

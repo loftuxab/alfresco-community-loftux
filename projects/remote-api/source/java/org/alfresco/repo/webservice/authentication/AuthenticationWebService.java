@@ -18,11 +18,8 @@ package org.alfresco.repo.webservice.authentication;
 
 import java.rmi.RemoteException;
 
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,13 +50,9 @@ public class AuthenticationWebService implements AuthenticationServiceSoapPort
     */
    public AuthenticationResult authenticate(String username, String password) throws RemoteException, AuthenticationFault
    {
-      // TODO: This needs to be configured or passed in as a parameter
-      StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-      
       try
       {
-         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-         this.authenticationService.authenticate(storeRef, token);
+         this.authenticationService.authenticate(username, password.toCharArray());
          String ticket = this.authenticationService.getCurrentTicket();
          
          if (logger.isDebugEnabled())

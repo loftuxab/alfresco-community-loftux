@@ -53,6 +53,7 @@
                 <value>org/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
                 <value>org/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
                 <value>org/alfresco/repo/domain/hibernate/VersionCount.hbm.xml</value>
+                <value>org/alfresco/repo/security/permissions/impl/hibernate/Permission.hbm.xml</value>
             </list>
         </property>
         <property name="hibernateProperties">
@@ -339,6 +340,12 @@
         <property name="nodeService">
             <ref bean="NodeService" />
         </property>
+        <property name="authenticationComponent">
+            <ref bean="authenticationComponent" />
+        </property>
+        <property name="permissionService">
+            <ref bean="permissionService" />
+        </property>
     </bean>
 
     <!--                 -->
@@ -572,6 +579,7 @@
     <bean id="authenticationManager" class="net.sf.acegisecurity.providers.ProviderManager">
         <property name="providers">
             <list>
+                <ref bean="authenticatedAuthenticationPassthroughProvider" />
                 <ref bean="daoAuthenticationProvider" />
             </list>
         </property>
@@ -589,32 +597,44 @@
         </property>
     </bean>
 
-    <bean id="alfDaoImpl" class="org.alfresco.repo.security.authentication.RepositoryAuthenticationDao">
-        <property name="nodeService">
-            <ref bean="nodeService" />
+    <bean id="authenticatedAuthenticationPassthroughProvider" class="org.alfresco.repo.security.authentication.AuthenticatedAuthenticationPassthroughProvider" />
+
+    <alias alias="saltSource" name="alfDaoImpl"/> 
+
+    <bean id="alfDaoImpl" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.repo.security.authentication.MutableAuthenticationDao</value>
         </property>
-        <property name="dictionaryService">
-            <ref bean="dictionaryService" />
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
         </property>
-        <property name="namespaceService">
-            <ref bean="namespaceService" />
+        <property name="target">
+           <bean  class="org.alfresco.repo.security.authentication.RepositoryAuthenticationDao">
+              <property name="nodeService">
+                  <ref bean="nodeService" />
+              </property>
+              <property name="dictionaryService">
+                  <ref bean="dictionaryService" />
+              </property>
+              <property name="namespaceService">
+                  <ref bean="namespaceService" />
+              </property>
+              <property name="passwordEncoder">
+                  <ref bean="passwordEncoder" />
+              </property>
+              <property name="searchService">
+                  <ref bean="searchService" />
+              </property>
+           </bean>
         </property>
-        <property name="passwordEncoder">
-            <ref bean="passwordEncoder" />
-        </property>
-        <property name="searchService">
-            <ref bean="searchService" />
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
         </property>
     </bean>
 
     <bean id="passwordEncoder" class="net.sf.acegisecurity.providers.encoding.ShaPasswordEncoder"></bean>
-
-    <bean id="saltSource" class="net.sf.acegisecurity.providers.dao.salt.ReflectionSaltSource">
-        <property name="userPropertyToUse">
-            <value>getSalt</value>
-        </property>
-    </bean>
-
 
     <!-- TODO: Move to public-services-context -->
 
@@ -636,7 +656,43 @@
                 <property name="ticketComponent">
                     <ref bean="ticketComponent" />
                 </property>
+                <property name="authenticationComponent">
+                    <ref bean="authenticationComponent" />
+                </property>
             </bean>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="authenticationComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.repo.security.authentication.AuthenticationComponent</value>
+        </property>
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+          <bean class="org.alfresco.repo.security.authentication.AuthenticationComponentImpl">
+             <property name="authenticationDao">
+                <ref bean="alfDaoImpl" />
+             </property>
+             <property name="nodeService">
+                <ref bean="nodeService" />
+             </property>
+             <property name="searchService">
+                <ref bean="searchService" />
+             </property>
+             <property name="dictionaryService">
+                <ref bean="dictionaryService" />
+             </property>
+             <property name="namespacePrefixResolver">
+                <ref bean="namespaceService" />
+             </property>
+           </bean>
         </property>
         <property name="transactionAttributes">
             <props>
@@ -656,10 +712,7 @@
             <value>false</value>
         </property>
     </bean>
-
-    <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true"
-        lazy-init="default" autowire="default" dependency-check="default" />
-
+    
     <!-- Importer -->
 
     <bean id="viewParser" class="org.alfresco.repo.importer.view.ViewParser">
@@ -708,6 +761,9 @@
         </property>
         <property name="storeUrl">
             <value>workspace://SpacesStore</value>
+        </property>
+        <property name="authenticationComponent">
+            <ref bean="authenticationComponent" />
         </property>
         <property name="configuration">
             <props>
@@ -772,30 +828,6 @@
                 <property name="nodeService">
                     <ref bean="nodeService" />
                 </property>
-            </bean>
-        </property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
-
-    <!--                         -->
-    <!-- Support for permissions -->
-    <!--                         -->
-
-    <!-- TODO: Move to public-services-context - Permission Service -->
-
-    <bean id='permissionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="proxyInterfaces">
-            <value>org.alfresco.repo.security.permissions.PermissionService</value>
-        </property>
-        <property name="transactionManager">
-            <ref bean="transactionManager" />
-        </property>
-        <property name="target">
-            <bean class="org.alfresco.repo.security.permissions.noop.PermissionServiceNOOPImpl">
             </bean>
         </property>
         <property name="transactionAttributes">

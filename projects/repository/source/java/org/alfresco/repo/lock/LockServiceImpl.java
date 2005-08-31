@@ -22,14 +22,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.acegisecurity.Authentication;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.lock.LockType;
@@ -136,7 +133,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType)
      */
-    public synchronized void lock(NodeRef nodeRef, NodeRef userRef, LockType lockType)
+    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType)
         throws UnableToAquireLockException, AspectMissingException
     {
         // Check for lock aspect
@@ -148,7 +145,7 @@ public class LockServiceImpl implements LockService
             lockType = LockType.WRITE_LOCK;
         }
         
-        LockStatus currentLockStatus = getLockStatus(nodeRef, userRef);
+        LockStatus currentLockStatus = getLockStatus(nodeRef, userName);
         if (LockStatus.LOCKED.equals(currentLockStatus) == true)
         {
             // Error since we are trying to lock a locked node
@@ -160,7 +157,7 @@ public class LockServiceImpl implements LockService
 			try
 			{
 	            // Set the current user as the lock owner
-	            this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_OWNER, userRef);
+	            this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_OWNER, userName);
 	            this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_TYPE, lockType.toString());
 			}
 			finally
@@ -173,17 +170,17 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType, boolean)
      */
-    public synchronized void lock(NodeRef nodeRef, NodeRef userRef, LockType lockType, boolean lockChildren)
+    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType, boolean lockChildren)
         throws UnableToAquireLockException, AspectMissingException
     {
-        lock(nodeRef, userRef, LockType.WRITE_LOCK);
+        lock(nodeRef, userName, LockType.WRITE_LOCK);
         
         if (lockChildren == true)
         {
             Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
             for (ChildAssociationRef childAssocRef : childAssocRefs)
             {
-                lock(childAssocRef.getChildRef(), userRef, lockType, lockChildren);
+                lock(childAssocRef.getChildRef(), userName, lockType, lockChildren);
             }
         }       
     }
@@ -191,26 +188,26 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(java.util.Collection, java.lang.String, LockType)
      */
-    public synchronized void lock(Collection<NodeRef> nodeRefs, NodeRef userRef, LockType lockType)
+    public synchronized void lock(Collection<NodeRef> nodeRefs, String userName, LockType lockType)
         throws UnableToAquireLockException, AspectMissingException
     {        
         // Lock each of the specifed nodes
         for (NodeRef nodeRef : nodeRefs)
         {
-            lock(nodeRef, userRef, LockType.WRITE_LOCK);
+            lock(nodeRef, userName, LockType.WRITE_LOCK);
         }        
     }
 
     /**
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String)
      */
-    public synchronized void unlock(NodeRef nodeRef, NodeRef userRef)
+    public synchronized void unlock(NodeRef nodeRef, String userName)
         throws UnableToReleaseLockException, AspectMissingException
     {
         // Check for lock aspect
         checkForLockApsect(nodeRef);
         
-        LockStatus lockStatus = getLockStatus(nodeRef, userRef);
+        LockStatus lockStatus = getLockStatus(nodeRef, userName);
         if (LockStatus.LOCKED.equals(lockStatus) == true)
         {
             // Error since the lock can only be released by the lock owner
@@ -235,11 +232,11 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String, boolean)
      */
-    public synchronized void unlock(NodeRef nodeRef, NodeRef userRef, boolean unlockChildren)
+    public synchronized void unlock(NodeRef nodeRef, String userName, boolean unlockChildren)
         throws UnableToReleaseLockException, AspectMissingException
     {
         // Unlock the parent
-        unlock(nodeRef, userRef);
+        unlock(nodeRef, userName);
         
         if (unlockChildren == true)
         {
@@ -247,7 +244,7 @@ public class LockServiceImpl implements LockService
             Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
             for (ChildAssociationRef childAssocRef : childAssocRefs)
             {
-                unlock(childAssocRef.getChildRef(), userRef, unlockChildren);
+                unlock(childAssocRef.getChildRef(), userName, unlockChildren);
             }
         }        
     }
@@ -255,12 +252,12 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.repo.lock.LockService#unlock(Collection<NodeRef>, String)
      */
-    public synchronized void unlock(Collection<NodeRef> nodeRefs, NodeRef userRef)
+    public synchronized void unlock(Collection<NodeRef> nodeRefs, String userName)
         throws UnableToReleaseLockException, AspectMissingException
     {        
         for (NodeRef nodeRef : nodeRefs)
         {
-            unlock(nodeRef, userRef);
+            unlock(nodeRef, userName);
         }         
     }
     
@@ -269,13 +266,13 @@ public class LockServiceImpl implements LockService
      */
     public LockStatus getLockStatus(NodeRef nodeRef) throws AspectMissingException
     {
-        return getLockStatus(nodeRef, getUserRef());
+        return getLockStatus(nodeRef, getUserName());
     }
     
     /**
      * @see org.alfresco.service.cmr.lock.LockService#getLockStatus(NodeRef, String)
      */
-    public LockStatus getLockStatus(NodeRef nodeRef, NodeRef userRef)
+    public LockStatus getLockStatus(NodeRef nodeRef, String userName)
         throws AspectMissingException
     {
         // Check for lock aspect
@@ -284,10 +281,10 @@ public class LockServiceImpl implements LockService
         LockStatus result = LockStatus.NO_LOCK;
         
         // Get the current lock owner
-        NodeRef currentUserRef = (NodeRef)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
+        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
         if (currentUserRef != null)
         {
-            if (currentUserRef.equals(userRef) == true)
+            if (currentUserRef.equals(userName) == true)
             {
                 result = LockStatus.LOCK_OWNER;
             }
@@ -344,17 +341,17 @@ public class LockServiceImpl implements LockService
 		throws NodeLockedException
     {
 		// Check the lock
-        checkForLockWithUser(nodeRef, getUserRef());
+        checkForLockWithUser(nodeRef, getUserName());
     }
     
     /**
      * @see LockService#checkForLockWithUser(NodeRef, String)
      */
-    public void checkForLockWithUser(NodeRef nodeRef, NodeRef userRef)
+    public void checkForLockWithUser(NodeRef nodeRef, String userName)
         throws NodeLockedException
     {     
 		// Ensure we have found a node reference
-        if (nodeRef != null && userRef != null)
+        if (nodeRef != null && userName != null)
         {
 			// Check to see if should just ignore this node
 			if (this.ignoreNodeRefs.contains(nodeRef) == false)
@@ -365,7 +362,7 @@ public class LockServiceImpl implements LockService
 	                if (LockType.WRITE_LOCK.equals(lockType) == true)
 	                {
 	                    // Get the current lock status on the node ref
-	                    LockStatus currentLockStatus = getLockStatus(nodeRef, userRef);
+	                    LockStatus currentLockStatus = getLockStatus(nodeRef, userName);
 	                    
 	                    if (LockStatus.LOCKED.equals(currentLockStatus) == true)
 	                    {
@@ -434,18 +431,8 @@ public class LockServiceImpl implements LockService
      * 
      * @return  the current user reference
      */
-    private NodeRef getUserRef()
+    private String getUserName()
     {
-        NodeRef userRef = null;
-        Authentication auth = this.authenticationService.getCurrentAuthentication();
-        if (auth != null)
-        {
-            RepositoryUser user = (RepositoryUser)auth.getPrincipal();
-            if (user != null)
-            {
-                userRef = user.getUserNodeRef();
-            }
-        }
-        return userRef;
+       return this.authenticationService.getCurrentUserName(); 
     }
 }

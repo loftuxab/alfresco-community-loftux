@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockType;
@@ -89,8 +88,8 @@ public class LockBehaviourImplTest extends BaseSpringTest
     /**
      * User node references
      */
-    private NodeRef goodUserNodeRef;
-    private NodeRef badUserNodeRef;
+    private String goodUserNodeRef;
+    private String badUserNodeRef;
    
     @Override
     protected void onSetUpInTransaction() throws Exception
@@ -107,7 +106,6 @@ public class LockBehaviourImplTest extends BaseSpringTest
         
         // Create a workspace that contains the 'live' nodes
         this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
-        StoreContextHolder.setContext(this.storeRef);
         
         // Get a reference to the root node
         NodeRef rootNodeRef = this.nodeService.getRootNode(this.storeRef);
@@ -137,9 +135,9 @@ public class LockBehaviourImplTest extends BaseSpringTest
         
         // Stash the user node ref's for later use
         TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.badUserNodeRef = TestWithUserUtils.getCurrentUserRef(this.authenticationService);
+        this.badUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);
         TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.goodUserNodeRef = TestWithUserUtils.getCurrentUserRef(this.authenticationService);     
+        this.goodUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);     
     }   
 
     /**

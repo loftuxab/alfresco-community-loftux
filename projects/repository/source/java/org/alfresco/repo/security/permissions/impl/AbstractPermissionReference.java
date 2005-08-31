@@ -52,4 +52,12 @@ public abstract class AbstractPermissionReference implements PermissionReference
     {
         return getQName().hashCode() * 37 + getName().hashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return getQName()+ "." + getName(); 
+    }
+    
+    
 }

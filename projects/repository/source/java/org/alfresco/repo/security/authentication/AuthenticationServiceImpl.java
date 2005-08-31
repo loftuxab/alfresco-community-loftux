@@ -16,21 +16,24 @@
  */
 package org.alfresco.repo.security.authentication;
 
+import java.util.Set;
+
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationManager;
 import net.sf.acegisecurity.UserDetails;
 import net.sf.acegisecurity.context.Context;
 import net.sf.acegisecurity.context.ContextHolder;
 import net.sf.acegisecurity.context.security.SecureContext;
-import net.sf.acegisecurity.context.security.SecureContextImpl;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
-import org.alfresco.repo.security.authentication.AuthenticationException;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 
 public class AuthenticationServiceImpl implements AuthenticationService
 {
     MutableAuthenticationDao authenticationDao;
+
+    AuthenticationComponent authenticationComponent;
 
     AuthenticationManager authenticationManager;
 
@@ -39,128 +42,6 @@ public class AuthenticationServiceImpl implements AuthenticationService
     public AuthenticationServiceImpl()
     {
         super();
-    }
-
-    public void createAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException
-    {
-        try
-        {
-            StoreContextHolder.setContext(storeRef);
-            authenticationDao.createUser(getUserName(authentication), getPassword(authentication));
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
-    }
-
-    public void updateAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException
-    {
-        try
-        {
-           StoreContextHolder.setContext(storeRef);
-           authenticationDao.updateUser(getUserName(authentication), getPassword(authentication));
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
-    }
-
-    public void deleteAuthentication(StoreRef storeRef, Authentication authentication) throws AuthenticationException
-    {
-        try
-        {
-            StoreContextHolder.setContext(storeRef);
-            authenticationDao.deleteUser(getUserName(authentication));
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
-    }
-
-    public Authentication authenticate(StoreRef storeRef, Authentication authentication) throws AuthenticationException
-    {
-        try
-        {
-            StoreContextHolder.setContext(storeRef);
-            return setCurrentAuthentication(authenticationManager.authenticate(authentication));
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
-    }
-
-    public Authentication getCurrentAuthentication() throws AuthenticationException
-    {
-        Context context = ContextHolder.getContext();
-        if ((context == null) || !(context instanceof SecureContext))
-        {
-            return null;
-        }
-        return ((SecureContext) context).getAuthentication();
-    }
-
-    private Authentication setCurrentAuthentication(Authentication authentication) throws AuthenticationException
-    {
-        Context context = ContextHolder.getContext();
-        SecureContext sc = null;
-        if ((context == null) || !(context instanceof SecureContext))
-        {
-            sc = new SecureContextImpl();
-            ContextHolder.setContext(sc);
-        }
-        else
-        {
-            sc = (SecureContext) context;
-        }
-        authentication.setAuthenticated(true);
-        sc.setAuthentication(authentication);
-        return authentication;
-    }
-
-    public void invalidate(Authentication authentication) throws AuthenticationException
-    {
-        ticketComponent.invalidateTicket(authentication);
-    }
-
-    private String getUserName(Authentication authentication)
-    {
-        String username = authentication.getPrincipal().toString();
-
-        if (authentication.getPrincipal() instanceof UserDetails)
-        {
-            username = ((UserDetails) authentication.getPrincipal()).getUsername();
-        }
-        return username;
-    }
-
-    private String getPassword(Authentication authentication)
-    {
-        return authentication.getCredentials().toString();
-    }
-
-    public void invalidate(String ticket) throws AuthenticationException
-    {
-        ticketComponent.invalidateTicket(ticket);
-    }
-
-    public Authentication validate(String ticket) throws AuthenticationException
-    {
-        return setCurrentAuthentication(ticketComponent.validateTicket(ticket));
-    }
-
-    public Authentication validate(Authentication authentication) throws AuthenticationException
-    {
-        return setCurrentAuthentication(ticketComponent.validateTicket(authentication));
-    }
-
-    public String getCurrentTicket()
-    {
-        setCurrentAuthentication(ticketComponent.addTicket(getCurrentAuthentication()));
-        return ticketComponent.extractTicket(getCurrentAuthentication());
     }
 
     public void setAuthenticationDao(MutableAuthenticationDao authenticationDao)
@@ -178,17 +59,183 @@ public class AuthenticationServiceImpl implements AuthenticationService
         this.ticketComponent = ticketComponent;
     }
 
-    public void clearCurrentSecurityContext()
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
-        ContextHolder.setContext(null);
+        this.authenticationComponent = authenticationComponent;
     }
 
-    public Authentication setAuthenticatedUser(String userName)
+    public void createAuthentication(String userName, char[] password) throws AuthenticationException
     {
-        RepositoryUserDetails ud = (RepositoryUserDetails)authenticationDao.loadUserByUsername(userName);
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, "", ud.getAuthorities());
-        auth.setDetails(ud);
-        auth.setAuthenticated(true);
-        return setCurrentAuthentication(auth);
+        try
+        {
+            authenticationDao.createUser(userName, new String(password));
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
     }
+
+    public void updateAuthentication(String userName, char[] oldPassword, char[] newPassword)
+            throws AuthenticationException
+    {
+        try
+        {
+            authenticationDao.updateUser(userName, new String(newPassword));
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
+    }
+
+    public void setAuthentication(String userName, char[] newPassword) throws AuthenticationException
+    {
+        try
+        {
+            authenticationDao.updateUser(userName, new String(newPassword));
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
+    }
+
+    public void deleteAuthentication(String userName) throws AuthenticationException
+    {
+        try
+        {
+            authenticationDao.deleteUser(userName);
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
+    }
+
+    public void authenticate(String userName, char[] password) throws AuthenticationException
+    {
+        try
+        {
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userName,
+                    new String(password));
+            authenticationManager.authenticate(authentication);
+            authenticationComponent.setCurrentUser(userName);
+
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
+    }
+
+    public String getCurrentUserName() throws AuthenticationException
+    {
+        Context context = ContextHolder.getContext();
+        if ((context == null) || !(context instanceof SecureContext))
+        {
+            return null;
+        }
+        return getUserName(((SecureContext) context).getAuthentication());
+    }
+
+    public void invalidateUserSession(String userName) throws AuthenticationException
+    {
+        ticketComponent.invalidateTicketByUser(userName);
+    }
+
+    public void invalidateTicket(String ticket) throws AuthenticationException
+    {
+        ticketComponent.invalidateTicketById(ticket);
+    }
+
+    private String getUserName(Authentication authentication)
+    {
+        String username = authentication.getPrincipal().toString();
+
+        if (authentication.getPrincipal() instanceof UserDetails)
+        {
+            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        }
+        return username;
+    }
+
+    public void validate(String ticket) throws AuthenticationException
+    {
+        authenticationComponent.setCurrentUser(ticketComponent.validateTicket(ticket));
+    }
+
+    public String getCurrentTicket()
+    {
+        return ticketComponent.getTicket(getCurrentUserName());
+    }
+
+    public void clearCurrentSecurityContext()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+    }
+
+    public Set<String> getCurrentUserRoles()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<String> getCurrentUserGroups()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<String> getUserRoles(String userName)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<String> getUserGroups(String userName)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<String> getAllUserRoles()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<String> getAllUserGroups()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Set<String> getAllUserNames()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public NodeRef synchronisePerson(StoreRef storeRef, String userName)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public NodeRef getPersonNodeRef(StoreRef storeRef, String userName)
+    {
+        return authenticationComponent.getPerson(storeRef, userName);
+    }
+
+    public boolean isCurrentUserTheSystemUser()
+    {
+        String userName = getCurrentUserName();
+        if ((userName != null) && userName.equals(authenticationComponent.getSystemUserName()))
+        {
+            return true;
+        }
+        return false;
+    }
+
 }

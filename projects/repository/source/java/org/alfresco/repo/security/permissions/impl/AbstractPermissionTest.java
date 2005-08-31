@@ -20,10 +20,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.ServiceRegistry;
@@ -67,66 +65,68 @@ public class AbstractPermissionTest extends BaseSpringTest
     protected SimplePermissionReference READ_CONTENT;
 
     protected SimplePermissionReference WRITE;
-    
+
     protected SimplePermissionReference DELETE;
-    
+
     protected SimplePermissionReference DELETE_NODE;
-    
+
     protected SimplePermissionReference DELETE_CHILDREN;
 
     protected SimplePermissionReference FULL_CONTROL;
 
     protected NodeRef systemNodeRef;
 
-    
+    protected AuthenticationComponent authenticationComponent;
+
+    protected ModelDAO permissionModelDAO;
+
     public AbstractPermissionTest()
     {
         super();
         // TODO Auto-generated constructor stub
     }
 
-
     protected void onSetUpInTransaction() throws Exception
     {
         nodeService = (NodeService) applicationContext.getBean("dbNodeService");
-        dictionaryService = (DictionaryService) applicationContext.getBean(ServiceRegistry.DICTIONARY_SERVICE.getLocalName());
+        dictionaryService = (DictionaryService) applicationContext.getBean(ServiceRegistry.DICTIONARY_SERVICE
+                .getLocalName());
         permissionService = (PermissionService) applicationContext.getBean("permissionService");
-        namespacePrefixResolver = (NamespacePrefixResolver) applicationContext.getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName());
+        namespacePrefixResolver = (NamespacePrefixResolver) applicationContext
+                .getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName());
         authenticationService = (AuthenticationService) applicationContext.getBean("authenticationService");
+        authenticationComponent = (AuthenticationComponent) applicationContext.getBean("authenticationComponent");
         serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-    
+        permissionModelDAO = (ModelDAO) applicationContext.getBean("permissionsModelDAO");
+
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
-    
+
         setUpPermissions();
-    
+
         QName children = ContentModel.ASSOC_CHILDREN;
         QName system = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "system");
         QName container = ContentModel.TYPE_CONTAINER;
         QName types = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "people");
-    
+
         systemNodeRef = nodeService.createNode(rootNodeRef, children, system, container).getChildRef();
         NodeRef typesNodeRef = nodeService.createNode(systemNodeRef, children, types, container).getChildRef();
         Map<QName, Serializable> props = createPersonProperties("andy");
         nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
         props = createPersonProperties("lemur");
         nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
-    
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("andy", "andy");
-        // create an authentication object e.g. the user
-        authenticationService.createAuthentication(storeRef, token);
-    
-        token = new UsernamePasswordAuthenticationToken("lemur", "lemur");
-        authenticationService.createAuthentication(storeRef, token);
-    }
 
+        // create an authentication object e.g. the user
+        authenticationService.createAuthentication("andy", "andy".toCharArray());
+
+        authenticationService.createAuthentication("lemur", "lemur".toCharArray());
+    }
 
     protected void onTearDownInTransaction()
     {
         super.onTearDownInTransaction();
         flushAndClear();
     }
-
 
     private void setUpPermissions()
     {
@@ -137,33 +137,32 @@ public class AbstractPermissionTest extends BaseSpringTest
                 "ReadChildren");
         READ_CONTENT = new SimplePermissionReference(QName.createQName("cm", "content", namespacePrefixResolver),
                 "ReadContent");
-    
+
         WRITE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Write");
-        
+
         DELETE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Delete");
-        
-        DELETE_CHILDREN = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "DeleteChildren");
-        
-        DELETE_NODE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "DeleteNode");
-    
+
+        DELETE_CHILDREN = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
+                "DeleteChildren");
+
+        DELETE_NODE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
+                "DeleteNode");
+
         FULL_CONTROL = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
                 "FullControl");
-    
-    }
 
+    }
 
     protected void runAs(String userName)
     {
-        Authentication woof = authenticationService.authenticate(rootNodeRef.getStoreRef(),
-                new UsernamePasswordAuthenticationToken(userName, userName));
-        assertNotNull(woof);
+        authenticationService.authenticate(userName, userName.toCharArray());
+        assertNotNull(authenticationService.getCurrentUserName());
         // for(GrantedAuthority authority : woof.getAuthorities())
         // {
         // System.out.println("Auth = "+authority.getAuthority());
         // }
-    
-    }
 
+    }
 
     private Map<QName, Serializable> createPersonProperties(String userName)
     {

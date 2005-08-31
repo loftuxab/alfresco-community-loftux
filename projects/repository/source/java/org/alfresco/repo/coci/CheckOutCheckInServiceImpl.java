@@ -20,14 +20,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.acegisecurity.Authentication;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInServiceException;
 import org.alfresco.service.cmr.lock.LockService;
@@ -262,15 +259,15 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		}
 		
 		// Get the user 
-		NodeRef userNodeRef = getUserNodeRef();
+		String userName = getUserName();
 		
 		// Apply the working copy aspect to the working copy
 		Map<QName, Serializable> workingCopyProperties = new HashMap<QName, Serializable>(1);
-		workingCopyProperties.put(ContentModel.PROP_WORKING_COPY_OWNER, userNodeRef);
+		workingCopyProperties.put(ContentModel.PROP_WORKING_COPY_OWNER, userName);
 		this.nodeService.addAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY, workingCopyProperties);
 		
 		// Lock the origional node
-		this.lockService.lock(nodeRef, userNodeRef, LockType.READ_ONLY_LOCK);
+		this.lockService.lock(nodeRef, userName, LockType.READ_ONLY_LOCK);
 		
 		// Return the working copy
 		return workingCopy;
@@ -281,25 +278,17 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
      * 
      * @return  the users node reference
      */
-    private NodeRef getUserNodeRef()
+    private String getUserName()
     {
-        NodeRef result = null;
-        Authentication auth = this.authenticationService.getCurrentAuthentication();
-        if (auth != null)
+        String un =  this.authenticationService.getCurrentUserName();
+        if (un != null)
         {
-            RepositoryUser user = (RepositoryUser)auth.getPrincipal();
-            if (user != null)
-            {
-                result = user.getUserNodeRef();
-            }
+           return un;
         }
-        
-        if (result == null)
+        else
         {
             throw new CheckOutCheckInServiceException("Can not find the currently authenticated user details required by the CheckOutCheckIn service.");
         }
-        
-        return result;
     }
 
 	/**
@@ -346,7 +335,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			try
 			{
 				// Release the lock
-				this.lockService.unlock(nodeRef, getUserNodeRef());
+				this.lockService.unlock(nodeRef, getUserName());
 			}
 			catch (UnableToReleaseLockException exception)
 			{
@@ -379,7 +368,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			else
 			{
 				// Re-lock the origional node
-				this.lockService.lock(nodeRef, getUserNodeRef(), LockType.READ_ONLY_LOCK);
+				this.lockService.lock(nodeRef, getUserName(), LockType.READ_ONLY_LOCK);
 			}
 			
 		}
@@ -439,7 +428,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			}			
 			
 			// Release the lock on the origional node
-			this.lockService.unlock(nodeRef, getUserNodeRef());
+			this.lockService.unlock(nodeRef, getUserName());
 			
 			// Delete the working copy
 			this.nodeService.deleteNode(workingCopyNodeRef);

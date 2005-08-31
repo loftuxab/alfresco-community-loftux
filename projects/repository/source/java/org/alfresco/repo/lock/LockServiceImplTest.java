@@ -60,8 +60,8 @@ public class LockServiceImplTest extends BaseSpringTest
     private static final String BAD_USER_NAME = "badUser";
     private static final String PWD = "password";
     
-    private NodeRef badUserNodeRef;
-    private NodeRef goodUserNodeRef;
+    private String badUserNodeRef;
+    private String goodUserNodeRef;
 
     /**
      * Called during the transaction setup
@@ -125,9 +125,9 @@ public class LockServiceImplTest extends BaseSpringTest
         
         // Stash the user node ref's for later use
         TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.badUserNodeRef = TestWithUserUtils.getCurrentUserRef(this.authenticationService);
+        this.badUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);
         TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.goodUserNodeRef = TestWithUserUtils.getCurrentUserRef(this.authenticationService);  
+        this.goodUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);  
     }
     
     /**

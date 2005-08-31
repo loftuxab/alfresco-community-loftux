@@ -24,6 +24,7 @@ import java.util.Properties;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -60,6 +61,7 @@ public class ImporterBootstrap
     private List<Properties> bootstrapViews;
     private StoreRef storeRef;
     private Properties configuration;
+    private AuthenticationComponent authenticationComponent;
     
 
     /**
@@ -112,6 +114,12 @@ public class ImporterBootstrap
         this.bootstrapViews = bootstrapViews;
     }
     
+    
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+    {
+        this.authenticationComponent = authenticationComponent;
+    }
+
     /**
      * Sets the Store URL to bootstrap into
      * 
@@ -160,6 +168,7 @@ public class ImporterBootstrap
         }
         
         UserTransaction userTransaction = transactionService.getUserTransaction();
+        authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
 
         try
         {
@@ -220,6 +229,7 @@ public class ImporterBootstrap
         {
             // rollback the transaction
             try { if (userTransaction != null) {userTransaction.rollback();} } catch (Exception ex) {}
+            try {authenticationComponent.clearCurrentSecurityContext(); } catch (Exception ex) {}
             throw new AlfrescoRuntimeException("Bootstrap failed", e);
         }            
     }

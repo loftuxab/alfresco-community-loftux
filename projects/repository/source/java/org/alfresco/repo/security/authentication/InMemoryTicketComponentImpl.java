@@ -18,11 +18,8 @@ package org.alfresco.repo.security.authentication;
 
 import java.util.Date;
 import java.util.HashMap;
-
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.GrantedAuthority;
-import net.sf.acegisecurity.GrantedAuthorityImpl;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.service.cmr.repository.datatype.Duration;
 import org.alfresco.util.GUID;
@@ -43,58 +40,20 @@ public class InMemoryTicketComponentImpl implements TicketComponent
         super();
     }
 
-    public Authentication addTicket(Authentication authentication) throws AuthenticationException
+    public String getTicket(String userName) throws AuthenticationException
     {
-        if (!authentication.isAuthenticated())
-        {
-            throw new AuthenticationException("Tickets may not be issued for unauthenticated users!");
-        }
-        //Object details = authentication.getDetails();
-        if (authentication.getPrincipal() instanceof RepositoryUserDetails)
-        {
-            RepositoryUserDetails userDetails = (RepositoryUserDetails) authentication.getPrincipal();
             Date expiryDate = null;
             if (ticketsExpire)
             {
                 expiryDate = Duration.add(new Date(), validDuration);
             }
-            Ticket ticket = new Ticket(ticketsExpire, expiryDate, authentication);
+            Ticket ticket = new Ticket(ticketsExpire, expiryDate, userName);
             tickets.put(ticket.getTicketId(), ticket);
-            GrantedAuthority[] gas = new GrantedAuthority[authentication.getAuthorities().length + 1];
-            System.arraycopy(authentication.getAuthorities(), 0, gas, 0, authentication.getAuthorities().length);
-            gas[gas.length - 1] = new GrantedAuthorityImpl(GRANTED_AUTHORITY_TICKET_PREFIX + ticket.getTicketId());
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), gas);
-            auth.setDetails(userDetails);
-            auth.setAuthenticated(authentication.isAuthenticated());
-            return auth;
-        }
-        else
-        {
-            throw new AuthenticationException("Tickets may only be generated for RepositoryUserDetails not " + authentication.getPrincipal().getClass().getName());
-        }
+       
+            return GRANTED_AUTHORITY_TICKET_PREFIX + ticket.getTicketId();
     }
 
-    public Authentication validateTicket(Authentication authentication) throws AuthenticationException
-    {
-        String ticketString = extractTicket(authentication);
-        return validateTicket(ticketString);
-    }
-
-    public String extractTicket(Authentication authentication)
-    {
-        GrantedAuthority[] gas = authentication.getAuthorities();
-
-        for (GrantedAuthority ga : gas)
-        {
-            if (ga.getAuthority().startsWith(GRANTED_AUTHORITY_TICKET_PREFIX))
-            {
-                return ga.getAuthority();
-            }
-        }
-        throw new AuthenticationException("No ticket information present under granted authority " + GRANTED_AUTHORITY_TICKET_PREFIX + " ...");
-    }
-
-    public Authentication validateTicket(String ticketString)
+    public String validateTicket(String ticketString) throws AuthenticationException
     {
         if (ticketString.length() < GRANTED_AUTHORITY_TICKET_PREFIX.length())
         {
@@ -117,23 +76,32 @@ public class InMemoryTicketComponentImpl implements TicketComponent
         {
             tickets.remove(key);
         }
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ticket.getAuthentication().getPrincipal(), ticket.getAuthentication().getCredentials(),
-                ticket.getAuthentication().getAuthorities());
-        auth.setDetails(ticket.getAuthentication().getDetails());
-        auth.setAuthenticated(ticket.getAuthentication().isAuthenticated());
-        return auth;
-    }
-
-    public void invalidateTicket(Authentication authentication)
-    {
-        String ticketString = extractTicket(authentication);
-        invalidateTicket(ticketString);
+        return ticket.getUserName();
     }
     
-    public void invalidateTicket(String ticketString)
+    public void invalidateTicketById(String ticketString)
     {
         String key = ticketString.substring(GRANTED_AUTHORITY_TICKET_PREFIX.length());
         tickets.remove(key);
+    }
+    
+    public void invalidateTicketByUser(String userName)
+    {
+        Set<String> toRemove = new HashSet<String>();
+        
+        for(String key: tickets.keySet())
+        {
+            Ticket ticket = tickets.get(key);
+            if(ticket.getUserName().equals(userName))
+            {
+                toRemove.add(ticket.getTicketId());
+            }
+        }
+        
+        for(String id: toRemove)
+        {
+            tickets.remove(id);
+        }
     }
     
     
@@ -144,15 +112,15 @@ public class InMemoryTicketComponentImpl implements TicketComponent
 
         private Date expiryDate;
 
-        private Authentication authentication;
+        private String userName;
 
         private String ticketId;
 
-        Ticket(boolean expires, Date expiryDate, Authentication authentication)
+        Ticket(boolean expires, Date expiryDate, String userName)
         {
             this.expires = expires;
             this.expiryDate = expiryDate;
-            this.authentication = authentication;
+            this.userName = userName;
             this.ticketId = GUID.generate();
         }
 
@@ -184,7 +152,7 @@ public class InMemoryTicketComponentImpl implements TicketComponent
                 return false;
             }
             Ticket t = (Ticket) o;
-            return (this.expires == t.expires) && this.expiryDate.equals(t.expiryDate) && this.authentication.equals(t.authentication) && this.ticketId.equals(t.ticketId);
+            return (this.expires == t.expires) && this.expiryDate.equals(t.expiryDate) && this.userName.equals(t.userName) && this.ticketId.equals(t.ticketId);
         }
 
         public int hashCode()
@@ -207,9 +175,9 @@ public class InMemoryTicketComponentImpl implements TicketComponent
             return ticketId;
         }
 
-        protected Authentication getAuthentication()
+        protected String getUserName()
         {
-            return authentication;
+            return userName;
         }
 
     }

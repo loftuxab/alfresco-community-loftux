@@ -14,20 +14,22 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.security.authentication;
+package org.alfresco.repo.security.permissions.impl.acegi;
 
-import org.alfresco.service.cmr.repository.StoreRef;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 
-public class StoreContextHolder extends RepositoryAuthenticationDao
+public class AlwaysProcedeMethodInterceptor implements MethodInterceptor
 {
-    private static ThreadLocal<StoreRef> contextHolder = new ThreadLocal<StoreRef>();
 
-    public static void setContext(StoreRef store) {
-        contextHolder.set(store);
+    public AlwaysProcedeMethodInterceptor()
+    {
+        super();
     }
 
-    public static StoreRef getContext() {
-        return contextHolder.get();
+    public Object invoke(MethodInvocation mi) throws Throwable
+    {
+        return mi.proceed();
     }
-    
+
 }

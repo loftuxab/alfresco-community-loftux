@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationManager;
 import net.sf.acegisecurity.BadCredentialsException;
+import net.sf.acegisecurity.UserDetails;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.dao.SaltSource;
 import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
@@ -65,7 +66,7 @@ public class AuthenticationTest extends TestCase
 
     private PasswordEncoder passwordEncoder;
 
-    private RepositoryAuthenticationDao dao;
+    private MutableAuthenticationDao dao;
 
     private AuthenticationManager authenticationManager;
 
@@ -74,6 +75,8 @@ public class AuthenticationTest extends TestCase
     private TicketComponent ticketComponent;
 
     private AuthenticationService authenticationService;
+    
+    private AuthenticationComponent authenticationComponent;
 
     public AuthenticationTest()
     {
@@ -94,8 +97,9 @@ public class AuthenticationTest extends TestCase
         passwordEncoder = (PasswordEncoder) ctx.getBean("passwordEncoder");
         ticketComponent = (TicketComponent) ctx.getBean("ticketComponent");
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
+        authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
 
-        dao = (RepositoryAuthenticationDao) ctx.getBean("alfDaoImpl");
+        dao = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
         authenticationManager = (AuthenticationManager) ctx.getBean("authenticationManager");
         saltSource = (SaltSource) ctx.getBean("saltSource");
 
@@ -104,7 +108,6 @@ public class AuthenticationTest extends TestCase
         userTransaction.begin();
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
-        StoreContextHolder.setContext(storeRef);
         rootNodeRef = nodeService.getRootNode(storeRef);
 
         QName children = ContentModel.ASSOC_CHILDREN;
@@ -134,8 +137,8 @@ public class AuthenticationTest extends TestCase
         dao.setDictionaryService(dictionaryService);
         dao.setNamespaceService(getNamespacePrefixReolsver(""));
         dao.setPasswordEncoder(passwordEncoder);
-
-        assertNotNull(dao.getPersonOrNull("andy"));
+      
+        assertNotNull(authenticationComponent.getPerson(rootNodeRef.getStoreRef(), "andy"));
     }
 
     public void testCreateAndyUserAndOtherCRUD()
@@ -150,12 +153,11 @@ public class AuthenticationTest extends TestCase
         dao.createUser("andy", "cabbage");
         assertNotNull(dao.getUserOrNull("andy"));
 
-        RepositoryUserDetails andyDetails = (RepositoryUserDetails) dao.loadUserByUsername("andy");
+        UserDetails andyDetails = (UserDetails) dao.loadUserByUsername("andy");
         assertNotNull(andyDetails);
-        assertNotNull(andyDetails.getPersonNodeRef());
-        assertNotNull(andyDetails.getUserNodeRef());
+        assertNotNull(authenticationComponent.getPerson(rootNodeRef.getStoreRef(), "andy"));
         assertEquals("andy", andyDetails.getUsername());
-        assertNotNull(andyDetails.getSalt());
+        assertNotNull(dao.getSalt(andyDetails));
         assertTrue(andyDetails.isAccountNonExpired());
         assertTrue(andyDetails.isAccountNonLocked());
         assertTrue(andyDetails.isCredentialsNonExpired());
@@ -164,13 +166,13 @@ public class AuthenticationTest extends TestCase
         assertEquals(andyDetails.getPassword(), passwordEncoder.encodePassword("cabbage", saltSource.getSalt(andyDetails)));
         assertEquals(1, andyDetails.getAuthorities().length);
 
+        Object oldSalt = dao.getSalt(andyDetails);
         dao.updateUser("andy", "carrot");
-        RepositoryUserDetails newDetails = (RepositoryUserDetails) dao.loadUserByUsername("andy");
+        UserDetails newDetails = (UserDetails) dao.loadUserByUsername("andy");
         assertNotNull(newDetails);
-        assertNotNull(newDetails.getPersonNodeRef());
-        assertNotNull(newDetails.getUserNodeRef());
+        assertNotNull(authenticationComponent.getPerson(rootNodeRef.getStoreRef(), "andy"));
         assertEquals("andy", newDetails.getUsername());
-        assertNotNull(newDetails.getSalt());
+        assertNotNull(dao.getSalt(newDetails));
         assertTrue(newDetails.isAccountNonExpired());
         assertTrue(newDetails.isAccountNonLocked());
         assertTrue(newDetails.isCredentialsNonExpired());
@@ -179,9 +181,8 @@ public class AuthenticationTest extends TestCase
         assertEquals(1, newDetails.getAuthorities().length);
 
         assertNotSame(andyDetails.getPassword(), newDetails.getPassword());
-        assertNotSame(andyDetails.getSalt(), newDetails.getSalt());
-        assertEquals(andyDetails.getPersonNodeRef(), newDetails.getPersonNodeRef());
-        assertEquals(andyDetails.getUserNodeRef(), newDetails.getUserNodeRef());
+        assertNotSame(oldSalt, dao.getSalt(newDetails));
+        assertNotNull(authenticationComponent.getPerson(rootNodeRef.getStoreRef(), "andy"));
 
         dao.deleteUser("andy");
         assertNull(dao.getUserOrNull("andy"));
@@ -196,6 +197,9 @@ public class AuthenticationTest extends TestCase
 
         Authentication result = authenticationManager.authenticate(token);
         assertNotNull(result);
+        
+        dao.deleteUser("andy");
+        //assertNull(dao.getUserOrNull("andy"));
     }
 
     public void testAuthenticationFailure()
@@ -215,6 +219,8 @@ public class AuthenticationTest extends TestCase
         {
             // Expected
         }
+        dao.deleteUser("andy");
+       // assertNull(dao.getUserOrNull("andy"));
     }
 
     public void testTicket()
@@ -227,12 +233,12 @@ public class AuthenticationTest extends TestCase
         Authentication result = authenticationManager.authenticate(token);
         result.setAuthenticated(true);
 
-        result = ticketComponent.addTicket(result);
-        result = ticketComponent.validateTicket(result);
+        String ticket = ticketComponent.getTicket(getUserName(result));
+        String user = ticketComponent.validateTicket(ticket);
 
         try
         {
-            result = ticketComponent.validateTicket(result);
+            user = ticketComponent.validateTicket("INVALID");
             assertNotNull(null);
         }
         catch (AuthenticationException e)
@@ -240,34 +246,19 @@ public class AuthenticationTest extends TestCase
 
         }
 
-        result = ticketComponent.addTicket(result);
-        String ticketString = ticketComponent.extractTicket(result);
-        result = ticketComponent.validateTicket(ticketString);
-
-        result = ticketComponent.addTicket(result);
-        ticketString = ticketComponent.extractTicket(result);
-        ticketComponent.invalidateTicket(ticketString);
+        ticketComponent.invalidateTicketById(ticket);
         try
         {
-            result = ticketComponent.validateTicket(ticketString);
+            user = ticketComponent.validateTicket(ticket);
             assertNotNull(null);
         }
         catch (AuthenticationException e)
         {
 
         }
-
-        result = ticketComponent.addTicket(result);
-        ticketComponent.invalidateTicket(result);
-        try
-        {
-            ticketComponent.validateTicket(result);
-            assertNotNull(null);
-        }
-        catch (AuthenticationException e)
-        {
-
-        }
+        
+        dao.deleteUser("andy");
+        //assertNull(dao.getUserOrNull("andy"));
 
     }
 
@@ -286,9 +277,12 @@ public class AuthenticationTest extends TestCase
         Authentication result = authenticationManager.authenticate(token);
         result.setAuthenticated(true);
 
-        result = tc.addTicket(result);
-        tc.validateTicket(result);
-        tc.validateTicket(result);
+        String ticket = tc.getTicket(getUserName(result));
+        tc.validateTicket(ticket);
+        tc.validateTicket(ticket);
+        
+        dao.deleteUser("andy");
+        //assertNull(dao.getUserOrNull("andy"));
     }
 
     public void testTicketOneOff()
@@ -306,17 +300,20 @@ public class AuthenticationTest extends TestCase
         Authentication result = authenticationManager.authenticate(token);
         result.setAuthenticated(true);
 
-        result = tc.addTicket(result);
-        tc.validateTicket(result);
+        String ticket = tc.getTicket(getUserName(result));
+        tc.validateTicket(ticket);
         try
         {
-            tc.validateTicket(result);
+            tc.validateTicket(ticket);
             assertNotNull(null);
         }
         catch (AuthenticationException e)
         {
 
         }
+        
+        dao.deleteUser("andy");
+        //assertNull(dao.getUserOrNull("andy"));
     }
 
     public void testTicketExpires()
@@ -334,10 +331,10 @@ public class AuthenticationTest extends TestCase
         Authentication result = authenticationManager.authenticate(token);
         result.setAuthenticated(true);
 
-        result = tc.addTicket(result);
-        tc.validateTicket(result);
-        tc.validateTicket(result);
-        tc.validateTicket(result);
+        String ticket = tc.getTicket(getUserName(result));
+        tc.validateTicket(ticket);
+        tc.validateTicket(ticket);
+        tc.validateTicket(ticket);
         synchronized (this)
         {
             try
@@ -352,13 +349,16 @@ public class AuthenticationTest extends TestCase
         }
         try
         {
-            tc.validateTicket(result);
+            tc.validateTicket(ticket);
             assertNotNull(null);
         }
         catch (AuthenticationException e)
         {
 
         }
+        
+        dao.deleteUser("andy");
+        //assertNull(dao.getUserOrNull("andy"));
     }
 
     public void testTicketDoesNotExpire()
@@ -376,10 +376,10 @@ public class AuthenticationTest extends TestCase
         Authentication result = authenticationManager.authenticate(token);
         result.setAuthenticated(true);
 
-        result = tc.addTicket(result);
-        tc.validateTicket(result);
-        tc.validateTicket(result);
-        tc.validateTicket(result);
+        String ticket = tc.getTicket(getUserName(result));
+        tc.validateTicket(ticket);
+        tc.validateTicket(ticket);
+        tc.validateTicket(ticket);
         synchronized (this)
         {
             try
@@ -393,41 +393,38 @@ public class AuthenticationTest extends TestCase
             }
         }
 
-        tc.validateTicket(result);
+        tc.validateTicket(ticket);
+        
+        dao.deleteUser("andy");
+        //assertNull(dao.getUserOrNull("andy"));
 
     }
 
     public void testAuthenticationService()
     {
-        // token for user name and password pair
-        UsernamePasswordAuthenticationToken token1 = new UsernamePasswordAuthenticationToken("andy", "auth1");
-        UsernamePasswordAuthenticationToken token2 = new UsernamePasswordAuthenticationToken("andy", "auth2");
-        UsernamePasswordAuthenticationToken token3 = new UsernamePasswordAuthenticationToken("andy", "auth3");
         // create an authentication object e.g. the user
-        authenticationService.createAuthentication(rootNodeRef.getStoreRef(), token1);
+        authenticationService.createAuthentication("andy", "auth1".toCharArray());
 
         // authenticate with this user details
-        Authentication result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token1);
-        assertNotNull(result);
+        authenticationService.authenticate("andy", "auth1".toCharArray());
 
         // assert the user is authenticated
-        assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());
+        assertEquals("andy", authenticationService.getCurrentUserName());
         // delete the user authenticatiom object
 
-        authenticationService.deleteAuthentication(rootNodeRef.getStoreRef(), token1);
+        authenticationService.deleteAuthentication("andy");
 
         // create a new authentication user object
-        authenticationService.createAuthentication(rootNodeRef.getStoreRef(), token2);
+        authenticationService.createAuthentication("andy", "auth2".toCharArray());
         // change the password
-        authenticationService.updateAuthentication(rootNodeRef.getStoreRef(), token3);
+        authenticationService.setAuthentication("andy", "auth3".toCharArray());
         // authenticate again to assert password changed
-        result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token3);
-        assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());
+        authenticationService.authenticate("andy", "auth3".toCharArray());
 
         try
         {
-            result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token1);
-            assertNotNull(null);
+           authenticationService.authenticate("andy", "auth1".toCharArray());
+           assertNotNull(null);
         }
         catch (AuthenticationException e)
         {
@@ -435,7 +432,7 @@ public class AuthenticationTest extends TestCase
         }
         try
         {
-            result = authenticationService.authenticate(rootNodeRef.getStoreRef(), token2);
+            authenticationService.authenticate("andy", "auth2".toCharArray());
             assertNotNull(null);
         }
         catch (AuthenticationException e)
@@ -446,13 +443,13 @@ public class AuthenticationTest extends TestCase
         // get the ticket that represents the current user authentication instance
         String ticket = authenticationService.getCurrentTicket();
         // validate our ticket is still valid
-        result = authenticationService.validate(ticket);
+        authenticationService.validate(ticket);
 
         // destroy the ticket instance
-        authenticationService.invalidate(ticket);
+        authenticationService.invalidateTicket(ticket);
         try
         {
-            result = authenticationService.validate(ticket);
+            authenticationService.validate(ticket);
             assertNotNull(null);
         }
         catch (AuthenticationException e)
@@ -462,17 +459,30 @@ public class AuthenticationTest extends TestCase
         
         // clear any context and check we are no longer authenticated
         authenticationService.clearCurrentSecurityContext();
-        assertNull(authenticationService.getCurrentAuthentication());
+        assertNull(authenticationService.getCurrentUserName());
+        
+        dao.deleteUser("andy");
+        //assertNull(dao.getUserOrNull("andy"));
     }
 
     public void testPassThroughLogin()
     {
-        UsernamePasswordAuthenticationToken token1 = new UsernamePasswordAuthenticationToken("andy", "auth1");
-        authenticationService.createAuthentication(rootNodeRef.getStoreRef(), token1);
+        authenticationService.createAuthentication("andy", "auth1".toCharArray());
         
-        authenticationService.setAuthenticatedUser("andy");
-        assertTrue(authenticationService.getCurrentAuthentication().isAuthenticated());
-        assertEquals(1, authenticationService.getCurrentAuthentication().getAuthorities().length);
+        authenticationComponent.setCurrentUser("andy");
+        assertEquals("andy", authenticationService.getCurrentUserName());
+        
+    }
+    
+    private String getUserName(Authentication authentication)
+    {
+        String username = authentication.getPrincipal().toString();
+
+        if (authentication.getPrincipal() instanceof UserDetails)
+        {
+            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        }
+        return username;
     }
     
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)

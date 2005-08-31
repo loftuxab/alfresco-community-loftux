@@ -14,38 +14,33 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.security.authentication;
-
-import net.sf.acegisecurity.UserDetails;
+package org.alfresco.repo.security.permissions;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
- * Extension to the acegi user details to access the password salt
+ * The interface for a dynamic authority provider e.g. for the owner of a node
+ * or any other authority that is determined by the context rather than just a
+ * node.
  * 
- * @author andyh
- *
+ * @author Andy Hind
  */
-public interface RepositoryUserDetails extends UserDetails
+public interface DynamicAuthority
 {
     /**
-     * Get the salt
+     * Is this authority granted to the given user for this node ref?
      * 
+     * @param nodeRef
+     * @param userName
      * @return
      */
-    public String getSalt();
-   
+    public boolean hasAuthority(NodeRef nodeRef, String userName);
+
     /**
-     * A noderef for the user 
+     * If this authority is granted this method provides the string
+     * representation of the granted authority.
      * 
      * @return
      */
-    public NodeRef getUserNodeRef();
-    
-    /**
-     * A node ref for the person 
-     * 
-     * @return
-     */
-    public NodeRef getPersonNodeRef();
+    public String getAuthority();
 }

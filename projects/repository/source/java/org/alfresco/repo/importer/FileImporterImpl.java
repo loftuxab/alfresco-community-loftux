@@ -25,8 +25,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.acegisecurity.Authentication;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -163,8 +161,8 @@ public class FileImporterImpl implements FileImporter
         contentProps.put(ContentModel.PROP_NAME, file.getName());
         contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
         contentProps.put(ContentModel.PROP_MIME_TYPE, mimetypeService.guessMimetype(file.getName()));
-        Authentication currentAuth = authenticationService.getCurrentAuthentication();
-        contentProps.put(ContentModel.PROP_CREATOR, currentAuth == null ? "unknown" : currentAuth.getName());
+        String currentUser = authenticationService.getCurrentUserName();
+        contentProps.put(ContentModel.PROP_CREATOR, currentUser == null ? "unknown" : currentUser);
 
         // create the node to represent the node
         String assocName = QName.createValidLocalName(file.getName());

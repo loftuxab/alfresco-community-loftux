@@ -23,6 +23,7 @@ import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.providers.dao.User;
 
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.AccessPermission;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
@@ -36,6 +37,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -47,11 +50,15 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class PermissionServiceImpl implements PermissionService, InitializingBean
 {
+
+    private static Log log = LogFactory.getLog(PermissionServiceImpl.class);
+
     /*
      * ALL Permission
      */
-    private static final PermissionReference ALL_PERMISSION = new SimplePermissionReference(QName.createQName("\u0000", "\u0000"), "\u0000");
-    
+    private static final PermissionReference ALL_PERMISSION = new SimplePermissionReference(QName.createQName("\u0000",
+            "\u0000"), "\u0000");
+
     /*
      * Access to the model
      */
@@ -75,8 +82,15 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
     /*
      * Access to the authentication service
      */
-    private AuthenticationService authenticationService;    
-    
+
+    private AuthenticationService authenticationService;
+
+    /*
+     * Access to the authentication component
+     */
+
+    private AuthenticationComponent authenticationComponent;
+
     /*
      * Standard spring construction.
      */
@@ -114,7 +128,11 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         this.authenticationService = authenticationService;
     }
 
-    
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+    {
+        this.authenticationComponent = authenticationComponent;
+    }
+
     public void afterPropertiesSet() throws Exception
     {
         if (dictionaryService == null)
@@ -135,11 +153,15 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         }
         if (authenticationService == null)
         {
-            throw new IllegalArgumentException("There must be an authentication");
+            throw new IllegalArgumentException("There must be an authentication service");
         }
-        
+        if (authenticationComponent == null)
+        {
+            throw new IllegalArgumentException("There must be an authentication component");
+        }
+
     }
-    
+
     //
     // Permissions Service
     //
@@ -158,7 +180,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
     {
         return ALL_PERMISSION;
     }
-    
+
     public Set<AccessPermission> getPermissions(NodeRef nodeRef)
     {
         // TODO Auto-generated method stub
@@ -188,6 +210,22 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
     public boolean hasPermission(NodeRef nodeRef, PermissionReference perm)
     {
+        // If the node ref is null there is no sensible test to do - and there
+        // must be no permissions
+        // - so we allow it
+
+        if (nodeRef == null)
+        {
+            return true;
+        }
+
+        // If the permission is null we deny
+
+        if (perm == null)
+        {
+            return false;
+        }
+
         // If the node does not support the given permission there is no point
         // doing the test
         Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
@@ -207,7 +245,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
          */
 
         // Get the current authentications
-        Authentication auth = authenticationService.getCurrentAuthentication();
+        Authentication auth = authenticationComponent.getCurrentAuthentication();
 
         // Get the available authorisations
         Set<String> authorisations = getAuthorisations(auth);
@@ -216,7 +254,14 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         Set<QName> aspectQNames = nodeService.getAspects(nodeRef);
 
         NodeTest nt = new NodeTest(perm, typeQname, aspectQNames);
-        return nt.evaluate(authorisations, nodeRef);
+        boolean result = nt.evaluate(authorisations, nodeRef);
+        if (log.isDebugEnabled())
+        {
+            log.debug("Permission <"
+                    + perm + "> is " + (result ? "allowed" : "denied") + " for " + authenticationService.getCurrentUserName() + " on node "
+                    + nodeService.getPath(nodeRef));
+        }
+        return result;
 
     }
 
@@ -367,7 +412,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         }
 
         /**
-         * Internal hook point for recursion 
+         * Internal hook point for recursion
          * 
          * @param authorisations
          * @param nodeRef
@@ -405,7 +450,8 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
                     }
                     else
                     {
-                        // Much cheaper to do this as we go then check all the stack values for each parent
+                        // Much cheaper to do this as we go then check all the
+                        // stack values for each parent
                         recursiveOut = new MutableBoolean(false);
                     }
                 }

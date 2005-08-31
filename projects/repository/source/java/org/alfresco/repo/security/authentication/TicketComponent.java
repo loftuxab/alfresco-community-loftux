@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.security.authentication;
 
-import net.sf.acegisecurity.Authentication;
 
 /**
  * Manage authentication tickets
@@ -33,7 +32,7 @@ public interface TicketComponent
      * @return
      * @throws AuthenticationException
      */
-    public Authentication addTicket(Authentication authentication) throws AuthenticationException;
+    public String getTicket(String userName) throws AuthenticationException;
 
     /**
      * Check that a certificate is valid and can be used in place of a login.
@@ -59,13 +58,9 @@ public interface TicketComponent
      * @return
      * @throws AuthenticationException
      */
-    public Authentication validateTicket(Authentication authentication) throws AuthenticationException;
+    public String validateTicket(String ticket) throws AuthenticationException;
     
-    public Authentication validateTicket(String ticketString) throws AuthenticationException;
+    public void invalidateTicketById(String ticket);
     
-    public String extractTicket(Authentication authentication);
-    
-    public void invalidateTicket(String ticket);
-    
-    public void invalidateTicket(Authentication authentication);
+    public void invalidateTicketByUser(String userName);
 }

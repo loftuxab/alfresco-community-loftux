@@ -17,10 +17,13 @@
 package org.alfresco.repo.security.authentication;
 
 import net.sf.acegisecurity.providers.dao.AuthenticationDao;
+import net.sf.acegisecurity.providers.dao.SaltSource;
 
-public interface MutableAuthenticationDao extends AuthenticationDao
+public interface MutableAuthenticationDao extends AuthenticationDao, SaltSource
 {
     public void createUser(String userName, String rawPassword) throws AuthenticationException;
     public void updateUser(String userName, String rawPasswrod) throws AuthenticationException;
     public void deleteUser(String userName) throws AuthenticationException;
+    public boolean userExists(String userName);
+    
 }

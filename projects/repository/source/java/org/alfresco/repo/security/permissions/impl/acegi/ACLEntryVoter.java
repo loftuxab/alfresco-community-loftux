@@ -17,7 +17,9 @@
 package org.alfresco.repo.security.permissions.impl.acegi;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sf.acegisecurity.Authentication;
@@ -25,7 +27,7 @@ import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
-import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -35,6 +37,8 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -44,6 +48,8 @@ import org.springframework.beans.factory.InitializingBean;
 
 public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 {
+    private static Log log = LogFactory.getLog(ACLEntryVoter.class);
+
     private static final String ACL_NODE = "ACL_NODE";
 
     private static final String ACL_PARENT = "ACL_PARENT";
@@ -53,6 +59,8 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
     private NamespacePrefixResolver nspr;
 
     private NodeService nodeService;
+
+    private AuthenticationService authenticationService;
 
     public ACLEntryVoter()
     {
@@ -92,6 +100,16 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         this.nodeService = nodeService;
     }
 
+    public AuthenticationService getAuthenticationService()
+    {
+        return authenticationService;
+    }
+
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService;
+    }
+
     public void afterPropertiesSet() throws Exception
     {
         if (permissionService == null)
@@ -105,6 +123,10 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         if (nodeService == null)
         {
             throw new IllegalArgumentException("There must be a node service");
+        }
+        if (authenticationService == null)
+        {
+            throw new IllegalArgumentException("There must be an authentication service");
         }
 
     }
@@ -139,7 +161,26 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 
     public int vote(Authentication authentication, Object object, ConfigAttributeDefinition config)
     {
-        int defaultResult = AccessDecisionVoter.ACCESS_ABSTAIN;
+        if (log.isDebugEnabled())
+        {
+            MethodInvocation mi = (MethodInvocation) object;
+            log.debug("Method: " + mi.getMethod().toString());
+        }
+        if (authenticationService.isCurrentUserTheSystemUser())
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug("Access granted for the system user");
+            }
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+
+        List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
+
+        if (supportedDefinitions.size() == 0)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
 
         MethodInvocation invocation = (MethodInvocation) object;
 
@@ -148,104 +189,156 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 
         Iterator iter = config.getConfigAttributes();
 
+        for (ConfigAttributeDefintion cad : supportedDefinitions)
+        {
+            NodeRef testNodeRef = null;
+
+            if (cad.typeString.equals(ACL_NODE))
+            {
+                if (StoreRef.class.isAssignableFrom(params[cad.parameter]))
+                {
+                    if (invocation.getArguments()[cad.parameter] != null)
+                    {
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tPermission test against the store - using permissions on the root node");
+                        }
+                        StoreRef storeRef = (StoreRef) invocation.getArguments()[cad.parameter];
+                        if (nodeService.exists(storeRef))
+                        {
+                            testNodeRef = nodeService.getRootNode(storeRef);
+                        }
+                    }
+                }
+                else if (NodeRef.class.isAssignableFrom(params[cad.parameter]))
+                {
+                    testNodeRef = (NodeRef) invocation.getArguments()[cad.parameter];
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("\tPermission test on node " + nodeService.getPath(testNodeRef));
+                    }
+                }
+                else if (ChildAssociationRef.class.isAssignableFrom(params[cad.parameter]))
+                {
+                    if (invocation.getArguments()[cad.parameter] != null)
+                    {
+                        testNodeRef = ((ChildAssociationRef) invocation.getArguments()[cad.parameter]).getChildRef();
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tPermission test on node " + nodeService.getPath(testNodeRef));
+                        }
+                    }
+                }
+                else
+                {
+                    throw new ACLEntryVoterException("The specified parameter is not a NodeRef or ChildAssociationRef");
+                }
+            }
+            else if (cad.typeString.equals(ACL_PARENT))
+            {
+                // There is no point having parent permissions for store
+                // refs
+                if (NodeRef.class.isAssignableFrom(params[cad.parameter]))
+                {
+                    NodeRef child = (NodeRef) invocation.getArguments()[cad.parameter];
+                    if (child != null)
+                    {
+                        testNodeRef = nodeService.getPrimaryParent(child).getParentRef();
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tPermission test for parent on node " + nodeService.getPath(testNodeRef));
+                        }
+                    }
+                }
+                else if (ChildAssociationRef.class.isAssignableFrom(params[cad.parameter]))
+                {
+                    if (invocation.getArguments()[cad.parameter] != null)
+                    {
+                        testNodeRef = ((ChildAssociationRef) invocation.getArguments()[cad.parameter]).getParentRef();
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tPermission test for parent on child assoc ref for node "
+                                    + nodeService.getPath(testNodeRef));
+                        }
+                    }
+
+                }
+                else
+                {
+                    throw new ACLEntryVoterException("The specified parameter is not a ChildAssociationRef");
+                }
+            }
+
+            if (testNodeRef != null)
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("\t\tNode ref is not null");
+                }
+                if (!permissionService.hasPermission(testNodeRef, cad.required))
+                {
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("\t\tPermission is denied");
+                        Thread.dumpStack();
+                    }
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+            }
+        }
+
+        return AccessDecisionVoter.ACCESS_GRANTED;
+    }
+
+    private List<ConfigAttributeDefintion> extractSupportedDefinitions(ConfigAttributeDefinition config)
+    {
+        List<ConfigAttributeDefintion> definitions = new ArrayList<ConfigAttributeDefintion>();
+        Iterator iter = config.getConfigAttributes();
+
         while (iter.hasNext())
         {
             ConfigAttribute attr = (ConfigAttribute) iter.next();
 
             if (this.supports(attr))
             {
-                defaultResult = AccessDecisionVoter.ACCESS_DENIED;
-                StringTokenizer st = new StringTokenizer(attr.getAttribute(), ".", false);
-                if (st.countTokens() != 4)
-                {
-                    throw new ACLEntryVoterException("There must be four . separated tokens in each config attribute");
-                }
-                String typeString = st.nextToken();
-                String numberString = st.nextToken();
-                String qNameString = st.nextToken();
-                String permissionString = st.nextToken();
-
-                if (!(typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT)))
-                {
-                    throw new ACLEntryVoterException("Invalid type: must be ACL_NODE or ACL_PARENT");
-                }
-
-                int parameter = Integer.parseInt(numberString);
-
-                QName qName = QName.createQName(qNameString, nspr);
-
-                PermissionReference required = new SimplePermissionReference(qName, permissionString);
-
-                NodeRef testNodeRef = null;
-
-                if (typeString.equals(ACL_NODE))
-                {
-                    if (StoreRef.class.isAssignableFrom(params[parameter]))
-                    {
-                        if (invocation.getArguments()[parameter] != null)
-                        {
-                            testNodeRef = nodeService.getRootNode((StoreRef) invocation.getArguments()[parameter]);
-                        }
-                    }
-                    else if (NodeRef.class.isAssignableFrom(params[parameter]))
-                    {
-                        testNodeRef = (NodeRef) invocation.getArguments()[parameter];
-                    }
-                    else if (ChildAssociationRef.class.isAssignableFrom(params[parameter]))
-                    {
-                        if (invocation.getArguments()[parameter] != null)
-                        {
-                            testNodeRef = ((ChildAssociationRef) invocation.getArguments()[parameter]).getChildRef();
-                        }
-                    }
-                    else
-                    {
-                        throw new ACLEntryVoterException(
-                                "The specified parameter is not a NodeRef or ChildAssociationRef");
-                    }
-                }
-                else if (typeString.equals(ACL_PARENT))
-                {
-                    // There is no point having parent permissions for store
-                    // refs
-                    if (NodeRef.class.isAssignableFrom(params[parameter]))
-                    {
-                        NodeRef child = (NodeRef) invocation.getArguments()[parameter];
-                        if (child != null)
-                        {
-                            testNodeRef = nodeService.getPrimaryParent(child).getParentRef();
-                        }
-                    }
-                    else if (ChildAssociationRef.class.isAssignableFrom(params[parameter]))
-                    {
-                        if (invocation.getArguments()[parameter] != null)
-                        {
-                            testNodeRef = ((ChildAssociationRef) invocation.getArguments()[parameter]).getParentRef();
-                        }
-                    }
-                    else
-                    {
-                        throw new ACLEntryVoterException("The specified parameter is not a ChildAssociationRef");
-                    }
-                }
-
-                if (testNodeRef != null)
-                {
-                    if (permissionService.hasPermission(testNodeRef, required))
-                    {
-                        return AccessDecisionVoter.ACCESS_GRANTED;
-                    }
-                }
-                else
-                {
-                    // We allow access to null objects
-                    return AccessDecisionVoter.ACCESS_GRANTED;
-                }
-
+                definitions.add(new ConfigAttributeDefintion(attr));
             }
-        }
 
-        // No configuration attribute matched, so abstain
-        return defaultResult;
+        }
+        return definitions;
+    }
+
+    private class ConfigAttributeDefintion
+    {
+        String typeString;
+
+        SimplePermissionReference required;
+
+        int parameter;
+
+        ConfigAttributeDefintion(ConfigAttribute attr)
+        {
+            StringTokenizer st = new StringTokenizer(attr.getAttribute(), ".", false);
+            if (st.countTokens() != 4)
+            {
+                throw new ACLEntryVoterException("There must be four . separated tokens in each config attribute");
+            }
+            typeString = st.nextToken();
+            String numberString = st.nextToken();
+            String qNameString = st.nextToken();
+            String permissionString = st.nextToken();
+
+            if (!(typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT)))
+            {
+                throw new ACLEntryVoterException("Invalid type: must be ACL_NODE or ACL_PARENT");
+            }
+
+            parameter = Integer.parseInt(numberString);
+
+            QName qName = QName.createQName(qNameString, nspr);
+
+            required = new SimplePermissionReference(qName, permissionString);
+
+        }
     }
 }

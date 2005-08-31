@@ -19,12 +19,8 @@ package org.alfresco.util;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.RepositoryUser;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -66,8 +62,8 @@ public abstract class TestWithUserUtils extends BaseSpringTest
         NodeRef goodUserPerson = nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, properties).getChildRef();
         
         // Create the  users
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-        authenticationService.createAuthentication(rootNodeRef.getStoreRef(), token); 
+
+        authenticationService.createAuthentication(userName, password.toCharArray()); 
     }
 
     /**
@@ -84,8 +80,7 @@ public abstract class TestWithUserUtils extends BaseSpringTest
             NodeRef rootNodeRef,
             AuthenticationService authenticationService)
     {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-        authenticationService.authenticate(rootNodeRef.getStoreRef(), token);
+        authenticationService.authenticate(userName, password.toCharArray());
     }
     
     /**
@@ -94,25 +89,23 @@ public abstract class TestWithUserUtils extends BaseSpringTest
      * @param authenticationService     the authentication service
      * @return                          the currenlty authenticated user's node reference
      */
-    public static NodeRef getCurrentUserRef(AuthenticationService authenticationService)
+    public static String getCurrentUser(AuthenticationService authenticationService)
     {
-        NodeRef result = null;
-        Authentication auth = authenticationService.getCurrentAuthentication();
-        if (auth != null)
+        String un = authenticationService.getCurrentUserName();
+        if (un != null)
         {
-            RepositoryUser user = (RepositoryUser)auth.getPrincipal();
-            if (user != null)
-            {
-                result = user.getUserNodeRef();
-            }
+            return un;
         }
-        
-        if (result == null)
+        else
         {
             throw new RuntimeException("The current user could not be retrieved.");
         }
         
-        return result;
+    }
+
+    public static void deleteUser(String user_name, String pwd, NodeRef ref, NodeService service, AuthenticationService service2)
+    {
+        service2.deleteAuthentication(user_name);
     }
 
 }

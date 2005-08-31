@@ -785,7 +785,7 @@ public class RuleServiceCoverageTest extends TestCase
             if (childNodeRef.equals(newNodeRef) == true)
             {
                 // check that the node has been locked
-                LockStatus lockStatus = this.lockService.getLockStatus(childNodeRef, TestWithUserUtils.getCurrentUserRef(this.authenticationService));
+                LockStatus lockStatus = this.lockService.getLockStatus(childNodeRef, TestWithUserUtils.getCurrentUser(this.authenticationService));
                 assertEquals(LockStatus.LOCK_OWNER, lockStatus);
             }
             else if (this.nodeService.hasAspect(childNodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
@@ -837,7 +837,7 @@ public class RuleServiceCoverageTest extends TestCase
 		assertFalse(this.nodeService.exists(workingCopy));
 		
 		// Check that the origional is no longer locked
-		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(newNodeRef, TestWithUserUtils.getCurrentUserRef(this.authenticationService)));
+		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(newNodeRef, TestWithUserUtils.getCurrentUser(this.authenticationService)));
 		
 		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }

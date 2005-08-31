@@ -24,16 +24,18 @@ import java.util.Map;
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.GrantedAuthorityImpl;
 import net.sf.acegisecurity.UserDetails;
+import net.sf.acegisecurity.providers.dao.User;
 import net.sf.acegisecurity.providers.dao.UsernameNotFoundException;
 import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.QueryParameterDefImpl;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
@@ -44,20 +46,28 @@ import org.springframework.dao.DataAccessException;
 
 public class RepositoryAuthenticationDao implements MutableAuthenticationDao
 {
+
     public static final String SYSTEM_FOLDER = "/sys:system";
-    public static final String PEOPLE_FOLDER  = SYSTEM_FOLDER + "/sys:people";
-    
+
+    public static final String PEOPLE_FOLDER = SYSTEM_FOLDER + "/sys:people";
+
     private NodeService nodeService;
+
     private NamespacePrefixResolver namespacePrefixResolver;
+
     private DictionaryService dictionaryService;
+
     private SearchService searchService;
+
     private PasswordEncoder passwordEncoder;
 
+    private StoreRef userStoreRef;
+    
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
     }
-    
+
     public void setNamespaceService(NamespacePrefixResolver namespacePrefixResolver)
     {
         this.namespacePrefixResolver = namespacePrefixResolver;
@@ -72,63 +82,46 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     {
         this.passwordEncoder = passwordEncoder;
     }
-    
+
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
     }
-
+    
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException, DataAccessException
     {
-        //System.out.println("Getting user: "+userName);
         NodeRef userRef = getUserOrNull(userName);
-        if(userRef == null)
+        if (userRef == null)
         {
-            throw new UsernameNotFoundException("Could not find user by userName: "+userName);
+            throw new UsernameNotFoundException("Could not find user by userName: " + userName);
         }
-        
+
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-        String password = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "password", namespacePrefixResolver))); 
-        String salt = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "salt", namespacePrefixResolver))); 
-        
+        String password = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "password",
+                namespacePrefixResolver)));
+        // String salt = ValueConverter.convert(String.class,
+        // properties.get(QName.createQName("usr", "salt",
+        // namespacePrefixResolver)));
+
         // TODO: Get roles correctly
-        
+
         GrantedAuthority[] gas = new GrantedAuthority[1];
         gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
-        
-        NodeRef personRef = getPersonOrNull(userName);
-        if(personRef == null)
-        {
-            throw new UsernameNotFoundException("Could not find person by userName: "+userName);
-        }
-        
-        //System.out.println("\tFound user: "+userName);
-        RepositoryUserDetails ud = new RepositoryUser(userName, password, true, true, true, true, gas, salt, userRef, personRef);
+
+        UserDetails ud = new User(userName, password, true, true, true, true, gas);
         return ud;
     }
 
-    /*package for testing*/  NodeRef getPersonOrNull(String userName)
+    /* package for testing */NodeRef getUserOrNull(String userName)
     {
-        NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
+        NodeRef rootNode = nodeService.getRootNode(getUserStoreRef());
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
-        defs[0] = new QueryParameterDefImpl(QName.createQName("cm", "var", namespacePrefixResolver), text, true, userName);
-        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/cm:person[@cm:userName = $cm:var ]", defs, namespacePrefixResolver, false);
-        if(results.size() != 1)
-        {
-            return null;
-        }
-        return results.get(0);
-    }
-
-    /*package for testing*/ NodeRef getUserOrNull(String userName)
-    {
-        NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
-        QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
-        DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
-        defs[0] = new QueryParameterDefImpl(QName.createQName("usr", "var", namespacePrefixResolver), text, true, userName);
-        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/usr:user[@usr:username = $usr:var ]", defs, namespacePrefixResolver, false);
-        if(results.size() != 1)
+        defs[0] = new QueryParameterDefImpl(QName.createQName("usr", "var", namespacePrefixResolver), text, true,
+                userName);
+        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER
+                + "/usr:user[@usr:username = $usr:var ]", defs, namespacePrefixResolver, false);
+        if (results.size() != 1)
         {
             return null;
         }
@@ -138,9 +131,9 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     public void createUser(String userName, String rawPassword) throws AuthenticationException
     {
         NodeRef userRef = getUserOrNull(userName);
-        if(userRef != null)
+        if (userRef != null)
         {
-            throw new AuthenticationException("User already exists: "+userName);
+            throw new AuthenticationException("User already exists: " + userName);
         }
         NodeRef typesNode = getOrCreateTypeLocation();
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
@@ -148,18 +141,21 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         String salt = GUID.generate();
         properties.put(ContentModel.PROP_SALT, salt);
         properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(rawPassword, salt));
-        nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_USER, ContentModel.TYPE_USER, properties);
+        nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_USER, ContentModel.TYPE_USER,
+                properties);
     }
-    
 
     private NodeRef getOrCreateTypeLocation()
     {
-        NodeRef rootNode = nodeService.getRootNode(StoreContextHolder.getContext());
-        List<ChildAssociationRef> results = nodeService.getChildAssocs(rootNode, QName.createQName("sys", "system", namespacePrefixResolver));
+        NodeRef rootNode = nodeService.getRootNode(getUserStoreRef());
+        List<ChildAssociationRef> results = nodeService.getChildAssocs(rootNode, QName.createQName("sys", "system",
+                namespacePrefixResolver));
         NodeRef sysNode = null;
-        if(results.size() == 0)
+        if (results.size() == 0)
         {
-            sysNode = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN, QName.createQName("sys", "system", namespacePrefixResolver), ContentModel.TYPE_CONTAINER ).getChildRef();
+            sysNode = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
+                    QName.createQName("sys", "system", namespacePrefixResolver), ContentModel.TYPE_CONTAINER)
+                    .getChildRef();
         }
         else
         {
@@ -167,9 +163,11 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         }
         results = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people", namespacePrefixResolver));
         NodeRef typesNode = null;
-        if(results.size() == 0)
+        if (results.size() == 0)
         {
-            typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN, QName.createQName("sys", "people", namespacePrefixResolver), ContentModel.TYPE_CONTAINER ).getChildRef();
+            typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN,
+                    QName.createQName("sys", "people", namespacePrefixResolver), ContentModel.TYPE_CONTAINER)
+                    .getChildRef();
         }
         else
         {
@@ -177,13 +175,13 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         }
         return typesNode;
     }
-    
+
     public void updateUser(String userName, String rawPassword) throws AuthenticationException
     {
         NodeRef userRef = getUserOrNull(userName);
-        if(userRef == null)
+        if (userRef == null)
         {
-            throw new AuthenticationException("User does not exist: "+userName);
+            throw new AuthenticationException("User does not exist: " + userName);
         }
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
         String salt = GUID.generate();
@@ -197,10 +195,47 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     public void deleteUser(String userName) throws AuthenticationException
     {
         NodeRef userRef = getUserOrNull(userName);
-        if(userRef == null)
+        if (userRef == null)
         {
-            throw new AuthenticationException("User does not exist: "+userName);
+            throw new AuthenticationException("User does not exist: " + userName);
         }
         nodeService.deleteNode(userRef);
     }
+
+    private synchronized StoreRef getUserStoreRef()
+    {
+        if (userStoreRef == null)
+        {
+            userStoreRef = new StoreRef("user", "alfrescoUserStore");
+        }
+        if (!nodeService.exists(userStoreRef))
+        {
+            nodeService.createStore(userStoreRef.getProtocol(), userStoreRef.getIdentifier());
+        }
+
+        return userStoreRef;
+    }
+
+    public Object getSalt(UserDetails userDetails)
+    {   
+        NodeRef userRef = getUserOrNull(userDetails.getUsername());
+        if (userRef == null)
+        {
+            throw new UsernameNotFoundException("Could not find user by userName: " + userDetails.getUsername());
+        }
+
+        Map<QName, Serializable> properties = nodeService.getProperties(userRef);
+
+        String salt = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "salt",
+                namespacePrefixResolver)));
+
+        return salt;
+    }
+
+    public boolean userExists(String userName)
+    {
+       return (getUserOrNull(userName) != null);
+    }
+    
+    
 }

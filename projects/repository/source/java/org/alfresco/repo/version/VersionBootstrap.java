@@ -19,6 +19,8 @@ package org.alfresco.repo.version;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.transaction.TransactionService;
@@ -32,6 +34,8 @@ public class VersionBootstrap
 {
     private TransactionService transactionService;
     private NodeService nodeService;
+    private AuthenticationComponent authenticationComponent;
+    private PermissionService permissionService;
     
     
     /**
@@ -53,6 +57,18 @@ public class VersionBootstrap
     {
         this.nodeService = nodeService;
     }
+    
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+    {
+        this.authenticationComponent = authenticationComponent;
+    }
+    
+    
+
+    public void setPermissionService(PermissionService permissionService)
+    {
+        this.permissionService = permissionService;
+    }
 
     /**
      * Bootstrap the Version Store
@@ -60,6 +76,7 @@ public class VersionBootstrap
     public void bootstrap()
     {
         UserTransaction userTransaction = transactionService.getUserTransaction();
+        authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
         
         try
         {
@@ -72,7 +89,9 @@ public class VersionBootstrap
             }
             else
             {
-                this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, VersionStoreConst.STORE_ID);
+                StoreRef vStore = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, VersionStoreConst.STORE_ID);
+                // TODO: For now there are no permissions on version access 
+                permissionService.setPermission(nodeService.getRootNode(vStore), permissionService.getAllAuthorities(), permissionService.getAllPermission(), true);
                 userTransaction.commit();
             }
         }
@@ -80,6 +99,7 @@ public class VersionBootstrap
         {
             // rollback the transaction
             try { if (userTransaction != null) {userTransaction.rollback();} } catch (Exception ex) {}
+            try {authenticationComponent.clearCurrentSecurityContext(); } catch (Exception ex) {}
             throw new AlfrescoRuntimeException("Bootstrap failed", e);
         }            
     }

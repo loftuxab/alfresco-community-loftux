@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.providers.dao.UsernameNotFoundException;
 
 import org.alfresco.filesys.server.auth.ntlm.NTLM;
@@ -44,9 +43,8 @@ import org.alfresco.filesys.server.auth.passthru.PassthruServers;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.smb.SMBException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.RepositoryUserDetails;
-import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
@@ -453,17 +451,17 @@ public class NTLMAuthenticationFilter implements Filter
                             
                             WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(m_context);
                             AuthenticationService authService = (AuthenticationService)ctx.getBean("authenticationService");
-                            StoreContextHolder.setContext(Repository.getStoreRef());
+                            AuthenticationComponent authComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
     
-                            Authentication authToken = authService.setAuthenticatedUser(userName);
+                            authComponent.setCurrentUser(userName);
                             
                             // Setup User object and Home space ID etc.
                             
                             NodeService nodeService = (NodeService) ctx.getBean("nodeService");
-                            RepositoryUserDetails principal = (RepositoryUserDetails)authToken.getPrincipal();
-                            User user = new User(principal.getUserNodeRef(), userName, authService.getCurrentTicket(), principal.getPersonNodeRef());
+                          
+                            User user = new User(userName, authService.getCurrentTicket(), authService.getPersonNodeRef(Repository.getStoreRef(), userName));
                             
-                            String homeSpaceId = (String)nodeService.getProperty(principal.getPersonNodeRef(), ContentModel.PROP_HOMEFOLDER);
+                            String homeSpaceId = (String)nodeService.getProperty(authComponent.getPerson(Repository.getStoreRef(), userName), ContentModel.PROP_HOMEFOLDER);
                             user.setHomeSpaceId(homeSpaceId);
                             
                             httpSess.setAttribute(AuthenticationFilter.AUTHENTICATION_USER, user);

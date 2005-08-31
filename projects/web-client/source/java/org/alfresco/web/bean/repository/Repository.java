@@ -232,10 +232,10 @@ public final class Repository
       if (node.hasAspect(ContentModel.ASPECT_WORKING_COPY))
       {
          Object obj = node.getProperties().get("workingCopyOwner");
-         if (obj instanceof NodeRef)
+         if (obj instanceof String)
          {
             User user = Application.getCurrentUser(FacesContext.getCurrentInstance());
-            if ( ((NodeRef)obj).equals(user.getUserNodeRef()) )
+            if ( ((String)obj).equals(user.getUserName()))
             {
                locked = Boolean.TRUE;
             }

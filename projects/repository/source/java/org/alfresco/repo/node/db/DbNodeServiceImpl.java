@@ -81,21 +81,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     }
 
     /**
-     * @param storeRef store to search for
-     * @return Returns a non-null <code>Store</code> instance
-     * @throws InvalidStoreRefException if the reference is to a store that doesn't exist
-     */
-    private Store getStoreNotNull(StoreRef storeRef) throws InvalidStoreRefException
-    {
-        Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
-        if (store == null)
-        {
-            throw new InvalidStoreRefException(storeRef);
-        }
-        return store;
-    }
-
-    /**
      * Performs a null-safe get of the node
      * 
      * @param nodeRef the node to retrieve
@@ -477,7 +462,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Set<QName> ret = new HashSet<QName>(aspectQNames.size());
         ret.addAll(aspectQNames);
         // done
-        return Collections.unmodifiableSet(ret);
+        return ret;
     }
 
     public void deleteNode(NodeRef nodeRef)
@@ -742,7 +727,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             results.add(parentNode.getNodeRef());
         }
         // done
-        return Collections.unmodifiableCollection(results);
+        return results;
     }
 
     /**
@@ -773,7 +758,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             results.add(assoc.getChildAssocRef());
         }
         // done
-        return Collections.unmodifiableList(results);
+        return results;
     }
 
     /**
@@ -812,7 +797,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             results.add(assoc.getChildAssocRef());
         }
         // done
-        return Collections.unmodifiableList(results);
+        return results;
     }
 
     public ChildAssociationRef getPrimaryParent(NodeRef nodeRef) throws InvalidNodeRefException
@@ -902,7 +887,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             nodeAssocRefs.add(assoc.getNodeAssocRef());
         }
         // done
-        return Collections.unmodifiableList(nodeAssocRefs);
+        return nodeAssocRefs;
     }
 
     /**
@@ -926,7 +911,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             nodeAssocRefs.add(assoc.getNodeAssocRef());
         }
         // done
-        return Collections.unmodifiableList(nodeAssocRefs);
+        return nodeAssocRefs;
     }
     
     /**

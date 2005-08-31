@@ -29,9 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.authentication.StoreContextHolder;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -83,7 +81,6 @@ public class AuthenticationFilter implements Filter
             // setup the authentication context
             WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
             AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
-            StoreContextHolder.setContext(Repository.getStoreRef());
             auth.validate(user.getTicket());
             
             // continue filter chaining
