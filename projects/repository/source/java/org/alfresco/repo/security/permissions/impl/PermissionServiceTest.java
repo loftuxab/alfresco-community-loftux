@@ -21,6 +21,8 @@ import java.util.Set;
 
 import javax.transaction.UserTransaction;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 
@@ -36,6 +38,10 @@ import org.alfresco.service.transaction.TransactionService;
 public class PermissionServiceTest extends AbstractPermissionTest
 {
 
+    public static Test suite() {
+        TestSuite suite= new TestSuite();
+        return suite;
+    }
     
     public PermissionServiceTest()
     {

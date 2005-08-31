@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
  
 <beans>
-     <import resource="classpath:alfresco/public-services-security-context.xml" />
+     <import resource="classpath:alfresco/public-services-simple-security-context.xml" />
 
     <!-- Base Service Descriptor for Alfresco Services -->
     <bean id="AlfrescoServiceDescriptor" abstract="true" class="org.alfresco.repo.service.ServiceDescriptorAdvisorFactory">
