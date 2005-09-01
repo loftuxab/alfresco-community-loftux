@@ -45,7 +45,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    private static Log logger = LogFactory.getLog(RepositoryServiceSystemTest.class);
    private static Store STORE = new Store(StoreEnum.workspace, "SpacesStore");
    private static StoreRef STORE_REF = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-   
+
    private RepositoryServiceSoapBindingStub repoService;
 
    @Override
@@ -85,7 +85,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       assertNotNull("stores array should not be null", stores);
       logger.debug("store1 = " + stores[0].getScheme() + ":" + stores[0].getAddress());
       logger.debug("store2 = " + stores[1].getScheme() + ":" + stores[1].getAddress());
-      assertTrue("There should be 2 stores", stores.length == 2);
+      logger.debug("store3 = " + stores[2].getScheme() + ":" + stores[2].getAddress());
+      assertTrue("There should be 3 stores", stores.length == 3);
    }
    
    /**
@@ -196,7 +197,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       // query for all the child nodes of the root
       Reference node = new Reference();
       node.setStore(STORE);
-      String rootId = "227f1ee2-1082-11da-8fd4-3310e1ddfea6";
       node.setUuid(rootId);     // find a query to retrieve this maybe type == store_root?
       logger.debug("Retrieving children for node: " + rootId + "....");
       QueryResult rootChildren = this.repoService.queryChildren(node);

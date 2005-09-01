@@ -46,6 +46,21 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
    private static final String USERNAME = "admin";
    private static final String PASSWORD = "admin";
    
+   // ********************************************************************
+   //
+   // NOTE: The rootId and companyHomeId variables have to be set for your
+   //       database for the tests to run successfully, once there is a way
+   //       to query for the root node this can be removed.
+   //       Perform a MySQL query to get the ids for the rootId execute:
+   //       "select * from node where type_local_name = 'store_root';" and 
+   //       pick the row with an identifier of 'SpacesStore'.
+   //       For the company home id execute the following query:
+   //       "select * from child_assoc where parent_guid = '<your-root-id>' and local_name = 'Company_Home';"
+   //
+   // ********************************************************************
+   
+   protected static String rootId = "fddc4ffb-1ace-11da-b3ba-e981aa43b126";
+   protected static String companyHomeId = "fe289b3d-1ace-11da-b3ba-e981aa43b126";
    protected Store STORE = new Store(StoreEnum.workspace, "SpacesStore");
    protected StoreRef STORE_REF = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
    

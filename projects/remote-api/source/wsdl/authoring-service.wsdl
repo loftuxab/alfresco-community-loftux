@@ -90,7 +90,7 @@
                <sequence>
                   <element name="items" type="cms:Predicate"/>
                   <element name="lockChildren" type="xsd:boolean"/>
-                  <element name="lockType" type="author:LockType"/>
+                  <element name="lockType" type="author:LockTypeEnum"/>
                </sequence>
             </complexType>
          </element>
@@ -242,16 +242,17 @@
          </complexType>
          <element name="VersionResult" type="author:VersionResult"/>
          
+         <!-- 
          <complexType name="LockType">
             <sequence>
                <element name="type" type="author:LockTypeEnum"/>
             </sequence>
          </complexType>
          <element name="LockType" type="author:LockType"/>
+         -->
          
          <xsd:simpleType name="LockTypeEnum">
     	      <xsd:restriction base="xsd:string">
-    	         <xsd:enumeration value="none"/>
     		      <xsd:enumeration value="read"/>
     		      <xsd:enumeration value="write"/>
             </xsd:restriction>

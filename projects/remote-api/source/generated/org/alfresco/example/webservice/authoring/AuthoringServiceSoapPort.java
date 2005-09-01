@@ -33,7 +33,7 @@ public interface AuthoringServiceSoapPort extends java.rmi.Remote {
     /**
      * Locks a content resource.
      */
-    public org.alfresco.example.webservice.types.Reference[] lock(org.alfresco.example.webservice.types.Predicate items, boolean lockChildren, org.alfresco.example.webservice.authoring.LockType lockType) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
+    public org.alfresco.example.webservice.types.Reference[] lock(org.alfresco.example.webservice.types.Predicate items, boolean lockChildren, org.alfresco.example.webservice.authoring.LockTypeEnum lockType) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
 
     /**
      * Unlocks a content resource.

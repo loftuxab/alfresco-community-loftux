@@ -16,10 +16,6 @@
  */
 package org.alfresco.example.webservice.content;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
 import javax.xml.rpc.ServiceException;
 
 import junit.framework.AssertionFailedError;
@@ -43,7 +39,6 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
    
    private static String newContentId;
    private ContentServiceSoapBindingStub contentService;
-   private String companyHomeId = "22b12b64-1082-11da-8fd4-3310e1ddfea6";
    private String fileName = "unit-test.txt";
    
 
@@ -83,7 +78,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       // get the root node (hard code for now until we have a way to query for the root node)
       ParentReference root = new ParentReference();
       root.setStore(STORE);
-      root.setUuid(this.companyHomeId);
+      root.setUuid(companyHomeId);
       
       String mimetype = "text/plain";
       Content content = this.contentService.create(root, this.fileName, new ContentFormat(mimetype, "UTF-8"), CONTENT.getBytes());

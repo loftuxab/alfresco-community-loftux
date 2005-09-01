@@ -649,7 +649,7 @@
       <operation name="lock" qname="operNS:lock" xmlns:operNS="http://www.alfresco.org/ws/service/authoring/1.0" returnQName="retNS:lockReturn" xmlns:retNS="http://www.alfresco.org/ws/service/authoring/1.0" returnType="rtns:Reference" xmlns:rtns="http://www.alfresco.org/ws/model/content/1.0" soapAction="http://www.alfresco.org/ws/service/authoring/1.0/lock" >
         <parameter qname="pns:items" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:Predicate" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
         <parameter qname="pns:lockChildren" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:boolean" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
-        <parameter qname="pns:lockType" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:LockType" xmlns:tns="http://www.alfresco.org/ws/service/authoring/1.0"/>
+        <parameter qname="pns:lockType" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:LockTypeEnum" xmlns:tns="http://www.alfresco.org/ws/service/authoring/1.0"/>
         <fault name="AuthoringFault" qname="fns:AuthoringFault" xmlns:fns="http://www.alfresco.org/ws/service/authoring/1.0" class="org.alfresco.repo.webservice.authoring.AuthoringFault" type="tns:AuthoringFault" xmlns:tns="http://www.alfresco.org/ws/service/authoring/1.0"/>
       </operation>
       <operation name="unlock" qname="operNS:unlock" xmlns:operNS="http://www.alfresco.org/ws/service/authoring/1.0" returnQName="retNS:unlockReturn" xmlns:retNS="http://www.alfresco.org/ws/service/authoring/1.0" returnType="rtns:Reference" xmlns:rtns="http://www.alfresco.org/ws/model/content/1.0" soapAction="http://www.alfresco.org/ws/service/authoring/1.0/unlock" >
@@ -734,14 +734,6 @@
         xmlns:ns="http://www.alfresco.org/ws/service/authoring/1.0"
         qname="ns:CheckoutResult"
         type="java:org.alfresco.repo.webservice.authoring.CheckoutResult"
-        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-        encodingStyle=""
-      />
-      <typeMapping
-        xmlns:ns="http://www.alfresco.org/ws/service/authoring/1.0"
-        qname="ns:LockType"
-        type="java:org.alfresco.repo.webservice.authoring.LockType"
         serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
         deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""

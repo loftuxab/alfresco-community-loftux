@@ -95,9 +95,9 @@ public class AuthoringWebService implements AuthoringServiceSoapPort
    }
 
    /**
-    * @see org.alfresco.repo.webservice.authoring.AuthoringServiceSoapPort#lock(org.alfresco.repo.webservice.types.Predicate, boolean, org.alfresco.repo.webservice.authoring.LockType)
+    * @see org.alfresco.repo.webservice.authoring.AuthoringServiceSoapPort#lock(org.alfresco.repo.webservice.types.Predicate, boolean, org.alfresco.repo.webservice.authoring.LockTypeEnum)
     */
-   public Reference[] lock(Predicate items, boolean lockChildren, LockType lockType) throws RemoteException, AuthoringFault
+   public Reference[] lock(Predicate items, boolean lockChildren, LockTypeEnum lockType) throws RemoteException, AuthoringFault
    {
       throw new AuthoringFault(1, "lock() is not implemented yet!");
    }

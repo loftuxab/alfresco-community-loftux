@@ -19,10 +19,12 @@ public class StoreEnum implements java.io.Serializable {
 
     public static final java.lang.String _workspace = "workspace";
     public static final java.lang.String _version = "version";
+    public static final java.lang.String _user = "user";
     public static final java.lang.String _search = "search";
     public static final java.lang.String _http = "http";
     public static final StoreEnum workspace = new StoreEnum(_workspace);
     public static final StoreEnum version = new StoreEnum(_version);
+    public static final StoreEnum user = new StoreEnum(_user);
     public static final StoreEnum search = new StoreEnum(_search);
     public static final StoreEnum http = new StoreEnum(_http);
     public java.lang.String getValue() { return _value_;}

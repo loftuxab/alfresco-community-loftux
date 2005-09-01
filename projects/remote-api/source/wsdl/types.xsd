@@ -36,6 +36,7 @@
     	<xsd:restriction base="xsd:string">
     		<xsd:enumeration value="workspace"/>
     		<xsd:enumeration value="version"/>
+    		<xsd:enumeration value="user"/>
     		<xsd:enumeration value="search"/>
     		<xsd:enumeration value="http"/>
     	</xsd:restriction>

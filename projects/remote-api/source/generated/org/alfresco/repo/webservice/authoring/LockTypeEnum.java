@@ -17,10 +17,8 @@ public class LockTypeEnum implements java.io.Serializable {
         _table_.put(_value_,this);
     }
 
-    public static final java.lang.String _none = "none";
     public static final java.lang.String _read = "read";
     public static final java.lang.String _write = "write";
-    public static final LockTypeEnum none = new LockTypeEnum(_none);
     public static final LockTypeEnum read = new LockTypeEnum(_read);
     public static final LockTypeEnum write = new LockTypeEnum(_write);
     public java.lang.String getValue() { return _value_;}

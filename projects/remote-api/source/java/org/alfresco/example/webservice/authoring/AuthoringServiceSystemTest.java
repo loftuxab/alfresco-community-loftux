@@ -30,6 +30,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
 {
    private static Log logger = LogFactory.getLog(AuthoringServiceSystemTest.class);
    
+   private static String versionedNodeId;
    private AuthoringServiceSoapBindingStub authoringService;
 
    @Override
@@ -56,6 +57,10 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
       
       // Time out after a minute
       this.authoringService.setTimeout(60000);
+   }
+   
+   public void testCreateNode() throws Exception
+   {
    }
    
    /**
