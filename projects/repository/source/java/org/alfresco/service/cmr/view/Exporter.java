@@ -17,7 +17,6 @@
 package org.alfresco.service.cmr.view;
 
 import java.io.InputStream;
-import java.io.Serializable;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -103,7 +102,7 @@ public interface Exporter
      * @param property  the property name
      * @param value  the value
      */
-    public void value(NodeRef nodeRef, QName property, Serializable value);
+    public void value(NodeRef nodeRef, QName property, Object value);
     
     /**
      * Export content stream
@@ -130,6 +129,13 @@ public interface Exporter
      */
     public void endAssoc(NodeRef nodeRef, QName assoc);
 
+    /**
+     * Export warning
+     * 
+     * @param warning  the warning message
+     */
+    public void warning(String warning);
+    
     /**
      * End export
      */

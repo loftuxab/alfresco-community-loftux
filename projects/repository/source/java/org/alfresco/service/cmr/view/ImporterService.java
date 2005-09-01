@@ -20,8 +20,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 
-
-
 /**
  * Importer Service.  Entry point for importing xml data sources into the Repository.
  * 
@@ -42,4 +40,19 @@ public interface ImporterService
     public void importView(InputStream inputStream, Location location, Properties configuration, ImporterProgress progress)
         throws ImporterException;
 
+    
+    /**
+     * Import a Repository view into the specified location
+     * 
+     * This import allows for a custom content importer.
+     * 
+     * @param inputStream  input stream containing the xml view to parse
+     * @param streamHandler  custom content importer
+     * @param location  the location to import under
+     * @param configuration  property values used for binding property place holders in import stream
+     * @param progress  progress monitor (optional)
+     */
+    public void importView(InputStream inputStream, ImportStreamHandler streamHandler, Location location, Properties configuration, ImporterProgress progress)
+        throws ImporterException;
+    
 }

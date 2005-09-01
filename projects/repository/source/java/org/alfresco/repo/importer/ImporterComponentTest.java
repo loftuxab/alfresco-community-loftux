@@ -77,7 +77,7 @@ public class ImporterComponentTest extends BaseSpringTest
         importerBootstrap.setStoreUrl(bootstrapStoreRef.toString());
         importerBootstrap.setConfiguration(configuration);
         importerBootstrap.bootstrap();
-        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, bootstrapStoreRef));
     }
     
     

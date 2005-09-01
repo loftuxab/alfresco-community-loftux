@@ -24,10 +24,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ExportStreamHandler;
+import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.TempFileProvider;
 import org.springframework.context.ApplicationContext;
@@ -55,7 +58,7 @@ public class Export
             try
             {
                 Export export = new Export(context);
-                export.export();
+                export.doExport();
                 System.exit(0);
             }
             catch (ExportException e)
@@ -89,16 +92,15 @@ public class Export
      * 
      * @param context  export context
      */
-    /*package*/ Export(ExportContext context)
+    private Export(ExportContext context)
     {
         this.context = context;
     }
 
-
     /**
      * Performs the Export
      */        
-    private void export()
+    private void doExport()
     {
         log("Alfresco Repository Exporter");
 
@@ -115,7 +117,7 @@ public class Export
         streamHandler.createPackage();
 
         // Export Repository content to export package
-        exporter.exportView(output, streamHandler, context.getLocation(), context.children, null);
+        exporter.exportView(output, streamHandler, context.getLocation(), context.children, new ExportProgress());
         
         // Close Export File
         try
@@ -129,7 +131,6 @@ public class Export
         
         log("Export completed successfully.");
     }
-
 
     /**
      * Create XML Export File
@@ -162,7 +163,6 @@ public class Export
         }
     }
 
-    
     /**
      * Log Export message
      * 
@@ -176,6 +176,18 @@ public class Export
         }
     }
 
+    /**
+     * Log Export message
+     * 
+     * @param msg  message to log
+     */
+    private void logVerbose(String msg)
+    {
+        if (context.verbose)
+        {
+            log(msg);
+        }
+    }
     
     /**
      * Process Export Tool command line arguments
@@ -213,12 +225,12 @@ public class Export
                 }
                 context.path = args[i];
             }
-            else if (args[i].equals("-d") || args[i].equals("-destdir"))
+            else if (args[i].equals("-d") || args[i].equals("-dir"))
             {
                 i++;
                 if (i == args.length || args[i].length() == 0)
                 {
-                    throw new ExportException("The value <destdir> for the parameter -destdir must be specified");
+                    throw new ExportException("The value <dir> for the parameter -dir must be specified");
                 }
                 context.destDir = args[i];
             }
@@ -243,6 +255,10 @@ public class Export
             {
                 context.quiet = true;
             }
+            else if (args[i].equals("-verbose"))
+            {
+                context.verbose = true;
+            }
             else if (i == (args.length - 1))
             {
                 context.packageName = args[i];
@@ -260,7 +276,6 @@ public class Export
         return context;
     }
 
-    
     /**
      * Display Help
      */
@@ -274,20 +289,20 @@ public class Export
         System.out.println("Options:");
         System.out.println(" -h[elp] display this help");
         System.out.println(" -p[ath] the path within the store to extract from (default: /)");
-        System.out.println(" -d[estdir] the destination directory to export to (default: current directory)");
-        System.out.println(" -packagedir the directory to place extracted content (default: destdir/<packagename>)");
+        System.out.println(" -d[ir] the destination directory to export to (default: current directory)");
+        System.out.println(" -packagedir the directory to place extracted content (default: dir/<packagename>)");
         System.out.println(" -nochildren do not extract children");
         System.out.println(" -overwrite force overwrite of existing export package if it already exists");
         System.out.println(" -quiet do not display any messages during export");
+        System.out.println(" -verbose report export progress");
     }
-    
     
     /**
      * Handler for exporting Repository content streams to file system files
      * 
      * @author David Caruana
      */
-    /*package*/ class PackageStreamHandler
+    private class PackageStreamHandler
         implements ExportStreamHandler
     {
         private File packageDir;
@@ -368,13 +383,12 @@ public class Export
         }
     }
     
-    
     /**
      * Export Tool Context
      * 
      * @author David Caruana
      */
-    /* package */static class ExportContext
+    private static class ExportContext
     {
         /** Store Reference to export from */
         private StoreRef storeRef;
@@ -392,12 +406,14 @@ public class Export
         private boolean overwrite = false;
         /** Log message whilst exporting? */
         private boolean quiet = false;
+        /** Verbose logging */
+        private boolean verbose = false;
         
 
         /**
          * Validate the Export Context i.e. ensure all required information has been provided and is correct
          */
-        /* package */void validate()
+        private void validate()
         {
             if (storeRef == null)
             {
@@ -417,38 +433,35 @@ public class Export
             }
         }
 
-
         /**
          * Get the location within the Repository to export from
          * 
          * @return the location
          */
-        /* package */Location getLocation()
+        private Location getLocation()
         {
             Location location = new Location(storeRef);
             location.setPath(path);
             return location;
         }
 
-
         /**
          * Get the destination directory
          * 
          * @return the destination directory (or null if current directory)
          */
-        /* package */File getDestDir()
+        private File getDestDir()
         {
             File dir = (destDir == null) ? null : new File(destDir); 
             return dir;
         }
-
 
         /**
          * Get the package directory
          * 
          * @return the package directory within the destination directory
          */
-        /*package*/ File getPackageDir()
+        private File getPackageDir()
         {
             File dir = null;
             if (packageDir != null)
@@ -465,14 +478,13 @@ public class Export
             }
             return dir;
         }
-        
 
         /**
          * Get the xml export file
          * 
          * @return the package file
          */
-        /* package */File getPackageFile()
+        private File getPackageFile()
         {
             String packageFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
             File file = new File(getDestDir(), packageFile); 
@@ -482,11 +494,129 @@ public class Export
 
     
     /**
+     * Report Export Progress
+     * 
+     * @author David Caruana
+     */
+    private class ExportProgress
+        implements Exporter
+    {
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#start()
+         */
+        public void start()
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#startNamespace(java.lang.String, java.lang.String)
+         */
+        public void startNamespace(String prefix, String uri)
+        {
+            logVerbose("Exporting namespace " + uri + " (prefix: " + prefix + ")");
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#endNamespace(java.lang.String)
+         */
+        public void endNamespace(String prefix)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#startNode(org.alfresco.service.cmr.repository.NodeRef)
+         */
+        public void startNode(NodeRef nodeRef)
+        {
+            logVerbose("Exporting node " + nodeRef.toString());
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#endNode(org.alfresco.service.cmr.repository.NodeRef)
+         */
+        public void endNode(NodeRef nodeRef)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#startAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+         */
+        public void startAspect(NodeRef nodeRef, QName aspect)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#endAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+         */
+        public void endAspect(NodeRef nodeRef, QName aspect)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#startProperty(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+         */
+        public void startProperty(NodeRef nodeRef, QName property)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#endProperty(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+         */
+        public void endProperty(NodeRef nodeRef, QName property)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
+         */
+        public void value(NodeRef nodeRef, QName property, Object value)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
+         */
+        public void content(NodeRef nodeRef, QName property, InputStream content)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#startAssoc(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+         */
+        public void startAssoc(NodeRef nodeRef, QName assoc)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#endAssoc(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+         */
+        public void endAssoc(NodeRef nodeRef, QName assoc)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)
+         */
+        public void warning(String warning)
+        {
+            log("Warning: " + warning);            
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#end()
+         */
+        public void end()
+        {
+        }
+    }
+
+    
+    /**
      * Export Tool Exception
      * 
      * @author David Caruana
      */
-    /*package*/ static class ExportException extends RuntimeException
+    private static class ExportException extends RuntimeException
     {
         private static final long serialVersionUID = 3257008761007847733L;
 

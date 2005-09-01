@@ -38,10 +38,11 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.view.ImportStreamHandler;
 import org.alfresco.service.cmr.view.ImporterException;
+import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
-import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
@@ -120,15 +121,37 @@ public class ImporterComponent
         this.namespaceService = namespaceService;
     }
 
-    
     /* (non-Javadoc)
      * @see org.alfresco.repo.importer.ImporterService#importView(java.io.InputStream, org.alfresco.repo.importer.Location, java.util.Properties, org.alfresco.repo.importer.Progress)
      */
     public void importView(InputStream inputStream, Location location, Properties configuration, ImporterProgress progress)
     {
-        ParameterCheck.mandatory("Input stream", inputStream);
+        NodeRef nodeRef = getNodeRef(location, configuration);
+        QName childAssocType = getChildAssocType(location, configuration);
+        performImport(nodeRef, childAssocType, inputStream, new DefaultStreamHandler(), configuration, progress);       
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStream, org.alfresco.service.cmr.view.ImportStreamHandler, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
+     */
+    public void importView(InputStream inputStream, ImportStreamHandler streamHandler, Location location, Properties configuration, ImporterProgress progress) throws ImporterException
+    {
+        NodeRef nodeRef = getNodeRef(location, configuration);
+        QName childAssocType = getChildAssocType(location, configuration);
+        performImport(nodeRef, childAssocType, inputStream, streamHandler, configuration, progress);       
+    }
+    
+    /**
+     * Get Node Reference from Location
+     *  
+     * @param location the location to extract node reference from
+     * @param configuration import configuration
+     * @return node reference
+     */
+    private NodeRef getNodeRef(Location location, Properties configuration)
+    {
         ParameterCheck.mandatory("Location", location);
-        
+    
         // Establish node to import within
         NodeRef nodeRef = location.getNodeRef();
         if (nodeRef == null)
@@ -155,10 +178,23 @@ public class ImporterComponent
             }
             nodeRef = nodeRefs.get(0);
         }
-        
+    
         // TODO: Check Node actually exists
         
+        return nodeRef;
+    }
+    
+    /**
+     * Get the child association type from location
+     * 
+     * @param location the location to extract child association type from
+     * @param configuration import configuration
+     * @return the child association type
+     */
+    private QName getChildAssocType(Location location, Properties configuration)
+    {
         // Establish child association type to import under
+        NodeRef nodeRef = getNodeRef(location, configuration);
         QName childAssocType = location.getChildAssocType();
         if (childAssocType == null)
         {
@@ -173,9 +209,26 @@ public class ImporterComponent
             }
             childAssocType = childAssocDefs.keySet().iterator().next();
         }
+        return childAssocType;
+    }
 
-        // Perform import
-        Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, configuration, progress);
+    /**
+     * Perform the actual import
+     * 
+     * @param nodeRef node reference to import under
+     * @param childAssocType the child association type to import under
+     * @param inputStream the input stream to import from
+     * @param handler the content property import stream handler
+     * @param configuration import configuration
+     * @param progress import progress
+     */
+    private void performImport(NodeRef nodeRef, QName childAssocType, InputStream inputStream, ImportStreamHandler handler, Properties configuration, ImporterProgress progress)
+    {
+        ParameterCheck.mandatory("Node Reference", nodeRef);
+        ParameterCheck.mandatory("Child Assoc Type", childAssocType);
+        ParameterCheck.mandatory("Input stream", inputStream);
+        ParameterCheck.mandatory("Stream Handler", handler);
+        Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, configuration, handler, progress);
         viewParser.parse(inputStream, defaultImporter);
     }
     
@@ -237,6 +290,7 @@ public class ImporterComponent
         private QName rootAssocType;
         private Properties configuration;
         private ImporterProgress progress;
+        private ImportStreamHandler streamHandler;
 
         
         /**
@@ -247,12 +301,13 @@ public class ImporterComponent
          * @param configuration
          * @param progress
          */
-        private DefaultImporter(NodeRef rootRef, QName rootAssocType, Properties configuration, ImporterProgress progress)
+        private DefaultImporter(NodeRef rootRef, QName rootAssocType, Properties configuration, ImportStreamHandler streamHandler, ImporterProgress progress)
         {
             this.rootRef = rootRef;
             this.rootAssocType = rootAssocType;
             this.configuration = configuration;
             this.progress = progress;
+            this.streamHandler = streamHandler;
         }
         
         /* (non-Javadoc)
@@ -352,32 +407,26 @@ public class ImporterComponent
             String contentUrl = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT_URL);
             if (contentUrl != null && contentUrl.length() > 0)
             {
-                // Create a Resource around the source location
-                ResourceLoader loader = new DefaultResourceLoader();
-                Resource resource = loader.getResource(contentUrl);
-                if (resource.exists() == false)
-                {
-                    throw new ImporterException("Content URL " + contentUrl + " does not exist.");
-                }
-                
                 // since there really isn't any content associated with the node (yet), we should
                 // remove the URL from the node.  It will be set after the content has been
                 // uploaded
                 nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT_URL, null);
         
-                // Import the content
+                // import the content from the url
+                InputStream contentStream = streamHandler.importStream(contentUrl);
+                ContentWriter writer = contentService.getUpdatingWriter(nodeRef);
+                writer.putContent(contentStream);
+                reportContentCreated(nodeRef, contentUrl);
+
+                // close input stream
                 try
                 {
-                    ContentWriter writer = contentService.getUpdatingWriter(nodeRef);
-                    InputStream contentStream = resource.getInputStream();
-                    writer.putContent(contentStream);
+                    contentStream.close();
                 }
                 catch(IOException e)
                 {
-                    throw new ImporterException("Failed to import content " + contentUrl, e);
+                    throw new ImporterException("Failed to close content import stream for url " + contentUrl);
                 }
-                
-                reportContentCreated(nodeRef, contentUrl);
             }
         }
 
@@ -466,5 +515,38 @@ public class ImporterComponent
             }
         }
     }
-    
+
+
+    /**
+     * Default Import Stream Handler
+     * 
+     * @author David Caruana
+     */
+    private static class DefaultStreamHandler
+        implements ImportStreamHandler
+    {
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportStreamHandler#importStream(java.lang.String)
+         */
+        public InputStream importStream(String url)
+        {
+            ResourceLoader loader = new DefaultResourceLoader();
+            Resource resource = loader.getResource(url);
+            if (resource.exists() == false)
+            {
+                throw new ImporterException("Content URL " + url + " does not exist.");
+            }
+            
+            try
+            {
+                return resource.getInputStream();
+            }
+            catch(IOException e)
+            {
+                throw new ImporterException("Failed to retrieve input stream for content URL " + url);
+            }
+        }
+    }
+
+
 }

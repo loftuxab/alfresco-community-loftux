@@ -17,7 +17,6 @@
 package org.alfresco.repo.exporter;
 
 import java.io.InputStream;
-import java.io.Serializable;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.view.ExportStreamHandler;
@@ -130,7 +129,7 @@ import org.alfresco.util.ParameterCheck;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
-    public void value(NodeRef nodeRef, QName property, Serializable value)
+    public void value(NodeRef nodeRef, QName property, Object value)
     {
         exporter.value(nodeRef, property, value);
     }
@@ -160,6 +159,14 @@ import org.alfresco.util.ParameterCheck;
     {
         exporter.endAssoc(nodeRef, assoc);
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)
+     */
+    public void warning(String warning)
+    {
+        exporter.warning(warning);
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#end()
@@ -168,5 +175,7 @@ import org.alfresco.util.ParameterCheck;
     {
         exporter.end();
     }
+
+
 
 }

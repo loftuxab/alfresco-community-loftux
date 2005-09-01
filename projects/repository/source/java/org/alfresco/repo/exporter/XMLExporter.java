@@ -17,14 +17,13 @@
 package org.alfresco.repo.exporter;
 
 import java.io.InputStream;
-import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
 
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.namespace.NamespaceService;
@@ -43,55 +42,30 @@ import org.xml.sax.helpers.AttributesImpl;
     implements Exporter
 {
     private final static String VIEW_LOCALNAME = "view";
-    private final static QName VIEW_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME);
-
     private final static String CHILDNAME_LOCALNAME = "childName";
-    private final static QName CHILDNAME_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, CHILDNAME_LOCALNAME);
+    private static QName VIEW_QNAME; 
+    private static QName CHILDNAME_QNAME; 
     
     private NamespaceService namespaceService;
-    private DictionaryService dictionaryService;
     private NodeService nodeService;
     private ContentHandler contentHandler;
     
 
     /**
-     * Set the namspace service
+     * Construct
      * 
-     * @param namespaceService  the namespace service
+     * @param namespaceService  namespace service
+     * @param nodeService  node service
+     * @param contentHandler  content handler
      */
-    public void setNamespaceService(NamespaceService namespaceService)
+    /*package*/ XMLExporter(NamespaceService namespaceService, NodeService nodeService, ContentHandler contentHandler)
     {
         this.namespaceService = namespaceService;
-    }
-
-    /**
-     * Set the dictionary service
-     * 
-     * @param dictionaryService  the dictionary service
-     */
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dictionaryService = dictionaryService;
-    }
-
-    /**
-     * Set the node service
-     * 
-     * @param nodeService  the node service
-     */
-    public void setNodeService(NodeService nodeService)
-    {
         this.nodeService = nodeService;
-    }
-
-    /**
-     * Set the content handler
-     * 
-     * @param contentHandler  the content handler call-back
-     */
-    public void setContentHandler(ContentHandler contentHandler)
-    {
         this.contentHandler = contentHandler;
+        
+        VIEW_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, namespaceService);
+        CHILDNAME_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, CHILDNAME_LOCALNAME, namespaceService);
     }
     
     
@@ -152,14 +126,11 @@ import org.xml.sax.helpers.AttributesImpl;
             Path path = nodeService.getPath(nodeRef);
             String childName = path.last().getElementString();
             QName childQName = QName.createQName(childName);
-            String prefix = namespaceService.getPrefixes(childQName.getNamespaceURI()).iterator().next();
-            QName prefixedQName = QName.createQName(prefix, childQName.getLocalName(), namespaceService);
-            
             AttributesImpl attrs = new AttributesImpl(); 
-            attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_1_0_URI, CHILDNAME_LOCALNAME, CHILDNAME_QNAME.toPrefixString(), null, prefixedQName.toPrefixString());
+            attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_1_0_URI, CHILDNAME_LOCALNAME, CHILDNAME_QNAME.toPrefixString(), null, toPrefixString(childQName));
             
             QName type = nodeService.getType(nodeRef);
-            contentHandler.startElement(type.getNamespaceURI(), type.getLocalName(), type.toPrefixString(), attrs);
+            contentHandler.startElement(type.getNamespaceURI(), type.getLocalName(), toPrefixString(type), attrs);
         }
         catch (SAXException e)
         {
@@ -167,6 +138,7 @@ import org.xml.sax.helpers.AttributesImpl;
         }
     }
 
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#endNode(org.alfresco.service.cmr.repository.NodeRef)
      */
@@ -175,7 +147,7 @@ import org.xml.sax.helpers.AttributesImpl;
         try
         {
             QName type = nodeService.getType(nodeRef);
-            contentHandler.endElement(type.getNamespaceURI(), type.getLocalName(), type.toPrefixString());
+            contentHandler.endElement(type.getNamespaceURI(), type.getLocalName(), toPrefixString(type));
         }
         catch (SAXException e)
         {
@@ -190,11 +162,11 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.startElement(aspect.getNamespaceURI(), aspect.getLocalName(), aspect.toPrefixString(), null);
+            contentHandler.startElement(aspect.getNamespaceURI(), aspect.getLocalName(), toPrefixString(aspect), null);
         }
         catch (SAXException e)
         {
-            throw new ExporterException("Failed to process start aspect event - node ref " + nodeRef.toString() + "; aspect " + aspect.toPrefixString(), e);
+            throw new ExporterException("Failed to process start aspect event - node ref " + nodeRef.toString() + "; aspect " + toPrefixString(aspect), e);
         }
     }
 
@@ -205,11 +177,11 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.endElement(aspect.getNamespaceURI(), aspect.getLocalName(), aspect.toPrefixString());
+            contentHandler.endElement(aspect.getNamespaceURI(), aspect.getLocalName(), toPrefixString(aspect));
         }
         catch (SAXException e)
         {
-            throw new ExporterException("Failed to process end aspect event - node ref " + nodeRef.toString() + "; aspect " + aspect.toPrefixString(), e);
+            throw new ExporterException("Failed to process end aspect event - node ref " + nodeRef.toString() + "; aspect " + toPrefixString(aspect), e);
         }
     }
 
@@ -220,11 +192,11 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.startElement(property.getNamespaceURI(), property.getLocalName(), property.toPrefixString(), null);
+            contentHandler.startElement(property.getNamespaceURI(), property.getLocalName(), toPrefixString(property), null);
         }
         catch (SAXException e)
         {
-            throw new ExporterException("Failed to process start property event - nodeRef " + nodeRef + "; property " + property.toPrefixString(), e);
+            throw new ExporterException("Failed to process start property event - nodeRef " + nodeRef + "; property " + toPrefixString(property), e);
         }
     }
 
@@ -235,42 +207,38 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.endElement(property.getNamespaceURI(), property.getLocalName(), property.toPrefixString());
+            contentHandler.endElement(property.getNamespaceURI(), property.getLocalName(), toPrefixString(property));
         }
         catch (SAXException e)
         {
-            throw new ExporterException("Failed to process end property event - nodeRef " + nodeRef + "; property " + property.toPrefixString(), e);
+            throw new ExporterException("Failed to process end property event - nodeRef " + nodeRef + "; property " + toPrefixString(property), e);
         }
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
-    public void value(NodeRef nodeRef, QName property, Serializable value)
+    public void value(NodeRef nodeRef, QName property, Object value)
     {
         if (value != null)
         {
-            String strValue = null;
-            
             try
             {
-                PropertyDefinition propDef = dictionaryService.getProperty(property);
-                Object objValue = ValueConverter.convert(propDef.getDataType(), value);
-                strValue = objValue.toString();
-            }
-            catch(UnsupportedOperationException e)
-            {
-                // TODO: Either abort or log warning according to configuration
-                strValue = value.toString();
-            }
-            
-            try
-            {
+                String strValue;
+                if (value instanceof Date)
+                {
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    strValue = format.format((Date)value);
+                }
+                else
+                {
+                    strValue = value.toString();
+                }
                 contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
             }
             catch (SAXException e)
             {
-                throw new ExporterException("Failed to process value - property " + property.toPrefixString(), e);
+                throw new ExporterException("Failed to process value - property " + toPrefixString(property), e);
             }
         }
     }
@@ -290,11 +258,11 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.startElement(assoc.getNamespaceURI(), assoc.getLocalName(), assoc.toPrefixString(), null);
+            contentHandler.startElement(assoc.getNamespaceURI(), assoc.getLocalName(), toPrefixString(assoc), null);
         }
         catch (SAXException e)
         {
-            throw new ExporterException("Failed to process start assoc event - nodeRef " + nodeRef + "; association " + assoc.toPrefixString(), e);
+            throw new ExporterException("Failed to process start assoc event - nodeRef " + nodeRef + "; association " + toPrefixString(assoc), e);
         }
     }
 
@@ -305,14 +273,21 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.endElement(assoc.getNamespaceURI(), assoc.getLocalName(), assoc.toPrefixString());
+            contentHandler.endElement(assoc.getNamespaceURI(), assoc.getLocalName(), toPrefixString(assoc));
         }
         catch (SAXException e)
         {
-            throw new ExporterException("Failed to process end assoc event - nodeRef " + nodeRef + "; association " + assoc.toPrefixString(), e);
+            throw new ExporterException("Failed to process end assoc event - nodeRef " + nodeRef + "; association " + toPrefixString(assoc), e);
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)
+     */
+    public void warning(String warning)
+    {
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#end()
      */
@@ -330,4 +305,24 @@ import org.xml.sax.helpers.AttributesImpl;
         }
     }
 
+    /**
+     * Get the prefix for the specified URI
+     * @param uri  the URI
+     * @return  the prefix (or null, if one is not registered)
+     */
+    private String toPrefixString(QName qname)
+    {
+        Collection<String> prefixes = namespaceService.getPrefixes(qname.getNamespaceURI());
+        if (prefixes.isEmpty() == false)
+        {
+            String prefix = prefixes.iterator().next();
+            QName prefixedQName = QName.createQName(prefix, qname.getLocalName(), namespaceService);
+            return prefixedQName.toPrefixString();
+        }
+        else
+        {
+            return qname.toPrefixString();
+        }
+    }
+    
 }

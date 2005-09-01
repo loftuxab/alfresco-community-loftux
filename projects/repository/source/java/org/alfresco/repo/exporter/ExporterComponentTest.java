@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -110,7 +109,7 @@ public class ExporterComponentTest extends BaseSpringTest
 //            System.out.println("TestProgress: end property " + property);
         }
 
-        public void value(NodeRef nodeRef, QName property, Serializable value)
+        public void value(NodeRef nodeRef, QName property, Object value)
         {
 //            System.out.println("TestProgress: value " + value);
         }
@@ -128,6 +127,11 @@ public class ExporterComponentTest extends BaseSpringTest
         public void endAssoc(NodeRef nodeRef, QName assoc)
         {
 //            System.out.println("TestProgress: end association " + assocDef.getName());
+        }
+
+        public void warning(String warning)
+        {
+            System.out.println("TestProgress: warning " + warning);   
         }
 
         public void end()

@@ -27,11 +27,13 @@ import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ExportStreamHandler;
 import org.alfresco.service.cmr.view.Exporter;
@@ -157,12 +159,7 @@ public class ExporterComponent
         XMLSerializer serializer = new XMLSerializer(output, format);
 
         // Construct an XML Exporter
-        XMLExporter xmlExporter = new XMLExporter();
-        xmlExporter.setNamespaceService(namespaceService);
-        xmlExporter.setDictionaryService(dictionaryService);
-        xmlExporter.setNodeService(nodeService);
-        xmlExporter.setContentHandler(serializer);
-
+        XMLExporter xmlExporter = new XMLExporter(namespaceService, nodeService, serializer);
         return xmlExporter;        
     }
 
@@ -220,15 +217,24 @@ public class ExporterComponent
         private void walk()
         {
             exporter.start();
-            walkStartNamespaces();
-
-            List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
-            for (ChildAssociationRef childAssoc : childAssocs)
+            if (nodeService.getRootNode(nodeRef.getStoreRef()).equals(nodeRef))
             {
-                walkNode(childAssoc.getChildRef());
+                // exporting complete store so cycle through the root entries
+                List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
+                for (ChildAssociationRef childAssoc : childAssocs)
+                {
+                    walkStartNamespaces();
+                    walkNode(childAssoc.getChildRef());
+                    walkEndNamespaces();
+                }
             }
-
-            walkEndNamespaces();
+            else
+            {
+                // exporting specific node within store
+                walkStartNamespaces();
+                walkNode(nodeRef);
+                walkEndNamespaces();
+            }
             exporter.end();
         }
         
@@ -312,6 +318,7 @@ public class ExporterComponent
                 // TODO: This should test for datatype.content
                 if (dictionaryService.isSubClass(type, ContentModel.TYPE_CMOBJECT) && property.equals(ContentModel.PROP_CONTENT_URL))
                 {
+                    // Export property of datatype CONTENT
                     ContentReader reader = contentService.getReader(nodeRef);
                     if (reader.exists())
                     {
@@ -335,7 +342,19 @@ public class ExporterComponent
                 }
                 else
                 {
-                    exporter.value(nodeRef, property, properties.get(property));
+                    // Export all other datatypes
+                    Object value = null; 
+                    PropertyDefinition propDef = dictionaryService.getProperty(property);
+                    try
+                    {
+                        value = ValueConverter.convert(propDef.getDataType(), properties.get(property));
+                    }
+                    catch(UnsupportedOperationException e)
+                    {
+                        exporter.warning("Value of property " + property + " is incompatible for its datatype " + propDef.getDataType().getName());
+                        value = properties.get(property);
+                    }
+                    exporter.value(nodeRef, property, value);
                 }
                 
                 exporter.endProperty(nodeRef, property);
