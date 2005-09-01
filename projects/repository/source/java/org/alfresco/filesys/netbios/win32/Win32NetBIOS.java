@@ -533,6 +533,94 @@ public class Win32NetBIOS
         return niList;
     }
 
+    //---------- Winsock based NetBIOS interface ----------//
+    
+    /**
+     * Initialize the NetBIOS socket interface
+     * 
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native void InitializeSockets()
+        throws WinsockNetBIOSException;
+    
+    /**
+     * Shutdown the NetBIOS socket interface
+     */
+    protected static native void ShutdownSockets();
+    
+    /**
+     * Create a NetBIOS socket
+     * 
+     * @param lana int
+     * @return int
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native int CreateSocket(int lana)
+        throws WinsockNetBIOSException;
+    
+    /**
+     * Bind a NetBIOS socket to a name to listen for incoming sessions
+     * 
+     * @param sockPtr int
+     * @param name byte[]
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native int BindSocket(int sockPtr, byte[] name)
+        throws WinsockNetBIOSException;
+    
+    /**
+     * Listen for an incoming connection
+     * 
+     * @param sockPtr int
+     * @param callerName byte[]
+     * @return int
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native int ListenSocket(int sockPtr, byte[] callerName)
+        throws WinsockNetBIOSException;
+
+    
+    /**
+     * Close a NetBIOS socket
+     * 
+     * @param sockPtr int
+     */
+    protected static native void CloseSocket(int sockPtr);
+    
+    /**
+     * Send data on a session socket
+     * 
+     * @param sockPtr int
+     * @param buf byte[]
+     * @param off int
+     * @param len int
+     * @return int
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native int SendSocket(int sockPtr, byte[] buf, int off, int len)
+        throws WinsockNetBIOSException;
+
+    
+    /**
+     * Receive data on a session socket
+     * 
+     * @param sockPtr int
+     * @param buf byte[]
+     * @param off int
+     * @param maxLen int
+     * @return int
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native int ReceiveSocket(int sockPtr, byte[] buf, int off, int maxLen)
+        throws WinsockNetBIOSException;
+
+    
+    /**
+     * Wait for a network address change event, block until a change occurs or the Winsock NetBIOS
+     * interface is shut down
+     */
+    public static native void waitForNetworkAddressChange();
+    
     /**
      * Static initializer used to load the native code library
      */

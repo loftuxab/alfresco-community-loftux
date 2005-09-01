@@ -26,9 +26,11 @@ import org.alfresco.filesys.smb.server.SMBSrvPacket;
 
 /**
  * Win32 NetBIOS Packet Handler Class
- * <p>
- * Uses the Win32 Netbios() call to provide the low level session layer for better integration with
+ * 
+ * <p>Uses the Win32 Netbios() call to provide the low level session layer for better integration with
  * Windows.
+ * 
+ * @author GKSpencer
  */
 public class Win32NetBIOSPacketHandler extends PacketHandler
 {
@@ -115,8 +117,7 @@ public class Win32NetBIOSPacketHandler extends PacketHandler
             {
 
                 // Check if the packet buffer is already at the maximum size (we assume the maximum
-                // size is the maximum
-                // that RFC NetBIOS can send which is 17bits)
+                // size is the maximum that RFC NetBIOS can send which is 17bits)
 
                 if (pkt.getBuffer().length < RFCNetBIOSProtocol.MaxPacketSize)
                 {
@@ -145,8 +146,7 @@ public class Win32NetBIOSPacketHandler extends PacketHandler
                 // Receive the remaining data
                 //
                 // Note: If the second read request is issued with a size of 64K or 64K-4 it returns
-                // with another
-                // incomplete status and returns no data.
+                // with another incomplete status and returns no data.
 
                 int rxLen2 = Win32NetBIOS.Receive(m_lana, m_lsn, pkt.getBuffer(), rxLen + 4, 32768);
 
@@ -156,11 +156,6 @@ public class Win32NetBIOSPacketHandler extends PacketHandler
                     throw new IOException("Win32 NetBIOS multi-part receive failed, sts=0x" + sts + ", err="
                             + NetBIOS.getErrorString(sts));
                 }
-
-                // DEBUG
-
-                // Debug.println("readPacket() rxlen2=" + rxLen2 + ", total read len = " + (rxLen +
-                // rxLen2));
 
                 // Set the total received data length
 
@@ -193,8 +188,7 @@ public class Win32NetBIOSPacketHandler extends PacketHandler
         // Output the packet on the Win32 NetBIOS session
         //
         // As Windows is handling the NetBIOS session layer we do not send the 4 byte header that is
-        // used
-        // by the NetBIOS over TCP/IP and native SMB packet handlers.
+        // used by the NetBIOS over TCP/IP and native SMB packet handlers.
 
         int sts = Win32NetBIOS.Send(m_lana, m_lsn, pkt.getBuffer(), 4, len);
 

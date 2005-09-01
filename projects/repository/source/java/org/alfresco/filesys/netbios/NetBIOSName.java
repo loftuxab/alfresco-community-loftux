@@ -27,38 +27,42 @@ import org.alfresco.filesys.util.IPAddress;
  */
 public class NetBIOSName
 {
+    // NetBIOS name length
+    
+    public static final int NameLength  = 16;
+    
     // NetBIOS name types - <computername> + type
 
-    public static final char WorkStation = 0x00;
-    public static final char Messenger = 0x01;
-    public static final char RemoteMessenger = 0x03;
-    public static final char RASServer = 0x06;
-    public static final char FileServer = 0x20;
-    public static final char RASClientService = 0x21;
-    public static final char MSExchangeInterchange = 0x22;
-    public static final char MSExchangeStore = 0x23;
-    public static final char MSExchangeDirectory = 0x24;
-    public static final char LotusNotesServerService = 0x2B;
-    public static final char ModemSharingService = 0x30;
-    public static final char ModemSharingClient = 0x31;
-    public static final char McCaffeeAntiVirus = 0x42;
+    public static final char WorkStation            = 0x00;
+    public static final char Messenger              = 0x01;
+    public static final char RemoteMessenger        = 0x03;
+    public static final char RASServer              = 0x06;
+    public static final char FileServer             = 0x20;
+    public static final char RASClientService       = 0x21;
+    public static final char MSExchangeInterchange  = 0x22;
+    public static final char MSExchangeStore        = 0x23;
+    public static final char MSExchangeDirectory    = 0x24;
+    public static final char LotusNotesServerService= 0x2B;
+    public static final char ModemSharingService    = 0x30;
+    public static final char ModemSharingClient     = 0x31;
+    public static final char McCaffeeAntiVirus      = 0x42;
     public static final char SMSClientRemoteControl = 0x43;
-    public static final char SMSAdminRemoteControl = 0x44;
-    public static final char SMSClientRemoteChat = 0x45;
-    public static final char SMSClientRemoteTransfer = 0x46;
-    public static final char DECPathworksService = 0x4C;
-    public static final char MSExchangeIMC = 0x6A;
-    public static final char MSExchangeMTA = 0x87;
-    public static final char NetworkMonitorAgent = 0xBE;
-    public static final char NetworkMonitorApp = 0xBF;
+    public static final char SMSAdminRemoteControl  = 0x44;
+    public static final char SMSClientRemoteChat    = 0x45;
+    public static final char SMSClientRemoteTransfer= 0x46;
+    public static final char DECPathworksService    = 0x4C;
+    public static final char MSExchangeIMC          = 0x6A;
+    public static final char MSExchangeMTA          = 0x87;
+    public static final char NetworkMonitorAgent    = 0xBE;
+    public static final char NetworkMonitorApp      = 0xBF;
 
     // <domainname> + type
 
-    public static final char Domain = 0x00; // Group
-    public static final char DomainMasterBrowser = 0x1B;
-    public static final char DomainControllers = 0x1C; // Group
-    public static final char MasterBrowser = 0x1D;
-    public static final char DomainAnnounce = 0x1E;
+    public static final char Domain                 = 0x00; // Group
+    public static final char DomainMasterBrowser    = 0x1B;
+    public static final char DomainControllers      = 0x1C; // Group
+    public static final char MasterBrowser          = 0x1D;
+    public static final char DomainAnnounce         = 0x1E;
 
     // Browse master - __MSBROWSE__ + type
 
@@ -201,8 +205,8 @@ public class NetBIOSName
      */
     public NetBIOSName(byte[] buf, int off)
     {
-        setName(new String(buf, off, 15));
-        setType((char) buf[off + 15]);
+        setName(new String(buf, off, NameLength - 1));
+        setType((char) buf[off + NameLength - 1]);
     }
 
     /**
@@ -212,8 +216,8 @@ public class NetBIOSName
      */
     public NetBIOSName(String name)
     {
-        setName(name.substring(0, 15).trim());
-        setType(name.charAt(15));
+        setName(name.substring(0, NameLength - 1).trim());
+        setType(name.charAt(NameLength - 1));
     }
 
     /**
@@ -224,8 +228,8 @@ public class NetBIOSName
      */
     protected NetBIOSName(String name, String scope)
     {
-        setName(name.substring(0, 15).trim());
-        setType(name.charAt(15));
+        setName(name.substring(0, NameLength - 1).trim());
+        setType(name.charAt(NameLength - 1));
 
         if (scope != null && scope.length() > 0)
             setNameScope(scope);
@@ -336,7 +340,7 @@ public class NetBIOSName
 
         // Allocate a buffer to build the full name
 
-        byte[] nameBuf = new byte[16];
+        byte[] nameBuf = new byte[NameLength];
 
         // Get the name string bytes
 
@@ -356,9 +360,9 @@ public class NetBIOSName
 
         for (int i = 0; i < nameBytes.length; i++)
             nameBuf[i] = nameBytes[i];
-        for (int i = nameBytes.length; i < 16; i++)
+        for (int i = nameBytes.length; i < NameLength; i++)
             nameBuf[i] = ' ';
-        nameBuf[15] = (byte) (m_type & 0xFF);
+        nameBuf[NameLength - 1] = (byte) (m_type & 0xFF);
 
         return nameBuf;
     }
@@ -682,12 +686,12 @@ public class NetBIOSName
 
         StringBuffer nbName = new StringBuffer(getName().toUpperCase());
 
-        if (nbName.length() > 15)
-            nbName.setLength(15);
+        if (nbName.length() > NameLength - 1)
+            nbName.setLength(NameLength - 1);
 
         // Space pad the name then add the NetBIOS name type
 
-        while (nbName.length() < 15)
+        while (nbName.length() < NameLength - 1)
             nbName.append(' ');
         nbName.append(getType());
 

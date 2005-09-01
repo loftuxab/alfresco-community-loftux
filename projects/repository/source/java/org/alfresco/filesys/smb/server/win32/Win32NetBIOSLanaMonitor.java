@@ -18,7 +18,9 @@ package org.alfresco.filesys.smb.server.win32;
 
 import java.util.BitSet;
 
+import org.alfresco.filesys.netbios.win32.NetBIOSSocket;
 import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
+import org.alfresco.filesys.netbios.win32.WinsockNetBIOSException;
 import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.smb.mailslot.Win32NetBIOSHostAnnouncer;
 import org.alfresco.filesys.smb.server.SMBServer;
@@ -33,7 +35,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Win32NetBIOSLanaMonitor extends Thread
 {
-
+    // Constants
+    //
+    // Initial LANA listener array size
+    
+    private static final int LanaListenerArraySize  = 16;
+    
     // Debug logging
 
     private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
@@ -42,10 +49,15 @@ public class Win32NetBIOSLanaMonitor extends Thread
 
     private static Win32NetBIOSLanaMonitor _lanaMonitor;
 
-    // Available LANA list
+    // Available LANA list and current status
 
     private BitSet m_lanas;
+    private BitSet m_lanaSts;
 
+    // LANA status listeners
+    
+    private LanaListener[] m_listeners;
+    
     // SMB/CIFS server to add new session handlers to
 
     private SMBServer m_server;
@@ -82,7 +94,9 @@ public class Win32NetBIOSLanaMonitor extends Thread
 
         // Set the current LANAs in the available LANAs list
 
-        m_lanas = new BitSet();
+        m_lanas   = new BitSet();
+        m_lanaSts = new BitSet();
+        
         if (lanas != null)
         {
 
@@ -92,6 +106,16 @@ public class Win32NetBIOSLanaMonitor extends Thread
                 m_lanas.set(lanas[i]);
         }
 
+        // Initialize the online LANA status list
+        
+        int[] curLanas = Win32NetBIOS.LanaEnum();
+        
+        if ( curLanas != null)
+        {
+            for ( int i = 0; i < curLanas.length; i++)
+                m_lanaSts.set(curLanas[i], true);
+        }
+        
         // Set the global LANA monitor, if not already set
 
         if (_lanaMonitor == null)
@@ -114,32 +138,117 @@ public class Win32NetBIOSLanaMonitor extends Thread
     }
 
     /**
+     * Add a LANA listener
+     * 
+     * @param lana int
+     * @param listener LanaListener
+     */
+    public synchronized final void addLanaListener(int lana, LanaListener l)
+    {
+        // Range check the LANA id
+        
+        if ( lana < 0 || lana > 255)
+            return;
+        
+        // Check if the listener array has been allocated
+        
+        if ( m_listeners == null)
+        {
+            int len = LanaListenerArraySize;
+            if ( lana > len)
+                len = (lana + 3) & 0x00FC;
+            
+            m_listeners = new LanaListener[len];
+        }
+        else if ( lana > m_listeners.length)
+        {
+            // Extend the LANA listener array
+            
+            LanaListener[] newArray = new LanaListener[(lana + 3) & 0x00FC];
+           
+            // Copy the existing array to the extended array
+            
+            System.arraycopy(m_listeners, 0, newArray, 0, m_listeners.length);
+            m_listeners = newArray;
+        }
+        
+        //  Add the LANA listener
+        
+        m_listeners[lana] = l;
+
+        // DEBUG
+
+        if (logger.isDebugEnabled() && hasDebug())
+            logger.debug("[SMB] Win32 NetBIOS register listener for LANA " + lana);
+    }
+
+    /**
+     * Remove a LANA listener
+     * 
+     * @param lana int
+     */
+    public synchronized final void removeLanaListener(int lana)
+    {
+        // Validate the LANA id
+        
+        if ( m_listeners == null || lana < 0 || lana >= m_listeners.length)
+            return;
+        
+        m_listeners[lana] = null;
+    }
+    
+    /**
      * Thread method
      */
     public void run()
     {
-
         // Clear the shutdown flag
 
         m_shutdown = false;
 
+        // If Winsock NetBIOS is not enabled then initialize the sockets interface
+        
+        ServerConfiguration config = m_server.getConfiguration();
+        
+        if ( config.useWinsockNetBIOS() == false)
+        {
+            try
+            {
+                NetBIOSSocket.initializeSockets();
+            }
+            catch (WinsockNetBIOSException ex)
+            {
+                // DEBUG
+
+                if (logger.isDebugEnabled() && hasDebug())
+                    logger.debug("[SMB] Win32 NetBIOS initialization error", ex);
+                
+                // Shutdown the LANA monitor thread
+                
+                m_shutdown = true;
+            }
+        }
+        
         // Loop until shutdown
 
-        ServerConfiguration config = m_server.getConfiguration();
-
+        BitSet curLanas = new BitSet();
+        
         while (m_shutdown == false)
         {
 
-            // Sleep for a while
+            // Wait for a network address change event
 
-            try
-            {
-                Thread.sleep(m_wakeup);
-            }
-            catch (InterruptedException ex)
-            {
-            }
+            Win32NetBIOS.waitForNetworkAddressChange();
+            
+            // Check if the monitor has been closed
+            
+            if ( m_shutdown == true)
+                continue;
 
+            // Clear the current active LANA bit set
+            
+            curLanas.clear();
+            
             // Get the available LANA list
 
             int[] lanas = Win32NetBIOS.LanaEnum();
@@ -156,6 +265,8 @@ public class Win32NetBIOSLanaMonitor extends Thread
                     // Get the current LANA id, check if it's a known LANA
 
                     int lana = lanas[i];
+                    curLanas.set(lana, true);
+                    
                     if (m_lanas.get(lana) == false)
                     {
 
@@ -228,9 +339,58 @@ public class Win32NetBIOSLanaMonitor extends Thread
                                     logger.debug("[SMB] Win32 NetBIOS host announcer enabled on LANA " + lana);
                             }
 
-                            // Set the LANA in the available LANA list
+                            // Set the LANA in the available LANA list, and set the current status to online
 
                             m_lanas.set(lana);
+                            m_lanaSts.set(lana, true);
+                        }
+                    }
+                    else
+                    {
+                        // Check if the LANA has just come back online
+                        
+                        if ( m_lanaSts.get(lana) == false)
+                        {
+                            // Change the LANA status to indicate the LANA is back online
+                            
+                            m_lanaSts.set(lana, true);
+                            
+                            // Inform the listener that the LANA is back online
+
+                            if ( m_listeners != null && lana < m_listeners.length &&
+                                    m_listeners[lana] != null)
+                                m_listeners[lana].lanaStatusChange(lana, true);
+                            
+                            // DEBUG
+
+                            if (logger.isDebugEnabled() && hasDebug())
+                                logger.debug("[SMB] Win32 NetBIOS LANA online - " + lana);
+                        }
+                    }
+                }
+                
+                // Check if there are any LANAs that have gone offline
+
+                for ( int i = 0; i < m_lanaSts.length(); i++)
+                {
+                    if ( curLanas.get(i) == false && m_lanaSts.get(i) == true)
+                    {
+                        // DEBUG
+
+                        if (logger.isDebugEnabled() && hasDebug())
+                            logger.debug("[SMB] Win32 NetBIOS LANA offline - " + i);
+
+                        // Change the LANA status
+                        
+                        m_lanaSts.set(i, false);
+                        
+                        // Check if there is an associated listener for the LANA
+                        
+                        if ( m_listeners != null && m_listeners[i] != null)
+                        {
+                            // Notify the LANA listener that the LANA is now offline
+                            
+                            m_listeners[i].lanaStatusChange(i, false);
                         }
                     }
                 }
@@ -254,5 +414,10 @@ public class Win32NetBIOSLanaMonitor extends Thread
     public final void shutdownRequest()
     {
         m_shutdown = true;
+        
+        // If Winsock NetBIOS is being used shutdown the Winsock interface
+        
+        if ( m_server.getConfiguration().useWinsockNetBIOS())
+            NetBIOSSocket.shutdownSockets();
     }
 }

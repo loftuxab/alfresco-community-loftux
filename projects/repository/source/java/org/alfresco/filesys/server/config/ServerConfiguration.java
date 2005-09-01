@@ -393,7 +393,8 @@ public class ServerConfiguration
             config = xmlConfigService.getConfig(ConfigFilesystems, configCtx);
             processFilesystemsConfig(config);
 
-            // successful initialisation
+            // Successful initialisation
+            
             initialised = true;
         }
         catch (UnsatisfiedLinkError ex)
@@ -759,13 +760,32 @@ public class ServerConfiguration
                 // LANA should be in the range 0-255
 
                 if (lana < 0 || lana > 255)
-                    throw new AlfrescoRuntimeException("Invlaid Win32 NetBIOS LANA number, " + lana);
+                    throw new AlfrescoRuntimeException("Invalid Win32 NetBIOS LANA number, " + lana);
 
                 // Set the LANA number
 
                 setWin32LANA(lana);
             }
 
+            // Check if the native NetBIOS interface has been specified, either 'winsock' or 'netbios'
+            
+            String nativeAPI = elem.getAttribute("api");
+            if ( nativeAPI != null && nativeAPI.length() > 0)
+            {
+                // Validate the API type
+                
+                boolean useWinsock = true;
+                
+                if ( nativeAPI.equalsIgnoreCase("netbios"))
+                    useWinsock = false;
+                else if ( nativeAPI.equalsIgnoreCase("winsock") == false)
+                    throw new AlfrescoRuntimeException("Invalid NetBIOS API type, spefify 'winsock' or 'netbios'");
+                
+                // Set the NetBIOS API to use
+                
+                setWin32WinsockNetBIOS( useWinsock);
+            }
+            
             // Check if the current operating system is supported by the Win32
             // NetBIOS handler
 
