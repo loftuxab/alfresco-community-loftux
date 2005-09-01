@@ -1038,10 +1038,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			}					
 		};
 		
-		NodeRef actionExecutionDetailsNodeRef = (NodeRef)TransactionUtil.executeInNonPropigatingUserTransaction(
+		NodeRef actionExecutionDetailsNodeRef = (NodeRef)TransactionUtil.executeInNonPropagatingUserTransaction(
 				this.transactionService,
-				work,
-				true);
+				work);
 		
 		if (actionExecutionDetailsNodeRef == null)
 		{
@@ -1078,10 +1077,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 				}					
 			};
 			
-			boolean result = ((Boolean)TransactionUtil.executeInNonPropigatingUserTransaction(
+			boolean result = ((Boolean)TransactionUtil.executeInNonPropagatingUserTransaction(
 					this.transactionService,
-					work,
-					true)).booleanValue();
+					work)).booleanValue();
 			
 			if (result == false)
 			{
@@ -1120,10 +1118,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 				}					
 			};
 			
-			boolean result = ((Boolean)TransactionUtil.executeInNonPropigatingUserTransaction(
+			boolean result = ((Boolean)TransactionUtil.executeInNonPropagatingUserTransaction(
 					this.transactionService,
-					work,
-					true)).booleanValue();
+					work)).booleanValue();
 			
 			if (result == false)
 			{

@@ -204,7 +204,7 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 		{	
 			try
 			{
-				TransactionUtil.executeInNonPropigatingUserTransaction(
+				TransactionUtil.executeInNonPropagatingUserTransaction(
 						this.transactionService,
 						new TransactionUtil.TransactionWork()
 						{
@@ -219,8 +219,7 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 								
 								return null;
 							}
-						},
-						false);
+						});
 			}
 			catch (Throwable exception)
 			{

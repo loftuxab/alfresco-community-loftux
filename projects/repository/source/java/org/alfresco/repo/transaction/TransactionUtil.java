@@ -17,11 +17,12 @@
 package org.alfresco.repo.transaction;
 
 import javax.transaction.Status;
-import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ParameterCheck;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class containing transactions helper methods and interfaces.
@@ -30,136 +31,119 @@ import org.alfresco.util.ParameterCheck;
  */
 public class TransactionUtil
 {
-	/**
-	 * Transaction work interface.
-	 * <p>
-	 * This interface encapsulates a unit of work that should be done within a transaction.
-	 */
-	public interface TransactionWork
-	{
-		/**
-		 * Method containing the work to be done in the user transaction.
-		 */
-		Object doWork();
-	}
-	
-	/**
-	 * Execute the transaction work in a user transaction
-	 * 
-	 * @param transactionService	the transaction service
-	 * @param transactionWork		the transaction work
-	 * @param ignoreException		indicates whether errors raised in the work are ignored or
-	 * 								re-thrown
-	 */
-	public static Object executeInUserTransaction(
-			TransactionService transactionService, 
-			TransactionWork transactionWork,
-			boolean ignoreException)
-	{
-		return executeInTransaction(transactionService, transactionWork, ignoreException, false);
-	}
-	
-	/**
-	 * Execute the transaction work in a non propigating user transaction
-	 * 
-	 * @param transactionService	the transaction service
-	 * @param transactionWork		the transaction work
-	 * @param ignoreException		indicates whether errors raised in the work are ignored or
-	 * 								re-thrown
-	 */
-	public static Object executeInNonPropigatingUserTransaction(
-			TransactionService transactionService, 
-			TransactionWork transactionWork,
-			boolean ignoreException)
-	{
-		return executeInTransaction(transactionService, transactionWork, ignoreException, true);
-	}
-	
-	/**
-	 * Execute the transaction work in a user transaction of a specified type
-	 * 
-	 * @param transactionService	the transaction service
-	 * @param transactionWork		the transaction work
-	 * @param ignoreException		indicates whether errors raised in the work are ignored or
-	 * 								re-thrown
-	 * @param nonPropigatingUserTransaction
-	 * 								indicates whether the transaction should be non propigating
-	 * 								or not
-	 */
-	private static Object executeInTransaction(
-			TransactionService transactionService, 
-			TransactionWork transactionWork,
-			boolean ignoreException,
-			boolean nonPropigatingUserTransaction)
-	{
-		ParameterCheck.mandatory("transactionWork", transactionWork);
-		
-		Object result = null;
-		
-		// Get the right type of user transaction
-		UserTransaction txn = null;
-		if (nonPropigatingUserTransaction == true)
-		{
-			txn = transactionService.getNonPropagatingUserTransaction();
-		}
-		else
-		{
-			txn = transactionService.getUserTransaction();
-		}
-		
-		try
-		{
-			try
-			{
-				// Beging the transaction, do the work and then commit the transaction
-				txn.begin();
-				result = transactionWork.doWork();
-				txn.commit();
-			}
-			catch (Throwable exception)
-			{
-				try
-				{
-					// Roll back the exception
-					if (txn.getStatus() == Status.STATUS_ACTIVE)
-					{					
-						txn.rollback();
-					}
-				}
-				catch (SystemException systemException)
-				{
-					// Ignore system exception
-				}
-				
-				// Re-throw the exception (if appropriate)
-				if (ignoreException == false)
-				{
-					if (exception instanceof RuntimeException)
-					{
-						throw (RuntimeException)exception;
-					}
-					else
-					{
-						throw new RuntimeException("Error during execution of transaction.", exception);
-					}
-				}
-			}
-		}
-		finally
-		{
-			try
-			{
-				if (txn.getStatus() == Status.STATUS_ACTIVE)
-				{					
-					txn.rollback();
-				}
-			}
-			catch (SystemException systemException)
-			{
-				// Ignore system exception
-			}
-		}
-		
-		return result;
-	}
+    private static Log logger = LogFactory.getLog(TransactionUtil.class);
+
+    /**
+     * Transaction work interface.
+     * <p>
+     * This interface encapsulates a unit of work that should be done within a
+     * transaction.
+     */
+    public interface TransactionWork
+    {
+        /**
+         * Method containing the work to be done in the user transaction.
+         */
+        Object doWork();
+    }
+
+    /**
+     * Execute the transaction work in a user transaction
+     * 
+     * @param transactionService the transaction service
+     * @param transactionWork the transaction work
+     * 
+     * @throws java.lang.RuntimeException if the transaction was rolled back
+     */
+    public static Object executeInUserTransaction(
+            TransactionService transactionService,
+            TransactionWork transactionWork)
+    {
+        return executeInTransaction(transactionService, transactionWork, false);
+    }
+
+    /**
+     * Execute the transaction work in a non propigating user transaction
+     * 
+     * @param transactionService the transaction service
+     * @param transactionWork the transaction work
+     * 
+     * @throws java.lang.RuntimeException if the transaction was rolled back
+     */
+    public static Object executeInNonPropagatingUserTransaction(
+            TransactionService transactionService,
+            TransactionWork transactionWork)
+    {
+        return executeInTransaction(transactionService, transactionWork, true);
+    }
+
+    /**
+     * Execute the transaction work in a user transaction of a specified type
+     * 
+     * @param transactionService the transaction service
+     * @param transactionWork the transaction work
+     * @param ignoreException indicates whether errors raised in the work are
+     *        ignored or re-thrown
+     * @param nonPropigatingUserTransaction indicates whether the transaction
+     *        should be non propigating or not
+     * 
+     * @throws java.lang.RuntimeException if the transaction was rolled back
+     */
+    private static Object executeInTransaction(
+            TransactionService transactionService,
+            TransactionWork transactionWork,
+            boolean nonPropigatingUserTransaction)
+    {
+        ParameterCheck.mandatory("transactionWork", transactionWork);
+
+        Object result = null;
+
+        // Get the right type of user transaction
+        UserTransaction txn = null;
+        if (nonPropigatingUserTransaction == true)
+        {
+            txn = transactionService.getNonPropagatingUserTransaction();
+        }
+        else
+        {
+            txn = transactionService.getUserTransaction();
+        }
+
+        try
+        {
+            // Begin the transaction, do the work and then commit the
+            // transaction
+            txn.begin();
+            result = transactionWork.doWork();
+            txn.commit();
+        }
+        catch (Throwable exception)
+        {
+            try
+            {
+                // Roll back the exception
+                if (txn.getStatus() == Status.STATUS_ACTIVE)
+                {
+                    txn.rollback();
+                }
+            }
+            catch (Throwable rollbackException)
+            {
+                // just dump the exception - we are already in a failure state
+                logger.error("Error rolling back transaction", rollbackException);
+            }
+
+            // Re-throw the exception
+            if (exception instanceof RuntimeException)
+            {
+                throw (RuntimeException) exception;
+            }
+            else
+            {
+                throw new RuntimeException("Error during execution of transaction.", exception);
+            }
+        }
+
+        return result;
+    }
 }

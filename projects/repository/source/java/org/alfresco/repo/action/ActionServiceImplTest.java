@@ -669,8 +669,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 										// See if the action has been performed
 										return test.executeTest();
 									}					
-								},
-								false)).booleanValue();			
+								})).booleanValue();			
 				} 
 				catch (InterruptedException e)
 				{
@@ -835,8 +834,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 						assertTrue(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ContentModel.ASPECT_VERSIONABLE));
 						return goodAction;
 					}					
-				},
-				false);
+				});
 		
 		// Now (in a new transaction) check the execution history has been set-up correctly)
 		TransactionUtil.executeInUserTransaction(
@@ -859,8 +857,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 						
 						return null;
 					}					
-				},
-				false);
+				});
 		
 		// Execute an action failure (on the same node
 		TransactionUtil.executeInUserTransaction(
@@ -891,8 +888,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 						
 						return null;
 					}					
-				},
-				false);
+				});
 		
 		// Now check the execution history for the failed action
 		TransactionUtil.executeInUserTransaction(
@@ -915,8 +911,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 						
 						return null;
 					}					
-				},
-				false);
+				});
 	}
 	
 	private void checkActionExecutionDetails(
@@ -1053,8 +1048,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 						return null;
 					}
 					
-				},
-				false);
+				});
 		
 		postAsyncActionTest(
 				1000, 
