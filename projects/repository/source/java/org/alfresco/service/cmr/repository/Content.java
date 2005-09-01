@@ -16,6 +16,8 @@
  */
 package org.alfresco.service.cmr.repository;
 
+import org.alfresco.service.transaction.TransactionService;
+
 
 /**
  * A <tt>Content</tt> is a handle onto a specific content location.
@@ -24,6 +26,30 @@ package org.alfresco.service.cmr.repository;
  */
 public interface Content
 {    
+    /**
+     * Use this method to register any interest in events against underlying
+     * content streams. 
+     * {@link #getContentOutputStream() output stream}.
+     * <p>
+     * This method can only be used before the content stream has been retrieved.
+     * <p>
+     * When the stream has been closed, all listeners will be called
+     * within a {@link #setTransactionService(TransactionService) transaction}.
+     * 
+     * @param listener a listener that will be called for output stream
+     *      event notification
+     *      
+     * @see #setTransactionService(TransactionService)
+     */
+    public void addListener(ContentStreamListener listener);
+    
+    /**
+     * Set the transaction provider that will be used when stream listeners are called.
+     * 
+     * @param transactionService a transaction provider
+     */
+    public void setTransactionService(TransactionService transactionService);
+    
     /**
      * @return Returns a URL identifying the specific location of the content.
      *      The URL must identify, within the context of the originating content

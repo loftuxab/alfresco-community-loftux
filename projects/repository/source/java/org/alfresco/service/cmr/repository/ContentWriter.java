@@ -42,18 +42,6 @@ import java.nio.channels.WritableByteChannel;
 public interface ContentWriter extends Content
 {
     /**
-     * Use this method to register any interest in the 
-     * {@link #getContentOutputStream() output stream}.
-     * <p>
-     * This method can only be used before the output stream has been
-     * retrieved.
-     * 
-     * @param listener a listener that will be called for output stream
-     *      event notification
-     */
-    public void addListener(ContentStreamListener listener);
-    
-    /**
      * Convenience method to get a reader onto newly written content.  This
      * method will return null if the content has not yet been written by the
      * writer or if the output stream is still open.
@@ -98,6 +86,18 @@ public interface ContentWriter extends Content
      * @see #getWritableChannel()
      */
     public OutputStream getContentOutputStream() throws ContentIOException;
+    
+    /**
+     * Copies content from the reader.
+     * <p>
+     * All resources will be closed automatically.
+     * 
+     * @param reader the reader acting as the source of the content
+     * @throws ContentIOException
+     * 
+     * @see #getWritableChannel()
+     */
+    public void putContent(ContentReader reader) throws ContentIOException;
     
     /**
      * Puts content to the repository

@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentStreamListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.util.FileCopyUtils;
 
 /**
@@ -157,16 +157,17 @@ public abstract class AbstractContentReader extends AbstractContent implements C
      * @param listeners the listeners to call
      * @return Returns a channel
      * @throws ContentIOException
-     * 
-     * @see AbstractContentReader.CallbackChannel
      */
     protected ReadableByteChannel getCallbackReadableChannel(
             ReadableByteChannel directChannel,
             List<ContentStreamListener> listeners)
             throws ContentIOException
     {
-        // wrap it
-        ReadableByteChannel callbackChannel = new CallbackChannel(directChannel, listeners);
+        // introduce an advistor to handle the callbacks to the listeners
+        ByteChannelCallbackAdvise advise = new ByteChannelCallbackAdvise(listeners);
+        ProxyFactory proxyFactory = new ProxyFactory(directChannel);
+        proxyFactory.addAdvice(advise);
+        ReadableByteChannel callbackChannel = (ReadableByteChannel) proxyFactory.getProxy();
         // done
         return callbackChannel;
     }
@@ -184,6 +185,7 @@ public abstract class AbstractContentReader extends AbstractContent implements C
         }
         ReadableByteChannel directChannel = getDirectReadableChannel();
         channel = getCallbackReadableChannel(directChannel, listeners);
+
         // done
         if (logger.isDebugEnabled())
         {
@@ -324,46 +326,6 @@ public abstract class AbstractContentReader extends AbstractContent implements C
             throw new ContentIOException("Failed to copy content to string: \n" +
                     "   accessor: " + this,
                     e);
-        }
-    }
-
-    /**
-     * Provides callbacks to the {@link ContentStreamListener listeners}.
-     * 
-     * @author Derek Hulley
-     */
-    private static class CallbackChannel implements ReadableByteChannel
-    {
-        /*
-         * Override most methods in order to go direct to the delegate's
-         * implementations.
-         */
-        
-        private ReadableByteChannel delegate;
-        private List<ContentStreamListener> listeners;
-        
-        public CallbackChannel(ReadableByteChannel delegate, List<ContentStreamListener> listeners)
-        {
-            this.delegate = delegate;
-            this.listeners = listeners;
-        }
-        
-        public boolean isOpen()
-        {
-            return delegate.isOpen();
-        }
-        public int read(ByteBuffer dst) throws IOException
-        {
-            return delegate.read(dst);
-        }
-        public void close() throws IOException
-        {
-            delegate.close();
-            // call the listeners
-            for (ContentStreamListener listener : listeners)
-            {
-                listener.contentStreamClosed();
-            }
         }
     }
 }

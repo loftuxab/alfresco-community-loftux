@@ -110,7 +110,7 @@ public class ContentStoreCleanupJob implements Job
             System.out.println(contentUrl + ": " + Boolean.toString(result));
         }       
         
-        // TODO for now throw this exception to ensure that this job does not get run untill
+        // TODO for now throw this exception to ensure that this job does not get run until
         //      the orphaned content can be correctly retrieved
         throw new UnsupportedOperationException();
     }

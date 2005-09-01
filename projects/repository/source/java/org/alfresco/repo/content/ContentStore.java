@@ -32,9 +32,6 @@ import org.alfresco.service.cmr.repository.ContentWriter;
  * <code>NodeRef</code>.  Problems such as whether the node exists or
  * not are irrelevant - rather the <code>NodeRef</code> should be regarded
  * as key against which to store the content.
- * <p>
- * The nature of the API means that it is <b>never</b> possible to
- * dictate the location of a write operation.
  * 
  * @author Derek Hulley
  */
@@ -54,19 +51,17 @@ public interface ContentStore
     public ContentReader getReader(String contentUrl) throws ContentIOException;
     
     /**
-     * Get an accessor with which to write content to an anonymous location
+     * Get an accessor with which to write content to a location
      * within the store.  The writer is <b>stateful</b> and can
-     * <b>only be used once</b>.
-     * <p>
-     * Every call to this method will return a writer onto a <b>new</b>
-     * content URL.  It is never possible to write the same physical
-     * location twice.
+     * <b>only be used once</b>.  The location may be specified but must, in that case,
+     * be a valid and unused URL.
      * <p>
      * By supplying a reader to existing content, the store implementation may
      * enable {@link RandomAccessContent random access}.
      * 
      * @param existingContentReader a reader onto any existing content for which
      *      a writer is required - may be null
+     * @param newContentUrl an unused, valid URL to use - may be null.
      * @return Returns a write-only content accessor, possibly implementing
      *      the {@link RandomAccessContent random access interface}
      * @throws ContentIOException
@@ -75,7 +70,7 @@ public interface ContentStore
      * @see ContentWriter#addListener(ContentStreamListener)
      * @see ContentWriter#getContentUrl()
      */
-    public ContentWriter getWriter(ContentReader existingContentReader) throws ContentIOException;
+    public ContentWriter getWriter(ContentReader existingContentReader, String newContentUrl) throws ContentIOException;
 
     /**
      * Get a list of all content in the store

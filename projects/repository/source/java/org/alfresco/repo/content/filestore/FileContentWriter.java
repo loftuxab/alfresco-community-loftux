@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentWriter;
-import org.alfresco.repo.content.CallbackFileChannel;
 import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -145,7 +144,7 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
     {
         if (!(directChannel instanceof FileChannel))
         {
-            throw new AlfrescoRuntimeException("Expected read channel to be a file channel");
+            throw new AlfrescoRuntimeException("Expected write channel to be a file channel");
         }
         FileChannel fileChannel = (FileChannel) directChannel;
         // wrap it

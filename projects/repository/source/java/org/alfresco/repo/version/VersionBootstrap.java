@@ -19,6 +19,7 @@ package org.alfresco.repo.version;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.VersionStoreConst;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.cmr.repository.NodeService;

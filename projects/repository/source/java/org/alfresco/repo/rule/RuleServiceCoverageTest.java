@@ -852,8 +852,7 @@ public class RuleServiceCoverageTest extends TestCase
 						return result;
 					}
         			
-        		},
-        		false);        
+        		});        
 		
 		// Check that the working copy has been removed
 		assertFalse(this.nodeService.exists(list.get(1)));

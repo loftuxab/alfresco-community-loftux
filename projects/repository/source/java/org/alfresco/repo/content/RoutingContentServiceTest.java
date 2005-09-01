@@ -474,6 +474,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
                     writer.wait();   // wait until notified
                 }
                 os.close();
+                os = null;
                 txn.commit();
             }
             catch (Throwable e)

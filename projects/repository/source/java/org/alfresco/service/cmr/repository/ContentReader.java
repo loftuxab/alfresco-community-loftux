@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.ReadableByteChannel;
 
-
 /**
  * Represents a handle to read specific content.  Content may only be accessed
  * once per instance.
@@ -41,18 +40,6 @@ import java.nio.channels.ReadableByteChannel;
  */
 public interface ContentReader extends Content
 {
-    /**
-     * Use this method to register any interest in the 
-     * {@link #getContentInputStream() input stream}.
-     * <p>
-     * This method can only be used before the input stream has been
-     * retrieved.
-     * 
-     * @param listener a listener that will be called for input stream
-     *      event notification
-     */
-    public void addListener(ContentStreamListener listener);
-    
     /**
      * Convenience method to get another reader onto the underlying content.
      * 

@@ -33,22 +33,38 @@ public interface TransactionListener
     void flush();
     
     /**
+     * Called before a transaction is committed.
+     * <p>
+     * All transaction resources are still available.
+     * 
      * @param readOnly true if the transaction is read-only
      */
     void beforeCommit(boolean readOnly);
     
     /**
-     * 
+     * Invoked before transaction commit/rollback.  Will be called after
+     * {@link #beforeCommit(boolean) } even if {@link #beforeCommit(boolean)}
+     * failed.
+     * <p>
+     * Any exceptions generated here will cause the transaction to rollback.
+     * <p>
+     * All transaction resources are still available.
      */
     void beforeCompletion();
     
     /**
-     *
+     * Invoked after transaction commit.
+     * <p>
+     * Any exceptions generated here will cause the transaction to rollback.
+     * <p>
+     * All transaction resources are still available.
      */
     void afterCommit();
 
     /**
-     *
+     * Invoked after transaction rollback.
+     * <p>
+     * All transaction resources are still available.
      */
     void afterRollback();
 }

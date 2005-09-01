@@ -22,7 +22,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import org.alfresco.service.cmr.repository.ContentStreamListener;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.util.FileCopyUtils;
 
 /**
@@ -170,16 +170,17 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
      * @param listeners the listeners to call
      * @return Returns a callback channel
      * @throws ContentIOException
-     * 
-     * @see AbstractContentWriter.CallbackChannel
      */
     protected WritableByteChannel getCallbackWritableChannel(
             WritableByteChannel directChannel,
             List<ContentStreamListener> listeners)
             throws ContentIOException
     {
-        // wrap it
-        WritableByteChannel callbackChannel = new CallbackChannel(directChannel, listeners);
+        // proxy to add an advise
+        ByteChannelCallbackAdvise advise = new ByteChannelCallbackAdvise(listeners);
+        ProxyFactory proxyFactory = new ProxyFactory(directChannel);
+        proxyFactory.addAdvice(advise);
+        WritableByteChannel callbackChannel = (WritableByteChannel) proxyFactory.getProxy();
         // done
         return callbackChannel;
     }
@@ -197,10 +198,13 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
         }
         WritableByteChannel directChannel = getDirectWritableChannel();
         channel = getCallbackWritableChannel(directChannel, listeners);
+
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("Opened channel onto content: " + this);
+            logger.debug("Opened channel onto content: \n" +
+                    "   content: " + this + "\n" +
+                    "   channel: " + channel);
         }
         return channel;
     }
@@ -220,7 +224,29 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
         catch (Throwable e)
         {
             throw new ContentIOException("Failed to open stream onto channel: \n" +
-                    "   accessor: " + this,
+                    "   writer: " + this,
+                    e);
+        }
+    }
+
+    /**
+     * @see ContentReader#getContentInputStream()
+     * @see #putContent(InputStream) 
+     */
+    public void putContent(ContentReader reader) throws ContentIOException
+    {
+        try
+        {
+            // get the stream to read from
+            InputStream is = reader.getContentInputStream();
+            // put the content
+            putContent(is);
+        }
+        catch (Throwable e)
+        {
+            throw new ContentIOException("Failed to copy reader content to writer: \n" +
+                    "   writer: " + this + "\n" +
+                    "   source reader: " + reader,
                     e);
         }
     }
@@ -236,7 +262,7 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
         catch (IOException e)
         {
             throw new ContentIOException("Failed to copy content from input stream: \n" +
-                    "   accessor: " + this,
+                    "   writer: " + this,
                     e);
         }
     }
@@ -253,7 +279,7 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
         catch (IOException e)
         {
             throw new ContentIOException("Failed to copy content from file: \n" +
-                    "   accessor: " + this + "\n" +
+                    "   writer: " + this + "\n" +
                     "   file: " + file,
                     e);
         }
@@ -280,49 +306,9 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
         catch (IOException e)
         {
             throw new ContentIOException("Failed to copy content from string: \n" +
-                    "   accessor: " + this +
+                    "   writer: " + this +
                     "   content length: " + content.length(),
                     e);
-        }
-    }
-
-    /**
-     * Provides callbacks to the {@link ContentStreamListener listeners}.
-     * 
-     * @author Derek Hulley
-     */
-    private static class CallbackChannel implements WritableByteChannel
-    {
-        /*
-         * Override most methods in order to go direct to the delegate's
-         * implementations.
-         */
-        
-        private WritableByteChannel delegate;
-        private List<ContentStreamListener> listeners;
-        
-        public CallbackChannel(WritableByteChannel delegate, List<ContentStreamListener> listeners)
-        {
-            this.delegate = delegate;
-            this.listeners = listeners;
-        }
-        
-        public boolean isOpen()
-        {
-            return delegate.isOpen();
-        }
-        public int write(ByteBuffer src) throws IOException
-        {
-            return delegate.write(src);
-        }
-        public void close() throws IOException
-        {
-            delegate.close();
-            // call the listeners
-            for (ContentStreamListener listener : listeners)
-            {
-                listener.contentStreamClosed();
-            }
         }
     }
 }

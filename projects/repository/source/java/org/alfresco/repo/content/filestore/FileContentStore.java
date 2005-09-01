@@ -17,7 +17,9 @@
 package org.alfresco.repo.content.filestore;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -47,6 +49,7 @@ import org.apache.commons.logging.LogFactory;
 public class FileContentStore implements ContentStore
 {
     public static final String STORE_PROTOCOL = "file://";
+    public static final String DELETION_MARKER_SUFFIX = ".delete";
     
     private static final Log logger = LogFactory.getLog(FileContentStore.class);
     
@@ -70,7 +73,7 @@ public class FileContentStore implements ContentStore
         rootDirectory = rootDirectory.getAbsoluteFile();
         rootAbsolutePath = rootDirectory.getAbsolutePath();
     }
-    
+
     public String toString()
     {
         StringBuilder sb = new StringBuilder(36);
@@ -94,18 +97,43 @@ public class FileContentStore implements ContentStore
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         // create the directory
         StringBuilder sb = new StringBuilder(20);
-        sb.append(year).append(File.separatorChar)
+        sb.append(FileContentStore.STORE_PROTOCOL)
+          .append(year).append(File.separatorChar)
           .append(month).append(File.separatorChar)
-          .append(day);
-        File dir = new File(rootDirectory, sb.toString());
+          .append(day).append(File.separatorChar)
+          .append(GUID.generate()).append(".bin");
+        String newContentUrl = sb.toString();
+        return getNewStorageFile(newContentUrl);
+    }
+    
+    /**
+     * Creates a file for the specifically provided content URL.  The URL may
+     * not already be in use.
+     * 
+     * @param newContentUrl the specific URL to use, which may not be in use
+     * @return Returns a new and unique file
+     * @throws IOException if the file or parent directories couldn't be created or
+     *      if the URL is already in use.
+     */
+    private File getNewStorageFile(String newContentUrl) throws IOException
+    {
+        File file = makeFile(newContentUrl);
+        // check that the URL is new
+        if (file.exists())
+        {
+            throw new ContentIOException(
+                    "When specifying a URL for new content, the URL may not be in use already. \n" +
+                    "   store: " + this + "\n" +
+                    "   new URL: " + newContentUrl);
+        }
+        
+        // create the directory, if it doesn't exist
+        File dir = file.getParentFile();
         if (!dir.exists())
         {
             dir.mkdirs();
         }
         
-        // create the file
-        String localFileName = GUID.generate() + ".bin";
-        File file = new File(dir, localFileName);
         // done
         return file;
     }
@@ -170,30 +198,8 @@ public class FileContentStore implements ContentStore
      * 
      * @see #checkUrl(String)
      */
-    private static boolean warned = false;
     private File makeFile(String contentUrl)
     {
-        /*
-         * This temporary code is here to prevent mass barfing for data where
-         * the content URL is still in the old absolute format
-         */
-        if (contentUrl.contains("alfresco\\contentstore\\") ||
-                contentUrl.contains("alfresco/contentstore/"))
-        {
-            // strip off everything before that
-            int index = contentUrl.indexOf("alfresco\\contentstore\\");
-            if (index < 0)
-            {
-                index = contentUrl.indexOf("alfresco/contentstore/");
-            }
-            contentUrl = FileContentStore.STORE_PROTOCOL + contentUrl.substring(index + 22);
-            if (!warned)
-            {
-                logger.warn("Content URLs in database are absolute.  See issue AR-4");
-                warned = true;
-            }
-        }
-        
         checkUrl(contentUrl);
         // take just the part after the protocol
         String relativeUrl = contentUrl.substring(7);
@@ -212,7 +218,8 @@ public class FileContentStore implements ContentStore
         try
         {
             File file = makeFile(contentUrl);
-            ContentReader reader = new FileContentReader(file, contentUrl);
+            FileContentReader reader = new FileContentReader(file, contentUrl);
+            
             // done
             if (logger.isDebugEnabled())
             {
@@ -232,16 +239,27 @@ public class FileContentStore implements ContentStore
     /**
      * @return Returns a writer onto a location based on the date
      */
-    public ContentWriter getWriter(ContentReader existingContentReader)
+    public ContentWriter getWriter(ContentReader existingContentReader, String newContentUrl)
     {
         try
         {
-            File file = getNewStorageFile();
-            // make a URL
-            String contentUrl = makeContentUrl(file);
+            File file = null;
+            String contentUrl = null;
+            if (newContentUrl == null)              // a specific URL was not supplied
+            {
+                // get a new file with a new URL
+                file = getNewStorageFile();
+                // make a URL
+                contentUrl = makeContentUrl(file);
+            }
+            else                                    // the URL has been given
+            {
+                file = getNewStorageFile(newContentUrl);
+                contentUrl = newContentUrl;
+            }
             // create the writer
-            ContentWriter writer = new FileContentWriter(file, contentUrl, existingContentReader);
-            // set the 
+            FileContentWriter writer = new FileContentWriter(file, contentUrl, existingContentReader);
+            
             // done
             if (logger.isDebugEnabled())
             {
@@ -288,37 +306,66 @@ public class FileContentStore implements ContentStore
             }
             else
             {
-                // found a file - create and add the URL
+                // found a file - create the URL
                 String contentUrl = makeContentUrl(file);
+                // ignore deletion markers
+                if (contentUrl.endsWith(DELETION_MARKER_SUFFIX))
+                {
+                    continue;
+                }
+                // ignore content files for which there is a deletion marker
+                String deletionUrl = contentUrl + DELETION_MARKER_SUFFIX;
+                File deletionFile = makeFile(deletionUrl);
+                if (deletionFile.exists())
+                {
+                    continue;
+                }
+                // add url to list
                 contentUrls.add(contentUrl);
             }
         }
     }
-
+    
     /**
-     * Attempts to delete the content at the URL provided.
+     * Doesn't perform any actual deletions, but rather marks files for deletion by
+     * creating a new marker file alongside the content.
      */
     public boolean delete(String contentUrl) throws ContentIOException
     {
-        try
+        checkUrl(contentUrl);
+        // ignore files that don't exist
+        File file = makeFile(contentUrl);
+        if (!file.exists())
         {
-            File file = makeFile(contentUrl);
-            // check if the file exists
-            if (file.exists()) 
+            return true;
+        }
+        
+        String deleteUrl = contentUrl + DELETION_MARKER_SUFFIX;
+        File deleteFile = makeFile(deleteUrl);
+        if (!deleteFile.exists())
+        {
+            // not yet marked for deletion
+            try
             {
-                return file.delete();
-            }
-            else
-            {
-                // already gone
+                OutputStream os = new FileOutputStream(deleteFile);
+                os.close();
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Marked URL for deletion: \n" +
+                            "   content url: " + contentUrl);
+                }
                 return true;
             }
+            catch (IOException e)
+            {
+                logger.error("Failed to create deletion marker for url: " + contentUrl, e);
+                return false;
+            }
         }
-        catch (Throwable e)
+        else
         {
-            throw new ContentIOException("Failed to delete content: \n" +
-                    "   store: " + this + "\n" +
-                    "   URL: " + contentUrl);
+            // already marked for deletion
+            return true;
         }
     }
 }

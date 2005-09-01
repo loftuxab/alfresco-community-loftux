@@ -21,10 +21,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
-
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy;
@@ -208,7 +204,10 @@ public class RoutingContentService implements ContentService
         ContentReader existingContentReader = getReader(nodeRef);
         
         // TODO: Choose the store to write to at runtime
-        ContentWriter writer = store.getWriter(existingContentReader);
+        
+        // get the content using the (potentially) existing content - the new content
+        // can be wherever the store decides.
+        ContentWriter writer = store.getWriter(existingContentReader, null);
 
         // get node properties
         Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
@@ -240,8 +239,9 @@ public class RoutingContentService implements ContentService
         // get the plain writer
         ContentWriter writer = getWriter(nodeRef);
         // need a listener to update the node when the stream closes
-        WriteStreamListener listener = new WriteStreamListener(transactionService, nodeService, nodeRef, writer);
+        WriteStreamListener listener = new WriteStreamListener(nodeService, nodeRef, writer);
         writer.addListener(listener);
+        writer.setTransactionService(transactionService);
         // give back to the client
         return writer;
     }
@@ -251,7 +251,8 @@ public class RoutingContentService implements ContentService
      */
     public ContentWriter getTempWriter()
     {
-        return tempStore.getWriter(null);
+        // there is no existing content and we don't specify the location of the new content
+        return tempStore.getWriter(null, null);
     }
 
     /**
@@ -309,19 +310,23 @@ public class RoutingContentService implements ContentService
     /**
      * Ensures that, upon closure of the output stream, the node is updated with
      * the latest URL of the content to which it refers.
+     * <p>
+     * The listener close operation does not need a transaction as the 
+     * <code>ContentWriter</code> takes care of that.
      * 
      * @author Derek Hulley
      */
     private static class WriteStreamListener implements ContentStreamListener
     {
-        private TransactionService transactionService;
         private NodeService nodeService;
         private NodeRef nodeRef;
         private ContentWriter writer;
         
-        public WriteStreamListener(TransactionService transactionService, NodeService nodeService, NodeRef nodeRef, ContentWriter writer)
+        public WriteStreamListener(
+                NodeService nodeService,
+                NodeRef nodeRef,
+                ContentWriter writer)
         {
-            this.transactionService = transactionService;
             this.nodeService = nodeService;
             this.nodeRef = nodeRef;
             this.writer = writer;
@@ -329,11 +334,8 @@ public class RoutingContentService implements ContentService
         
         public void contentStreamClosed() throws ContentIOException
         {
-            // begin a txn
-            UserTransaction txn = transactionService.getUserTransaction();
             try
             {
-                txn.begin();
                 // change the content URL property of the node we are listening for
                 String contentUrl = writer.getContentUrl();
                 nodeService.setProperty(
@@ -347,25 +349,11 @@ public class RoutingContentService implements ContentService
                         nodeRef,
                         ContentModel.PROP_SIZE,
                         new Long(length));
-                // commit
-                txn.commit();
             }
             catch (Throwable e)
             {
-                try
-                {
-                    if (txn.getStatus() == Status.STATUS_ACTIVE)
-                    {
-                        txn.rollback();
-                    }
-                }
-                catch (SystemException ee)
-                {
-                    ee.printStackTrace();
-                }
                 throw new ContentIOException("Failed to set URL and size upon stream closure", e);
             }
         }
     }
-
 }

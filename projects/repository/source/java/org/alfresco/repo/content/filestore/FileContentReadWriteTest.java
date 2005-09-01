@@ -23,7 +23,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
 import org.alfresco.repo.content.AbstractContentReadWriteTest;
-import org.alfresco.repo.content.CallbackFileChannel;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -80,7 +79,7 @@ public class FileContentReadWriteTest extends AbstractContentReadWriteTest
     {
         ContentWriter writer = getWriter();
         WritableByteChannel writeChannel = writer.getWritableChannel();
-        assertTrue("Channel not of correct callback type", writeChannel instanceof CallbackFileChannel);
+        assertTrue("Channel not of correct callback type", writeChannel instanceof FileChannel);
         
         // put some content
         writeChannel.write(ByteBuffer.wrap("ABC".getBytes()));
@@ -92,7 +91,7 @@ public class FileContentReadWriteTest extends AbstractContentReadWriteTest
         // get the reader
         ContentReader reader = writer.getReader();
         ReadableByteChannel readChannel = reader.getReadableChannel();
-        assertTrue("Channel not of correct callback type", readChannel instanceof CallbackFileChannel);
+        assertTrue("Channel not of correct callback type", readChannel instanceof FileChannel);
     }
     
     /**

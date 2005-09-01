@@ -22,6 +22,7 @@ import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
 
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -36,10 +37,12 @@ public class TransactionComponentTest extends TestCase
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     
     private TransactionService transactionService;
+    private NodeService nodeService;
     
     public void setUp() throws Exception
     {
         transactionService = (TransactionService) ctx.getBean("transactionComponent");
+        nodeService = (NodeService) ctx.getBean("dbNodeService");
     }
     
     public void testPropagatingTxn() throws Exception
