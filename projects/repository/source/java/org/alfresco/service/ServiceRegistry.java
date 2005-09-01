@@ -18,7 +18,6 @@ package org.alfresco.service;
 
 import java.util.Collection;
 
-import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -31,6 +30,7 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -65,6 +65,7 @@ public interface ServiceRegistry
     static final QName COCI_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CheckoutCheckinService");
     static final QName RULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "RuleService");
     static final QName IMPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ImporterService");
+    static final QName EXPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ExporterService");
     static final QName ACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ActionService");
     
     /**
@@ -162,6 +163,11 @@ public interface ServiceRegistry
      * @return the importer service or null if not present
      */
     ImporterService getImporterService();
+    
+    /**
+     * @return the exporter service or null if not present
+     */
+    ExporterService getExporterService();
     
     /**
      * @return the rule service (or null, if one is not provided)

@@ -22,7 +22,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
 
 /**
- * Importer Location
+ * Importer / Exporter Location
  * 
  * @author David Caruana
  */
@@ -74,7 +74,7 @@ public class Location
     }
     
     /**
-     * Sets the import location to the specified path
+     * Sets the location to the specified path
      *  
      * @param path  path relative to store or node reference
      */
@@ -84,7 +84,7 @@ public class Location
     }
     
     /**
-     * @return  the import location
+     * @return  the location
      */
     public String getPath()
     {
@@ -92,7 +92,7 @@ public class Location
     }
 
     /**
-     * Sets the child association type to import within
+     * Sets the child association type
      * 
      * @param childAssocType  child association type
      */

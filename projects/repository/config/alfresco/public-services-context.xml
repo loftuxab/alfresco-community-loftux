@@ -500,6 +500,40 @@
     </bean>
 
 
+    <!-- Exporter Service -->
+
+    <bean id="ExporterService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.view.ExporterService</value>
+    	</property>
+    	<property name="target"><ref bean="exporterComponent"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    		    <idref local="ExporterService_transaction" />
+    			<idref local="ExporterService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="ExporterService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.view.ExporterService.*=PROPAGATION_REQUIRED</value> 
+        </property>
+    </bean>
+
+    <bean id="ExporterService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.view.ExporterService</value>
+    	</property>
+    	<property name="description">
+    		<value>Exporter Service</value>
+    	</property>
+    </bean>
+
+
     <!-- Action Service -->
 
     <bean id="ActionService" class="org.springframework.aop.framework.ProxyFactoryBean">

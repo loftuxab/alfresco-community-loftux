@@ -797,6 +797,25 @@
         </property>
     </bean>
 
+    <!-- Exporter -->
+    <bean id="exporterComponent" class="org.alfresco.repo.exporter.ExporterComponent">
+        <property name="namespaceService">
+            <ref bean="namespaceService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="searchService">
+            <ref bean="searchService" />
+        </property>
+        <property name="contentService">
+            <ref bean="contentService" />
+        </property>
+    </bean>
+
     <!-- Audit -->
     <bean id="auditableAspect" class="org.alfresco.repo.audit.AuditableAspect" init-method="init">
         <property name="nodeService">
