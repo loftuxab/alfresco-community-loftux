@@ -95,9 +95,9 @@ public class FileContentStore implements ContentStore
         // create the directory
         StringBuilder sb = new StringBuilder(20);
         sb.append(FileContentStore.STORE_PROTOCOL)
-          .append(year).append(File.separatorChar)
-          .append(month).append(File.separatorChar)
-          .append(day).append(File.separatorChar)
+          .append(year).append('/')
+          .append(month).append('/')
+          .append(day).append('/')
           .append(GUID.generate()).append(".bin");
         String newContentUrl = sb.toString();
         return getNewStorageFile(newContentUrl);
@@ -181,6 +181,8 @@ public class FileContentStore implements ContentStore
         }
         // strip off the root path
         String url = FileContentStore.STORE_PROTOCOL + path.substring(index);
+        // replace '\' with '/' so that URLs are consistent across all filesystems
+        url = url.replace('\\', '/');
         // done
         return url;
     }
