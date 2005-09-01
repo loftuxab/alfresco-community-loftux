@@ -37,7 +37,6 @@ import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.repo.security.permissions.PermissionService;
-import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -231,7 +230,7 @@ public void contextInitialized(ServletContextEvent event)
 
             PermissionService permissionService = (PermissionService)ctx.getBean("permissionService");
             permissionService.setPermission(rootNodeRef, ADMIN, permissionService.getAllPermission(), true);
-            permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), new SimplePermissionReference(QName.createQName("sys", "base", registry.getNamespaceService()), "Read"), true);
+            permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), permissionService.getPermissionReference(QName.createQName("sys", "base", registry.getNamespaceService()), "Read"), true);
             
             // commit the transaction
             tx.commit();

@@ -494,7 +494,6 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         for (int i = 0, l = returnedObject.length; i < l; i++)
         {
             Object current = returnedObject[i];
-            boolean allowed = true;
             for (ConfigAttributeDefintion cad : supportedDefinitions)
             {
                 incudedSet.set(i, true);

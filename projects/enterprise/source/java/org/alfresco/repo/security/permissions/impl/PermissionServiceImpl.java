@@ -337,6 +337,8 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         permissionsDAO.setInheritParentPermissions(nodeRef, inheritParentPermissions);
     }
 
+    
+    
     //
     // SUPPORT CLASSES
     //
@@ -794,6 +796,11 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         {
             return value;
         }
+    }
+
+    public PermissionReference getPermissionReference(QName qname, String permissionName)
+    {
+        return new SimplePermissionReference(qname, permissionName);
     }
 
 }

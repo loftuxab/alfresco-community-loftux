@@ -175,4 +175,13 @@ public interface PermissionService
      * @param inheritParentPermissions
      */
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
+    
+    /**
+     * Get the permission reference for the given type and permission name.
+     * 
+     * @param qname
+     * @param permissionName
+     * @return
+     */
+    public PermissionReference getPermissionReference(QName qname, String permissionName);
 }

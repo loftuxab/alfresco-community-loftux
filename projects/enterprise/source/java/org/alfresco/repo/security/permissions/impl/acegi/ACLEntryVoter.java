@@ -187,8 +187,6 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         Method method = invocation.getMethod();
         Class[] params = method.getParameterTypes();
 
-        Iterator iter = config.getConfigAttributes();
-
         for (ConfigAttributeDefintion cad : supportedDefinitions)
         {
             NodeRef testNodeRef = null;

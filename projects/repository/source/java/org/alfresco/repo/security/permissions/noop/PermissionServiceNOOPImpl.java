@@ -191,4 +191,31 @@ public class PermissionServiceNOOPImpl
     {
     }
 
+    public PermissionReference getPermissionReference(QName qname, String permissionName)
+    {
+        return new SimplePermissionReference(qname, permissionName);
+    }
+    
+    private static class SimplePermissionReference implements PermissionReference
+    {
+        private QName qName;
+        private String name;
+        
+        SimplePermissionReference(QName qName, String name)
+        {
+            this.qName = qName;
+            this.name = name;
+        }
+        
+        public QName getQName()
+        {
+            return qName;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+        
+    }
 }

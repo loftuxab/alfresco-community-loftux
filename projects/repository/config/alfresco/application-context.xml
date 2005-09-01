@@ -53,7 +53,9 @@
                 <value>org/alfresco/repo/domain/hibernate/Node.hbm.xml</value>
                 <value>org/alfresco/repo/domain/hibernate/Store.hbm.xml</value>
                 <value>org/alfresco/repo/domain/hibernate/VersionCount.hbm.xml</value>
+                <!--
                 <value>org/alfresco/repo/security/permissions/impl/hibernate/Permission.hbm.xml</value>
+                -->
             </list>
         </property>
         <property name="hibernateProperties">

@@ -19,7 +19,6 @@ package org.alfresco.repo.security.permissions.impl;
 import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.QName;
 
 /**
  * A simple object representation of a permission entry.
