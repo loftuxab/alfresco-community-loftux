@@ -365,7 +365,7 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         
         // with the stream open, attempt to delete the content
         boolean deleted = store.delete(contentUrl);
-        assertFalse("No exception thrown when attempting to delete content with open write stream", deleted);
+        assertFalse("Should not be able to delete content with open write stream", deleted);
         
         // close the stream
         os.close();

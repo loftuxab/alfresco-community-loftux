@@ -34,7 +34,8 @@ public interface Content
      * This method can only be used before the content stream has been retrieved.
      * <p>
      * When the stream has been closed, all listeners will be called
-     * within a {@link #setTransactionService(TransactionService) transaction}.
+     * within a {@link #setTransactionService(TransactionService) transaction} -
+     * to this end, a {@link TransactionService} must have been set as well.
      * 
      * @param listener a listener that will be called for output stream
      *      event notification

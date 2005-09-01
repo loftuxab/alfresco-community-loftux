@@ -17,9 +17,7 @@
 package org.alfresco.repo.content.filestore;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -49,7 +47,6 @@ import org.apache.commons.logging.LogFactory;
 public class FileContentStore implements ContentStore
 {
     public static final String STORE_PROTOCOL = "file://";
-    public static final String DELETION_MARKER_SUFFIX = ".delete";
     
     private static final Log logger = LogFactory.getLog(FileContentStore.class);
     
@@ -308,19 +305,6 @@ public class FileContentStore implements ContentStore
             {
                 // found a file - create the URL
                 String contentUrl = makeContentUrl(file);
-                // ignore deletion markers
-                if (contentUrl.endsWith(DELETION_MARKER_SUFFIX))
-                {
-                    continue;
-                }
-                // ignore content files for which there is a deletion marker
-                String deletionUrl = contentUrl + DELETION_MARKER_SUFFIX;
-                File deletionFile = makeFile(deletionUrl);
-                if (deletionFile.exists())
-                {
-                    continue;
-                }
-                // add url to list
                 contentUrls.add(contentUrl);
             }
         }
@@ -339,33 +323,16 @@ public class FileContentStore implements ContentStore
         {
             return true;
         }
-        
-        String deleteUrl = contentUrl + DELETION_MARKER_SUFFIX;
-        File deleteFile = makeFile(deleteUrl);
-        if (!deleteFile.exists())
+        // attempt to delete the file directly
+        boolean deleted = file.delete();
+
+        // done
+        if (logger.isDebugEnabled())
         {
-            // not yet marked for deletion
-            try
-            {
-                OutputStream os = new FileOutputStream(deleteFile);
-                os.close();
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Marked URL for deletion: \n" +
-                            "   content url: " + contentUrl);
-                }
-                return true;
-            }
-            catch (IOException e)
-            {
-                logger.error("Failed to create deletion marker for url: " + contentUrl, e);
-                return false;
-            }
+            logger.debug("Delete content directly: \n" +
+                    "   store: " + this + "\n" +
+                    "   url: " + contentUrl);
         }
-        else
-        {
-            // already marked for deletion
-            return true;
-        }
+        return deleted;
     }
 }

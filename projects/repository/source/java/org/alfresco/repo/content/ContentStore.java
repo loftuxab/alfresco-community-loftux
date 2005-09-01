@@ -86,7 +86,7 @@ public interface ContentStore
      * <p>
      * A delete cannot be forced since it is much better to have the
      * file remain longer than desired rather than deleted prematurely.
-     * The store implementation may choose to safeguard files for certain
+     * The store implementation should safeguard files for certain
      * minimum period, in which case all files younger than a certain
      * age will not be deleted.
      * 
