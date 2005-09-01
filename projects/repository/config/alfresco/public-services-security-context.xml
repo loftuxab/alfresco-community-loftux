@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+ <!-- Interceptors that do not enforce security of any form -->
+ 
+<beans>
+    
+   <bean id='permissionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.repo.security.permissions.PermissionService</value>
+        </property>
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.alfresco.repo.security.permissions.noop.PermissionServiceNOOPImpl">
+            </bean>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="NamespaceService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="DictionaryService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="NodeService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="ContentService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="MimetypeService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="SearchService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="CategoryService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="CopyService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="LockService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="VersionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="CheckoutCheckinService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="RuleService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="ImporterService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="ActionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+    <bean id="PermissionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProcedeMethodInterceptor" />
+    
+</beans>
