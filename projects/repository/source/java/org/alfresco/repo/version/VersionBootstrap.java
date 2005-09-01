@@ -19,7 +19,6 @@ package org.alfresco.repo.version;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.model.VersionStoreConst;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -79,18 +78,18 @@ public class VersionBootstrap
         UserTransaction userTransaction = transactionService.getUserTransaction();
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
         
-        try
+        try 
         {
             userTransaction.begin();
 
             //  Ensure that the version store has been created
-            if (this.nodeService.exists(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionStoreConst.STORE_ID)) == true)
+            if (this.nodeService.exists(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, VersionModel.STORE_ID)) == true)
             {
                 userTransaction.rollback();
             }
             else
             {
-                StoreRef vStore = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, VersionStoreConst.STORE_ID);
+                StoreRef vStore = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, VersionModel.STORE_ID);
                 // TODO: For now there are no permissions on version access 
                 permissionService.setPermission(nodeService.getRootNode(vStore), permissionService.getAllAuthorities(), permissionService.getAllPermission(), true);
                 userTransaction.commit();
