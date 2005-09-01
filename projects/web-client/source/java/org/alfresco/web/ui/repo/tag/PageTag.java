@@ -23,9 +23,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.config.ClientConfigElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * A non-JSF tag library that adds the HTML begin and end tags if running in servlet mode
@@ -40,6 +43,7 @@ public class PageTag extends TagSupport
    private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
    private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
    private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
+   private final static String STYLES_UNICODE_2  = "/css/main_unicode.css\" TYPE=\"text/css\">\n";
    private final static String ALF_URL   = "http://www.alfrescosoftware.com";
    private final static String ALF_LOGO  = "/images/logo/alfresco_logo.gif";
    private final static String ALF_TEXT  = "Content managed by Alfresco";
@@ -48,6 +52,7 @@ public class PageTag extends TagSupport
    private static Log logger = LogFactory.getLog(PageTag.class);
    private static String alfresco = null;
    private static String loginPage = null;
+   private static Boolean unicode = null; 
    
    private long startTime = 0;
    private String title;
@@ -129,7 +134,7 @@ public class PageTag extends TagSupport
          out.write(SCRIPTS_2);
          out.write(STYLES_1);
          out.write(reqPath);
-         out.write(STYLES_2);
+         out.write(isUnicode() ? STYLES_UNICODE_2 : STYLES_2);
       }
       catch (IOException ioe)
       {
@@ -195,5 +200,26 @@ public class PageTag extends TagSupport
       }
       
       return alfresco;
+   }
+   
+   private boolean isUnicode()
+   {
+      if (unicode == null)
+      {
+         ConfigService configService = (ConfigService)WebApplicationContextUtils.getRequiredWebApplicationContext(
+               pageContext.getServletContext()).getBean(Application.BEAN_CONFIG_SERVICE);
+         
+         if (configService == null)
+         {
+            throw new IllegalStateException("Unable to locate ConfigService bean!");
+         }
+         
+         ClientConfigElement config = (ClientConfigElement)configService.getGlobalConfig().getConfigElement(
+               ClientConfigElement.CONFIG_ELEMENT_ID);
+         
+         unicode = Boolean.valueOf(config.isUnicodeFont());
+      }
+      
+      return unicode.booleanValue();
    }
 }

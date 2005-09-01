@@ -27,10 +27,14 @@
          <initial-password>admin</initial-password>
       </admin>
       <client>
+         <!-- specifies whether to use 'Arial Unicode MS' as default client font
+              this should be used to display multi-byte language packs correctly -->
+         <unicode-font>false</unicode-font>
+         
          <!-- specifies the list of available language files -->
          <languages>
             <language locale="en_US">English</language>
-            <!--<language locale="fr">French</language>-->
+            <!-- <language locale="fr">French</language> -->
          </languages>
          
          <!-- specifies the maximum page size for each view mode in the browse screen -->

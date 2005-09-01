@@ -29,12 +29,15 @@ import org.alfresco.config.element.ConfigElementAdapter;
  */
 public class ClientConfigElement extends ConfigElementAdapter
 {
+   public static final String CONFIG_ELEMENT_ID = "client";
+   
    // defaults for any config values not supplied
    private int listPageSize = 10;
    private int detailsPageSize = 10;
    private int iconsPageSize = 9;
    private String defaultView = "list";
    private int recentSpacesItems = 6;
+   private boolean unicodeFont = false;
    private Map<String, String> languages = new HashMap<String, String>();
    
    
@@ -163,5 +166,21 @@ public class ClientConfigElement extends ConfigElementAdapter
    public Map<String, String> getLanguageMap()
    {
       return this.languages;
+   }
+
+   /**
+    * @return Returns the unicode font setting.
+    */
+   public boolean isUnicodeFont()
+   {
+      return this.unicodeFont;
+   }
+
+   /**
+    * @param unicodeFont The unicode font value to set.
+    */
+   public void setUnicodeFont(boolean unicodeFont)
+   {
+      this.unicodeFont = unicodeFont;
    }
 }

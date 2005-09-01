@@ -1,16 +1,16 @@
 body 
 {
-   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-family: Arial Unicode MS, Arial, Helvetica, sans-serif;
 }
 
 p
 {
-   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-family: Arial Unicode MS, Arial, Helvetica, sans-serif;
 }
 
 table.moduletable td
 {
-	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-family: Arial Unicode MS, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	font-weight: normal;
 }
@@ -18,7 +18,7 @@ table.moduletable td
 td,tr,p,div
 {
    color: #465F7D;
-	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-family: Arial Unicode MS, Arial, Helvetica, sans-serif;
 	font-size: 11px;
 	color: #465F7D;
 }
@@ -43,7 +43,7 @@ a:link, a:visited
 	font-size: 11px;
 	color: #465F7D;
 	text-decoration: none;
-	font-family: Tahoma, Arial, Helvetica, sans-serif;
+	font-family: Arial Unicode MS, Arial, Helvetica, sans-serif;
 	font-weight: normal;
 }
 

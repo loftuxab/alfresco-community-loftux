@@ -111,7 +111,9 @@ public class LoginBean
     */
    public SelectItem[] getLanguages()
    {
-      ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement("client");
+      ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
+            ClientConfigElement.CONFIG_ELEMENT_ID);
+      
       Map<String, String> languages = config.getLanguageMap();
       SelectItem[] items = new SelectItem[languages.size()];
       int count = 0;

@@ -194,7 +194,8 @@ public class RecentSpacesBean implements IContextListener
    {
       if (maxRecentSpaces == null)
       {
-         ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement("client");
+         ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
+               ClientConfigElement.CONFIG_ELEMENT_ID);
          maxRecentSpaces = Integer.valueOf(config.getRecentSpacesItems());
       }
       

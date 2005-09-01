@@ -49,6 +49,7 @@ import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.log4j.Logger;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -450,6 +451,18 @@ public final class Repository
    public static ServiceRegistry getServiceRegistry(FacesContext context)
    {
        return (ServiceRegistry)FacesContextUtils.getRequiredWebApplicationContext(
+               context).getBean(ServiceRegistry.SERVICE_REGISTRY);
+   }
+   
+   /**
+    * Return the Repository Service Registry
+    * 
+    * @param context Servlet Context
+    * @return the Service Registry
+    */
+   public static ServiceRegistry getServiceRegistry(ServletContext context)
+   {
+       return (ServiceRegistry)WebApplicationContextUtils.getRequiredWebApplicationContext(
                context).getBean(ServiceRegistry.SERVICE_REGISTRY);
    }
 
