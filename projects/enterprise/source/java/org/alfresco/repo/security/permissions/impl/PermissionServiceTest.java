@@ -38,10 +38,10 @@ import org.alfresco.service.transaction.TransactionService;
 public class PermissionServiceTest extends AbstractPermissionTest
 {
 
-    public static Test suite() {
-        TestSuite suite= new TestSuite();
-        return suite;
-    }
+//    public static Test suite() {
+//        TestSuite suite= new TestSuite();
+//        return suite;
+//    }
     
     public PermissionServiceTest()
     {

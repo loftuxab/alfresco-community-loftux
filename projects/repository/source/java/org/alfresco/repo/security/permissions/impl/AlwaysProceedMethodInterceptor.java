@@ -19,10 +19,10 @@ package org.alfresco.repo.security.permissions.impl;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-public class AlwaysProcedeMethodInterceptor implements MethodInterceptor
+public class AlwaysProceedMethodInterceptor implements MethodInterceptor
 {
 
-    public AlwaysProcedeMethodInterceptor()
+    public AlwaysProceedMethodInterceptor()
     {
         super();
     }
