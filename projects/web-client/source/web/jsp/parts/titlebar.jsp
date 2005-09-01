@@ -44,9 +44,9 @@
                <td><a:actionLink value="#{msg.toggle_shelf}" image="/images/icons/shelf.gif" actionListener="#{NavigationBean.toggleShelf}" showLink="false" /></td>
                <td width=8>&nbsp;</td>
                <td><img src="<%=request.getContextPath()%>/images/icons/Help_icon.gif" width=15 height=15></td>
-               <td><h:outputText value="#{msg.help}"/></td>
+               <td><nobr><h:outputText value="#{msg.help}"/></nobr></td>
                <td width=8>&nbsp;</td>
-               <td><a:actionLink value="#{msg.logout}" action="#{LoginBean.logout}" /></td>
+               <td><nobr><a:actionLink value="#{msg.logout}" action="#{LoginBean.logout}" /></nobr></td>
             </tr>
          </table>
       </td>

@@ -313,7 +313,7 @@ public class Application
    {
       Locale locale = Locale.getDefault();
       
-      StringTokenizer t = new StringTokenizer(code, "-");
+      StringTokenizer t = new StringTokenizer(code, "_");
       int tokens = t.countTokens();
       if (tokens == 1)
       {

@@ -979,7 +979,9 @@ public class BrowseBean implements IContextListener
     */
    private void initFromClientConfig()
    {
-      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement("client");
+      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
+            ClientConfigElement.CONFIG_ELEMENT_ID);
+      
       this.browseViewMode = clientConfig.getDefaultView();
       
       if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(this.browseViewMode))

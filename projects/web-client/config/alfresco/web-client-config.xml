@@ -34,7 +34,9 @@
          <!-- specifies the list of available language files -->
          <languages>
             <language locale="en_US">English</language>
-            <!-- <language locale="fr">French</language> -->
+            <!--<language locale="fr_FR">French</language>-->
+            <!--<language locale="de_DE">German</language>-->
+            <!--<language locale="ja_JP">Japanese</language>-->
          </languages>
          
          <!-- specifies the maximum page size for each view mode in the browse screen -->
