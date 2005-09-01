@@ -106,7 +106,7 @@
                               <table cellpadding="2" cellspacing="2" border="0" valign="top">
                                  
                                  <tr>
-                                    <td colspan=3>Look for:&nbsp;<h:inputText value="#{AdvancedSearchBean.text}" size="42" maxlength="1024" />&nbsp;*</td>
+                                    <td colspan=3><h:outputText value="#{msg.look_for}" />:&nbsp;<h:inputText value="#{AdvancedSearchBean.text}" size="42" maxlength="1024" />&nbsp;*</td>
                                  </tr>
                                  
                                  <tr>
