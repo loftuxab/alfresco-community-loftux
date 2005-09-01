@@ -220,15 +220,6 @@ public class Import
                 }
                 context.sourceDir = args[i];
             }
-            else if (args[i].equals("-packagedir"))
-            {
-                i++;
-                if (i == args.length || args[i].length() == 0)
-                {
-                    throw new ImportException("The value <packagedir> for the parameter -packagedir must be specified");
-                }
-                context.packageDir = args[i];
-            }
             else if (args[i].equals("-quiet"))
             {
                 context.quiet = true;
@@ -267,8 +258,7 @@ public class Import
         System.out.println("Options:");
         System.out.println(" -h[elp] display this help");
         System.out.println(" -p[ath] the path within the store to extract into (default: /)");
-        System.out.println(" -d[ir] the source directory to export from (default: current directory)");
-        System.out.println(" -packagedir the source directory to find extracted content (default: dir/<packagename>)");
+        System.out.println(" -d[ir] the source directory to import from (default: current directory)");
         System.out.println(" -quiet do not display any messages during import");
         System.out.println(" -verbose report import progress");
     }
@@ -330,8 +320,6 @@ public class Import
         private String path;
         /** Source directory to import from */
         private String sourceDir;
-        /** The package directory within the destination directory to import from */
-        private String packageDir;
         /** The package name to import */
         private String packageName;
         /** Log messages whilst importing? */
@@ -388,29 +376,6 @@ public class Import
         private File getSourceDir()
         {
             File dir = (sourceDir == null) ? null : new File(sourceDir); 
-            return dir;
-        }
-
-        /**
-         * Get the package directory
-         * 
-         * @return the package directory within the destination directory
-         */
-        private File getPackageDir()
-        {
-            File dir = null;
-            if (packageDir != null)
-            {
-                dir = new File(packageDir);
-            }
-            else if (packageName.indexOf('.') != -1)
-            {
-                dir = new File(packageName.substring(0, packageName.indexOf('.')));
-            }
-            else
-            {
-                dir = new File(packageName); 
-            }
             return dir;
         }
 
