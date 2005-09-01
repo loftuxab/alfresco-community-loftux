@@ -29,7 +29,8 @@
 <script language="JavaScript1.2">
    function updateButtonState()
    {
-      if (document.getElementById("user-props:userName").value.length == 0)
+      if (document.getElementById("user-props:userName").value.length == 0 ||
+          document.getElementById("user-props:password").value.length == 0)
       {
          document.getElementById("user-props:finish-button").disabled = true;
          document.getElementById("user-props:next-button").disabled = true;
@@ -200,7 +201,7 @@
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewUserWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewUserWizard.cancel}" styleClass="wizardButton" immediate="true" />
                                     </td>
                                  </tr>
                               </table>

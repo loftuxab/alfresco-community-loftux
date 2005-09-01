@@ -17,6 +17,7 @@
 package org.alfresco.web.bean;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -42,6 +44,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.config.PropertySheetConfigElement;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
+import org.alfresco.web.ui.common.Utils;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
@@ -119,6 +122,15 @@ public class DocumentPropertiesBean
          
          // reset the document held by the browse bean as it's just been updated
          this.browseBean.getDocument().reset();
+      }
+      catch (InvalidNodeRefException err)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {this.browseBean.getDocument().getId()}) );
+         // this failure means the node no longer exists - we cannot show the doc properties screen
+         outcome = "browse";
       }
       catch (Exception e)
       {

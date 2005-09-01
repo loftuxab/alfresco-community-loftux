@@ -107,7 +107,7 @@ public class UILockIcon extends SelfRenderingComponent
       if (val instanceof NodeRef)
       {
          ref = (NodeRef)val;
-         if (nodeService.hasAspect(ref, ContentModel.ASPECT_LOCKABLE) == true)
+         if (nodeService.exists(ref) && nodeService.hasAspect(ref, ContentModel.ASPECT_LOCKABLE) == true)
          {
             LockStatus lockStatus = getLockService(context).getLockStatus(ref);
             locked = (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER);
