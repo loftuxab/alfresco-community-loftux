@@ -11,6 +11,7 @@
     <import resource="classpath:alfresco/network-protocol-context.xml" />
     <import resource="classpath:alfresco/content-services-context.xml" />
     <import resource="classpath:alfresco/hibernate-context.xml" />
+    <import resource="classpath:alfresco/ownable-services-context.xml" />
 
     <!--                    -->
     <!--  PERSISTENCE       -->

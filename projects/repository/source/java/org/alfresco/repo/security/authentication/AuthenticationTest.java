@@ -78,6 +78,8 @@ public class AuthenticationTest extends TestCase
     
     private AuthenticationComponent authenticationComponent;
 
+    private UserTransaction userTransaction;
+
     public AuthenticationTest()
     {
         super();
@@ -104,7 +106,7 @@ public class AuthenticationTest extends TestCase
         saltSource = (SaltSource) ctx.getBean("saltSource");
 
         TransactionService transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName());
-        UserTransaction userTransaction = transactionService.getUserTransaction();
+        userTransaction = transactionService.getUserTransaction();
         userTransaction.begin();
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
@@ -120,6 +122,15 @@ public class AuthenticationTest extends TestCase
         Map<QName, Serializable> props = createPersonProperties("andy");
         personAndyNodeRef = nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
         assertNotNull(personAndyNodeRef);
+    }
+
+    
+    
+    @Override
+    protected void tearDown() throws Exception
+    {
+        userTransaction.rollback();
+        super.tearDown();
     }
 
     private Map<QName, Serializable> createPersonProperties(String userName)

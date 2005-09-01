@@ -42,11 +42,6 @@ import org.springframework.aop.target.SingletonTargetSource;
 public class ACLEntryVoterTest extends AbstractPermissionTest
 {
 
-    public static Test suite() {
-        TestSuite suite= new TestSuite();
-        return suite;
-    }
-    
     public ACLEntryVoterTest()
     {
         super();
@@ -713,6 +708,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
             voter.setNamespacePrefixResolver(namespacePrefixResolver);
             voter.setPermissionService(permissionService);
             voter.setNodeService(nodeService);
+            voter.setAuthenticationService(authenticationService);
 
             if (!(voter.vote(null, invocation, cad) == AccessDecisionVoter.ACCESS_DENIED))
             {

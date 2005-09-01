@@ -50,11 +50,6 @@ import org.springframework.aop.target.SingletonTargetSource;
 public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 {
 
-    public static Test suite() {
-        TestSuite suite= new TestSuite();
-        return suite;
-    }
-    
     public ACLEntryAfterInvocationTest()
     {
         super();
@@ -795,6 +790,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
             after.setNamespacePrefixResolver(namespacePrefixResolver);
             after.setPermissionService(permissionService);
             after.setNodeService(nodeService);
+            after.setAuthenticationService(authenticationService);
 
             Object returnObject = invocation.proceed();
             return after.decide(null, invocation, cad, returnObject);

@@ -274,19 +274,11 @@
    
       <aspect name="cm:ownable">
          <title>Ownable</title>
-         <associations>
-            <child-association name="cm:owner">
-               <source>
-                  <mandatory>true</mandatory>
-                  <many>false</many>
-               </source>
-               <target>
-                  <class>cm:person</class>
-                  <mandatory>true</mandatory>
-                  <many>false</many>
-               </target>
-            </child-association>
-         </associations>
+         <properties>
+            <property name="cm:owner">
+               <type>d:text</type> 
+            </property>
+         </properties>
       </aspect>
    
       <aspect name="cm:dublincore">

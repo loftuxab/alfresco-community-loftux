@@ -22,7 +22,7 @@
     
       <!-- Full access -->
       <permissionGroup name="FullControl" expose="true" allowFullControl="true" />
-      
+ 
       <!-- Higher level acces groupings -->
       <permissionGroup name="Read"  expose="true" allowFullControl="false" />  
       <permissionGroup name="Write" expose="true" allowFullControl="false" />  
@@ -156,6 +156,10 @@
         <permissionGroup name="Contributor" allowFullControl="false" expose="true" >
             <includePermissionGroup permissionGroup="Guest" type="cm:folder"/>
             <includePermissionGroup permissionGroup="AddChildren" type="sys:base"/>
+        </permissionGroup> 
+        <permissionGroup name="Editor"  expose="true" allowFullControl="false" >
+            <includePermissionGroup type="cm:folder" permissionGroup="Guest"/>
+            <includePermissionGroup type="sys:base" permissionGroup="Write"/>
         </permissionGroup>
         <permissionGroup name="Guest" allowFullControl="false" expose="true" >
             <includePermissionGroup permissionGroup="Read" type="sys:base" />

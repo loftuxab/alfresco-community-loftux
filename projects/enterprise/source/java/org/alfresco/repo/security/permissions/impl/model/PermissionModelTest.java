@@ -28,11 +28,6 @@ import org.alfresco.service.namespace.QName;
 
 public class PermissionModelTest extends AbstractPermissionTest
 {
-
-    public static Test suite() {
-        TestSuite suite= new TestSuite();
-        return suite;
-    }
     
     public PermissionModelTest()
     {

@@ -32,11 +32,7 @@ import org.alfresco.util.BaseSpringTest;
  */
 public class HibernatePermissionTest extends BaseSpringTest
 {    
-    public static Test suite() {
-        TestSuite suite= new TestSuite();
-        return suite;
-    }
-    
+  
     public HibernatePermissionTest()
     {
     }

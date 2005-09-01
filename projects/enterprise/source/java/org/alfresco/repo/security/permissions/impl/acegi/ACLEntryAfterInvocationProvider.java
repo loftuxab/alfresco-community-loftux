@@ -364,7 +364,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
 
                 if (filteringResultSet.getIncluded(i)
                         && (testNodeRef != null)
-                        && !permissionService.hasPermission(returnedObject.getNodeRef(i), cad.required))
+                        && !permissionService.hasPermission(testNodeRef, cad.required))
                 {
                     filteringResultSet.setIncluded(i, false);
                 }

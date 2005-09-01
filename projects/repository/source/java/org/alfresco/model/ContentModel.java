@@ -120,6 +120,9 @@ public interface ContentModel
     static final QName PROP_EMAIL = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "email");
     static final QName PROP_ORGID = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "organizationId");
 
+    // Ownable aspect  
+    static final QName ASPECT_OWNABLE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "ownable");
+    static final QName PROP_OWNER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "owner");
     
     //
     // Application Model Definitions
@@ -218,5 +221,7 @@ public interface ContentModel
 
     static final String VERSION_MODEL_URI = "http://www.alfresco.org/model/version/1.0";
     static final String VERSION_MODEL_PREFIX = "ver";
+    
+    
     
 }
