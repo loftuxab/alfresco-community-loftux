@@ -18,7 +18,9 @@ package org.alfresco.repo.security.permissions.impl.acegi;
 
 import java.util.ArrayList;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.results.ChildAssocRefResultSet;
@@ -31,6 +33,11 @@ import org.alfresco.service.namespace.QName;
 public class FilteringResultSetTest extends TestCase
 {
 
+    public static Test suite() {
+        TestSuite suite= new TestSuite();
+        return suite;
+    }
+    
     public FilteringResultSetTest()
     {
         super();

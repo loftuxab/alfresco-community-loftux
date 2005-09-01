@@ -24,6 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 
@@ -47,6 +50,11 @@ import org.springframework.aop.target.SingletonTargetSource;
 public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 {
 
+    public static Test suite() {
+        TestSuite suite= new TestSuite();
+        return suite;
+    }
+    
     public ACLEntryAfterInvocationTest()
     {
         super();

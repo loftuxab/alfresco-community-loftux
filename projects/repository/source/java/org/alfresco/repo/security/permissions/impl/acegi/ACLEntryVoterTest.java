@@ -19,6 +19,9 @@ package org.alfresco.repo.security.permissions.impl.acegi;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
@@ -39,6 +42,11 @@ import org.springframework.aop.target.SingletonTargetSource;
 public class ACLEntryVoterTest extends AbstractPermissionTest
 {
 
+    public static Test suite() {
+        TestSuite suite= new TestSuite();
+        return suite;
+    }
+    
     public ACLEntryVoterTest()
     {
         super();

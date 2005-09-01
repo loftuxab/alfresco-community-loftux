@@ -18,6 +18,9 @@ package org.alfresco.repo.security.permissions.impl.hibernate;
 
 import java.io.Serializable;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.util.BaseSpringTest;
 
@@ -29,6 +32,11 @@ import org.alfresco.util.BaseSpringTest;
  */
 public class HibernatePermissionTest extends BaseSpringTest
 {    
+    public static Test suite() {
+        TestSuite suite= new TestSuite();
+        return suite;
+    }
+    
     public HibernatePermissionTest()
     {
     }
