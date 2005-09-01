@@ -21,16 +21,28 @@
 #endif
 
 #include <stdio.h>
+#include <winsock2.h>
 #include <windows.h>
+#include <wsnetbs.h>
 #include <lm.h>
 #include <nb30.h>
 #include <jni.h>
+#include <IPHlpApi.h>
 
 #include "org_alfresco_filesys_netbios_win32_Win32NetBIOS.h"
+
+// Define the receive error flag, added to the receive length for a partial read
+
+#define ReceiveErrorMask 0x80000000
 
 // Internal functions
 
 void parseMultiSz(const wchar_t*, wchar_t*);
+void throwWinsockException(JNIEnv* jnienv, int winsockErr, const char* msg);
+
+// Event triggered when the Winsock interface is closed down
+
+WSAEVENT _shutdownEvent = 0;
 
 /*
  * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
@@ -944,4 +956,328 @@ void parseMultiSz( const wchar_t* buf, wchar_t* outbuf) {
 	}
 }
 
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    InitializeSockets
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_InitializeSockets
+	(JNIEnv* jnienv, jclass jthis)
+{
+	/*
+	 * Initialize Winsock interface
+	 */
 
+	int sts = 0;
+	WORD versionReq = MAKEWORD( 2, 2);
+	WSADATA wsaData;
+
+	sts = WSAStartup( versionReq, &wsaData);
+	if ( sts != 0)
+		throwWinsockException( jnienv, sts, "InitializeSockets");
+
+	/*
+	 * Allocate the shutdown event, release any previously allocated event
+	 */
+
+	if ( _shutdownEvent != 0)
+		WSACloseEvent(_shutdownEvent);
+	_shutdownEvent = WSACreateEvent();
+	
+}
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    ShutdownSockets
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_ShutdownSockets
+	(JNIEnv* jnienv, jclass jthis)
+{
+	/*
+	 * Set the shutdown event to unblock address change listeners
+	 */
+
+	SetEvent(_shutdownEvent);
+
+	/*
+	 * Cleanup Winsock
+	 */
+
+	WSACleanup();
+}
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    CreateSocket
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_CreateSocket
+	(JNIEnv* jnienv, jclass jthis, jint lana)
+{
+	int noDelay = 1;
+
+	/*
+	 * Create a NetBIOS socket
+	 */
+
+	SOCKET nbSocket = socket(AF_NETBIOS, SOCK_SEQPACKET, -lana);
+
+	/*
+	 * Check for an error
+	 */
+
+	if ( nbSocket == INVALID_SOCKET)
+		throwWinsockException(jnienv, WSAGetLastError(), "CreateSocket");
+
+	/*
+	 * Return the new socket
+	 */
+
+	return (jint) nbSocket;
+}
+
+/*
+* Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+* Method:    BindSocket
+* Signature: (I[B)I
+*/
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_BindSocket
+	(JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray nbname)
+{
+	jbyte* namePtr = (*jnienv)->GetByteArrayElements(jnienv, nbname, 0);
+	int sts = 0;
+
+	SOCKET sock = (SOCKET) sockPtr;
+	SOCKADDR_NB localNbAddr;
+
+	/*
+	 * Bind the socket to a local NetBIOS name
+	 */
+
+	memset(&localNbAddr, 0, sizeof(SOCKADDR_NB));
+	SET_NETBIOS_SOCKADDR(&localNbAddr, NETBIOS_UNIQUE_NAME, namePtr, namePtr[15]);
+
+	(*jnienv)->ReleaseByteArrayElements(jnienv, nbname, namePtr, 0);
+
+	/*
+	 * Bind the socket to the NetBIOS name
+	 */
+
+	sts = bind( sock, (struct sockaddr*) &localNbAddr, sizeof(localNbAddr));
+	if ( sts == SOCKET_ERROR)
+		throwWinsockException(jnienv, WSAGetLastError(), "BindSocket (bind)");
+
+	/*
+	 * Listen for incoming connections
+	 */
+
+	sts = listen( sock, SOMAXCONN);
+	if ( sts == SOCKET_ERROR)
+		throwWinsockException(jnienv, WSAGetLastError(), "BindSocket (listen)");
+
+	/*
+	 * Return a success status
+	 */
+
+	return 0;
+}
+
+	/*
+	* Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+	* Method:    ListenSocket
+	* Signature: (I[B)I
+	*/
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_ListenSocket
+	(JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray callerName)
+{
+	jbyte* pBuffer = NULL;
+
+	/*
+	 * Accept the incoming connection, get the connection details
+	 */
+
+	SOCKADDR_NB remNbAddr;
+	int addrLen = sizeof(remNbAddr);
+
+	SOCKET sessSock = accept(( SOCKET) sockPtr, (struct sockaddr*) &remNbAddr, &addrLen);
+
+	if ( sessSock == INVALID_SOCKET)
+		throwWinsockException(jnienv, WSAGetLastError(), "ListenSocket (accept)");
+
+	if ( addrLen > 0) {
+		pBuffer = (*jnienv)->GetByteArrayElements(jnienv, callerName, 0);
+		memcpy(pBuffer, remNbAddr.snb_name, NCBNAMSZ);
+		(*jnienv)->ReleaseByteArrayElements(jnienv, callerName, pBuffer, 0);
+	}
+
+	/*
+		* Return the new session socket
+		*/
+	return (jint) sessSock;
+}
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    CloseSocket
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_CloseSocket
+	(JNIEnv* jnienv, jclass jthis, jint sockPtr)
+{
+	/*
+	 * Close the socket
+	 */
+
+	closesocket((SOCKET) sockPtr);
+}
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    SendSocket
+ * Signature: (I[BII)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_SendSocket
+	(JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray jbuf, jint off, jint len)
+{
+	/*
+	 * Access the send buffer
+	 */
+
+	int sts = 0;
+	jbyte* pBuffer = (*jnienv)->GetByteArrayElements(jnienv, jbuf, 0);
+
+	/*
+	 * Send a packet of data
+	 */
+
+	SOCKET sock = (SOCKET) sockPtr;
+	sts = send( sock, (const char*) (pBuffer + off), len, 0);
+
+	/*
+	 * Release the Java buffer and return the sent data length
+	 */
+
+	(*jnienv)->ReleaseByteArrayElements(jnienv, jbuf, pBuffer, 0);
+
+	if ( sts == SOCKET_ERROR)
+		throwWinsockException(jnienv, WSAGetLastError(), "SendSocket");
+
+	/*
+	 * Return the actual length of data written
+	 */
+
+	return sts;
+}
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    ReceiveSocket
+ * Signature: (I[BII)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_ReceiveSocket
+	(JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray jbuf, jint off, jint maxlen)
+{
+	/*
+	 * Access the receive buffer
+	 */
+
+	int sts = 0;
+	jbyte* pBuffer = (*jnienv)->GetByteArrayElements(jnienv, jbuf, 0);
+
+	/*
+	 * Receive a packet of data
+	 */
+
+	SOCKET sock = (SOCKET) sockPtr;
+	sts = recv( sock, (char*) (pBuffer + off), maxlen, 0);
+
+	/*
+	 * Release the Java buffer and return the received data length
+	 */
+
+	(*jnienv)->ReleaseByteArrayElements(jnienv, jbuf, pBuffer, 0);
+
+	if ( sts == SOCKET_ERROR) {
+		int wsts = WSAGetLastError();
+		if ( wsts != WSAEMSGSIZE)
+			throwWinsockException(jnienv, WSAGetLastError(), "ReceiveSocket");
+		else {
+			sts = ReceiveErrorMask;
+		}
+	}
+
+	/*
+	 * Return the actual length of data received
+	 */
+
+	return sts;
+}
+
+/*
+* Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+* Method:    waitForNetworkAddressChange
+* Signature: ()V
+*/
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_waitForNetworkAddressChange
+  (JNIEnv* jnienv, jclass jthis) {
+
+		DWORD sts = 0;
+		OVERLAPPED overLap;
+		WSAEVENT events[2];
+		HANDLE handle;
+
+		/*
+		 * Register for the network address change notifications
+		 */
+
+		memset(&overLap, 0, sizeof(overLap));
+
+		events[0] = _shutdownEvent;
+		events[1] = WSACreateEvent();
+
+		overLap.hEvent = events[1];
+
+		sts = NotifyAddrChange( &handle, &overLap);
+
+		/*
+		 * Wait for either a network address change or shutdown event
+		 */
+
+		sts = WaitForMultipleObjects(2, &events[0], FALSE, INFINITE);
+
+		/*
+		 * Delete the address change event
+		 */
+
+		WSACloseEvent( events[1]);
+}
+
+/**
+ * Create a WinsockNetBIOSException with the specified status code
+ */
+void throwWinsockException(JNIEnv* jnienv, int winsockErr, const char* msg) {
+
+	char msgbuf[64];
+	jclass exceptionClass = NULL;
+
+	/*
+	 * Create the error message using the status code
+	 */
+
+	sprintf(msgbuf, "%u:%s", winsockErr, msg);
+
+	/*
+	 * Create the Winsock NetBIOS exception object
+	 */
+	
+	exceptionClass = (*jnienv)->FindClass(jnienv, "org/alfresco/filesys/netbios/win32/WinsockNetBIOSException");
+	if ( exceptionClass == NULL)
+		return;
+
+	/*
+	 * Throw the Java exception
+	 */
+
+	(*jnienv)->ThrowNew( jnienv, exceptionClass, msgbuf);
+}

@@ -9,6 +9,7 @@ extern "C" {
 #endif
 #undef org_alfresco_filesys_netbios_win32_Win32NetBIOS_FindNameBufferLen
 #define org_alfresco_filesys_netbios_win32_Win32NetBIOS_FindNameBufferLen 33L
+/* Inaccessible static: m_loadDLLException */
 /*
  * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
  * Method:    AddName
@@ -143,6 +144,78 @@ JNIEXPORT jstring JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_G
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_getWINSServerList
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    InitializeSockets
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_InitializeSockets
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    ShutdownSockets
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_ShutdownSockets
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    CreateSocket
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_CreateSocket
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    BindSocket
+ * Signature: (I[B)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_BindSocket
+  (JNIEnv *, jclass, jint, jbyteArray);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    ListenSocket
+ * Signature: (I[B)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_ListenSocket
+  (JNIEnv *, jclass, jint, jbyteArray);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    CloseSocket
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_CloseSocket
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    SendSocket
+ * Signature: (I[BII)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_SendSocket
+  (JNIEnv *, jclass, jint, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    ReceiveSocket
+ * Signature: (I[BII)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_ReceiveSocket
+  (JNIEnv *, jclass, jint, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    waitForNetworkAddressChange
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_waitForNetworkAddressChange
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus
