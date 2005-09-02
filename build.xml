@@ -51,10 +51,6 @@
       </subant>
       <antcall target="deploy-tomcat" />
    </target>
-   
-   <target name="continuous" depends="reset-database, test, distribute" />
-   
-   <target name="nightly" depends="reset-database, test, package-source-distribution, compile-docs" />
 
    <!-- ************************* -->
    <!-- ** Compilation targets ** -->
@@ -217,122 +213,6 @@
    
    <target name="clean-war" depends="init" description="Cleans just the WAR file">
       <delete file="${file.deploy}" />
-   </target>
-   
-   <!-- ************************** -->
-   <!-- ** Distribution targets ** -->
-   <!-- ************************** -->
-   
-   <target name="distribute" 
-           depends="package-jboss-binary-distribution,package-tomcat-binary-distribution,
-                    package-source-distribution" 
-           description="Creates the distribution files for all platforms for all appservers"/>
-   
-   <target name="package-jboss-binary-distribution" 
-           depends="clean-war, incremental-jboss, package-jboss-binary-distribution-windows,
-                    package-jboss-binary-distribution-linux" 
-           description="Creates the distibution files for JBoss"/>
-           
-   <target name="package-tomcat-binary-distribution" 
-           depends="clean-war, incremental-tomcat, package-tomcat-binary-distribution-windows,
-                    package-tomcat-binary-distribution-linux" 
-           description="Creates the distibution files for Tomcat"/>
-           
-   <target name="package-jboss-binary-distribution-windows" depends="init">
-      <!-- make sure the MySQL connector is present and up to date -->
-      <delete>
-         <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
-      </delete>
-      <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
-      <mkdir dir="${dir.dist}" />
-      <zip destfile="${dir.dist}/${file.name.dist.bin.jboss}.zip">
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="alf_start_jb.bat,alf_stop_jb.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
-                               license.txt,notice.txt,README_jboss_win.txt,start_oo2.bat,
-                               stop_oo.bat,zstart_oo.bat" />
-         <zipfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.sh" />
-         <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
-         <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
-         <zipfileset dir="${dir.project.webclient}/build/dist" prefix="jboss/server/default/deploy" 
-                     includes="${file.name.war.alfresco}"/>
-         <zipfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf"/>
-         <zipfileset dir="${dir.config.webclient}"  prefix="jboss/server/default/conf"/>
-         <zipfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
-      </zip>
-   </target>
-   
-   <target name="package-jboss-binary-distribution-linux" depends="init">
-      <!-- make sure the MySQL connector is present and up to date -->
-      <delete>
-         <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
-      </delete>
-      <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
-      <mkdir dir="${dir.dist}" />
-      <tar destfile="${dir.dist}/${file.name.dist.bin.jboss}.tar" longfile="gnu">
-         <tarfileset dir="${dir.project.installer}" 
-                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_jboss_linux.txt,start_oo.sh,stop_oo.sh" />
-         <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
-         <tarfileset dir="${dir.project.webclient}/build/dist" includes="${file.name.war.alfresco}"
-                     prefix="jboss/server/default/deploy" />
-         <tarfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf" />
-         <tarfileset dir="${dir.config.webclient}" prefix="jboss/server/default/conf" />
-         <tarfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
-      </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.bin.jboss}.tar.gz" src="${dir.dist}/${file.name.dist.bin.jboss}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.bin.jboss}.tar" />
-   </target>
-
-   <target name="package-tomcat-binary-distribution-windows" depends="init">
-      <!-- make sure the MySQL connector is present and up to date -->
-      <delete>
-         <fileset dir="${dir.distribution.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
-      </delete>
-      <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
-      <mkdir dir="${dir.dist}" />
-      <zip destfile="${dir.dist}/${file.name.dist.bin.tomcat}.zip">
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="alf_start_tc.bat,alf_stop_tc.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
-                               license.txt,notice.txt,README_tomcat_win.txt,start_oo2.bat,
-                               stop_oo.bat,zstart_oo.bat" />
-         <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
-         <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
-         <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
-         <zipfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.alfresco}"/>
-      </zip>
-   </target>
-   
-   <target name="package-tomcat-binary-distribution-linux" depends="init">
-      <!-- make sure the MySQL connector is present and up to date -->
-      <delete>
-         <fileset dir="${dir.distribution.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
-      </delete>
-      <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
-      <mkdir dir="${dir.dist}" />
-      <tar destfile="${dir.dist}/${file.name.dist.bin.tomcat}.tar" longfile="gnu">
-         <tarfileset dir="${dir.project.installer}"
-                     includes="AlfrescoTest.pdf,license.txt,notice.txt,README_tomcat_linux.txt,start_oo.sh,stop_oo.sh" />
-         <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
-         <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
-         <tarfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.alfresco}"/>
-      </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.bin.tomcat}.tar.gz" src="${dir.dist}/${file.name.dist.bin.tomcat}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.bin.tomcat}.tar" />
-   </target>
-   
-   <target name="package-source-distribution" depends="init"
-           description="Creates the source distribution file for all platforms">
-      <mkdir dir="${dir.dist}" />
-      <zip destfile="${dir.dist}/${file.name.dist.src}.zip">
-         <zipfileset dir="${dir.common}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,
-                                                   projects/repository/alfresco/**,projects/website/**" />
-      </zip>
-      
-      <tar destfile="${dir.dist}/${file.name.dist.src}.tar" longfile="gnu">
-         <tarfileset dir="${dir.common}" excludes="**/build/**,**/*.zip,**/*.tar,**/*.doc,**/*Thumbs.db,
-                                                   projects/repository/alfresco/**,projects/website/**" />
-      </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.src}.tar.gz" src="${dir.dist}/${file.name.dist.src}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.src}.tar" />
    </target>
 
 </project>

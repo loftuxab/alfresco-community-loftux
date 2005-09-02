@@ -4,4 +4,28 @@
    <property name="dir.common" refid="path.common"/>
    <import file="${dir.common}/common.xml"/>
 
+   <target name="init" depends="common-init.init">
+      <path id="classpath.unit.test.enterprise">
+         <path refid="classpath.unit.test"/>
+         <pathelement location="${basedir}/${dir.name.config}"/>
+      </path>
+   </target>
+
+   <target name="run-tests" depends="package-jar" description="Runs the enterprise project unit tests">
+        <mkdir dir="${dir.test.results}" />
+        <junit printsummary="yes" fork="yes" haltonfailure="yes" dir="${basedir}">
+            <classpath refid="classpath.unit.test.enterprise" />
+            <formatter type="xml" />
+            <batchtest todir="${dir.test.results}">
+                <fileset dir="${dir.src.java}">
+                    <include name="**/*Test.java" />
+                    <exclude name="**/Base*Test.java" />
+                    <exclude name="**/Abstract*Test.java" />
+                    <exclude name="**/*SystemTest.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+
 </project>

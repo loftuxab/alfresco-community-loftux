@@ -30,9 +30,8 @@
             <dirset dir="${dir.projects}">
                 <include name="**/build/classes" />
             </dirset>
-            <dirset dir="${dir.projects}">
-                <include name="**/config" />
-            </dirset>
+            <pathelement location="${dir.project.repository}/${dir.name.config}"/>
+            <pathelement location="${dir.project.webclient}/${dir.name.config}"/>
             <pathelement location="${dir.src.test.resources}" />
             <fileset dir="${dir.common.lib}">
                 <include name="**/*.jar" />
