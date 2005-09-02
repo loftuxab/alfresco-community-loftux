@@ -328,6 +328,10 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testSimplePermissionOnRoot()
     {
         runAs("andy");
+        
+        assertEquals(0, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
+        
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
         runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -335,6 +339,10 @@ public class PermissionServiceTest extends AbstractPermissionTest
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
+        
+        assertEquals(1, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
+        
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
         runAs("lemur");
         assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
@@ -397,6 +405,10 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
         runAs("andy");
+        
+        assertEquals(3, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
+        
         assertTrue(permissionService.hasPermission(rootNodeRef, READ));
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
         assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));

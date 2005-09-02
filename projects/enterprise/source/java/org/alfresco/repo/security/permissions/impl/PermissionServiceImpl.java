@@ -27,6 +27,7 @@ import net.sf.acegisecurity.providers.dao.User;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.AccessPermission;
+import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.DynamicAuthority;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
@@ -198,16 +199,88 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
     public Set<AccessPermission> getPermissions(NodeRef nodeRef)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return getAllPermissionsImpl(nodeRef, true, false);
     }
 
     public Set<AccessPermission> getAllPermissions(NodeRef nodeRef)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return getAllPermissionsImpl(nodeRef, true, true);
+    }
+    
+    private Set<AccessPermission> getAllPermissionsImpl(NodeRef nodeRef, boolean includeTrue, boolean includeFalse)
+    {
+        HashSet<AccessPermission> accessPermissions = new HashSet<AccessPermission>();
+        for (PermissionReference pr : getSettablePermissions(nodeRef))
+        {
+            if(hasPermission(nodeRef, pr))
+            {
+                accessPermissions.add(new AccessPermissionImpl(pr, true));
+            }
+            else
+            {
+                if(includeFalse)
+                {
+                    accessPermissions.add(new AccessPermissionImpl(pr, false)); 
+                }
+            }
+        }
+        return accessPermissions;
     }
 
+    private class AccessPermissionImpl implements AccessPermission
+    {
+        private PermissionReference permissionReference;
+        
+        private boolean allowed;
+        
+        AccessPermissionImpl(PermissionReference permissionReference, boolean allowed)
+        {
+            this.permissionReference = permissionReference;
+            this.allowed = allowed;
+        }
+        
+        public PermissionReference getPermissionDefinition()
+        {
+            return permissionReference;
+        }
+
+        public boolean isAllowed()
+        {
+            return allowed;
+        }
+
+        public boolean isDenied()
+        {
+            return !allowed;
+        }
+
+        public AccessStatus getAccessStatus()
+        {
+            return allowed ? AccessStatus.ALLOWED : AccessStatus.DENIED;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if(this == o)
+            {
+                return true;
+            }
+            if(!(o instanceof AccessPermissionImpl))
+            {
+                return false;
+            }
+            AccessPermissionImpl other = (AccessPermissionImpl)o;
+            return this.getPermissionDefinition().equals(other.getPermissionDefinition()) && (this.isAllowed() == other.isAllowed());
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return permissionReference.hashCode() *37 + (allowed ? 1 : 0);
+        }       
+    }
+    
     public Set<PermissionReference> getSettablePermissions(NodeRef nodeRef)
     {
         return modelDAO.getExposedPermissions(nodeRef);
@@ -245,7 +318,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         // doing the test
         Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
         available.add(getAllPermission());
-        
+
         if (!(available.contains(perm)))
         {
             return false;
