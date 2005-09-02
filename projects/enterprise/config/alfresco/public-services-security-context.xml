@@ -177,7 +177,20 @@
       </property>
    </bean>
     
-   <bean id="ContentService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+     <bean id="ContentService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
+      <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+      <property name="objectDefinitionSource">
+         <value>
+				org.alfresco.service.cmr.repository.ContentService.getReader=ACL_NODE.0.cm:content.ReadContent
+                org.alfresco.service.cmr.repository.ContentService.getWriter=ACL_NODE.0.cm:content.WriteContent
+                org.alfresco.service.cmr.repository.ContentService.getUpdatingWriter=ACL_NODE.0.cm:content.WriteContent
+         </value>
+      </property>
+   </bean>
+    
+   <!--<bean id="ContentService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />-->
     
    <bean id="MimetypeService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
