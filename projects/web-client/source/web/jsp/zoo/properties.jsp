@@ -19,7 +19,7 @@
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
-<%@ page buffer="32kb" %>
+<%@ page buffer="32kb" contentType="text/html;charset=UTF-8" %>
 
 <r:page>
 

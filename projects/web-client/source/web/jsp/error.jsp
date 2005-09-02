@@ -17,7 +17,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
-<%@ page buffer="32kb" %>
+<%@ page buffer="32kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.app.Application" %>
 
