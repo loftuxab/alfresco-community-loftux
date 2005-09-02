@@ -41,7 +41,7 @@
 
     <bean id="action-common-resource">
         <property name="resource">
-            <value>classpath:org/alfresco/repo/action/action-config.properties</value>
+            <value>classpath:alfresco/messages/action-config.properties</value>
         </property>
     </bean>
 

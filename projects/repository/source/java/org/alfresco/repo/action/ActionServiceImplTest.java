@@ -108,6 +108,11 @@ public class ActionServiceImplTest extends BaseSpringTest
 		List<ActionDefinition> defintions = this.actionService.getActionDefinitions();
 		assertNotNull(defintions);
 		assertFalse(defintions.isEmpty());
+        
+//        for (ActionDefinition definition : defintions)
+//        {
+//            System.out.println(definition.getTitle());
+//        }
 	}	
 
 	/**
@@ -132,6 +137,11 @@ public class ActionServiceImplTest extends BaseSpringTest
 		List<ActionConditionDefinition> defintions = this.actionService.getActionConditionDefinitions();
 		assertNotNull(defintions);
 		assertFalse(defintions.isEmpty());
+        
+//        for (ActionConditionDefinition definition : defintions)
+//        {
+//            System.out.println(definition.getTitle());
+//        }
 	}
 
 	/**

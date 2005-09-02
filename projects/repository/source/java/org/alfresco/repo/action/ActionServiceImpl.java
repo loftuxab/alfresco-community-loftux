@@ -432,7 +432,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	public void registerActionConditionEvaluator(ActionConditionEvaluator actionConditionEvaluator) 
 	{
-		ActionConditionDefinition cond = actionConditionEvaluator.getRuleConditionDefintion();
+		ActionConditionDefinition cond = actionConditionEvaluator.getActionConditionDefintion();
 		this.conditionDefinitions.put(cond.getName(), cond);
 	}
 

@@ -44,11 +44,10 @@ public class RuleServiceImplTest extends BaseRuleTest
         assertNotNull(ruleTypes);  
         
         // Visual check to make sure that the display labels are being returned correctly
-        //assertEquals(1, ruleTypes.size());        
-        //for (RuleType type : ruleTypes)
-		//{
-		//	System.out.println(type.getDisplayLabel());
-		//}
+//        for (RuleType type : ruleTypes)
+//		{
+//			System.out.println(type.getDisplayLabel());
+//		}
     }
     
     /**

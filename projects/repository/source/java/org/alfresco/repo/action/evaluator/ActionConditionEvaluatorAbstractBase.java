@@ -29,16 +29,44 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public abstract class ActionConditionEvaluatorAbstractBase extends ParameterizedItemAbstractBase implements ActionConditionEvaluator
 {	
-	
+    /**
+     * Indicates whether the condition is public or not
+     */
+    private boolean publicCondition = true;
+    
+	/**
+     * The action condition definition
+	 */
 	protected ActionConditionDefinition actionConditionDefinition;		
 	
+    /**
+     * Initialise method
+     */
 	public void init()
 	{
-		// Call back to the action service to register the condition
-		this.runtimeActionService.registerActionConditionEvaluator(this);
+        if (this.publicCondition == true)
+        {
+            // Call back to the action service to register the condition
+            this.runtimeActionService.registerActionConditionEvaluator(this);
+        }
 	}
+    
+    /**
+     * Set the value that indicates whether a condition is public or not
+     * 
+     * @param publicCondition   true if the condition is public, false otherwise
+     */
+    public void setPublicCondition(boolean publicCondition)
+    {
+        this.publicCondition = publicCondition;
+    }
 	
-	public ActionConditionDefinition getRuleConditionDefintion() 
+    /**
+     * Get the action condition definition.
+     * 
+     * @return  the action condition definition
+     */
+	public ActionConditionDefinition getActionConditionDefintion() 
 	{
 		if (this.actionConditionDefinition == null)
 		{
@@ -57,13 +85,16 @@ public abstract class ActionConditionEvaluatorAbstractBase extends Parameterized
      */
     public boolean evaluate(ActionCondition actionCondition, NodeRef actionedUponNodeRef)
     {
-        checkMandatoryProperties(actionCondition, getRuleConditionDefintion());
+        checkMandatoryProperties(actionCondition, getActionConditionDefintion());
         return evaluateImpl(actionCondition, actionedUponNodeRef);
     }
 	
     /**
      * Evaluation implementation
+     * 
+     * @param actionCondition       the action condition
      * @param actionedUponNodeRef   the actioned upon node reference
+     * @return                      the result of the condition evaluation
      */
 	protected abstract boolean evaluateImpl(ActionCondition actionCondition, NodeRef actionedUponNodeRef);
 }

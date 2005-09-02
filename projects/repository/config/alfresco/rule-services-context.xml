@@ -21,7 +21,7 @@
    
    <bean id="rule-type-base" init-method="init">
       <property name="resource">
-          <value>classpath:org/alfresco/repo/rule/rule-config.properties</value>
+          <value>classpath:alfresco/messages/rule-config.properties</value>
 	  </property>  
 	  <property name="ruleService">
          <ref bean="ruleService"/>
