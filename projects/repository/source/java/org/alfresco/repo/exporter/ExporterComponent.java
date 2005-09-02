@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,9 @@ import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 
 /**
@@ -126,7 +127,6 @@ public class ExporterComponent
         export(location, createXMLExporter(output), exportChildren, progress);
     }
 
-    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.ExportStreamHandler, org.alfresco.service.cmr.view.Location, boolean, org.alfresco.service.cmr.view.Exporter)
      */
@@ -143,7 +143,6 @@ public class ExporterComponent
         export(location, urlExporter, exportChildren, progress);        
     }
 
-
     /**
      * Create an XML Exporter that exports repository information to the specified
      * output stream in xml format.
@@ -153,16 +152,21 @@ public class ExporterComponent
      */
     private Exporter createXMLExporter(OutputStream output)
     {
-        // Construct an XML Output Stream Serializer
-        OutputFormat format = new OutputFormat("xml", "UTF-8", true);
-        format.setLineWidth(9999);
-        XMLSerializer serializer = new XMLSerializer(output, format);
+        // Define output format
+        OutputFormat outformat = OutputFormat.createPrettyPrint();
+        outformat.setEncoding("UTF-8");
 
         // Construct an XML Exporter
-        XMLExporter xmlExporter = new XMLExporter(namespaceService, nodeService, serializer);
-        return xmlExporter;        
+        try
+        {
+            XMLWriter writer = new XMLWriter(output, outformat);
+            return new XMLExporter(namespaceService, nodeService, writer);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new ExporterException("Failed to create XML Writer for export", e);
+        }
     }
-
     
     /**
      * Perform the Export
@@ -183,7 +187,6 @@ public class ExporterComponent
         ExportNavigator navigator = new ExportNavigator(nodeRef, chainedExporter, exportChildren);
         navigator.walk();        
     }
-    
     
     /**
      * Responsible for navigating the Repository from specified location and invoking
@@ -238,7 +241,6 @@ public class ExporterComponent
             exporter.end();
         }
         
-        
         /**
          * Call-backs for start of Namespace scope
          */
@@ -257,7 +259,6 @@ public class ExporterComponent
                 }
             }
         }
-
         
         /**
          * Call-backs for end of Namespace scope
@@ -277,7 +278,6 @@ public class ExporterComponent
                 }
             }
         }
-
         
         /**
          * Navigate a Node.
@@ -320,7 +320,11 @@ public class ExporterComponent
                 {
                     // Export property of datatype CONTENT
                     ContentReader reader = contentService.getReader(nodeRef);
-                    if (reader.exists())
+                    if (reader == null || reader.exists() == false)
+                    {
+                        exporter.warning("Failed to read content for property " + property + " on node " + nodeRef);
+                    }
+                    else
                     {
                         InputStream inputStream = reader.getContentInputStream();
                         try
@@ -395,7 +399,6 @@ public class ExporterComponent
             // Signal end of node
             exporter.endNode(nodeRef);
         }
-
         
         /**
          * Is the specified URI an excluded URI?
@@ -416,7 +419,6 @@ public class ExporterComponent
         }
 
     }
-    
 
     /**
      * Get the Node Ref from the specified Location
@@ -457,6 +459,5 @@ public class ExporterComponent
     
         return nodeRef;
     }
-    
     
 }

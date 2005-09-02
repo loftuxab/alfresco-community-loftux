@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -292,6 +293,10 @@ public class ImporterComponent
         private ImporterProgress progress;
         private ImportStreamHandler streamHandler;
 
+        // Flush threshold
+        private int flushThreshold = 500;
+        private int flushCount = 0;
+        
         
         /**
          * Construct
@@ -393,6 +398,14 @@ public class ImporterComponent
                 importContent(nodeRef);
             }
             
+            // Do we need to flush?
+            flushCount++;
+            if (flushCount > flushThreshold)
+            {
+                AlfrescoTransactionSupport.flush();
+                flushCount = 0;
+            }
+            
             return nodeRef;
         }
         
@@ -417,16 +430,6 @@ public class ImporterComponent
                 ContentWriter writer = contentService.getUpdatingWriter(nodeRef);
                 writer.putContent(contentStream);
                 reportContentCreated(nodeRef, contentUrl);
-
-                // close input stream
-                try
-                {
-                    contentStream.close();
-                }
-                catch(IOException e)
-                {
-                    throw new ImporterException("Failed to close content import stream for url " + contentUrl);
-                }
             }
         }
 

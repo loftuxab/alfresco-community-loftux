@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ImportStreamHandler;
@@ -30,18 +29,19 @@ import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.ApplicationContextHelper;
-import org.springframework.context.ApplicationContext;
 
 
 /**
- * Alfresco Repository Import Tool
+ * Import Tool.
  * 
  * @author David Caruana
  */
-public class Import
+public class Import extends Tool
 {
-
+    /** Import Tool Context */
+    private ImportContext context;
+    
+    
     /**
      * Entry Point
      * 
@@ -49,75 +49,133 @@ public class Import
      */
     public static void main(String[] args)
     {
-        try
-        {
-            ImportContext context = processArgs(args);
-    
-            try
-            {
-                Import importer = new Import(context);
-                importer.doImport();
-                System.exit(0);
-            }
-            catch (ImportException e)
-            {
-                displayError(e);
-                System.exit(-1);
-            }
-        }
-        catch(ImportException e)
-        {
-            System.out.println(e.getMessage());
-            System.out.println();
-            displayHelp();
-            System.exit(-1);
-        }
-        catch (Throwable e)
-        {
-            System.out.println("The following import error has occured:");
-            displayError(e);
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        Tool tool = new Import();
+        tool.start(args);
     }
     
-    private static void displayError(Throwable e)
-    {
-        Throwable display = e;
-        while(display != null)
-        {
-            System.out.println(display.getMessage());
-            display = display.getCause();
-        }
-    }
-    
-
-    
-    /** Import Context */
-    private ImportContext context;
-    
-
-    /**
-     * Constuct Export Tool
-     * 
-     * @param context  export context
+    /* (non-Javadoc)
+     * @see org.alfresco.tools.Tool#processArgs(java.lang.String[])
      */
-    private Import(ImportContext context)
+    @Override
+    /*package*/ ToolContext processArgs(String[] args)
     {
-        this.context = context;
+        context = new ImportContext();
+        context.setLogin(true);
+
+        int i = 0;
+        while (i < args.length)
+        {
+            if (args[i].equals("-h") || args[i].equals("-help"))
+            {
+                context.setHelp(true);
+                break;
+            }
+            else if (args[i].equals("-s") || args[i].equals("-store"))
+            {
+                i++;
+                if (i == args.length || args[i].length() == 0)
+                {
+                    throw new ToolException("The value <store> for the option -store must be specified");
+                }
+                context.storeRef = new StoreRef(args[i]);
+            }
+            else if (args[i].equals("-p") || args[i].equals("-path"))
+            {
+                i++;
+                if (i == args.length || args[i].length() == 0)
+                {
+                    throw new ToolException("The value <path> for the option -path must be specified");
+                }
+                context.path = args[i];
+            }
+            else if (args[i].equals("-d") || args[i].equals("-dir"))
+            {
+                i++;
+                if (i == args.length || args[i].length() == 0)
+                {
+                    throw new ToolException("The value <dir> for the option -dir must be specified");
+                }
+                context.sourceDir = args[i];
+            }
+            else if (args[i].equals("-user"))
+            {
+                i++;
+                if (i == args.length || args[i].length() == 0)
+                {
+                    throw new ToolException("The value <user> for the option -user must be specified");
+                }
+                context.setUsername(args[i]);
+            }
+            else if (args[i].equals("-pwd"))
+            {
+                i++;
+                if (i == args.length || args[i].length() == 0)
+                {
+                    throw new ToolException("The value <password> for the option -pwd must be specified");
+                }
+                context.setPassword(args[i]);
+            }
+            else if (args[i].equals("-quiet"))
+            {
+                context.setQuiet(true);
+            }
+            else if (args[i].equals("-verbose"))
+            {
+                context.setVerbose(true);
+            }
+            else if (i == (args.length - 1))
+            {
+                context.packageName = args[i];
+            }
+            else
+            {
+                throw new ToolException("Unknown option " + args[i]);
+            }
+
+            // next argument
+            i++;
+        }
+
+        return context;
     }
-
-    /**
-     * Performs the Export
-     */        
-    private void doImport()
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.tools.Tool#displayHelp()
+     */
+    @Override
+    /*package*/ void displayHelp()
     {
-        log("Alfresco Repository Importer");
-
-        // Get handle onto Importer service
-        ApplicationContext appcontext = ApplicationContextHelper.getApplicationContext();
-        ServiceRegistry registry = (ServiceRegistry) appcontext.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        ImporterService importer = registry.getImporterService();
+        System.out.println("Usage: import -user username -store store [options] packagename");
+        System.out.println("");
+        System.out.println("username: username for login");
+        System.out.println("store: the store to import into the form of scheme://store_name");
+        System.out.println("packagename: the filename to import from (with or without extension)");
+        System.out.println("");
+        System.out.println("Options:");
+        System.out.println(" -h[elp] display this help");
+        System.out.println(" -p[ath] the path within the store to extract into (default: /)");
+        System.out.println(" -d[ir] the source directory to import from (default: current directory)");
+        System.out.println(" -pwd password for login");
+        System.out.println(" -quiet do not display any messages during import");
+        System.out.println(" -verbose report import progress");
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.tools.Tool#getToolName()
+     */
+    @Override
+    /*package*/ String getToolName()
+    {
+        return "Alfresco Repository Importer";
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.tools.Tool#execute()
+     */
+    @Override
+    /*package*/ void execute() throws ToolException
+    {
+        ImporterService importer = getServiceRegistry().getImporterService();
         
         // Create Import package
         File packageFile = context.getPackageFile();
@@ -127,10 +185,8 @@ public class Import
 
         // Export Repository content to export package
         importer.importView(input, streamHandler, context.getLocation(), null, new ImportProgress());
-                
-        log("Import completed successfully.");
     }
-
+    
     /**
      * Get XML Export File
      * 
@@ -145,122 +201,8 @@ public class Import
         }
         catch(IOException e)
         {
-            throw new ImportException("Failed to get package file " + packageFile.getAbsolutePath() + " due to " + e.getMessage());
+            throw new ToolException("Failed to get package file " + packageFile.getAbsolutePath() + " due to " + e.getMessage());
         }
-    }
-
-    /**
-     * Log Export message
-     * 
-     * @param msg  message to log
-     */
-    private void log(String msg)
-    {
-        if (context.quiet == false)
-        {
-            System.out.println(msg);
-        }
-    }
-
-    /**
-     * Log Export message
-     * 
-     * @param msg  message to log
-     */
-    private void logVerbose(String msg)
-    {
-        if (context.verbose)
-        {
-            log(msg);
-        }
-    }
-    
-    /**
-     * Process Export Tool command line arguments
-     * 
-     * @param args  the arguments
-     * @return  the export context
-     */
-    private static ImportContext processArgs(String[] args)
-    {
-        ImportContext context = new ImportContext();
-
-        int i = 0;
-        while (i < args.length)
-        {
-            if (args[i].equals("-h") || args[i].equals("-help"))
-            {
-                displayHelp();
-                System.exit(0);
-            }
-            else if (args[i].equals("-s") || args[i].equals("-store"))
-            {
-                i++;
-                if (i == args.length || args[i].length() == 0)
-                {
-                    throw new ImportException("The value <store> for the parameter -store must be specified");
-                }
-                context.storeRef = new StoreRef(args[i]);
-            }
-            else if (args[i].equals("-p") || args[i].equals("-path"))
-            {
-                i++;
-                if (i == args.length || args[i].length() == 0)
-                {
-                    throw new ImportException("The value <path> for the parameter -path must be specified");
-                }
-                context.path = args[i];
-            }
-            else if (args[i].equals("-d") || args[i].equals("-dir"))
-            {
-                i++;
-                if (i == args.length || args[i].length() == 0)
-                {
-                    throw new ImportException("The value <dir> for the parameter -dir must be specified");
-                }
-                context.sourceDir = args[i];
-            }
-            else if (args[i].equals("-quiet"))
-            {
-                context.quiet = true;
-            }
-            else if (args[i].equals("-verbose"))
-            {
-                context.verbose = true;
-            }
-            else if (i == (args.length - 1))
-            {
-                context.packageName = args[i];
-            }
-            else
-            {
-                throw new ImportException("Unknown option " + args[i]);
-            }
-
-            // next argument
-            i++;
-        }
-
-        context.validate();
-        return context;
-    }
-
-    /**
-     * Display Help
-     */
-    private static void displayHelp()
-    {
-        System.out.println("Usage: import -store store [options] packagename");
-        System.out.println("");
-        System.out.println("store: the store to import into the form of scheme://store_name");
-        System.out.println("packagename: the filename to import from (with or without extension)");
-        System.out.println("");
-        System.out.println("Options:");
-        System.out.println(" -h[elp] display this help");
-        System.out.println(" -p[ath] the path within the store to extract into (default: /)");
-        System.out.println(" -d[ir] the source directory to import from (default: current directory)");
-        System.out.println(" -quiet do not display any messages during import");
-        System.out.println(" -verbose report import progress");
     }
     
     /**
@@ -301,97 +243,10 @@ public class Import
             }
             catch(IOException e)
             {
-                throw new ImportException("Failed to read content url " + url + " from file " + fileURL.getAbsolutePath());
+                throw new ToolException("Failed to read content url " + url + " from file " + fileURL.getAbsolutePath());
             }
         }
     }
-    
-    
-    /**
-     * Import Tool Context
-     * 
-     * @author David Caruana
-     */
-    private static class ImportContext
-    {
-        /** Store Reference to import into */
-        private StoreRef storeRef;
-        /** Path to import into */
-        private String path;
-        /** Source directory to import from */
-        private String sourceDir;
-        /** The package name to import */
-        private String packageName;
-        /** Log messages whilst importing? */
-        private boolean quiet = false;
-        /** Verbose logging */
-        private boolean verbose = false;
-        
-
-        /**
-         * Validate the Import Context i.e. ensure all required information has been provided and is correct
-         */
-        private void validate()
-        {
-            if (storeRef == null)
-            {
-                throw new ImportException("Store to import into has not been specified.");
-            }
-            if (packageName == null)
-            {
-                throw new ImportException("Package name has not been specified.");
-            }
-            if (sourceDir != null)
-            {
-                File fileSourceDir = new File(sourceDir);
-                if (fileSourceDir.exists() == false)
-                {
-                    throw new ImportException("Source directory " + fileSourceDir.getAbsolutePath() + " does not exist.");
-                }
-            }
-            File packageFile = getPackageFile();
-            if (packageFile.exists() == false)
-            {
-                throw new ImportException("Package file " + packageFile.getAbsolutePath() + " does not exist.");
-            }
-        }
-
-        /**
-         * Get the location within the Repository to import into
-         * 
-         * @return the location
-         */
-        private Location getLocation()
-        {
-            Location location = new Location(storeRef);
-            location.setPath(path);
-            return location;
-        }
-        
-        /**
-         * Get the source directory
-         * 
-         * @return the source directory (or null if current directory)
-         */
-        private File getSourceDir()
-        {
-            File dir = (sourceDir == null) ? null : new File(sourceDir); 
-            return dir;
-        }
-
-        /**
-         * Get the xml import file
-         * 
-         * @return the package file
-         */
-        private File getPackageFile()
-        {
-            String packageFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
-            File file = new File(getSourceDir(), packageFile); 
-            return file;
-        }
-    }
-
     
     /**
      * Report Import Progress
@@ -430,26 +285,89 @@ public class Import
         {
         }
     }
-
-
+    
     /**
-     * Import Tool Exception
+     * Import Tool Context
      * 
      * @author David Caruana
      */
-    private static class ImportException extends RuntimeException
+    private class ImportContext extends ToolContext
     {
-        private static final long serialVersionUID = 3257008761007847733L;
+        /** Store Reference to import into */
+        private StoreRef storeRef;
+        /** Path to import into */
+        private String path;
+        /** Source directory to import from */
+        private String sourceDir;
+        /** The package name to import */
+        private String packageName;
+        
 
-        private ImportException(String msg)
+        /* (non-Javadoc)
+         * @see org.alfresco.tools.ToolContext#validate()
+         */
+        @Override
+        /*package*/ void validate()
         {
-            super(msg);
+            super.validate();
+            
+            if (storeRef == null)
+            {
+                throw new ToolException("Store to import into has not been specified.");
+            }
+            if (packageName == null)
+            {
+                throw new ToolException("Package name has not been specified.");
+            }
+            if (sourceDir != null)
+            {
+                File fileSourceDir = new File(sourceDir);
+                if (fileSourceDir.exists() == false)
+                {
+                    throw new ToolException("Source directory " + fileSourceDir.getAbsolutePath() + " does not exist.");
+                }
+            }
+            File packageFile = getPackageFile();
+            if (packageFile.exists() == false)
+            {
+                throw new ToolException("Package file " + packageFile.getAbsolutePath() + " does not exist.");
+            }
         }
 
-        private ImportException(String msg, Throwable cause)
+        /**
+         * Get the location within the Repository to import into
+         * 
+         * @return the location
+         */
+        private Location getLocation()
         {
-            super(msg, cause);
+            Location location = new Location(storeRef);
+            location.setPath(path);
+            return location;
+        }
+        
+        /**
+         * Get the source directory
+         * 
+         * @return the source directory (or null if current directory)
+         */
+        private File getSourceDir()
+        {
+            File dir = (sourceDir == null) ? null : new File(sourceDir); 
+            return dir;
+        }
+
+        /**
+         * Get the xml import file
+         * 
+         * @return the package file
+         */
+        private File getPackageFile()
+        {
+            String packageFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
+            File file = new File(getSourceDir(), packageFile); 
+            return file;
         }
     }
-
+    
 }

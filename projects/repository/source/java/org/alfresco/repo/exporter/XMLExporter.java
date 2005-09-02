@@ -49,6 +49,7 @@ import org.xml.sax.helpers.AttributesImpl;
     private NamespaceService namespaceService;
     private NodeService nodeService;
     private ContentHandler contentHandler;
+    private final static AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
     
 
     /**
@@ -78,7 +79,7 @@ import org.xml.sax.helpers.AttributesImpl;
         {
             contentHandler.startDocument();
             contentHandler.startPrefixMapping(NamespaceService.REPOSITORY_VIEW_PREFIX, NamespaceService.REPOSITORY_VIEW_1_0_URI);
-            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, VIEW_QNAME.toPrefixString(), null);
+            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, VIEW_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
         }
         catch (SAXException e)
         {
@@ -162,7 +163,7 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.startElement(aspect.getNamespaceURI(), aspect.getLocalName(), toPrefixString(aspect), null);
+            contentHandler.startElement(aspect.getNamespaceURI(), aspect.getLocalName(), toPrefixString(aspect), EMPTY_ATTRIBUTES);
         }
         catch (SAXException e)
         {
@@ -192,7 +193,7 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.startElement(property.getNamespaceURI(), property.getLocalName(), toPrefixString(property), null);
+            contentHandler.startElement(property.getNamespaceURI(), property.getLocalName(), toPrefixString(property), EMPTY_ATTRIBUTES);
         }
         catch (SAXException e)
         {
@@ -258,7 +259,7 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            contentHandler.startElement(assoc.getNamespaceURI(), assoc.getLocalName(), toPrefixString(assoc), null);
+            contentHandler.startElement(assoc.getNamespaceURI(), assoc.getLocalName(), toPrefixString(assoc), EMPTY_ATTRIBUTES);
         }
         catch (SAXException e)
         {
