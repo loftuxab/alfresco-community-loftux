@@ -30,6 +30,7 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,9 +65,9 @@ public class ResultSetQuerySession extends AbstractQuerySession
    }
    
    /**
-    * @see org.alfresco.repo.webservice.repository.QuerySession#getNextResultsBatch()
+    * @see org.alfresco.repo.webservice.repository.QuerySession#getNextResultsBatch(org.alfresco.service.cmr.search.SearchService, org.alfresco.service.cmr.repository.NodeService, org.alfresco.service.namespace.NamespaceService)
     */
-   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService)
+   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService, NamespaceService namespaceService)
    {
       QueryResult queryResult = null;
       

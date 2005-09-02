@@ -24,13 +24,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.webservice.axis.QueryConfigHandler;
+import org.alfresco.repo.webservice.types.ParentReference;
 import org.alfresco.repo.webservice.types.Predicate;
+import org.alfresco.repo.webservice.types.Query;
+import org.alfresco.repo.webservice.types.QueryLanguageEnum;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.Store;
 import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
@@ -68,15 +75,25 @@ public class Utils
     * @param ref The Reference to convert
     * @return The NodeRef representation of the Reference
     */
-   public static NodeRef convertToNodeRef(Reference ref)
+   public static NodeRef convertToNodeRef(Reference ref, NodeService nodeService, SearchService searchService,
+                                          NamespaceService namespaceService)
+   {      
+      return resolveToNodeRef(ref.getStore(), ref.getUuid(), ref.getPath(), nodeService, searchService, namespaceService);
+   }
+   
+   /**
+    * Converts the given ParentReference web service type into a repository NodeRef
+    * 
+    * @param parentRef The ParentReference to convert
+    * @return The NodeRef representation of the ParentReference
+    */
+   public static NodeRef convertToNodeRef(ParentReference parentRef, NodeService nodeService, SearchService searchService,
+                                          NamespaceService namespaceService)
    {
-      // TODO: Also support creation from the path
-      if (ref.getPath() != null)
-      {
-         throw new IllegalArgumentException("Paths in References are not supported yet!");
-      }
+      // TODO: Also take into account any association information passed in the ParentReference
       
-      return new NodeRef(convertToStoreRef(ref.getStore()), ref.getUuid());
+      return resolveToNodeRef(parentRef.getStore(), parentRef.getUuid(), parentRef.getPath(), 
+                              nodeService, searchService, namespaceService);
    }
    
    /**
@@ -96,24 +113,118 @@ public class Utils
    }
    
    /**
+    * Resolves the given parameters to a repository NodeRef
+    * 
+    * @param store The Store to search within 
+    * @param uuid The id of the node, or the id of the starting node if a path is also present
+    * @param path The path to the required node, if a uuid is given the search starts from that node
+    *             otherwise the search will start from the root node
+    * @param nodeService NodeService to use
+    * @param searchService SearchService to use
+    * @param namespaceService NamespaceService to use
+    * @return A repository NodeRef
+    */
+   public static NodeRef resolveToNodeRef(Store store, String uuid, String path, NodeService nodeService, 
+                                          SearchService searchService, NamespaceService namespaceService)
+   {
+      if (store == null)
+      {
+         throw new IllegalArgumentException("A Store must be supplied to resolve to a NodeRef");
+      }
+      
+      NodeRef nodeRef = null;
+      
+      // find out where we are starting from, either the root or the node represented by the uuid
+      NodeRef rootNodeRef = null;
+      if (uuid == null)
+      {
+         rootNodeRef = nodeService.getRootNode(convertToStoreRef(store));
+      }
+      else
+      {
+         rootNodeRef = new NodeRef(convertToStoreRef(store), uuid);
+      }
+      
+      // see if we have a path to further define the node being requested
+      if (path != null)
+      {
+         List<NodeRef> nodes = searchService.selectNodes(rootNodeRef, path, null, namespaceService, false);
+         
+         // make sure we only have one result
+         if (nodes.size() != 1)
+         {
+            StringBuilder builder = new StringBuilder("Failed to resolve to a single NodeRef with parameters (store=");
+            builder.append(store.getScheme().getValue()).append(":").append(store.getAddress());
+            builder.append(" uuid=").append(uuid);
+            builder.append(" path=").append(path).append("), found ");
+            builder.append(nodes.size()).append(" nodes.");
+            throw new IllegalStateException(builder.toString());
+         }
+         
+         nodeRef = nodes.get(0);
+      }
+      else
+      {
+         // if there is no path just use whatever the rootNodeRef currently is
+         nodeRef = rootNodeRef;
+      }
+      
+      return nodeRef;
+   }
+   
+   /**
     * Resolves the given predicate into a list of NodeRefs that can be acted upon
     * 
     * @param predicate The predicate passed from the client
+    * @param nodeService NodeService to use
+    * @param searchService SearchService to use
+    * @param namespaceService NamespaceService to use
     * @return A List of NodeRef objects
     */
-   public static List<NodeRef> resolvePredicate(Predicate predicate)
+   public static List<NodeRef> resolvePredicate(Predicate predicate, NodeService nodeService, SearchService searchService,
+                                                NamespaceService namespaceService)
    {
-      if (predicate.getQuery() != null)
-      {
-         throw new IllegalArgumentException("Queries in predicates are not supported yet!");
-      }
+      List<NodeRef> nodeRefs = null;
       
-      Reference[] nodes = predicate.getNodes();
-      ArrayList<NodeRef> nodeRefs = new ArrayList<NodeRef>(nodes.length);
-
-      for (int x = 0; x < nodes.length; x++)
+      if (predicate.getNodes() != null)
       {
-         nodeRefs.add(convertToNodeRef(nodes[x]));
+         Reference[] nodes = predicate.getNodes();
+         nodeRefs = new ArrayList<NodeRef>(nodes.length);
+   
+         for (int x = 0; x < nodes.length; x++)
+         {
+            nodeRefs.add(convertToNodeRef(nodes[x], nodeService, searchService, namespaceService));
+         }
+      }
+      else
+      {
+         // make sure a query is present
+         Query query = predicate.getQuery();
+         
+         if (query == null)
+         {
+            throw new IllegalStateException("Either a set of nodes or a query must be supplied in a Predicate.");
+         }
+         
+         // make sure a Store has been supplied too
+         if (predicate.getStore() == null)
+         {
+            throw new IllegalStateException("A Store has to be supplied to in order to execute a query.");
+         }
+         
+         QueryLanguageEnum langEnum = query.getLanguage();
+         
+         if (langEnum.equals(QueryLanguageEnum.cql) || langEnum.equals(QueryLanguageEnum.xpath))
+         {
+            throw new IllegalArgumentException("Only '" + QueryLanguageEnum.lucene.getValue() + "' queries are currently supported!");
+         }
+         
+         // execute the query
+         ResultSet searchResults = searchService.query(Utils.convertToStoreRef(predicate.getStore()), 
+               langEnum.getValue(), query.getStatement());
+         
+         // get hold of all the NodeRef's from the results
+         nodeRefs = searchResults.getNodeRefs();
       }
       
       return nodeRefs;

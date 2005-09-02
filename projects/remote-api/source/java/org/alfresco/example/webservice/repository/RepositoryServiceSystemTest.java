@@ -25,6 +25,7 @@ import org.alfresco.example.webservice.types.ClassDefinition;
 import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.NodeDefinition;
 import org.alfresco.example.webservice.types.Predicate;
+import org.alfresco.example.webservice.types.PropertyDefinition;
 import org.alfresco.example.webservice.types.Query;
 import org.alfresco.example.webservice.types.QueryConfiguration;
 import org.alfresco.example.webservice.types.QueryLanguageEnum;
@@ -209,6 +210,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       
       // get hold of the id of the first child
       ResultSetRow firstRow = rootChildrenResults.getRows(0);
+      assertNotNull("getColumns() should not return null", firstRow.getColumns());
       String id = firstRow.getNode().getId();
       logger.debug("Retrieving parents for first node found: " + id + "....");
       
@@ -228,6 +230,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       for (int x = 0; x < rows.length; x++)
       {
          ResultSetRow row = rows[x];
+         assertNotNull("getColumns() should not return null", row.getColumns());
          ResultSetRowNode rowNode = row.getNode();
          String nodeId = rowNode.getId();
          logger.debug("parent node = " + nodeId + ", type = " + rowNode.getType());
@@ -347,6 +350,84 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       assertTrue("Aspect2 should be an aspect", aspect2.isIsAspect());
       assertNotNull("Aspect2 should have properties", aspect2.getProperties());
       assertEquals("Aspect2 has wrong number of properties", 5, aspect2.getProperties().length);
+   }
+   
+   /**
+    * Tests passing a query in the predicate to return items to describe
+    * 
+    * @throws Exception
+    */
+   public void testPredicateQuery() throws Exception
+   {
+      // define a query to add to the predicate (get everything that mentions 'test')
+      Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
+      
+      Predicate predicate = new Predicate();
+      predicate.setQuery(query);
+      predicate.setStore(STORE);
+      
+      // call the service and make sure we get some details back
+      NodeDefinition[] nodeDefs = this.repoService.describe(predicate);
+      assertNotNull("nodeDefs should not be null", nodeDefs);
+      assertTrue("There should be at least one result", nodeDefs.length > 0);
+      
+      NodeDefinition nodeDef = nodeDefs[0];
+      assertNotNull("The nodeDef should not be null", nodeDef);
+      ClassDefinition typeDef = nodeDef.getType();
+      assertNotNull("Type definition should not be null", typeDef);
+      
+      logger.debug("type name = " + typeDef.getName());
+      logger.debug("is aspect = " + typeDef.isIsAspect());
+      PropertyDefinition[] propDefs = typeDef.getProperties();
+      if (propDefs != null)
+      {
+         logger.debug("There are " + propDefs.length + " properties:");
+         for (int x = 0; x < propDefs.length; x++)
+         {
+            PropertyDefinition propDef = propDefs[x];
+            logger.debug("name = " + propDef.getName() + " type = " + propDef.getDataType());
+         }
+      }
+   }
+   
+   /**
+    * Tests the use of a path within a reference
+    * 
+    * @throws Exception
+    */
+   public void testPathReference() throws Exception
+   {
+      // setup a predicate to find the 'Company Home' folder using an xpath
+      Reference ref = new Reference();
+      ref.setStore(STORE);
+      ref.setPath("//*[@cm:name = 'Company Home']");
+      Predicate predicate = new Predicate();
+      predicate.setNodes(new Reference[] {ref});
+
+      // call the service and make sure we get some details back
+      NodeDefinition[] nodeDefs = this.repoService.describe(predicate);
+      assertNotNull("nodeDefs should not be null", nodeDefs);
+      assertTrue("There should be at least one result", nodeDefs.length > 0);
+      
+      NodeDefinition nodeDef = nodeDefs[0];
+      assertNotNull("The nodeDef should not be null", nodeDef);
+      ClassDefinition typeDef = nodeDef.getType();
+      assertNotNull("Type definition should not be null", typeDef);
+      
+      logger.debug("type name = " + typeDef.getName());
+      assertEquals("Type is incorrect", "{http://www.alfresco.org/model/content/1.0}folder", typeDef.getName());
+      logger.debug("is aspect = " + typeDef.isIsAspect());
+      assertFalse("Item should not be an aspect", typeDef.isIsAspect());
+      PropertyDefinition[] propDefs = typeDef.getProperties();
+      if (propDefs != null)
+      {
+         logger.debug("There are " + propDefs.length + " properties:");
+         for (int x = 0; x < propDefs.length; x++)
+         {
+            PropertyDefinition propDef = propDefs[x];
+            logger.debug("name = " + propDef.getName() + " type = " + propDef.getDataType());
+         }
+      }
    }
    
    /**

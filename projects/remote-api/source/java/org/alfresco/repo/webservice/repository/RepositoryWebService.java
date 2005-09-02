@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.cache.SimpleCache;
+import org.alfresco.repo.webservice.AbstractWebService;
 import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.AssociationDefinition;
 import org.alfresco.repo.webservice.types.CML;
@@ -41,9 +42,7 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.apache.axis.MessageContext;
 import org.apache.commons.logging.Log;
@@ -55,34 +54,12 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author gavinc
  */
-public class RepositoryWebService implements RepositoryServiceSoapPort
+public class RepositoryWebService extends AbstractWebService implements RepositoryServiceSoapPort
 {
    private static Log logger = LogFactory.getLog(RepositoryWebService.class);
-   
-   private NodeService nodeService;
-   private SearchService searchService;
+
    private DictionaryService dictionaryService;
    private SimpleCache<String, QuerySession> querySessionCache; 
-   
-   /**
-    * Sets the instance of the NodeService to be used
-    * 
-    * @param nodeService The NodeService
-    */
-   public void setNodeService(NodeService nodeService)
-   {
-      this.nodeService = nodeService;
-   }
-   
-   /**
-    * Sets the instance of the SearchService to be used
-    * 
-    * @param searchService The SearchService
-    */
-   public void setSearchService(SearchService searchService)
-   {
-      this.searchService = searchService;
-   }
    
    /**
     * Sets the instance of the DictionaryService to be used
@@ -167,7 +144,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          
          // setup a query session and get the first batch of results
          QuerySession querySession = new ResultSetQuerySession(Utils.getBatchSize(msgContext), store, query, includeMetaData);
-         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService);
+         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService, this.namespaceService);
          
          // add the session to the cache if there are more results to come
          if (queryResult.getQuerySession() != null)
@@ -209,7 +186,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          
          // setup a query session and get the first batch of results
          QuerySession querySession = new ChildrenQuerySession(Utils.getBatchSize(MessageContext.getCurrentContext()), node);
-         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService);
+         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService, this.namespaceService);
          
          // add the session to the cache if there are more results to come
          if (queryResult.getQuerySession() != null)
@@ -251,7 +228,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          
          // setup a query session and get the first batch of results
          QuerySession querySession = new ParentsQuerySession(Utils.getBatchSize(MessageContext.getCurrentContext()), node);
-         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService); 
+         QueryResult queryResult = querySession.getNextResultsBatch(this.searchService, this.nodeService, this.namespaceService); 
          
          // add the session to the cache if there are more results to come
          if (queryResult.getQuerySession() != null)
@@ -313,7 +290,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          }
       
          // get the next batch of results
-         queryResult = session.getNextResultsBatch(this.searchService, this.nodeService); 
+         queryResult = session.getNextResultsBatch(this.searchService, this.nodeService, this.namespaceService);
          
          // remove the QuerySession from the cache if there are no more results to come
          if (queryResult.getQuerySession() == null)
@@ -368,7 +345,7 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
          tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
          tx.begin();
          
-         List<NodeRef> nodes = Utils.resolvePredicate(items);
+         List<NodeRef> nodes = Utils.resolvePredicate(items, this.nodeService, this.searchService, this.namespaceService);
          nodeDefs = new NodeDefinition[nodes.size()];
          
          for (int x = 0; x < nodes.size(); x++)
@@ -511,12 +488,18 @@ public class RepositoryWebService implements RepositoryServiceSoapPort
             }
             
             RoleDefinition sourceRole = new RoleDefinition();
-            sourceRole.setName(ddAssocDef.getSourceRoleName().toString());
+            if (ddAssocDef.getSourceRoleName() != null)
+            {
+               sourceRole.setName(ddAssocDef.getSourceRoleName().toString());
+            }
             sourceRole.setCardinality(setupSourceCardinalityObject(ddAssocDef));
             assocDef.setSourceRole(sourceRole);
             
             RoleDefinition targetRole = new RoleDefinition();
-            targetRole.setName(ddAssocDef.getTargetRoleName().toString());
+            if (ddAssocDef.getTargetRoleName() != null)
+            {
+               targetRole.setName(ddAssocDef.getTargetRoleName().toString());
+            }
             targetRole.setCardinality(setupTargetCardinalityObject(ddAssocDef));;
             assocDef.setTargetRole(targetRole);
             assocDef.setTargetClass(ddAssocDef.getTargetClass().getName().toString());

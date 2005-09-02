@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
 
 /**
  * Interface definition for a QuerySession.
@@ -46,8 +47,10 @@ public interface QuerySession extends Serializable
     * @see org.alfresco.repo.webservice.repository.QuerySession#getId()
     * @param searchService The SearchService to use for gathering the results
     * @param nodeService The NodeService to use for gathering the results
+    * @param namespaceService The NamespaceService to use
     * @return QueryResult containing the next batch of results or null if there
     * are no more results
     */
-   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService);
+   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService, 
+                                          NamespaceService namespaceService);
 }

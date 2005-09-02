@@ -21,6 +21,13 @@ import javax.xml.rpc.ServiceException;
 import junit.framework.AssertionFailedError;
 
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
+import org.alfresco.example.webservice.content.ContentServiceLocator;
+import org.alfresco.example.webservice.content.ContentServiceSoapBindingStub;
+import org.alfresco.example.webservice.types.Content;
+import org.alfresco.example.webservice.types.ContentFormat;
+import org.alfresco.example.webservice.types.ParentReference;
+import org.alfresco.example.webservice.types.Predicate;
+import org.alfresco.example.webservice.types.Reference;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.commons.logging.Log;
@@ -31,6 +38,11 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
    private static Log logger = LogFactory.getLog(AuthoringServiceSystemTest.class);
    
    private static String versionedNodeId;
+   private static final String INITIAL_VERSION_CONTENT = "Content of the initial version";
+   private static final String FIRST_VERSION_CONTENT = "Content of the first version";
+   private static final String SECOND_VERSION_CONTENT = "The content for the second version is completely different";
+   private static final String THIRD_VERSION_CONTENT = "The third version is short!";
+   
    private AuthoringServiceSoapBindingStub authoringService;
 
    @Override
@@ -61,6 +73,32 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
    
    public void testCreateNode() throws Exception
    {
+      ContentServiceSoapBindingStub contentService = null;
+      try 
+      {
+         EngineConfiguration config = new FileProvider(getResourcesDir(), "client-deploy.wsdd");
+         contentService = (ContentServiceSoapBindingStub)new ContentServiceLocator(config).getContentService();
+         assertNotNull("contentService is null", contentService);
+         contentService.setTimeout(60000);
+      }
+      catch (Exception e) 
+      {
+         fail("Could not instantiate the content service" + e.toString());
+      }
+      
+      // get the root node (hard code for now until we have a way to query for the root node)
+      ParentReference root = new ParentReference();
+      root.setStore(STORE);
+      root.setUuid(companyHomeId);
+      
+      String mimetype = "text/plain";
+      Content content = contentService.create(root, "version-test.txt", new ContentFormat(mimetype, "UTF-8"), 
+            INITIAL_VERSION_CONTENT.getBytes());
+      assertNotNull("returned content should not be null", content);
+      assertNotNull("format should not be null", content.getFormat());
+      assertEquals("Mimetype should match what was sent", mimetype, content.getFormat().getMimetype());
+      versionedNodeId = content.getReference().getUuid();
+      logger.debug("created new content with id: " + versionedNodeId);
    }
    
    /**
@@ -70,15 +108,21 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
     */
    public void testCheckout() throws Exception
    {
-      try
-      {
-         this.authoringService.checkout(null, null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
+      Reference ref = new Reference();
+      ref.setStore(STORE);
+      ref.setUuid(versionedNodeId);
+      Predicate predicate = new Predicate();
+      predicate.setNodes(new Reference[] {ref});
+      
+      // define the parent reference as a path based reference
+//      ParentReference checkoutLocation = new ParentReference();
+//      checkoutLocation.setStore(STORE);
+//      checkoutLocation.setPath("//*[@cm:name = 'Company Home']");
+      
+      CheckoutResult result = this.authoringService.checkout(predicate, null);
+      assertNotNull("The result should not be null", result);
+      assertEquals("There should only be 1 original reference", 1, result.getOriginals().length);
+      assertEquals("There should only be 1 working copy reference", 1, result.getWorkingCopies().length);
    }
    
    /**

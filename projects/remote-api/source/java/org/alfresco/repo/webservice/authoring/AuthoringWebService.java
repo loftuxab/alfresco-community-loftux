@@ -17,15 +17,21 @@
 package org.alfresco.repo.webservice.authoring;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
+import javax.transaction.UserTransaction;
+
+import org.alfresco.repo.webservice.AbstractWebService;
+import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.ContentFormat;
 import org.alfresco.repo.webservice.types.NamedValue;
 import org.alfresco.repo.webservice.types.ParentReference;
 import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.VersionHistory;
-import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.apache.axis.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,39 +41,70 @@ import org.apache.commons.logging.LogFactory;
  *  
  * @author gavinc
  */
-public class AuthoringWebService implements AuthoringServiceSoapPort
+public class AuthoringWebService extends AbstractWebService implements AuthoringServiceSoapPort
 {
    private static Log logger = LogFactory.getLog(AuthoringWebService.class);
-   
-   private NodeService nodeService;
-   private ContentService contentService;
-   
-   /**
-    * Sets the instance of the NodeService to be used
-    * 
-    * @param nodeService The NodeService
-    */
-   public void setNodeService(NodeService nodeService)
-   {
-      this.nodeService = nodeService;
-   }
-   
-   /**
-    * Sets the ContentService instance to use
-    * 
-    * @param contentSvc The ContentService
-    */
-   public void setContentService(ContentService contentSvc)
-   {
-      this.contentService = contentSvc;
-   }
 
+   private CheckOutCheckInService cociService;
+   
+   /**
+    * Sets the CheckInCheckOutService to use
+    * 
+    * @param cociService The CheckInCheckOutService
+    */
+   public void setCheckOutCheckinService(CheckOutCheckInService cociService)
+   {
+      this.cociService = cociService;
+   }
+   
    /**
     * @see org.alfresco.repo.webservice.authoring.AuthoringServiceSoapPort#checkout(org.alfresco.repo.webservice.types.Predicate, org.alfresco.repo.webservice.types.ParentReference)
     */
    public CheckoutResult checkout(Predicate items, ParentReference destination) throws RemoteException, AuthoringFault
    {
-      throw new AuthoringFault(1, "checkout() is not implemented yet!");
+      UserTransaction tx = null;
+      
+      try
+      {
+         tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
+         tx.begin();
+         
+         List<NodeRef> nodes = Utils.resolvePredicate(items, this.nodeService, this.searchService, this.namespaceService);
+         CheckoutResult checkoutResult = new CheckoutResult();
+         Reference[] originals = new Reference[nodes.size()];
+         Reference[] workingCopies = new Reference[nodes.size()];
+         
+         for (int x = 0; x < nodes.size(); x++)
+         {
+            // TODO: Add support for specifying the destination of the check out
+            
+            NodeRef original = nodes.get(x);
+            NodeRef workingCopy = this.cociService.checkout(original);
+            originals[x] = Utils.convertToReference(original);
+            workingCopies[x] = Utils.convertToReference(workingCopy);
+         }
+         
+         // setup the result object
+         checkoutResult.setOriginals(originals);
+         checkoutResult.setWorkingCopies(workingCopies);
+         
+         // commit the transaction
+         tx.commit();
+         
+         return checkoutResult;
+      }
+      catch (Throwable e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         
+         if (logger.isDebugEnabled())
+         {
+            logger.error("Unexpected error occurred", e);
+         }
+         
+         throw new AuthoringFault(0, e.getMessage());
+      }
    }
 
    /**

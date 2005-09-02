@@ -16,9 +16,12 @@
  */
 package org.alfresco.repo.webservice.repository;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.repo.webservice.Utils;
+import org.alfresco.repo.webservice.types.NamedValue;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.ResultSetRow;
 import org.alfresco.repo.webservice.types.ResultSetRowNode;
@@ -26,6 +29,8 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,9 +59,9 @@ public class ChildrenQuerySession extends AbstractQuerySession
    }
    
    /**
-    * @see org.alfresco.repo.webservice.repository.QuerySession#getNextResultsBatch(org.alfresco.service.cmr.search.SearchService, org.alfresco.service.cmr.repository.NodeService)
+    * @see org.alfresco.repo.webservice.repository.QuerySession#getNextResultsBatch(org.alfresco.service.cmr.search.SearchService, org.alfresco.service.cmr.repository.NodeService, org.alfresco.service.namespace.NamespaceService)
     */
-   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService)
+   public QueryResult getNextResultsBatch(SearchService searchService, NodeService nodeService, NamespaceService namespaceService)
    {
       QueryResult queryResult = null;
       
@@ -66,7 +71,7 @@ public class ChildrenQuerySession extends AbstractQuerySession
             logger.debug("Before getNextResultsBatch: " + toString());
          
          // create the node ref and get the children from the repository
-         NodeRef nodeRef = Utils.convertToNodeRef(this.node);
+         NodeRef nodeRef = Utils.convertToNodeRef(this.node, nodeService, searchService, namespaceService);
          List<ChildAssociationRef> kids = nodeService.getChildAssocs(nodeRef);
          
          int totalRows = kids.size();
@@ -85,9 +90,28 @@ public class ChildrenQuerySession extends AbstractQuerySession
             ChildAssociationRef assoc = kids.get(x);
             NodeRef childNodeRef = assoc.getChildRef();
             ResultSetRowNode rowNode = new ResultSetRowNode(childNodeRef.getId(), nodeService.getType(childNodeRef).toString(), null);
+            
+            // create columns for all the properties of the node
+            // get the data for the row and build up the columns structure
+            Map<QName, Serializable> props = nodeService.getProperties(childNodeRef);
+            NamedValue[] columns = new NamedValue[props.size()];
+            int col = 0;
+            for (QName propName : props.keySet())
+            {
+               String value = null;
+               Serializable valueObj = props.get(propName);
+               if (valueObj != null)
+               {
+                  value = valueObj.toString();
+               }
+               columns[col] = new NamedValue(propName.toString(), value);
+               col++;
+            }
+            
             ResultSetRow row = new ResultSetRow();
             row.setRowIndex(x);
             row.setNode(rowNode);
+            row.setColumns(columns);
             
             // add the row to the overall results
             rows[arrPos] = row;

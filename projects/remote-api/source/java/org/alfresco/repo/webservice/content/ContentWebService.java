@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.webservice.AbstractWebService;
 import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.Content;
 import org.alfresco.repo.webservice.types.ContentFormat;
@@ -35,10 +36,8 @@ import org.alfresco.repo.webservice.types.ParentReference;
 import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.axis.MessageContext;
@@ -52,33 +51,10 @@ import org.apache.commons.logging.LogFactory;
  *  
  * @author gavinc
  */
-public class ContentWebService implements ContentServiceSoapPort
+public class ContentWebService extends AbstractWebService implements ContentServiceSoapPort
 {
    private static Log logger = LogFactory.getLog(ContentWebService.class);
    private static final String BROWSER_URL   = "{0}://{1}{2}/download/direct/{3}/{4}/{5}/{6}";
-   
-   private NodeService nodeService;
-   private ContentService contentService;
-   
-   /**
-    * Sets the instance of the NodeService to be used
-    * 
-    * @param nodeService The NodeService
-    */
-   public void setNodeService(NodeService nodeService)
-   {
-      this.nodeService = nodeService;
-   }
-   
-   /**
-    * Sets the ContentService instance to use
-    * 
-    * @param contentSvc The ContentService
-    */
-   public void setContentService(ContentService contentSvc)
-   {
-      this.contentService = contentSvc;
-   }
 
    /**
     * @see org.alfresco.repo.webservice.content.ContentServiceSoapPort#describe(org.alfresco.repo.webservice.types.Predicate)
@@ -92,7 +68,7 @@ public class ContentWebService implements ContentServiceSoapPort
          tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
          tx.begin();
          
-         List<NodeRef> nodes = Utils.resolvePredicate(items);
+         List<NodeRef> nodes = Utils.resolvePredicate(items, this.nodeService, this.searchService, this.namespaceService);
          Content[] descriptions = new Content[nodes.size()];
          
          for (int x = 0; x < nodes.size(); x++)
@@ -132,7 +108,7 @@ public class ContentWebService implements ContentServiceSoapPort
          tx.begin();
          
          // retrieve metadata for given node
-         NodeRef nodeRef = Utils.convertToNodeRef(node);
+         NodeRef nodeRef = Utils.convertToNodeRef(node, this.nodeService, this.searchService, this.namespaceService);
          Map<QName, Serializable> props = this.nodeService.getProperties(nodeRef);
          String filename = (String)props.get(ContentModel.PROP_NAME);
          Content content = setupContentObject(nodeRef);
@@ -197,7 +173,7 @@ public class ContentWebService implements ContentServiceSoapPort
          tx.begin();
          
          // create a NodeRef from the parent reference
-         NodeRef nodeRef = Utils.convertToNodeRef(node);
+         NodeRef nodeRef = Utils.convertToNodeRef(node, this.nodeService, this.searchService, this.namespaceService);
          
          ContentWriter writer = this.contentService.getUpdatingWriter(nodeRef);
          writer.putContent(new String(content));
@@ -235,8 +211,7 @@ public class ContentWebService implements ContentServiceSoapPort
          tx.begin();
          
          // create a NodeRef from the parent reference
-         // TODO: handle creation from a path
-         NodeRef parentNodeRef = new NodeRef(Utils.convertToStoreRef(parent.getStore()), parent.getUuid());
+         NodeRef parentNodeRef = Utils.convertToNodeRef(parent, this.nodeService, this.searchService, this.namespaceService);
          
          Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(5, 1.0f);
          contentProps.put(ContentModel.PROP_NAME, name);
@@ -295,7 +270,7 @@ public class ContentWebService implements ContentServiceSoapPort
          tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
          tx.begin();
          
-         List<NodeRef> nodes = Utils.resolvePredicate(items);
+         List<NodeRef> nodes = Utils.resolvePredicate(items, this.nodeService, this.searchService, this.namespaceService);
          Reference[] refs = new Reference[nodes.size()];
          
          // delete each node in the predicate
@@ -342,7 +317,7 @@ public class ContentWebService implements ContentServiceSoapPort
          tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
          tx.begin();
          
-         List<NodeRef> nodes = Utils.resolvePredicate(items);
+         List<NodeRef> nodes = Utils.resolvePredicate(items, this.nodeService, this.searchService, this.namespaceService);
          ExistsResult[] existsReturn = new ExistsResult[nodes.size()];
          
          // query whether each NodeRef exists in the repository

@@ -33,8 +33,14 @@
       <property name="nodeService">
          <ref bean="NodeService"/>
       </property>
+      <property name="contentService">
+         <ref bean="ContentService"/>
+      </property>
       <property name="searchService">
          <ref bean="SearchService"/>
+      </property>
+      <property name="namespaceService">
+         <ref bean="namespaceService"/>
       </property>
       <property name="dictionaryService">
          <ref bean="dictionaryService"/>
@@ -51,6 +57,12 @@
       <property name="contentService">
          <ref bean="ContentService"/>
       </property>
+      <property name="searchService">
+         <ref bean="SearchService"/>
+      </property>
+      <property name="namespaceService">
+         <ref bean="namespaceService"/>
+      </property>
    </bean>
    
    <bean id="authoringWebService" class="org.alfresco.repo.webservice.authoring.AuthoringWebService">
@@ -59,6 +71,15 @@
       </property>
       <property name="contentService">
          <ref bean="ContentService"/>
+      </property>
+      <property name="searchService">
+         <ref bean="SearchService"/>
+      </property>
+      <property name="namespaceService">
+         <ref bean="namespaceService"/>
+      </property>
+      <property name="checkOutCheckinService">
+         <ref bean="checkOutCheckInService"/>
       </property>
    </bean>
  

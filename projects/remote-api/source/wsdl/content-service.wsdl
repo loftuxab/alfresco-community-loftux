@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<wsdl:definitions name="authentication-service"
+<wsdl:definitions name="content-service"
    targetNamespace="http://www.alfresco.org/ws/service/content/1.0" 
    xmlns:apachesoap="http://xml.apache.org/xml-soap" 
    xmlns:content="http://www.alfresco.org/ws/service/content/1.0" 

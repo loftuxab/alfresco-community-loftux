@@ -16,6 +16,10 @@
  */
 package org.alfresco.example.webservice.content;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+
 import javax.xml.rpc.ServiceException;
 
 import junit.framework.AssertionFailedError;
@@ -141,9 +145,9 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       assertTrue("Content length of update content should not be the same as the previous content length",
             contentLength != CONTENT.length());
       
-      /* TODO: Uncomment out when we have a way of providing the login credentials 
-               to the download servlet (auth filter); it needs to look for a ticket
-               on the URL
+      /* TODO: At some point we will have to provide the login credentials 
+               for the download servlet (auth filter); it needs to look for a ticket
+               on the URL */
                
       // read the contents of the URL and make sure they match
       StringBuilder readContent = new StringBuilder();
@@ -160,7 +164,6 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       // make sure the content in the repository is correct
       logger.debug("Content from repository: " + readContent.toString());
       assertEquals("Content does not match", UPDATED_CONTENT, readContent.toString());
-      */
    }
    
    /**
