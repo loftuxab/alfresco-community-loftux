@@ -29,6 +29,7 @@ import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.ModelDAO;
+import org.alfresco.repo.security.permissions.impl.PermissionServiceImpl;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -800,6 +801,10 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
     public boolean checkPermission(PermissionReference required)
     {
+        if(required.equals(PermissionServiceImpl.ALL_PERMISSION))
+        {
+            return true;
+        }
         Permission permission = getPermissionOrNull(required);
         if (permission != null)
         {

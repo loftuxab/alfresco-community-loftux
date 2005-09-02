@@ -394,12 +394,16 @@ public class NewUserWizard extends AbstractWizardBean
             
             // create the node to represent the Person
             String assocName = QName.createValidLocalName(this.userName);
-            this.nodeService.createNode(
+            NodeRef newPerson = this.nodeService.createNode(
                   peopleNode,
                   ContentModel.ASSOC_CHILDREN,
                   ContentModel.TYPE_PERSON,
                   ContentModel.TYPE_PERSON,
-                  props);
+                  props).getChildRef();
+            
+           
+            this.permissionService.setPermission(newPerson, this.userName, permissionService.getAllPermission(), true);
+            
             
             if (logger.isDebugEnabled())
                logger.debug("Created Person node for username: " + this.userName);

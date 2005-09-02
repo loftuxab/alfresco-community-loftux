@@ -21,8 +21,6 @@ import java.util.Set;
 
 import javax.transaction.UserTransaction;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 
@@ -308,7 +306,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertEquals(21, answer.size());
         
         answer = permissionService.getSettablePermissions(QName.createQName("cm", "folder", namespacePrefixResolver));
-        assertEquals(4, answer.size());
+        assertEquals(5, answer.size());
     }
     
     public void testGetSettablePermissionsForNode()

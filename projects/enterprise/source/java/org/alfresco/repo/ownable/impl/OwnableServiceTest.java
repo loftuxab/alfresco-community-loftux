@@ -23,17 +23,21 @@ import junit.framework.TestCase;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.ownable.OwnableService;
 import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
 public class OwnableServiceTest extends TestCase
 {
-
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private NodeService nodeService;
@@ -45,6 +49,13 @@ public class OwnableServiceTest extends TestCase
     private NodeRef rootNodeRef;
 
     private UserTransaction userTransaction;
+    
+    private PermissionService permissionService;
+    
+    private OwnerDynamicAuthority dynamicAuthority;
+
+    private NamespacePrefixResolver namespacePrefixResolver;
+
     
     public OwnableServiceTest()
     {
@@ -61,6 +72,10 @@ public class OwnableServiceTest extends TestCase
         nodeService = (NodeService) ctx.getBean("nodeService");
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
         ownableService = (OwnableService) ctx.getBean("ownableService");
+        permissionService = (PermissionService) ctx.getBean("permissionService");
+        
+        namespacePrefixResolver = (NamespacePrefixResolver) ctx
+        .getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName());
      
         TransactionService transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName());
         userTransaction = transactionService.getUserTransaction();
@@ -70,6 +85,9 @@ public class OwnableServiceTest extends TestCase
         rootNodeRef = nodeService.getRootNode(storeRef);
         
         authenticationService.createAuthentication("andy", "andy".toCharArray());
+        
+        dynamicAuthority = new OwnerDynamicAuthority();
+        dynamicAuthority.setOwnableService(ownableService);
     }
     
     @Override
@@ -100,6 +118,7 @@ public class OwnableServiceTest extends TestCase
         assertTrue(ownableService.hasOwner(testNode));
         assertTrue(nodeService.hasAspect(testNode, ContentModel.ASPECT_AUDITABLE));
         assertFalse(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
+        assertTrue(dynamicAuthority.hasAuthority(testNode, "andy"));
         
         ownableService.setOwner(testNode, "muppet");
         assertEquals("muppet", ownableService.getOwner(testNode));
@@ -107,16 +126,25 @@ public class OwnableServiceTest extends TestCase
         assertEquals("andy", ownableService.getOwner(testNode));
         assertTrue(nodeService.hasAspect(testNode, ContentModel.ASPECT_AUDITABLE));
         assertTrue(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
+        assertTrue(dynamicAuthority.hasAuthority(testNode, "andy"));
     }
     
     public void testContainer()
     {
+        PermissionReference READ = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Read");
+        
         authenticationService.authenticate("andy", "andy".toCharArray());
         NodeRef testNode = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, ContentModel.TYPE_CONTAINER, null).getChildRef();
         assertNull(ownableService.getOwner(testNode));
         assertFalse(ownableService.hasOwner(testNode));
         assertFalse(nodeService.hasAspect(testNode, ContentModel.ASPECT_AUDITABLE));
         assertFalse(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
+        assertFalse(dynamicAuthority.hasAuthority(testNode, "andy"));
+        
+        assertFalse(permissionService.hasPermission(testNode, READ));
+        assertFalse(permissionService.hasPermission(testNode, permissionService.getAllPermission()));
+        
+        permissionService.setPermission(rootNodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
         
         ownableService.setOwner(testNode, "muppet");
         assertEquals("muppet", ownableService.getOwner(testNode));
@@ -124,6 +152,12 @@ public class OwnableServiceTest extends TestCase
         assertEquals("andy", ownableService.getOwner(testNode));
         assertFalse(nodeService.hasAspect(testNode, ContentModel.ASPECT_AUDITABLE));
         assertTrue(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
+        assertTrue(dynamicAuthority.hasAuthority(testNode, "andy"));
+        
+        assertTrue(permissionService.hasPermission(testNode, READ));
+        assertTrue(permissionService.hasPermission(testNode, permissionService.getAllPermission()));
+        
+        
     }
     
 }

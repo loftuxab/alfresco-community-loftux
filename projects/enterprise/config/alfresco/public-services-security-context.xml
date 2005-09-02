@@ -36,12 +36,25 @@
                 <property name="authenticationComponent">
                     <ref bean="authenticationComponent" />
                 </property>
+                <property name="dynamicAuthorities">
+                    <list>
+                        <ref bean="ownerDynamicAuthority" />
+                    </list>
+                </property>
             </bean>
         </property>
         <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
             </props>
+        </property>
+    </bean>
+    
+    <!-- Dynamic Authorities -->
+    
+    <bean id="ownerDynamicAuthority" class="org.alfresco.repo.ownable.impl.OwnerDynamicAuthority">
+        <property name="ownableService">
+            <ref bean="ownableService" />
         </property>
     </bean>
 

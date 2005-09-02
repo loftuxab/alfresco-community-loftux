@@ -37,6 +37,9 @@
     	</property>
     </bean>
 
+    <!-- Exception Translation -->
+    
+    <bean id="exceptionTranslator" class="org.alfresco.repo.security.permissions.impl.ExceptionTranslatorMethodInterceptor"/>
 
     <!-- Namespace Service -->
 
@@ -48,6 +51,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="NamespaceService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="NamespaceService_security" />
     			<idref local="NamespaceService_descriptor" />
     		</list>
@@ -88,6 +92,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="DictionaryService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="DictionaryService_security" />
     			<idref local="DictionaryService_descriptor" />
     		</list>
@@ -123,6 +128,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="NodeService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="NodeService_security" />
     			<idref local="NodeService_descriptor" />
     		</list>
@@ -160,6 +166,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="ContentService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="ContentService_security" />
     			<idref local="ContentService_descriptor" />
     		</list>
@@ -195,6 +202,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="MimetypeService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="MimetypeService_security" />
     			<idref local="MimetypeService_descriptor" />
     		</list>
@@ -230,6 +238,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="SearchService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="SearchService_security" />
     			<idref local="SearchService_descriptor" />
     		</list>
@@ -265,6 +274,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="CategoryService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="CategoryService_security" />
     			<idref local="CategoryService_descriptor" />
     		</list>
@@ -300,6 +310,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="CopyService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="CopyService_security" />
     			<idref local="CopyService_descriptor" />
     		</list>
@@ -335,6 +346,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="LockService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="LockService_security" />
     			<idref local="LockService_descriptor" />
     		</list>
@@ -370,6 +382,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="VersionService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="VersionService_security" />
     			<idref local="VersionService_descriptor" />
     		</list>
@@ -405,6 +418,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="CheckoutCheckinService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="CheckoutCheckinService_security" />
     			<idref local="CheckoutCheckinService_descriptor" />
     		</list>
@@ -440,6 +454,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="RuleService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="RuleService_security" />
     			<idref local="RuleService_descriptor" />
     		</list>
@@ -475,6 +490,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="ImporterService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="ImporterService_security" />
     			<idref local="ImporterService_descriptor" />
     		</list>
@@ -544,6 +560,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="ActionService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="ActionService_security" />
     			<idref local="ActionService_descriptor" />
     		</list>
@@ -579,6 +596,7 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="PermissionService_transaction" />
+                <idref local="exceptionTranslator" />
                 <idref bean="PermissionService_security" />
     			<idref local="PermissionService_descriptor" />
     		</list>

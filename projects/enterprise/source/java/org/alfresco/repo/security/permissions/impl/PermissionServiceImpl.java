@@ -17,6 +17,7 @@
 package org.alfresco.repo.security.permissions.impl;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.acegisecurity.Authentication;
@@ -26,6 +27,7 @@ import net.sf.acegisecurity.providers.dao.User;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.AccessPermission;
+import org.alfresco.repo.security.permissions.DynamicAuthority;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
@@ -51,12 +53,14 @@ import org.springframework.beans.factory.InitializingBean;
 public class PermissionServiceImpl implements PermissionService, InitializingBean
 {
 
+    public static final String OWNER_AUTHORITY = "\u0000owner";
+
     private static Log log = LogFactory.getLog(PermissionServiceImpl.class);
 
     /*
      * ALL Permission
      */
-    private static final PermissionReference ALL_PERMISSION = new SimplePermissionReference(QName.createQName("\u0000",
+    public static final PermissionReference ALL_PERMISSION = new SimplePermissionReference(QName.createQName("\u0000",
             "\u0000"), "\u0000");
 
     /*
@@ -90,6 +94,12 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
      */
 
     private AuthenticationComponent authenticationComponent;
+
+    /*
+     * Dynamic authorities providers
+     */
+
+    private List<DynamicAuthority> dynamicAuthorities;
 
     /*
      * Standard spring construction.
@@ -133,6 +143,11 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         this.authenticationComponent = authenticationComponent;
     }
 
+    public void setDynamicAuthorities(List<DynamicAuthority> dynamicAuthorities)
+    {
+        this.dynamicAuthorities = dynamicAuthorities;
+    }
+
     public void afterPropertiesSet() throws Exception
     {
         if (dictionaryService == null)
@@ -168,7 +183,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
     public String getOwnerAuthority()
     {
-        return "\u0000owner";
+        return OWNER_AUTHORITY;
     }
 
     public String getAllAuthorities()
@@ -229,7 +244,8 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         // If the node does not support the given permission there is no point
         // doing the test
         Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
-
+        available.add(getAllPermission());
+        
         if (!(available.contains(perm)))
         {
             return false;
@@ -248,7 +264,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         Authentication auth = authenticationComponent.getCurrentAuthentication();
 
         // Get the available authorisations
-        Set<String> authorisations = getAuthorisations(auth);
+        Set<String> authorisations = getAuthorisations(auth, nodeRef);
 
         QName typeQname = nodeService.getType(nodeRef);
         Set<QName> aspectQNames = nodeService.getAspects(nodeRef);
@@ -258,8 +274,8 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         if (log.isDebugEnabled())
         {
             log.debug("Permission <"
-                    + perm + "> is " + (result ? "allowed" : "denied") + " for " + authenticationService.getCurrentUserName() + " on node "
-                    + nodeService.getPath(nodeRef));
+                    + perm + "> is " + (result ? "allowed" : "denied") + " for "
+                    + authenticationService.getCurrentUserName() + " on node " + nodeService.getPath(nodeRef));
         }
         return result;
 
@@ -271,7 +287,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
      * @param auth
      * @return
      */
-    private Set<String> getAuthorisations(Authentication auth)
+    private Set<String> getAuthorisations(Authentication auth, NodeRef nodeRef)
     {
         HashSet<String> auths = new HashSet<String>();
         // No authenticated user then no permissions
@@ -286,6 +302,16 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         for (GrantedAuthority authority : auth.getAuthorities())
         {
             auths.add(authority.getAuthority());
+        }
+        if (dynamicAuthorities != null)
+        {
+            for (DynamicAuthority da : dynamicAuthorities)
+            {
+                if (da.hasAuthority(nodeRef, user.getUsername()))
+                {
+                    auths.add(da.getAuthority());
+                }
+            }
         }
         return auths;
     }
@@ -337,8 +363,6 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
         permissionsDAO.setInheritParentPermissions(nodeRef, inheritParentPermissions);
     }
 
-    
-    
     //
     // SUPPORT CLASSES
     //
