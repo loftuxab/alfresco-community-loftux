@@ -36,7 +36,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form id="add-content-upload-start">
+   <h:form acceptCharset="UTF-8" id="add-content-upload-start">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -147,7 +147,7 @@
                                  </tr>
                                  </r:uploadForm>
                                  
-                                 <h:form id="add-content-upload-end">
+                                 <h:form acceptCharset="UTF-8" id="add-content-upload-end">
                                  <tr><td class="paddingRow"></td></tr>
                                  <%
                                  AddContentWizard wiz = (AddContentWizard)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "AddContentWizard");

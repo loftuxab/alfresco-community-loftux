@@ -27,7 +27,7 @@
 
    <h2>Dynamic Description</h2>
    
-   <h:form id="dyna-desc">
+   <h:form acceptCharset="UTF-8" id="dyna-desc">
 
       <h:selectOneMenu onchange="javascript:listItemSelected(this);">
          <f:selectItem itemLabel="Choice One" itemValue="one" />

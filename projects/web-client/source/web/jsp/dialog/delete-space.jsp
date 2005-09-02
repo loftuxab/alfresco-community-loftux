@@ -32,7 +32,7 @@
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="delete-space">
+   <h:form acceptCharset="UTF-8" id="delete-space">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">

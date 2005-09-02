@@ -29,7 +29,7 @@
    <%-- load a bundle of properties I18N strings here --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form id="loginForm" >
+   <h:form acceptCharset="UTF-8" id="loginForm" >
    
    <table width=100% height=98% align=center>
       <tr width=100% align=center>

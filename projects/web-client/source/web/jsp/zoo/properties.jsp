@@ -27,7 +27,7 @@
    
    <h2>Property sheet with standard JSF components</h2>
    
-   <h:form id="propertySheetForm">
+   <h:form acceptCharset="UTF-8" id="propertySheetForm">
    
       <r:propertySheetGrid value="/gav.doc">
          <h:outputText value='#{MockDDService.types[node.type].propertiesMap["name"].displayName}: ' />
@@ -55,7 +55,7 @@
    
    <h2>Property sheet with custom property components</h2>
    
-   <h:form id="propertySheetForm2">
+   <h:form acceptCharset="UTF-8" id="propertySheetForm2">
    
       <r:propertySheetGrid value="/kev.txt" var="node2">
          <r:property value="name" columns="1" />

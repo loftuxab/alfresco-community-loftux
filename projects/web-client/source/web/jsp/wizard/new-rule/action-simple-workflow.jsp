@@ -72,7 +72,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form id="new-rule-simple-workflow">
+   <h:form acceptCharset="UTF-8" id="new-rule-simple-workflow">
    
    <%-- add the approve and reject folder ids as hidden fields --%>
    <h:inputHidden id="client-approve-folder" value="#{NewRuleWizard.actionProperties.approveFolder}" />

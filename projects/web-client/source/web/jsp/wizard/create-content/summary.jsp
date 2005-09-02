@@ -32,7 +32,7 @@
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="create-content-summary">
+   <h:form acceptCharset="UTF-8" id="create-content-summary">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">

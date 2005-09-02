@@ -166,6 +166,8 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
    protected void facesRender(RenderRequest request, RenderResponse response) 
       throws PortletException, IOException
    {
+      Application.setInPortalServer(true);
+      
       if (request.getParameter(ERROR_OCCURRED) != null)
       {
          String errorPage = Application.getErrorPage(getPortletContext());

@@ -29,7 +29,7 @@
    
    <h2>The Zoo</h2>
    
-   <h:form id="zooForm">
+   <h:form acceptCharset="UTF-8" id="zooForm">
       
       <h:commandButton id="show-components-zoo" value="Component Zoo" action="showRichListZoo" />
       <br/><br/>

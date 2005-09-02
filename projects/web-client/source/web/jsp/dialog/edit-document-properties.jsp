@@ -46,7 +46,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form id="edit-doc-properties">
+   <h:form acceptCharset="UTF-8" id="edit-doc-properties">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">

@@ -48,7 +48,7 @@
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="person-props">
+   <h:form acceptCharset="UTF-8" id="person-props">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">

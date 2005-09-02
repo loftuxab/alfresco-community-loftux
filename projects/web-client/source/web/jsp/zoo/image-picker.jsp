@@ -27,7 +27,7 @@
    
    <h2>Image Picker</h2>
    
-   <h:form id="imagePicker">
+   <h:form acceptCharset="UTF-8" id="imagePicker">
    
       <a:imagePickerRadio columns="4" spacing="5" value="#{DummyBean.properties.one}">
          <a:listItem value="1" label="Checkin" tooltip="Checkin"

@@ -27,7 +27,7 @@
    
    <h2>Auto configured property sheet</h2>
    
-   <h:form id="propertySheetForm3">
+   <h:form acceptCharset="UTF-8" id="propertySheetForm3">
    
       <r:propertySheetGrid value="/sop.txt" var="node3">
       </r:propertySheetGrid>
@@ -42,7 +42,7 @@
    
    <h2>Config driven property sheet (WEB-INF/web-client-config.xml)</h2>
    
-   <h:form id="propertySheetForm4">
+   <h:form acceptCharset="UTF-8" id="propertySheetForm4">
    
       <r:propertySheetGrid value="/sop.txt" var="node4" externalConfig="true">
       </r:propertySheetGrid>

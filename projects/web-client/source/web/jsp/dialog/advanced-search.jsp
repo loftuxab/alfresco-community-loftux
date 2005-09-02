@@ -32,7 +32,7 @@
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form id="advsearch">
+   <h:form acceptCharset="UTF-8" id="advsearch">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">

@@ -31,7 +31,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form id="browse">
+   <h:form acceptCharset="UTF-8" id="browse">
    
    <%-- Main outer table --%>
    <table cellspacing=0 cellpadding=2>
