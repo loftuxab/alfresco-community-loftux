@@ -564,6 +564,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		final NodeRef finalNodeRef = this.nodeRef;
 		
 		postAsyncActionTest(
+                this.transactionService,
 				1000, 
 				10, 
 				new AsyncTest()
@@ -605,6 +606,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		final NodeRef finalNodeRef = this.nodeRef;
 		
 		postAsyncActionTest(
+                this.transactionService,
 				1000, 
 				10, 
 				new AsyncTest()
@@ -644,7 +646,11 @@ public class ActionServiceImplTest extends BaseSpringTest
 	 * @param test
 	 * @param context
 	 */
-	private void postAsyncActionTest(final long sleepTime, final int maxTries, final AsyncTest test)
+	public static void postAsyncActionTest(
+            TransactionService transactionService,
+            final long sleepTime, 
+            final int maxTries, 
+            final AsyncTest test)
 	{
 		try
 		{
@@ -661,7 +667,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 					Thread.sleep(sleepTime);
 					
 					done = ((Boolean)TransactionUtil.executeInUserTransaction(
-								this.transactionService,
+								transactionService,
 								new TransactionUtil.TransactionWork()
 								{
 									public Object doWork()
@@ -693,7 +699,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 	/**
 	 * Async test interface
 	 */
-	private interface AsyncTest
+	public interface AsyncTest
 	{
 		boolean executeTest();		
 	}
@@ -1014,6 +1020,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		
 		final NodeRef finalNodeRef = nodeRef;
 		postAsyncActionTest(
+                this.transactionService,
 				1000, 
 				10, 
 				new AsyncTest()
@@ -1051,6 +1058,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 				});
 		
 		postAsyncActionTest(
+                this.transactionService,
 				1000, 
 				10, 
 				new AsyncTest()

@@ -28,6 +28,8 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.ActionServiceImplTest;
+import org.alfresco.repo.action.ActionServiceImplTest.AsyncTest;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
 import org.alfresco.repo.action.evaluator.NoConditionEvaluator;
@@ -43,6 +45,7 @@ import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
 import org.alfresco.repo.action.executer.TransformActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
+import org.alfresco.repo.content.transform.ContentTransformerRegistry;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Model;
@@ -102,6 +105,7 @@ public class RuleServiceCoverageTest extends TestCase
     private DictionaryDAO dictionaryDAO;
     private AuthenticationService authenticationService;
     private ActionService actionService;
+    private ContentTransformerRegistry transformerRegistry;
 
     /**
      * Category related values
@@ -114,18 +118,13 @@ public class RuleServiceCoverageTest extends TestCase
     private NodeRef catRBase;
     private NodeRef catROne;
     private NodeRef catRTwo;
+    @SuppressWarnings("unused")
     private NodeRef catRThree;
     
     /**
      * Standard content text
      */
     private static final String STANDARD_TEXT_CONTENT = "standardTextContent";
-
-    /**
-     * Test user name and password
-     */
-    private static final String USER_NAME = "userName";
-    private static final String PWD = "password";  
     
 	/**
 	 * Setup method
@@ -144,6 +143,7 @@ public class RuleServiceCoverageTest extends TestCase
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         this.actionService = serviceRegistry.getActionService();
         this.transactionService = serviceRegistry.getTransactionService();
+        this.transformerRegistry = (ContentTransformerRegistry)applicationContext.getBean("contentTransformerRegistry");
         
         AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
@@ -178,9 +178,9 @@ public class RuleServiceCoverageTest extends TestCase
         return rule;
 	}
     
-	/**
-	 * Create the categories used in the tests
-	 */
+    /**
+     * Create the categories used in the tests
+     */
     private void createTestCategories()
     {
         // Create the test model
@@ -215,6 +215,72 @@ public class RuleServiceCoverageTest extends TestCase
         catRTwo = nodeService.createNode(catRBase, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "RestOfWorld"), ContentModel.TYPE_CATEGORY).getChildRef();
         catRThree = nodeService.createNode(catRTwo, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(TEST_NAMESPACE, "US"), ContentModel.TYPE_CATEGORY).getChildRef();
     }
+    
+    /**
+     * Asynchronous rule tests
+     */
+    
+    /**
+     * Check async rule execution
+     */
+    public void testAsyncRuleExecution()
+    {
+        final NodeRef newNodeRef = (NodeRef)TransactionUtil.executeInUserTransaction(
+                this.transactionService,
+                new TransactionUtil.TransactionWork()
+                {
+                    public Object doWork()
+                    {
+                        RuleServiceCoverageTest.this.nodeService.addAspect(
+                                RuleServiceCoverageTest.this.nodeRef, 
+                                ContentModel.ASPECT_LOCKABLE, 
+                                null);
+                        
+                        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                        params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
+                        
+                        Rule rule = createRule(
+                                RuleType.INBOUND, 
+                                AddFeaturesActionExecuter.NAME, 
+                                params, 
+                                NoConditionEvaluator.NAME, 
+                                null);
+                        rule.setExecuteAsynchronously(true);
+                        
+                        RuleServiceCoverageTest.this.ruleService.saveRule(RuleServiceCoverageTest.this.nodeRef, rule);
+
+                        NodeRef newNodeRef = RuleServiceCoverageTest.this.nodeService.createNode(
+                                RuleServiceCoverageTest.this.nodeRef,
+                                ContentModel.ASSOC_CHILDREN,                
+                                QName.createQName(TEST_NAMESPACE, "children"),
+                                ContentModel.TYPE_CONTENT,
+                                getContentProperties()).getChildRef();         
+                        addContentToNode(newNodeRef);
+                        
+                        return newNodeRef;
+                    }                    
+                });
+        
+        ActionServiceImplTest.postAsyncActionTest(
+                this.transactionService,
+                1000, 
+                10, 
+                new AsyncTest()
+                {
+                    public boolean executeTest() 
+                    {
+                        return RuleServiceCoverageTest.this.nodeService.hasAspect(
+                                newNodeRef, 
+                                ContentModel.ASPECT_VERSIONABLE);
+                    };
+                });
+    }
+    
+    // TODO check compensating action execution
+    
+    /**
+     * Standard rule coverage tests
+     */
 
     /**
      * Test:
@@ -546,75 +612,78 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testTransformAction()
     {
-		try
-		{
-	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-			params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
-	        params.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
-	        params.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-	        params.put(TransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "transformed"));
-	        
-	        Rule rule = createRule(
-	        		RuleType.INBOUND, 
-	        		TransformActionExecuter.NAME, 
-	        		params, 
-	        		NoConditionEvaluator.NAME, 
-	        		null);
-	        
-	        this.ruleService.saveRule(this.nodeRef, rule);
-	
-	        UserTransaction tx = transactionService.getUserTransaction();
-			tx.begin();
-			
-			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
-	        props.put(ContentModel.PROP_NAME, "test.xls");
-			props.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_EXCEL);
-			
-			// Create the node at the root
-	        NodeRef newNodeRef = this.nodeService.createNode(
-	                this.nodeRef,
-                    ContentModel.ASSOC_CHILDREN,                
-	                QName.createQName(TEST_NAMESPACE, "origional"),
-	                ContentModel.TYPE_CONTENT,
-	                props).getChildRef(); 
-			
-			// Set some content on the origional
-			ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
-			File testFile = AbstractContentTransformerTest.loadQuickTestFile("xls");
-			contentWriter.putContent(testFile);
-			
-			tx.commit();
-	        
-	        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
-	        
-	        // Check that the created node is still there
-	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
-	                this.nodeRef, 
-	                QName.createQName(TEST_NAMESPACE, "origional"));
-	        assertNotNull(origRefs);
-	        assertEquals(1, origRefs.size());
-	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
-	        assertEquals(newNodeRef, origNodeRef);
-	
-	        // Check that the created node has been copied
-	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
-	                                                    this.rootNodeRef, 
-	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
-	        assertNotNull(copyChildAssocRefs);
-	        assertEquals(1, copyChildAssocRefs.size());
-	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
-	        assertTrue(this.nodeService.hasAspect(copyNodeRef, ContentModel.ASPECT_COPIEDFROM));
-	        NodeRef source = (NodeRef)this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_COPY_REFERENCE);
-	        assertEquals(newNodeRef, source);
-	        
-	        // Check the transformed content
-			assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE));
-			
-		}
-		catch (Exception exception)
-		{
-			throw new RuntimeException(exception);
-		}
+        if (this.transformerRegistry.getTransformer(MimetypeMap.MIMETYPE_EXCEL, MimetypeMap.MIMETYPE_TEXT_PLAIN) != null)
+        {
+    		try
+    		{
+    	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+    			params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+    	        params.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
+    	        params.put(TransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
+    	        params.put(TransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "transformed"));
+    	        
+    	        Rule rule = createRule(
+    	        		RuleType.INBOUND, 
+    	        		TransformActionExecuter.NAME, 
+    	        		params, 
+    	        		NoConditionEvaluator.NAME, 
+    	        		null);
+    	        
+    	        this.ruleService.saveRule(this.nodeRef, rule);
+    	
+    	        UserTransaction tx = transactionService.getUserTransaction();
+    			tx.begin();
+    			
+    			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
+    	        props.put(ContentModel.PROP_NAME, "test.xls");
+    			props.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_EXCEL);
+    			
+    			// Create the node at the root
+    	        NodeRef newNodeRef = this.nodeService.createNode(
+    	                this.nodeRef,
+                        ContentModel.ASSOC_CHILDREN,                
+    	                QName.createQName(TEST_NAMESPACE, "origional"),
+    	                ContentModel.TYPE_CONTENT,
+    	                props).getChildRef(); 
+    			
+    			// Set some content on the origional
+    			ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
+    			File testFile = AbstractContentTransformerTest.loadQuickTestFile("xls");
+    			contentWriter.putContent(testFile);
+    			
+    			tx.commit();
+    	        
+    	        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+    	        
+    	        // Check that the created node is still there
+    	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
+    	                this.nodeRef, 
+    	                QName.createQName(TEST_NAMESPACE, "origional"));
+    	        assertNotNull(origRefs);
+    	        assertEquals(1, origRefs.size());
+    	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
+    	        assertEquals(newNodeRef, origNodeRef);
+    	
+    	        // Check that the created node has been copied
+    	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
+    	                                                    this.rootNodeRef, 
+    	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
+    	        assertNotNull(copyChildAssocRefs);
+    	        assertEquals(1, copyChildAssocRefs.size());
+    	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
+    	        assertTrue(this.nodeService.hasAspect(copyNodeRef, ContentModel.ASPECT_COPIEDFROM));
+    	        NodeRef source = (NodeRef)this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_COPY_REFERENCE);
+    	        assertEquals(newNodeRef, source);
+    	        
+    	        // Check the transformed content
+    			assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE));
+    			
+    		}
+    		catch (Exception exception)
+    		{
+    			throw new RuntimeException(exception);
+    		}
+        }
     }
     
     /**
@@ -623,72 +692,75 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testImageTransformAction()
     {
-		try
-		{
-	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-			params.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
-	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
-	        params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_JPEG);
-	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "transformed"));
-	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "-negate");
-	        
-	        Rule rule = createRule(
-	        		RuleType.INBOUND, 
-	        		ImageTransformActionExecuter.NAME, 
-	        		params, 
-	        		NoConditionEvaluator.NAME, 
-	        		null);
-	        
-	        this.ruleService.saveRule(this.nodeRef, rule);
-	
-	        UserTransaction tx = transactionService.getUserTransaction();
-			tx.begin();
-			
-			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
-	        props.put(ContentModel.PROP_NAME, "test.gif");
-			props.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_GIF);
-			
-			// Create the node at the root
-	        NodeRef newNodeRef = this.nodeService.createNode(
-	                this.nodeRef,
-                    ContentModel.ASSOC_CHILDREN,                
-	                QName.createQName(TEST_NAMESPACE, "origional"),
-	                ContentModel.TYPE_CONTENT,
-	                props).getChildRef(); 
-			
-			// Set some content on the origional
-			ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
-			File testFile = AbstractContentTransformerTest.loadQuickTestFile("gif");
-			contentWriter.putContent(testFile);
-			
-			tx.commit();
-	        
-	        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
-	        
-	        // Check that the created node is still there
-	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
-	                this.nodeRef, 
-	                QName.createQName(TEST_NAMESPACE, "origional"));
-	        assertNotNull(origRefs);
-	        assertEquals(1, origRefs.size());
-	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
-	        assertEquals(newNodeRef, origNodeRef);
-	
-	        // Check that the created node has been copied
-	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
-	                                                    this.rootNodeRef, 
-	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
-	        assertNotNull(copyChildAssocRefs);
-	        assertEquals(1, copyChildAssocRefs.size());
-	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
-	        assertTrue(this.nodeService.hasAspect(copyNodeRef, ContentModel.ASPECT_COPIEDFROM));
-	        NodeRef source = (NodeRef)this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_COPY_REFERENCE);
-	        assertEquals(newNodeRef, source);
-		}
-		catch (Exception exception)
-		{
-			throw new RuntimeException(exception);
-		}
+        if (this.transformerRegistry.getTransformer(MimetypeMap.MIMETYPE_IMAGE_GIF, MimetypeMap.MIMETYPE_IMAGE_JPEG) != null)
+        {
+    		try
+    		{
+    	        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+    			params.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, this.rootNodeRef);
+    	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
+    	        params.put(TransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_JPEG);
+    	        params.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, QName.createQName(TEST_NAMESPACE, "transformed"));
+    	        params.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, "-negate");
+    	        
+    	        Rule rule = createRule(
+    	        		RuleType.INBOUND, 
+    	        		ImageTransformActionExecuter.NAME, 
+    	        		params, 
+    	        		NoConditionEvaluator.NAME, 
+    	        		null);
+    	        
+    	        this.ruleService.saveRule(this.nodeRef, rule);
+    	
+    	        UserTransaction tx = transactionService.getUserTransaction();
+    			tx.begin();
+    			
+    			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
+    	        props.put(ContentModel.PROP_NAME, "test.gif");
+    			props.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_GIF);
+    			
+    			// Create the node at the root
+    	        NodeRef newNodeRef = this.nodeService.createNode(
+    	                this.nodeRef,
+                        ContentModel.ASSOC_CHILDREN,                
+    	                QName.createQName(TEST_NAMESPACE, "origional"),
+    	                ContentModel.TYPE_CONTENT,
+    	                props).getChildRef(); 
+    			
+    			// Set some content on the origional
+    			ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
+    			File testFile = AbstractContentTransformerTest.loadQuickTestFile("gif");
+    			contentWriter.putContent(testFile);
+    			
+    			tx.commit();
+    	        
+    	        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+    	        
+    	        // Check that the created node is still there
+    	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
+    	                this.nodeRef, 
+    	                QName.createQName(TEST_NAMESPACE, "origional"));
+    	        assertNotNull(origRefs);
+    	        assertEquals(1, origRefs.size());
+    	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
+    	        assertEquals(newNodeRef, origNodeRef);
+    	
+    	        // Check that the created node has been copied
+    	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
+    	                                                    this.rootNodeRef, 
+    	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
+    	        assertNotNull(copyChildAssocRefs);
+    	        assertEquals(1, copyChildAssocRefs.size());
+    	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
+    	        assertTrue(this.nodeService.hasAspect(copyNodeRef, ContentModel.ASPECT_COPIEDFROM));
+    	        NodeRef source = (NodeRef)this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_COPY_REFERENCE);
+    	        assertEquals(newNodeRef, source);
+    		}
+    		catch (Exception exception)
+    		{
+    			throw new RuntimeException(exception);
+    		}
+        }
     }
 	
     /**

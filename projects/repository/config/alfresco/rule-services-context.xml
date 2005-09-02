@@ -25,6 +25,9 @@
 	  </property>  
 	  <property name="ruleService">
          <ref bean="ruleService"/>
+	  </property>  
+	  <property name="actionService">
+         <ref bean="actionService"/>
 	  </property>					
    </bean>
    

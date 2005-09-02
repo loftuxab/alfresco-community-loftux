@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.alfresco.repo.action.CommonResourceAbstractBase;
 import org.alfresco.repo.rule.ruletrigger.RuleTrigger;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
@@ -32,6 +33,11 @@ import org.alfresco.service.cmr.rule.RuleType;
  */
 public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
 {
+    /**
+     * The action service
+     */
+    private ActionService actionService;
+    
 	/**
 	 * The rule service
 	 */
@@ -51,6 +57,16 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
 				trigger.registerRuleType(this);
 			}
     	}
+    }
+    
+    /**
+     * Set the action service
+     * 
+     * @param actionService the action service
+     */
+    public void setActionService(ActionService actionService)
+    {
+        this.actionService = actionService;
     }
     
     /**
@@ -101,7 +117,16 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
 			
             for (Rule rule : rules)
             {   
-				((RuntimeRuleService)this.ruleService).addRulePendingExecution(nodeRef, actionedUponNodeRef, rule);
+                if (rule.getExecuteAsychronously() == true)
+                {
+                    // Execute the rule now since it will be be queued for async execution later
+                    this.actionService.executeAction(rule, actionedUponNodeRef);
+                }
+                else
+                {
+                    // Queue the rule to be executed at the end of the transaction (but still in the transaction)
+                    ((RuntimeRuleService)this.ruleService).addRulePendingExecution(nodeRef, actionedUponNodeRef, rule);
+                }
             }
         }
 	}
