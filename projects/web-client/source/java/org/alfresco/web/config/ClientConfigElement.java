@@ -167,20 +167,4 @@ public class ClientConfigElement extends ConfigElementAdapter
    {
       return this.languages;
    }
-
-   /**
-    * @return Returns the unicode font setting.
-    */
-   public boolean isUnicodeFont()
-   {
-      return this.unicodeFont;
-   }
-
-   /**
-    * @param unicodeFont The unicode font value to set.
-    */
-   public void setUnicodeFont(boolean unicodeFont)
-   {
-      this.unicodeFont = unicodeFont;
-   }
 }

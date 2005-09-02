@@ -40,7 +40,6 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_LANGUAGES = "languages";
    public static final String ELEMENT_LANGUAGE = "language";
    public static final String ATTRIBUTE_LOCALE = "locale";
-   public static final String ELEMENT_UNICODE = "unicode-font";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -105,13 +104,6 @@ public class ClientElementReader implements ConfigElementReader
                   configElement.addLanguage(localeCode, label);
                }
             }
-         }
-         
-         // get the unicode font element
-         Element unicode = element.element(ELEMENT_UNICODE);
-         if (unicode != null)
-         {
-            configElement.setUnicodeFont( Boolean.parseBoolean(unicode.getTextTrim()) );
          }
          
          // get the default view mode
