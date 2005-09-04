@@ -17,7 +17,7 @@
 package org.alfresco.repo.importer.view;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.Stack;
 
 import org.alfresco.repo.importer.Importer;
@@ -92,16 +92,15 @@ public class ViewParser implements Parser
         this.dictionaryService = dictionaryService;
     }
 
-    
     /* (non-Javadoc)
-     * @see org.alfresco.repo.importer.Parser#parse(java.io.InputStream, org.alfresco.repo.importer.Importer)
+     * @see org.alfresco.repo.importer.Parser#parse(java.io.Reader, org.alfresco.repo.importer.Importer)
      */
-    public void parse(InputStream inputStream, Importer importer)
+    public void parse(Reader viewReader, Importer importer)
     {
         try
         {
             XmlPullParser xpp = factory.newPullParser();
-            xpp.setInput(inputStream, null);
+            xpp.setInput(viewReader);
             Stack<ElementContext> contextStack = new Stack<ElementContext>();
             
             try

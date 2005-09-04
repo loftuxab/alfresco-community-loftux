@@ -18,6 +18,7 @@ package org.alfresco.repo.importer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -57,7 +59,6 @@ import org.springframework.util.StringUtils;
  * Default implementation of the Importer Service
  *  
  * @author David Caruana
- *
  */
 public class ImporterComponent
     implements ImporterService
@@ -117,29 +118,35 @@ public class ImporterComponent
     /**
      * @param namespaceService  the namespace service
      */
+    /**
+     * @param namespaceService
+     */
     public void setNamespaceService(NamespaceService namespaceService)
     {
         this.namespaceService = namespaceService;
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.repo.importer.ImporterService#importView(java.io.InputStream, org.alfresco.repo.importer.Location, java.util.Properties, org.alfresco.repo.importer.Progress)
+     * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStreamReader, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
      */
-    public void importView(InputStream inputStream, Location location, Properties configuration, ImporterProgress progress)
+    public void importView(Reader viewReader, Location location, Properties configuration, ImporterProgress progress)
     {
         NodeRef nodeRef = getNodeRef(location, configuration);
         QName childAssocType = getChildAssocType(location, configuration);
-        performImport(nodeRef, childAssocType, inputStream, new DefaultStreamHandler(), configuration, progress);       
+        performImport(nodeRef, childAssocType, viewReader, new DefaultStreamHandler(), configuration, progress);       
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStream, org.alfresco.service.cmr.view.ImportStreamHandler, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
+     * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStreamReader, org.alfresco.service.cmr.view.ImportStreamHandler, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
      */
-    public void importView(InputStream inputStream, ImportStreamHandler streamHandler, Location location, Properties configuration, ImporterProgress progress) throws ImporterException
+    public void importView(Reader viewReader, ImportStreamHandler streamHandler, Location location, Properties configuration, ImporterProgress progress) throws ImporterException
     {
         NodeRef nodeRef = getNodeRef(location, configuration);
         QName childAssocType = getChildAssocType(location, configuration);
-        performImport(nodeRef, childAssocType, inputStream, streamHandler, configuration, progress);       
+        performImport(nodeRef, childAssocType, viewReader, streamHandler, configuration, progress);
+
+        // TODO: Remove
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, nodeRef.getStoreRef()));
     }
     
     /**
@@ -219,18 +226,18 @@ public class ImporterComponent
      * @param nodeRef node reference to import under
      * @param childAssocType the child association type to import under
      * @param inputStream the input stream to import from
-     * @param handler the content property import stream handler
+     * @param streamHandler the content property import stream handler
      * @param configuration import configuration
      * @param progress import progress
      */
-    private void performImport(NodeRef nodeRef, QName childAssocType, InputStream inputStream, ImportStreamHandler handler, Properties configuration, ImporterProgress progress)
+    private void performImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportStreamHandler streamHandler, Properties configuration, ImporterProgress progress)
     {
         ParameterCheck.mandatory("Node Reference", nodeRef);
         ParameterCheck.mandatory("Child Assoc Type", childAssocType);
-        ParameterCheck.mandatory("Input stream", inputStream);
-        ParameterCheck.mandatory("Stream Handler", handler);
-        Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, configuration, handler, progress);
-        viewParser.parse(inputStream, defaultImporter);
+        ParameterCheck.mandatory("View Reader", viewReader);
+        ParameterCheck.mandatory("Stream Handler", streamHandler);
+        Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, configuration, streamHandler, progress);
+        viewParser.parse(viewReader, defaultImporter);
     }
     
     /**

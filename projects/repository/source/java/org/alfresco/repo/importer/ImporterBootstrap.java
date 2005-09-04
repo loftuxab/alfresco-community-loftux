@@ -16,8 +16,12 @@
  */
 package org.alfresco.repo.importer;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 
@@ -29,9 +33,9 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ImporterException;
+import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
-import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -49,6 +53,7 @@ public class ImporterBootstrap
     public static final String VIEW_PATH_PROPERTY = "path";
     public static final String VIEW_CHILDASSOCTYPE_PROPERTY = "childAssocType";
     public static final String VIEW_LOCATION_VIEW = "location";
+    public static final String VIEW_ENCODING = "encoding";
     
     // Logger
     private static final Log logger = LogFactory.getLog(ImporterBootstrap.class);
@@ -105,6 +110,16 @@ public class ImporterBootstrap
     }
         
     /**
+     * Set the authentication component
+     * 
+     * @param authenticationComponent
+     */
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+    {
+        this.authenticationComponent = authenticationComponent;
+    }
+
+    /**
      * Sets the bootstrap views
      * 
      * @param bootstrapViews
@@ -112,12 +127,6 @@ public class ImporterBootstrap
     public void setBootstrapViews(List<Properties> bootstrapViews)
     {
         this.bootstrapViews = bootstrapViews;
-    }
-    
-    
-    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
-    {
-        this.authenticationComponent = authenticationComponent;
     }
 
     /**
@@ -139,7 +148,6 @@ public class ImporterBootstrap
     {
         this.configuration = configuration;
     }
-
 
     /**
      * Boostrap the Repository
@@ -193,17 +201,14 @@ public class ImporterBootstrap
                 // bootstrap the store contents
                 for (Properties bootstrapView : bootstrapViews)
                 {
-                    // Create input stream onto view file
+                    // Create input stream reader onto view file
                     String view = bootstrapView.getProperty(VIEW_LOCATION_VIEW);
                     if (view == null || view.length() == 0)
                     {
                         throw new ImporterException("View file location must be provided");
                     }
-                    InputStream viewStream = getClass().getClassLoader().getResourceAsStream(view);
-                    if (viewStream == null)
-                    {
-                        throw new ImporterException("Could not find view file " + view);
-                    }
+                    String encoding = bootstrapView.getProperty(VIEW_ENCODING);
+                    Reader viewReader = getReader(view, encoding);
                     
                     // Create import location
                     Location importLocation = new Location(storeRef);
@@ -219,7 +224,7 @@ public class ImporterBootstrap
                     }
         
                     // Now import...
-                    importerService.importView(viewStream, importLocation, configuration, new BootstrapProgress());
+                    importerService.importView(viewReader, importLocation, configuration, new BootstrapProgress());
                 }
                 
                 userTransaction.commit();
@@ -234,6 +239,34 @@ public class ImporterBootstrap
         }            
     }
     
+    /**
+     * Get a Reader onto an XML view
+     * 
+     * @param view  the view location
+     * @param encoding  the encoding of the view
+     * @return  the reader
+     */
+    private Reader getReader(String view, String encoding)
+    {
+        // Get Input Stream
+        InputStream viewStream = getClass().getClassLoader().getResourceAsStream(view);
+        if (viewStream == null)
+        {
+            throw new ImporterException("Could not find view file " + view);
+        }
+
+        // Wrap in buffered reader
+        try
+        {
+            InputStreamReader inputReader = (encoding == null) ? new InputStreamReader(viewStream) : new InputStreamReader(viewStream, encoding);
+            BufferedReader reader = new BufferedReader(inputReader);
+            return reader;
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new ImporterException("Could not create reader for view " + view + " as encoding " + encoding + " is not supported");
+        }
+    }
     
     /**
      * Bootstrap Progress (debug logging)

@@ -17,10 +17,14 @@
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterService;
@@ -28,6 +32,7 @@ import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.TempFileProvider;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 
 public class ExporterComponentTest extends BaseSpringTest
@@ -56,7 +61,8 @@ public class ExporterComponentTest extends BaseSpringTest
         File tempFile = TempFileProvider.createTempFile("xmlexporttest", ".xml");
         OutputStream output = new FileOutputStream(tempFile);
         exporterService.exportView(output, location, true, testProgress);
-        //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        output.close();
+        System.out.println(NodeStoreInspector.dumpNodeStore((NodeService)applicationContext.getBean("NodeService"), storeRef));
     }
 
     

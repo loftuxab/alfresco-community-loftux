@@ -16,11 +16,16 @@
  */
 package org.alfresco.tools;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -115,6 +120,15 @@ public class Import extends Tool
                 }
                 context.setPassword(args[i]);
             }
+            else if (args[i].equals("-encoding"))
+            {
+                i++;
+                if (i == args.length || args[i].length() == 0)
+                {
+                    throw new ToolException("The value <encoding> for the option -encoding must be specified");
+                }
+                context.encoding = args[i];
+            }
             else if (args[i].equals("-quiet"))
             {
                 context.setQuiet(true);
@@ -156,6 +170,7 @@ public class Import extends Tool
         System.out.println(" -p[ath] the path within the store to extract into (default: /)");
         System.out.println(" -d[ir] the source directory to import from (default: current directory)");
         System.out.println(" -pwd password for login");
+        System.out.println(" -encoding package file encoding (default: " + Charset.defaultCharset() + ")");
         System.out.println(" -quiet do not display any messages during import");
         System.out.println(" -verbose report import progress");
     }
@@ -180,11 +195,11 @@ public class Import extends Tool
         // Create Import package
         File packageFile = context.getPackageFile();
         log("Importing from package " + packageFile.getAbsolutePath());
-        InputStream input = getPackageFile(packageFile);
+        Reader viewReader = getPackageReader(packageFile, context.encoding);
         PackageStreamHandler streamHandler = new PackageStreamHandler(context.getSourceDir());
 
         // Export Repository content to export package
-        importer.importView(input, streamHandler, context.getLocation(), null, new ImportProgress());
+        importer.importView(viewReader, streamHandler, context.getLocation(), null, new ImportProgress());
     }
     
     /**
@@ -193,15 +208,21 @@ public class Import extends Tool
      * @param packageFile  the name of the file
      * @return the input stream to the file
      */
-    private InputStream getPackageFile(File packageFile)
+    private Reader getPackageReader(File packageFile, String encoding)
     {
         try
         {
-            return new FileInputStream(packageFile);
+            InputStream inputStream = new FileInputStream(packageFile);
+            Reader inputReader = (encoding == null) ? new InputStreamReader(inputStream) : new InputStreamReader(inputStream, encoding);
+            return new BufferedReader(inputReader);
+        }
+        catch(UnsupportedEncodingException e)
+        {
+            throw new ToolException("Encoding " + encoding + " is not supported");
         }
         catch(IOException e)
         {
-            throw new ToolException("Failed to get package file " + packageFile.getAbsolutePath() + " due to " + e.getMessage());
+            throw new ToolException("Failed to read package " + packageFile.getAbsolutePath() + " due to " + e.getMessage());
         }
     }
     
@@ -301,6 +322,8 @@ public class Import extends Tool
         private String sourceDir;
         /** The package name to import */
         private String packageName;
+        /** The package encoding */
+        private String encoding = null;
         
 
         /* (non-Javadoc)

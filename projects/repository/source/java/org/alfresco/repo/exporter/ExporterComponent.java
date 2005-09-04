@@ -67,6 +67,9 @@ public class ExporterComponent
 
     /** The list of namespace URIs to exclude from the export */
     private String[] excludedURIs = new String[] { NamespaceService.SYSTEM_MODEL_1_0_URI, NamespaceService.REPOSITORY_VIEW_1_0_URI };
+
+    /** Indent Size */
+    private int indentSize = 2;
     
     
     /**
@@ -121,22 +124,22 @@ public class ExporterComponent
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.Location, boolean, org.alfresco.service.cmr.view.Exporter)
      */
-    public void exportView(OutputStream output, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, Location location, boolean exportChildren, Exporter progress)
     {
-        ParameterCheck.mandatory("Output Stream", output);
-        export(location, createXMLExporter(output), exportChildren, progress);
+        ParameterCheck.mandatory("View Writer", viewWriter);
+        export(location, createXMLExporter(viewWriter), exportChildren, progress);
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.ExportStreamHandler, org.alfresco.service.cmr.view.Location, boolean, org.alfresco.service.cmr.view.Exporter)
      */
-    public void exportView(OutputStream output, ExportStreamHandler streamHandler, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, Location location, boolean exportChildren, Exporter progress)
     {
-        ParameterCheck.mandatory("Output Stream", output);
-        ParameterCheck.mandatory("Content Handler", streamHandler);
+        ParameterCheck.mandatory("View Writer", viewWriter);
+        ParameterCheck.mandatory("Stream Handler", streamHandler);
 
         // Construct a URL Exporter (wrapped around an XML Exporter)
-        Exporter xmlExporter = createXMLExporter(output);
+        Exporter xmlExporter = createXMLExporter(viewWriter);
         URLExporter urlExporter = new URLExporter(xmlExporter, streamHandler);
         
         // Export        
@@ -147,24 +150,26 @@ public class ExporterComponent
      * Create an XML Exporter that exports repository information to the specified
      * output stream in xml format.
      * 
-     * @param output  the output stream to write to
+     * @param viewWriter  the output stream to write to
      * @return  the xml exporter
      */
-    private Exporter createXMLExporter(OutputStream output)
+    private Exporter createXMLExporter(OutputStream viewWriter)
     {
         // Define output format
-        OutputFormat outformat = OutputFormat.createPrettyPrint();
-        outformat.setEncoding("UTF-8");
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        format.setNewLineAfterDeclaration(false);
+        format.setIndentSize(indentSize);
+        format.setEncoding("UTF-8");
 
         // Construct an XML Exporter
         try
         {
-            XMLWriter writer = new XMLWriter(output, outformat);
+            XMLWriter writer = new XMLWriter(viewWriter, format);
             return new XMLExporter(namespaceService, nodeService, writer);
         }
-        catch (UnsupportedEncodingException e)
+        catch (UnsupportedEncodingException e)        
         {
-            throw new ExporterException("Failed to create XML Writer for export", e);
+            throw new ExporterException("Failed to create XML Writer for export", e);            
         }
     }
     

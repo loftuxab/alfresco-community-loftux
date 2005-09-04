@@ -32,12 +32,12 @@ public interface ExporterService
      * All repository information is exported to the single output stream.  This means that any
      * content properties are base64 encoded. 
      * 
-     * @param output  the output stream to export to
+     * @param viewWriter  the output stream to export to
      * @param location  the location within the Repository to export
      * @param exportChildren  export children as well
      * @param progress  exporter callback for tracking progress of export
      */
-    public void exportView(OutputStream output, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, Location location, boolean exportChildren, Exporter progress)
         throws ExporterException;
 
     /**
@@ -45,13 +45,13 @@ public interface ExporterService
      * 
      * This export supports the custom handling of content properties.
      * 
-     * @param output the output stream to export to
+     * @param viewWriter the output stream to export to
      * @param streamHandler  the custom handler for content properties
      * @param location  the location witihn the Repository to export
      * @param exportChildren  export children as well
      * @param progress  exporter callback for tracking progress of export
      */
-    public void exportView(OutputStream output, ExportStreamHandler streamHandler, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, Location location, boolean exportChildren, Exporter progress)
         throws ExporterException;
 
 }

@@ -17,6 +17,7 @@
 package org.alfresco.repo.importer;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Properties;
 
@@ -53,15 +54,17 @@ public class ImporterComponentTest extends BaseSpringTest
 
     
     public void xtestImport()
+        throws Exception
     {
         InputStream test = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/importer/importercomponent_test.xml");
+        InputStreamReader testReader = new InputStreamReader(test, "UTF-8");
         TestProgress testProgress = new TestProgress();
         Location location = new Location(storeRef);
         Properties configuration = new Properties();
         configuration.put("username", "fredb");
         
-        importerService.importView(test, location, configuration, testProgress);
-        //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        importerService.importView(testReader, location, configuration, testProgress);
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
     
     

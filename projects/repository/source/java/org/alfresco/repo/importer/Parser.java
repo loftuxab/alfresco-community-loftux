@@ -16,7 +16,7 @@
  */
 package org.alfresco.repo.importer;
 
-import java.io.InputStream;
+import java.io.Reader;
 
 
 /**
@@ -34,9 +34,9 @@ public interface Parser
     /**
      * Parse nodes from specified input stream and import via the provided importer
      * 
-     * @param inputStream
+     * @param viewReader
      * @param importer
      */
-    public void parse(InputStream inputStream, Importer importer);
+    public void parse(Reader viewReader, Importer importer);
 
 }
