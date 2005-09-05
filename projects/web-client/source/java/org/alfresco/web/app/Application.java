@@ -114,7 +114,7 @@ public class Application
       }
       errorBean.setLastError(error);
       errorBean.setReturnPage(returnPage);
-
+      
       // try and find the configured error page
       boolean errorShown = false;
       String errorPage = getErrorPage(servletContext);
@@ -123,7 +123,7 @@ public class Application
       {
          if (logger.isDebugEnabled())
             logger.debug("An error has occurred, redirecting to error page: " + errorPage);
-      
+         
          if (response.isCommitted() == false)
          {
             errorShown = true;
@@ -141,7 +141,7 @@ public class Application
             logger.debug("No error page defined, re-throwing error");
       }
       
-      // if we could show the error page for whatever reason, re-throw the error
+      // if we could not show the error page for whatever reason, re-throw the error
       if (!errorShown)
       {
          if (error instanceof IOException)
@@ -348,6 +348,18 @@ public class Application
    public static Locale getLanguage(FacesContext context)
    {
       return (Locale)context.getExternalContext().getSessionMap().get(LOCALE);
+   }
+   
+   /**
+    * Return the language Locale for the current user Session.
+    * 
+    * @param session        HttpSession for the current user
+    * 
+    * @return Current language Locale set or null if none set 
+    */
+   public static Locale getLanguage(HttpSession session)
+   {
+      return (Locale)session.getAttribute(LOCALE);
    }
    
    /**
