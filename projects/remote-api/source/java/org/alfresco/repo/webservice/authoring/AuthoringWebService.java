@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.transaction.UserTransaction;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.webservice.AbstractWebService;
 import org.alfresco.repo.webservice.Utils;
 import org.alfresco.repo.webservice.types.ContentFormat;
@@ -30,6 +31,7 @@ import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.VersionHistory;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.axis.MessageContext;
 import org.apache.commons.logging.Log;
@@ -37,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Web service implementation of the AuthoringService.
- * The WSDL for this service can be accessed from http://localhost:8080/alfresco/api/AuthoringService?wsdl
+ * The WSDL for this service can be accessed from http://localhost:8080/alfresco/wsdl/authoring-service.wsdl
  *  
  * @author gavinc
  */
@@ -74,12 +76,32 @@ public class AuthoringWebService extends AbstractWebService implements Authoring
          Reference[] originals = new Reference[nodes.size()];
          Reference[] workingCopies = new Reference[nodes.size()];
          
+         // get a repository NodeRef for the destination (if there is one)
+         NodeRef destinationRef = null;
+         if (destination != null)
+         {
+            destinationRef = Utils.convertToNodeRef(destination, this.nodeService, this.searchService, this.namespaceService);
+         }
+         
          for (int x = 0; x < nodes.size(); x++)
          {
-            // TODO: Add support for specifying the destination of the check out
-            
+            // get the current node
             NodeRef original = nodes.get(x);
-            NodeRef workingCopy = this.cociService.checkout(original);
+            
+            // call the appropriate service method depending on whether a destination has been provided
+            NodeRef workingCopy = null;
+            if (destinationRef != null)
+            {
+               ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(destinationRef);
+               workingCopy = this.cociService.checkout(original, destinationRef, 
+                     ContentModel.ASSOC_CONTAINS, childAssocRef.getQName());
+            }
+            else
+            {
+               workingCopy = this.cociService.checkout(original);
+            }
+            
+            // store the results
             originals[x] = Utils.convertToReference(original);
             workingCopies[x] = Utils.convertToReference(workingCopy);
          }

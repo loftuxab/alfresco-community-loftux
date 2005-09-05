@@ -82,5 +82,20 @@
          <ref bean="checkOutCheckInService"/>
       </property>
    </bean>
+   
+   <bean id="classificationWebService" class="org.alfresco.repo.webservice.classification.ClassificationWebService">
+      <property name="nodeService">
+         <ref bean="NodeService"/>
+      </property>
+      <property name="contentService">
+         <ref bean="ContentService"/>
+      </property>
+      <property name="searchService">
+         <ref bean="SearchService"/>
+      </property>
+      <property name="namespaceService">
+         <ref bean="namespaceService"/>
+      </property>
+   </bean>
  
 </beans>

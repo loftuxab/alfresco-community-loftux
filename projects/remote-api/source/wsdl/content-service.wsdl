@@ -144,9 +144,7 @@
             </sequence>
          </complexType>
          <element name="ContentFault" type="content:ContentFault"/>
-         
-            <element name="readChunkContentFault" type="string"></element>
-        </schema>
+      </schema>
    </wsdl:types>
    
    <wsdl:message name="describeRequest">

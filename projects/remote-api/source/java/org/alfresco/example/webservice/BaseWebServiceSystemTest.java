@@ -59,8 +59,8 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
    //
    // ********************************************************************
    
-   protected static String rootId = "fddc4ffb-1ace-11da-b3ba-e981aa43b126";
-   protected static String companyHomeId = "fe289b3d-1ace-11da-b3ba-e981aa43b126";
+   protected static String rootId = "e5bf89b3-1dfc-11da-90db-67258f900103";
+   protected static String companyHomeId = "e5e0f465-1dfc-11da-90db-67258f900103";
    protected Store STORE = new Store(StoreEnum.workspace, "SpacesStore");
    protected StoreRef STORE_REF = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
    

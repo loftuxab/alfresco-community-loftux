@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Web service implementation of the AuthenticationService.
- * The WSDL for this service can be accessed from http://localhost:8080/alfresco/api/AuthenticationService?wsdl
+ * The WSDL for this service can be accessed from http://localhost:8080/alfresco/wsdl/authentication-service.wsdl
  *  
  * @author gavinc
  */

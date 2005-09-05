@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Web service implementation of the ContentService.
- * The WSDL for this service can be accessed from http://localhost:8080/alfresco/api/ContentService?wsdl
+ * The WSDL for this service can be accessed from http://localhost:8080/alfresco/wsdl/content-service.wsdl
  *  
  * @author gavinc
  */

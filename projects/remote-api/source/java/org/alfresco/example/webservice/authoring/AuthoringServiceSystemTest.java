@@ -114,12 +114,31 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
       Predicate predicate = new Predicate();
       predicate.setNodes(new Reference[] {ref});
       
-      // define the parent reference as a path based reference
-//      ParentReference checkoutLocation = new ParentReference();
-//      checkoutLocation.setStore(STORE);
-//      checkoutLocation.setPath("//*[@cm:name = 'Company Home']");
-      
       CheckoutResult result = this.authoringService.checkout(predicate, null);
+      assertNotNull("The result should not be null", result);
+      assertEquals("There should only be 1 original reference", 1, result.getOriginals().length);
+      assertEquals("There should only be 1 working copy reference", 1, result.getWorkingCopies().length);
+   }
+   
+   /**
+    * Tests the checkout service method passing a destination for the working copy
+    * 
+    * @throws Exception
+    */
+   public void xtestCheckoutWithDestination() throws Exception
+   {
+      Reference ref = new Reference();
+      ref.setStore(STORE);
+      ref.setUuid(versionedNodeId);
+      Predicate predicate = new Predicate();
+      predicate.setNodes(new Reference[] {ref});
+      
+      // define the parent reference as a path based reference
+      ParentReference checkoutLocation = new ParentReference();
+      checkoutLocation.setStore(STORE);
+      checkoutLocation.setPath("//*[@cm:name = 'Alfresco Tutorial']");
+      
+      CheckoutResult result = this.authoringService.checkout(predicate, checkoutLocation);
       assertNotNull("The result should not be null", result);
       assertEquals("There should only be 1 original reference", 1, result.getOriginals().length);
       assertEquals("There should only be 1 working copy reference", 1, result.getWorkingCopies().length);
