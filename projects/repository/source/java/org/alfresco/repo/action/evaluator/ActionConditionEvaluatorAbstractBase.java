@@ -71,8 +71,8 @@ public abstract class ActionConditionEvaluatorAbstractBase extends Parameterized
 		if (this.actionConditionDefinition == null)
 		{
 			this.actionConditionDefinition = new ActionConditionDefinitionImpl(this.name);
-			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setTitle(getTitle());
-			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setDescription(getDescription());
+			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setTitleKey(getTitleKey());
+			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setDescriptionKey(getDescriptionKey());
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setAdhocPropertiesAllowed(getAdhocPropertiesAllowed());
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setConditionEvaluator(this.name);
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setParameterDefinitions(getParameterDefintions());

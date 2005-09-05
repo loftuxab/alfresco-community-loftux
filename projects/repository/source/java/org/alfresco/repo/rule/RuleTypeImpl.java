@@ -19,6 +19,7 @@ package org.alfresco.repo.rule;
 import java.util.List;
 
 import org.alfresco.repo.action.CommonResourceAbstractBase;
+import org.alfresco.repo.i18n.I18NUtil;
 import org.alfresco.repo.rule.ruletrigger.RuleTrigger;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -100,7 +101,7 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
      */
     public String getDisplayLabel()
     {
-        return this.properties.getProperty(this.name + "." + "display-label");
+        return I18NUtil.getMessage(this.name + "." + "display-label");
     }
 
     /**

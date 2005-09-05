@@ -49,8 +49,8 @@ public class ActionConditionDefinitionImplTest extends BaseParameterizedItemDefi
         // Create a good one
         ActionConditionDefinitionImpl temp = new ActionConditionDefinitionImpl(NAME);
         assertNotNull(temp);
-        temp.setTitle(TITLE);
-        temp.setDescription(DESCRIPTION);
+        //temp.setTitle(TITLE);
+        //temp.setDescription(DESCRIPTION);
         temp.setParameterDefinitions(this.paramDefs);
         temp.setConditionEvaluator(CONDITION_EVALUATOR);
         return temp;

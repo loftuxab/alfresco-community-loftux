@@ -40,8 +40,8 @@
     <!-- Definitions for beans that use the common resource -->
 
     <bean id="action-common-resource">
-        <property name="resource">
-            <value>classpath:alfresco/messages/action-config.properties</value>
+        <property name="resourceBundleBaseName">
+            <value>alfresco.messages.action-config</value>
         </property>
     </bean>
 
@@ -55,12 +55,6 @@
 
     <bean id="no-condition" class="org.alfresco.repo.action.evaluator.NoConditionEvaluator"
         parent="action-condition-evaluator">
-        <property name="nodeService">
-            <ref bean="nodeService" />
-        </property>
-        <property name="dictionaryService">
-            <ref bean="dictionaryService" />
-        </property>
     </bean>
 
     <bean id="match-text" class="org.alfresco.repo.action.evaluator.MatchTextEvaluator"
@@ -68,13 +62,23 @@
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>
-        <property name="dictionaryService">
-            <ref bean="dictionaryService" />
-        </property>
     </bean>
 
     <bean id="in-category" class="org.alfresco.repo.action.evaluator.InCategoryEvaluator"
         parent="action-condition-evaluator">
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+    </bean>
+    
+    <bean id="is-subtype" class="org.alfresco.repo.action.evaluator.IsSubTypeEvaluator"
+        parent="action-condition-evaluator">
+        <property name="publicCondition">
+        	<value>false</value>
+        </property>
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>

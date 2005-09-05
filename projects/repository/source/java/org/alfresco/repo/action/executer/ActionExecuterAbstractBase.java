@@ -70,8 +70,8 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
 		if (this.actionDefinition == null)
 		{
 			this.actionDefinition = new ActionDefinitionImpl(this.name);
-			((ActionDefinitionImpl)this.actionDefinition).setTitle(getTitle());
-			((ActionDefinitionImpl)this.actionDefinition).setDescription(getDescription());
+			((ActionDefinitionImpl)this.actionDefinition).setTitleKey(getTitleKey());
+			((ActionDefinitionImpl)this.actionDefinition).setDescriptionKey(getDescriptionKey());
 			((ActionDefinitionImpl)this.actionDefinition).setAdhocPropertiesAllowed(getAdhocPropertiesAllowed());
 			((ActionDefinitionImpl)this.actionDefinition).setRuleActionExecutor(this.name);
 			((ActionDefinitionImpl)this.actionDefinition).setParameterDefinitions(getParameterDefintions());

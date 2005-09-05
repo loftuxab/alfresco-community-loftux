@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.repo.i18n.I18NUtil;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.action.ParameterizedItem;
 import org.alfresco.service.cmr.action.ParameterizedItemDefinition;
@@ -58,8 +59,8 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
     {
         StringBuilder sb = new StringBuilder(60);
         sb.append("ParameterizedItem")
-          .append("[ title='").append(getTitle()).append("'")
-          .append(", description='").append(getDescription()).append("'")
+          .append("[ title='").append(getTitleKey()).append("'")
+          .append(", description='").append(getDescriptionKey()).append("'")
           .append("]");
         return sb.toString();
     }
@@ -94,23 +95,23 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	}
 
 	/**
-	 * Gets the rule item title value from the properties file.
+	 * Gets the title I18N key
 	 * 
-	 * @return	the title of the rule item
+	 * @return	the title key
 	 */
-	protected String getTitle() 
+	protected String getTitleKey() 
 	{
-		return this.properties.getProperty(this.name + "." + TITLE);
+        return this.name + "." + TITLE;
 	}
 
 	/**
-	 * Gets the description of the rule item from the properties file.
+	 * Gets the description I18N key
 	 * 
-	 * @return	the description of the rule item
+	 * @return	the description key
 	 */
-	protected String getDescription() 
+	protected String getDescriptionKey() 
 	{
-		return this.properties.getProperty(this.name + "." + DESCRIPTION);
+		return this.name + "." + DESCRIPTION;
 	}	
 	
 	/**
@@ -132,7 +133,7 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	 */
 	protected String getParamDisplayLabel(String paramName) 
 	{
-		return this.properties.getProperty(this.name + "." + paramName + "." + DISPLAY_LABEL);
+		return I18NUtil.getMessage(this.name + "." + paramName + "." + DISPLAY_LABEL);
 	}
 	
 	/**

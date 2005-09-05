@@ -25,7 +25,15 @@ import org.alfresco.service.cmr.rule.RuleType;
  */
 public interface RuleTrigger
 {
+    /**
+     * Register the rule trigger
+     */
 	void registerRuleTrigger();
 	
+    /**
+     * Register the rule type as using this trigger
+     * 
+     * @param ruleType  the rule type
+     */
 	void registerRuleType(RuleType ruleType);
 }

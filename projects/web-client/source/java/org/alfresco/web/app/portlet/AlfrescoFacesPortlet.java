@@ -31,7 +31,9 @@ import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.servlet.http.HttpSession;
 
+import org.alfresco.repo.i18n.I18NUtil;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.web.app.Application;
@@ -207,6 +209,9 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
                   AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
                   auth.validate(user.getTicket());
                }
+               
+               // Set the current locale
+               I18NUtil.setLocale(Application.getLanguage((HttpSession)request.getPortletSession()));
                
                // do the normal JSF processing
                super.facesRender(request, response);

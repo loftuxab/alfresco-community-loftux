@@ -19,10 +19,10 @@
          
    <!-- Rule types -->
    
-   <bean id="rule-type-base" init-method="init">
-      <property name="resource">
-          <value>classpath:alfresco/messages/rule-config.properties</value>
-	  </property>  
+   <bean id="rule-type-base" init-method="init">   
+      <property name="resourceBundleBaseName">
+          <value>alfresco.messages.rule-config</value>
+      </property> 
 	  <property name="ruleService">
          <ref bean="ruleService"/>
 	  </property>  

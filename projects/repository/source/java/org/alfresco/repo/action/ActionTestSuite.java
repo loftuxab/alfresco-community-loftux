@@ -19,6 +19,8 @@ package org.alfresco.repo.action;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.alfresco.repo.action.evaluator.IsSubTypeEvaluatorTest;
+
 
 /**
  * Version test suite
@@ -42,6 +44,12 @@ public class ActionTestSuite extends TestSuite
         suite.addTestSuite(ActionConditionImplTest.class);
         suite.addTestSuite(CompositeActionImplTest.class);
         suite.addTestSuite(ActionServiceImplTest.class);
+        
+        // Test evaluators
+        suite.addTestSuite(IsSubTypeEvaluatorTest.class);
+        
+        // Test executors
+        
         return suite;
     }
 }

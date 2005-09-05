@@ -16,12 +16,8 @@
  */
 package org.alfresco.repo.action;
 
-import java.io.IOException;
-import java.util.Properties;
-
-import org.alfresco.service.cmr.rule.RuleServiceException;
+import org.alfresco.repo.i18n.I18NUtil;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.core.io.Resource;
 
 /**
  * Common resouce abstract base class.
@@ -36,11 +32,6 @@ public abstract class CommonResourceAbstractBase implements BeanNameAware
     protected String name;
 
     /**
-     * The properties object
-     */
-    protected Properties properties;
-
-    /**
      * Set the bean name
      * 
      * @param name
@@ -52,22 +43,12 @@ public abstract class CommonResourceAbstractBase implements BeanNameAware
     }
 
     /**
-     * Set the resource
+     * Set the resource bundle base name
      * 
-     * @param resource
-     *            the resource object
+     * @param resourceBundleBaseName    the resource bundle base name
      */
-    public void setResource(Resource resource)
+    public void setResourceBundleBaseName(String resourceBundleBaseName)
     {
-        try
-        {
-            this.properties = new Properties();
-            this.properties.load(resource.getInputStream());
-        } 
-        catch (IOException exception)
-        {
-            throw new RuleServiceException("Unable to load resource file: " + resource.getFilename(), exception);
-        }
+        I18NUtil.registerResourceBundle(resourceBundleBaseName);
     }
-
 }

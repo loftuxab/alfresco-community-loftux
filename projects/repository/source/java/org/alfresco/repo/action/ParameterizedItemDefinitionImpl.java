@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.repo.i18n.I18NUtil;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.action.ParameterizedItemDefinition;
 import org.alfresco.service.cmr.rule.RuleServiceException;
@@ -40,14 +41,14 @@ public abstract class ParameterizedItemDefinitionImpl implements ParameterizedIt
     private String name;
     
     /**
-     * The title of the rule item
+     * The title I18N key
      */
-    private String title;
+    private String titleKey;
     
     /**
-     * The description of the rule item
+     * The description I18N key
      */
-    private String description;
+    private String descriptionKey;
         
     /**
      * Indicates whether adHocProperties are allowed
@@ -94,9 +95,9 @@ public abstract class ParameterizedItemDefinitionImpl implements ParameterizedIt
      * 
      * @param title  the title
      */
-    public void setTitle(String title)
+    public void setTitleKey(String title)
     {
-        this.title = title;
+        this.titleKey = title;
     }
     
     /**
@@ -104,17 +105,17 @@ public abstract class ParameterizedItemDefinitionImpl implements ParameterizedIt
      */
     public String getTitle()
     {
-        return this.title;
+        return I18NUtil.getMessage(this.titleKey);
     }
 
     /**
-     * Set the description of the rule item.
+     * Set the description I18N key
      * 
-     * @param description  the description
+     * @param descriptionKey  the description key
      */
-    public void setDescription(String description)
+    public void setDescriptionKey(String descriptionKey)
     {
-        this.description = description;
+        this.descriptionKey = descriptionKey;
     }
     
     /**
@@ -122,7 +123,7 @@ public abstract class ParameterizedItemDefinitionImpl implements ParameterizedIt
      */
     public String getDescription()
     {
-        return this.description;
+        return I18NUtil.getMessage(this.descriptionKey);
     }
 
     /**

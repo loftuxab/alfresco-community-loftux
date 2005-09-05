@@ -18,13 +18,9 @@ package org.alfresco.repo.action.evaluator;
 
 import java.util.List;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.namespace.QName;
 
 /**
  * No condition evaluator implmentation.
@@ -36,56 +32,19 @@ public class NoConditionEvaluator extends ActionConditionEvaluatorAbstractBase
 	/**
 	 * Evaluator constants
 	 */
-	public static final String NAME = "no-condition";	
-	
-    /**
-     * The node service
-     */
-    private NodeService nodeService;
+	public static final String NAME = "no-condition";	 
     
     /**
-     * The dictionary service
+     * @see org.alfresco.repo.action.evaluator.ActionConditionEvaluatorAbstractBase#evaluateImpl(org.alfresco.service.cmr.action.ActionCondition, org.alfresco.service.cmr.repository.NodeRef)
      */
-    private DictionaryService dictionaryService;
-    
-    /**
-     * Set node service
-     * 
-     * @param nodeService  the node service
-     */
-    public void setNodeService(NodeService nodeService) 
-    {
-        this.nodeService = nodeService;
-    }
-    
-    /**
-     * Set dictionary service
-     * 
-     * @param dictionaryService  the dictionary service
-     */
-    public void setDictionaryService(DictionaryService dictionaryService) 
-    {
-        this.dictionaryService = dictionaryService;
-    }   
-    
-    
     public boolean evaluateImpl(ActionCondition ruleCondition, NodeRef actionedUponNodeRef)
     {
-        boolean result = false;
-        
-        if (this.nodeService.exists(actionedUponNodeRef) == true)
-        {
-            // TODO: Move this type check into its own Class Evaluator
-            QName nodeType = nodeService.getType(actionedUponNodeRef);
-            if (dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
-            {
-                result = true;
-            }
-        }
-        
-        return result;
+        return true;
     }
 
+    /**
+     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefintions(java.util.List)
+     */
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{

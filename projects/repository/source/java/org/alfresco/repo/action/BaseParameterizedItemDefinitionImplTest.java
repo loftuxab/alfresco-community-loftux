@@ -66,18 +66,6 @@ public abstract class BaseParameterizedItemDefinitionImplTest extends TestCase
         assertEquals(NAME, temp.getName());
     }
     
-    public void testGetTitle()
-    {
-        ParameterizedItemDefinitionImpl temp = create();
-        assertEquals(TITLE, temp.getTitle());
-    }
-    
-    public void testGetDescription()
-    {
-        ParameterizedItemDefinitionImpl temp = create();
-        assertEquals(DESCRIPTION, temp.getDescription());
-    }
-    
     public void testGetParameterDefintions()
     {
         ParameterizedItemDefinitionImpl temp = create();

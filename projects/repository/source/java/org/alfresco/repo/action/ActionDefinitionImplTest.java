@@ -43,8 +43,8 @@ public class ActionDefinitionImplTest extends BaseParameterizedItemDefinitionImp
         // Create a good one
         ActionDefinitionImpl temp = new ActionDefinitionImpl(NAME);
         assertNotNull(temp);
-        temp.setTitle(TITLE);
-        temp.setDescription(DESCRIPTION);
+        //temp.setTitle(TITLE);
+       // temp.setDescription(DESCRIPTION);
         temp.setParameterDefinitions(paramDefs);
         temp.setRuleActionExecutor(RULE_ACTION_EXECUTOR);
         return temp;
