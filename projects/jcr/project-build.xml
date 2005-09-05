@@ -7,7 +7,7 @@
    <target name="package" depends="package-war" />
 
    <target name="package-war" depends="package-jar" description="Packages the WAR file for the current server">
-      <war warfile="${dir.dist}/${file.name.war}" webxml="${dir.src.webinf}\web.xml">
+      <war warfile="${dir.dist}/${file.name.war.tck}" webxml="${dir.src.webinf}\web.xml">
          <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
          <webinf dir="${dir.project.installer}" includes="licenses/**"/>
          <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes.@{for}}"/>   
@@ -20,7 +20,7 @@
          <lib dir="${dir.project.core}/build/dist" includes="${dir.name.core}.jar" />
          <lib dir="${dir.project.repository}/build/dist" includes="${dir.name.repository}.jar" />
       </war>
-      <war warfile="${dir.dist}/${file.name.war}" update="true" >
+      <war warfile="${dir.dist}/${file.name.war.tck}" update="true" >
          <classes dir="${dir.config.repository}"/>
          <classes dir="${dir.config.jcr}"/>
          <classes file="${dir.project.core}/source/java/log4j.properties" prefix="WEB-INF/classes"/>
