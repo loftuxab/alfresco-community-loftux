@@ -37,17 +37,19 @@
 	  </property>
    </bean>   
    
-    <!-- Definitions for beans that use the common resource -->
-
-    <bean id="action-common-resource">
-        <property name="resourceBundleBaseName">
-            <value>alfresco.messages.action-config</value>
-        </property>
-    </bean>
+   <!-- I18N -->
+   
+   <bean id="actionResourceBundles" class="org.alfresco.repo.i18n.ResourceBundleBootstrapComponent">
+    	<property name="resourceBundles">
+    		<list>
+    			<value>alfresco.messages.action-config</value>
+    		</list>
+    	</property>
+   </bean>
 
     <!-- Action Conditions -->
 
-    <bean id="action-condition-evaluator" parent="action-common-resource" init-method="init">
+    <bean id="action-condition-evaluator" init-method="init">
         <property name="runtimeActionService">
             <ref bean="actionService" />
         </property>
@@ -89,7 +91,7 @@
 
     <!-- Actions -->
 
-    <bean id="action-executer" parent="action-common-resource" init-method="init">
+    <bean id="action-executer" init-method="init">
         <property name="runtimeActionService">
             <ref bean="actionService" />
         </property>
@@ -104,15 +106,13 @@
 	  </property>
    </bean>
 
-    <bean id="add-features" class="org.alfresco.repo.action.executer.AddFeaturesActionExecuter"
-        parent="action-executer">
+    <bean id="add-features" class="org.alfresco.repo.action.executer.AddFeaturesActionExecuter" parent="action-executer">
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>
     </bean>
 
-    <bean id="link-category" class="org.alfresco.repo.action.executer.LinkCategoryActionExecuter"
-        parent="action-executer">
+    <bean id="link-category" class="org.alfresco.repo.action.executer.LinkCategoryActionExecuter" parent="action-executer">
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>
@@ -121,8 +121,7 @@
         </property>
     </bean>
 
-    <bean id="simple-workflow" class="org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter"
-        parent="action-executer">
+    <bean id="simple-workflow" class="org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter" parent="action-executer">
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>
@@ -189,6 +188,15 @@
     <bean id="mail" class="org.alfresco.repo.action.executer.MailActionExecuter" parent="action-executer">
         <property name="mailService">
             <ref bean="mailService"></ref>
+        </property>
+    </bean>
+        
+    <bean id="set-property-value" class="org.alfresco.repo.action.executer.SetPropertyValueActionExecuter" parent="action-executer">
+       <property name="publicAction">
+          <value>false</value>
+       </property>
+        <property name="nodeService">
+            <ref bean="nodeService"></ref>
         </property>
     </bean>
 

@@ -16,13 +16,20 @@
 		    <ref bean="searchService"/>
 	    </property>
    </bean>
+   
+   <!-- I18N -->
+   
+   <bean id="ruleResourceBundles" class="org.alfresco.repo.i18n.ResourceBundleBootstrapComponent">
+    	<property name="resourceBundles">
+    		<list>
+    			<value>alfresco.messages.rule-config</value>
+    		</list>
+    	</property>
+   </bean>
          
    <!-- Rule types -->
    
    <bean id="rule-type-base" init-method="init">   
-      <property name="resourceBundleBaseName">
-          <value>alfresco.messages.rule-config</value>
-      </property> 
 	  <property name="ruleService">
          <ref bean="ruleService"/>
 	  </property>  

@@ -20,6 +20,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.alfresco.repo.action.evaluator.IsSubTypeEvaluatorTest;
+import org.alfresco.repo.action.executer.SetPropertyValueActionExecuterTest;
 
 
 /**
@@ -49,6 +50,7 @@ public class ActionTestSuite extends TestSuite
         suite.addTestSuite(IsSubTypeEvaluatorTest.class);
         
         // Test executors
+        suite.addTestSuite(SetPropertyValueActionExecuterTest.class);
         
         return suite;
     }

@@ -16,8 +16,9 @@
  */
 package org.alfresco.repo.action;
 
-import org.alfresco.repo.i18n.I18NUtil;
 import org.springframework.beans.factory.BeanNameAware;
+
+// TODO this is no longer required
 
 /**
  * Common resouce abstract base class.
@@ -40,15 +41,5 @@ public abstract class CommonResourceAbstractBase implements BeanNameAware
     public void setBeanName(String name)
     {
         this.name = name;
-    }
-
-    /**
-     * Set the resource bundle base name
-     * 
-     * @param resourceBundleBaseName    the resource bundle base name
-     */
-    public void setResourceBundleBaseName(String resourceBundleBaseName)
-    {
-        I18NUtil.registerResourceBundle(resourceBundleBaseName);
     }
 }

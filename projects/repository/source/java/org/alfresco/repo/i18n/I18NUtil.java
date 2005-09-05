@@ -25,12 +25,24 @@ public class I18NUtil
      */
     private static ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
     
+    /**
+     * List of registered bundles
+     */
     private static Set<String> resouceBundleBaseNames = new HashSet<String>();
     
+    /**
+     * Map of loaded bundles by Locale
+     */
     private static Map<Locale, Set<String>> loadedResourceBundles = new HashMap<Locale, Set<String>>();
     
+    /**
+     * Map of cached messaged by Locale
+     */
     private static Map<Locale, Map<String, String>> cachedMessages = new HashMap<Locale, Map<String, String>>();
     
+    /**
+     * Lock objects
+     */
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
     private static Lock readLock = lock.readLock();
     private static Lock writeLock = lock.writeLock();
@@ -63,8 +75,13 @@ public class I18NUtil
     }
     
     /**
+     * Register a resource bundle.
+     * <p>
+     * This should be the bundle base name eg, alfresco.messages.errors
+     * <p>
+     * Once registered the messges will be available via getMessage
      * 
-     * @param bundleBaseName
+     * @param bundleBaseName    the bundle base name
      */
     public static void registerResourceBundle(String bundleBaseName)
     {
@@ -80,9 +97,10 @@ public class I18NUtil
     }
     
     /**
+     * Get message from registered resource bundle.
      * 
-     * @param messageKey
-     * @return
+     * @param messageKey    message key
+     * @return              localised message string, null if not found
      */
     public static String getMessage(String messageKey)
     {
@@ -93,7 +111,8 @@ public class I18NUtil
      * Get a localised message string
      * 
      * @param messageKey        the message key
-     * @return                  the localised message string
+     * @param locale            override the current locale
+     * @return                  the localised message string, null if not found
      */
     public static String getMessage(String messageKey, Locale locale)
     {
@@ -107,10 +126,11 @@ public class I18NUtil
     }
     
     /**
+     * Get a localised message string, parameterized using standard MessageFormatter.
      * 
-     * @param messageKey
-     * @param params
-     * @return
+     * @param messageKey    message key
+     * @param params        format parameters
+     * @return              the localised string, null if not found
      */
     public static String getMessage(String messageKey, Object[] params)
     {
@@ -118,11 +138,12 @@ public class I18NUtil
     }
     
     /**
-     * Get a localised message string formatted with the passed parameter values.
+     * Get a localised message string, parameterized using standard MessageFormatter.
      * 
      * @param messageKey        the message key
      * @param params            the localised message string
-     * @return
+     * @param locale            override current locale
+     * @return                  the localaised string, null if not found
      */
     public static String getMessage(String messageKey, Object[] params, Locale locale)
     {
@@ -130,9 +151,12 @@ public class I18NUtil
     }
     
     /**
+     * Get the messages for a locale.
+     * <p>
+     * Will use cache where available otherwise will load into cache from bundles.
      * 
-     * @param locale
-     * @return
+     * @param locale    the locale
+     * @return          message map
      */
     private static Map<String, String> getLocaleProperties(Locale locale)
     {
