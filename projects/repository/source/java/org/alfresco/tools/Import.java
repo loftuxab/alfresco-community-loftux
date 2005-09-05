@@ -159,7 +159,7 @@ public class Import extends Tool
     @Override
     /*package*/ void displayHelp()
     {
-        System.out.println("Usage: import -user username -store store [options] packagename");
+        System.out.println("Usage: import -user username -s[tore] store [options] packagename");
         System.out.println("");
         System.out.println("username: username for login");
         System.out.println("store: the store to import into the form of scheme://store_name");

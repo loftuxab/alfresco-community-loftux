@@ -175,7 +175,7 @@ public final class Export extends Tool
     @Override
     /*package*/ void displayHelp()
     {
-        System.out.println("Usage: export -user username -store store [options] packagename");
+        System.out.println("Usage: export -user username -s[tore] store [options] packagename");
         System.out.println("");
         System.out.println("username: username for login");
         System.out.println("store: the store to extract from in the form of scheme://store_name");

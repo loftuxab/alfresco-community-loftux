@@ -1,0 +1,31 @@
+<project name="jcr" default="build">
+
+   <path id="path.common" path="${basedir}/../.."/>
+   <property name="dir.common" refid="path.common"/>
+   <import file="${dir.common}/common.xml"/>
+   
+   <target name="package" depends="package-war" />
+
+   <target name="package-war" depends="package-jar" description="Packages the WAR file for the current server">
+      <war warfile="${dir.dist}/${file.name.war}" webxml="${dir.src.webinf}\web.xml">
+         <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
+         <webinf dir="${dir.project.installer}" includes="licenses/**"/>
+         <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes.@{for}}"/>   
+         <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes.@{for}}" />
+         <lib dir="${dir.common.lib}/jibx" includes="*.jar" />
+         <lib dir="${dir.common.lib}/openoffice" includes="*.jar" />
+         <lib dir="${dir.common.lib}/jmagick" includes="*.jar" />
+         <lib dir="${dir.common.lib}/treecache" includes="*.jar" />
+         <lib dir="${dir.dist}" includes="${file.name.jar}" />
+         <lib dir="${dir.project.core}/build/dist" includes="${dir.name.core}.jar" />
+         <lib dir="${dir.project.repository}/build/dist" includes="${dir.name.repository}.jar" />
+      </war>
+      <war warfile="${dir.dist}/${file.name.war}" update="true" >
+         <classes dir="${dir.config.repository}"/>
+         <classes dir="${dir.config.jcr}"/>
+         <classes file="${dir.project.core}/source/java/log4j.properties" prefix="WEB-INF/classes"/>
+         <classes file="${dir.common}/version.properties" prefix="WEB-INF/classes/alfresco"/>
+      </war>
+   </target>
+      
+</project>
