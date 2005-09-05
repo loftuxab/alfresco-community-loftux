@@ -49,7 +49,7 @@ public class ReplicatingContentStore implements ContentStore
      * 
      * @param transactionService
      */
-    protected void setTransactionService(TransactionService transactionService)
+    public void setTransactionService(TransactionService transactionService)
     {
         this.transactionService = transactionService;
     }
