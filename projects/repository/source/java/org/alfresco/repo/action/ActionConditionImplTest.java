@@ -40,4 +40,12 @@ public class ActionConditionImplTest extends BaseParameterizedItemImplTest
         ActionCondition temp = (ActionCondition)create();
         assertEquals(NAME, temp.getActionConditionDefinitionName());        
     }
+    
+    public void testSetGetInvertCondition()
+    {
+        ActionCondition temp = (ActionCondition)create();
+        assertFalse(temp.getInvertCondition());
+        temp.setInvertCondition(true);
+        assertTrue(temp.getInvertCondition());
+    }
 }

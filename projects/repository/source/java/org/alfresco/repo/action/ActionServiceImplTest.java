@@ -210,6 +210,10 @@ public class ActionServiceImplTest extends BaseSpringTest
 		assertFalse(this.actionService.evaluateActionCondition(condition, this.nodeRef));
 		this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_NAME, "myDocument.doc");
 		assertTrue(this.actionService.evaluateActionCondition(condition, this.nodeRef));
+        
+        // Check that inverting the condition has the correct effect
+        condition.setInvertCondition(true);
+        assertFalse(this.actionService.evaluateActionCondition(condition, this.nodeRef));
 	}
 	
 	/**

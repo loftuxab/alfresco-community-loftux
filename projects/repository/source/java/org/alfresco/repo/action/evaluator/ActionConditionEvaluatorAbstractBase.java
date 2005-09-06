@@ -86,7 +86,12 @@ public abstract class ActionConditionEvaluatorAbstractBase extends Parameterized
     public boolean evaluate(ActionCondition actionCondition, NodeRef actionedUponNodeRef)
     {
         checkMandatoryProperties(actionCondition, getActionConditionDefintion());
-        return evaluateImpl(actionCondition, actionedUponNodeRef);
+        boolean result = evaluateImpl(actionCondition, actionedUponNodeRef);
+        if (actionCondition.getInvertCondition() == true)
+        {
+            result = !result;
+        }
+        return result;
     }
 	
     /**

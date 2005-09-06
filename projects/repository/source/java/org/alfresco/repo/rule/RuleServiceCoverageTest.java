@@ -1177,8 +1177,7 @@ public class RuleServiceCoverageTest extends TestCase
      *          action:     add-features(
      *                          aspect-name = versionable)
      */
-	// TODO removed for technology preview release
-    public void xtestOutboundRuleType()
+    public void testOutboundRuleType()
     {
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         
@@ -1210,7 +1209,15 @@ public class RuleServiceCoverageTest extends TestCase
                 QName.createQName(TEST_NAMESPACE, "children"));
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));
         
+        // Check the deletion of a node
+        
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
+        NodeRef newNodeRef2 = this.nodeService.createNode(
+                this.nodeRef,
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
+                ContentModel.TYPE_CONTAINER).getChildRef();
+        this.nodeService.deleteNode(newNodeRef2);
     }
     
     /**

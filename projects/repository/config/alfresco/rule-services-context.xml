@@ -46,6 +46,14 @@
          </list>
       </constructor-arg>
    </bean>
+   
+   <bean id="outbound" class="org.alfresco.repo.rule.RuleTypeImpl" parent="rule-type-base">
+      <constructor-arg>
+         <list>
+         	<ref bean="on-delete-child-association-trigger"/>
+         </list>
+      </constructor-arg>
+   </bean>
       
    <!-- Rule triggers -->
    

@@ -36,6 +36,12 @@ public class ActionConditionImpl extends ParameterizedItemImpl implements Serial
      * Rule condition defintion
      */
     private String actionConditionDefinitionName;
+    
+    /**
+     * Indicates whether the result of the condition should have the NOT logical operator applied 
+     * to it.
+     */
+    private boolean invertCondition = false;
 
     /**
      * Constructor
@@ -64,5 +70,20 @@ public class ActionConditionImpl extends ParameterizedItemImpl implements Serial
     {
         return this.actionConditionDefinitionName;
     }
-
+    
+    /**
+     * @see org.alfresco.service.cmr.action.ActionCondition#setInvertCondition(boolean)
+     */
+    public void setInvertCondition(boolean invertCondition)
+    {
+        this.invertCondition = invertCondition;
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.action.ActionCondition#getInvertCondition()
+     */
+    public boolean getInvertCondition()
+    {
+        return this.invertCondition;
+    }    
 }
