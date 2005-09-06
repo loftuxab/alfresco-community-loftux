@@ -16,22 +16,82 @@
  */
 package org.alfresco.error;
 
+import org.alfresco.i18n.I18NUtil;
+
 /**
- * Runtime exception thrown by Alfresco code
+ * I18n'ed runtime exception thrown by Alfresco code.
  * 
  * @author gavinc
  */
 public class AlfrescoRuntimeException extends RuntimeException
 {
-   private static final long serialVersionUID = 3834594313622859827L;
+    /**
+     * Serial version UUID
+     */
+    private static final long serialVersionUID = 3834594313622859827L;
 
-   public AlfrescoRuntimeException(String msg)
+    /**
+     * Constructor
+     * 
+     * @param msgId     the message id
+     */
+    public AlfrescoRuntimeException(String msgId)
     {
-        super(msg);
+        super(resolveMessage(msgId, null));
+    }
+    
+    /**
+     * Constructor
+     * 
+     * @param msgId         the message id
+     * @param msgParams     the message parameters
+     */
+    public AlfrescoRuntimeException(String msgId, Object[] msgParams)
+    {
+        super(resolveMessage(msgId, msgParams));
     }
 
-    public AlfrescoRuntimeException(String msg, Throwable cause)
+    /**
+     * Constructor
+     * 
+     * @param msgId     the message id
+     * @param cause     the exception cause
+     */
+    public AlfrescoRuntimeException(String msgId, Throwable cause)
     {
-        super(msg, cause);
+        super(resolveMessage(msgId, null), cause);
+    }
+    
+    /**
+     * Constructor
+     * 
+     * @param msgId         the message id
+     * @param msgParams     the message parameters
+     * @param cause         the exception cause
+     */
+    public AlfrescoRuntimeException(String msgId, Object[] msgParams, Throwable cause)
+    {
+        super(resolveMessage(msgId, msgParams), cause);
+    }
+    
+    /**
+     * Resolves the message id to the localised string.
+     * <p>
+     * If a localised message can not be found then the message Id is
+     * returned.
+     * 
+     * @param messageId     the message Id
+     * @param params        message parameters
+     * @return              the localised message (or the message id if none found)
+     */
+    private static String resolveMessage(String messageId, Object[] params)
+    {
+        String message = I18NUtil.getMessage(messageId, params);
+        if (message == null)
+        {
+            // If a localised string cannot be found then return the messageId
+            message = messageId;
+        }
+        return message;
     }
 }

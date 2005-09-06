@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.service.cmr.action.Action;
@@ -62,8 +62,8 @@ public class BaseRuleTest extends BaseSpringTest
     /**
      * ActionCondition used in tests
      */
-    protected static final String CONDITION_DEF_NAME = MatchTextEvaluator.NAME;
-    protected static final String COND_PROP_NAME_1 = MatchTextEvaluator.PARAM_TEXT;
+    protected static final String CONDITION_DEF_NAME = ComparePropertyValueEvaluator.NAME;
+    protected static final String COND_PROP_NAME_1 = ComparePropertyValueEvaluator.PARAM_VALUE;
     protected static final String COND_PROP_VALUE_1 = ".doc";
 
     /**

@@ -31,7 +31,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ActionServiceImplTest;
 import org.alfresco.repo.action.ActionServiceImplTest.AsyncTest;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
-import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.evaluator.NoConditionEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.action.executer.CheckInActionExecuter;
@@ -1005,7 +1005,7 @@ public class RuleServiceCoverageTest extends TestCase
         		RuleType.INBOUND, 
         		AddFeaturesActionExecuter.NAME, 
         		actionParams, 
-        		MatchTextEvaluator.NAME, 
+        		ComparePropertyValueEvaluator.NAME, 
         		condParams);
         
         this.ruleService.saveRule(this.nodeRef, rule);
@@ -1046,13 +1046,13 @@ public class RuleServiceCoverageTest extends TestCase
         
         // ActionCondition parameter's 
 		Map<String, Serializable> condParams = new HashMap<String, Serializable>(1);
-		condParams.put(MatchTextEvaluator.PARAM_TEXT, ".doc");        
+		condParams.put(ComparePropertyValueEvaluator.PARAM_VALUE, ".doc");        
 		
 		Rule rule = createRule(
         		RuleType.INBOUND, 
         		AddFeaturesActionExecuter.NAME, 
         		actionParams, 
-        		MatchTextEvaluator.NAME, 
+        		ComparePropertyValueEvaluator.NAME, 
         		condParams);
         
         this.ruleService.saveRule(this.nodeRef, rule);
@@ -1107,9 +1107,9 @@ public class RuleServiceCoverageTest extends TestCase
         
         // Test begins with
         Map<String, Serializable> condParamsBegins = new HashMap<String, Serializable>(1);
-        condParamsBegins.put(MatchTextEvaluator.PARAM_TEXT, "bob*");
+        condParamsBegins.put(ComparePropertyValueEvaluator.PARAM_VALUE, "bob*");
         rule.removeAllActionConditions();
-        ActionCondition condition1 = this.actionService.createActionCondition(MatchTextEvaluator.NAME, condParamsBegins);
+        ActionCondition condition1 = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME, condParamsBegins);
         rule.addActionCondition(condition1);
         this.ruleService.saveRule(this.nodeRef, rule);
         Map<QName, Serializable> propsx = new HashMap<QName, Serializable>();
@@ -1139,9 +1139,9 @@ public class RuleServiceCoverageTest extends TestCase
         
         // Test ends with
         Map<String, Serializable> condParamsEnds = new HashMap<String, Serializable>(1);
-        condParamsEnds.put(MatchTextEvaluator.PARAM_TEXT, "*s.doc");
+        condParamsEnds.put(ComparePropertyValueEvaluator.PARAM_VALUE, "*s.doc");
         rule.removeAllActionConditions();
-        ActionCondition condition2 = this.actionService.createActionCondition(MatchTextEvaluator.NAME, condParamsEnds);
+        ActionCondition condition2 = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME, condParamsEnds);
         rule.addActionCondition(condition2);
         this.ruleService.saveRule(this.nodeRef, rule);
         Map<QName, Serializable> propsa = new HashMap<QName, Serializable>();

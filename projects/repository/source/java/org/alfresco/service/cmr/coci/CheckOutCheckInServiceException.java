@@ -16,25 +16,19 @@
  */
 package org.alfresco.service.cmr.coci;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 /**
  * Version opertaions service exception class
  * 
  * @author Roy Wetherall
  */
-public class CheckOutCheckInServiceException extends RuntimeException 
+public class CheckOutCheckInServiceException extends AlfrescoRuntimeException 
 {
 	/**
 	 * Serial version UID
 	 */
 	private static final long serialVersionUID = 3258410621186618417L;
-
-	/**
-	 * Constructor
-	 */
-	public CheckOutCheckInServiceException() 
-	{
-		super();
-	}
 
 	/**
 	 * Constructor

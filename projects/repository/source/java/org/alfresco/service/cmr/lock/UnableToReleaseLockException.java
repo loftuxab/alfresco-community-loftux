@@ -25,8 +25,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * 
  * @author Roy Wetherall
  */
-public class UnableToReleaseLockException extends
-        RuntimeException
+public class UnableToReleaseLockException extends RuntimeException
 {
     /**
      * Serial verison UID

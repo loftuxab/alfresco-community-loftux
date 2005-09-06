@@ -32,7 +32,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
-import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
@@ -107,9 +107,9 @@ public class NewRuleWizard extends BaseActionWizard
          
          // set up parameters maps for the condition
          Map<String, Serializable> conditionParams = new HashMap<String, Serializable>();
-         if (this.condition.equals(MatchTextEvaluator.NAME))
+         if (this.condition.equals(ComparePropertyValueEvaluator.NAME))
          {
-            conditionParams.put(MatchTextEvaluator.PARAM_TEXT, 
+            conditionParams.put(ComparePropertyValueEvaluator.PARAM_VALUE, 
                   this.conditionProperties.get(PROP_CONTAINS_TEXT));
          }
          else if (this.condition.equals(InCategoryEvaluator.NAME))
@@ -441,10 +441,10 @@ public class NewRuleWizard extends BaseActionWizard
       
       // populate the condition property bag with the relevant values
       Map<String, Serializable> condProps = rule.getActionConditions().get(0).getParameterValues();
-      if (this.condition.equals(MatchTextEvaluator.NAME))
+      if (this.condition.equals(ComparePropertyValueEvaluator.NAME))
       {
          this.conditionProperties.put(PROP_CONTAINS_TEXT, 
-               (String)condProps.get(MatchTextEvaluator.PARAM_TEXT));
+               (String)condProps.get(ComparePropertyValueEvaluator.PARAM_VALUE));
       }
       else if (this.condition.equals(InCategoryEvaluator.NAME))
       {

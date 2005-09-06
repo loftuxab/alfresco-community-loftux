@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.i18n;
+package org.alfresco.i18n;
 
 import java.util.List;
 

@@ -28,7 +28,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.repo.i18n.I18NUtil;
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.User;

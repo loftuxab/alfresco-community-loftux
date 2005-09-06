@@ -22,8 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.evaluator.ComparePropertyValueOperation;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
-import org.alfresco.repo.action.evaluator.MatchTextEvaluator;
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.evaluator.NoConditionEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.action.executer.CheckInActionExecuter;
@@ -182,16 +183,16 @@ public class ActionServiceImplTest extends BaseSpringTest
 		Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
 		assertTrue(this.actionService.evaluateAction(action, this.nodeRef));
 		
-		ActionCondition condition = this.actionService.createActionCondition(MatchTextEvaluator.NAME);
-		condition.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "*.doc");
+		ActionCondition condition = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
+		condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "*.doc");
 		action.addActionCondition(condition);
 		
 		assertFalse(this.actionService.evaluateAction(action, this.nodeRef));
 		this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_NAME, "myDocument.doc");
 		assertTrue(this.actionService.evaluateAction(action, this.nodeRef));
 		
-		ActionCondition condition2 = this.actionService.createActionCondition(MatchTextEvaluator.NAME);
-		condition2.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "my");
+		ActionCondition condition2 = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
+		condition2.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "my");
 		action.addActionCondition(condition2);
 		assertTrue(this.actionService.evaluateAction(action, this.nodeRef));
 		
@@ -204,8 +205,8 @@ public class ActionServiceImplTest extends BaseSpringTest
 	 */
 	public void testEvaluateActionCondition()
 	{
-		ActionCondition condition = this.actionService.createActionCondition(MatchTextEvaluator.NAME);
-		condition.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "*.doc");
+		ActionCondition condition = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
+		condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "*.doc");
 		
 		assertFalse(this.actionService.evaluateActionCondition(condition, this.nodeRef));
 		this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_NAME, "myDocument.doc");
@@ -232,8 +233,8 @@ public class ActionServiceImplTest extends BaseSpringTest
 		this.nodeService.removeAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE);
 		assertFalse(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE));
 		
-		ActionCondition condition = this.actionService.createActionCondition(MatchTextEvaluator.NAME);
-		condition.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "*.doc");
+		ActionCondition condition = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
+		condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "*.doc");
 		action.addActionCondition(condition);
 				
 		this.actionService.executeAction(action, this.nodeRef);
@@ -391,8 +392,8 @@ public class ActionServiceImplTest extends BaseSpringTest
 		
 		// Set the conditions of the action
 		ActionCondition actionCondition = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
-		ActionCondition actionCondition2 = this.actionService.createActionCondition(MatchTextEvaluator.NAME);
-		actionCondition2.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "*.doc");
+		ActionCondition actionCondition2 = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
+		actionCondition2.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "*.doc");
 		action.addActionCondition(actionCondition);
 		action.addActionCondition(actionCondition2);
 		
@@ -423,10 +424,10 @@ public class ActionServiceImplTest extends BaseSpringTest
 			{
 				assertEquals(0, savedCondition.getParameterValues().size());
 			}
-			else if (savedCondition.getActionConditionDefinitionName().equals(MatchTextEvaluator.NAME) == true)
+			else if (savedCondition.getActionConditionDefinitionName().equals(ComparePropertyValueEvaluator.NAME) == true)
 			{
 				assertEquals(1, savedCondition.getParameterValues().size());
-				assertEquals("*.doc", savedCondition.getParameterValue(MatchTextEvaluator.PARAM_TEXT));
+				assertEquals("*.doc", savedCondition.getParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE));
 			}
 			else
 			{
@@ -439,8 +440,8 @@ public class ActionServiceImplTest extends BaseSpringTest
 		actionCondition3.setParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_ACTIONABLE);
 		action.addActionCondition(actionCondition3);
 		action.removeActionCondition(actionCondition);
-		actionCondition2.setParameterValue(MatchTextEvaluator.PARAM_TEXT, "*.exe");
-		actionCondition2.setParameterValue(MatchTextEvaluator.PARAM_OPERATION, MatchTextEvaluator.Operation.EXACT);
+		actionCondition2.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "*.exe");
+		actionCondition2.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS);
 		
 		this.actionService.saveAction(this.nodeRef, action);
 		Action savedAction2 = this.actionService.getAction(this.nodeRef, actionId);
@@ -455,11 +456,11 @@ public class ActionServiceImplTest extends BaseSpringTest
 				assertEquals(1, savedCondition.getParameterValues().size());
 				assertEquals(ContentModel.ASPECT_ACTIONABLE, savedCondition.getParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT));
 			}
-			else if (savedCondition.getActionConditionDefinitionName().equals(MatchTextEvaluator.NAME) == true)
+			else if (savedCondition.getActionConditionDefinitionName().equals(ComparePropertyValueEvaluator.NAME) == true)
 			{
 				assertEquals(2, savedCondition.getParameterValues().size());
-				assertEquals("*.exe", savedCondition.getParameterValue(MatchTextEvaluator.PARAM_TEXT));
-				assertEquals(MatchTextEvaluator.Operation.EXACT, savedCondition.getParameterValue(MatchTextEvaluator.PARAM_OPERATION));
+				assertEquals("*.exe", savedCondition.getParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE));
+				assertEquals(ComparePropertyValueOperation.EQUALS, savedCondition.getParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION));
 			}
 			else
 			{

@@ -39,7 +39,7 @@
    
    <!-- I18N -->
    
-   <bean id="actionResourceBundles" class="org.alfresco.repo.i18n.ResourceBundleBootstrapComponent">
+   <bean id="actionResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
     	<property name="resourceBundles">
     		<list>
     			<value>alfresco.messages.action-config</value>
@@ -55,19 +55,19 @@
         </property>
     </bean>
 
-    <bean id="no-condition" class="org.alfresco.repo.action.evaluator.NoConditionEvaluator"
-        parent="action-condition-evaluator">
+    <bean id="no-condition" class="org.alfresco.repo.action.evaluator.NoConditionEvaluator" parent="action-condition-evaluator">
     </bean>
 
-    <bean id="match-text" class="org.alfresco.repo.action.evaluator.MatchTextEvaluator"
-        parent="action-condition-evaluator">
+    <bean id="compare-property-value" class="org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator" parent="action-condition-evaluator">
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
     </bean>
 
-    <bean id="in-category" class="org.alfresco.repo.action.evaluator.InCategoryEvaluator"
-        parent="action-condition-evaluator">
+    <bean id="in-category" class="org.alfresco.repo.action.evaluator.InCategoryEvaluator" parent="action-condition-evaluator">
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>
@@ -76,8 +76,7 @@
         </property>
     </bean>
     
-    <bean id="is-subtype" class="org.alfresco.repo.action.evaluator.IsSubTypeEvaluator"
-        parent="action-condition-evaluator">
+    <bean id="is-subtype" class="org.alfresco.repo.action.evaluator.IsSubTypeEvaluator" parent="action-condition-evaluator">
         <property name="publicCondition">
         	<value>false</value>
         </property>

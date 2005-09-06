@@ -33,7 +33,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.repo.i18n.I18NUtil;
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.web.app.Application;

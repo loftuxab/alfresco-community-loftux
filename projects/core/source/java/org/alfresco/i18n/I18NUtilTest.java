@@ -1,4 +1,4 @@
-package org.alfresco.repo.i18n;
+package org.alfresco.i18n;
 
 import java.util.Locale;
 
@@ -11,13 +11,24 @@ import junit.framework.TestCase;
  */
 public class I18NUtilTest extends TestCase
 {
-    private static final String BASE_RESOURCE_NAME = "org.alfresco.repo.i18n.testMessages";
+    private static final String BASE_RESOURCE_NAME = "org.alfresco.i18n.testMessages";
+    private static final String PARAM_VALUE = "television";
     private static final String MSG_YES = "msg_yes";    
     private static final String MSG_NO = "msg_no";
+    private static final String MSG_PARAMS = "msg_params";
     private static final String VALUE_YES = "Yes";
     private static final String VALUE_NO = "No";
+    private static final String VALUE_PARAMS = "What no " + PARAM_VALUE + "?";
     private static final String VALUE_FR_YES = "Oui";
     private static final String VALUE_FR_NO = "Non";
+    private static final String VALUE_FR_PARAMS = "Que non " + PARAM_VALUE + "?";
+   
+    @Override
+    protected void setUp() throws Exception
+    {
+        // Re-set the current locale to be the default
+        I18NUtil.setLocale(Locale.getDefault());
+    }
     
     /**
      * Test the set and get methods
@@ -41,8 +52,6 @@ public class I18NUtilTest extends TestCase
      */
     public void testGetMessage()
     {
-        // TODO should throw a specialised I18N execption
-        
         // Check with no bundles loaded
         assertNull(I18NUtil.getMessage(MSG_NO));        
         
@@ -68,5 +77,24 @@ public class I18NUtilTest extends TestCase
         assertEquals(VALUE_NO, I18NUtil.getMessage(MSG_NO, Locale.getDefault()));
     }
     
-    // TODO test parameterised messages
+    /**
+     * Test getting a parameterised message
+     */
+    public void testGetMessageWithParams()
+    {
+        // Register the bundle
+        I18NUtil.registerResourceBundle(BASE_RESOURCE_NAME);
+        
+        // Check the default value
+        assertEquals(VALUE_PARAMS, I18NUtil.getMessage(MSG_PARAMS, new Object[]{PARAM_VALUE}));
+            
+        // Change the locale and re-test
+        I18NUtil.setLocale(new Locale("fr", "FR"));
+        
+        // Check the default value
+        assertEquals(VALUE_FR_PARAMS, I18NUtil.getMessage(MSG_PARAMS, new Object[]{PARAM_VALUE}));       
+        
+        // Check values when overriding the locale    
+        assertEquals(VALUE_PARAMS, I18NUtil.getMessage(MSG_PARAMS, new Object[]{PARAM_VALUE}, Locale.getDefault()));
+    }
 }

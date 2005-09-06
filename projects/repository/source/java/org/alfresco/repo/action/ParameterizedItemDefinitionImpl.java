@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.i18n.I18NUtil;
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.action.ParameterizedItemDefinition;
 import org.alfresco.service.cmr.rule.RuleServiceException;

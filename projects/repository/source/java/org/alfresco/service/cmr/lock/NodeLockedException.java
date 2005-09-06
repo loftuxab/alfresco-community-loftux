@@ -18,6 +18,7 @@ package org.alfresco.service.cmr.lock;
 
 import java.text.MessageFormat;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
@@ -25,7 +26,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * 
  * @author Roy Wetherall
  */
-public class NodeLockedException extends RuntimeException
+public class NodeLockedException extends AlfrescoRuntimeException
 {    
     /**
      * Serial version UID

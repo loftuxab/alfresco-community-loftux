@@ -1,4 +1,4 @@
-package org.alfresco.repo.i18n;
+package org.alfresco.i18n;
 
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -147,7 +147,12 @@ public class I18NUtil
      */
     public static String getMessage(String messageKey, Object[] params, Locale locale)
     {
-        return MessageFormat.format(getMessage(messageKey, locale), params);
+        String message = getMessage(messageKey, locale);
+        if (message != null && params != null)
+        {
+            message = MessageFormat.format(message, params);
+        }
+        return message;
     }
     
     /**

@@ -16,25 +16,19 @@
  */
 package org.alfresco.service.cmr.action;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 /**
  * Rule Service Exception Class
  * 
  * @author Roy Wetherall
  */
-public class ActionServiceException extends RuntimeException 
+public class ActionServiceException extends AlfrescoRuntimeException 
 {
 	/**
 	 * Serial version UID 
 	 */
 	private static final long serialVersionUID = 3257571685241467958L;
-
-	/**
-	 * Constructor
-	 */
-	public ActionServiceException() 
-	{
-		super();
-	}
 
 	/**
 	 * Construtor
@@ -55,15 +49,5 @@ public class ActionServiceException extends RuntimeException
 	public ActionServiceException(String message, Throwable source) 
 	{
 		super(message, source);
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param source	the source exception
-	 */
-	public ActionServiceException(Throwable source) 
-	{
-		super(source);
 	}
 }
