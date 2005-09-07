@@ -30,24 +30,23 @@ public class ActionServiceException extends AlfrescoRuntimeException
 	 */
 	private static final long serialVersionUID = 3257571685241467958L;
 
-	/**
-	 * Construtor
-	 * 
-	 * @param message 	the message string
-	 */
-	public ActionServiceException(String message) 
-	{
-		super(message);
-	}
+    public ActionServiceException(String msgId)
+    {
+        super(msgId);
+    }
 
-	/**
-	 * Constructor
-	 * 
-	 * @param message	the message string
-	 * @param source	the source exception
-	 */
-	public ActionServiceException(String message, Throwable source) 
-	{
-		super(message, source);
-	}
+    public ActionServiceException(String msgId, Object[] msgParams)
+    {
+        super(msgId, msgParams);
+    }
+
+    public ActionServiceException(String msgId, Object[] msgParams, Throwable cause)
+    {
+        super(msgId, msgParams, cause);
+    }
+
+    public ActionServiceException(String msgId, Throwable cause)
+    {
+        super(msgId, cause);
+    }
 }

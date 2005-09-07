@@ -17,11 +17,14 @@
 package org.alfresco.repo.action.evaluator;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -31,7 +34,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 
 /**
- * 
+ * Compare property value evaluator
  * 
  * @author Roy Wetherall
  */
@@ -49,6 +52,16 @@ public class ComparePropertyValueEvaluator extends ActionConditionEvaluatorAbstr
      * The default property to check if none is specified in the properties
      */
     private final static QName DEFAULT_PROPERTY = ContentModel.PROP_NAME;
+    
+    /**
+     * I18N message ID's
+     */
+    private static final String MSGID_INVALID_OPERATION = "compare_property_value_evaluator.invalid_operation";
+    
+    /**
+     * Map of comparators used by different property types
+     */
+    private Map<QName, PropertyValueComparator> comparators = new HashMap<QName, PropertyValueComparator>();
     
 	/**
 	 * The node service
@@ -78,6 +91,30 @@ public class ComparePropertyValueEvaluator extends ActionConditionEvaluatorAbstr
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
+    }
+    
+    /**
+     * Set the list of property value comparators
+     *
+     * @param comparators  the list of property value comparators
+     */
+    public void setPropertyValueComparators(List<PropertyValueComparator> comparators)
+    {
+        for (PropertyValueComparator comparator : comparators)
+        {
+            comparator.registerComparator(this);
+        }
+    }
+    
+    /**
+     * Registers a comparator for a given property data type.
+     * 
+     * @param dataType      property data type
+     * @param comparator    property value comparator
+     */
+    public void registerComparator(QName dataType, PropertyValueComparator comparator)
+    {
+        this.comparators.put(dataType, comparator);
     }
 	
     /**
@@ -114,24 +151,36 @@ public class ComparePropertyValueEvaluator extends ActionConditionEvaluatorAbstr
             Serializable compareValue = ruleCondition.getParameterValue(PARAM_VALUE);
             
             // Get the operation
-            ComparePropertyValueOperation operation = null;
-            String stringOperation = (String)ruleCondition.getParameterValue(PARAM_OPERATION);
-            if (stringOperation != null)
+            ComparePropertyValueOperation operation = (ComparePropertyValueOperation)ruleCondition.getParameterValue(PARAM_OPERATION);
+            
+            // Look at the type of the property (assume to be ANY if none found in dicitionary)
+            QName propertyTypeQName = DataTypeDefinition.ANY;
+            PropertyDefinition propertyDefintion = this.dictionaryService.getProperty(propertyQName);
+            if (propertyDefintion != null)
             {
-                operation = ComparePropertyValueOperation.valueOf(stringOperation);
+                propertyTypeQName = propertyDefintion.getDataType().getName();
             }
             
-            // Look at the type of the property
-            PropertyDefinition propertyDefintion = this.dictionaryService.getProperty(propertyQName);
-            
-            if (DataTypeDefinition.TEXT.equals(propertyDefintion.getDataType().getName()) == true)
+            // Try and get a matching comparator
+            PropertyValueComparator comparator = this.comparators.get(propertyTypeQName);
+            if (comparator != null)
             {
-                // TODO change this
-                result = new TextPropertyValueComparator().compare(propertyValue, compareValue, operation);                
-            }			
+                // Call the comparator for the property type
+                result = comparator.compare(propertyValue, compareValue, operation);
+            }
             else
             {
-                // TODO Fill in what happens here ...
+                // The default behaviour is to assume the property can only be compared using equals
+                if (operation != null && operation != ComparePropertyValueOperation.EQUALS)
+                {
+                    // Error since only the equals operation is valid
+                    throw new ActionServiceException(
+                            MSGID_INVALID_OPERATION, 
+                            new Object[]{operation.toString(), propertyTypeQName.toString()});
+                }
+                
+                // Use equals to compare the values
+                result = compareValue.equals(propertyValue);
             }
         }
 		

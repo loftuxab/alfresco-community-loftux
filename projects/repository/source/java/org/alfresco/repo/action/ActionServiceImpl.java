@@ -294,23 +294,10 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	public boolean evaluateActionCondition(ActionCondition condition, NodeRef actionedUponNodeRef)
 	{
 		boolean result = false;
-		
-		try
-		{
-			// Evaluate the condition
-			ActionConditionEvaluator evaluator = (ActionConditionEvaluator)this.applicationContext.getBean(condition.getActionConditionDefinitionName());
-			result = evaluator.evaluate(condition, actionedUponNodeRef);
-		}
-		catch (RuntimeException exception)
-		{
-			// Log the exception
-			logger.error(
-						"An error was encountered whilst evaluating the action condition '" + condition.getActionConditionDefinitionName() + "'.",
-						exception);
-			
-			// An exception raised here is interpreted as a failure of the condition
-			result = false;
-		}
+
+    	// Evaluate the condition
+    	ActionConditionEvaluator evaluator = (ActionConditionEvaluator)this.applicationContext.getBean(condition.getActionConditionDefinitionName());
+    	result = evaluator.evaluate(condition, actionedUponNodeRef);
 		
 		return result;
 	}

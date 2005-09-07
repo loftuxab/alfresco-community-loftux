@@ -42,6 +42,7 @@
    <bean id="actionResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
     	<property name="resourceBundles">
     		<list>
+    			<value>alfresco.messages.action-service</value>
     			<value>alfresco.messages.action-config</value>
     		</list>
     	</property>
@@ -64,6 +65,13 @@
         </property>
         <property name="dictionaryService">
             <ref bean="dictionaryService" />
+        </property>
+        <property name="propertyValueComparators">
+            <list>
+            	<bean class="org.alfresco.repo.action.evaluator.TextPropertyValueComparator"/>
+            	<bean class="org.alfresco.repo.action.evaluator.NumericPropertyValueComparator"/>
+            	<bean class="org.alfresco.repo.action.evaluator.DatePropertyValueComparator"/>
+            </list>
         </property>
     </bean>
 

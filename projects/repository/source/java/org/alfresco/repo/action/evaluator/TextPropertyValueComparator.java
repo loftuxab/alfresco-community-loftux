@@ -20,11 +20,21 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.service.cmr.action.ActionServiceException;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+
 /**
+ * Test property value comparator
+ * 
  * @author Roy Wetherall
  */
 public class TextPropertyValueComparator implements PropertyValueComparator
 {
+    /**
+     * I18N message ids
+     */
+    private static final String MSGID_INVALID_OPERATION = "text_property_value_comparator.invalid_operation";
+    
     /**
      * Special star string
      */
@@ -83,8 +93,6 @@ public class TextPropertyValueComparator implements PropertyValueComparator
      */
     private String buildRegEx(String matchText, ComparePropertyValueOperation operation) 
     {
-        // TODO the result of this could be cached to speed things up ...
-        
         String result = escapeText(matchText);
         switch (operation) 
         {
@@ -97,8 +105,13 @@ public class TextPropertyValueComparator implements PropertyValueComparator
             case ENDS:
                 result = "^.*" + result + "$";
                 break;
-            default:
+            case EQUALS:
                 break;
+            default:
+                // Raise an invalid operation exception
+                throw new ActionServiceException(
+                        MSGID_INVALID_OPERATION, 
+                        new Object[]{operation.toString()});
         }
         return result;
     }
@@ -145,5 +158,13 @@ public class TextPropertyValueComparator implements PropertyValueComparator
             ESCAPE_CHAR_LIST.add('$');
         }
         return ESCAPE_CHAR_LIST;
+    }
+
+    /**
+     * @see org.alfresco.repo.action.evaluator.PropertyValueComparator#registerComparator(org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator)
+     */
+    public void registerComparator(ComparePropertyValueEvaluator evaluator)
+    {
+        evaluator.registerComparator(DataTypeDefinition.TEXT, this);        
     }
 }
