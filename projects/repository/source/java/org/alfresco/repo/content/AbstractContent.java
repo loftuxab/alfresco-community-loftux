@@ -159,7 +159,7 @@ public abstract class AbstractContent implements Content
             {
                 throw new AlfrescoRuntimeException("A transaction service is required when there are listeners present");
             }
-            TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork()
+            TransactionUtil.TransactionWork<Object> work = new TransactionUtil.TransactionWork<Object>()
                     {
                         public Object doWork()
                         {
@@ -239,7 +239,7 @@ public abstract class AbstractContent implements Content
             {
                 throw new AlfrescoRuntimeException("A transaction service is required when there are listeners present");
             }
-            TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork()
+            TransactionUtil.TransactionWork<Object> work = new TransactionUtil.TransactionWork<Object>()
                     {
                         public Object doWork()
                         {

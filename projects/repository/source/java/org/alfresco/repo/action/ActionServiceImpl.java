@@ -1008,9 +1008,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	private NodeRef createActionExecutionDetails(final Action action, final NodeRef actionedUponNodeRef)
 	{
-		TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork() 
+		TransactionUtil.TransactionWork<NodeRef> work = new TransactionUtil.TransactionWork<NodeRef>() 
 		{
-			public Object doWork()
+			public NodeRef doWork()
 			{
 				NodeRef actionExecutionDetailsNodeRef = null;
 				
@@ -1038,14 +1038,14 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			}					
 		};
 		
-		NodeRef actionExecutionDetailsNodeRef = (NodeRef)TransactionUtil.executeInNonPropagatingUserTransaction(
+		NodeRef actionExecutionDetailsNodeRef = TransactionUtil.executeInNonPropagatingUserTransaction(
 				this.transactionService,
 				work);
 		
 		if (actionExecutionDetailsNodeRef == null)
 		{
 			// Re-do the work in this transaction (since the node is also in this transaction)
-			actionExecutionDetailsNodeRef = (NodeRef)work.doWork();
+			actionExecutionDetailsNodeRef = work.doWork();
 		}
 		
 		return actionExecutionDetailsNodeRef;
@@ -1060,9 +1060,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		if (actionExecutionDetailsNodeRef != null)
 		{		
-			TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork() 
+			TransactionUtil.TransactionWork<Boolean> work = new TransactionUtil.TransactionWork<Boolean>() 
 			{
-				public Object doWork()
+				public Boolean doWork()
 				{
 					boolean result = false;
 					if (ActionServiceImpl.this.nodeService.exists(actionExecutionDetailsNodeRef) == true)
@@ -1077,7 +1077,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 				}					
 			};
 			
-			boolean result = ((Boolean)TransactionUtil.executeInNonPropagatingUserTransaction(
+			boolean result = (TransactionUtil.executeInNonPropagatingUserTransaction(
 					this.transactionService,
 					work)).booleanValue();
 			
@@ -1093,9 +1093,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		if (actionExecutionDetailsNodeRef != null)
 		{		
-			TransactionUtil.TransactionWork work = new TransactionUtil.TransactionWork() 
+			TransactionUtil.TransactionWork<Boolean> work = new TransactionUtil.TransactionWork<Boolean>() 
 			{
-				public Object doWork()
+				public Boolean doWork()
 				{
 					boolean result = false;
 					if (ActionServiceImpl.this.nodeService.exists(actionExecutionDetailsNodeRef) == true)
@@ -1118,7 +1118,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 				}					
 			};
 			
-			boolean result = ((Boolean)TransactionUtil.executeInNonPropagatingUserTransaction(
+			boolean result = (TransactionUtil.executeInNonPropagatingUserTransaction(
 					this.transactionService,
 					work)).booleanValue();
 			

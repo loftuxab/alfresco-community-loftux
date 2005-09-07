@@ -681,11 +681,11 @@ public class ActionServiceImplTest extends BaseSpringTest
 					// Sleep for a bit
 					Thread.sleep(sleepTime);
 					
-					done = ((Boolean)TransactionUtil.executeInUserTransaction(
+					done = (TransactionUtil.executeInUserTransaction(
 								transactionService,
-								new TransactionUtil.TransactionWork()
+								new TransactionUtil.TransactionWork<Boolean>()
 								{
-									public Object doWork()
+									public Boolean doWork()
 									{	
 										// See if the action has been performed
 										return test.executeTest();
@@ -834,9 +834,9 @@ public class ActionServiceImplTest extends BaseSpringTest
 		// Create and execute the action
 		TransactionUtil.executeInUserTransaction(
 				this.transactionService,
-				new TransactionUtil.TransactionWork() 
+				new TransactionUtil.TransactionWork<Action>() 
 				{
-					public Object doWork()
+					public Action doWork()
 					{
 						//	Check execution history is empty before we start
 						List<ActionExecutionDetails> empty = ActionServiceImplTest.this.actionService.getActionExecutionHistory(ActionServiceImplTest.this.nodeRef);
@@ -860,7 +860,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		// Now (in a new transaction) check the execution history has been set-up correctly)
 		TransactionUtil.executeInUserTransaction(
 				this.transactionService,
-				new TransactionUtil.TransactionWork() 
+				new TransactionUtil.TransactionWork<Object>() 
 				{
 					public Object doWork()
 					{
@@ -883,7 +883,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		// Execute an action failure (on the same node
 		TransactionUtil.executeInUserTransaction(
 				this.transactionService,
-				new TransactionUtil.TransactionWork() 
+				new TransactionUtil.TransactionWork<Object>() 
 				{
 					public Object doWork()
 					{
@@ -914,7 +914,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		// Now check the execution history for the failed action
 		TransactionUtil.executeInUserTransaction(
 				this.transactionService,
-				new TransactionUtil.TransactionWork() 
+				new TransactionUtil.TransactionWork<Object>() 
 				{
 					public Object doWork()
 					{
@@ -1053,7 +1053,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		final Action finalAction = action;
 		TransactionUtil.executeInUserTransaction(
 				this.transactionService,
-				new TransactionUtil.TransactionWork()
+				new TransactionUtil.TransactionWork<Object>()
 				{
 					public Object doWork()
 					{						

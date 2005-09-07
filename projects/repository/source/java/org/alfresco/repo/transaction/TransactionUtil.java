@@ -39,12 +39,14 @@ public class TransactionUtil
      * This interface encapsulates a unit of work that should be done within a
      * transaction.
      */
-    public interface TransactionWork
+    public interface TransactionWork<Result>
     {
         /**
          * Method containing the work to be done in the user transaction.
+         * 
+         * @return Return the result of the operation
          */
-        Object doWork();
+        Result doWork();
     }
 
     /**
@@ -55,9 +57,9 @@ public class TransactionUtil
      * 
      * @throws java.lang.RuntimeException if the transaction was rolled back
      */
-    public static Object executeInUserTransaction(
+    public static <R> R executeInUserTransaction(
             TransactionService transactionService,
-            TransactionWork transactionWork)
+            TransactionWork<R> transactionWork)
     {
         return executeInTransaction(transactionService, transactionWork, false);
     }
@@ -70,9 +72,9 @@ public class TransactionUtil
      * 
      * @throws java.lang.RuntimeException if the transaction was rolled back
      */
-    public static Object executeInNonPropagatingUserTransaction(
+    public static <R> R executeInNonPropagatingUserTransaction(
             TransactionService transactionService,
-            TransactionWork transactionWork)
+            TransactionWork<R> transactionWork)
     {
         return executeInTransaction(transactionService, transactionWork, true);
     }
@@ -89,14 +91,14 @@ public class TransactionUtil
      * 
      * @throws java.lang.RuntimeException if the transaction was rolled back
      */
-    private static Object executeInTransaction(
+    private static <R> R executeInTransaction(
             TransactionService transactionService,
-            TransactionWork transactionWork,
+            TransactionWork<R> transactionWork,
             boolean nonPropigatingUserTransaction)
     {
         ParameterCheck.mandatory("transactionWork", transactionWork);
 
-        Object result = null;
+        R result = null;
 
         // Get the right type of user transaction
         UserTransaction txn = null;

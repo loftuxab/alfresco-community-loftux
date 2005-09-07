@@ -225,11 +225,11 @@ public class RuleServiceCoverageTest extends TestCase
      */
     public void testAsyncRuleExecution()
     {
-        final NodeRef newNodeRef = (NodeRef)TransactionUtil.executeInUserTransaction(
+        final NodeRef newNodeRef = TransactionUtil.executeInUserTransaction(
                 this.transactionService,
-                new TransactionUtil.TransactionWork()
+                new TransactionUtil.TransactionWork<NodeRef>()
                 {
-                    public Object doWork()
+                    public NodeRef doWork()
                     {
                         RuleServiceCoverageTest.this.nodeService.addAspect(
                                 RuleServiceCoverageTest.this.nodeRef, 
@@ -896,11 +896,11 @@ public class RuleServiceCoverageTest extends TestCase
         
         this.ruleService.saveRule(this.nodeRef, rule);
          
-        List<NodeRef> list = (List<NodeRef>)TransactionUtil.executeInUserTransaction(
+        List<NodeRef> list = TransactionUtil.executeInUserTransaction(
         		this.transactionService,
-        		new TransactionUtil.TransactionWork()
+        		new TransactionUtil.TransactionWork<List<NodeRef>>()
         		{
-					public Object doWork()
+					public List<NodeRef> doWork()
 					{
 						// Create a new node and check-it out
 				        NodeRef newNodeRef = RuleServiceCoverageTest.this.nodeService.createNode(
