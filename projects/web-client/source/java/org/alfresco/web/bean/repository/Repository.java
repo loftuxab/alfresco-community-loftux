@@ -30,6 +30,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.configuration.ConfigurableService;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
@@ -414,7 +415,7 @@ public final class Repository
       MimetypeService mimetypeService = (MimetypeService)getServiceRegistry(context).getMimetypeService();
       
       // fall back to binary mimetype if no match found
-      String mimetype = "application/octet-stream";
+      String mimetype = MimetypeMap.MIMETYPE_BINARY;
       int extIndex = filename.lastIndexOf('.');
       if (extIndex != -1)
       {
