@@ -5,5 +5,9 @@
 
     <import resource="classpath:alfresco/application-context.xml" />
 
-
+    <bean id="JCR.Repository" class="org.alfresco.jcr.repository.RepositoryImpl">
+        <property name="authenticationService"><ref bean="authenticationService"/></property>
+        <property name="serviceRegistry"><ref bean="ServiceRegistry"/></property>
+    </bean>
+    
 </beans>

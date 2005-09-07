@@ -28,4 +28,14 @@
       </war>
    </target>
       
+   <target name="deploy-tck" depends="package">
+      <copy file="${dir.dist}/${file.name.war.tck}" todir="${dir.deploy.tck}/bin/tck-webapp/webapps" /> 
+   </target>  
+   
+   <target name="start-tck" depends="init">
+      <exec dir="${dir.deploy.tck}/bin/tck-webapp" executable="cmd.exe" spawn="true">
+         <arg line="/k start server.bat" />
+      </exec>
+   </target>  
+   
 </project>

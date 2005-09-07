@@ -114,11 +114,9 @@ public final class QName implements QNamePattern, Serializable
         if (qname != null)
         {
             int colonIndex = qname.indexOf(NAMESPACE_PREFIX);
-            if(colonIndex == -1)
-            {
-                throw new InvalidQNameException("QName '" + qname + "' must be a prefix and local name");
-            }
-            name = createQName(qname.substring(0, colonIndex), qname.substring(colonIndex+1), prefixResolver);
+            String prefix = (colonIndex == -1) ? NamespaceService.DEFAULT_PREFIX : qname.substring(0, colonIndex);
+            String localName = (colonIndex == -1) ? qname : qname.substring(colonIndex +1);
+            name = createQName(prefix, localName, prefixResolver);
         }
         return name;
     }
@@ -342,6 +340,4 @@ public final class QName implements QNamePattern, Serializable
         return (prefix == null) ? "" : prefix + NAMESPACE_PREFIX + localName;
     }
 
-
-    
 }

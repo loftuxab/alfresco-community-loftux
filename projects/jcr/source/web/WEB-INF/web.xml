@@ -23,7 +23,7 @@
    
    <servlet>
       <servlet-name>Repository Startup</servlet-name>
-      <servlet-class>org.alfresco.jcr.server.RepositoryStartupServlet</servlet-class>
+      <servlet-class>org.alfresco.jcr.tck.RepositoryStartupServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
    </servlet>
    
