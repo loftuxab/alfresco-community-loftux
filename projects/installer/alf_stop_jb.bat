@@ -8,9 +8,9 @@ rem Shutdown JBoss
 rem ---------------------------------------
 
 echo Shutting down JBoss...
-cd \alfresco\jboss
+cd jboss
 call bin\shutdown.bat -S
-cd \alfresco
+cd ..
 
 rem ---------------------------------------
 rem Shutdown MySQL

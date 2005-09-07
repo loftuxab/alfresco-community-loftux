@@ -8,9 +8,9 @@ rem Shutdown Tomcat
 rem ---------------------------------------
 
 echo Shutting down Tomcat...
-cd \alfresco\tomcat
+cd tomcat
 call bin\shutdown.bat
-cd \alfresco
+cd ..
 
 rem ---------------------------------------
 rem Shutdown MySQL

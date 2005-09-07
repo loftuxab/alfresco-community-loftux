@@ -23,9 +23,9 @@ rem Start Tomcat
 rem ---------------------------------------
 
 echo Starting Tomcat...
-cd \alfresco\tomcat
+cd tomcat
 call bin\startup.bat
-cd \alfresco
+cd ..
 
 rem ---------------------------------------
 rem Start OpenOffice for transformations

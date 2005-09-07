@@ -205,7 +205,7 @@ JBoss:
 . If the following errors are reported on the console:
 ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
 ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available: Failed to execute command: imconvert ...
-  The are not issues which will cause the server to fail, Alfresco is reporting the fact that various external document transformation engines are not available for use by the server. Either follow the instructions at the bottom of the Release Notes Wiki page:
+  These are not issues which will cause the server to fail, Alfresco is reporting the fact that various external document transformation engines are not available for use by the server. Either follow the instructions at the bottom of the Release Notes Wiki page:
  - http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
   or remove the transformer references completely if you don't require them:
  - http://www.alfresco.org/forums/viewtopic.php?t=90

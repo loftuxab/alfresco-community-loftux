@@ -22,9 +22,9 @@ rem Start JBoss
 rem ---------------------------------------
 
 echo Starting JBoss...
-cd \alfresco\jboss
+cd jboss
 start "JBoss Server" cmd /c bin\run.bat
-cd \alfresco
+cd ..
 
 rem ---------------------------------------
 rem Start OpenOffice for transformations
