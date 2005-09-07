@@ -447,6 +447,19 @@ public class Application
    }
    
    /**
+    * Helper to get the ConfigService instance
+    * 
+    * @param context        FacesContext
+    * 
+    * @return ConfigService
+    */
+   public static ConfigService getConfigService(FacesContext context)
+   {
+      return (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean(
+            Application.BEAN_CONFIG_SERVICE);
+   }
+   
+   /**
     * Returns the repository store URL (retrieved from config service)
     * 
     * @param context The spring context

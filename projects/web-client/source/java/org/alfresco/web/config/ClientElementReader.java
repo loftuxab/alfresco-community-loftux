@@ -33,13 +33,16 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_CLIENT = "client";
    public static final String ELEMENT_PAGESIZE = "page-size";
    public static final String ELEMENT_LIST = "list";
-   public static final String ELEMENT_DETAILS ="details";
+   public static final String ELEMENT_DETAILS = "details";
    public static final String ELEMENT_ICONS = "icons";
    public static final String ELEMENT_DEFAULTVIEW = "default-view";
    public static final String ELEMENT_RECENTSPACESITEMS = "recent-spaces-items";
    public static final String ELEMENT_LANGUAGES = "languages";
    public static final String ELEMENT_LANGUAGE = "language";
    public static final String ATTRIBUTE_LOCALE = "locale";
+   public static final String ELEMENT_TEMPLATES = "templates";
+   public static final String ELEMENT_ENGINE = "engine";
+   public static final String ATTRIBUTE_NAME = "name";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -102,6 +105,26 @@ public class ClientElementReader implements ConfigElementReader
                {
                   // store the language code against the display label
                   configElement.addLanguage(localeCode, label);
+               }
+            }
+         }
+         
+         // get the template sub-element
+         Element templates = element.element(ELEMENT_TEMPLATES);
+         if (templates != null)
+         {
+            Iterator<Element> tempItr = templates.elementIterator(ELEMENT_ENGINE);
+            while (tempItr.hasNext())
+            {
+               Element engine = tempItr.next();
+               String templateName = engine.attributeValue(ATTRIBUTE_NAME);
+               String templateEngine = engine.getTextTrim();
+               
+               if (templateName != null && templateName.length() != 0 &&
+                   templateEngine != null && templateEngine.length() != 0)
+               {
+                  // store the template processor class name against the unique name
+                  configElement.addTemplateProcessor(templateName, templateEngine);
                }
             }
          }

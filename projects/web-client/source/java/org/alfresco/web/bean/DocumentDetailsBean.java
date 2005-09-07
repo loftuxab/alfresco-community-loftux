@@ -45,6 +45,7 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewRuleWizard;
 import org.alfresco.web.ui.common.component.UIActionLink;
+import org.alfresco.web.ui.repo.component.template.TemplateNode;
 import org.apache.log4j.Logger;
 
 /**
@@ -62,6 +63,7 @@ public class DocumentDetailsBean
    private LockService lockService;
    private CopyService copyService;
    private VersionService versionService;
+   private NavigationBean navigator;
    
    private Map<String, String> workflowProperties;
 
@@ -910,6 +912,23 @@ public class DocumentDetailsBean
    }
    
    /**
+    * Returns a model for use by a template on the Document Details page.
+    * 
+    * @return model containing current document and current space info.
+    */
+   public Map getTemplateModel()
+   {
+      HashMap model = new HashMap(3, 1.0f);
+      
+      TemplateNode documentNode = new TemplateNode(getDocument().getNodeRef(), this.nodeService);
+      model.put("document", documentNode);
+      TemplateNode spaceNode = new TemplateNode(this.navigator.getCurrentNode().getNodeRef(), this.nodeService);
+      model.put("space", spaceNode);
+      
+      return model;
+   }
+   
+   /**
     * Returns whether the current document is locked
     * 
     * @return true if the document is checked out
@@ -997,5 +1016,13 @@ public class DocumentDetailsBean
    public void setCopyService(CopyService copyService)
    {
       this.copyService = copyService;
+   }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
    }
 }

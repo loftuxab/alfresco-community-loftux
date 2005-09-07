@@ -30,12 +30,12 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author gavinc
  */
-public final class QNameMap<K,V> implements Map
+public final class QNameMap<K,V> implements Map, Cloneable
 {
-   private Log logger = LogFactory.getLog(QNameMap.class);
-   private Map<String, Object> contents = new HashMap<String, Object>(7, 1.0f);
-   private Node parent;
-   private Map<String, NodePropertyResolver> resolvers = new HashMap<String, NodePropertyResolver>(7, 1.0f);
+   private static Log logger = LogFactory.getLog(QNameMap.class);
+   private Map<String, Object> contents = new HashMap<String, Object>(11, 1.0f);
+   private Node parent = null;
+   private Map<String, NodePropertyResolver> resolvers = new HashMap<String, NodePropertyResolver>(11, 1.0f);
    
    /**
     * Constructor
@@ -193,5 +193,19 @@ public final class QNameMap<K,V> implements Map
    public String toString()
    {
       return this.contents.toString();
+   }
+   
+   /**
+    * Shallow copy the map by copying keys and values into a new QNameMap
+    */
+   public Object clone()
+   {
+      QNameMap map = new QNameMap(this.parent);
+      map.putAll(this);
+      if (this.resolvers.size() != 0)
+      {
+         map.resolvers = (Map)((HashMap)this.resolvers).clone();
+      }
+      return map;
    }
 }

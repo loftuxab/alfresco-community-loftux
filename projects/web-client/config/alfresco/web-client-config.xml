@@ -15,6 +15,12 @@
    <config>
       <server>
          <error-page>/jsp/error.jsp</error-page>
+         <error-pages>
+            <error-page>/jsp/error.jsp</error-page>
+            <error-page type="org.alfresco.service.cmr.repository.InvalidNodeRefException">
+               /jsp/error_missing.jsp
+            </error-page>
+         </error-pages>
          <login-page>/jsp/login.jsp</login-page>
       </server>
       <repository>
@@ -30,9 +36,9 @@
          <!-- specifies the list of available language files -->
          <languages>
             <language locale="en_US">English</language>
-            <!--<language locale="fr_FR">French</language>-->
-            <!--<language locale="de_DE">German</language>-->
-            <!--<language locale="ja_JP">Japanese</language>-->
+            <!-- <language locale="fr_FR">French</language> -->
+            <!-- <language locale="de_DE">German</language> -->
+            <!-- <language locale="ja_JP">Japanese</language> -->
          </languages>
          
          <!-- specifies the maximum page size for each view mode in the browse screen -->
@@ -48,6 +54,12 @@
          
          <!-- specified the maximum number of items to show in the recent spaces shelf component -->
          <recent-spaces-items>6</recent-spaces-items>
+         
+         <!-- list of template engine implementations -->
+         <templates>
+            <!-- FreeMarker engine is the default -->
+            <engine name="freemarker">org.alfresco.web.ui.repo.component.template.FreeMarkerProcessor</engine>
+         </templates>
       </client>
    </config>
    

@@ -39,14 +39,14 @@ public class ClientConfigElement extends ConfigElementAdapter
    private int recentSpacesItems = 6;
    private boolean unicodeFont = false;
    private Map<String, String> languages = new HashMap<String, String>();
-   
+   private Map<String, String> processors = new HashMap<String, String>();
    
    /**
     * Default Constructor
     */
    public ClientConfigElement()
    {
-      super("client");
+      super(CONFIG_ELEMENT_ID);
    }
    
    /**
@@ -153,7 +153,7 @@ public class ClientConfigElement extends ConfigElementAdapter
     * @param locale     Locale code
     * @param label      Display label
     */
-   public void addLanguage(String locale, String label)
+   /*package*/ void addLanguage(String locale, String label)
    {
       this.languages.put(locale, label);
    }
@@ -166,5 +166,28 @@ public class ClientConfigElement extends ConfigElementAdapter
    public Map<String, String> getLanguageMap()
    {
       return this.languages;
+   }
+   
+   /**
+    * Add a template processor to the map.
+    * 
+    * @param name       Unique name of the template processor
+    * @param processor  Fully qualified class name of the template processor
+    */
+   /*package*/ void addTemplateProcessor(String name, String processor)
+   {
+      this.processors.put(name, processor);
+   }
+   
+   /**
+    * Return the template processor with the specified name
+    * 
+    * @param name   Unique name of the template processor
+    * 
+    * @return Template processor or null if not found
+    */
+   public String getTemplateProcessor(String name)
+   {
+      return this.processors.get(name);
    }
 }

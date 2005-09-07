@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UIDynamicDescription extends SelfRenderingComponent
 {
-   private Log logger = LogFactory.getLog(UIDynamicDescription.class);
+   private static Log logger = LogFactory.getLog(UIDynamicDescription.class);
    private String selected;
    private String functionName;
    

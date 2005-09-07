@@ -38,16 +38,15 @@ public class Node implements Serializable
 
    private static Log logger = LogFactory.getLog(Node.class);
    
-   private NodeRef nodeRef;
+   protected NodeRef nodeRef;
    private String name;
    private QName type;
    private String path;
    private String id;
    private Set<QName> aspects = null;
-   private QNameMap<String, Object> properties = null;
-   private List<String> propertyNames = null;
+   private QNameMap<String, Object> properties;
    private boolean propsRetrieved = false;
-   private NodeService nodeService;
+   protected NodeService nodeService;
    
    /**
     * Constructor
@@ -215,12 +214,6 @@ public class Node implements Serializable
       this.properties.clear();
       this.propsRetrieved = false;
       this.aspects = null;
-      
-      if (this.propertyNames != null)
-      {
-         this.propertyNames.clear();
-      }
-      this.propertyNames = null;
    }
    
    /**
@@ -230,7 +223,7 @@ public class Node implements Serializable
    {
       if (this.nodeService != null)
       {
-         return "Node Type: " + this.type + 
+         return "Node Type: " + getType() + 
                 "\nNode Properties: " + this.getProperties().toString() + 
                 "\nNode Aspects: " + this.getAspects().toString();
       }
