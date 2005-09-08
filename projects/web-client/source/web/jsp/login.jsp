@@ -23,6 +23,8 @@
 <%@ page buffer="16kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 
+<body bgcolor="#ffffff" style="background-image: url(<%=request.getContextPath()%>/images/logo/AlfrescoFadedBG.png); background-repeat: no-repeat; background-attachment: fixed">
+
 <r:page titleId="title_login">
 
 <f:view>
@@ -129,3 +131,5 @@
 </script>
 
 </r:page>
+
+</body>

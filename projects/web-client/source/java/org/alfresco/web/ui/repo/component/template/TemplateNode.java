@@ -55,6 +55,8 @@ import org.alfresco.web.ui.repo.WebResources;
  */
 public class TemplateNode extends Node
 {
+   private final static String NAMESPACE_BEGIN = "" + QName.NAMESPACE_BEGIN;
+   
    /** The children of this node */
    private List<TemplateNode> children = null;
    
@@ -153,6 +155,32 @@ public class TemplateNode extends Node
       }
       
       return isDocument.booleanValue();
+   }
+   
+   /**
+    * @param aspect The aspect name to test for
+    * 
+    * @return true if the node has the aspect false otherwise
+    */
+   public boolean hasAspect(String aspect)
+   {
+      if (aspect.startsWith(NAMESPACE_BEGIN))
+      {
+         return super.hasAspect(QName.createQName(aspect));
+      }
+      else
+      {
+         boolean found = false;
+         for (QName qname : getAspects())
+         {
+            if (qname.toPrefixString().equals(aspect))
+            {
+               found = true;
+               break;
+            }
+         }
+         return found;
+      }
    }
    
    /**

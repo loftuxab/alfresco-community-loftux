@@ -17,13 +17,11 @@
 package org.alfresco.web.ui.repo.component.template;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
-import javax.transaction.UserTransaction;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -32,7 +30,6 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ClientConfigElement;
-import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 import org.apache.log4j.Logger;
 
@@ -42,6 +39,7 @@ import org.apache.log4j.Logger;
 public class UITemplate extends SelfRenderingComponent
 {
    private final static String ENGINE_DEFAULT = "freemarker";
+   private final static String TEMPLATE_KEY = "_template_";
    
    private static Logger logger = Logger.getLogger(UITemplate.class);
    
@@ -122,38 +120,64 @@ public class UITemplate extends SelfRenderingComponent
             startTime = System.currentTimeMillis();
          }
          
+         // process the template against the model
+         getTemplateProcessor(procName).process(getTemplate(), model, context.getResponseWriter());
+         
+         if (logger.isDebugEnabled())
+         {
+            long endTime = System.currentTimeMillis();
+            logger.debug("Time to process template: " + (endTime - startTime) + "ms");
+         }
+      }
+   }
+   
+   /**
+    * Get the named template processor instance
+    * 
+    * @param name       Name of the processor instance to create
+    * 
+    * @return ITemplateProcessor
+    */
+   private ITemplateProcessor getTemplateProcessor(String name)
+   {
+      // we use the session as a cache for the template processor
+      // the processor is not thread safe, so we don't want to share it with other users
+      // but we don't want to create one everytime we need it either 
+      FacesContext context = FacesContext.getCurrentInstance();
+      ITemplateProcessor proc = (ITemplateProcessor)context.getExternalContext().getSessionMap().get(TEMPLATE_KEY + name);
+      if (proc == null)
+      {
          try
          {
-            // instantiate
-            Object obj = Class.forName(procName).newInstance();
+            // instantiate as required
+            Object obj = Class.forName(name).newInstance();
             if (obj instanceof ITemplateProcessor)
             {
-               ((ITemplateProcessor)obj).process(getTemplate(), model, context.getResponseWriter());
-               
-               if (logger.isDebugEnabled())
-               {
-                  long endTime = System.currentTimeMillis();
-                  logger.debug("Time to process template: " + (endTime - startTime) + "ms");
-               }
+               proc = (ITemplateProcessor)obj;
             }
             else
             {
-               logger.error("Supplied template processor does not implement ITemplateProcessor: " + procName);
+               logger.error("Supplied template processor does not implement ITemplateProcessor: " + name);
             }
          }
          catch (ClassNotFoundException err1)
          {
-            logger.error("Unable to load class for supplied template processor: " + procName);
+            logger.error("Unable to load class for supplied template processor: " + name);
          }
          catch (IllegalAccessException err2)
          {
-            logger.error("Unable to load class for supplied template processor: " + procName);
+            logger.error("Unable to load class for supplied template processor: " + name);
          }
          catch (InstantiationException err3)
          {
-            logger.error("Unable to instantiate class for supplied template processor: " + procName);
+            logger.error("Unable to instantiate class for supplied template processor: " + name);
          }
+         
+         // cache processor instance in the session
+         context.getExternalContext().getSessionMap().put(TEMPLATE_KEY + name, proc);
       }
+      
+      return proc;
    }
    
    
@@ -220,6 +244,9 @@ public class UITemplate extends SelfRenderingComponent
          
          // supply the current user Node as "person"
          root.put("person", new TemplateNode(user.getPerson(), nodeService));
+         
+         // add custom method objects
+         root.put("hasAspect", new HasAspectMethod());
          
          // merge models
          if (model instanceof Map)

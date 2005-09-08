@@ -39,6 +39,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
+ * FreeMarker implementation the template processor interface
+ * 
  * @author Kevin Roast
  */
 public class FreeMarkerProcessor implements ITemplateProcessor
@@ -59,7 +61,7 @@ public class FreeMarkerProcessor implements ITemplateProcessor
       Configuration config = new Configuration();
       
       // setup template cache
-      config.setCacheStorage(new MruCacheStorage(10, 0));
+      config.setCacheStorage(new MruCacheStorage(20, 0));
       
       // use our custom loader to find templates on the ClassPath
       //config.setTemplateLoader(new ClassPathTemplateLoader());
