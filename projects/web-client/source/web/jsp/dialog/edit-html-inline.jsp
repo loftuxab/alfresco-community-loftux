@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_edit_file_inline">
+<r:page titleId="title_edit_html_inline">
 
 <script language="javascript" type="text/javascript" src="<%=request.getContextPath()%>/scripts/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript">
@@ -50,8 +50,6 @@
       document.forms['edit-file']['edit-file:editorOutput'].value = content;
    }
    
-   var isIE = (document.all);
-   
 </script>
 
 
@@ -60,7 +58,6 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <%-- set the form name here --%>
    <h:form acceptCharset="UTF-8" id="edit-file">
    
    <%-- Main outer table --%>
@@ -165,6 +162,7 @@
                            </td>
                         </tr>
                         
+                        <%-- Inline editor --%>
                         <tr>
                            <td width="100%" valign="top" height="100%">
                               <div id='editor' style='width:100%; height:360px'>

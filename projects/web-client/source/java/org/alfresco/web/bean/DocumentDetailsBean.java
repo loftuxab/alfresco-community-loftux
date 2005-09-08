@@ -808,8 +808,12 @@ public class DocumentDetailsBean
          // add the inlineeditable aspect to the node
          Map<QName, Serializable> props = new HashMap<QName, Serializable>(1, 1.0f);
          String contentType = (String)getDocument().getProperties().get("mimetype");
-         // set the property to true by default if the filetype is HTML content
-         if (MimetypeMap.MIMETYPE_HTML.equals(contentType))
+         
+         // set the property to true by default if the filetype is text/HTML content
+         if (MimetypeMap.MIMETYPE_HTML.equals(contentType) ||
+             MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(contentType) ||
+             MimetypeMap.MIMETYPE_XML.equals(contentType) ||
+             MimetypeMap.MIMETYPE_TEXT_CSS.equals(contentType))
          {
             props.put(ContentModel.PROP_EDITINLINE, true);
          }

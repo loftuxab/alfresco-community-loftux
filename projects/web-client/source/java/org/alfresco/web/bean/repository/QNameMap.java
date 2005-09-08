@@ -99,12 +99,12 @@ public final class QNameMap<K,V> implements Map, Cloneable
     */
    public Object get(Object key)
    {
-      String qnameKey = Repository.resolveToQNameString((String)key);
+      String qnameKey = Repository.resolveToQNameString(key.toString());
       Object obj = this.contents.get(qnameKey);
       if (obj == null)
       {
          // if a property resolver exists for this property name then invoke it
-         NodePropertyResolver resolver = this.resolvers.get((String)key);
+         NodePropertyResolver resolver = this.resolvers.get(key.toString());
          if (resolver != null)
          {
             obj = resolver.get(this.parent);

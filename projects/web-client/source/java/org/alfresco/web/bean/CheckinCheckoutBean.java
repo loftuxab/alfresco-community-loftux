@@ -27,12 +27,14 @@ import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
@@ -278,7 +280,7 @@ public class CheckinCheckoutBean
    }
    
    /**
-    * @return Returns the document content used for in-line editing.
+    * @return Returns the document content used for HTML in-line editing.
     */
    public String getDocumentContent()
    {
@@ -286,7 +288,7 @@ public class CheckinCheckoutBean
    }
    
    /**
-    * @param documentContent     The document content for in-line editing.
+    * @param documentContent     The document content for HTML in-line editing.
     */
    public void setDocumentContent(String documentContent)
    {
@@ -518,18 +520,37 @@ public class CheckinCheckoutBean
          
          // detect the inline editing aspect to see which edit mode to use
          if (node.hasAspect(ContentModel.ASPECT_INLINEEDITABLE) &&
-             node.getProperties().get("app:editInline") != null &&
-             ((Boolean)node.getProperties().get("app:editInline")).booleanValue() == true)
+             node.getProperties().get(ContentModel.PROP_EDITINLINE) != null &&
+             ((Boolean)node.getProperties().get(ContentModel.PROP_EDITINLINE)).booleanValue() == true)
          {
             // found a document that can be edited in-line
-            // retrieve the content so it's available to the editing screen
-            ContentReader reader = getContentService().getReader(node.getNodeRef());
-            setDocumentContent(reader.getContentString());
-            setEditorOutput(null);
+            String mimetype = (String)node.getProperties().get(ContentModel.PROP_MIME_TYPE);
             
-            // navigate to appropriate screen
-            FacesContext fc = FacesContext.getCurrentInstance();
-            fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "editInline");
+            // retrieve the content reader for this node
+            ContentReader reader = getContentService().getReader(node.getNodeRef());
+            
+            // calculate which editor screen to display
+            if (MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(mimetype) ||
+                MimetypeMap.MIMETYPE_XML.equals(mimetype) ||
+                MimetypeMap.MIMETYPE_TEXT_CSS.equals(mimetype))
+            {
+               // make content available to the editing screen
+               setEditorOutput(reader.getContentString());
+               
+               // navigate to appropriate screen
+               FacesContext fc = FacesContext.getCurrentInstance();
+               fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "editTextInline");
+            }
+            else
+            {
+               // make content available to the editing screen
+               setDocumentContent(reader.getContentString());
+               setEditorOutput(null);
+               
+               // navigate to appropriate screen
+               FacesContext fc = FacesContext.getCurrentInstance();
+               fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "editHtmlInline");
+            }
          }
          else
          {
@@ -856,7 +877,7 @@ public class CheckinCheckoutBean
    /** The working copy of the document we are checking out */
    private Node workingDocument;
    
-   /** Content of the document used for in-line editing */
+   /** Content of the document used for HTML in-line editing */
    private String documentContent;
    
    /** Content of the document returned from in-line editing */

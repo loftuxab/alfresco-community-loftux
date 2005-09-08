@@ -114,8 +114,12 @@
          <to-view-id>/jsp/dialog/edit-file.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>editInline</from-outcome>
-         <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
+         <from-outcome>editHtmlInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-html-inline.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editTextInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-text-inline.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>inviteUsers</from-outcome>
@@ -144,7 +148,15 @@
    </navigation-rule>
    
    <navigation-rule>
-      <from-view-id>/jsp/dialog/edit-file-inline.jsp</from-view-id>
+      <from-view-id>/jsp/dialog/edit-text-inline.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>checkoutFile</from-outcome>
+         <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/edit-html-inline.jsp</from-view-id>
       <navigation-case>
          <from-outcome>checkoutFile</from-outcome>
          <to-view-id>/jsp/dialog/checkout-file.jsp</to-view-id>
@@ -226,8 +238,12 @@
          <to-view-id>/jsp/dialog/edit-file.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>editInline</from-outcome>
-         <to-view-id>/jsp/dialog/edit-file-inline.jsp</to-view-id>
+         <from-outcome>editHtmlInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-html-inline.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>editTextInline</from-outcome>
+         <to-view-id>/jsp/dialog/edit-text-inline.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>editSimpleWorkflow</from-outcome>
