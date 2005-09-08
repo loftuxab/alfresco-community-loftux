@@ -34,7 +34,6 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
-import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
@@ -535,7 +534,14 @@ public class CheckinCheckoutBean
                 MimetypeMap.MIMETYPE_TEXT_CSS.equals(mimetype))
             {
                // make content available to the editing screen
-               setEditorOutput(reader.getContentString());
+               if (reader != null)
+               {
+                  setEditorOutput(reader.getContentString());
+               }
+               else
+               {
+                  setEditorOutput("");
+               }
                
                // navigate to appropriate screen
                FacesContext fc = FacesContext.getCurrentInstance();
@@ -544,7 +550,14 @@ public class CheckinCheckoutBean
             else
             {
                // make content available to the editing screen
-               setDocumentContent(reader.getContentString());
+               if (reader != null)
+               {
+                  setDocumentContent(reader.getContentString());
+               }
+               else
+               {
+                  setDocumentContent("");
+               }
                setEditorOutput(null);
                
                // navigate to appropriate screen
