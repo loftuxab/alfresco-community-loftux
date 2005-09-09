@@ -18,8 +18,7 @@
    <types>
       
 	  <type name="ver:versionMetaDataValue">
-         <parent>sys:base</parent>
-         
+         <parent>sys:base</parent>         
          <properties>
             <property name="ver:metaDataName">
                <type>d:text</type>
@@ -31,8 +30,7 @@
       </type>
 	  
       <type name="ver:versionedProperty">
-         <parent>sys:base</parent>
-         
+         <parent>sys:base</parent>         
          <properties>
             <property name="ver:qname">
                <type>d:text</type>
@@ -44,8 +42,7 @@
       </type>
 
       <type name="ver:versionedAssoc">
-         <parent>sys:reference</parent>
-         
+         <parent>sys:reference</parent>         
          <properties>
             <property name="ver:assocQName">
                <type>d:qname</type>
@@ -54,8 +51,7 @@
       </type>
       
       <type name="ver:versionedChildAssoc">
-         <parent>ver:versionedAssoc</parent>
-         
+         <parent>ver:versionedAssoc</parent>         
          <properties>
             <property name="ver:isPrimary">
                <type>d:boolean</type>
@@ -67,8 +63,7 @@
       </type>
 
       <type name="ver:version">
-         <parent>sys:container</parent>
-         
+         <parent>sys:container</parent>         
          <properties>
             <property name="ver:versionNumber">
                <type>d:int</type>

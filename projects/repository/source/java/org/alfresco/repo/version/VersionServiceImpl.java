@@ -60,11 +60,14 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 								implements VersionService, VersionModel
 {
     /**
-     * Error messages
+     * Error message I18N id's
      */
-    private static final String ERR_NOT_FOUND = "The current version could not be found in the light weight store.";
-    private static final String ERR_NO_BRANCHES = "The current implmentation of the light weight version store does " +
-                                                    "not support the creation of branches.";
+    private static final String MSGID_ERR_NOT_FOUND = "version_service.err_not_found";
+    private static final String MSGID_ERR_NO_BRANCHES = "version_service.err_unsupported";
+    private static final String MSGID_ERR_RESTORE_EXISTS = "version_service.err_restore_exists";
+    private static final String MSGID_ERR_ONE_PRECEEDING = "version_service.err_one_preceeding";
+    private static final String MSGID_ERR_RESTORE_NO_VERSION = "version_service.err_restore_no_version";
+    private static final String MSGID_ERR_REVERT_MISMATCH = "version_service.err_revert_mismatch";
     
     /**
      * The version counter service
@@ -268,7 +271,10 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 
 		// Copy the version properties (to prevent unexpected side effects to the caller)
 		Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
-		versionProperties.putAll(origVersionProperties);
+        if (origVersionProperties != null)
+        {
+            versionProperties.putAll(origVersionProperties);
+        }
 		
         // Check for the version aspect
         checkForVersionAspect(nodeRef);
@@ -305,7 +311,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             
             if (currentVersionRef == null)
             {
-                throw new VersionServiceException(ERR_NOT_FOUND);
+                throw new VersionServiceException(MSGID_ERR_NOT_FOUND);
             }
             
             // Need to check that we are not about to create branch since this is not currently supported
@@ -313,7 +319,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             Version currentVersion = getVersion(currentVersionRef);
             if (versionHistory.getSuccessors(currentVersion).size() != 0)
             {
-                throw new VersionServiceException(ERR_NO_BRANCHES);
+                throw new VersionServiceException(MSGID_ERR_NO_BRANCHES);
             }
         }
         
@@ -402,6 +408,15 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		return version;
 	}
 	
+    /**
+     * Get a map containing the standard list of version properties populated.
+     * 
+     * @param versionProperties     the version meta data properties
+     * @param nodeRef               the node reference
+     * @param preceedingNodeRef     the preceeding node reference
+     * @param versionNumber         the version number
+     * @return                      the standard version properties
+     */
 	private Map<QName, Serializable> getStandardVersionProperties(Map<String, Serializable> versionProperties, NodeRef nodeRef, NodeRef preceedingNodeRef, int versionNumber)
 	{
         Map<QName, Serializable> result = new HashMap<QName, Serializable>(10);
@@ -476,9 +491,10 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     }
     
     /**
-     * 
-     * @param versionNodeRef
-     * @param versionProperties
+     * Store the version meta data
+     *  
+     * @param versionNodeRef        the version node reference
+     * @param versionProperties     the version properties
      */
 	private void storeVersionMetaData(NodeRef versionNodeRef, Map<String, Serializable> versionProperties)
     {
@@ -499,10 +515,11 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     }
 
     /**
-	 * 
-	 * @param nodeDetails
-	 * @param versionNodeRef
-	 * @param aspects
+	 * Freeze the aspects
+     * 
+	 * @param nodeDetails      the node details
+	 * @param versionNodeRef   the version node reference
+	 * @param aspects          the set of aspects
 	 */
     private void freezeAspects(PolicyScope nodeDetails, NodeRef versionNodeRef, Set<QName> aspects) 
 	{
@@ -516,9 +533,10 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	}
 
 	/**
-	 * 
-	 * @param versionNodeRef
-	 * @param associations
+	 * Freeze associations
+     * 
+	 * @param versionNodeRef   the version node reference
+	 * @param associations     the list of associations
 	 */
 	private void freezeAssociations(NodeRef versionNodeRef, List<AssociationRef> associations) 
 	{
@@ -543,9 +561,10 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	}
 
 	/**
-	 * 
-	 * @param versionNodeRef
-	 * @param childAssociations
+	 * Freeze child associations
+     * 
+	 * @param versionNodeRef       the version node reference
+	 * @param childAssociations    the child associations
 	 */
 	private void freezeChildAssociations(NodeRef versionNodeRef, List<ChildAssociationRef> childAssociations) 
 	{
@@ -573,9 +592,10 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 	}
 
 	/**
-	 * 
-	 * @param versionNodeRef
-	 * @param properties
+	 * Freeze properties
+     * 
+	 * @param versionNodeRef   the version node reference
+	 * @param properties       the properties
 	 */
 	private void freezeProperties(NodeRef versionNodeRef, Map<QName, Serializable> properties) 
 	{
@@ -642,7 +662,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             else if (preceedingVersions.size() > 1)
             {
                 // Error since we only currently support one preceeding version
-                throw new VersionServiceException("The light weight version store only supports one preceeding version.");
+                throw new VersionServiceException(MSGID_ERR_ONE_PRECEEDING);
             }     
             else
             {
@@ -797,27 +817,42 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * @see org.alfresco.cms.version.VersionService#revert(NodeRef)
      */
     public void revert(NodeRef nodeRef) 
-    	throws AspectMissingException 
     {
-		// First check that the versionable aspect is present
-		checkForVersionAspect(nodeRef);
-		
-		revert(nodeRef, getCurrentVersion(nodeRef));
+		revert(nodeRef, getCurrentVersion(nodeRef), true);
 	}
+    
+    /**
+     * @see org.alfresco.service.cmr.version.VersionService#revert(org.alfresco.service.cmr.repository.NodeRef, boolean)
+     */
+    public void revert(NodeRef nodeRef, boolean deep) 
+    {
+        revert(nodeRef, getCurrentVersion(nodeRef), deep);
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.version.VersionService#revert(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.version.Version)
+     */
+    public void revert(NodeRef nodeRef, Version version) 
+    {
+        revert(nodeRef, version, true);
+    }
 
     /**
-     * @see org.alfresco.cms.version.VersionService#revert(NodeRef, Version)
+     * @see org.alfresco.service.cmr.version.VersionService#revert(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.version.Version, boolean)
      */
-	public void revert(NodeRef nodeRef, Version version) 
-		throws AspectMissingException 
+	public void revert(NodeRef nodeRef, Version version, boolean deep) 
 	{
 		// Check the mandatory parameters
 		ParameterCheck.mandatory("nodeRef", nodeRef);
 		ParameterCheck.mandatory("version", version);
 		
-		// First check that the versionable aspect is present
-		checkForVersionAspect(nodeRef);
-		
+        // Cross check that the version provided relates to the node reference provided
+        if (nodeRef.getId().equals(version.getVersionProperty(VersionModel.PROP_FROZEN_NODE_ID)) == false)
+        {
+            // Error since the version provided does not correspond to the node reference provided
+            throw new VersionServiceException(MSGID_ERR_REVERT_MISMATCH);
+        }
+        
 		NodeRef versionNodeRef = version.getNodeRef();
 		
 		// Revert the property values
@@ -840,13 +875,14 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 		{
 			this.nodeService.removeAspect(nodeRef, aspect);
 		}
-		// TODO do we need to manually re-apply the versionable aspect (since it is not versioned)
+        
+		// Re-add the versionable aspect to the reverted node
+        this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
 
 		// Add/remove the child nodes
 		List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(nodeRef));
 		for (ChildAssociationRef versionedChild : this.nodeService.getChildAssocs(versionNodeRef)) 
 		{
-		    // TODO: BUG AR112
 			if (children.contains(versionedChild) == false)
 			{			
 				if (this.nodeService.exists(versionedChild.getChildRef()) == true)
@@ -859,8 +895,26 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 				}
 				else
 				{
-					// TODO if the node no longer exists it would be nice to be able to recover the node from the
-					//      version store (if it was versioned)
+                    if (versionedChild.isPrimary() == true)
+                    {
+                        // Only try to resotre missing children if we are doing a deep revert
+                        // Look and see if we have a version history for the child node
+                        if (deep == true && getVersionHistoryNodeRef(versionedChild.getChildRef()) != null)
+                        {
+                            // We're going to try and restore the missing child node and recreate the assoc
+                            restore(
+                               versionedChild.getChildRef(),
+                               nodeRef,
+                               versionedChild.getTypeQName(), 
+                               versionedChild.getQName());
+                        }
+                        // else the deleted child did not have a version history so we can't restore the child
+                        // and so we can't revert the association
+                    }
+                    
+                    // else
+                    // Since this was never a primary assoc and the child has been deleted we won't recreate
+                    // the missing node as it was never owned by the node and we wouldn't know where to put it.
 				}
 			}
 			else
@@ -884,14 +938,108 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
 			{
 				this.nodeService.createAssociation(nodeRef, versionedAssoc.getTargetRef(), versionedAssoc.getTypeQName());
 			}
-			else
-			{
-				// TODO we should restore this from the version service if possible
-			}
+            
+			// else
+            // Since the tareget of the assoc no longer exists we can't recreate the assoc
 		}	
-		
-		// TODO what do we do about the version label (do we reset it the reverted label??)
 	}
+    
+    /**
+     * @see org.alfresco.service.cmr.version.VersionService#restore(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, org.alfresco.service.namespace.QName)
+     */
+     public NodeRef restore(
+                NodeRef nodeRef,
+                NodeRef parentNodeRef, 
+                QName assocTypeQName,
+                QName assocQName)
+     {
+         return restore(nodeRef, parentNodeRef, assocTypeQName, assocQName, true);
+     }
+    
+    /**
+     * @see org.alfresco.service.cmr.version.VersionService#restore(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, org.alfresco.service.namespace.QName, boolean)
+     */
+     public NodeRef restore(
+            NodeRef nodeRef,
+            NodeRef parentNodeRef, 
+            QName assocTypeQName,
+            QName assocQName,
+            boolean deep)
+    {
+        // Check that the node does not exist 
+        if (this.nodeService.exists(nodeRef) == true)
+        {
+            // Error since you can not restore a node that already exists
+            throw new VersionServiceException(MSGID_ERR_RESTORE_EXISTS, new Object[]{nodeRef.toString()});
+        }
+        
+        // Try and get the version details that we want to restore to
+        Version version = getHeadVersion(nodeRef);
+        if (version == null)
+        {
+            // Error since there is no version information available to restore the node from
+            throw new VersionServiceException(MSGID_ERR_RESTORE_NO_VERSION, new Object[]{nodeRef.toString()});
+        }
+        
+        // Set the uuid of the new node
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NODE_UUID, version.getVersionProperty(VersionModel.PROP_FROZEN_NODE_ID));
+        
+        // Get the type of the node node
+        QName type = (QName)version.getVersionProperty(VersionModel.PROP_FROZEN_NODE_TYPE);
+        
+        // Create the restored node
+        NodeRef restoredNodeRef = this.nodeService.createNode(
+                parentNodeRef,
+                assocTypeQName,
+                assocQName,
+                type,
+                props).getChildRef();
+        
+        // Now we need to revert the newly restored node
+        revert(restoredNodeRef, version, deep);
+        
+        return restoredNodeRef;
+    }
+    
+    /**
+     * Get the head version given a node reference
+     * 
+     * @param nodeRef   the node reference
+     * @return          the 'head' version
+     */
+    private Version getHeadVersion(NodeRef nodeRef)
+    {
+        Version version = null;
+        StoreRef storeRef = nodeRef.getStoreRef();
+        
+        NodeRef versionHistoryNodeRef = getVersionHistoryNodeRef(nodeRef);
+        if (versionHistoryNodeRef != null)
+        {
+            List<ChildAssociationRef> versionsAssoc = this.dbNodeService.getChildAssocs(versionHistoryNodeRef, VersionModel.CHILD_QNAME_VERSIONS);
+            for (ChildAssociationRef versionAssoc : versionsAssoc)
+            {
+                NodeRef versionNodeRef = versionAssoc.getChildRef();
+                List<AssociationRef> successors = this.dbNodeService.getTargetAssocs(versionNodeRef, VersionModel.ASSOC_SUCCESSOR);
+                if (successors.size() == 0)
+                {
+                    String storeProtocol = (String)this.dbNodeService.getProperty(
+                            versionNodeRef,
+                            QName.createQName(NAMESPACE_URI, VersionModel.PROP_FROZEN_NODE_STORE_PROTOCOL));
+                    String storeId = (String)this.dbNodeService.getProperty(
+                            versionNodeRef,
+                            QName.createQName(NAMESPACE_URI, VersionModel.PROP_FROZEN_NODE_STORE_ID));
+                    StoreRef versionStoreRef = new StoreRef(storeProtocol, storeId);
+                    if (storeRef.equals(versionStoreRef) == true)
+                    {
+                        version = getVersion(versionNodeRef);
+                    }                
+                }
+            }
+        }
+        
+        return version;
+    }
 
 	/**
 	 * @see org.alfresco.cms.version.VersionService#deleteVersionHistory(NodeRef)

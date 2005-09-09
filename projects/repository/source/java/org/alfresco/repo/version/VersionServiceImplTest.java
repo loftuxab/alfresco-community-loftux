@@ -25,6 +25,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionHistory;
+import org.alfresco.service.cmr.version.VersionServiceException;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -299,6 +300,79 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	assertEquals(aspects2.size(), origAspects.size());
     	
     	// TODO version the reverted node and ensure that the next version is created correctly
+    }
+    
+    /**
+     * Test restore
+     */
+    public void testRestore()
+    {
+        // Try and restore a node without any version history
+        try
+        {
+            this.versionService.restore(
+                    new NodeRef(this.testStoreRef, "123"),
+                    rootNodeRef, 
+                    ContentModel.ASSOC_CHILDREN, 
+                    QName.createQName("{test}MyVersionableNode"));
+            fail("An exception should have been raised since this node has no version history.");
+        }
+        catch (VersionServiceException exception)
+        {
+            // We where expecting this exception
+        }
+        
+        // Create a versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        
+        // Store the node details for later
+        Set<QName> origAspects = this.dbNodeService.getAspects(versionableNode);
+        
+        // Try and restore the node (fail since exist!!)
+        try
+        {
+            this.versionService.restore(
+                    versionableNode,
+                    rootNodeRef, 
+                    ContentModel.ASSOC_CHILDREN, 
+                    QName.createQName("{test}MyVersionableNode"));
+            fail("An exception should have been raised since this node exists and you can't restore a node that exists.");
+        }
+        catch (VersionServiceException exception)
+        {
+            // We where expecting this exception
+        }
+        
+        // Version it
+        this.versionService.createVersion(versionableNode, null);
+        
+        // Delete it
+        this.dbNodeService.deleteNode(versionableNode);
+        assertFalse(this.dbNodeService.exists(versionableNode));
+        
+        // Try and resotre it
+        NodeRef restoredNode = this.versionService.restore(
+                versionableNode, 
+                this.rootNodeRef, 
+                ContentModel.ASSOC_CHILDREN, 
+                QName.createQName("{test}MyVersionableNode"));
+        
+        assertNotNull(restoredNode);
+        assertTrue(this.dbNodeService.exists(restoredNode));
+        
+        // Check that the properties are correct
+        assertEquals(VALUE_1, this.dbNodeService.getProperty(restoredNode, PROP_1));
+        assertEquals(VALUE_2, this.dbNodeService.getProperty(restoredNode, PROP_2));
+        assertEquals(VALUE_3, this.dbNodeService.getProperty(restoredNode, PROP_3));
+        
+        // Check that the content is correct
+        ContentReader contentReader2 = this.contentService.getReader(restoredNode);
+        assertNotNull(contentReader2);
+        assertEquals(TEST_CONTENT, contentReader2.getContentString());
+        
+        // Check that the aspects have been reverted correctly
+        Set<QName> aspects2 = this.dbNodeService.getAspects(restoredNode);
+        assertEquals(aspects2.size(), origAspects.size());
     }
     
     /**

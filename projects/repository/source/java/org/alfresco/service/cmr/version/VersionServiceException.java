@@ -16,32 +16,34 @@
  */
 package org.alfresco.service.cmr.version;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 /**
  * Version service exception class.
  * 
  * @author Roy Wetherall
  */
-public class VersionServiceException extends RuntimeException
-{     
+public class VersionServiceException extends AlfrescoRuntimeException
+{   
     private static final long serialVersionUID = 3544671772030349881L;
-
-    public VersionServiceException()
+    
+    public VersionServiceException(String msgId, Throwable cause)
     {
-        super();
+        super(msgId, cause);
     }
 
-    public VersionServiceException(String message)
+    public VersionServiceException(String msgId, Object[] msgParams, Throwable cause)
     {
-        super(message);
+        super(msgId, msgParams, cause);
     }
 
-    public VersionServiceException(String message, Throwable cause)
+    public VersionServiceException(String msgId, Object[] msgParams)
     {
-        super(message, cause);
+        super(msgId, msgParams);
     }
 
-    public VersionServiceException(Throwable cause)
+    public VersionServiceException(String msgId)
     {
-        super(cause);
+        super(msgId);
     }
 }

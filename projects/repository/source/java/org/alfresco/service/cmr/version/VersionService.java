@@ -23,6 +23,7 @@ import java.util.Map;
 import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Interface for public and internal version operations.
@@ -145,34 +146,103 @@ public interface VersionService
 	
 	/**
 	 * The node reference will be reverted to the current version.
+     * <p>
+     * A deep revert will be performed.
 	 * 
-	 * @see VersionService#revert(NodeRef, Version)
+	 * @see VersionService#revert(NodeRef, Version, boolean)
 	 * 
 	 * @param 	nodeRef					the node reference
-	 * @throws	AspectMissingException	thrown if the version aspect is missing
 	 */
-	public void revert(NodeRef nodeRef)
-		throws AspectMissingException;
+	public void revert(NodeRef nodeRef);
+    
+    /**
+     * The node reference will be reverted to the current version.
+     * 
+     * @see VersionService#revert(NodeRef, Version, boolean)
+     * 
+     * @param nodeRef                       the node reference
+     * @param deep                          true if a deep revert is to be performed, flase otherwise
+     */
+    public void revert(NodeRef nodeRef, boolean deep);
+    
+    /**
+     * A deep revert will take place by default.
+     * 
+     * @see VersionService#revert(NodeRef, Version, boolean)
+     *  
+     * @param nodeRef   the node reference
+     * @param version   the version to revert to
+     */
+    public void revert(NodeRef nodeRef, Version version);
 	
 	/**
 	 * Revert the state of the node to the specified version.  
 	 * <p>
 	 * Any changes made to the node will be lost and the state of the node will reflect
-	 * that of the node when the node was versioned.
+	 * that of the version specified.
 	 * <p>
-	 * The version label property on the node reference will be changed to reflect the 
-	 * associated version. ???
+	 * The version label property on the node reference will remain unchanged. 
 	 * <p>
 	 * If the node is further versioned then the new version will be created at the head of 
 	 * the version history graph.  A branch will not be created.
+     * <p>
+     * If a deep revert is to be performed then any child nodes that are no longer present will
+     * be deep restored (if appropriate) otherwise child associations to deleted, versioned nodes
+     * will not be restored.
 	 * 
 	 * @param 	nodeRef			the node reference
 	 * @param 	version			the version to revert to
-	 * @throws 	AspectMissingException
-	 * 							thrown if the version aspect is missing
+     * @param   deep            true is a deep revert is to be performed, false otherwise.
 	 */
-	public void revert(NodeRef nodeRef, Version version)
-		throws AspectMissingException;
+	public void revert(NodeRef nodeRef, Version version, boolean deep);
+    
+    /**
+     * By default a deep restore is performed.
+     * 
+     * @see org.alfresco.service.cmr.version.VersionService#restore(NodeRef, NodeRef, QName, QName, boolean)
+     * 
+     * @param nodeRef           the node reference to a node that no longer exists in the store
+     * @param parentNodeRef     the new parent of the restored node
+     * @param assocTypeQName    the assoc type qname
+     * @param assocQName        the assoc qname
+     * @return                  the newly restored node reference
+     */
+    public NodeRef restore(
+            NodeRef nodeRef,
+            NodeRef parentNodeRef, 
+            QName assocTypeQName,
+            QName assocQName);
+    
+    /**
+     * Restores a node not currenlty present in the store, but that has a version
+     * history.
+     * <p>
+     * The restored node will be at the head (most resent version).
+     * <p>
+     * Resoration will fail if there is no version history for the specified node id in
+     * the specified store.
+     * <p>
+     * If the node already exists in the store then an exception will be raised.
+     * <p>
+     * Once the node is restored it is reverted to the head version in the appropriate 
+     * version history tree.  If deep is set to true then this will be a deep revert, false 
+     * otherwise.
+     * 
+     * @param nodeRef           the node reference to a node that no longer exists in 
+     *                          the store
+     * @param parentNodeRef     the new parent of the resotred node
+     * @param assocTypeQName    the assoc type qname
+     * @param assocQName        the assoc qname  
+     * @param deep              true is a deep revert shoudl be performed once the node has been 
+     *                          restored, false otherwise
+     * @return                  the newly restored node reference                            
+     */
+    public NodeRef restore(
+            NodeRef nodeRef,
+            NodeRef parentNodeRef, 
+            QName assocTypeQName,
+            QName assocQName,
+            boolean deep);
 	
 	/**
 	 * Delete the version history associated with a node reference.

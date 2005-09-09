@@ -66,6 +66,19 @@
 
     <!-- use around method calls to debug - see class comments for details -->
     <bean id="methodCallLogAdvice" class="org.alfresco.util.debug.MethodCallLogAdvice" />
+    
+    <!--                        -->
+    <!-- I18N                   -->
+    <!--                        -->
+   
+    <bean id="resourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+    	<property name="resourceBundles">
+    		<list>
+    			<value>alfresco.messages.version-service</value>
+    		</list>
+    	</property>
+    </bean>
+   
 
     <!--                        -->
     <!-- MAIL SERVICE           -->
@@ -268,7 +281,7 @@
     </bean>
 
     <!--                               -->
-    <!--  Light Weight Version Store   -->
+    <!--  Version Service   -->
     <!--                               -->
 
 
