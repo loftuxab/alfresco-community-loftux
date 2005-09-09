@@ -44,7 +44,7 @@ public class SessionImplTest extends JCRTest
         superuser.setAttribute("attr2", new Integer(1));
         superuserSession = repository.login(superuser, getWorkspace());
 
-        SimpleCredentials readuser = new SimpleCredentials("readuser", "".toCharArray());
+        SimpleCredentials readuser = new SimpleCredentials("anonymous", "".toCharArray());
         readuser.setAttribute("attr1", "readuserValue");
         readuser.setAttribute("attr2", new Integer(2));
         readuserSession = repository.login(readuser, getWorkspace());
@@ -68,7 +68,7 @@ public class SessionImplTest extends JCRTest
         {
             String userId = readuserSession.getUserID();
             assertNotNull(userId);
-            assertEquals("readuser", userId);
+            assertEquals("anonymous", userId);
         }
     }
 

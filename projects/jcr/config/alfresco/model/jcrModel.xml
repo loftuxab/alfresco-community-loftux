@@ -1,0 +1,17 @@
+<model name="jcr:jcrmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <description>JCR Model Definitions</description>
+   <version>1.0</version>
+
+   <imports>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.jcp.org/jcr/1.0" prefix="jcr"/>
+      <namespace uri="http://www.jcp.org/jcr/nt/1.0" prefix="nt"/>
+      <namespace uri="http://www.jcp.org/jcr/mix/1.0" prefix="mix"/>
+      <namespace uri="http://www.w3.org/XML/1998/namespace" prefix="xml"/>
+   </namespaces>
+   
+</model>

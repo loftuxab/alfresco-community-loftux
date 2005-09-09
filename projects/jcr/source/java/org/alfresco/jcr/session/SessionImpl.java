@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.AccessControlException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +48,17 @@ import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.version.VersionException;
 
-import org.alfresco.jcr.node.ItemFactory;
+import org.alfresco.jcr.item.ItemImpl;
+import org.alfresco.jcr.item.ItemResolver;
+import org.alfresco.jcr.item.NodeImpl;
+import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.repository.RepositoryImpl;
 import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -78,6 +83,9 @@ public class SessionImpl implements Session, SessionContext
     /** Workspace Store Reference */
     private StoreRef workspaceStore;
     
+    /** Dynamic Namespace for this session */
+    NamespacePrefixResolver namespaceResolver;
+    
     
     /**
      * Construct
@@ -94,9 +102,24 @@ public class SessionImpl implements Session, SessionContext
         this.repository = repository;
         this.ticket = ticket;
         this.attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
+        this.namespaceResolver = new DynamicNamespacePrefixResolver(repository.getServiceRegistry().getNamespaceService());
         this.workspaceStore = getWorkspaceStore(workspaceName);
     }
 
+    /**
+     * Create proxied Session
+     * 
+     * @return  JCR Session
+     */    
+    public Session createSession()
+    {
+        return (Session)JCRProxyFactory.create(this, Session.class, this);
+    }
+
+    //
+    // Session Context
+    //
+    
     /* (non-Javadoc)
      * @see org.alfresco.jcr.session.SessionContext#getServiceRegistry()
      */
@@ -126,11 +149,13 @@ public class SessionImpl implements Session, SessionContext
      */
     public NamespacePrefixResolver getNamespaceResolver()
     {
-        // TODO: Handle session specific resolver
-        return getServiceRegistry().getNamespaceService();
+        return namespaceResolver;
     }
 
-        
+    //
+    // JCR Session
+    //
+    
     /* (non-Javadoc)
      * @see javax.jcr.Session#getRepository()
      */
@@ -188,7 +213,8 @@ public class SessionImpl implements Session, SessionContext
     public Node getRootNode() throws RepositoryException
     {
         NodeRef nodeRef = getServiceRegistry().getNodeService().getRootNode(workspaceStore);
-        return ItemFactory.createNode(this, nodeRef);
+        NodeImpl nodeImpl = new NodeImpl(this, nodeRef);
+        return nodeImpl.createNode();
     }
 
     /* (non-Javadoc)
@@ -202,7 +228,8 @@ public class SessionImpl implements Session, SessionContext
         {
             throw new ItemNotFoundException();
         }
-        return ItemFactory.createNode(this, nodeRef);
+        NodeImpl nodeImpl = new NodeImpl(this, nodeRef);
+        return nodeImpl.createNode();
     }
 
     /* (non-Javadoc)
@@ -211,7 +238,8 @@ public class SessionImpl implements Session, SessionContext
     public Item getItem(String absPath) throws PathNotFoundException, RepositoryException
     {
         NodeRef nodeRef = getServiceRegistry().getNodeService().getRootNode(workspaceStore);
-        return ItemFactory.createItem(this, nodeRef, absPath);
+        ItemImpl itemImpl = ItemResolver.findItem(this, nodeRef, absPath);
+        return itemImpl.createItem();
     }
 
     /* (non-Javadoc)
@@ -220,7 +248,7 @@ public class SessionImpl implements Session, SessionContext
     public boolean itemExists(String absPath) throws RepositoryException
     {
         NodeRef nodeRef = getServiceRegistry().getNodeService().getRootNode(workspaceStore);
-        return ItemFactory.itemExists(this, nodeRef, absPath);
+        return ItemResolver.itemExists(this, nodeRef, absPath);
     }
 
     /* (non-Javadoc)
@@ -337,8 +365,8 @@ public class SessionImpl implements Session, SessionContext
      */
     public String[] getNamespacePrefixes() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        Collection<String> prefixes = namespaceResolver.getPrefixes();
+        return prefixes.toArray(new String[prefixes.size()]);
     }
 
     /* (non-Javadoc)
@@ -346,8 +374,12 @@ public class SessionImpl implements Session, SessionContext
      */
     public String getNamespaceURI(String prefix) throws NamespaceException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        String uri = namespaceResolver.getNamespaceURI(prefix);
+        if (uri == null)
+        {
+            throw new NamespaceException("Prefix " + prefix + " is unknown.");
+        }
+        return uri;
     }
 
     /* (non-Javadoc)
@@ -355,8 +387,13 @@ public class SessionImpl implements Session, SessionContext
      */
     public String getNamespacePrefix(String uri) throws NamespaceException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        Collection<String> prefixes = namespaceResolver.getPrefixes(uri);
+        if (prefixes.size() == 0)
+        {
+            throw new NamespaceException("URI " + uri + " is unknown.");
+        }
+        // Return first prefix registered for uri
+        return prefixes.iterator().next();
     }
 
     /* (non-Javadoc)

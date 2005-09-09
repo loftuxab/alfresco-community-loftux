@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.session;
+package org.alfresco.jcr.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +24,7 @@ import java.lang.reflect.Proxy;
 import javax.jcr.RepositoryException;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.jcr.session.SessionContext;
 
 
 /**
@@ -36,7 +37,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
  * @author David Caruana
  *
  */
-public class SessionContextProxyFactory
+public class JCRProxyFactory
 {
     
     /**

@@ -16,20 +16,18 @@
  */
 package org.alfresco.repo.dictionary;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 
@@ -51,9 +49,6 @@ public class DictionaryDAOImpl implements DictionaryDAO
     // Namespace Data Access
     private NamespaceDAO namespaceDAO;
 
-    // The list of models to bootstrap with
-    private List<String> bootstrapModels = new ArrayList<String>();
-    
     // Map of namespace to model name
     private Map<String,QName> namespaceToModel = new HashMap<String,QName>();
     
@@ -71,42 +66,6 @@ public class DictionaryDAOImpl implements DictionaryDAO
         this.namespaceDAO = namespaceDAO;
     }
     
-    
-    /**
-     * Sets the initial list of models to bootstrap with
-     * 
-     * @param modelResources the model names
-     */
-    public void setBootstrapModels(List<String> modelResources)
-    {
-        this.bootstrapModels = modelResources;
-    }
-    
-    
-    /**
-     * Bootstrap the Dictionary
-     */
-    public void bootstrap()
-    {
-        for (String bootstrapModel : bootstrapModels)
-        {
-            InputStream modelStream = getClass().getClassLoader().getResourceAsStream(bootstrapModel);
-            if (modelStream == null)
-            {
-                throw new DictionaryException("Could not find bootstrap model " + bootstrapModel);
-            }
-            try
-            {
-                M2Model model = M2Model.createModel(modelStream);
-                putModel(model);
-            }
-            catch(DictionaryException e)
-            {
-                throw new DictionaryException("Could not import bootstrap model " + bootstrapModel, e);
-            }
-        }
-    }
-
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.DictionaryDAO#putModel(org.alfresco.repo.dictionary.impl.M2Model)

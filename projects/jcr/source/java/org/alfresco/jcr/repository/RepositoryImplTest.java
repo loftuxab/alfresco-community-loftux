@@ -102,7 +102,6 @@ public class RepositoryImplTest extends JCRTest
         try
         {
             repository.login(good, null);
-            fail("Failed to catch null workspace name.");
         }
         catch (NoSuchWorkspaceException e)
         {

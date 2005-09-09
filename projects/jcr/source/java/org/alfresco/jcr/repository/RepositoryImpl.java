@@ -28,7 +28,7 @@ import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.jcr.session.SessionContextProxyFactory;
+import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
@@ -63,7 +63,11 @@ public class RepositoryImpl implements Repository
     // Service dependencies
     private AuthenticationService authenticationService;  // TODO: remove when moved to service registry
     private ServiceRegistry serviceRegistry;
+    private String defaultWorkspace = null;
 
+    //
+    // Dependency Injection
+    //
     
     /**
      * Set the authentication service
@@ -76,6 +80,26 @@ public class RepositoryImpl implements Repository
     }
 
     /**
+     * Set the service registry
+     * 
+     * @param serviceRegistry
+     */
+    public void setServiceRegistry(ServiceRegistry serviceRegistry)
+    {
+        this.serviceRegistry = serviceRegistry;
+    }
+    
+    /**
+     * Sets the Default Workspace
+     * 
+     * @param defaultWorkspace  default workspace 
+     */
+    public void setDefaultWorkspace(String defaultWorkspace)
+    {
+        this.defaultWorkspace = defaultWorkspace;
+    }
+
+    /**
      * Get the authentication service
      * 
      * @return  the authentication service
@@ -85,16 +109,6 @@ public class RepositoryImpl implements Repository
         return authenticationService;
     }
     
-    /**
-     * Set the service registry
-     * 
-     * @param serviceRegistry
-     */
-    public void setServiceRegistry(ServiceRegistry serviceRegistry)
-    {
-        this.serviceRegistry = serviceRegistry;
-    }
-
     /**
      * Get the service registry
      * 
@@ -151,9 +165,10 @@ public class RepositoryImpl implements Repository
         try
         {
             // construct the session
+            String sessionWorkspace = (workspaceName == null) ? defaultWorkspace : workspaceName;
             String ticket = authenticationService.getCurrentTicket();
-            SessionImpl sessionImpl = new SessionImpl(this, ticket, workspaceName, getAttributes(credentials));
-            Session session = (Session)SessionContextProxyFactory.create(sessionImpl, Session.class, sessionImpl);
+            SessionImpl sessionImpl = new SessionImpl(this, ticket, sessionWorkspace, getAttributes(credentials));
+            Session session = sessionImpl.createSession();
     
             // clear the security context for this thread
             authenticationService.clearCurrentSecurityContext();
@@ -215,5 +230,6 @@ public class RepositoryImpl implements Repository
         }
         return attributes;
     }
+    
     
 }

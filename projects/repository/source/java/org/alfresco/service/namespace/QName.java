@@ -17,6 +17,7 @@
 package org.alfresco.service.namespace;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.alfresco.util.EqualsHelper;
 
@@ -337,7 +338,37 @@ public final class QName implements QNamePattern, Serializable
      */
     public String toPrefixString()
     {
-        return (prefix == null) ? "" : prefix + NAMESPACE_PREFIX + localName;
+        return (prefix == null) ? localName : prefix + NAMESPACE_PREFIX + localName;
     }
 
+
+    /**
+     * Render string representation of QName using format:
+     * 
+     * <code>prefix:name</code>
+     * 
+     * according to namespace prefix mappings of specified namespace resolver.
+     * 
+     * @param prefixResolver namespace prefix resolver
+     * 
+     * @return  the string representation
+     */
+    public String toPrefixString(NamespacePrefixResolver prefixResolver)
+    {
+        Collection<String> prefixes = prefixResolver.getPrefixes(namespaceURI);
+        if (prefixes.size() == 0)
+        {
+            throw new NamespaceException("A namespace prefix is not registered for uri " + namespaceURI);
+        }
+        String prefix = prefixes.iterator().next();
+        if (prefix.equals(NamespaceService.DEFAULT_PREFIX))
+        {
+            return localName;
+        }
+        else
+        {
+            return prefix + NAMESPACE_PREFIX + localName;
+        }
+    }
+    
 }

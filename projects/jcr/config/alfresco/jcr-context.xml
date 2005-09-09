@@ -8,6 +8,16 @@
     <bean id="JCR.Repository" class="org.alfresco.jcr.repository.RepositoryImpl">
         <property name="authenticationService"><ref bean="authenticationService"/></property>
         <property name="serviceRegistry"><ref bean="ServiceRegistry"/></property>
+        <property name="defaultWorkspace"><value>SpacesStore</value></property>
+    </bean>
+    
+    <bean id="JCR.DictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap" depends-on="dictionaryBootstrap">
+        <property name="dictionaryDAO"><ref bean="dictionaryDAO"/></property>
+        <property name="bootstrapModels">
+            <list>
+                <value>alfresco/model/jcrModel.xml</value>
+            </list>
+        </property>
     </bean>
     
 </beans>

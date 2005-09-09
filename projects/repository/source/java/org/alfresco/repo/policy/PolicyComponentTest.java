@@ -23,6 +23,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.alfresco.repo.dictionary.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAOImpl;
 import org.alfresco.repo.dictionary.M2Model;
@@ -53,19 +54,19 @@ public class PolicyComponentTest extends TestCase
     @Override
     protected void setUp() throws Exception
     {
-        // Load Test Model
-        InputStream modelStream = getClass().getClassLoader().getResourceAsStream(TEST_MODEL);
-        M2Model model = M2Model.createModel(modelStream);
-
         // Instantiate Dictionary Service
         NamespaceDAO namespaceDAO = new NamespaceDAOImpl();
         DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+        
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
         bootstrapModels.add("org/alfresco/repo/policy/policycomponenttest_model.xml");
-        dictionaryDAO.setBootstrapModels(bootstrapModels);
-        dictionaryDAO.bootstrap();
-        dictionaryDAO.putModel(model);
+        bootstrapModels.add(TEST_MODEL);
+        bootstrap.setBootstrapModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDAO);
+        bootstrap.bootstrap();
+
         DictionaryComponent dictionary = new DictionaryComponent();
         dictionary.setDictionaryDAO(dictionaryDAO);
 

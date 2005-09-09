@@ -12,7 +12,7 @@
    <context-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>
-         classpath:alfresco/jcr-context.xml 
+         classpath:org/alfresco/jcr/test/test-context.xml 
       </param-value>
       <description>Spring config file locations</description>
    </context-param>

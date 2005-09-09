@@ -25,12 +25,15 @@ import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
+import org.alfresco.jcr.repository.RepositoryFactory;
+import org.alfresco.jcr.repository.RepositoryImpl;
+import org.alfresco.jcr.test.TestData;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
- * Setup Repository for access via JNDI
+ * Setup Repository for access via JNDI by TCK Web Application
  * 
  * @author David Caruana
  */
@@ -54,7 +57,8 @@ public class RepositoryStartupServlet extends HttpServlet
         super.init();
         
         WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        Repository repository = (Repository)context.getBean("JCR.Repository");
+        RepositoryImpl repository = (RepositoryImpl)context.getBean(RepositoryFactory.REPOSITORY_BEAN);
+        repository.setDefaultWorkspace(TestData.TEST_WORKSPACE);
         
         try
         {

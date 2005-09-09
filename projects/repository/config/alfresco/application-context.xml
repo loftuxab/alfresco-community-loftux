@@ -342,10 +342,27 @@
 
     <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.NamespaceDAOImpl" />
 
-    <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.DictionaryDAOImpl" init-method="bootstrap">
+    <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.DictionaryDAOImpl">
         <constructor-arg index="0">
             <ref bean="namespaceDAO" />
         </constructor-arg>
+    </bean>
+
+    <bean id="dictionaryService" class="org.alfresco.repo.dictionary.DictionaryComponent" depends-on="dictionaryBootstrap">
+        <property name="dictionaryDAO">
+            <ref bean="dictionaryDAO" />
+        </property>
+    </bean>
+
+    <bean id="namespaceService" class="org.alfresco.repo.dictionary.DictionaryNamespaceComponent"
+        depends-on="dictionaryDAO">
+        <property name="namespaceDAO">
+            <ref bean="namespaceDAO" />
+        </property>
+    </bean>
+
+    <bean id="dictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap">
+        <property name="dictionaryDAO"><ref local="dictionaryDAO"/></property>
         <property name="bootstrapModels">
             <list>
                 <value>alfresco/model/dictionaryModel.xml</value>
@@ -359,19 +376,6 @@
                 <value>org/alfresco/repo/rule/ruleModel.xml</value>
                 <value>org/alfresco/repo/version/version_model.xml</value>
             </list>
-        </property>
-    </bean>
-
-    <bean id="dictionaryService" class="org.alfresco.repo.dictionary.DictionaryComponent">
-        <property name="dictionaryDAO">
-            <ref bean="dictionaryDAO" />
-        </property>
-    </bean>
-
-    <bean id="namespaceService" class="org.alfresco.repo.dictionary.DictionaryNamespaceComponent"
-        depends-on="dictionaryDAO">
-        <property name="namespaceDAO">
-            <ref bean="namespaceDAO" />
         </property>
     </bean>
 

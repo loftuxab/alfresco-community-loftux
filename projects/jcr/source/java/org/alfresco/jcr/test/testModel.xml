@@ -1,0 +1,36 @@
+<model name="jcrtest:jcrtestmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <description>JCR Test Model Definitions</description>
+   <version>1.0</version>
+
+   <imports>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/test/jcr/1.0" prefix="jcrtest"/>
+   </namespaces>
+
+   <types>
+   
+      <type name="jcrtest:testtype">
+         <title>Test Type</title>
+         <parent>sys:base</parent>
+         <properties>
+            <property name="jcrtest:booleanProp">
+               <type>d:boolean</type>
+            </property>
+         </properties>
+         <associations>
+            <child-association name="jcrtest:children">
+               <target>
+                  <class>jcrtest:testtype</class>
+               </target>
+            </child-association>
+         </associations>
+      </type>
+      
+   </types>
+   
+</model>

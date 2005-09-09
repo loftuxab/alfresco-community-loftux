@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.dictionary;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,18 +36,18 @@ public class DictionaryDAOTest extends TestCase
     @Override
     public void setUp()
     {
-        // Load Test Model
-        InputStream modelStream = getClass().getClassLoader().getResourceAsStream(TEST_MODEL);
-        M2Model model = M2Model.createModel(modelStream);
-
         // Instantiate Dictionary Service
         NamespaceDAO namespaceDAO = new NamespaceDAOImpl();
         DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
+
+        // Populate with appropriate models
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
-        dictionaryDAO.setBootstrapModels(bootstrapModels);
-        dictionaryDAO.bootstrap();
-        dictionaryDAO.putModel(model);
+        bootstrapModels.add(TEST_MODEL);
+        bootstrap.setBootstrapModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDAO);
+        bootstrap.bootstrap();
         
         DictionaryComponent component = new DictionaryComponent();
         component.setDictionaryDAO(dictionaryDAO);
@@ -61,6 +60,7 @@ public class DictionaryDAOTest extends TestCase
         NamespaceDAO namespaceDAO = new NamespaceDAOImpl();
         DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl(namespaceDAO);
         
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
         bootstrapModels.add("alfresco/model/systemModel.xml");
@@ -72,8 +72,9 @@ public class DictionaryDAOTest extends TestCase
         bootstrapModels.add("org/alfresco/repo/rule/ruleModel.xml");
         bootstrapModels.add("org/alfresco/repo/version/version_model.xml");
         
-        dictionaryDAO.setBootstrapModels(bootstrapModels);
-        dictionaryDAO.bootstrap();        
+        bootstrap.setBootstrapModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDAO);
+        bootstrap.bootstrap();        
     }
 
     
