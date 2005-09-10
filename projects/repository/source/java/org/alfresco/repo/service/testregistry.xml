@@ -8,16 +8,20 @@
 
 	<bean id="namespaceDAO" class="org.alfresco.repo.dictionary.NamespaceDAOImpl"></bean>
 
-	<bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.DictionaryDAOImpl" init-method="bootstrap">
-		<constructor-arg index="0">
-			<ref bean="namespaceDAO" />
-		</constructor-arg>
-		<property name="bootstrapModels">
-			<list>
-				<value>org/alfresco/repo/service/serviceregistrytest_model.xml</value>
-			</list>
-		</property>
-	</bean>
+    <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.DictionaryDAOImpl">
+        <constructor-arg index="0">
+            <ref bean="namespaceDAO" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="dictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap">
+        <property name="dictionaryDAO"><ref local="dictionaryDAO"/></property>
+        <property name="bootstrapModels">
+            <list>
+                <value>alfresco/model/dictionaryModel.xml</value>
+            </list>
+        </property>
+    </bean>
 
 	<bean id="serviceRegistry" class="org.alfresco.repo.service.ServiceDescriptorRegistry"></bean>
 
