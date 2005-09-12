@@ -29,11 +29,19 @@
 <script language="JavaScript1.2">
    function updateButtonState()
    {
-      if (document.getElementById("user-props:userName").value.length == 0 ||
-          document.getElementById("user-props:password").value.length == 0)
+      if (document.getElementById("user-props:password").disabled == false)
       {
-         document.getElementById("user-props:finish-button").disabled = true;
-         document.getElementById("user-props:next-button").disabled = true;
+         if (document.getElementById("user-props:userName").value.length == 0 ||
+             document.getElementById("user-props:password").value.length == 0)
+         {
+            document.getElementById("user-props:finish-button").disabled = true;
+            document.getElementById("user-props:next-button").disabled = true;
+         }
+         else
+         {
+            document.getElementById("user-props:finish-button").disabled = false;
+            document.getElementById("user-props:next-button").disabled = false;
+         }
       }
       else
       {
