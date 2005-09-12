@@ -29,7 +29,7 @@ import org.alfresco.util.BaseSpringTest;
  * 
  * @author David Caruana
  */
-public class JCRTest extends BaseSpringTest
+public class BaseJCRTest extends BaseSpringTest
 {
     protected Repository repository;
     protected StoreRef storeRef;

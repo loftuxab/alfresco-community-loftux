@@ -10,8 +10,8 @@
       <war warfile="${dir.dist}/${file.name.war.tck}" webxml="${dir.src.webinf}\web.xml">
          <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
          <webinf dir="${dir.project.installer}" includes="licenses/**"/>
-         <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes.@{for}}"/>   
-         <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes.@{for}}" />
+         <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes}"/>   
+         <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" />
          <lib dir="${dir.common.lib}/jibx" includes="*.jar" />
          <lib dir="${dir.common.lib}/openoffice" includes="*.jar" />
          <lib dir="${dir.common.lib}/jmagick" includes="*.jar" />

@@ -21,7 +21,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
-import org.alfresco.jcr.test.JCRTest;
+import org.alfresco.jcr.test.BaseJCRTest;
 
 
 /**
@@ -29,7 +29,7 @@ import org.alfresco.jcr.test.JCRTest;
  * 
  * @author David Caruana
  */
-public class SessionImplTest extends JCRTest
+public class SessionImplTest extends BaseJCRTest
 {
     protected Session superuserSession;
     protected Session readuserSession;

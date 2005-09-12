@@ -23,7 +23,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
-import org.alfresco.jcr.test.JCRTest;
+import org.alfresco.jcr.test.BaseJCRTest;
 
 
 /**
@@ -31,7 +31,7 @@ import org.alfresco.jcr.test.JCRTest;
  * 
  * @author David Caruana
  */
-public class RepositoryImplTest extends JCRTest
+public class RepositoryImplTest extends BaseJCRTest
 {
 
     public void testDescriptors()
