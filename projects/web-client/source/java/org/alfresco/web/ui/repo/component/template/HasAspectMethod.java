@@ -25,9 +25,17 @@ import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.StringModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateScalarModel;
 
 /**
  * @author Kevin Roast
+ * 
+ * Custom FreeMarker Template language method.
+ * <p>
+ * Method returns whether a TemplateNode has a particular aspect applied to it. The aspect
+ * name can be either the fully qualified QName or the short prefixed name string.
+ * <p>
+ * Usage: hasAspect(TemplateNode node, String aspect)
  */
 public final class HasAspectMethod implements TemplateMethodModelEx
 {
@@ -40,11 +48,24 @@ public final class HasAspectMethod implements TemplateMethodModelEx
       
       if (args.size() == 2)
       {
+         // arg 0 must be a wrapped TemplateNode object
          BeanModel arg0 = (BeanModel)args.get(0);
-         BeanModel arg1 = (BeanModel)args.get(1);
+         
+         // arg 1 can be either wrapped QName object or a String 
+         String arg1String = null;
+         Object arg1 = args.get(1);
+         if (arg1 instanceof BeanModel)
+         {
+            arg1String = ((BeanModel)arg1).getWrappedObject().toString();
+         }
+         else if (arg1 instanceof TemplateScalarModel)
+         {
+            arg1String = ((TemplateScalarModel)arg1).getAsString();
+         }
          if (arg0.getWrappedObject() instanceof TemplateNode)
          {
-            if ( ((TemplateNode)arg0.getWrappedObject()).hasAspect(arg1.getWrappedObject().toString()) )
+            // test to see if this node has the aspect
+            if ( ((TemplateNode)arg0.getWrappedObject()).hasAspect(arg1String) )
             {
                result = 1;
             }

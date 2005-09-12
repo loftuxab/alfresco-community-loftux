@@ -173,7 +173,7 @@ public class TemplateNode extends Node
          boolean found = false;
          for (QName qname : getAspects())
          {
-            if (qname.toPrefixString().equals(aspect))
+            if (qname.toPrefixString(getServiceRegistry().getNamespaceService()).equals(aspect))
             {
                found = true;
                break;
