@@ -15,11 +15,17 @@
 				<app:icon>space-icon-default</app:icon>
 				<cm:title>${glossaryName}</cm:title>
 				<cm:contains>
-					<cm:folder view:childName="app:${templatesName}">
+					<cm:folder view:childName="app:${spaceTemplatesName}">
 						<app:uifacets />
-						<cm:name>${templatesName}</cm:name>
+						<cm:name>${spaceTemplatesName}</cm:name>
 						<app:icon>space-icon-default</app:icon>
-						<cm:title>${templatesName}</cm:title>
+						<cm:title>${spaceTemplatesName}</cm:title>
+					</cm:folder>
+					<cm:folder view:childName="app:${contentTemplatesName}">
+						<app:uifacets />
+						<cm:name>${contentTemplatesName}</cm:name>
+						<app:icon>space-icon-default</app:icon>
+						<cm:title>${contentTemplatesName}</cm:title>
 					</cm:folder>
 				</cm:contains>
 			</cm:folder>

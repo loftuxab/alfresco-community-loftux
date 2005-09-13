@@ -124,6 +124,10 @@ public interface ContentModel
     static final QName ASPECT_OWNABLE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "ownable");
     static final QName PROP_OWNER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "owner");
     
+    // Templatable aspect
+    static final QName ASPECT_TEMPLATABLE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "templatable");
+    static final QName PROP_TEMPLATE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "template");
+    
     //
     // Application Model Definitions
     //

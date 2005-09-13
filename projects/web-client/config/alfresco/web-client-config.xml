@@ -25,9 +25,12 @@
       </server>
       <repository>
          <store-url>workspace://SpacesStore</store-url>
+         <!-- NOTE: see repository/config/alfresco/bootstrap/systemimport.xml -->
+         <!--       values changed here must match those in systemimport.xml! -->
          <root-path>Company Home</root-path>
          <glossary-folder-name>Glossary</glossary-folder-name>
-         <templates-folder-name>Templates</templates-folder-name>
+         <space-templates-folder-name>Space Templates</space-templates-folder-name>
+         <content-templates-folder-name>Content Templates</content-templates-folder-name>
       </repository>
       <admin>
          <initial-password>admin</initial-password>
@@ -134,6 +137,7 @@
          <aspect id="effectivity" description="Effectivity"/>
          <aspect id="summarizable" description="Summarizable"/>
          <aspect id="versionable" description="Versionable"/>
+         <aspect id="templatable" description="Templatable"/>
       </aspects>
       <transformers>
          <transformer id="text/html" description="HTML" />

@@ -871,6 +871,7 @@ public class DocumentDetailsBean
                   
                   // prepare for showing details for this node
                   this.browseBean.setupContentAction(next.getId(), false);
+                  break;
                }
             }
          }
@@ -909,6 +910,7 @@ public class DocumentDetailsBean
                   
                   // prepare for showing details for this node
                   this.browseBean.setupContentAction(previous.getId(), false);
+                  break;
                }
             }
          }

@@ -561,6 +561,7 @@ public class BrowseBean implements IContextListener
       node.addPropertyResolver("url", this.resolverUrl);
       node.addPropertyResolver("fileType16", this.resolverFileType16);
       node.addPropertyResolver("fileType32", this.resolverFileType32);
+      node.addPropertyResolver("templatable", this.resolverTemplatable);
    }
    
    private NodePropertyResolver resolverlocked = new NodePropertyResolver() {
@@ -623,6 +624,12 @@ public class BrowseBean implements IContextListener
          QNameMap props = (QNameMap)node.getProperties();
          String icon = (String)props.getRaw("app:icon");
          return (icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
+      }
+   };
+   
+   private NodePropertyResolver resolverTemplatable = new NodePropertyResolver() {
+      public Object get(Node node) {
+         return Boolean.valueOf(node.hasAspect(ContentModel.ASPECT_TEMPLATABLE));
       }
    };
    

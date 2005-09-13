@@ -62,7 +62,8 @@ public class Application
    private static String companyRootId;
    private static String companyRootDescription;
    private static String glossaryFolderName;
-   private static String templatesFolderName;
+   private static String spaceTemplatesFolderName;
+   private static String contentTemplatesFolderName;
    
    /**
     * Private constructor to prevent instantiation of this class 
@@ -288,19 +289,35 @@ public class Application
    }
    
    /**
-    * @return Returns the templates folder name (retrieved from config service)
+    * @return Returns the Space templates folder name (retrieved from config service)
     */
-   public static String getTemplatesFolderName(ServletContext context)
+   public static String getSpaceTemplatesFolderName(ServletContext context)
    {
-      return getTemplatesFolderName(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
+      return getSpaceTemplatesFolderName(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
-    * @return Returns the templates folder name (retrieved from config service)
+    * @return Returns the Space templates folder name (retrieved from config service)
     */
-   public static String getTemplatesFolderName(FacesContext context)
+   public static String getSpaceTemplatesFolderName(FacesContext context)
    {
-      return getTemplatesFolderName(FacesContextUtils.getRequiredWebApplicationContext(context));
+      return getSpaceTemplatesFolderName(FacesContextUtils.getRequiredWebApplicationContext(context));
+   }
+   
+   /**
+    * @return Returns the Content templates folder name (retrieved from config service)
+    */
+   public static String getContentTemplatesFolderName(ServletContext context)
+   {
+      return getContentTemplatesFolderName(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
+   }
+   
+   /**
+    * @return Returns the Content templates folder name (retrieved from config service)
+    */
+   public static String getContentTemplatesFolderName(FacesContext context)
+   {
+      return getContentTemplatesFolderName(FacesContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
@@ -528,27 +545,51 @@ public class Application
    }
    
    /**
-    * Returns the templates folder name (retrieved from config service)
+    * Returns the Space Templates folder name (retrieved from config service)
     * 
     * @param context The spring context
     * @return The templates folder name
     */
-   private static String getTemplatesFolderName(WebApplicationContext context)
+   private static String getSpaceTemplatesFolderName(WebApplicationContext context)
    {
-      if (templatesFolderName == null)
+      if (spaceTemplatesFolderName == null)
       {
          ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
          ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
          for (ConfigElement child : repoConfig.getChildren())
          {
-            if (child.getName().equals("templates-folder-name"))
+            if (child.getName().equals("space-templates-folder-name"))
             {
-               templatesFolderName = child.getValue();
+               spaceTemplatesFolderName = child.getValue();
             }
          }
       }
       
-      return templatesFolderName;
+      return spaceTemplatesFolderName;
+   }
+   
+   /**
+    * Returns the Content Templates folder name (retrieved from config service)
+    * 
+    * @param context The spring context
+    * @return The templates folder name
+    */
+   private static String getContentTemplatesFolderName(WebApplicationContext context)
+   {
+      if (contentTemplatesFolderName == null)
+      {
+         ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
+         ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
+         for (ConfigElement child : repoConfig.getChildren())
+         {
+            if (child.getName().equals("content-templates-folder-name"))
+            {
+               contentTemplatesFolderName = child.getValue();
+            }
+         }
+      }
+      
+      return contentTemplatesFolderName;
    }
    
    /**

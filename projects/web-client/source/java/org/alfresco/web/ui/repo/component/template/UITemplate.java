@@ -109,24 +109,29 @@ public class UITemplate extends SelfRenderingComponent
       ClientConfigElement clientConfig = (ClientConfigElement)service.getGlobalConfig().getConfigElement(
             ClientConfigElement.CONFIG_ELEMENT_ID);
       
-      // get the class name of the processor to instantiate
-      String procName = clientConfig.getTemplateProcessor(getEngine());
-      if (procName != null && procName.length() != 0)
+      // get the template to process
+      String template = getTemplate();
+      if (template != null && template.length() != 0)
       {
-         long startTime = 0;
-         if (logger.isDebugEnabled())
+         // get the class name of the processor to instantiate
+         String procName = clientConfig.getTemplateProcessor(getEngine());
+         if (procName != null && procName.length() != 0)
          {
-            logger.debug("Using template processor name: " + procName);
-            startTime = System.currentTimeMillis();
-         }
-         
-         // process the template against the model
-         getTemplateProcessor(procName).process(getTemplate(), model, context.getResponseWriter());
-         
-         if (logger.isDebugEnabled())
-         {
-            long endTime = System.currentTimeMillis();
-            logger.debug("Time to process template: " + (endTime - startTime) + "ms");
+            long startTime = 0;
+            if (logger.isDebugEnabled())
+            {
+               logger.debug("Using template processor name: " + procName);
+               startTime = System.currentTimeMillis();
+            }
+            
+            // process the template against the model
+            getTemplateProcessor(procName).process(getTemplate(), model, context.getResponseWriter());
+            
+            if (logger.isDebugEnabled())
+            {
+               long endTime = System.currentTimeMillis();
+               logger.debug("Time to process template: " + (endTime - startTime) + "ms");
+            }
          }
       }
    }
@@ -257,9 +262,12 @@ public class UITemplate extends SelfRenderingComponent
             root.putAll((Map)model);
          }
          
-         this.model = root;
+         return root;
       }
-      return this.model;
+      else
+      {
+         return this.model;
+      }
    }
 
    /**

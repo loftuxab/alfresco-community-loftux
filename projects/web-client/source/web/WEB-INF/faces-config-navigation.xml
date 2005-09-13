@@ -137,6 +137,10 @@
          <from-outcome>showSystemInfo</from-outcome>
          <to-view-id>/jsp/dialog/system-info.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>previewContent</from-outcome>
+         <to-view-id>/jsp/dialog/preview-file.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <navigation-rule>

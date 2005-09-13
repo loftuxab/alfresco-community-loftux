@@ -214,7 +214,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                      "/" + actNs + ":" + 
                      QName.createValidLocalName(Application.getGlossaryFolderName(FacesContext.getCurrentInstance())) +
                      "/" + actNs + ":" + 
-                     QName.createValidLocalName(Application.getTemplatesFolderName(FacesContext.getCurrentInstance()));
+                     QName.createValidLocalName(Application.getSpaceTemplatesFolderName(FacesContext.getCurrentInstance()));
                
                NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
                List<NodeRef> templateNodeList = this.searchService.selectNodes(
@@ -457,12 +457,11 @@ public class NewSpaceWizard extends AbstractWizardBean
                "/" + actNs + ":" + 
                QName.createValidLocalName(Application.getGlossaryFolderName(context)) +
                "/" + actNs + ":" + 
-               QName.createValidLocalName(Application.getTemplatesFolderName(context)) +
+               QName.createValidLocalName(Application.getSpaceTemplatesFolderName(context)) +
                "/*";
          
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
-         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.addDynamicNamespace(NamespaceService.APP_MODEL_PREFIX, NamespaceService.APP_MODEL_1_0_URI);
+         NamespaceService resolver = Repository.getServiceRegistry(context).getNamespaceService();
          List<NodeRef> results = this.searchService.selectNodes(rootNodeRef, xpath, null, resolver, false);
          
          if (results.size() > 0)

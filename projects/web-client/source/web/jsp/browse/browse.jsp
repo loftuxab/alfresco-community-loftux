@@ -407,6 +407,11 @@
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
+                           <a:booleanEvaluator value="#{r.templatable == true}">
+                              <a:actionLink value="#{msg.preview}" image="/images/icons/preview.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="previewContent">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </a:booleanEvaluator>
                            <a:booleanEvaluator value="#{(r.locked == false && r.workingCopy == false) || r.owner == true}">
                               <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
                                  <f:param name="id" value="#{r.id}" />

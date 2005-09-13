@@ -759,10 +759,13 @@
         </property>
         <property name="configuration">
             <props>
+                <!-- NOTE: see web-client/config/alfresco/web-client-config.xml -->
+                <!--       values changed here must match those in web-client-config.xml -->
                 <prop key="companySpaceName">Company Home</prop>
                 <prop key="companySpaceDescription">The company root space</prop>
                 <prop key="glossaryName">Glossary</prop>
-                <prop key="templatesName">Templates</prop>
+                <prop key="spaceTemplatesName">Space Templates</prop>
+                <prop key="contentTemplatesName">Content Templates</prop>
             </props>
         </property>
         <property name="bootstrapViews">

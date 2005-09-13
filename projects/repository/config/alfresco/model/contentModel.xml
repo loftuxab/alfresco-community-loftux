@@ -256,7 +256,17 @@
             </association>
          </associations>
       </aspect>
-   
+      
+      <aspect name="cm:templatable">
+         <title>Templatable</title>
+         <properties>
+            <property name="cm:template">
+               <type>d:noderef</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>
+      
       <aspect name="cm:complianceable">
          <title>Complianceable</title>
          <parent>cm:auditable</parent>
