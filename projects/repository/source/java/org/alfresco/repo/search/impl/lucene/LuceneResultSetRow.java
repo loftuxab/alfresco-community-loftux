@@ -97,7 +97,7 @@ public class LuceneResultSetRow extends AbstractResultSetRow
     {
         String primaryParent = getDocument().getField("PRIMARYPARENT").stringValue();
         NodeRef childNodeRef = getNodeRef();
-        NodeRef paretnNodeRef = new NodeRef(childNodeRef.getStoreRef(), primaryParent);
+        NodeRef paretnNodeRef = new NodeRef(primaryParent);
         return new ChildAssociationRef(getTypeQName(), paretnNodeRef, getQName(), childNodeRef);
     }
 

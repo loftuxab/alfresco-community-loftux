@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
@@ -109,6 +110,7 @@ public class LuceneTest extends TestCase
     private LuceneIndexerAndSearcher indexerAndSearcher;
 
     private ServiceRegistry serviceRegistry;
+    private UserTransaction testTX;
 
     public LuceneTest()
     {
@@ -134,8 +136,8 @@ public class LuceneTest extends TestCase
         assertEquals(true, ctx.isSingleton("luceneIndexLock"));
         assertEquals(true, ctx.isSingleton("LuceneFullTextSearchIndexer"));
 
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
+        testTX = transactionService.getUserTransaction();
+        testTX.begin();
  
         // load in the test model
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
@@ -246,7 +248,19 @@ public class LuceneTest extends TestCase
         nodeService.addChild(n12, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n13, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         
-        tx.commit();        
+            
+    }
+    
+    
+
+    @Override
+    protected void tearDown() throws Exception
+    {
+        if(testTX.getStatus() == Status.STATUS_ACTIVE)
+        {
+            testTX.rollback();
+        }
+        super.tearDown();
     }
 
     public LuceneTest(String arg0)
@@ -257,8 +271,6 @@ public class LuceneTest extends TestCase
     
     public void testSort() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -312,46 +324,34 @@ public class LuceneTest extends TestCase
         results.close();
 
         luceneFTS.resume();
-        tx.rollback();
     }
     
     public void test1() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void test2() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void test3() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void test4() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
 
@@ -361,35 +361,26 @@ public class LuceneTest extends TestCase
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"valuetwo\"", null, null);
         results.close();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void test5() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void test6() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testNoOp() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1", indexerAndSearcher);
 
@@ -402,7 +393,6 @@ public class LuceneTest extends TestCase
         indexer.prepare();
         indexer.commit();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     /**
@@ -414,8 +404,6 @@ public class LuceneTest extends TestCase
 
     public void testStandAloneIndexerCommit() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1", indexerAndSearcher);
 
@@ -523,13 +511,12 @@ public class LuceneTest extends TestCase
 
         QName qname = QName.createQName("", "property-1");
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\"" + n1.getId() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\"" + n1.toString() + "\"", null, null);
 
         assertEquals(2, results.length());
 
         results.close();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     private void simpleResultSetTest(ResultSet results)
@@ -554,8 +541,6 @@ public class LuceneTest extends TestCase
 
     public void testStandAlonePathIndexer() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
 
@@ -580,7 +565,7 @@ public class LuceneTest extends TestCase
             results.close();
         }
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+ID:\"" + n1.getId() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+ID:\"" + n1.toString() + "\"", null, null);
         try
         {
             assertEquals(2, results.length());
@@ -590,7 +575,7 @@ public class LuceneTest extends TestCase
             results.close();
         }
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\"" + rootNodeRef.getId() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\"" + rootNodeRef.toString() + "\"", null, null);
         try
         {
             assertEquals(1, results.length());
@@ -600,7 +585,6 @@ public class LuceneTest extends TestCase
             results.close();
         }
         luceneFTS.resume();
-        tx.rollback();
     }
 
     private void buildBaseIndex()
@@ -633,14 +617,11 @@ public class LuceneTest extends TestCase
 
     public void testAllPathSearch() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
 
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     private void runBaseTests()
@@ -983,8 +964,6 @@ public class LuceneTest extends TestCase
 
     public void testPathSearch() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
 
@@ -1033,14 +1012,10 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
         luceneFTS.resume();
-        
-        tx.rollback();
     }
 
     public void testXPathSearch() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
 
@@ -1062,13 +1037,10 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "xpath", "${alf:query}", null, new QueryParameterDefinition[] { paramDef });
         assertEquals(14, results.length());
         results.close();
-        tx.rollback();
     }
 
     public void testMissingIndex() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "_missing_");
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(storeRef, indexerAndSearcher);
@@ -1083,13 +1055,10 @@ public class LuceneTest extends TestCase
         results = searcher.query(storeRef, "xpath", "//./*", null, null);
         assertEquals(0, results.length());
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testUpdateIndex() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
 
@@ -1122,13 +1091,10 @@ public class LuceneTest extends TestCase
 
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testDeleteLeaf() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1329,13 +1295,10 @@ public class LuceneTest extends TestCase
         assertEquals(0, results.length());
         results.close();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testDeleteContainer() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1539,13 +1502,10 @@ public class LuceneTest extends TestCase
         assertEquals(0, results.length());
         results.close();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testDeleteAndAddReference() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1776,13 +1736,10 @@ public class LuceneTest extends TestCase
 
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testRenameReference() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1838,13 +1795,10 @@ public class LuceneTest extends TestCase
         assertEquals(3, results.length());
         results.close();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testDelayIndex() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1892,13 +1846,10 @@ public class LuceneTest extends TestCase
 
         runBaseTests();
         luceneFTS.resume();
-        tx.rollback();
     }
 
     public void testWaitForIndex() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1930,6 +1881,16 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
 
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
+        indexer.setNodeService(nodeService);
+        indexer.setLuceneIndexLock(luceneIndexLock);
+        indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
+        indexer.setContentService(contentService);
+        indexer.updateFullTextSearch(1000);
+        indexer.prepare();
+        indexer.commit();
+        
         luceneFTS.resume();
         //luceneFTS.requiresIndex(rootNodeRef.getStoreRef());
         //luceneFTS.index();
@@ -1945,7 +1906,6 @@ public class LuceneTest extends TestCase
         results.close();
         
         runBaseTests();
-        tx.rollback();
     }
 
     private String escapeQName(QName qname)
@@ -1955,8 +1915,6 @@ public class LuceneTest extends TestCase
 
     public void testForKev() throws Exception
     {
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
@@ -1966,18 +1924,17 @@ public class LuceneTest extends TestCase
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PARENT:\"" + rootNodeRef.getId() + "\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PARENT:\"" + rootNodeRef.toString() + "\"", null, null);
         assertEquals(5, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PARENT:\"" + rootNodeRef.getId() + "\" +QNAME:\"one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PARENT:\"" + rootNodeRef.toString() + "\" +QNAME:\"one\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "( +TYPE:\"{http://www.alfresco.org/model/content/1.0}linkfile\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}name:\"content woof\") OR  TEXT:\"content\"", null, null);
           
         luceneFTS.resume();
-        tx.rollback();
     }
 
     
@@ -1990,6 +1947,7 @@ public class LuceneTest extends TestCase
         // So we add something, add and delete someting repeatedly and then check we can still do the search.
 
         // Running in autocommit against the index
+        testTX.commit();
         UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         ChildAssociationRef testFind = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}testFind"), testSuperType);
@@ -2030,6 +1988,7 @@ public class LuceneTest extends TestCase
     
     public void testReadAgainstDelta() throws Exception
     {
+        testTX.commit();
         UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         luceneFTS.pause();

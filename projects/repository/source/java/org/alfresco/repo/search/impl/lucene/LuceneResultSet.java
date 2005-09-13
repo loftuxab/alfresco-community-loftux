@@ -25,7 +25,6 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
@@ -44,12 +43,6 @@ public class LuceneResultSet extends AbstractResultSet
      */
     Hits hits;
 
-    /**
-     * The store against this result set applies. We do not have to store this
-     * in the index - but we may
-     */
-    StoreRef storeRef;
-
     private Searcher searcher;
     
     private NodeService nodeService;
@@ -60,11 +53,10 @@ public class LuceneResultSet extends AbstractResultSet
      * @param storeRef
      * @param hits
      */
-    public LuceneResultSet(StoreRef storeRef, Hits hits, Searcher searcher, NodeService nodeService, Path[]propertyPaths)
+    public LuceneResultSet(Hits hits, Searcher searcher, NodeService nodeService, Path[]propertyPaths)
     {
         super(propertyPaths);
         this.hits = hits;
-        this.storeRef = storeRef;
         this.searcher = searcher;
         this.nodeService = nodeService;
     }
@@ -91,7 +83,7 @@ public class LuceneResultSet extends AbstractResultSet
             // It is possible the store ref is also stored in the index
             Document doc = hits.doc(n);
             String id = doc.get("ID");
-            return new NodeRef(storeRef, id);
+            return new NodeRef(id);
         }
         catch (IOException e)
         {

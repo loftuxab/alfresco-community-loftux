@@ -39,9 +39,9 @@ import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.impl.lucene.fts.FTSIndexerAware;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -80,6 +80,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
     private static Logger s_logger = Logger.getLogger(LuceneIndexerImpl.class);
 
+    /**
+     * Enum for indexing actions against a node
+     */
     private enum Action {
         INDEX, REINDEX, DELETE, CASCADEREINDEX
     };
@@ -89,27 +92,19 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      */
     private NodeService nodeService;
 
+    /**
+     * Content service to get content for indexing.
+     */
     private ContentService contentService;
 
     /**
      * A list of all deletions we have made - at merge these deletions need to
      * be made against the main index.
      * 
-     * TODO: Consider if this informantion needs to be persisted for recovery
+     * TODO: Consider if this information needs to be persisted for recovery
      */
 
     private Set<NodeRef> deletions = new LinkedHashSet<NodeRef>();
-
-    /**
-     * A list of all nodes we have altered This list is used to drive the
-     * background full text seach index which is to time consuming to do as part
-     * of the transaction. The commit of the list of nodes to reindex is done as
-     * part of the transaction.
-     * 
-     * TODO: Condsider persistence and recovery
-     */
-
-    private Set<NodeRef> fts = new LinkedHashSet<NodeRef>();
 
     /**
      * The status of this index - follows javax.transaction.Status
@@ -131,21 +126,46 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private Boolean isFTSUpdate = null;
 
+    /**
+     * List of pending indexing commands.
+     */
     private List<Command> commandList = new ArrayList<Command>(10000);
 
+    
+    /**
+     * Call back to make after doing non atomic indexing
+     */
     private FTSIndexerAware callBack;
 
+    /**
+     * Count of remaining items to index non atomically
+     */
     private int remainingCount = 0;
 
+    /**
+     * A list of stuff that requires non atomic indexing
+     */
     private ArrayList<Helper> toFTSIndex = new ArrayList<Helper>();
 
+    /**
+     * Ref to the QName for content
+     * TODO: This should be based on type.
+     */
     private QName contentPropertyQName = ContentModel.PROP_CONTENT_URL;
 
+    /**
+     * Default construction
+     *
+     */
     LuceneIndexerImpl()
     {
         super();
     }
 
+    /**
+     * IOC setting of dictionary service
+     */
+    
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         super.setDictionaryService(dictionaryService);
@@ -162,13 +182,19 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         this.nodeService = nodeService;
     }
 
+    /**
+     * IOC setting of the content service
+     * 
+     * @param contentService
+     */
     public void setContentService(ContentService contentService)
     {
         this.contentService = contentService;
     }
 
-    /*
-     * Indexer Implementation
+    /*    **************************
+     *    * Indexer Implementation *
+     *    **************************
      */
 
     /**
@@ -290,7 +316,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     int doc = td.doc();
                     Document document = mainReader.document(doc);
                     String id = document.get("ID");
-                    NodeRef ref = new NodeRef(store, id);
+                    NodeRef ref = new NodeRef(id);
                     deleteImpl(ref, false, true, mainReader);
                 }
             }
@@ -437,7 +463,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     }
 
     /*
-     * Transactional support Used by the resource mananger for indexers.
+     * Transactional support Used by the resource manager for indexers.
      */
 
     /**
@@ -485,7 +511,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         Set<Term> terms = new LinkedHashSet<Term>();
                         for (NodeRef nodeRef : deletions)
                         {
-                            terms.add(new Term("ID", nodeRef.getId()));
+                            terms.add(new Term("ID", nodeRef.toString()));
                         }
                         // Merge
                         mergeDeltaIntoMain(terms);
@@ -690,11 +716,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
 
         case Status.STATUS_COMMITTED:
-            throw new IndexerException("Unable to roll back: Transaction is commited ");
+            throw new IndexerException("Unable to roll back: Transaction is committed ");
         case Status.STATUS_ROLLING_BACK:
             throw new IndexerException("Unable to roll back: Transaction is rolling back");
         case Status.STATUS_ROLLEDBACK:
-            throw new IndexerException("Unable to roll back: Transaction is aleady rolled back");
+            throw new IndexerException("Unable to roll back: Transaction is already rolled back");
         case Status.STATUS_COMMITTING:
         // Can roll back during commit
         default:
@@ -725,7 +751,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         case Status.STATUS_COMMITTING:
             throw new IndexerException("Unable to mark for rollback: Transaction is committing");
         case Status.STATUS_COMMITTED:
-            throw new IndexerException("Unable to mark for rollback: Transaction is commited");
+            throw new IndexerException("Unable to mark for rollback: Transaction is committed");
         default:
             status = Status.STATUS_MARKED_ROLLBACK;
             break;
@@ -909,13 +935,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             try
             {
-                TermDocs td = reader.termDocs(new Term("PRIMARYPARENT", nodeRef.getId()));
+                TermDocs td = reader.termDocs(new Term("PRIMARYPARENT", nodeRef.toString()));
                 while (td.next())
                 {
                     int doc = td.doc();
                     Document document = reader.document(doc);
                     String id = document.get("ID");
-                    NodeRef ref = new NodeRef(store, id);
+                    NodeRef ref = new NodeRef(id);
                     refs.add(ref);
                     if (delete)
                     {
@@ -925,7 +951,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
             catch (IOException e)
             {
-                throw new LuceneIndexException("Failed to delete node by primary parent for " + nodeRef.getId(), e);
+                throw new LuceneIndexException("Failed to delete node by primary parent for " + nodeRef.toString(), e);
             }
         }
 
@@ -943,13 +969,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             try
             {
-                TermDocs td = reader.termDocs(new Term("PARENT", nodeRef.getId()));
+                TermDocs td = reader.termDocs(new Term("PARENT", nodeRef.toString()));
                 while (td.next())
                 {
                     int doc = td.doc();
                     Document document = reader.document(doc);
                     String id = document.get("ID");
-                    NodeRef ref = new NodeRef(store, id);
+                    NodeRef ref = new NodeRef(id);
                     refs.add(ref);
                     if (delete)
                     {
@@ -959,7 +985,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             }
             catch (IOException e)
             {
-                throw new LuceneIndexException("Failed to delete node by parent for " + nodeRef.getId(), e);
+                throw new LuceneIndexException("Failed to delete node by parent for " + nodeRef.toString(), e);
             }
         }
 
@@ -975,18 +1001,18 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             if (delete)
             {
-                int count = reader.delete(new Term("ID", nodeRef.getId()));
+                int count = reader.delete(new Term("ID", nodeRef.toString()));
             }
             refs.add(nodeRef);
             if (cascade)
             {
-                TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.getId()));
+                TermDocs td = reader.termDocs(new Term("ANCESTOR", nodeRef.toString()));
                 while (td.next())
                 {
                     int doc = td.doc();
                     Document document = reader.document(doc);
                     String id = document.get("ID");
-                    NodeRef ref = new NodeRef(store, id);
+                    NodeRef ref = new NodeRef(id);
                     refs.add(ref);
                     if (delete)
                     {
@@ -997,7 +1023,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         catch (IOException e)
         {
-            throw new LuceneIndexException("Failed to delete container and below for " + nodeRef.getId(), e);
+            throw new LuceneIndexException("Failed to delete container and below for " + nodeRef.toString(), e);
         }
         return refs;
     }
@@ -1110,7 +1136,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         paths.addAll(categoryPaths);
 
         Document xdoc = new Document();
-        xdoc.add(new Field("ID", nodeRef.getId(), true, true, false));
+        xdoc.add(new Field("ID", nodeRef.toString(), true, true, false));
         boolean isAtomic = true;
         for (QName propertyName : properties.keySet())
         {
@@ -1137,7 +1163,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 pathString = pathString.substring(1);
             }
 
-            String parentString = getParentString(pair.getFirst());
+          
 
             if (isRoot)
             {
@@ -1163,7 +1189,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             qNameBuffer.append(";/");
                         }
                         qNameBuffer.append(qNameRef.getQName().toString());
-                        xdoc.add(new Field("PARENT", qNameRef.getParentRef().getId(), true, true, false));
+                        xdoc.add(new Field("PARENT", qNameRef.getParentRef().toString(), true, true, false));
                         xdoc.add(new Field("TYPEQNAME", qNameRef.getTypeQName().toString(), true, false, false));
                         xdoc.add(new Field("LINKASPECT", (pair.getSecond() == null) ? "" : pair.getSecond().toString(), true, true, false));
                     }
@@ -1183,9 +1209,12 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     if (directPaths.contains(pair.getFirst()))
                     {
                         Document directoryEntry = new Document();
-                        directoryEntry.add(new Field("ID", nodeRef.getId(), true, true, false));
+                        directoryEntry.add(new Field("ID", nodeRef.toString(), true, true, false));
                         directoryEntry.add(new Field("PATH", pathString, true, true, true));
-                        directoryEntry.add(new Field("ANCESTOR", parentString, true, true, true));
+                        for(NodeRef parent : getParents(pair.getFirst()))
+                        {
+                            directoryEntry.add(new Field("ANCESTOR", parent.toString(), true, true, false));
+                        }
                         directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
 
                         if (isCategory(getDictionaryService().getType(nodeService.getType(nodeRef))))
@@ -1219,7 +1248,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // true));
 
             ChildAssociationRef primary = nodeService.getPrimaryParent(nodeRef);
-            xdoc.add(new Field("PRIMARYPARENT", primary.getParentRef().getId(), true, true, false));
+            xdoc.add(new Field("PRIMARYPARENT", primary.getParentRef().toString(), true, true, false));
             xdoc.add(new Field("TYPE", nodeService.getType(nodeRef).toString(), true, true, false));
             for (QName classRef : nodeService.getAspects(nodeRef))
             {
@@ -1253,9 +1282,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         return docs;
     }
 
-    private String getParentString(Path path)
+    private ArrayList<NodeRef> getParents(Path path)
     {
-        StringBuilder parentBuffer = new StringBuilder(128);
         ArrayList<NodeRef> parentsInDepthOrderStartingWithSelf = new ArrayList<NodeRef>(8);
         for (Iterator<Path.Element> elit = path.iterator(); elit.hasNext(); /**/)
         {
@@ -1268,16 +1296,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             parentsInDepthOrderStartingWithSelf.add(0, cae.getRef().getChildRef());
 
         }
-        for (NodeRef ref : parentsInDepthOrderStartingWithSelf)
-        {
-            if (parentBuffer.length() != 0)
-            {
-                parentBuffer.append(" ");
-            }
-            parentBuffer.append(ref.getId());
-        }
-        parentsInDepthOrderStartingWithSelf.clear();
-        return parentBuffer.toString();
+        return parentsInDepthOrderStartingWithSelf;
     }
 
     private ChildAssociationRef getLastRefOrNull(Path path)
@@ -1513,9 +1532,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
                 catch (IOException e)
                 {
-                    throw new LuceneIndexException("Failed to excute query to find content which needs updating in the index", e);
+                    throw new LuceneIndexException("Failed to execute query to find content which needs updating in the index", e);
                 }
-                results = new LuceneResultSet(store, hits, searcher, nodeService, null);
+                results = new LuceneResultSet(hits, searcher, nodeService, null);
 
                 for (ResultSetRow row : results)
                 {
@@ -1632,7 +1651,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     }
                     catch (IOException e)
                     {
-                        throw new LuceneIndexException("Failed to add docuement while updating fts index", e);
+                        throw new LuceneIndexException("Failed to add document while updating fts index", e);
                     }
 
                     // Need to do all the current id in the TX - should all be

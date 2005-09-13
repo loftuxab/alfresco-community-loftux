@@ -109,6 +109,21 @@ public class LuceneQueryParser extends QueryParser
                 pathQuery.setRepeats(true);
                 return pathQuery;
             }
+            else if (field.equals("ID"))
+            {
+                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                return termQuery;
+            }
+            else if (field.equals("PARENT"))
+            {
+                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                return termQuery;
+            }
+            else if (field.equals("PRIMARYPARENT"))
+            {
+                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                return termQuery;
+            }
             else if (field.equals("QNAME"))
             {
                 XPathReader reader = new XPathReader();

@@ -187,7 +187,6 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         {
             throw new IllegalStateException("Only one store can be searched at present");
         }
-        StoreRef store = searchParameters.getStores().get(0);
 
         if (indexExists())
         {
@@ -234,7 +233,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                         hits = searcher.search(query);
                     }
 
-                    return new LuceneResultSet(store, hits, searcher, nodeService, searchParameters.getAttributePaths().toArray(new Path[0]));
+                    return new LuceneResultSet(hits, searcher, nodeService, searchParameters.getAttributePaths().toArray(new Path[0]));
 
                 }
                 catch (ParseException e)
@@ -263,7 +262,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     Query query = handler.getQuery();
                     Searcher searcher = getSearcher(null);
                     Hits hits = searcher.search(query);
-                    return new LuceneResultSet(store, hits, searcher, nodeService, searchParameters.getAttributePaths().toArray(new Path[0]));
+                    return new LuceneResultSet(hits, searcher, nodeService, searchParameters.getAttributePaths().toArray(new Path[0]));
                 }
                 catch (SAXPathException e)
                 {
@@ -456,14 +455,6 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         return buffer.toString();
     }
 
-    private void reset(ListIterator it)
-    {
-        while (it.hasPrevious())
-        {
-            it.previous();
-        }
-    }
-
     /**
      * @see org.alfresco.repo.search.impl.NodeSearcher
      */
@@ -492,7 +483,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         {
             // build Lucene search string specific to the node
             StringBuilder sb = new StringBuilder();
-            sb.append("+ID:").append(nodeRef.getId()).append(" +(TEXT:(").append(googleLikePattern.toLowerCase()).append(") ");
+            sb.append("+ID:\"").append(nodeRef.toString()).append("\" +(TEXT:(").append(googleLikePattern.toLowerCase()).append(") ");
             if (propertyQName != null)
             {
                 sb.append("@").append(LuceneQueryParser.escape(propertyQName.toString()));
@@ -543,7 +534,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
 
             // build Lucene search string specific to the node
             sb = new StringBuilder();
-            sb.append("+ID:").append(nodeRef.getId()).append(" +(");
+            sb.append("+ID:\"").append(nodeRef.toString()).append("\" +(");
             // FTS or attribute matches
             if (includeFTS)
             {

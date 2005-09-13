@@ -46,7 +46,7 @@ public class FilterIndexReaderByNodeRefs extends FilterIndexReader
         {
             for (NodeRef nodeRef : deletions)
             {
-                TermDocs td = reader.termDocs(new Term("ID", nodeRef.getId()));
+                TermDocs td = reader.termDocs(new Term("ID", nodeRef.toString()));
                 while (td.next())
                 {
                     deletedDocuments.set(td.doc(), true);
