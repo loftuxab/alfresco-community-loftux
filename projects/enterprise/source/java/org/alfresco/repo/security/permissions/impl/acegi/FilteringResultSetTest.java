@@ -17,6 +17,8 @@
 package org.alfresco.repo.security.permissions.impl.acegi;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -28,15 +30,13 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.namespace.QName;
 
 public class FilteringResultSetTest extends TestCase
 {
 
-    public static Test suite() {
-        TestSuite suite= new TestSuite();
-        return suite;
-    }
+    
     
     public FilteringResultSetTest()
     {
@@ -93,6 +93,32 @@ public class FilteringResultSetTest extends TestCase
             assertEquals("n"+i, filtering.getNodeRef(i).getId());
         }
         
+        int count = 0;
+        for(ResultSetRow row : filtering)
+        {
+            assertTrue(count < 6);
+            count++;
+        }
+        
+        ResultSetRow last = null;
+        for(ListIterator<ResultSetRow> it = filtering.iterator(); it.hasNext(); /**/)
+        {
+            ResultSetRow row = it.next();
+            if(last != null)
+            {
+                assertTrue(it.hasPrevious()); 
+                ResultSetRow previous = it.previous();
+                assertEquals(last.getIndex(), previous.getIndex());
+                row = it.next();
+                
+            }
+            else
+            {
+                assertFalse(it.hasPrevious());
+            }
+            last = row;
+         
+        }
     }
     
 }

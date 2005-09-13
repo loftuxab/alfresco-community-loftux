@@ -17,8 +17,8 @@
 package org.alfresco.repo.security.permissions.impl.acegi;
 
 import java.util.BitSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.alfresco.repo.search.ResultSetRowIterator;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -78,7 +78,7 @@ public class FilteringResultSet extends ACLEntryAfterInvocationProvider implemen
             {
                 count++;
             }
-            if(count == n)
+            if (count == n)
             {
                 return i;
             }
@@ -138,33 +138,45 @@ public class FilteringResultSet extends ACLEntryAfterInvocationProvider implemen
         return unfiltered.getChildAssocRef(translateIndex(n));
     }
 
-    public Iterator<ResultSetRow> iterator()
+    public ListIterator<ResultSetRow> iterator()
     {
         return new FilteringIterator();
     }
 
     class FilteringIterator implements ResultSetRowIterator
     {
-        int underlyingPosition = 0;
+        // -1 at the start
+        int underlyingPosition = -1;
 
         public boolean hasNext()
         {
-            return (inclusionMask.nextSetBit(underlyingPosition) != -1);
+            return inclusionMask.nextSetBit(underlyingPosition + 1) != -1;
         }
 
         public ResultSetRow next()
         {
-            underlyingPosition = inclusionMask.nextSetBit(underlyingPosition);
+            underlyingPosition = inclusionMask.nextSetBit(underlyingPosition + 1);
+            if( underlyingPosition == -1)
+            {
+                throw new IllegalStateException();
+            }
             return unfiltered.getRow(underlyingPosition);
         }
 
         public boolean hasPrevious()
         {
-            for (int i = underlyingPosition - 1; i >= 0; i--)
+            if (underlyingPosition <= 0)
             {
-                if (inclusionMask.get(i))
+                return false;
+            }
+            else
+            {
+                for (int i = underlyingPosition - 1; i >= 0; i--)
                 {
-                    return true;
+                    if (inclusionMask.get(i))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -172,23 +184,32 @@ public class FilteringResultSet extends ACLEntryAfterInvocationProvider implemen
 
         public ResultSetRow previous()
         {
+            if (underlyingPosition <= 0)
+            {
+                throw new IllegalStateException();
+            }
             for (int i = underlyingPosition - 1; i >= 0; i--)
             {
                 if (inclusionMask.get(i))
                 {
                     underlyingPosition = i;
+                    return unfiltered.getRow(underlyingPosition);
                 }
             }
-            return unfiltered.getRow(underlyingPosition);
+            throw new IllegalStateException();
         }
 
         public int nextIndex()
         {
-            return inclusionMask.nextSetBit(underlyingPosition);
+            return inclusionMask.nextSetBit(underlyingPosition+1);
         }
 
         public int previousIndex()
         {
+            if (underlyingPosition <= 0)
+            {
+                return -1;
+            }
             for (int i = underlyingPosition - 1; i >= 0; i--)
             {
                 if (inclusionMask.get(i))

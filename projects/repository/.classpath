@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="var" path="CLOVER_RUNTIME"/>
 	<classpathentry kind="src" path="source/java"/>
 	<classpathentry kind="src" path="config"/>
 	<classpathentry kind="src" path="source/test-resources"/>

@@ -54,6 +54,8 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 
     private static final String ACL_PARENT = "ACL_PARENT";
 
+    private static final String ACL_ALLOW = "ACL_ALLOW";
+
     private PermissionService permissionService;
 
     private NamespacePrefixResolver nspr;
@@ -134,7 +136,8 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
-                && (attribute.getAttribute().startsWith(ACL_NODE) || attribute.getAttribute().startsWith(ACL_PARENT)))
+                && (attribute.getAttribute().startsWith(ACL_NODE) || attribute.getAttribute().startsWith(ACL_PARENT) || attribute
+                        .getAttribute().startsWith(ACL_ALLOW)))
         {
             return true;
         }
@@ -191,7 +194,11 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         {
             NodeRef testNodeRef = null;
 
-            if (cad.typeString.equals(ACL_NODE))
+            if (cad.typeString.equals(ACL_ALLOW))
+            {
+                return AccessDecisionVoter.ACCESS_GRANTED;
+            }
+            else if (cad.typeString.equals(ACL_NODE))
             {
                 if (StoreRef.class.isAssignableFrom(params[cad.parameter]))
                 {
@@ -326,16 +333,20 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
             String qNameString = st.nextToken();
             String permissionString = st.nextToken();
 
-            if (!(typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT)))
+            if (!(typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT) || typeString.equals(ACL_ALLOW)))
             {
-                throw new ACLEntryVoterException("Invalid type: must be ACL_NODE or ACL_PARENT");
+                throw new ACLEntryVoterException("Invalid type: must be ACL_NODE, ACL_PARENT or ACL_ALLOW");
             }
 
-            parameter = Integer.parseInt(numberString);
+            if (!typeString.equals(ACL_ALLOW))
+            {
 
-            QName qName = QName.createQName(qNameString, nspr);
+                parameter = Integer.parseInt(numberString);
 
-            required = new SimplePermissionReference(qName, permissionString);
+                QName qName = QName.createQName(qNameString, nspr);
+
+                required = new SimplePermissionReference(qName, permissionString);
+            }
 
         }
     }

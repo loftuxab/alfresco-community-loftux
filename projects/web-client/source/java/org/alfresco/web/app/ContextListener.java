@@ -78,7 +78,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
     /**
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
-public void contextInitialized(ServletContextEvent event)
+
+    public void contextInitialized(ServletContextEvent event)
     {
         // make sure that the spaces store in the repository exists
         this.servletContext = event.getServletContext();
@@ -88,7 +89,8 @@ public void contextInitialized(ServletContextEvent event)
         NodeService nodeService = registry.getNodeService();
         SearchService searchService = registry.getSearchService();
         NamespaceService namespaceService = registry.getNamespaceService();
-        AuthenticationComponent authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
+        AuthenticationComponent authenticationComponent = (AuthenticationComponent) ctx
+                .getBean("authenticationComponent");
 
         String repoStoreUrl = Application.getRepositoryStoreUrl(servletContext);
         if (repoStoreUrl == null)
@@ -103,8 +105,8 @@ public void contextInitialized(ServletContextEvent event)
         try
         {
             tx = transactionService.getUserTransaction();
-            authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
             tx.begin();
+            authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
 
             // get and setup the initial store ref from config
             StoreRef storeRef = Repository.getStoreRef(servletContext);
@@ -136,12 +138,12 @@ public void contextInitialized(ServletContextEvent event)
             companySpaceId = nodes.get(0).getId();
             Application.setCompanyRootId(companySpaceId);
 
-            
             // check the admin user exists, create if it doesn't
             MutableAuthenticationDao dao = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
+
             // this is required to setup the ACEGI context before we can check
             // for the user
-            if(!dao.userExists(ADMIN))
+            if (!dao.userExists(ADMIN))
             {
                 ConfigService configService = (ConfigService) ctx.getBean(Application.BEAN_CONFIG_SERVICE);
                 // default to password of "admin" if we don't find config for it
@@ -179,38 +181,40 @@ public void contextInitialized(ServletContextEvent event)
                 // Create the person under the special people system folder
                 // This is required to allow authenticate() to succeed during
                 // login
+               
                 List<NodeRef> results = searchService.selectNodes(rootNodeRef,
                         RepositoryAuthenticationDao.PEOPLE_FOLDER, null, namespaceService, false);
                 NodeRef typesNode = null;
                 if (results.size() == 0)
                 {
+                    
+
                     List<ChildAssociationRef> result = nodeService.getChildAssocs(rootNodeRef, QName.createQName("sys",
                             "system", namespaceService));
                     NodeRef sysNode = null;
                     if (result.size() == 0)
                     {
                         sysNode = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
-                                QName.createQName("sys", "system", namespaceService),
-                                ContentModel.TYPE_CONTAINER).getChildRef();
+                                QName.createQName("sys", "system", namespaceService), ContentModel.TYPE_CONTAINER)
+                                .getChildRef();
                     }
                     else
                     {
                         sysNode = result.get(0).getChildRef();
                     }
-                    result = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people",
-                            namespaceService));
-                    
+                    result = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people", namespaceService));
+
                     if (result.size() == 0)
                     {
                         typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN,
-                                QName.createQName("sys", "people", namespaceService),
-                                ContentModel.TYPE_CONTAINER).getChildRef();
+                                QName.createQName("sys", "people", namespaceService), ContentModel.TYPE_CONTAINER)
+                                .getChildRef();
                     }
                     else
                     {
                         typesNode = result.get(0).getChildRef();
                     }
-                    
+
                 }
                 else
                 {
@@ -218,20 +222,22 @@ public void contextInitialized(ServletContextEvent event)
                 }
 
                 nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, // expecting
-                                                                                                                // this
-                                                                                                                // qname
-                                                                                                                // path
-                                                                                                                // in
-                                                                                                                // the
-                                                                                                                // authentication
-                                                                                                                // methods
+                        // this
+                        // qname
+                        // path
+                        // in
+                        // the
+                        // authentication
+                        // methods
                         ContentModel.TYPE_PERSON, props);
             }
 
-            PermissionService permissionService = (PermissionService)ctx.getBean("permissionService");
+            PermissionService permissionService = (PermissionService) ctx.getBean("permissionService");
             permissionService.setPermission(rootNodeRef, ADMIN, permissionService.getAllPermission(), true);
-            permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), permissionService.getPermissionReference(QName.createQName("sys", "base", registry.getNamespaceService()), "Read"), true);
-            
+            permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), permissionService
+                    .getPermissionReference(QName.createQName("sys", "base", registry.getNamespaceService()), "Read"),
+                    true);
+
             // commit the transaction
             tx.commit();
         }
@@ -248,11 +254,18 @@ public void contextInitialized(ServletContextEvent event)
             catch (Exception ex)
             {
             }
-            try{ authenticationComponent.clearCurrentSecurityContext(); }  catch (Exception ex) {} 
+            try
+            {
+                authenticationComponent.clearCurrentSecurityContext();
+            }
+            catch (Exception ex)
+            {
+            }
             logger.error("Failed to initialise ", e);
             throw new AlfrescoRuntimeException("Failed to initialise ", e);
         }
     }
+
     /**
      * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */

@@ -177,7 +177,7 @@
       </property>
    </bean>
     
-     <bean id="ContentService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+   <bean id="ContentService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
       <property name="authenticationManager"><ref bean="authenticationManager"/></property>
       <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
       <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
@@ -190,13 +190,40 @@
       </property>
    </bean>
     
-   <!--<bean id="ContentService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />-->
-    
+   <!-- There are no permissions around mime types -->
    <bean id="MimetypeService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
-   <bean id="SearchService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
-    
-   <bean id="CategoryService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   <!-- Role Authenticated required to stop acegi resetting to unauthenticated -->
+   <bean id="SearchService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
+      <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+      <property name="objectDefinitionSource">
+         <value>
+				org.alfresco.service.cmr.search.SearchService.query=AFTER_ACL_NODE.sys:base.Read
+                org.alfresco.service.cmr.search.SearchService.selectNodes=AFTER_ACL_NODE.sys:base.Read
+                org.alfresco.service.cmr.search.SearchService.selectProperties=ACL_NODE.0.sys:base.Read
+                org.alfresco.service.cmr.search.SearchService.contains=ACL_NODE.0.sys:base.Read
+                org.alfresco.service.cmr.search.SearchService.like=ACL_NODE.0.sys:base.Read
+         </value>
+      </property>
+   </bean>
+   
+   <!-- Role Authenticated required to stop acegi resetting to unauthenticated -->
+   <bean id="CategoryService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
+      <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+      <property name="objectDefinitionSource">
+         <value>
+				org.alfresco.service.cmr.search.CategoryService.getChildren=AFTER_ACL_NODE.sys:base.Read
+                org.alfresco.service.cmr.search.CategoryService.getCategories=AFTER_ACL_NODE.sys:base.Read
+                org.alfresco.service.cmr.search.CategoryService.getRootCategories=AFTER_ACL_NODE.sys:base.Read
+                org.alfresco.service.cmr.search.CategoryService.getCategoryAspects=ACL_ALLOW
+                org.alfresco.service.cmr.search.CategoryService.newCategory=ACL_ALLOW
+         </value>
+      </property>
+   </bean>
     
    <bean id="CopyService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
