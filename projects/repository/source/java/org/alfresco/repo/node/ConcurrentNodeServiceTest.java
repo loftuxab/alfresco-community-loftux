@@ -17,21 +17,14 @@
 package org.alfresco.repo.node;
 
 import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -96,81 +89,7 @@ public class ConcurrentNodeServiceTest extends TestCase
 
     protected Map<QName, ChildAssociationRef> buildNodeGraph() throws Exception
     {
-        String ns = BaseNodeServiceTest.NAMESPACE;
-        QName qname = null;
-        ChildAssociationRef assoc = null;
-        Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-        Map<QName, ChildAssociationRef> ret = new HashMap<QName, ChildAssociationRef>(13);
-
-        // LEVEL 0
-
-        // LEVEL 1
-        qname = QName.createQName(ns, "root_p_n1");
-        assoc = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n1 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "root_p_n2");
-        assoc = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n2 = assoc.getChildRef();
-
-        // LEVEL 2
-
-        properties.clear();
-        properties.put(QName.createQName(ns, "animal"), "monkey");
-        properties.put(QName.createQName(ns, "reference"), n2.toString());
-
-        qname = QName.createQName(ns, "n1_p_n3");
-        assoc = nodeService.createNode(n1, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER, properties);
-        ret.put(qname, assoc);
-        NodeRef n3 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "n2_p_n4");
-        assoc = nodeService.createNode(n2, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n4 = assoc.getChildRef();
-
-        qname = QName.createQName(ns, "n1_n4");
-        assoc = nodeService.addChild(n1, n4, ContentModel.ASSOC_CHILDREN, qname);
-        ret.put(qname, assoc);
-
-        qname = QName.createQName(ns, "n2_p_n5");
-        assoc = nodeService.createNode(n2, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n5 = assoc.getChildRef();
-
-        // LEVEL 3
-        qname = QName.createQName(ns, "n3_p_n6");
-        assoc = nodeService.createNode(n3, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n6 = assoc.getChildRef();
-        nodeService.addAspect(n6, ContentModel.ASPECT_ROOT, Collections.<QName, Serializable> emptyMap());
-
-        qname = QName.createQName(ns, "n4_n6");
-        assoc = nodeService.addChild(n4, n6, ContentModel.ASSOC_CHILDREN, qname);
-        ret.put(qname, assoc);
-
-        qname = QName.createQName(ns, "n5_p_n7");
-        assoc = nodeService.createNode(n5, ContentModel.ASSOC_CHILDREN, qname, ContentModel.TYPE_CONTAINER);
-        ret.put(qname, assoc);
-        NodeRef n7 = assoc.getChildRef();
-
-        // LEVEL 4
-        properties.clear();
-        properties.put(PROP_QNAME_TEST_MIMETYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        properties.put(PROP_QNAME_TEST_TITLE, "node8");
-        qname = QName.createQName(ns, "n6_p_n8");
-        assoc = nodeService.createNode(n6, ContentModel.ASSOC_CHILDREN, qname, TYPE_QNAME_TEST_CONTENT, properties);
-        ret.put(qname, assoc);
-        NodeRef n8 = assoc.getChildRef();
-        nodeService.getPaths(n8, false);
-
-        qname = QName.createQName(ns, "n7_n8");
-        assoc = nodeService.addChild(n7, n8, ContentModel.ASSOC_CHILDREN, qname);
-        ret.put(qname, assoc);
-
-        return ret;
+        return BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
     }
 
     protected Map<QName, ChildAssociationRef> commitNodeGraph() throws Exception
