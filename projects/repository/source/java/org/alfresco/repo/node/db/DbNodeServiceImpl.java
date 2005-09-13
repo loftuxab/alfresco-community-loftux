@@ -451,9 +451,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         return hasAspect;
     }
 
-    /**
-     * Transforms the results from {@link Node#getAspects()} into an unmodifiable set
-     */
     public Set<QName> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
@@ -709,7 +706,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		invokeOnUpdateNode(nodeRef);
         invokeOnUpdateProperties(nodeRef, propertiesBefore, propertiesAfter);
     }
-
+    
     /**
      * Transforms {@link Node#getParentAssocs()} to a new collection
      */
@@ -732,8 +729,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
     /**
      * Filters out any associations if their qname is not a match to the given pattern.
-     * <p>
-     * Transforms {@link Node#getParentAssocs()} into an unmodifiable list
      */
     public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
     {
@@ -763,8 +758,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
     /**
      * Filters out any associations if their qname is not a match to the given pattern.
-     * <p>
-     * Transforms {@link Node#getChildAssocs()} into an unmodifiable list.
      */
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
     {
@@ -866,10 +859,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         invokeOnDeleteAssociation(assocRef);
     }
 
-    /**
-     * Transforms {@link NodeDaoService#getNodeAssocTargets(Node, String)} into
-     * an unmodifiable collection.
-     */
     public List<AssociationRef> getTargetAssocs(NodeRef sourceRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException
     {
@@ -890,10 +879,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         return nodeAssocRefs;
     }
 
-    /**
-     * Transforms {@link NodeDaoService#getNodeAssocSources(Node, String)} into
-     * an unmodifiable collection.
-     */
     public List<AssociationRef> getSourceAssocs(NodeRef targetRef, QNamePattern qnamePattern)
             throws InvalidNodeRefException
     {
@@ -1081,7 +1066,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
         
         // done
-        return Collections.unmodifiableList(paths);
+        return paths;
     }
     
     /**
