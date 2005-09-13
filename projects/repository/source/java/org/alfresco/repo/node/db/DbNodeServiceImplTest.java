@@ -35,9 +35,20 @@ import org.alfresco.service.transaction.TransactionService;
  */
 public class DbNodeServiceImplTest extends BaseNodeServiceTest
 {
+    private TransactionService txnService;
+    private NodeDaoService nodeDaoService;
+    
     protected NodeService getNodeService()
     {
         return (NodeService) applicationContext.getBean("dbNodeService");
+    }
+
+    @Override
+    protected void onSetUpInTransaction() throws Exception
+    {
+        super.onSetUpInTransaction();
+        txnService = (TransactionService) applicationContext.getBean("transactionComponent");
+        nodeDaoService = (NodeDaoService) applicationContext.getBean("nodeDaoService");
     }
 
     /**
@@ -52,8 +63,7 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
         setComplete();
         endTransaction();
 
-        TransactionService trxService = (TransactionService)applicationContext.getBean("transactionComponent");
-        UserTransaction userTransaction = trxService.getUserTransaction();
+        UserTransaction userTransaction = txnService.getUserTransaction();
         
         try
         {
