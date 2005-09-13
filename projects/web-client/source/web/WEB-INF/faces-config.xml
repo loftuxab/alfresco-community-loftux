@@ -195,6 +195,10 @@
          <property-name>searchService</property-name>
          <value>#{SearchService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>authenticationService</property-name>
+         <value>#{authenticationService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

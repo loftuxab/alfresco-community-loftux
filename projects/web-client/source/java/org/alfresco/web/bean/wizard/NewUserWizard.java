@@ -404,7 +404,6 @@ public class NewUserWizard extends AbstractWizardBean
            
             this.permissionService.setPermission(newPerson, this.userName, permissionService.getAllPermission(), true);
             
-            
             if (logger.isDebugEnabled())
                logger.debug("Created Person node for username: " + this.userName);
             
@@ -458,45 +457,6 @@ public class NewUserWizard extends AbstractWizardBean
    public void setupUsers(ActionEvent event)
    {
       invalidateUserList();
-   }
-   
-   /**
-    * Action event called by all actions that need to setup a Person context on the 
-    * NewUserWizard bean before an action page is called. The context will be a Person Node in
-    * setPerson() which can be retrieved on the action page from NewUserWizard.getPerson().
-    */
-   public void setupUserAction(ActionEvent event)
-   {
-      UIActionLink link = (UIActionLink)event.getComponent();
-      Map<String, String> params = link.getParameterMap();
-      String id = params.get("id");
-      if (id != null && id.length() != 0)
-      {
-         if (logger.isDebugEnabled())
-            logger.debug("Setup for action, setting current Person to: " + id);
-         
-         try
-         {
-            // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
-            
-            // remember the Person node
-            setPerson(node);
-            
-            // clear the UI state in preparation for finishing the action and returning to the main page
-            invalidateUserList();
-         }
-         catch (InvalidNodeRefException refErr)
-         {
-            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-                  FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {id}) );
-         }
-      }
-      else
-      {
-         setPerson(null);
-      }
    }
    
    /**

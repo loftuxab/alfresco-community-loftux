@@ -349,6 +349,18 @@
          <from-outcome>editUser</from-outcome>
          <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteUser</from-outcome>
+         <to-view-id>/jsp/dialog/delete-user.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/dialog/delete-user.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>manageUsers</from-outcome>
+         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <!-- navigation rule for the new space dialog -->
