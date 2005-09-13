@@ -323,7 +323,7 @@ public class SearcherComponentTest extends TestCase
         // select the monkey node again, but use the first level as the starting poing
         NodeRef n1Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "root_p_n1")).getChildRef();
         NodeRef n3Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n1_p_n3")).getChildRef();
-        // fist time go too deep
+        // first time go too deep
         answer = searcher.selectNodes(
                 n1Ref,
                 "./*/*[like(@test:animal, $test:animal, false) or subtypeOf($test:type)]",
@@ -341,5 +341,5 @@ public class SearcherComponentTest extends TestCase
         assertEquals(1, answer.size());
         assertFalse("Incorrect result: search root node pulled back", answer.contains(n1Ref));
         assertTrue("Incorrect result: incorrect node retrieved", answer.contains(n3Ref));
-   }
+    }
 }
