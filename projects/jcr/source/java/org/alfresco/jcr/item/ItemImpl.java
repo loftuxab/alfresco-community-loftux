@@ -20,8 +20,6 @@ import javax.jcr.AccessDeniedException;
 import javax.jcr.InvalidItemStateException;
 import javax.jcr.Item;
 import javax.jcr.ItemExistsException;
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.ItemVisitor;
 import javax.jcr.ReferentialIntegrityException;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -31,7 +29,6 @@ import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.version.VersionException;
 
-import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
 
 
@@ -56,50 +53,20 @@ public abstract class ItemImpl implements Item
     }
     
     /**
-     * Create a JCR Item
+     * Get the Item Proxy
      * 
-     * @return  proxied Item
+     * @return  the proxy
      */
-    public Item createItem()
-    {
-        return (Item)JCRProxyFactory.create(this, Item.class, session);
-    }
+    public abstract Item getProxy();
     
-    /* (non-Javadoc)
-     * @see javax.jcr.Item#getPath()
-     */
-    public String getPath() throws RepositoryException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see javax.jcr.Item#getAncestor(int)
-     */
-    public Item getAncestor(int depth) throws ItemNotFoundException, AccessDeniedException, RepositoryException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see javax.jcr.Item#getDepth()
-     */
-    public int getDepth() throws RepositoryException
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     /* (non-Javadoc)
      * @see javax.jcr.Item#getSession()
      */
     public Session getSession() throws RepositoryException
     {
-        return session;
+        return session.getProxy();
     }
-
+    
     /* (non-Javadoc)
      * @see javax.jcr.Item#isNew()
      */
@@ -114,24 +81,6 @@ public abstract class ItemImpl implements Item
     public boolean isModified()
     {
         return false;
-    }
-
-    /* (non-Javadoc)
-     * @see javax.jcr.Item#isSame(javax.jcr.Item)
-     */
-    public boolean isSame(Item otherItem) throws RepositoryException
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* (non-Javadoc)
-     * @see javax.jcr.Item#accept(javax.jcr.ItemVisitor)
-     */
-    public void accept(ItemVisitor visitor) throws RepositoryException
-    {
-        // TODO Auto-generated method stub
-        
     }
 
     /* (non-Javadoc)
@@ -158,4 +107,5 @@ public abstract class ItemImpl implements Item
         throw new UnsupportedRepositoryOperationException();
     }
 
+    
 }

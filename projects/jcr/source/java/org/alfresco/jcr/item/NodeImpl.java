@@ -17,17 +17,17 @@
 package org.alfresco.jcr.item;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.jcr.AccessDeniedException;
 import javax.jcr.InvalidItemStateException;
 import javax.jcr.Item;
 import javax.jcr.ItemExistsException;
 import javax.jcr.ItemNotFoundException;
+import javax.jcr.ItemVisitor;
 import javax.jcr.MergeException;
 import javax.jcr.NoSuchWorkspaceException;
 import javax.jcr.Node;
@@ -49,11 +49,17 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 import javax.jcr.version.VersionHistory;
 
+import org.alfresco.jcr.dictionary.NodeTypeImpl;
 import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.Path.Element;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 
 
@@ -67,6 +73,9 @@ public class NodeImpl extends ItemImpl implements Node
     /** Node Reference to wrap */
     private NodeRef nodeRef;
 
+    /** Proxy */
+    private Node proxy = null;
+    
     
     /**
      * Construct
@@ -81,14 +90,19 @@ public class NodeImpl extends ItemImpl implements Node
     }
 
     /**
-     * Create JCR Node
+     * Get Node Proxy
      * 
      * @param nodeImpl
      * @return
      */
-    public Node createNode()
+    @Override
+    public Node getProxy()
     {
-        return (Node)JCRProxyFactory.create(this, Node.class, session);
+        if (proxy == null)
+        {
+            proxy = (Node)JCRProxyFactory.create(this, Node.class, session); 
+        }
+        return proxy;
     }
     
     
@@ -234,7 +248,7 @@ public class NodeImpl extends ItemImpl implements Node
     public Node getNode(String relPath) throws PathNotFoundException, RepositoryException
     {
         NodeImpl nodeImpl = ItemResolver.findNode(session, nodeRef, relPath);
-        return nodeImpl.createNode();
+        return nodeImpl.getProxy();
     }
 
     /* (non-Javadoc)
@@ -253,8 +267,11 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeIterator getNodes(String namePattern) throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        JCRPatternMatch match = new JCRPatternMatch(namePattern, session.getNamespaceResolver());
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, match);        
+        NodeIterator iterator = new ChildAssocNodeIteratorImpl(session, childAssocs);
+        return iterator;
     }
 
     /* (non-Javadoc)
@@ -262,8 +279,19 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property getProperty(String relPath) throws PathNotFoundException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        JCRPath path = new JCRPath(relPath);
+        if (path.size() == 1)
+        {
+            QName propertyName = QName.createQName(relPath, session.getNamespaceResolver());
+            return PropertyResolver.createProperty(this, propertyName).getProxy();
+        }
+
+        ItemImpl itemImpl = ItemResolver.findItem(session, nodeRef, relPath);
+        if (itemImpl == null || !(itemImpl instanceof PropertyImpl))
+        {
+            throw new PathNotFoundException("Property path " + relPath + " not found from node " + nodeRef);
+        }
+        return ((PropertyImpl)itemImpl).getProxy();
     }
 
     /* (non-Javadoc)
@@ -271,7 +299,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public PropertyIterator getProperties() throws RepositoryException
     {
-        List<PropertyImpl> properties = createProperties();
+        List<PropertyImpl> properties = PropertyResolver.createProperties(this, null);
         PropertyIterator iterator = new PropertyListIterator(properties);
         return iterator;
     }
@@ -281,8 +309,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public PropertyIterator getProperties(String namePattern) throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        JCRPatternMatch match = new JCRPatternMatch(namePattern, session.getNamespaceResolver());
+        List<PropertyImpl> properties = PropertyResolver.createProperties(this, match);
+        PropertyIterator iterator = new PropertyListIterator(properties);
+        return iterator;
     }
 
     /* (non-Javadoc)
@@ -290,8 +320,8 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Item getPrimaryItem() throws ItemNotFoundException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        // Note: Alfresco does not support the notion of primary item
+        throw new ItemNotFoundException();
     }
 
     /* (non-Javadoc)
@@ -299,8 +329,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public String getUUID() throws UnsupportedRepositoryOperationException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        return nodeRef.getId();
     }
 
     /* (non-Javadoc)
@@ -308,8 +337,23 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public int getIndex() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return 0;
+        int index = 1;
+        String name = getName();
+        if (name != null)
+        {
+            // TODO: Look at more efficient approach
+            SearchService searchService = session.getServiceRegistry().getSearchService();
+            List<NodeRef> siblings = searchService.selectNodes(nodeRef, "../" + name, null, session.getNamespaceResolver(), false);
+            for (NodeRef sibling : siblings)
+            {
+                if (sibling.equals(nodeRef))
+                {
+                    break;
+                }
+                index++;
+            }
+        }        
+        return index;
     }
 
     /* (non-Javadoc)
@@ -317,8 +361,8 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public PropertyIterator getReferences() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        // Note: Lookup for references not supported for now
+        return new PropertyListIterator(new ArrayList<PropertyImpl>());
     }
 
     /* (non-Javadoc)
@@ -334,8 +378,14 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean hasProperty(String relPath) throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return false;
+        JCRPath path = new JCRPath(relPath);
+        if (path.size() == 1)
+        {
+            QName propertyName = QName.createQName(relPath, session.getNamespaceResolver());
+            return PropertyResolver.hasProperty(this, propertyName);
+        }
+
+        return ItemResolver.itemExists(session, nodeRef, relPath);
     }
 
     /* (non-Javadoc)
@@ -343,8 +393,9 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean hasNodes() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return false;
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);        
+        return childAssocs.size() > 0;
     }
 
     /* (non-Javadoc)
@@ -352,8 +403,8 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean hasProperties() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return false;
+        // Note: nt:base has a mandatory primaryType property for which we don't have security access control
+        return true;
     }
 
     /* (non-Javadoc)
@@ -361,8 +412,11 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeType getPrimaryNodeType() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        QName type = nodeService.getType(nodeRef);
+        DictionaryService dictionaryService = session.getServiceRegistry().getDictionaryService();
+        ClassDefinition classDefinition = dictionaryService.getClass(type);
+        return new NodeTypeImpl(session, classDefinition).getProxy();
     }
 
     /* (non-Javadoc)
@@ -370,8 +424,24 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeType[] getMixinNodeTypes() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        DictionaryService dictionaryService = session.getServiceRegistry().getDictionaryService();
+        
+        // Add aspects defined by node
+        Set<QName> aspects = nodeService.getAspects(nodeRef);
+        NodeType[] nodeTypes = new NodeType[aspects.size() + 1];
+        int i = 0;
+        for (QName aspect : aspects)
+        {
+            ClassDefinition classDefinition = dictionaryService.getClass(aspect);
+            nodeTypes[i++] = new NodeTypeImpl(session, classDefinition).getProxy(); 
+        }
+        
+        // Add mix:referenceable aspect (to represent the Alfresco sys:referenceable aspect)
+        ClassDefinition classDefinition = dictionaryService.getClass(NodeTypeImpl.MIX_REFERENCEABLE);
+        nodeTypes[i] = new NodeTypeImpl(session, classDefinition).getProxy();
+        
+        return nodeTypes;
     }
 
     /* (non-Javadoc)
@@ -379,7 +449,36 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean isNodeType(String nodeTypeName) throws RepositoryException
     {
-        // TODO Auto-generated method stub
+        QName name = QName.createQName(nodeTypeName, session.getNamespaceResolver());
+        
+        // is it one of standard types
+        if (name.equals(NodeTypeImpl.MIX_REFERENCEABLE) || name.equals(NodeTypeImpl.NT_BASE))
+        {
+            return true;
+        }
+
+        // determine via class hierarchy
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        DictionaryService dictionaryService = session.getServiceRegistry().getDictionaryService();
+
+        // first, check the type
+        QName type = nodeService.getType(nodeRef);
+        if (dictionaryService.isSubClass(name, type))
+        {
+            return true;
+        }
+        
+        // second, check the aspects
+        Set<QName> aspects = nodeService.getAspects(nodeRef);
+        for (QName aspect : aspects)
+        {
+            if (dictionaryService.isSubClass(name, aspect))
+            {
+                return true;
+            }
+        }
+
+        // no, its definitely not of the specified type
         return false;
     }
 
@@ -573,8 +672,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public String getName() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        ChildAssociationRef parentAssoc = nodeService.getPrimaryParent(nodeRef);
+        QName childName = parentAssoc.getQName();
+        return (childName == null) ? "" : childName.toPrefixString(session.getNamespaceResolver());
     }
 
     /* (non-Javadoc)
@@ -590,10 +691,109 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Node getParent() throws ItemNotFoundException, AccessDeniedException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        ChildAssociationRef parentAssoc = nodeService.getPrimaryParent(nodeRef);
+        if (parentAssoc == null || parentAssoc.getParentRef() == null)
+        {
+            // TODO: Distinguish between ItemNotFound and AccessDenied
+            throw new ItemNotFoundException("Parent of node " + nodeRef + " does not exist.");
+        }
+        NodeImpl nodeImpl = new NodeImpl(session, parentAssoc.getParentRef());
+        return nodeImpl.getProxy();
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#getPath()
+     */
+    public String getPath() throws RepositoryException
+    {
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        SearchService searchService = session.getServiceRegistry().getSearchService();
+        Path path = nodeService.getPath(nodeRef);
+        
+        // Add indexes for same name siblings
+        // TODO: Look at more efficient approach
+        for (int i = path.size() - 1; i >= 0; i--)
+        {
+            Path.Element pathElement = path.get(i);
+            if (i > 0 && pathElement instanceof Path.ChildAssocElement)
+            {
+                int index = 1;
+                String searchPath = path.subPath(i).toPrefixString(session.getNamespaceResolver());
+                List<NodeRef> siblings = searchService.selectNodes(nodeRef, searchPath, null, session.getNamespaceResolver(), false);
+                if (siblings.size() > 1)
+                {
+                    ChildAssociationRef childAssoc = ((Path.ChildAssocElement)pathElement).getRef();
+                    NodeRef childRef = childAssoc.getChildRef();
+                    for (NodeRef sibling : siblings)
+                    {
+                        if (sibling.equals(childRef))
+                        {
+                            childAssoc.setNthSibling(index);
+                            break;
+                        }
+                        index++;
+                    }
+                }
+            }
+        }
+        
+        return path.toPrefixString(session.getNamespaceResolver());
+    }
+
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#getDepth()
+     */
+    public int getDepth() throws RepositoryException
+    {
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        Path path = nodeService.getPath(nodeRef);
+        // Note: Root is at depth 0
+        return path.size() -1;
+    }
+
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#getAncestor(int)
+     */
+    public Item getAncestor(int depth) throws ItemNotFoundException, AccessDeniedException, RepositoryException
+    {
+        // Retrieve primary parent path for node
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        Path path = nodeService.getPath(nodeRef);
+        if (depth < 0 || depth > (path.size() - 1))
+        {
+            throw new ItemNotFoundException("Ancestor at depth " + depth + " not found for node " + nodeRef);
+        }
+
+        // Extract path element at requested depth
+        Element element = path.get(depth);
+        if (!(element instanceof Path.ChildAssocElement))
+        {
+            throw new RepositoryException("Path element at depth " + depth + " is not a node");
+        }
+        Path.ChildAssocElement childAssocElement = (Path.ChildAssocElement)element;
+        
+        // Create node
+        NodeRef ancestorNodeRef = childAssocElement.getRef().getChildRef();
+        NodeImpl nodeImpl = new NodeImpl(session, ancestorNodeRef);
+        return nodeImpl.getProxy();
+    }
+
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#isSame(javax.jcr.Item)
+     */
+    public boolean isSame(Item otherItem) throws RepositoryException
+    {
+        return getProxy().equals(otherItem);
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#accept(javax.jcr.ItemVisitor)
+     */
+    public void accept(ItemVisitor visitor) throws RepositoryException
+    {
+        visitor.visit(getProxy());
+    }
     
     /**
      * Gets the Alfresco Node Reference
@@ -604,28 +804,26 @@ public class NodeImpl extends ItemImpl implements Node
     {
         return nodeRef;
     }
-    
-    
-    /**
-     * Create Property List for all properties of this node
-     * 
-     * @return  list of properties (null properties are filtered)
-     */
-    private List<PropertyImpl> createProperties()
+
+    @Override
+    public boolean equals(Object obj)
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
-        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-        List<PropertyImpl> propertyList = new ArrayList<PropertyImpl>(properties.size());        
-        for (Map.Entry<QName, Serializable> entry : properties.entrySet())
+        if (obj == this)
         {
-            Serializable value = entry.getValue();
-            if (value != null)
-            {
-                PropertyImpl property = new PropertyImpl(this, entry.getKey());
-                propertyList.add(property);
-            }
+            return true;
         }
-        return propertyList;
+        if (!(obj instanceof NodeImpl))
+        {
+            return false;
+        }
+        NodeImpl other = (NodeImpl)obj;
+        return this.nodeRef.equals(other.nodeRef);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return nodeRef.hashCode();
     }
     
 }

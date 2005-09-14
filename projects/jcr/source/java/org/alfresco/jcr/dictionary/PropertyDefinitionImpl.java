@@ -34,6 +34,9 @@ public class PropertyDefinitionImpl implements PropertyDefinition
     /** Session */
     private SessionImpl session;
     
+    /** Proxy */
+    private PropertyDefinition proxy;
+    
     /** Alfresco Property Definition */
     private org.alfresco.service.cmr.dictionary.PropertyDefinition propDef;
     
@@ -50,12 +53,15 @@ public class PropertyDefinitionImpl implements PropertyDefinition
     }
 
     /**
-     * Create proxied JCR PropertyDefinition
-     * 
+     * Get proxied JCR PropertyDefinition
      */
-    public PropertyDefinition createPropertyDefinition()
+    public PropertyDefinition getProxy()
     {
-        return (PropertyDefinition)JCRProxyFactory.create(this, PropertyDefinition.class, session);
+        if (proxy == null)
+        {
+            proxy = (PropertyDefinition)JCRProxyFactory.create(this, PropertyDefinition.class, session); 
+        }
+        return proxy;
     }
     
     /* (non-Javadoc)

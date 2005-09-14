@@ -20,7 +20,9 @@ import java.io.InputStream;
 import java.util.Calendar;
 
 import javax.jcr.AccessDeniedException;
+import javax.jcr.Item;
 import javax.jcr.ItemNotFoundException;
+import javax.jcr.ItemVisitor;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
@@ -37,6 +39,7 @@ import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
 import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.QName;
 
 
@@ -50,7 +53,8 @@ public class PropertyImpl extends ItemImpl implements Property
 
     private NodeImpl node;
     private QName name;
-
+    private Property proxy = null;
+    
     
     /**
      * Constructor
@@ -69,9 +73,14 @@ public class PropertyImpl extends ItemImpl implements Property
      * 
      * @return  property
      */
-    public Property createProperty()
+    @Override
+    public Property getProxy()
     {
-        return (Property)JCRProxyFactory.create(this, Property.class, session);
+        if (proxy == null)
+        {
+            proxy = (Property)JCRProxyFactory.create(this, Property.class, session); 
+        }
+        return proxy;
     }
     
     /* (non-Javadoc)
@@ -154,6 +163,9 @@ public class PropertyImpl extends ItemImpl implements Property
         throw new UnsupportedRepositoryOperationException();        
     }    
     
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getValue()
+     */
     public Value getValue() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
@@ -170,32 +182,32 @@ public class PropertyImpl extends ItemImpl implements Property
 
     public String getString() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        checkSingleValued();
+        return JCRValue.stringValue(getPropertyValue());
     }
 
     public InputStream getStream() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        checkSingleValued();
+        return JCRValue.streamValue(getPropertyValue());
     }
 
     public long getLong() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return 0;
+        checkSingleValued();
+        return JCRValue.longValue(getPropertyValue());
     }
 
     public double getDouble() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return 0;
+        checkSingleValued();
+        return JCRValue.doubleValue(getPropertyValue());
     }
 
     public Calendar getDate() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        checkSingleValued();
+        return JCRValue.dateValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -204,19 +216,25 @@ public class PropertyImpl extends ItemImpl implements Property
     public boolean getBoolean() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValueConverter.booleanValue(getPropertyValue());
+        return JCRValue.booleanValue(getPropertyValue());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getNode()
+     */
     public Node getNode() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        checkSingleValued();
+        return JCRValue.referenceValue(session, getPropertyValue());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getLength()
+     */
     public long getLength() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return 0;
+        checkSingleValued();
+        return JCRValue.getLength(getPropertyValue());
     }
 
     public long[] getLengths() throws ValueFormatException, RepositoryException
@@ -231,7 +249,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public PropertyDefinition getDefinition() throws RepositoryException
     {
         PropertyDefinitionImpl propDefImpl = new PropertyDefinitionImpl(session, getPropertyDefinition());
-        return propDefImpl.createPropertyDefinition();
+        return propDefImpl.getProxy();
     }
 
     /* (non-Javadoc)
@@ -266,38 +284,91 @@ public class PropertyImpl extends ItemImpl implements Property
         return node;
     }
 
-
-    /**
-     * Checks that this property is single valued.
-     * 
-     * @throws ValueFormatException  if value is multi-valued
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#getPath()
      */
-    private void checkSingleValued()
-        throws ValueFormatException
+    public String getPath() throws RepositoryException
     {
-        if (getPropertyDefinition().isMultiValued())
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        Path path = nodeService.getPath(node.getNodeRef());
+        path.append(new JCRPath.SimpleElement(getName()));
+        return path.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#getDepth()
+     */
+    public int getDepth() throws RepositoryException
+    {
+        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        Path path = nodeService.getPath(node.getNodeRef());
+        // Note: Property is one depth lower than its node
+        return path.size();
+    }
+
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#getAncestor(int)
+     */
+    public Item getAncestor(int depth) throws ItemNotFoundException, AccessDeniedException, RepositoryException
+    {
+        int propertyDepth = getDepth();
+        if (depth < 0 || depth > propertyDepth)
         {
-            throw new ValueFormatException("Property " + name + " is multi-valued.");
+            throw new ItemNotFoundException("Ancestor at depth " + depth + " not found for property " + name);
+        }
+
+        if (depth == propertyDepth)
+        {
+            return this.getProxy();
+        }
+        else
+        {
+            return node.getAncestor(depth -1);
         }
     }
-    
-    /**
-     * Gets the Property Data Type
-     * 
-     * @return  the (JCR) data type
+
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#isSame(javax.jcr.Item)
      */
-    private org.alfresco.service.cmr.dictionary.PropertyDefinition getPropertyDefinition()
+    public boolean isSame(Item otherItem) throws RepositoryException
     {
-        DictionaryService dictionary = session.getServiceRegistry().getDictionaryService();
-        return dictionary.getProperty(name);
+        return getProxy().equals(otherItem);
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#accept(javax.jcr.ItemVisitor)
+     */
+    public void accept(ItemVisitor visitor) throws RepositoryException
+    {
+        visitor.visit(getProxy());
+    }
+        
+    /**
+     * Gets the Node Implementation that contains this property
+     * 
+     * @return  the node implementation
+     */
+    protected NodeImpl getNodeImpl()
+    {
+        return node;
     }
 
+    /**
+     * Gets the Property Name
+     * 
+     * @return  the property name
+     */
+    protected QName getPropertyName()
+    {
+        return name;
+    }
+    
     /**
      * Gets the property value
      * 
      * @return  the property value
      */
-    private Object getPropertyValue()
+    protected Object getPropertyValue()
         throws RepositoryException
     {
         Object value; 
@@ -315,4 +386,51 @@ public class PropertyImpl extends ItemImpl implements Property
         return value;
     }
     
+    /**
+     * Checks that this property is single valued.
+     * 
+     * @throws ValueFormatException  if value is multi-valued
+     */
+    private void checkSingleValued()
+        throws ValueFormatException
+    {
+        if (getPropertyDefinition().isMultiValued())
+        {
+            // Expected exception for JSR-170
+            throw new ValueFormatException("Property " + name + " is multi-valued.");
+        }
+    }
+    
+    /**
+     * Gets the Property Data Type
+     * 
+     * @return  the (JCR) data type
+     */
+    private org.alfresco.service.cmr.dictionary.PropertyDefinition getPropertyDefinition()
+    {
+        DictionaryService dictionary = session.getServiceRegistry().getDictionaryService();
+        return dictionary.getProperty(name);
+    }
+    
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == this)
+        {
+            return true;
+        }
+        if (!(obj instanceof PropertyImpl))
+        {
+            return false;
+        }
+        PropertyImpl other = (PropertyImpl)obj;
+        return this.name.equals(other.name);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return name.hashCode();
+    }    
+
 }

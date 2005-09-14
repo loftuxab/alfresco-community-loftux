@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -157,6 +158,43 @@ public final class Path implements Iterable<Path.Element>, Serializable
         }
         return sb.toString();
     }
+
+    /**
+     * @return Returns a string path made up of the component elements of this instance (prefixed where appropriate)
+     */
+    public String toPrefixString(NamespacePrefixResolver resolver)
+    {
+        StringBuilder sb = new StringBuilder(128);
+        for (Element element : elements)
+        {
+            if((sb.length() > 1) || ((sb.length() == 1) && (sb.charAt(0) != '/')))
+            {
+                sb.append("/");
+            }
+            sb.append(element.getPrefixedString(resolver));
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Return a new Path representing this path to the specified depth
+     *  
+     * @param depth  the path depth (0 based)
+     * @return  the sub-path
+     */
+    public Path subPath(int depth)
+    {
+        if (depth < 0 || depth > (elements.size() -1))
+        {
+            throw new IndexOutOfBoundsException("Depth must between 0 and " + (elements.size() -1));
+        }
+        Path subPath = new Path();
+        for (int i = 0; i <= depth; i++)
+        {
+            subPath.append(this.get(i));
+        }
+        return subPath;
+    }
     
     /**
      * Override equals to check equality of Path instances
@@ -194,6 +232,15 @@ public final class Path implements Iterable<Path.Element>, Serializable
          * @return Returns the path element portion including leading '/' and never null
          */
         public abstract String getElementString();
+
+        /**
+         * @param resolver  namespace prefix resolver
+         * @return  the path element portion (with namespaces converted to prefixes)
+         */
+        public String getPrefixedString(NamespacePrefixResolver resolver)
+        {
+            return getElementString();
+        }
         
         /**
          * @see #getElementString()
@@ -221,28 +268,25 @@ public final class Path implements Iterable<Path.Element>, Serializable
         {
             this.ref = ref;
         }
+
+        @Override
         public String getElementString()
         {
-            StringBuilder sb = new StringBuilder(32);
-            if (ref.getParentRef() == null)
-            {
-                sb.append("/");
-            }
-            else
-            {
-                // a parent is present
-                sb.append(ref.getQName());
-            }
-            if (ref.getNthSibling() > -1)
-            {
-                sb.append("[").append(ref.getNthSibling()).append("]");
-            }
-            return sb.toString();
+            return createElementString(null);
         }
+
+        @Override
+        public String getPrefixedString(NamespacePrefixResolver resolver)
+        {
+            return createElementString(resolver);
+        }
+
         public ChildAssociationRef getRef()
         {
             return ref;
         }
+        
+        @Override
         public boolean equals(Object o)
         {
             if(o == this)
@@ -256,12 +300,31 @@ public final class Path implements Iterable<Path.Element>, Serializable
             ChildAssocElement other = (ChildAssocElement)o;
             return this.ref.equals(other.ref);
         }
-        
+
+        @Override
         public int hashCode()
         {
             return ref.hashCode();
         }
         
+        private String createElementString(NamespacePrefixResolver resolver)
+        {
+            StringBuilder sb = new StringBuilder(32);
+            if (ref.getParentRef() == null)
+            {
+                sb.append("/");
+            }
+            else
+            {
+                // a parent is present
+                sb.append(resolver == null ? ref.getQName().toString() : ref.getQName().toPrefixString(resolver));
+            }
+            if (ref.getNthSibling() > -1)
+            {
+                sb.append("[").append(ref.getNthSibling()).append("]");
+            }
+            return sb.toString();
+        }
     }
 
     /**
@@ -288,11 +351,23 @@ public final class Path implements Iterable<Path.Element>, Serializable
             this(attribute);
             this.position = position;
         }
-        
+
+        @Override
         public String getElementString()
         {
+            return createElementString(null);
+        }
+        
+        @Override
+        public String getPrefixedString(NamespacePrefixResolver resolver)
+        {
+            return createElementString(resolver);
+        }
+        
+        private String createElementString(NamespacePrefixResolver resolver)
+        {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("@").append(attribute);
+            sb.append("@").append(resolver == null ? attribute.toString() : attribute.toPrefixString(resolver));
             
             if (position > -1)
             {
@@ -329,6 +404,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
         {
             return getQName().hashCode()*32 + position();
         }
+
     }
 
     /**
@@ -360,6 +436,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
         {
             return "descendant-or-self::node()".hashCode();
         }
+
     }
     
     /**

@@ -14,4 +14,33 @@
       <namespace uri="http://www.w3.org/XML/1998/namespace" prefix="xml"/>
    </namespaces>
    
+   <types>
+      
+      <!-- TODO: Fill out this definition -->
+      <type name="nt:base">
+         <properties>
+            <property name="jcr:primaryType">
+               <type>d:qname</type>
+            </property>
+            <property name="jcr:mixinTypes">
+               <type>d:qname</type>
+            </property>
+         </properties>
+      </type>
+   
+   </types>
+
+   <aspects>
+      
+      <aspect name="mix:referenceable">
+         <properties>
+            <property name="jcr:uuid">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </aspect>
+      
+   </aspects>
+   
+   
 </model>

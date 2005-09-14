@@ -57,7 +57,7 @@ public class ChildAssocNodeIteratorImpl extends AbstractRangeIterator
         long position = skip();
         ChildAssociationRef childAssocRef = childAssocs.get((int)position);
         NodeImpl nodeImpl = new NodeImpl(sessionImpl, childAssocRef.getChildRef());
-        return nodeImpl.createNode();
+        return nodeImpl.getProxy();
     }
 
     /* (non-Javadoc)

@@ -40,6 +40,9 @@ public class ValueImpl implements Value
     private SessionImpl session;
     private int datatype;
     private Object value;
+    private InputStream stream = null;
+    
+    private Value proxy;
     
 
     /**
@@ -59,11 +62,14 @@ public class ValueImpl implements Value
      * 
      * @return  the proxied value
      */
-    public Value createValue()
+    public Value getProxy()
     {
-        return (Value)JCRProxyFactory.create(this, Value.class, session);
+        if (proxy == null)
+        {
+            proxy = (Value)JCRProxyFactory.create(this, Value.class, session); 
+        }
+        return proxy;
     }
-    
     
     /* (non-Javadoc)
      * @see javax.jcr.Value#getString()
@@ -71,13 +77,20 @@ public class ValueImpl implements Value
     public String getString() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         enterState(ValueState.Value);
-        return JCRValueConverter.stringValue(value);
+        return JCRValue.stringValue(value);
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Value#getStream()
+     */
     public InputStream getStream() throws IllegalStateException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        enterState(ValueState.Stream);
+        if (stream == null)
+        {
+            stream = JCRValue.streamValue(value);
+        }
+        return stream;
     }
 
     /* (non-Javadoc)
@@ -86,19 +99,25 @@ public class ValueImpl implements Value
     public long getLong() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         enterState(ValueState.Value);
-        return JCRValueConverter.longValue(value);
+        return JCRValue.longValue(value);
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Value#getDouble()
+     */
     public double getDouble() throws ValueFormatException, IllegalStateException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return 0;
+        enterState(ValueState.Value);
+        return JCRValue.doubleValue(value);
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Value#getDate()
+     */
     public Calendar getDate() throws ValueFormatException, IllegalStateException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        enterState(ValueState.Value);
+        return JCRValue.dateValue(value);
     }
 
     /* (non-Javadoc)
@@ -107,7 +126,7 @@ public class ValueImpl implements Value
     public boolean getBoolean() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         enterState(ValueState.Value);
-        return JCRValueConverter.booleanValue(value);
+        return JCRValue.booleanValue(value);
     }
 
     /* (non-Javadoc)

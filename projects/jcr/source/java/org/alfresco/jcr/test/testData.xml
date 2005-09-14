@@ -1,10 +1,24 @@
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
-           xmlns:cm="http://www.alfresco.org/model/content/1.0"
-           xmlns:app="http://www.alfresco.org/model/application/1.0"
            xmlns:jcrtest="http://www.alfresco.org/test/jcr/1.0">
 
+    <jcrtest:testtype view:childName="testroot">
+    </jcrtest:testtype>
+
 	<jcrtest:testtype view:childName="testdata">
+	   <!-- Properties for XXXPropertyTests -->
 	   <jcrtest:booleanProp>true</jcrtest:booleanProp>
+	   
+       <jcrtest:children>
+          <jcrtest:testtype view:childName="firstChild"/>
+
+          <!-- Same name sibling tests -->
+          <jcrtest:testtype view:childName="sameNameTests">
+             <jcrtest:children>
+                <jcrtest:testtype view:childName="sameNameSibling"/>
+                <jcrtest:testtype view:childName="sameNameSibling"/>
+             </jcrtest:children>
+          </jcrtest:testtype>
+       </jcrtest:children>
 	</jcrtest:testtype>
 
 </view:view>

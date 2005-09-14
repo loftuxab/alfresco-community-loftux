@@ -86,6 +86,8 @@ public class SessionImpl implements Session, SessionContext
     /** Dynamic Namespace for this session */
     NamespacePrefixResolver namespaceResolver;
     
+    private Session proxy = null;
+    
     
     /**
      * Construct
@@ -111,9 +113,13 @@ public class SessionImpl implements Session, SessionContext
      * 
      * @return  JCR Session
      */    
-    public Session createSession()
+    public Session getProxy()
     {
-        return (Session)JCRProxyFactory.create(this, Session.class, this);
+        if (proxy == null)
+        {
+            proxy = (Session)JCRProxyFactory.create(this, Session.class, this); 
+        }
+        return proxy;
     }
 
     //
@@ -214,7 +220,7 @@ public class SessionImpl implements Session, SessionContext
     {
         NodeRef nodeRef = getServiceRegistry().getNodeService().getRootNode(workspaceStore);
         NodeImpl nodeImpl = new NodeImpl(this, nodeRef);
-        return nodeImpl.createNode();
+        return nodeImpl.getProxy();
     }
 
     /* (non-Javadoc)
@@ -229,7 +235,7 @@ public class SessionImpl implements Session, SessionContext
             throw new ItemNotFoundException();
         }
         NodeImpl nodeImpl = new NodeImpl(this, nodeRef);
-        return nodeImpl.createNode();
+        return nodeImpl.getProxy();
     }
 
     /* (non-Javadoc)
@@ -239,7 +245,7 @@ public class SessionImpl implements Session, SessionContext
     {
         NodeRef nodeRef = getServiceRegistry().getNodeService().getRootNode(workspaceStore);
         ItemImpl itemImpl = ItemResolver.findItem(this, nodeRef, absPath);
-        return itemImpl.createItem();
+        return itemImpl.getProxy();
     }
 
     /* (non-Javadoc)

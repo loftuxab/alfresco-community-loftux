@@ -23,6 +23,9 @@ import java.util.Date;
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 
 
@@ -32,9 +35,62 @@ import org.alfresco.service.cmr.repository.datatype.ValueConverter;
  * @author David Caruana
  *
  */
-public class JCRValueConverter
+public class JCRValue
 {
 
+    /**
+     * Get Length of a Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws RepositoryException
+     */
+    public static long getLength(Object value) throws ValueFormatException, RepositoryException
+    {
+        // TODO: Handle streams
+        
+        String strValue = (String)ValueConverter.convert(String.class, value);
+        return strValue.length();
+    }
+    
+    /**
+     * Convert to JCR Reference Value
+     * 
+     * @param session
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws RepositoryException
+     */
+    public static NodeImpl referenceValue(SessionImpl session, Object value) throws ValueFormatException, RepositoryException
+    {
+        if (value instanceof NodeRef)
+        {
+            return new NodeImpl(session, (NodeRef)value);
+        }
+        else if (value instanceof String)
+        {
+            try
+            {
+                return new NodeImpl(session, new NodeRef((String)value));
+            }
+            catch(AlfrescoRuntimeException e)
+            {
+                throw new ValueFormatException("Node Reference " + value + " is invalid.");
+            }
+        }
+        throw new ValueFormatException("Cannot convert value to Reference.");
+    }
+        
+    /**
+     * Convert to JCR String Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws RepositoryException
+     */
     public static String stringValue(Object value) throws ValueFormatException, RepositoryException 
     {
         try
@@ -48,6 +104,14 @@ public class JCRValueConverter
         }
     }
 
+    /**
+     * Convert to JCR Stream Value
+     * 
+     * @param value
+     * @return
+     * @throws IllegalStateException
+     * @throws RepositoryException
+     */
     public static InputStream streamValue(Object value) throws IllegalStateException, RepositoryException
     {
         try
@@ -61,6 +125,15 @@ public class JCRValueConverter
         }
     }
 
+    /**
+     * Convert to JCR Long Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws IllegalStateException
+     * @throws RepositoryException
+     */
     public static long longValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try
@@ -74,6 +147,15 @@ public class JCRValueConverter
         }
     }
 
+    /**
+     * Convert to JCR Double Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws IllegalStateException
+     * @throws RepositoryException
+     */
     public static double doubleValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try
@@ -87,6 +169,15 @@ public class JCRValueConverter
         }
     }
 
+    /**
+     * Convert to JCR Date Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws IllegalStateException
+     * @throws RepositoryException
+     */
     public static Calendar dateValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try
@@ -103,6 +194,15 @@ public class JCRValueConverter
         }
     }
 
+    /**
+     * Convert to JCR Boolean Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws IllegalStateException
+     * @throws RepositoryException
+     */
     public static boolean booleanValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try

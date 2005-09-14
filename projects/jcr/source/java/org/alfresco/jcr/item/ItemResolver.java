@@ -56,6 +56,7 @@ public class ItemResolver
         else
         {
             // TODO: create property
+            throw new UnsupportedOperationException();
         }
         
         if (item == null)
@@ -83,7 +84,7 @@ public class ItemResolver
         {
             throw new PathNotFoundException("A node does not exist at path " + path + " relative to node " + from);
         }
-        return new NodeImpl(context, from);
+        return new NodeImpl(context, nodeRef);
     }
     
     /**
@@ -99,7 +100,7 @@ public class ItemResolver
         boolean exists = nodeExists(context, from, path);
         if (!exists)
         {
-            // TODO: Look for property
+            throw new UnsupportedOperationException();
         }
         return exists;
     }
@@ -115,11 +116,7 @@ public class ItemResolver
     public static boolean nodeExists(SessionImpl context, NodeRef from, String path)
     {
         NodeRef nodeRef = getNodeRef(context, from, path);
-        if (nodeRef != null)
-        {
-            return true;
-        }
-        return false;
+        return nodeRef != null;
     }
     
     /**

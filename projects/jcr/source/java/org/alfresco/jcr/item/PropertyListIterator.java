@@ -51,7 +51,7 @@ public class PropertyListIterator extends AbstractRangeIterator
     {
         long position = skip();
         PropertyImpl propertyImpl = properties.get((int)position);
-        return propertyImpl.createProperty();
+        return propertyImpl.getProxy();
     }
 
     

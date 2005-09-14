@@ -16,6 +16,9 @@
  */
 package org.alfresco.service.cmr.repository.datatype;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -27,8 +30,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.QName;
@@ -490,8 +494,10 @@ public class ValueConverter
                 continue;
             }
             converter = map.get(dest);
+            
             if (converter == null)
             {
+                // attempt to establish converter from source to dest via Number
                 Converter<?, ?> first = map.get(Number.class);
                 Converter<?, ?> second = null;
                 if (first != null)
@@ -506,7 +512,6 @@ public class ValueConverter
                 {
                     converter = new TwoStageConverter<F, T, Number>(first, second);
                 }
-
             }
         }
         while ((converter == null) && ((clazz = clazz.getSuperclass()) != null));
@@ -708,6 +713,23 @@ public class ValueConverter
 
                 });
 
+        map.put(InputStream.class, new Converter<String, InputStream>()
+                {
+                    public InputStream convert(String source)
+                    {
+                        try
+                        {
+                            return new ByteArrayInputStream(source.getBytes("UTF-8"));
+                        }
+                        catch (UnsupportedEncodingException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                });
+        
+        
         //
         // Number to Subtypes and Date
         //
@@ -819,6 +841,10 @@ public class ValueConverter
 
         });
 
+        Converter stringToStream = conversions.get(String.class).get(InputStream.class);
+        Converter twoStage = new TwoStageConverter<Number, InputStream, String>(map.get(String.class), stringToStream);
+        map.put(InputStream.class, twoStage);
+        
         //
         // Date ->
         //
@@ -844,6 +870,8 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Date, InputStream, String>(map.get(String.class), stringToStream));
+
         //
         // Boolean ->
         //
@@ -859,6 +887,8 @@ public class ValueConverter
             }
 
         });
+
+        map.put(InputStream.class, new TwoStageConverter<Boolean, InputStream, String>(map.get(String.class), stringToStream));
 
         //
         // Character ->
@@ -876,6 +906,8 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Character, InputStream, String>(map.get(String.class), stringToStream));
+
         //
         // Duration ->
         //
@@ -892,10 +924,11 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Duration, InputStream, String>(map.get(String.class), stringToStream));
+        
         //
         // Byte
         //
-        
         
         map = new HashMap<Class, Converter>();
         conversions.put(Byte.class, map);
@@ -909,6 +942,8 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Byte, InputStream, String>(map.get(String.class), stringToStream));
+        
         //
         // Short
         //
@@ -924,6 +959,8 @@ public class ValueConverter
             }
 
         });
+
+        map.put(InputStream.class, new TwoStageConverter<Short, InputStream, String>(map.get(String.class), stringToStream));
 
         //
         // Integer
@@ -941,6 +978,8 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Integer, InputStream, String>(map.get(String.class), stringToStream));
+        
         //
         // Long
         //
@@ -956,6 +995,8 @@ public class ValueConverter
             }
 
         });
+
+        map.put(InputStream.class, new TwoStageConverter<Long, InputStream, String>(map.get(String.class), stringToStream));
 
         //
         // Float
@@ -973,6 +1014,8 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Float, InputStream, String>(map.get(String.class), stringToStream));
+        
         //
         // Double
         //
@@ -989,6 +1032,8 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Double, InputStream, String>(map.get(String.class), stringToStream));
+        
         //
         // BigInteger
         //
@@ -1004,6 +1049,8 @@ public class ValueConverter
             }
 
         });
+
+        map.put(InputStream.class, new TwoStageConverter<BigInteger, InputStream, String>(map.get(String.class), stringToStream));
 
         //
         // BigDecimal
@@ -1021,6 +1068,8 @@ public class ValueConverter
 
         });
         
+        map.put(InputStream.class, new TwoStageConverter<BigDecimal, InputStream, String>(map.get(String.class), stringToStream));
+
         //
         // QName
         //
@@ -1036,6 +1085,8 @@ public class ValueConverter
             }
 
         });
+
+        map.put(InputStream.class, new TwoStageConverter<QName, InputStream, String>(map.get(String.class), stringToStream));
         
         //
         // NodeRef
@@ -1052,6 +1103,8 @@ public class ValueConverter
             }
 
         });
+
+        map.put(InputStream.class, new TwoStageConverter<NodeRef, InputStream, String>(map.get(String.class), stringToStream));
         
         //
         // Path
@@ -1069,6 +1122,24 @@ public class ValueConverter
 
         });
 
+        map.put(InputStream.class, new TwoStageConverter<Path, InputStream, String>(map.get(String.class), stringToStream));
+        
+        //
+        // Content Reader
+        //
+        
+        map = new HashMap<Class, Converter>();
+        conversions.put(ContentReader.class, map);
+
+        map.put(InputStream.class, new Converter<ContentReader, InputStream>()
+        {
+            public InputStream convert(ContentReader source)
+            {
+                return source.getContentInputStream();
+            }
+
+        });
+        
     }
 
     // Support for pluggable conversions

@@ -28,7 +28,6 @@ import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationService;
@@ -168,7 +167,7 @@ public class RepositoryImpl implements Repository
             String sessionWorkspace = (workspaceName == null) ? defaultWorkspace : workspaceName;
             String ticket = authenticationService.getCurrentTicket();
             SessionImpl sessionImpl = new SessionImpl(this, ticket, sessionWorkspace, getAttributes(credentials));
-            Session session = sessionImpl.createSession();
+            Session session = sessionImpl.getProxy();
     
             // clear the security context for this thread
             authenticationService.clearCurrentSecurityContext();
