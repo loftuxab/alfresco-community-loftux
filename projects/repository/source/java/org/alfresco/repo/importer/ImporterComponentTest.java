@@ -74,7 +74,8 @@ public class ImporterComponentTest extends BaseSpringTest
         configuration.put("companySpaceName", "test company name");
         configuration.put("companySpaceDescription", "test company description");
         configuration.put("glossaryName", "glossary name");
-        configuration.put("templatesName", "template name");
+        configuration.put("spaceTemplatesName", "space templates name");
+        configuration.put("contentTemplatesName", "content templates name");
 
         StoreRef bootstrapStoreRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         importerBootstrap.setStoreUrl(bootstrapStoreRef.toString());
