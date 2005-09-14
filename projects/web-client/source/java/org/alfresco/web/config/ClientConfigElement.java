@@ -16,8 +16,11 @@
  */
 package org.alfresco.web.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.element.ConfigElementAdapter;
@@ -38,7 +41,8 @@ public class ClientConfigElement extends ConfigElementAdapter
    private String defaultView = "list";
    private int recentSpacesItems = 6;
    private boolean unicodeFont = false;
-   private Map<String, String> languages = new HashMap<String, String>();
+   private Map<String, String> localeMap = new HashMap<String, String>();
+   private List<String> languages = new ArrayList<String>(8);
    private Map<String, String> processors = new HashMap<String, String>();
    
    /**
@@ -155,17 +159,26 @@ public class ClientConfigElement extends ConfigElementAdapter
     */
    /*package*/ void addLanguage(String locale, String label)
    {
-      this.languages.put(locale, label);
+      this.localeMap.put(locale, label);
+      this.languages.add(locale);
    }
    
    /**
-    * Return the Map of supported locales to display labels
-    * 
-    * @return Map of supported locales to display labels
+    * @return List of supported language locale strings in config file order
     */
-   public Map<String, String> getLanguageMap()
+   public List<String> getLanguages()
    {
       return this.languages;
+   }
+   
+   /**
+    * @param locale     The locale string to lookup language label for
+    * 
+    * @return the language label for specified locale string, or null if not found
+    */
+   public String getLabelForLanguage(String locale)
+   {
+      return this.localeMap.get(locale);
    }
    
    /**

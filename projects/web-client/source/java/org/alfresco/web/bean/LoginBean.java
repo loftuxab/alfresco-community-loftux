@@ -18,6 +18,7 @@ package org.alfresco.web.bean;
 
 import java.text.MessageFormat;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -114,14 +115,13 @@ public class LoginBean
       ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
             ClientConfigElement.CONFIG_ELEMENT_ID);
       
-      Map<String, String> languages = config.getLanguageMap();
+      List<String> languages = config.getLanguages();
       SelectItem[] items = new SelectItem[languages.size()];
       int count = 0;
-      for (Iterator<String> i=languages.keySet().iterator(); i.hasNext(); /**/)
+      for (String locale : languages)
       {
-         // get a locale and associated label
-         String locale = i.next();
-         String label = languages.get(locale);
+         // get label associated to the locale 
+         String label = config.getLabelForLanguage(locale);
          
          // set default selection
          if (count == 0 && this.language == null)

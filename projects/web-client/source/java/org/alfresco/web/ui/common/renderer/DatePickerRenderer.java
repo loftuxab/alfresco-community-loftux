@@ -34,6 +34,8 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
 import javax.faces.model.SelectItem;
 
+import org.alfresco.web.app.Application;
+
 /**
  * @author kevinr
  * 
@@ -208,7 +210,7 @@ public class DatePickerRenderer extends BaseRenderer
    private List getMonths()
    {
       // get names of the months for default locale
-      DateFormatSymbols dfs = new DateFormatSymbols();
+      DateFormatSymbols dfs = new DateFormatSymbols(Application.getLanguage(FacesContext.getCurrentInstance()));
       String[] names = dfs.getMonths();
       List<SelectItem> months = new ArrayList<SelectItem>(12);
       for (int i=0; i<12; i++)
