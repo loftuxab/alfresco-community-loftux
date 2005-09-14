@@ -783,7 +783,7 @@
                     <prop key="location">alfresco/bootstrap/tutorial.xml</prop>
                 </props>
                 <props>
-                    <prop key="path">/app:${companySpaceName}/app:${glossaryName}/app:${templatesName}</prop>
+                    <prop key="path">/app:${companySpaceName}/app:${glossaryName}/app:${spaceTemplatesName}</prop>
                     <prop key="location">alfresco/templates/software_engineering_project.xml</prop>
                 </props>
             </list>
