@@ -227,7 +227,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         private AccessStatus accessStatus;
 
         private String authority;
-        
+
         AccessPermissionImpl(String permission, AccessStatus accessStatus, String authority)
         {
             this.permission = permission;
@@ -249,7 +249,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         {
             return authority;
         }
-        
+
         @Override
         public boolean equals(Object o)
         {
@@ -270,7 +270,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         @Override
         public int hashCode()
         {
-            return ((authority.hashCode() *37 ) +  permission.hashCode()) * 37 + accessStatus.hashCode();
+            return ((authority.hashCode() * 37) + permission.hashCode()) * 37 + accessStatus.hashCode();
         }
     }
 
@@ -278,7 +278,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         Set<PermissionReference> settable = getSettablePermissionReferences(nodeRef);
         Set<String> strings = new HashSet<String>(settable.size());
-        for(PermissionReference pr: settable)
+        for (PermissionReference pr : settable)
         {
             strings.add(getPermission(pr));
         }
@@ -289,7 +289,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         Set<PermissionReference> settable = getSettablePermissionReferences(type);
         Set<String> strings = new HashSet<String>(settable.size());
-        for(PermissionReference pr: settable)
+        for (PermissionReference pr : settable)
         {
             strings.add(getPermission(pr));
         }
@@ -300,9 +300,6 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         return permissionsDAO.getPermissions(nodeRef);
     }
-    
-    
-    
 
     public AccessStatus hasPermission(NodeRef nodeRef, PermissionReference perm)
     {
@@ -322,13 +319,12 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             return AccessStatus.DENIED;
         }
 
-        
         // Allow permissions for nodes that do not exist
-        if(!nodeService.exists(nodeRef))
+        if (!nodeService.exists(nodeRef))
         {
             return AccessStatus.ALLOWED;
         }
-        
+
         // If the node does not support the given permission there is no point
         // doing the test
         Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
@@ -336,7 +332,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
         if (!(available.contains(perm)))
         {
-            return  AccessStatus.DENIED;
+            return AccessStatus.DENIED;
         }
 
         //
@@ -633,9 +629,9 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
             // Check permissions required of children
 
-            for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef))
+            for (PermissionReference pr : childrenRequirements)
             {
-                for (PermissionReference pr : childrenRequirements)
+                for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef))
                 {
                     success &= (hasPermission(child.getChildRef(), pr) == AccessStatus.ALLOWED);
                     if (!success)
@@ -922,7 +918,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
     public String getPermission(PermissionReference permissionReference)
     {
-        if(modelDAO.isUnique(permissionReference))
+        if (modelDAO.isUnique(permissionReference))
         {
             return permissionReference.getName();
         }
@@ -941,12 +937,11 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         return modelDAO.getExposedPermissions(type);
     }
-    
+
     public Set<PermissionReference> getSettablePermissionReferences(NodeRef nodeRef)
     {
         return modelDAO.getExposedPermissions(nodeRef);
     }
-
 
     public void deletePermission(NodeRef nodeRef, String authority, String perm, boolean allow)
     {
@@ -963,6 +958,4 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         setPermission(nodeRef, authority, getPermissionReference(perm), allow);
     }
 
-    
-    
 }
