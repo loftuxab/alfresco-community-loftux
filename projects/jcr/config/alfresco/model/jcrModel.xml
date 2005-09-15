@@ -24,6 +24,7 @@
             </property>
             <property name="jcr:mixinTypes">
                <type>d:qname</type>
+               <multiple>true</multiple>
             </property>
          </properties>
       </type>

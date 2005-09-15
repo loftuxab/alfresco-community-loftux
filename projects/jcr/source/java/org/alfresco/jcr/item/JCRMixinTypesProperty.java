@@ -16,9 +16,15 @@
  */
 package org.alfresco.jcr.item;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import javax.jcr.RepositoryException;
 
+import org.alfresco.jcr.dictionary.NodeTypeImpl;
 import org.alfresco.jcr.repository.JCRNamespace;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -44,8 +50,22 @@ public class JCRMixinTypesProperty extends PropertyImpl
     @Override
     protected Object getPropertyValue() throws RepositoryException
     {
-        // TODO: Handle multi-valued properties
-        return "Not Implemented";
+        // get aspects from node
+        NodeImpl nodeImpl = getNodeImpl();
+        NodeService nodeService = nodeImpl.session.getServiceRegistry().getNodeService();
+        Set<QName> aspects = nodeService.getAspects(nodeImpl.getNodeRef());
+
+        // resolve against session namespace prefix resolver
+        List<String> aspectNames = new ArrayList<String>(aspects.size() + 1);
+        for (QName aspect : aspects)
+        {
+            aspectNames.add(aspect.toPrefixString(nodeImpl.session.getNamespaceResolver()));
+        }
+        
+        // add JCR referenceable
+        aspectNames.add(NodeTypeImpl.MIX_REFERENCEABLE.toPrefixString(nodeImpl.session.getNamespaceResolver()));
+        
+        return aspectNames; 
     }
     
 }
