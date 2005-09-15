@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
+import org.alfresco.web.app.servlet.AuthenticationHelper;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ClientConfigElement;
@@ -56,8 +57,7 @@ public class LoginBean
    // Managed bean properties
 
    /**
-    * @param authenticationService
-    *            The AuthenticationService to set.
+    * @param authenticationService      The AuthenticationService to set.
     */
    public void setAuthenticationService(AuthenticationService authenticationService)
    {
@@ -65,8 +65,7 @@ public class LoginBean
    }
 
    /**
-    * @param authenticationComponent
-    *            The AuthenticationComponent to set.
+    * @param authenticationComponent    The AuthenticationComponent to set.
     */
    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
    {
@@ -74,8 +73,7 @@ public class LoginBean
    }
 
    /**
-    * @param nodeService
-    *            The nodeService to set.
+    * @param nodeService                The nodeService to set.
     */
    public void setNodeService(NodeService nodeService)
    {
@@ -83,8 +81,7 @@ public class LoginBean
    }
 
    /**
-    * @param browseBean
-    *            The BrowseBean to set.
+    * @param browseBean                 The BrowseBean to set.
     */
    public void setBrowseBean(BrowseBean browseBean)
    {
@@ -92,29 +89,40 @@ public class LoginBean
    }
 
    /**
-    * @param configService
-    *            The ConfigService to set.
+    * @param configService              The ConfigService to set.
     */
    public void setConfigService(ConfigService configService)
    {
       this.configService = configService;
    }
 
+   /**
+    * @param val        Username from login dialog
+    */
    public void setUsername(String val)
    {
       this.username = val;
    }
 
+   /**
+    * @return The username string from login dialog
+    */
    public String getUsername()
    {
       return this.username;
    }
 
+   /**
+    * @param val         Password from login dialog
+    */
    public void setPassword(String val)
    {
       this.password = val;
    }
 
+   /**
+    * @return The password string from login dialog
+    */
    public String getPassword()
    {
       return this.password;
@@ -127,7 +135,7 @@ public class LoginBean
    {
       ClientConfigElement config = (ClientConfigElement) this.configService.getGlobalConfig()
             .getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
-
+      
       List<String> languages = config.getLanguages();
       SelectItem[] items = new SelectItem[languages.size()];
       int count = 0;
@@ -151,10 +159,10 @@ public class LoginBean
                this.language = locale;
             }
          }
-
+         
          items[count++] = new SelectItem(locale, label);
       }
-
+      
       return items;
    }
 
@@ -167,8 +175,7 @@ public class LoginBean
    }
 
    /**
-    * @param language
-    *            The language selection to set.
+    * @param language       The language selection to set.
     */
    public void setLanguage(String language)
    {
@@ -176,7 +183,7 @@ public class LoginBean
       Application.setLanguage(FacesContext.getCurrentInstance(), this.language);
    }
 
-   
+
    // ------------------------------------------------------------------------------
    // Validator methods
 
@@ -266,7 +273,7 @@ public class LoginBean
             // put the User object in the Session - the authentication servlet will then allow
             // the app to continue without redirecting to the login page
             Map session = fc.getExternalContext().getSessionMap();
-            session.put(AuthenticationFilter.AUTHENTICATION_USER, user);
+            session.put(AuthenticationHelper.AUTHENTICATION_USER, user);
             
             // if an external outcome has been provided then use that, else use default
             String externalOutcome = (String) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
@@ -338,7 +345,7 @@ public class LoginBean
 
       // invalidate User ticket
       Map session = context.getExternalContext().getSessionMap();
-      User user = (User) session.get(AuthenticationFilter.AUTHENTICATION_USER);
+      User user = (User) session.get(AuthenticationHelper.AUTHENTICATION_USER);
       if (user != null)
       {
          this.authenticationService.invalidateTicket(user.getTicket());

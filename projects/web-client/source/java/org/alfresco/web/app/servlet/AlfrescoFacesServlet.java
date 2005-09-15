@@ -56,5 +56,4 @@ public class AlfrescoFacesServlet extends FacesServlet
                (HttpServletResponse)response, error, logger, returnPage);
       }
    }
-   
 }

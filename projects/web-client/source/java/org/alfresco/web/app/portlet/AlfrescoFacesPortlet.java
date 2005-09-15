@@ -31,13 +31,12 @@ import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import javax.servlet.http.HttpSession;
 
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.util.TempFileProvider;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.app.servlet.AuthenticationFilter;
+import org.alfresco.web.app.servlet.AuthenticationHelper;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.repository.User;
@@ -186,7 +185,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
          // if we have no User object in the session then a timeout must have occured
          // use the viewId to check that we are not already on the login page
          String viewId = request.getParameter(VIEW_ID);
-         User user = (User)request.getPortletSession().getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
+         User user = (User)request.getPortletSession().getAttribute(AuthenticationHelper.AUTHENTICATION_USER);
          if (user == null && (viewId == null || viewId.equals(getLoginPage()) == false))
          {
             if (logger.isDebugEnabled())
@@ -211,7 +210,7 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
                }
                
                // Set the current locale
-               I18NUtil.setLocale(Application.getLanguage((HttpSession)request.getPortletSession()));
+               I18NUtil.setLocale(Application.getLanguage(request.getPortletSession()));
                
                // do the normal JSF processing
                super.facesRender(request, response);

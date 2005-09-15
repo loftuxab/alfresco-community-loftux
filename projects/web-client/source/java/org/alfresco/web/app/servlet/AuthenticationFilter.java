@@ -28,12 +28,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.i18n.I18NUtil;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.repository.User;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Kevin Roast
@@ -49,8 +44,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class AuthenticationFilter implements Filter
 {
-   public final static String AUTHENTICATION_USER = "_alfAuthTicket";
-   
    /**
     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
     */
@@ -65,28 +58,12 @@ public class AuthenticationFilter implements Filter
    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
          throws IOException, ServletException
    {
-      HttpServletRequest httpRequest = (HttpServletRequest)req;
       // allow the login page to proceed
-      if (httpRequest.getRequestURI().endsWith(getLoginPage()) == false)
+      if (((HttpServletRequest)req).getRequestURI().endsWith(getLoginPage()) == false)
       {
-         // examine the session for our User object
-         User user = (User)httpRequest.getSession().getAttribute(AUTHENTICATION_USER);
-         if (user == null)
+         if (AuthenticationHelper.authenticate(
+               this.context, (HttpServletRequest)req, (HttpServletResponse)res))
          {
-            // no user/ticket - redirect to login page
-            HttpServletResponse httpResponse = (HttpServletResponse)res; 
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/faces" + getLoginPage());
-         }
-         else
-         {
-            // setup the authentication context
-            WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this.context);
-            AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
-            auth.validate(user.getTicket());
-            
-            // Set the current locale
-            I18NUtil.setLocale(Application.getLanguage(httpRequest.getSession()));
-            
             // continue filter chaining
             chain.doFilter(req, res);
          }
@@ -106,6 +83,9 @@ public class AuthenticationFilter implements Filter
       // nothing to do
    }
    
+   /**
+    * @return The login page url
+    */
    private String getLoginPage()
    {
       if (this.loginPage == null)
@@ -118,5 +98,6 @@ public class AuthenticationFilter implements Filter
    
    
    private String loginPage = null;
+   
    private ServletContext context;
 }

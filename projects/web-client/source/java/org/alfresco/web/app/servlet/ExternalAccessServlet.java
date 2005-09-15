@@ -17,18 +17,14 @@
 package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
-import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.bean.LoginBean;
-import org.alfresco.web.bean.repository.User;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,6 +53,8 @@ public class ExternalAccessServlet extends HttpServlet
    protected void service(HttpServletRequest req, HttpServletResponse res)
       throws ServletException, IOException
    {
+      AuthenticationHelper.authenticate(getServletContext(), req, res);
+      
       // The URL contains multiple parts
       // /alfresco/navigate/<outcome>
       // the protocol, followed by the store, followed by the Id
@@ -86,7 +84,7 @@ public class ExternalAccessServlet extends HttpServlet
       
       // clear the User object from the Session - this will force a relogin
       // we do this so the outcome from the login page can then be changed
-      req.getSession().removeAttribute(AuthenticationFilter.AUTHENTICATION_USER);
+      req.getSession().removeAttribute(AuthenticationHelper.AUTHENTICATION_USER);
       
       if (logger.isDebugEnabled())
         logger.debug("Removing User session - will redirect via login page...");

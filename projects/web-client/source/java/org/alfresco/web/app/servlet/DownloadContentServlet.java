@@ -72,6 +72,8 @@ public class DownloadContentServlet extends HttpServlet
       
       try
       {
+         AuthenticationHelper.authenticate(getServletContext(), req, res);
+         
          WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
          // TODO: add compression here?
          //       see http://servlets.com/jservlet2/examples/ch06/ViewResourceCompress.java for example

@@ -25,6 +25,7 @@ import javax.faces.context.FacesContext;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -208,7 +209,7 @@ public class Node implements Serializable
       if (valid == null)
       {
          PermissionService service = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getPermissionService();
-         valid = Boolean.valueOf(/*service.hasPermission(getNodeRef() ...)*/true);
+         valid = Boolean.valueOf(service.hasPermission(this.nodeRef, permission) == AccessStatus.ALLOWED);
          permissions.put(permission, valid);
       }
       

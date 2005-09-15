@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
 import javax.portlet.PortletContext;
+import javax.portlet.PortletSession;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.app.servlet.AuthenticationFilter;
+import org.alfresco.web.app.servlet.AuthenticationHelper;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ServerConfigElement;
@@ -211,7 +213,7 @@ public class Application
     */
    public static User getCurrentUser(ServletContext context)
    {
-      return (User)context.getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
+      return (User)context.getAttribute(AuthenticationHelper.AUTHENTICATION_USER);
    }
    
    /**
@@ -219,7 +221,7 @@ public class Application
     */
    public static User getCurrentUser(FacesContext context)
    {
-      return (User)context.getExternalContext().getSessionMap().get(AuthenticationFilter.AUTHENTICATION_USER);
+      return (User)context.getExternalContext().getSessionMap().get(AuthenticationHelper.AUTHENTICATION_USER);
    }
    
    /**
@@ -375,6 +377,18 @@ public class Application
     * @return Current language Locale set or null if none set 
     */
    public static Locale getLanguage(HttpSession session)
+   {
+      return (Locale)session.getAttribute(LOCALE);
+   }
+   
+   /**
+    * Return the language Locale for the current user PortletSession.
+    * 
+    * @param session        PortletSession for the current user
+    * 
+    * @return Current language Locale set or null if none set 
+    */
+   public static Locale getLanguage(PortletSession session)
    {
       return (Locale)session.getAttribute(LOCALE);
    }

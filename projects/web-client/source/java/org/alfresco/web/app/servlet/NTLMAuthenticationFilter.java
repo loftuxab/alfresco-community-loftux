@@ -215,7 +215,7 @@ public class NTLMAuthenticationFilter implements Filter
         
         // Check if the user is already authenticated
         
-        if ( reqAuth == false && httpSess.getAttribute(AuthenticationFilter.AUTHENTICATION_USER) != null)
+        if ( reqAuth == false && httpSess.getAttribute(AuthenticationHelper.AUTHENTICATION_USER) != null)
         {
             chain.doFilter(sreq, sresp);
             return;
@@ -464,7 +464,7 @@ public class NTLMAuthenticationFilter implements Filter
                             String homeSpaceId = (String)nodeService.getProperty(authComponent.getPerson(Repository.getStoreRef(), userName), ContentModel.PROP_HOMEFOLDER);
                             user.setHomeSpaceId(homeSpaceId);
                             
-                            httpSess.setAttribute(AuthenticationFilter.AUTHENTICATION_USER, user);
+                            httpSess.setAttribute(AuthenticationHelper.AUTHENTICATION_USER, user);
     
                             // Update the NTLM logon details in the session
                             
