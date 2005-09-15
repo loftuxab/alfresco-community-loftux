@@ -58,7 +58,9 @@ public class UploadFileServlet extends HttpServlet
       boolean isMultipart = ServletFileUpload.isMultipartContent(request);
       
       try
-      {  
+      {
+         AuthenticationHelper.authenticate(getServletContext(), request, response);
+         
          if (isMultipart == false)
          {
             throw new AlfrescoRuntimeException("This servlet can only be used to handle file upload requests, make" +
