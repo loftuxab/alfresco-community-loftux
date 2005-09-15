@@ -55,7 +55,7 @@ public class UISpaceSelector extends AbstractItemSelector
    {
       String id = null;
       
-      if (this.navigationId.equals(Application.getCompanyRootId()) == false)
+      if (this.navigationId != null && this.navigationId.equals(Application.getCompanyRootId()) == false)
       {
          ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
                new NodeRef(Repository.getStoreRef(), this.navigationId));
