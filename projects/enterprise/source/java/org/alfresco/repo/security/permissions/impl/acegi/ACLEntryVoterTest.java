@@ -70,6 +70,22 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
         {
 
         }
+        
+        try
+        {
+            method.invoke(proxy, new Object[] { systemNodeRef });
+            assertNotNull(null);
+        }
+        catch (InvocationTargetException e)
+        {
+
+        }
+        
+        // Check we are allowed access to deleted nodes ..
+        
+        nodeService.deleteNode(systemNodeRef);
+        
+        assertNull(method.invoke(proxy, new Object[] { systemNodeRef }));
 
     }
     
@@ -269,6 +285,28 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         ProxyFactory proxyFactory = new ProxyFactory();
         proxyFactory.addAdvisor(advisorAdapterRegistry.wrap(new Interceptor("ACL_NODE.0.sys:base.Read")));
+
+        proxyFactory.setTargetSource(new SingletonTargetSource(o));
+
+        Object proxy = proxyFactory.getProxy();
+
+        method.invoke(proxy, new Object[] { rootNodeRef });
+    }
+    
+    
+    public void testBasicAllow() throws Exception
+    {
+        runAs("andy");
+
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
+
+        Object o = new ClassWithMethods();
+        Method method = o.getClass().getMethod("testOneNodeRef", new Class[] { NodeRef.class });
+
+        AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.addAdvisor(advisorAdapterRegistry.wrap(new Interceptor("ACL_ALLOW")));
 
         proxyFactory.setTargetSource(new SingletonTargetSource(o));
 

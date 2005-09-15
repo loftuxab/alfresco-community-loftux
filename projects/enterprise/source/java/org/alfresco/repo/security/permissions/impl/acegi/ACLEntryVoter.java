@@ -325,14 +325,12 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         ConfigAttributeDefintion(ConfigAttribute attr)
         {
             StringTokenizer st = new StringTokenizer(attr.getAttribute(), ".", false);
-            if (st.countTokens() != 4)
+            if(st.countTokens() < 1)
             {
-                throw new ACLEntryVoterException("There must be four . separated tokens in each config attribute");
+                throw new ACLEntryVoterException("There must be at least one token in a config attribute");
             }
             typeString = st.nextToken();
-            String numberString = st.nextToken();
-            String qNameString = st.nextToken();
-            String permissionString = st.nextToken();
+           
 
             if (!(typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT) || typeString.equals(ACL_ALLOW)))
             {
@@ -341,7 +339,14 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 
             if (!typeString.equals(ACL_ALLOW))
             {
-
+                if (st.countTokens() != 3)
+                {
+                    throw new ACLEntryVoterException("There must be four . separated tokens in each config attribute");
+                }
+                String numberString = st.nextToken();
+                String qNameString = st.nextToken();
+                String permissionString = st.nextToken();
+                
                 parameter = Integer.parseInt(numberString);
 
                 QName qName = QName.createQName(qNameString, nspr);
