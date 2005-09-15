@@ -36,7 +36,13 @@ public class RegexQNamePattern implements QNamePattern
     private static final Log logger = LogFactory.getLog(RegexQNamePattern.class);
     
     /** A helper pattern matcher that will match <i>all</i> qnames */
-    public static final QNamePattern MATCH_ALL = new RegexQNamePattern(".*");
+    public static final QNamePattern MATCH_ALL = new QNamePattern()
+        {
+            public boolean isMatch(QName qname)
+            {
+                return true;
+            }
+        };
     
     private String namespaceUriPattern;
     private String localNamePattern;
