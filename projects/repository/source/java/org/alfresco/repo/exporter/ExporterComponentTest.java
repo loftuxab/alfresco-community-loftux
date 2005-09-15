@@ -51,8 +51,8 @@ public class ExporterComponentTest extends BaseSpringTest
         importerService = (ImporterService)applicationContext.getBean("importerComponent");
         
         // Create the store
-//        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test");
+        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+//        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test");
     }
 
     
