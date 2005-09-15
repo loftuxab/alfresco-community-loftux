@@ -33,8 +33,8 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
     private static final String PARAM_VALUE = "television";
     private static final String MSG_PARAMS = "msg_params";
     private static final String MSG_ERROR = "msg_error";
-    private static final String VALUE_ERROR = "This is an error message.";
-    private static final String VALUE_FR_ERROR = "Ceci est un message derreur.";
+    private static final String VALUE_ERROR = "This is an error message. \n  This is on a new line.";
+    private static final String VALUE_FR_ERROR = "C'est un message d'erreur. \n  C'est sur une nouvelle ligne.";
     private static final String VALUE_PARAMS = "What no " + PARAM_VALUE + "?";
     private static final String VALUE_FR_PARAMS = "Que non " + PARAM_VALUE + "?";
     private static final String NON_I18NED_MSG = "This is a non i18ned error message.";
