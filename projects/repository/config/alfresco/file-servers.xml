@@ -8,8 +8,8 @@
       <broadcast>255.255.255.255</broadcast>
 
       <!-- Use Java socket based NetBIOS over TCP/IP and native SMB on linux -->
-      <tcpipSMB platforms="linux"/>
-      <netBIOSSMB platforms="linux"/>
+      <tcpipSMB platforms="linux,solaris,macosx"/>
+      <netBIOSSMB platforms="linux,solaris,macosx"/>
       <hostAnnounce interval="5"/>
 
       <!-- Use Win32 NetBIOS interface on Windows -->

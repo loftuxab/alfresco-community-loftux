@@ -113,7 +113,7 @@ public class ServerConfiguration
 
     public enum PlatformType
     {
-        Unknown, WINDOWS, LINUX
+        Unknown, WINDOWS, LINUX, SOLARIS, MACOSX
     };
 
     // Token name to substitute current server name into the CIFS server name
@@ -440,6 +440,10 @@ public class ServerConfiguration
             m_platform = PlatformType.WINDOWS;
         else if (osName.equalsIgnoreCase("Linux"))
             m_platform = PlatformType.LINUX;
+        else if (osName.startsWith("Mac OS X"))
+            m_platform = PlatformType.MACOSX;
+        else if (osName.startsWith("Solaris"))
+            m_platform = PlatformType.SOLARIS;
     }
 
     /**
