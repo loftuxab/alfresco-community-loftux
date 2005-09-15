@@ -31,14 +31,15 @@ import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.afterinvocation.AfterInvocationProvider;
 
-import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInvocation;
@@ -262,7 +263,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                 testNodeRef = nodeService.getPrimaryParent(returnedObject).getParentRef();
             }
 
-            if ((testNodeRef != null) && !permissionService.hasPermission(testNodeRef, cad.required))
+            if ((testNodeRef != null) && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -319,7 +320,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                 testNodeRef = ((ChildAssociationRef) returnedObject).getParentRef();
             }
 
-            if ((testNodeRef != null) && !permissionService.hasPermission(testNodeRef, cad.required))
+            if ((testNodeRef != null) && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -364,7 +365,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
 
                 if (filteringResultSet.getIncluded(i)
                         && (testNodeRef != null)
-                        && !permissionService.hasPermission(testNodeRef, cad.required))
+                        && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
                 {
                     filteringResultSet.setIncluded(i, false);
                 }
@@ -454,7 +455,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     }
                 }
 
-                if (allowed && (testNodeRef != null) && !permissionService.hasPermission(testNodeRef, cad.required))
+                if (allowed && (testNodeRef != null) && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
                 {
                     allowed = false;
                 }
@@ -535,7 +536,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
 
                 if (incudedSet.get(i)
                         && (testNodeRef != null)
-                        && !permissionService.hasPermission(testNodeRef, cad.required))
+                        && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
                 {
                     incudedSet.set(i, false);
                 }

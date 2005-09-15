@@ -18,9 +18,6 @@ package org.alfresco.repo.security.permissions.impl.model;
 
 import java.util.Set;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.AbstractPermissionTest;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;

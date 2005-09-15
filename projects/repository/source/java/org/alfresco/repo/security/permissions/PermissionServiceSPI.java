@@ -19,6 +19,8 @@ package org.alfresco.repo.security.permissions;
 import java.util.Set;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -26,58 +28,24 @@ import org.alfresco.service.namespace.QName;
  * 
  * The implementation may be changed in the application configuration
  * 
- * @author andyh
+ * @author Andy Hind
  */
-public interface PermissionService
-{
-    /**
-     * Get the Owner Authority
-     * 
-     * @return the owner authority
-     */
-    public String getOwnerAuthority();
-    
-    /**
-     * Get the All Authorities
-     * 
-     * @return the All authorities
-     */
-    public String getAllAuthorities();
-    
+public interface PermissionServiceSPI extends PermissionService
+{   
     /**
      * Get the All Permission
      * 
      * @return the All permission
      */
-    public PermissionReference getAllPermission();
-    
+    public PermissionReference getAllPermissionReference();
+     
     /**
-     * Get all the AccessPermissions that are granted to the given
-     * authentication for the given node
-     * 
-     * @param nodeRef -
-     *            the reference to the node
-     * @return the set of allowed permissions
-     */
-    public Set<AccessPermission> getPermissions(NodeRef nodeRef);
-
-    /**
-     * Get all the AccessPermissions that are granted/denied to the given
-     * authentication for the given node
-     * 
-     * @param nodeRef -
-     *            the reference to the node
-     * @return the set of allowed permissions
-     */
-    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef);
-
-    /**
-     * Get the permissions that can be set for a given node
+     * Get the permissions that can be set for a given type
      * 
      * @param nodeRef
      * @return
      */
-    public Set<PermissionReference> getSettablePermissions(NodeRef nodeRef);
+    public Set<PermissionReference> getSettablePermissionReferences(QName type);
     
     /**
      * Get the permissions that can be set for a given type
@@ -85,7 +53,7 @@ public interface PermissionService
      * @param nodeRef
      * @return
      */
-    public Set<PermissionReference> getSettablePermissions(QName type);
+    public Set<PermissionReference> getSettablePermissionReferences(NodeRef nodeRef);
 
     /**
      * Get the permissions that have been set on the given node (it knows
@@ -104,7 +72,7 @@ public interface PermissionService
      * @param perm
      * @return
      */
-    public boolean hasPermission(NodeRef nodeRef, PermissionReference perm);
+    public AccessStatus hasPermission(NodeRef nodeRef, PermissionReference perm);
 
     /**
      * Where is the permission set that controls the behaviour for the given
@@ -116,12 +84,6 @@ public interface PermissionService
      * @return
      */
     public NodePermissionEntry explainPermission(NodeRef nodeRef, PermissionReference perm);
-
-    /**
-     * Delete all the permission assigned to the node
-     * @param nodeRef
-     */
-    public void deletePermissions(NodeRef nodeRef);
     
     /**
      * Delete the permissions defined by the nodePermissionEntry
@@ -134,25 +96,6 @@ public interface PermissionService
      * @param permissionEntry
      */
     public void deletePermission(PermissionEntry permissionEntry);
-
-    /**
-     * Find and delete a permission by node, authentication and permission definition.
-     * 
-     * @param nodeRef
-     * @param authority
-     * @param perm
-     */
-    public void deletePermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow);
-    
-    /**
-     * Set a specific permission on a node.
-     * 
-     * @param nodeRef
-     * @param authority
-     * @param perm
-     * @param allow
-     */
-    public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow);
 
     /**
      * Add or set a permission entry on a node.
@@ -169,19 +112,28 @@ public interface PermissionService
     public void setPermission(NodePermissionEntry nodePermissionEntry);
 
     /**
-     * Set the global inheritance behaviour for permissions on a node.
+     * Get the permission reference for the given data type and permission name.
      * 
-     * @param nodeRef
-     * @param inheritParentPermissions
-     */
-    public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
-    
-    /**
-     * Get the permission reference for the given type and permission name.
-     * 
-     * @param qname
+     * @param qname - may be null if the permission name is unique
      * @param permissionName
      * @return
      */
     public PermissionReference getPermissionReference(QName qname, String permissionName);
+    
+    /**
+     * Get the permission reference by permission name.
+     *
+     * @param permissionName
+     * @return
+     */
+    public PermissionReference getPermissionReference(String permissionName);
+    
+    
+    /**
+     * Get the string that can be used to identify the given permission reference.
+     * 
+     * @param permissionReference
+     * @return
+     */
+    public String getPermission(PermissionReference permissionReference);
 }

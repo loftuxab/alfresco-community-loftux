@@ -14,16 +14,15 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.security.authentication;
+package org.alfresco.service.cmr.security;
 
 import java.util.Set;
 
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.repo.security.authentication.AuthenticationException;
 
 /**
  * The authentication service defines the API for managing authentication information 
- * against a userid. 
+ * against a user id. 
  *  
  * @author Andy Hind
  *
@@ -86,7 +85,7 @@ public interface AuthenticationService
     public String getCurrentUserName() throws AuthenticationException;
     
     /**
-     * Invlidate any tickets held by the user.
+     * Invalidate any tickets held by the user.
      * 
      * @param userName
      * @throws AuthenticationException
@@ -174,26 +173,7 @@ public interface AuthenticationService
     public Set<String> getAllUserNames();
     
     /**
-     * Create or update a basic person entry for the given user name.
-     * Depending on the implementation this may set properties derived from the authenication store. 
-     * 
-     * @param storeRef
-     * @param userName
-     * @return
-     */
-    public NodeRef synchronisePerson(StoreRef storeRef, String userName);
-    
-    /**
-     * Get a user by userName
-     * 
-     * @param storeRef
-     * @param userName
-     * @return
-     */
-    public NodeRef getPersonNodeRef(StoreRef storeRef, String userName);
-    
-    /**
-     * Is the current user the system user
+     * Is the current user the system user?
      * 
      * @return
      */

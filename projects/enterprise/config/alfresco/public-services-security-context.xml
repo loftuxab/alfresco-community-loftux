@@ -11,7 +11,7 @@
 
     <bean id='permissionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
-            <value>org.alfresco.repo.security.permissions.PermissionService</value>
+            <value>org.alfresco.repo.security.permissions.PermissionServiceSPI</value>
         </property>
         <property name="transactionManager">
             <ref bean="transactionManager" />

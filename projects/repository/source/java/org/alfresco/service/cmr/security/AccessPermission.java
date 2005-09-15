@@ -14,39 +14,36 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.security.permissions;
+package org.alfresco.service.cmr.security;
+
 
 /**
  * The interface used to support reporting back if permissions are allowed or
  * denied.
  * 
- * @author andyh
+ * @author Andy Hind
  */
 public interface AccessPermission
 {   
     /**
-     * The permission defintion.
+     * The permission.
      * 
      * @return
      */
-    public PermissionReference getPermissionDefinition();
-
-    /**
-     * Is this permission allowed?
-     * @return
-     */
-    public boolean isAllowed();
-
-    /**
-     * Is this permission denied?
-     * @return
-     */
-    public boolean isDenied();
+    public String getPermission();
     
     /**
-     * Get the Access enum value
+     * Get the Access enumeration value
      * 
      * @return
      */
     public AccessStatus getAccessStatus();
+    
+    
+    /**
+     * Get the authority to which this permission applies.
+     * 
+     * @return
+     */
+    public String getAuthority();
 }

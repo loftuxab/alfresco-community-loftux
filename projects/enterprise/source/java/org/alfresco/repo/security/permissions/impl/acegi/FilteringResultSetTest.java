@@ -17,12 +17,9 @@
 package org.alfresco.repo.security.permissions.impl.acegi;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.ListIterator;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.results.ChildAssocRefResultSet;

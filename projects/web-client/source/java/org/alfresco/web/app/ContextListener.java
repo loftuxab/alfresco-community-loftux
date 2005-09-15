@@ -33,16 +33,16 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
-import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
-import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -181,13 +181,12 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
                 // Create the person under the special people system folder
                 // This is required to allow authenticate() to succeed during
                 // login
-               
+
                 List<NodeRef> results = searchService.selectNodes(rootNodeRef,
                         RepositoryAuthenticationDao.PEOPLE_FOLDER, null, namespaceService, false);
                 NodeRef typesNode = null;
                 if (results.size() == 0)
                 {
-                    
 
                     List<ChildAssociationRef> result = nodeService.getChildAssocs(rootNodeRef, QName.createQName("sys",
                             "system", namespaceService));
@@ -234,8 +233,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
             PermissionService permissionService = (PermissionService) ctx.getBean("permissionService");
             permissionService.setPermission(rootNodeRef, ADMIN, permissionService.getAllPermission(), true);
-            permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), permissionService
-                    .getPermissionReference(QName.createQName("sys", "base", registry.getNamespaceService()), "Read"),
+            permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), PermissionService.READ,
                     true);
 
             // commit the transaction

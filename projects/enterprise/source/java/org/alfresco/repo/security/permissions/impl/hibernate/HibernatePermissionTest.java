@@ -18,9 +18,6 @@ package org.alfresco.repo.security.permissions.impl.hibernate;
 
 import java.io.Serializable;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.util.BaseSpringTest;
 

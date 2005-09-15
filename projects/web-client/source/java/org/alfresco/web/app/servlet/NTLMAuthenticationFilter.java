@@ -44,8 +44,8 @@ import org.alfresco.filesys.server.config.ServerConfiguration;
 import org.alfresco.filesys.smb.SMBException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
-import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
@@ -459,7 +459,7 @@ public class NTLMAuthenticationFilter implements Filter
                             
                             NodeService nodeService = (NodeService) ctx.getBean("nodeService");
                           
-                            User user = new User(userName, authService.getCurrentTicket(), authService.getPersonNodeRef(Repository.getStoreRef(), userName));
+                            User user = new User(userName, authService.getCurrentTicket(), authComponent.getPerson(Repository.getStoreRef(), userName));
                             
                             String homeSpaceId = (String)nodeService.getProperty(authComponent.getPerson(Repository.getStoreRef(), userName), ContentModel.PROP_HOMEFOLDER);
                             user.setHomeSpaceId(homeSpaceId);

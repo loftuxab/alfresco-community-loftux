@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.alfresco.repo.domain.NodeKey;
-import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
@@ -29,6 +28,7 @@ import org.alfresco.repo.security.permissions.impl.SimpleNodePermissionEntry;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionEntry;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.QName;
 import org.hibernate.ObjectDeletedException;
 import org.springframework.dao.DataAccessException;

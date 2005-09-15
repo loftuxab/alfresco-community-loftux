@@ -22,13 +22,14 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
-import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.PermissionServiceSPI;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -44,7 +45,7 @@ public class AbstractPermissionTest extends BaseSpringTest
 
     protected DictionaryService dictionaryService;
 
-    protected PermissionService permissionService;
+    protected PermissionServiceSPI permissionService;
 
     protected AuthenticationService authenticationService;
 
@@ -55,24 +56,6 @@ public class AbstractPermissionTest extends BaseSpringTest
     protected NamespacePrefixResolver namespacePrefixResolver;
 
     protected ServiceRegistry serviceRegistry;
-
-    protected SimplePermissionReference READ;
-
-    protected SimplePermissionReference READ_PROPERTIES;
-
-    protected SimplePermissionReference READ_CHILDREN;
-
-    protected SimplePermissionReference READ_CONTENT;
-
-    protected SimplePermissionReference WRITE;
-
-    protected SimplePermissionReference DELETE;
-
-    protected SimplePermissionReference DELETE_NODE;
-
-    protected SimplePermissionReference DELETE_CHILDREN;
-
-    protected SimplePermissionReference FULL_CONTROL;
 
     protected NodeRef systemNodeRef;
 
@@ -91,7 +74,7 @@ public class AbstractPermissionTest extends BaseSpringTest
         nodeService = (NodeService) applicationContext.getBean("dbNodeService");
         dictionaryService = (DictionaryService) applicationContext.getBean(ServiceRegistry.DICTIONARY_SERVICE
                 .getLocalName());
-        permissionService = (PermissionService) applicationContext.getBean("permissionService");
+        permissionService = (PermissionServiceSPI) applicationContext.getBean("permissionService");
         namespacePrefixResolver = (NamespacePrefixResolver) applicationContext
                 .getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName());
         authenticationService = (AuthenticationService) applicationContext.getBean("authenticationService");
@@ -101,8 +84,6 @@ public class AbstractPermissionTest extends BaseSpringTest
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
-
-        setUpPermissions();
 
         QName children = ContentModel.ASSOC_CHILDREN;
         QName system = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "system");
@@ -128,31 +109,6 @@ public class AbstractPermissionTest extends BaseSpringTest
         flushAndClear();
     }
 
-    private void setUpPermissions()
-    {
-        READ = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Read");
-        READ_PROPERTIES = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
-                "ReadProperties");
-        READ_CHILDREN = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
-                "ReadChildren");
-        READ_CONTENT = new SimplePermissionReference(QName.createQName("cm", "content", namespacePrefixResolver),
-                "ReadContent");
-
-        WRITE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Write");
-
-        DELETE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Delete");
-
-        DELETE_CHILDREN = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
-                "DeleteChildren");
-
-        DELETE_NODE = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
-                "DeleteNode");
-
-        FULL_CONTROL = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver),
-                "FullControl");
-
-    }
-
     protected void runAs(String userName)
     {
         authenticationService.authenticate(userName, userName.toCharArray());
@@ -169,6 +125,11 @@ public class AbstractPermissionTest extends BaseSpringTest
         HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_USERNAME, userName);
         return properties;
+    }
+
+    protected PermissionReference getPermission(String permission)
+    {
+        return permissionModelDAO.getPermissionReference(null, permission);
     }
 
 }

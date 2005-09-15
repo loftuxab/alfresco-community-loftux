@@ -25,19 +25,19 @@ import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.providers.dao.User;
 
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
-import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.permissions.AccessPermission;
-import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.DynamicAuthority;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
-import org.alfresco.repo.security.permissions.PermissionService;
+import org.alfresco.repo.security.permissions.PermissionServiceSPI;
 import org.alfresco.repo.security.permissions.impl.model.RequiredPermission;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessPermission;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
 import org.apache.commons.logging.Log;
@@ -51,18 +51,10 @@ import org.springframework.beans.factory.InitializingBean;
  * 
  * @author andyh
  */
-public class PermissionServiceImpl implements PermissionService, InitializingBean
+public class PermissionServiceImpl implements PermissionServiceSPI, InitializingBean
 {
 
-    public static final String OWNER_AUTHORITY = "\u0000owner";
-
     private static Log log = LogFactory.getLog(PermissionServiceImpl.class);
-
-    /*
-     * ALL Permission
-     */
-    public static final PermissionReference ALL_PERMISSION = new SimplePermissionReference(QName.createQName("\u0000",
-            "\u0000"), "\u0000");
 
     /*
      * Access to the model
@@ -189,38 +181,39 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
     public String getAllAuthorities()
     {
-        return "\u0000";
+        return ALL_AUTHORITIES;
     }
 
-    public PermissionReference getAllPermission()
+    public String getAllPermission()
     {
-        return ALL_PERMISSION;
+        return ALL_PERMISSIONS;
     }
 
     public Set<AccessPermission> getPermissions(NodeRef nodeRef)
     {
-        return getAllPermissionsImpl(nodeRef, true, false);
+        return getAllPermissionsImpl(nodeRef, true, true);
     }
 
     public Set<AccessPermission> getAllPermissions(NodeRef nodeRef)
     {
-        return getAllPermissionsImpl(nodeRef, true, true);
+        return null;
     }
-    
+
     private Set<AccessPermission> getAllPermissionsImpl(NodeRef nodeRef, boolean includeTrue, boolean includeFalse)
     {
+        String userName = authenticationService.getCurrentUserName();
         HashSet<AccessPermission> accessPermissions = new HashSet<AccessPermission>();
-        for (PermissionReference pr : getSettablePermissions(nodeRef))
+        for (PermissionReference pr : getSettablePermissionReferences(nodeRef))
         {
-            if(hasPermission(nodeRef, pr))
+            if (hasPermission(nodeRef, pr) == AccessStatus.ALLOWED)
             {
-                accessPermissions.add(new AccessPermissionImpl(pr, true));
+                accessPermissions.add(new AccessPermissionImpl(pr.toString(), AccessStatus.ALLOWED, userName));
             }
             else
             {
-                if(includeFalse)
+                if (includeFalse)
                 {
-                    accessPermissions.add(new AccessPermissionImpl(pr, false)); 
+                    accessPermissions.add(new AccessPermissionImpl(pr.toString(), AccessStatus.DENIED, userName));
                 }
             }
         }
@@ -229,74 +222,89 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
     private class AccessPermissionImpl implements AccessPermission
     {
-        private PermissionReference permissionReference;
+        private String permission;
+
+        private AccessStatus accessStatus;
+
+        private String authority;
         
-        private boolean allowed;
-        
-        AccessPermissionImpl(PermissionReference permissionReference, boolean allowed)
+        AccessPermissionImpl(String permission, AccessStatus accessStatus, String authority)
         {
-            this.permissionReference = permissionReference;
-            this.allowed = allowed;
-        }
-        
-        public PermissionReference getPermissionDefinition()
-        {
-            return permissionReference;
+            this.permission = permission;
+            this.accessStatus = accessStatus;
+            this.authority = authority;
         }
 
-        public boolean isAllowed()
+        public String getPermission()
         {
-            return allowed;
-        }
-
-        public boolean isDenied()
-        {
-            return !allowed;
+            return permission;
         }
 
         public AccessStatus getAccessStatus()
         {
-            return allowed ? AccessStatus.ALLOWED : AccessStatus.DENIED;
+            return accessStatus;
         }
 
+        public String getAuthority()
+        {
+            return authority;
+        }
+        
         @Override
         public boolean equals(Object o)
         {
-            if(this == o)
+            if (this == o)
             {
                 return true;
             }
-            if(!(o instanceof AccessPermissionImpl))
+            if (!(o instanceof AccessPermissionImpl))
             {
                 return false;
             }
-            AccessPermissionImpl other = (AccessPermissionImpl)o;
-            return this.getPermissionDefinition().equals(other.getPermissionDefinition()) && (this.isAllowed() == other.isAllowed());
+            AccessPermissionImpl other = (AccessPermissionImpl) o;
+            return this.getPermission().equals(other.getPermission())
+                    && (this.getAccessStatus() == other.getAccessStatus() && (this.getAccessStatus().equals(other
+                            .getAccessStatus())));
         }
 
         @Override
         public int hashCode()
         {
-            return permissionReference.hashCode() *37 + (allowed ? 1 : 0);
-        }       
-    }
-    
-    public Set<PermissionReference> getSettablePermissions(NodeRef nodeRef)
-    {
-        return modelDAO.getExposedPermissions(nodeRef);
+            return ((authority.hashCode() *37 ) +  permission.hashCode()) * 37 + accessStatus.hashCode();
+        }
     }
 
-    public Set<PermissionReference> getSettablePermissions(QName type)
+    public Set<String> getSettablePermissions(NodeRef nodeRef)
     {
-        return modelDAO.getExposedPermissions(type);
+        Set<PermissionReference> settable = getSettablePermissionReferences(nodeRef);
+        Set<String> strings = new HashSet<String>(settable.size());
+        for(PermissionReference pr: settable)
+        {
+            strings.add(getPermission(pr));
+        }
+        return strings;
+    }
+
+    public Set<String> getSettablePermissions(QName type)
+    {
+        Set<PermissionReference> settable = getSettablePermissionReferences(type);
+        Set<String> strings = new HashSet<String>(settable.size());
+        for(PermissionReference pr: settable)
+        {
+            strings.add(getPermission(pr));
+        }
+        return strings;
     }
 
     public NodePermissionEntry getSetPermissions(NodeRef nodeRef)
     {
         return permissionsDAO.getPermissions(nodeRef);
     }
+    
+    
+    
 
-    public boolean hasPermission(NodeRef nodeRef, PermissionReference perm)
+    public AccessStatus hasPermission(NodeRef nodeRef, PermissionReference perm)
     {
         // If the node ref is null there is no sensible test to do - and there
         // must be no permissions
@@ -304,24 +312,31 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
         if (nodeRef == null)
         {
-            return true;
+            return AccessStatus.ALLOWED;
         }
 
         // If the permission is null we deny
 
         if (perm == null)
         {
-            return false;
+            return AccessStatus.DENIED;
         }
 
+        
+        // Allow permissions for nodes that do not exist
+        if(!nodeService.exists(nodeRef))
+        {
+            return AccessStatus.ALLOWED;
+        }
+        
         // If the node does not support the given permission there is no point
         // doing the test
         Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
-        available.add(getAllPermission());
+        available.add(getAllPermissionReference());
 
         if (!(available.contains(perm)))
         {
-            return false;
+            return  AccessStatus.DENIED;
         }
 
         //
@@ -350,7 +365,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
                     + perm + "> is " + (result ? "allowed" : "denied") + " for "
                     + authenticationService.getCurrentUserName() + " on node " + nodeService.getPath(nodeRef));
         }
-        return result;
+        return result ? AccessStatus.ALLOWED : AccessStatus.DENIED;
 
     }
 
@@ -534,7 +549,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
             // Check the required permissions but not for sets they rely on
             // their underlying permissions
-            if (modelDAO.checkPermission(required))
+            if (required.equals(getPermissionReference(ALL_PERMISSIONS)) || modelDAO.checkPermission(required))
             {
                 if (parentRequirements.contains(required))
                 {
@@ -622,7 +637,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
             {
                 for (PermissionReference pr : childrenRequirements)
                 {
-                    success &= hasPermission(child.getChildRef(), pr);
+                    success &= (hasPermission(child.getChildRef(), pr) == AccessStatus.ALLOWED);
                     if (!success)
                     {
                         return false;
@@ -726,7 +741,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
                         // All permission excludes all permissions available for
                         // the node.
-                        if (pe.getPermissionReference().equals(getAllPermission()))
+                        if (pe.getPermissionReference().equals(getAllPermissionReference()))
                         {
                             for (PermissionReference deny : modelDAO.getAllPermissions(nodeRef))
                             {
@@ -753,7 +768,7 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
             // Find all the permissions that grant the allowed permission
             // All permissions are treated specially.
             Set<PermissionReference> granters = modelDAO.getGrantingPermissions(required);
-            granters.add(getAllPermission());
+            granters.add(getAllPermissionReference());
 
             NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
 
@@ -897,7 +912,57 @@ public class PermissionServiceImpl implements PermissionService, InitializingBea
 
     public PermissionReference getPermissionReference(QName qname, String permissionName)
     {
-        return new SimplePermissionReference(qname, permissionName);
+        return modelDAO.getPermissionReference(qname, permissionName);
     }
 
+    public PermissionReference getAllPermissionReference()
+    {
+        return getPermissionReference(ALL_PERMISSIONS);
+    }
+
+    public String getPermission(PermissionReference permissionReference)
+    {
+        if(modelDAO.isUnique(permissionReference))
+        {
+            return permissionReference.getName();
+        }
+        else
+        {
+            return permissionReference.toString();
+        }
+    }
+
+    public PermissionReference getPermissionReference(String permissionName)
+    {
+        return modelDAO.getPermissionReference(null, permissionName);
+    }
+
+    public Set<PermissionReference> getSettablePermissionReferences(QName type)
+    {
+        return modelDAO.getExposedPermissions(type);
+    }
+    
+    public Set<PermissionReference> getSettablePermissionReferences(NodeRef nodeRef)
+    {
+        return modelDAO.getExposedPermissions(nodeRef);
+    }
+
+
+    public void deletePermission(NodeRef nodeRef, String authority, String perm, boolean allow)
+    {
+        deletePermission(nodeRef, authority, getPermissionReference(perm), allow);
+    }
+
+    public AccessStatus hasPermission(NodeRef nodeRef, String perm)
+    {
+        return hasPermission(nodeRef, getPermissionReference(perm));
+    }
+
+    public void setPermission(NodeRef nodeRef, String authority, String perm, boolean allow)
+    {
+        setPermission(nodeRef, authority, getPermissionReference(perm), allow);
+    }
+
+    
+    
 }

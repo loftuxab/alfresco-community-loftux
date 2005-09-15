@@ -21,10 +21,10 @@ import java.util.HashMap;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.ownable.OwnableService;
-import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.InitializingBean;
 

@@ -202,7 +202,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         nodeService.deleteNode(userRef);
     }
 
-    private synchronized StoreRef getUserStoreRef()
+    public synchronized StoreRef getUserStoreRef()
     {
         if (userStoreRef == null)
         {

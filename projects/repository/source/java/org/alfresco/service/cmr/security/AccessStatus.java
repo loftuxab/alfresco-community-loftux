@@ -14,11 +14,14 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.security.permissions;
+package org.alfresco.service.cmr.security;
 
 /**
- * Enum used to indicate access status.
+ * Enumeration used to indicate access status.
  * 
  * @author Andy Hind
  */
-public enum  AccessStatus { DENIED, ALLOWED }
+public enum AccessStatus
+{
+    DENIED, ALLOWED
+}

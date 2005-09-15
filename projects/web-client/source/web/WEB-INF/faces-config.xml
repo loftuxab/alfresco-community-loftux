@@ -29,6 +29,10 @@
          <value>#{authenticationService}</value>
       </managed-property>
       <managed-property>
+         <property-name>authenticationComponent</property-name>
+         <value>#{authenticationComponent}</value>
+      </managed-property>
+      <managed-property>
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
       </managed-property>

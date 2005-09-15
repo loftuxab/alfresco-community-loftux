@@ -19,7 +19,7 @@ package org.alfresco.repo.webservice.authentication;
 import java.rmi.RemoteException;
 
 import org.alfresco.repo.security.authentication.AuthenticationException;
-import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

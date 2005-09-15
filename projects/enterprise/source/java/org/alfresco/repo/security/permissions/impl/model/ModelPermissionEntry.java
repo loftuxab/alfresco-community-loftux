@@ -16,11 +16,11 @@
  */
 package org.alfresco.repo.security.permissions.impl.model;
 
-import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.PermissionReferenceImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.dom4j.Attribute;

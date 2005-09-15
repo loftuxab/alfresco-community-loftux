@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.i18n.I18NUtil;
-import org.alfresco.repo.security.authentication.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.User;
 import org.springframework.web.context.WebApplicationContext;

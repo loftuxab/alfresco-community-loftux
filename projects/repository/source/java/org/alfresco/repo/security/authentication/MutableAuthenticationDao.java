@@ -19,11 +19,14 @@ package org.alfresco.repo.security.authentication;
 import net.sf.acegisecurity.providers.dao.AuthenticationDao;
 import net.sf.acegisecurity.providers.dao.SaltSource;
 
+import org.alfresco.service.cmr.repository.StoreRef;
+
 public interface MutableAuthenticationDao extends AuthenticationDao, SaltSource
 {
     public void createUser(String userName, String rawPassword) throws AuthenticationException;
     public void updateUser(String userName, String rawPasswrod) throws AuthenticationException;
     public void deleteUser(String userName) throws AuthenticationException;
     public boolean userExists(String userName);
+    public StoreRef getUserStoreRef();
     
 }

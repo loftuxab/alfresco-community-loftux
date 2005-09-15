@@ -27,7 +27,7 @@ import net.sf.acegisecurity.context.security.SecureContext;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AuthenticationService;
 
 public class AuthenticationServiceImpl implements AuthenticationService
 {
@@ -217,15 +217,10 @@ public class AuthenticationServiceImpl implements AuthenticationService
         return null;
     }
 
-    public NodeRef synchronisePerson(StoreRef storeRef, String userName)
+    public NodeRef synchronisePerson(String userName)
     {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public NodeRef getPersonNodeRef(StoreRef storeRef, String userName)
-    {
-        return authenticationComponent.getPerson(storeRef, userName);
     }
 
     public boolean isCurrentUserTheSystemUser()

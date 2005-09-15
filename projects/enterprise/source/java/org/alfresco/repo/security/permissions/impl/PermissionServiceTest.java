@@ -25,10 +25,11 @@ import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.PermissionEntry;
-import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessPermission;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 
@@ -91,11 +92,11 @@ public class PermissionServiceTest extends AbstractPermissionTest
         Set<SimplePermissionEntry> entries = new HashSet<SimplePermissionEntry>();
         entries.add(new SimplePermissionEntry(rootNodeRef, new SimplePermissionReference(QName.createQName("A", "B"),
                 "C"), "user-one", AccessStatus.ALLOWED));
-        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(), "user-two",
+        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(), "user-two",
                 AccessStatus.ALLOWED));
         entries.add(new SimplePermissionEntry(rootNodeRef, new SimplePermissionReference(QName.createQName("D", "E"),
                 "F"), permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
-        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 permissionService.getAllAuthorities(), AccessStatus.DENIED));
 
         SimpleNodePermissionEntry entry = new SimpleNodePermissionEntry(rootNodeRef, false, entries);
@@ -111,7 +112,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testSetNodePermissionEntry2()
     {
         Set<SimplePermissionEntry> entries = new HashSet<SimplePermissionEntry>();
-        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        entries.add(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
 
         SimpleNodePermissionEntry entry = new SimpleNodePermissionEntry(rootNodeRef, false, entries);
@@ -143,8 +144,8 @@ public class PermissionServiceTest extends AbstractPermissionTest
         {
             assertEquals("andy", pe.getAuthority());
             assertTrue(pe.isAllowed());
-            assertTrue(pe.getPermissionReference().getQName().equals(permissionService.getAllPermission().getQName()));
-            assertTrue(pe.getPermissionReference().getName().equals(permissionService.getAllPermission().getName()));
+            assertTrue(pe.getPermissionReference().getQName().equals(permissionService.getAllPermissionReference().getQName()));
+            assertTrue(pe.getPermissionReference().getName().equals(permissionService.getAllPermissionReference().getName()));
             assertEquals(rootNodeRef, pe.getNodeRef());
         }
 
@@ -174,8 +175,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // new
 
-        permissionService.setPermission(rootNodeRef, "andy", new SimplePermissionReference(QName.createQName("A", "B"),
-                "C"), false);
+        permissionService.setPermission(rootNodeRef, "andy", PermissionService.READ, false);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -183,8 +183,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // delete
 
-        permissionService.deletePermission(rootNodeRef, "andy", new SimplePermissionReference(QName.createQName("A",
-                "B"), "C"), false);
+        permissionService.deletePermission(rootNodeRef, "andy", PermissionService.READ, false);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -212,7 +211,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testSetPermissionEntry()
     {
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 "andy", AccessStatus.ALLOWED));
         permissionService.setPermission(rootNodeRef, "andy", permissionService.getAllPermission(), true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
@@ -223,14 +222,14 @@ public class PermissionServiceTest extends AbstractPermissionTest
         {
             assertEquals("andy", pe.getAuthority());
             assertTrue(pe.isAllowed());
-            assertTrue(pe.getPermissionReference().getQName().equals(permissionService.getAllPermission().getQName()));
-            assertTrue(pe.getPermissionReference().getName().equals(permissionService.getAllPermission().getName()));
+            assertTrue(pe.getPermissionReference().getQName().equals(permissionService.getAllPermissionReference().getQName()));
+            assertTrue(pe.getPermissionReference().getName().equals(permissionService.getAllPermissionReference().getName()));
             assertEquals(rootNodeRef, pe.getNodeRef());
         }
 
         // Set duplicate
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 "andy", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -239,7 +238,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // Set new
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 "other", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -248,7 +247,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
         // Deny
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 "andy", AccessStatus.DENIED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -272,21 +271,21 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertEquals(3, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef,
-                permissionService.getAllPermission(), "andy", AccessStatus.DENIED));
+                permissionService.getAllPermissionReference(), "andy", AccessStatus.DENIED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(2, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef,
-                permissionService.getAllPermission(), "other", AccessStatus.ALLOWED));
+                permissionService.getAllPermissionReference(), "other", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
         assertEquals(1, permissionService.getSetPermissions(rootNodeRef).getPermissionEntries().size());
 
         permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef,
-                permissionService.getAllPermission(), "andy", AccessStatus.ALLOWED));
+                permissionService.getAllPermissionReference(), "andy", AccessStatus.ALLOWED));
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
         assertEquals(rootNodeRef, permissionService.getSetPermissions(rootNodeRef).getNodeRef());
@@ -295,7 +294,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testGetSettablePermissionsForType()
     {
-        Set<PermissionReference> answer = permissionService.getSettablePermissions(QName.createQName("sys", "base",
+        Set<String> answer = permissionService.getSettablePermissions(QName.createQName("sys", "base",
                 namespacePrefixResolver));
         assertEquals(17, answer.size());
 
@@ -313,7 +312,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     {
         QName ownable = QName.createQName("cm", "ownable", namespacePrefixResolver);
 
-        Set<PermissionReference> answer = permissionService.getSettablePermissions(rootNodeRef);
+        Set<String> answer = permissionService.getSettablePermissions(rootNodeRef);
         assertEquals(17, answer.size());
 
         nodeService.addAspect(rootNodeRef, ownable, null);
@@ -329,167 +328,183 @@ public class PermissionServiceTest extends AbstractPermissionTest
     {
         runAs("andy");
         
-        assertEquals(0, permissionService.getPermissions(rootNodeRef).size());
-        assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
+        assertEquals(17, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(0, countGranted(permissionService.getPermissions(rootNodeRef)));
+        //assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
         
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
         
-        assertEquals(1, permissionService.getPermissions(rootNodeRef).size());
-        assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
+        assertEquals(17, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(1, countGranted(permissionService.getPermissions(rootNodeRef)));
+        //assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
         
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+    }
+
+    private int countGranted(Set<AccessPermission> permissions)
+    {
+       int count = 0;
+       for(AccessPermission ap :permissions)
+       {
+           if(ap.getAccessStatus() == AccessStatus.ALLOWED)
+           {
+               count++;
+           }
+       }
+       return count;
     }
 
     public void testPermissionGroupOnRoot()
     {
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
         
-        assertEquals(3, permissionService.getPermissions(rootNodeRef).size());
-        assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
+        assertEquals(17, permissionService.getPermissions(rootNodeRef).size());
+        assertEquals(3, countGranted(permissionService.getPermissions(rootNodeRef)));
+        //assertEquals(17, permissionService.getAllPermissions(rootNodeRef).size());
         
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testSimplePermissionSimpleInheritance()
@@ -500,83 +515,83 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
     }
 
     public void testPermissionGroupSimpleInheritance()
@@ -585,327 +600,327 @@ public class PermissionServiceTest extends AbstractPermissionTest
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertTrue(permissionService.hasPermission(n1, READ));
-        assertTrue(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertTrue(permissionService.hasPermission(n1, READ));
-        assertTrue(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
-        assertFalse(permissionService.hasPermission(n1, READ));
-        assertFalse(permissionService.hasPermission(n1, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n1, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n1, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n1, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testDenySimplePermisionOnRootNode()
     {
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
     }
 
     public void testDenyPermissionOnRootNOde()
     {
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testComplexDenyOnRootNode()
     {
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void doNotTest() throws Exception
@@ -937,10 +952,10 @@ public class PermissionServiceTest extends AbstractPermissionTest
         NodeRef n10 = nodeService.createNode(n9, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}ten"),
                 ContentModel.TYPE_FOLDER).getChildRef();
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
-        // permissionService.setPermission(new SimplePermissionEntry(n9, READ,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
+        // permissionService.setPermission(new SimplePermissionEntry(n9, getPermission(PermissionService.READ),
         // "andy", AccessStatus.ALLOWED));
-        // permissionService.setPermission(new SimplePermissionEntry(n10, READ,
+        // permissionService.setPermission(new SimplePermissionEntry(n10, getPermission(PermissionService.READ),
         // "andy", AccessStatus.ALLOWED));
 
         long start;
@@ -951,7 +966,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
             // getSession().flush();
             // getSession().clear();
             start = System.nanoTime();
-            assertTrue(permissionService.hasPermission(n10, READ));
+            assertTrue(permissionService.hasPermission(n10, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
             end = System.nanoTime();
             time += (end - start);
         }
@@ -961,7 +976,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         for (int i = 0; i < 1000; i++)
         {
             start = System.nanoTime();
-            assertTrue(permissionService.hasPermission(n10, READ));
+            assertTrue(permissionService.hasPermission(n10, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
             end = System.nanoTime();
             time += (end - start);
         }
@@ -975,61 +990,61 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testAllPermissions()
     {
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
     }
 
@@ -1037,274 +1052,274 @@ public class PermissionServiceTest extends AbstractPermissionTest
     {
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), ROLE_AUTHENTICATED,
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), ROLE_AUTHENTICATED,
                 AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED,
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), ROLE_AUTHENTICATED,
                 AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED,
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), ROLE_AUTHENTICATED,
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testAllAuthorities()
     {
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ),
                 permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ),
                 permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ,
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ),
                 permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, READ,
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ),
                 permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testAllPermissionsAllAuthorities()
     {
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 permissionService.getAllAuthorities(), AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ),
                 permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermission(),
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, permissionService.getAllPermissionReference(),
                 permissionService.getAllAuthorities(), AccessStatus.DENIED));
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, WRITE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.WRITE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testGroupAndUserInteraction()
     {
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, ROLE_AUTHENTICATED,
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), ROLE_AUTHENTICATED,
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testInheritPermissions()
@@ -1316,55 +1331,55 @@ public class PermissionServiceTest extends AbstractPermissionTest
                 ContentModel.TYPE_FOLDER).getChildRef();
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(n1, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n1, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(n2, READ));
-        assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
         permissionService.setInheritParentPermissions(n2, false);
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
         permissionService.setInheritParentPermissions(n2, true);
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(n2, READ));
-        assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
     }
 
@@ -1377,89 +1392,89 @@ public class PermissionServiceTest extends AbstractPermissionTest
                 ContentModel.TYPE_FOLDER).getChildRef();
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(n1, READ_CHILDREN, "andy", AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(n2, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n1, getPermission(PermissionService.READ_CHILDREN), "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ_PROPERTIES), "andy", AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(n2, READ));
-        assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(n1, READ_CHILDREN, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(n1, getPermission(PermissionService.READ_CHILDREN), "andy", AccessStatus.DENIED));
         permissionService.setInheritParentPermissions(n2, false);
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
         permissionService.setInheritParentPermissions(n2, true);
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
     public void testEffectiveComposite()
     {
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
     }
 
@@ -1471,136 +1486,136 @@ public class PermissionServiceTest extends AbstractPermissionTest
                 ContentModel.TYPE_CONTENT).getChildRef();
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(n1, READ_CHILDREN, "andy", AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(n2, READ_CHILDREN, "andy", AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(n2, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n1, getPermission(PermissionService.READ_CHILDREN), "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ_CHILDREN), "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ_PROPERTIES), "andy", AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(n2, READ_CONTENT, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ_CONTENT), "andy", AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(n2, READ));
-        assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertTrue(permissionService.hasPermission(n2, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(n2, READ_CHILDREN, "andy", AccessStatus.ALLOWED));
+        permissionService.deletePermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ_CHILDREN), "andy", AccessStatus.ALLOWED));
         permissionService
-                .deletePermission(new SimplePermissionEntry(n2, READ_PROPERTIES, "andy", AccessStatus.ALLOWED));
-        permissionService.deletePermission(new SimplePermissionEntry(n2, READ_CONTENT, "andy", AccessStatus.ALLOWED));
+                .deletePermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ_PROPERTIES), "andy", AccessStatus.ALLOWED));
+        permissionService.deletePermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ_CONTENT), "andy", AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(n2, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(n2, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(n2, READ));
-        assertTrue(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertTrue(permissionService.hasPermission(n2, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(n2, READ));
-        assertFalse(permissionService.hasPermission(n2, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(n2, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(n2, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(n2, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
     }
 
     public void testAllPermissionSet()
     {
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, FULL_CONTROL, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.FULL_CONTROL), "andy",
                 AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, FULL_CONTROL, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.FULL_CONTROL), "andy",
                 AccessStatus.DENIED));
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_PROPERTIES, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES), "andy",
                 AccessStatus.ALLOWED));
 
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, FULL_CONTROL, "andy",
+        permissionService.deletePermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.FULL_CONTROL), "andy",
                 AccessStatus.DENIED));
 
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_PROPERTIES));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, READ_CONTENT));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
 
     }
     
@@ -1609,52 +1624,55 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertEquals(1, nodeService.getChildAssocs(rootNodeRef).size());
         
         runAs("andy");
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
         
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy",
                 AccessStatus.ALLOWED));
         
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, DELETE, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.DELETE), "andy",
                 AccessStatus.ALLOWED));
         
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
-        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
-        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
         
         runAs("andy");
-        assertTrue(permissionService.hasPermission(systemNodeRef, DELETE_CHILDREN));
-        assertTrue(permissionService.hasPermission(systemNodeRef, DELETE_NODE));
-        assertTrue(permissionService.hasPermission(systemNodeRef, DELETE));
+        assertTrue(permissionService.hasPermission(systemNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(systemNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(systemNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(systemNodeRef, DELETE));
-        assertFalse(permissionService.hasPermission(systemNodeRef, DELETE_CHILDREN));
-        assertFalse(permissionService.hasPermission(systemNodeRef, DELETE_NODE));
+        assertFalse(permissionService.hasPermission(systemNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(systemNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(systemNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
         
         
-        permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, DELETE, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, getPermission(PermissionService.DELETE), "andy",
                 AccessStatus.DENIED));
         
         runAs("andy");
-        assertTrue(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
-        assertTrue(permissionService.hasPermission(rootNodeRef, READ_CHILDREN));
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
         runAs("lemur");
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_CHILDREN));
-        assertFalse(permissionService.hasPermission(rootNodeRef, DELETE_NODE));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_NODE)) == AccessStatus.ALLOWED);
         
     }
+    
+    
+    // TODO: Test permissions on missing nodes
 }

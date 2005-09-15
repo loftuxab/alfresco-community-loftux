@@ -31,9 +31,8 @@ import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.permissions.PermissionReference;
-import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
@@ -75,7 +74,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    private PermissionService permissionService;
    
    /** Cache of available folder permissions */
-   Set<PermissionReference> folderPermissions = null;
+   Set<String> folderPermissions = null;
    
    /** whether to invite all or specify individual users or groups */
    private String invite = "users";
@@ -166,10 +165,10 @@ public class InviteUsersWizard extends AbstractWizardBean
             NodeRef person = userGroupRole.UserGroup;
             
             // find the selected permission ref from it's name and apply for the specified user
-            Set<PermissionReference> perms = getFolderPermissions();
-            for (PermissionReference permission : perms)
+            Set<String> perms = getFolderPermissions();
+            for (String permission : perms)
             {
-               if (userGroupRole.Role.equals(permission.getName()))
+               if (userGroupRole.Role.equals(permission))
                {
                   this.permissionService.setPermission(this.navigator.getCurrentNode().getNodeRef(),
                         (String)this.nodeService.getProperty(person, ContentModel.PROP_USERNAME),
@@ -406,14 +405,13 @@ public class InviteUsersWizard extends AbstractWizardBean
       ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
       
       // get available roles (grouped permissions) from the permission service
-      Set<PermissionReference> perms = getFolderPermissions();
+      Set<String> perms = getFolderPermissions();
       SelectItem[] roles = new SelectItem[perms.size()];
       int index = 0;
-      for (PermissionReference permission : perms)
+      for (String permission : perms)
       {
-         String name = permission.getName();
-         String displayLabel = bundle.getString(name);
-         roles[index++] = new SelectItem(name, displayLabel);
+         String displayLabel = bundle.getString(permission);
+         roles[index++] = new SelectItem(permission, displayLabel);
       }
       
       return roles;
@@ -676,7 +674,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    /**
     * @return a cached list of available folder permissions
     */
-   private Set<PermissionReference> getFolderPermissions()
+   private Set<String> getFolderPermissions()
    {
       if (this.folderPermissions == null)
       {

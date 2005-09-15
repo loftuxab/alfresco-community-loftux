@@ -24,21 +24,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.results.ChildAssocRefResultSet;
-import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.impl.AbstractPermissionTest;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionEntry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -175,7 +173,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
         proxyFactory.setTargetSource(new SingletonTargetSource(o));
         Object proxy = proxyFactory.getProxy();
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object answer = method.invoke(proxy, new Object[] { rootNodeRef });
         assertEquals(answer, rootNodeRef);
@@ -196,7 +194,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
         proxyFactory.setTargetSource(new SingletonTargetSource(o));
         Object proxy = proxyFactory.getProxy();
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object answer = method.invoke(proxy, new Object[] { rootNodeRef.getStoreRef() });
         assertEquals(answer, rootNodeRef.getStoreRef());
@@ -230,7 +228,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         answer = method.invoke(proxy, new Object[] { systemNodeRef });
         assertEquals(answer, systemNodeRef);
@@ -351,7 +349,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
         proxyFactory.setTargetSource(new SingletonTargetSource(o));
         Object proxy = proxyFactory.getProxy();
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object answer = method.invoke(proxy, new Object[] { nodeService.getPrimaryParent(rootNodeRef) });
         assertEquals(answer, nodeService.getPrimaryParent(rootNodeRef));
@@ -375,7 +373,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
         proxyFactory.setTargetSource(new SingletonTargetSource(o));
         Object proxy = proxyFactory.getProxy();
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object answer = method.invoke(proxy, new Object[] { nodeService.getPrimaryParent(rootNodeRef) });
         assertEquals(answer, nodeService.getPrimaryParent(rootNodeRef));
@@ -602,7 +600,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 
         ChildAssocRefResultSet rsIn = new ChildAssocRefResultSet(nodeService, nodeRefList, null, false);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         assertEquals(4, rsIn.length());
         ResultSet answerResultSet = (ResultSet) methodResultSet.invoke(proxy, new Object[] { rsIn });
@@ -620,7 +618,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
         answerArray = (Object[]) methodArray.invoke(proxy, new Object[] { carArray });
         assertEquals(4, answerArray.length);
 
-        permissionService.setPermission(new SimplePermissionEntry(n1, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(n1, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
 
         assertEquals(4, rsIn.length());
         answerResultSet = (ResultSet) methodResultSet.invoke(proxy, new Object[] { rsIn });
@@ -684,7 +682,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 
         ChildAssocRefResultSet rsIn = new ChildAssocRefResultSet(nodeService, nodeRefList, null, false);
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         assertEquals(4, rsIn.length());
         ResultSet answerResultSet = (ResultSet) methodResultSet.invoke(proxy, new Object[] { rsIn });
@@ -702,7 +700,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
         answerArray = (Object[]) methodArray.invoke(proxy, new Object[] { carArray });
         assertEquals(4, answerArray.length);
 
-        permissionService.setPermission(new SimplePermissionEntry(n1, READ, "andy", AccessStatus.DENIED));
+        permissionService.setPermission(new SimplePermissionEntry(n1, getPermission(PermissionService.READ), "andy", AccessStatus.DENIED));
 
         assertEquals(4, rsIn.length());
         answerResultSet = (ResultSet) methodResultSet.invoke(proxy, new Object[] { rsIn });

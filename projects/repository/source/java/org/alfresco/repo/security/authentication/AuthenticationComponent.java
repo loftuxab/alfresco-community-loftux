@@ -54,15 +54,6 @@ public interface AuthenticationComponent
     
     /**
      * 
-     * @param storeRef
-     * @param userName
-     * @return
-     * @throws AuthenticationException
-     */
-    public NodeRef createPerson(StoreRef storeRef, String userName) throws AuthenticationException;
-    
-    /**
-     * 
      * @return
      * @throws AuthenticationException
      */

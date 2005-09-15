@@ -122,12 +122,6 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
         return results.get(0);
     }
 
-    public NodeRef createPerson(StoreRef storeRef, String userName) throws AuthenticationException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public Authentication getCurrentAuthentication() throws AuthenticationException
     {
         Context context = ContextHolder.getContext();

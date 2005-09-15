@@ -100,4 +100,22 @@ public interface ModelDAO
      */
     public boolean checkPermission(PermissionReference required);
 
+    /**
+     * Does the permission reference have a unique name?
+     * 
+     * @param permissionReference
+     * @return
+     */
+    public boolean isUnique(PermissionReference permissionReference);
+
+    /**
+     * Find a permission by name in the type context.
+     * If the context is null and the permission name is unique it will be found.
+     * 
+     * @param qname
+     * @param permissionName
+     * @return
+     */
+    public PermissionReference getPermissionReference(QName qname, String permissionName);
+
 }

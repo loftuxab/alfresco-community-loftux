@@ -22,14 +22,15 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.ownable.OwnableService;
-import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.repo.security.permissions.PermissionReference;
-import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -141,8 +142,8 @@ public class OwnableServiceTest extends TestCase
         assertFalse(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
         assertFalse(dynamicAuthority.hasAuthority(testNode, "andy"));
         
-        assertFalse(permissionService.hasPermission(testNode, READ));
-        assertFalse(permissionService.hasPermission(testNode, permissionService.getAllPermission()));
+        assertFalse(permissionService.hasPermission(testNode, READ.toString()) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(testNode, permissionService.getAllPermission()) == AccessStatus.ALLOWED);
         
         permissionService.setPermission(rootNodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
         
@@ -154,8 +155,8 @@ public class OwnableServiceTest extends TestCase
         assertTrue(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
         assertTrue(dynamicAuthority.hasAuthority(testNode, "andy"));
         
-        assertTrue(permissionService.hasPermission(testNode, READ));
-        assertTrue(permissionService.hasPermission(testNode, permissionService.getAllPermission()));
+        assertTrue(permissionService.hasPermission(testNode, READ.toString()) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(testNode, permissionService.getAllPermission())== AccessStatus.ALLOWED);
         
         
     }

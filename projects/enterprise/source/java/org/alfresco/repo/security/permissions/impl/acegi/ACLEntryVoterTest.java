@@ -19,19 +19,17 @@ package org.alfresco.repo.security.permissions.impl.acegi;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
-import org.alfresco.repo.security.permissions.AccessStatus;
 import org.alfresco.repo.security.permissions.impl.AbstractPermissionTest;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionEntry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
@@ -262,7 +260,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneNodeRef", new Class[] { NodeRef.class });
@@ -283,7 +281,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneStoreRef", new Class[] { StoreRef.class });
@@ -304,7 +302,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
@@ -325,7 +323,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
@@ -346,7 +344,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
 
         Object o = new ClassWithMethods();
         Method method = o.getClass().getMethod("testOneChildAssociationRef", new Class[] { ChildAssociationRef.class });
@@ -375,8 +373,8 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
     {
         runAs("andy");
 
-        permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, READ, "andy", AccessStatus.ALLOWED));
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ_CHILDREN, "andy",
+        permissionService.setPermission(new SimplePermissionEntry(systemNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
                 AccessStatus.ALLOWED));
 
         Object o = new ClassWithMethods();
@@ -422,7 +420,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { rootNodeRef, null, null, null });
     }
 
@@ -453,7 +451,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { null, rootNodeRef, null, null });
     }
 
@@ -484,7 +482,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { null, null, rootNodeRef, null });
     }
 
@@ -515,7 +513,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { null, null, null, rootNodeRef });
     }
 
@@ -548,7 +546,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { nodeService.getPrimaryParent(rootNodeRef), null, null, null });
     }
 
@@ -581,7 +579,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { null, nodeService.getPrimaryParent(rootNodeRef), null, null });
     }
 
@@ -614,7 +612,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { null, null, nodeService.getPrimaryParent(rootNodeRef), null });
     }
 
@@ -647,7 +645,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
 
         }
 
-        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, READ, "andy", AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy", AccessStatus.ALLOWED));
         method.invoke(proxy, new Object[] { null, null, null, nodeService.getPrimaryParent(rootNodeRef) });
     }
 

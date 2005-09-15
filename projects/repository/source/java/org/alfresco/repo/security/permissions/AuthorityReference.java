@@ -19,7 +19,7 @@ package org.alfresco.repo.security.permissions;
 /**
  * A simple reference to a string authority.
  * 
- * @author andyh
+ * @author Andy Hind
  */
 public interface AuthorityReference
 {

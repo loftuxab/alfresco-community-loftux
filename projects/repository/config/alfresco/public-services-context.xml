@@ -590,7 +590,7 @@
     
     <bean id="PermissionService" class="org.springframework.aop.framework.ProxyFactoryBean">
     	<property name="proxyInterfaces">
-    		<value>org.alfresco.repo.security.permissions.PermissionService</value>
+    		<value>org.alfresco.service.cmr.security.PermissionService</value>
     	</property>
     	<property name="target"><ref bean="permissionService"/></property>
     	<property name="interceptorNames">
@@ -608,13 +608,13 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="transactionAttributeSource">
-            <value>org.alfresco.repo.security.permissions.PermissionService.*=PROPAGATION_REQUIRED</value> 
+            <value>org.alfresco.service.cmr.security.PermissionService.*=PROPAGATION_REQUIRED</value> 
         </property>
     </bean>
     
     <bean id="PermissionService_descriptor" parent="AlfrescoServiceDescriptor">
     	<property name="interface">
-    		<value>org.alfresco.repo.security.permissions.PermissionService</value>
+    		<value>org.alfresco.service.cmr.security.PermissionService</value>
     	</property>
     	<property name="description">
     		<value>Permission Service</value>

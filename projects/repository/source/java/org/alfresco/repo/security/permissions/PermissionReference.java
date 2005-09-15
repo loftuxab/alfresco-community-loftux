@@ -22,7 +22,7 @@ import org.alfresco.service.namespace.QName;
  * A Permission is a named permission against a type or aspect which is defined
  * by QName. So a permission string is scoped by type.
  * 
- * @author andyh
+ * @author Andy Hind
  */
 public interface PermissionReference
 {

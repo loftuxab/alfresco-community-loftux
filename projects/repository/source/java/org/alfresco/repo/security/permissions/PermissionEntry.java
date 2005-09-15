@@ -17,6 +17,7 @@
 package org.alfresco.repo.security.permissions;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessStatus;
 
 /**
  * A single permission entry defined against a node.

@@ -632,7 +632,7 @@
 
     <bean id="authenticationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
-            <value>org.alfresco.repo.security.authentication.AuthenticationService</value>
+            <value>org.alfresco.service.cmr.security.AuthenticationService</value>
         </property>
         <property name="transactionManager">
             <ref bean="transactionManager" />

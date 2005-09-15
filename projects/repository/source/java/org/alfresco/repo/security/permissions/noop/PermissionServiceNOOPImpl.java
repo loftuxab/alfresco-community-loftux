@@ -19,13 +19,10 @@ package org.alfresco.repo.security.permissions.noop;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.permissions.AccessPermission;
-import org.alfresco.repo.security.permissions.NodePermissionEntry;
-import org.alfresco.repo.security.permissions.PermissionEntry;
-import org.alfresco.repo.security.permissions.PermissionReference;
-import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessPermission;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 
 
@@ -36,29 +33,13 @@ import org.alfresco.service.namespace.QName;
 public class PermissionServiceNOOPImpl
     implements PermissionService
 {
-
-    /**
-     * ALL Permission
-     */
-    private static PermissionReference ALL_PERMISSION = new PermissionReference()
-    {
-        public String getName()
-        {
-            return "All";
-        }
-    
-        public QName getQName()
-        {
-            return ContentModel.TYPE_BASE;
-        }
-    };    
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#getOwnerAuthority()
      */
     public String getOwnerAuthority()
     {
-        return "owner";
+        return OWNER_AUTHORITY;
     }
 
     /* (non-Javadoc)
@@ -66,15 +47,15 @@ public class PermissionServiceNOOPImpl
      */
     public String getAllAuthorities()
     {
-        return "all";
+        return ALL_AUTHORITIES;
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#getAllPermission()
      */
-    public PermissionReference getAllPermission()
+    public String getAllPermission()
     {
-        return ALL_PERMISSION;
+        return ALL_PERMISSIONS;
     }    
     
     /* (non-Javadoc)
@@ -96,7 +77,7 @@ public class PermissionServiceNOOPImpl
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#getSettablePermissions(org.alfresco.service.cmr.repository.NodeRef)
      */
-    public Set<PermissionReference> getSettablePermissions(NodeRef nodeRef)
+    public Set<String> getSettablePermissions(NodeRef nodeRef)
     {
         return getSettablePermissions((QName)null);
     }
@@ -104,35 +85,19 @@ public class PermissionServiceNOOPImpl
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#getSettablePermissions(org.alfresco.service.namespace.QName)
      */
-    public Set<PermissionReference> getSettablePermissions(QName type)
+    public Set<String> getSettablePermissions(QName type)
     {
-        HashSet<PermissionReference> permissions = new HashSet<PermissionReference>();
-        permissions.add(ALL_PERMISSION);
+        HashSet<String> permissions = new HashSet<String>();
+        permissions.add(ALL_PERMISSIONS);
         return permissions;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.security.permissions.PermissionService#getSetPermissions(org.alfresco.service.cmr.repository.NodeRef)
-     */
-    public NodePermissionEntry getSetPermissions(NodeRef nodeRef)
-    {
-        return null;
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#hasPermission(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.repo.security.permissions.PermissionReference)
      */
-    public boolean hasPermission(NodeRef nodeRef, PermissionReference perm)
+    public AccessStatus hasPermission(NodeRef nodeRef, String perm)
     {
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.security.permissions.PermissionService#explainPermission(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.repo.security.permissions.PermissionReference)
-     */
-    public NodePermissionEntry explainPermission(NodeRef nodeRef, PermissionReference perm)
-    {
-        return null;
+        return AccessStatus.ALLOWED;
     }
 
     /* (non-Javadoc)
@@ -143,44 +108,16 @@ public class PermissionServiceNOOPImpl
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.repo.security.permissions.PermissionService#deletePermissions(org.alfresco.repo.security.permissions.NodePermissionEntry)
-     */
-    public void deletePermissions(NodePermissionEntry nodePermissionEntry)
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.security.permissions.PermissionService#deletePermission(org.alfresco.repo.security.permissions.PermissionEntry)
-     */
-    public void deletePermission(PermissionEntry permissionEntry)
-    {
-    }
-
-    /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#deletePermission(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.repo.security.permissions.PermissionReference, boolean)
      */
-    public void deletePermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow)
+    public void deletePermission(NodeRef nodeRef, String authority, String perm, boolean allow)
     {
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#setPermission(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.repo.security.permissions.PermissionReference, boolean)
      */
-    public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow)
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.security.permissions.PermissionService#setPermission(org.alfresco.repo.security.permissions.PermissionEntry)
-     */
-    public void setPermission(PermissionEntry permissionEntry)
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.security.permissions.PermissionService#setPermission(org.alfresco.repo.security.permissions.NodePermissionEntry)
-     */
-    public void setPermission(NodePermissionEntry nodePermissionEntry)
+    public void setPermission(NodeRef nodeRef, String authority, String perm, boolean allow)
     {
     }
 
@@ -189,33 +126,5 @@ public class PermissionServiceNOOPImpl
      */
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
-    }
-
-    public PermissionReference getPermissionReference(QName qname, String permissionName)
-    {
-        return new SimplePermissionReference(qname, permissionName);
-    }
-    
-    private static class SimplePermissionReference implements PermissionReference
-    {
-        private QName qName;
-        private String name;
-        
-        SimplePermissionReference(QName qName, String name)
-        {
-            this.qName = qName;
-            this.name = name;
-        }
-        
-        public QName getQName()
-        {
-            return qName;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-        
     }
 }

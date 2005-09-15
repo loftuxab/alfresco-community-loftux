@@ -27,13 +27,14 @@ import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
-import org.alfresco.repo.security.authentication.AuthenticationService;
-import org.alfresco.repo.security.permissions.PermissionService;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInvocation;
@@ -280,7 +281,7 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
                 {
                     log.debug("\t\tNode ref is not null");
                 }
-                if (!permissionService.hasPermission(testNodeRef, cad.required))
+                if (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED)
                 {
                     if (log.isDebugEnabled())
                     {

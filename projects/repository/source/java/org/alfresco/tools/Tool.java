@@ -16,8 +16,8 @@
  */
 package org.alfresco.tools;
 
-import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 

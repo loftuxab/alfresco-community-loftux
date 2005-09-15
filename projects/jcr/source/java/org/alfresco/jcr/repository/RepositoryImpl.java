@@ -30,8 +30,8 @@ import javax.jcr.SimpleCredentials;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.repo.security.authentication.AuthenticationException;
-import org.alfresco.repo.security.authentication.AuthenticationService;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.security.AuthenticationService;
 
 
 /**
