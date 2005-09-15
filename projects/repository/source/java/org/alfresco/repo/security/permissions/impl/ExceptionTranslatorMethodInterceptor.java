@@ -23,7 +23,8 @@ import org.aopalliance.intercept.MethodInvocation;
 
 public class ExceptionTranslatorMethodInterceptor implements MethodInterceptor
 {
-
+    private static final String MSG_ACCESS_DENIED = "permissions.err_access_denied";
+    
     public ExceptionTranslatorMethodInterceptor()
     {
         super();
@@ -37,7 +38,7 @@ public class ExceptionTranslatorMethodInterceptor implements MethodInterceptor
         }
         catch(AccessDeniedException ade)
         {
-            throw new org.alfresco.repo.security.permissions.AccessDeniedException("Access Denied", ade);
+            throw new org.alfresco.repo.security.permissions.AccessDeniedException(MSG_ACCESS_DENIED, ade);
         }
     }
 

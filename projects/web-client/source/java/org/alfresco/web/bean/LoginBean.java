@@ -52,360 +52,349 @@ import org.alfresco.web.ui.common.Utils;
  */
 public class LoginBean
 {
-    // ------------------------------------------------------------------------------
-    // Managed bean properties
+   // ------------------------------------------------------------------------------
+   // Managed bean properties
 
-    private AuthenticationComponent authenticationComponent;
+   /**
+    * @param authenticationService
+    *            The AuthenticationService to set.
+    */
+   public void setAuthenticationService(AuthenticationService authenticationService)
+   {
+      this.authenticationService = authenticationService;
+   }
 
-    /**
-     * @param authenticationService
-     *            The AuthenticationService to set.
-     */
-    public void setAuthenticationService(AuthenticationService authenticationService)
-    {
-        this.authenticationService = authenticationService;
-    }
+   /**
+    * @param authenticationComponent
+    *            The AuthenticationComponent to set.
+    */
+   public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+   {
+      this.authenticationComponent = authenticationComponent;
+   }
 
-    /**
-     * @param authenticationComponent
-     *            The AuthenticationComponent to set.
-     */
-    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
-    {
-        this.authenticationComponent = authenticationComponent;
-    }
+   /**
+    * @param nodeService
+    *            The nodeService to set.
+    */
+   public void setNodeService(NodeService nodeService)
+   {
+      this.nodeService = nodeService;
+   }
 
-    
-    
-    /**
-     * @param nodeService
-     *            The nodeService to set.
-     */
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
+   /**
+    * @param browseBean
+    *            The BrowseBean to set.
+    */
+   public void setBrowseBean(BrowseBean browseBean)
+   {
+      this.browseBean = browseBean;
+   }
 
-    /**
-     * @param browseBean
-     *            The BrowseBean to set.
-     */
-    public void setBrowseBean(BrowseBean browseBean)
-    {
-        this.browseBean = browseBean;
-    }
+   /**
+    * @param configService
+    *            The ConfigService to set.
+    */
+   public void setConfigService(ConfigService configService)
+   {
+      this.configService = configService;
+   }
 
-    /**
-     * @param configService
-     *            The ConfigService to set.
-     */
-    public void setConfigService(ConfigService configService)
-    {
-        this.configService = configService;
-    }
+   public void setUsername(String val)
+   {
+      this.username = val;
+   }
 
-    public void setUsername(String val)
-    {
-        this.username = val;
-    }
+   public String getUsername()
+   {
+      return this.username;
+   }
 
-    public String getUsername()
-    {
-        return this.username;
-    }
+   public void setPassword(String val)
+   {
+      this.password = val;
+   }
 
-    public void setPassword(String val)
-    {
-        this.password = val;
-    }
+   public String getPassword()
+   {
+      return this.password;
+   }
 
-    public String getPassword()
-    {
-        return this.password;
-    }
+   /**
+    * @return the available languages
+    */
+   public SelectItem[] getLanguages()
+   {
+      ClientConfigElement config = (ClientConfigElement) this.configService.getGlobalConfig()
+            .getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
 
-    /**
-     * @return the available languages
-     */
-    public SelectItem[] getLanguages()
-    {
-        ClientConfigElement config = (ClientConfigElement) this.configService.getGlobalConfig().getConfigElement(
-                ClientConfigElement.CONFIG_ELEMENT_ID);
+      List<String> languages = config.getLanguages();
+      SelectItem[] items = new SelectItem[languages.size()];
+      int count = 0;
+      for (String locale : languages)
+      {
+         // get label associated to the locale
+         String label = config.getLabelForLanguage(locale);
 
-        List<String> languages = config.getLanguages();
-        SelectItem[] items = new SelectItem[languages.size()];
-        int count = 0;
-        for (String locale : languages)
-        {
-            // get label associated to the locale
-            String label = config.getLabelForLanguage(locale);
-
-            // set default selection
-            if (count == 0 && this.language == null)
+         // set default selection
+         if (count == 0 && this.language == null)
+         {
+            // first try to get the language that the current user is using
+            Locale lastLocale = Application.getLanguage(FacesContext.getCurrentInstance());
+            if (lastLocale != null)
             {
-                // first try to get the language that the current user is using
-                Locale lastLocale = Application.getLanguage(FacesContext.getCurrentInstance());
-                if (lastLocale != null)
-                {
-                    this.language = lastLocale.toString();
-                }
-                // else we default to the first item in the list
-                else
-                {
-                    this.language = locale;
-                }
+               this.language = lastLocale.toString();
             }
+            // else we default to the first item in the list
+            else
+            {
+               this.language = locale;
+            }
+         }
 
-            items[count++] = new SelectItem(locale, label);
-        }
+         items[count++] = new SelectItem(locale, label);
+      }
 
-        return items;
-    }
+      return items;
+   }
 
-    /**
-     * @return Returns the language selection.
-     */
-    public String getLanguage()
-    {
-        return this.language;
-    }
+   /**
+    * @return Returns the language selection.
+    */
+   public String getLanguage()
+   {
+      return this.language;
+   }
 
-    /**
-     * @param language
-     *            The language selection to set.
-     */
-    public void setLanguage(String language)
-    {
-        this.language = language;
-        Application.setLanguage(FacesContext.getCurrentInstance(), this.language);
-    }
+   /**
+    * @param language
+    *            The language selection to set.
+    */
+   public void setLanguage(String language)
+   {
+      this.language = language;
+      Application.setLanguage(FacesContext.getCurrentInstance(), this.language);
+   }
 
-    // ------------------------------------------------------------------------------
-    // Validator methods
+   
+   // ------------------------------------------------------------------------------
+   // Validator methods
 
-    /**
-     * Validate password field data is acceptable
-     */
-    public void validatePassword(FacesContext context, UIComponent component, Object value) throws ValidatorException
-    {
-        String pass = (String) value;
-        if (pass.length() < 5 || pass.length() > 12)
-        {
-            String err = Application.getMessage(context, MSG_PASSWORD_LENGTH);
+   /**
+    * Validate password field data is acceptable
+    */
+   public void validatePassword(FacesContext context, UIComponent component, Object value)
+         throws ValidatorException
+   {
+      String pass = (String) value;
+      if (pass.length() < 5 || pass.length() > 12)
+      {
+         String err = Application.getMessage(context, MSG_PASSWORD_LENGTH);
+         throw new ValidatorException(new FacesMessage(err));
+      }
+
+      for (int i = 0; i < pass.length(); i++)
+      {
+         if (Character.isLetterOrDigit(pass.charAt(i)) == false)
+         {
+            String err = Application.getMessage(context, MSG_PASSWORD_CHARS);
             throw new ValidatorException(new FacesMessage(err));
-        }
+         }
+      }
+   }
 
-        for (int i = 0; i < pass.length(); i++)
-        {
-            if (Character.isLetterOrDigit(pass.charAt(i)) == false)
-            {
-                String err = Application.getMessage(context, MSG_PASSWORD_CHARS);
-                throw new ValidatorException(new FacesMessage(err));
-            }
-        }
-    }
+   /**
+    * Validate Username field data is acceptable
+    */
+   public void validateUsername(FacesContext context, UIComponent component, Object value)
+         throws ValidatorException
+   {
+      String pass = (String) value;
+      if (pass.length() < 5 || pass.length() > 12)
+      {
+         String err = Application.getMessage(context, MSG_USERNAME_LENGTH);
+         throw new ValidatorException(new FacesMessage(err));
+      }
 
-    /**
-     * Validate Username field data is acceptable
-     */
-    public void validateUsername(FacesContext context, UIComponent component, Object value) throws ValidatorException
-    {
-        String pass = (String) value;
-        if (pass.length() < 5 || pass.length() > 12)
-        {
-            String err = Application.getMessage(context, MSG_USERNAME_LENGTH);
+      for (int i = 0; i < pass.length(); i++)
+      {
+         if (Character.isLetterOrDigit(pass.charAt(i)) == false)
+         {
+            String err = Application.getMessage(context, MSG_USERNAME_CHARS);
             throw new ValidatorException(new FacesMessage(err));
-        }
+         }
+      }
+   }
 
-        for (int i = 0; i < pass.length(); i++)
-        {
-            if (Character.isLetterOrDigit(pass.charAt(i)) == false)
+   
+   // ------------------------------------------------------------------------------
+   // Action event methods
+
+   /**
+    * Login action handler
+    * 
+    * @return outcome view name
+    */
+   public String login()
+   {
+      String outcome = null;
+      
+      FacesContext fc = FacesContext.getCurrentInstance();
+      
+      if (this.username != null && this.password != null)
+      {
+         // Authenticate via the authentication service, then save the details of user in an object
+         // in the session - this is used by the servlet filter etc. on each page to check for login
+         try
+         {
+            this.authenticationService.authenticate(this.username, this.password.toCharArray());
+            
+            // setup User object and Home space ID
+            User user = new User(this.username, this.authenticationService.getCurrentTicket(),
+                  authenticationComponent.getPerson(Repository.getStoreRef(), this.username));
+            String homeSpaceId = (String) this.nodeService.getProperty(authenticationComponent.getPerson(
+                  Repository.getStoreRef(), this.username), ContentModel.PROP_HOMEFOLDER);
+            NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
+            
+            // check that the home space node exists - else user cannot login
+            if (this.nodeService.exists(homeSpaceRef) == false)
             {
-                String err = Application.getMessage(context, MSG_USERNAME_CHARS);
-                throw new ValidatorException(new FacesMessage(err));
+               throw new InvalidNodeRefException(homeSpaceRef);
             }
-        }
-    }
-
-    // ------------------------------------------------------------------------------
-    // Action event methods
-
-    /**
-     * Login action handler
-     * 
-     * @return outcome view name
-     */
-    public String login()
-    {
-        String outcome = null;
-
-        FacesContext fc = FacesContext.getCurrentInstance();
-
-        if (this.username != null && this.password != null)
-        {
-            // Authenticate via the authentication service, then save the
-            // details of user in an object
-            // in the session - this is used by the servlet filter etc. on each
-            // page to check for login
-            try
+            user.setHomeSpaceId(homeSpaceId);
+            
+            // put the User object in the Session - the authentication servlet will then allow
+            // the app to continue without redirecting to the login page
+            Map session = fc.getExternalContext().getSessionMap();
+            session.put(AuthenticationFilter.AUTHENTICATION_USER, user);
+            
+            // if an external outcome has been provided then use that, else use default
+            String externalOutcome = (String) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
+            if (externalOutcome != null)
             {
-                this.authenticationService.authenticate(this.username, this.password.toCharArray());
+               // TODO: This is a quick solution. It would be better to specify the (identifier?)
+               // of a handler class that would be responsible for processing specific outcome arguments.
 
-                // setup User object and Home space ID
+               // setup is required for certain outcome requests
+               if (OUTCOME_DOCDETAILS.equals(externalOutcome))
+               {
+                  String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
+                  if (args.length == 3)
+                  {
+                     StoreRef storeRef = new StoreRef(args[0], args[1]);
+                     NodeRef nodeRef = new NodeRef(storeRef, args[2]);
+                     // setup the Document on the browse bean
+                     // TODO: the browse bean should accept a full
+                     // NodeRef - not just an ID
+                     this.browseBean.setupContentAction(nodeRef.getId(), true);
+                  }
+               }
+               else if (OUTCOME_SPACEDETAILS.equals(externalOutcome))
+               {
+                  String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
+                  if (args.length == 3)
+                  {
+                     StoreRef storeRef = new StoreRef(args[0], args[1]);
+                     NodeRef nodeRef = new NodeRef(storeRef, args[2]);
+                     // setup the Space on the browse bean
+                     // TODO: the browse bean should accept a full
+                     // NodeRef - not just an ID
+                     this.browseBean.setupSpaceAction(nodeRef.getId(), true);
+                  }
+               }
 
-                User user = new User(this.username, this.authenticationService.getCurrentTicket(),
-                        authenticationComponent.getPerson(Repository.getStoreRef(), this.username));
-                String homeSpaceId = (String) this.nodeService.getProperty(authenticationComponent.getPerson(Repository
-                        .getStoreRef(), this.username), ContentModel.PROP_HOMEFOLDER);
-                NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
-                // check that the home space node exists - else user cannot
-                // login
-                if (this.nodeService.exists(homeSpaceRef) == false)
-                {
-                    throw new InvalidNodeRefException(homeSpaceRef);
-                }
-                user.setHomeSpaceId(homeSpaceId);
-
-                // put the User object in the Session - the authentication
-                // servlet will then allow
-                // the app to continue without redirecting to the login page
-                Map session = fc.getExternalContext().getSessionMap();
-                session.put(AuthenticationFilter.AUTHENTICATION_USER, user);
-
-                // if an external outcome has been provided then use that, else
-                // use default
-                String externalOutcome = (String) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
-                if (externalOutcome != null)
-                {
-                    // TODO: This is a quick solution. It would be better to
-                    // specify the (identifier?) of a handler
-                    // class that would be responsible for processing specific
-                    // outcome arguments.
-
-                    // setup is required for certain outcome requests
-                    if (OUTCOME_DOCDETAILS.equals(externalOutcome))
-                    {
-                        String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
-                        if (args.length == 3)
-                        {
-                            StoreRef storeRef = new StoreRef(args[0], args[1]);
-                            NodeRef nodeRef = new NodeRef(storeRef, args[2]);
-                            // setup the Document on the browse bean
-                            // TODO: the browse bean should accept a full
-                            // NodeRef - not just an ID
-                            this.browseBean.setupContentAction(nodeRef.getId(), true);
-                        }
-                    }
-                    else if (OUTCOME_SPACEDETAILS.equals(externalOutcome))
-                    {
-                        String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
-                        if (args.length == 3)
-                        {
-                            StoreRef storeRef = new StoreRef(args[0], args[1]);
-                            NodeRef nodeRef = new NodeRef(storeRef, args[2]);
-                            // setup the Space on the browse bean
-                            // TODO: the browse bean should accept a full
-                            // NodeRef - not just an ID
-                            this.browseBean.setupSpaceAction(nodeRef.getId(), true);
-                        }
-                    }
-
-                    fc.getExternalContext().getSessionMap().remove(LOGIN_OUTCOME_KEY);
-                    return externalOutcome;
-                }
-                else
-                {
-                    return "success";
-                }
+               fc.getExternalContext().getSessionMap().remove(LOGIN_OUTCOME_KEY);
+               return externalOutcome;
             }
-            catch (AuthenticationException aerr)
+            else
             {
-                Utils.addErrorMessage(Application.getMessage(fc, MSG_ERROR_UNKNOWN_USER));
+               return "success";
             }
-            catch (InvalidNodeRefException refErr)
-            {
-                Utils.addErrorMessage(MessageFormat.format(Application.getMessage(fc, Repository.ERROR_NOHOME), refErr
-                        .getNodeRef().getId()));
-            }
-        }
-        else
-        {
-            Utils.addErrorMessage(Application.getMessage(fc, MSG_ERROR_MISSING));
-        }
+         }
+         catch (AuthenticationException aerr)
+         {
+            Utils.addErrorMessage(Application.getMessage(fc, MSG_ERROR_UNKNOWN_USER));
+         }
+         catch (InvalidNodeRefException refErr)
+         {
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(fc,
+                  Repository.ERROR_NOHOME), refErr.getNodeRef().getId()));
+         }
+      }
+      else
+      {
+         Utils.addErrorMessage(Application.getMessage(fc, MSG_ERROR_MISSING));
+      }
 
-        return outcome;
-    }
+      return outcome;
+   }
 
-    /**
-     * Invalidate ticket and logout user
-     */
-    public String logout()
-    {
-        FacesContext context = FacesContext.getCurrentInstance();
+   /**
+    * Invalidate ticket and logout user
+    */
+   public String logout()
+   {
+      FacesContext context = FacesContext.getCurrentInstance();
 
-        // invalidate User ticket
-        Map session = context.getExternalContext().getSessionMap();
-        User user = (User) session.get(AuthenticationFilter.AUTHENTICATION_USER);
-        if (user != null)
-        {
-            this.authenticationService.invalidateTicket(user.getTicket());
+      // invalidate User ticket
+      Map session = context.getExternalContext().getSessionMap();
+      User user = (User) session.get(AuthenticationFilter.AUTHENTICATION_USER);
+      if (user != null)
+      {
+         this.authenticationService.invalidateTicket(user.getTicket());
+      }
 
-        }
+      // clear Session for this user
+      context.getExternalContext().getSessionMap().clear();
 
-        // clear Session for this user
-        context.getExternalContext().getSessionMap().clear();
+      // set language to last used
+      if (this.language != null && this.language.length() != 0)
+      {
+         Application.setLanguage(context, this.language);
+      }
 
-        // set language to last used
-        if (this.language != null && this.language.length() != 0)
-        {
-            Application.setLanguage(context, this.language);
-        }
+      return "logout";
+   }
 
-        return "logout";
-    }
+   
+   // ------------------------------------------------------------------------------
+   // Private data
 
-    // ------------------------------------------------------------------------------
-    // Private data
+   /** I18N messages */
+   private static final String MSG_ERROR_MISSING = "error_login_missing";
+   private static final String MSG_ERROR_UNKNOWN_USER = "error_login_user";
+   private static final String MSG_USERNAME_CHARS = "login_err_username_chars";
+   private static final String MSG_USERNAME_LENGTH = "login_err_username_length";
+   private static final String MSG_PASSWORD_CHARS = "login_err_password_chars";
+   private static final String MSG_PASSWORD_LENGTH = "login_err_password_length";
 
-    /** I18N messages */
-    private static final String MSG_ERROR_MISSING = "error_login_missing";
+   public static final String LOGIN_OUTCOME_KEY = "_alfOutcome";
+   public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";
 
-    private static final String MSG_ERROR_UNKNOWN_USER = "error_login_user";
+   private final static String OUTCOME_DOCDETAILS = "showDocDetails";
+   private final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";
 
-    private static final String MSG_USERNAME_CHARS = "login_err_username_chars";
+   /** user name */
+   private String username = null;
 
-    private static final String MSG_USERNAME_LENGTH = "login_err_username_length";
+   /** password */
+   private String password = null;
 
-    private static final String MSG_PASSWORD_CHARS = "login_err_password_chars";
+   /** language locale selection */
+   private String language = null;
 
-    private static final String MSG_PASSWORD_LENGTH = "login_err_password_length";
+   /** AuthenticationComponent bean reference */
+   private AuthenticationComponent authenticationComponent;
+   
+   /** AuthenticationService bean reference */
+   private AuthenticationService authenticationService;
 
-    public static final String LOGIN_OUTCOME_KEY = "_alfOutcome";
+   /** NodeService bean reference */
+   private NodeService nodeService;
 
-    public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";
+   /** The BrowseBean reference */
+   private BrowseBean browseBean;
 
-    private final static String OUTCOME_DOCDETAILS = "showDocDetails";
-
-    private final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";
-
-    /** user name */
-    private String username = null;
-
-    /** password */
-    private String password = null;
-
-    /** language locale selection */
-    private String language = null;
-
-    /** AuthenticationService bean reference */
-    private AuthenticationService authenticationService;
-
-    /** NodeService bean reference */
-    private NodeService nodeService;
-
-    /** The BrowseBean reference */
-    private BrowseBean browseBean;
-
-    /** ConfigService bean reference */
-    private ConfigService configService;
+   /** ConfigService bean reference */
+   private ConfigService configService;
 }

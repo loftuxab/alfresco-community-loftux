@@ -17,12 +17,15 @@
 package org.alfresco.web.bean.repository;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.context.FacesContext;
+
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +49,7 @@ public class Node implements Serializable
    private Set<QName> aspects = null;
    private QNameMap<String, Object> properties;
    private boolean propsRetrieved = false;
+   private Map<String, Boolean> permissions;
    protected NodeService nodeService;
    
    /**
@@ -81,7 +85,7 @@ public class Node implements Serializable
    /**
     * @return All the properties known about this node.
     */
-   public Map<String, Object> getProperties()
+   public final Map<String, Object> getProperties()
    {
       if (this.propsRetrieved == false)
       {
@@ -104,7 +108,7 @@ public class Node implements Serializable
     * @param name       Name of the property this resolver is for
     * @param resolver   Property resolver to register
     */
-   public void addPropertyResolver(String name, NodePropertyResolver resolver)
+   public final void addPropertyResolver(String name, NodePropertyResolver resolver)
    {
       this.properties.addPropertyResolver(name, resolver);
    }
@@ -113,7 +117,7 @@ public class Node implements Serializable
     * @param propertyName Property to test existence of
     * @return true if property exists, false otherwise
     */
-   public boolean hasProperty(String propertyName)
+   public final boolean hasProperty(String propertyName)
    {
       return getProperties().containsKey(propertyName);
    }
@@ -121,7 +125,7 @@ public class Node implements Serializable
    /**
     * @return Returns the NodeRef this Node object represents
     */
-   public NodeRef getNodeRef()
+   public final NodeRef getNodeRef()
    {
       return this.nodeRef;
    }
@@ -129,7 +133,7 @@ public class Node implements Serializable
    /**
     * @return Returns the type.
     */
-   public QName getType()
+   public final QName getType()
    {
       if (this.type == null)
       {
@@ -142,7 +146,7 @@ public class Node implements Serializable
    /**
     * @return The display name for the node
     */
-   public String getName()
+   public final String getName()
    {
       if (this.name == null)
       {
@@ -162,7 +166,7 @@ public class Node implements Serializable
    /**
     * @return The list of aspects applied to this node
     */
-   public Set<QName> getAspects()
+   public final Set<QName> getAspects()
    {
       if (this.aspects == null)
       {
@@ -176,16 +180,45 @@ public class Node implements Serializable
     * @param aspect The aspect to test for
     * @return true if the node has the aspect false otherwise
     */
-   public boolean hasAspect(QName aspect)
+   public final boolean hasAspect(QName aspect)
    {
       Set aspects = getAspects();
       return aspects.contains(aspect);
+   }
+   
+   /**
+    * Return whether the current user has the specified access permission on this Node
+    * 
+    * @param permission     Permission to validate against
+    * 
+    * @return true if the permission is applied to the node for this user, false otherwise
+    */
+   public final boolean hasPermission(String permission)
+   {
+      Boolean valid = null;
+      if (permissions != null)
+      {
+         valid = permissions.get(permission);
+      }
+      else
+      {
+         permissions = new HashMap<String, Boolean>(5, 1.0f);
+      }
+      
+      if (valid == null)
+      {
+         PermissionService service = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getPermissionService();
+         valid = Boolean.valueOf(/*service.hasPermission(getNodeRef() ...)*/true);
+         permissions.put(permission, valid);
+      }
+      
+      return valid.booleanValue();
    }
 
    /**
     * @return The GUID for the node
     */
-   public String getId()
+   public final String getId()
    {
       return this.id;
    }
@@ -193,7 +226,7 @@ public class Node implements Serializable
    /**
     * @return The path for the node
     */
-   public String getPath()
+   public final String getPath()
    {
       if (this.path == null)
       {
@@ -214,6 +247,7 @@ public class Node implements Serializable
       this.properties.clear();
       this.propsRetrieved = false;
       this.aspects = null;
+      this.permissions = null;
    }
    
    /**

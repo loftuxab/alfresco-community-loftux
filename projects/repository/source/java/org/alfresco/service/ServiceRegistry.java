@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterService;
@@ -67,6 +68,7 @@ public interface ServiceRegistry
     static final QName IMPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ImporterService");
     static final QName EXPORTER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ExporterService");
     static final QName ACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ActionService");
+    static final QName PERMISSIONS_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "PermissionService");
     
     /**
      * Get the list of services provided by the Repository
@@ -178,5 +180,9 @@ public interface ServiceRegistry
      * @return the action service (or null if one is not provided)
      */
     ActionService getActionService();
-
+    
+    /**
+     * @return the permission service (or null if one is not provided)
+     */
+    PermissionService getPermissionService();
 }

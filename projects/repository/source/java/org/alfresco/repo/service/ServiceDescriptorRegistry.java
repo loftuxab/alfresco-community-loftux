@@ -22,9 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.transaction.UserTransaction;
-
-import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.service.ServiceDescriptor;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.ActionService;
@@ -38,6 +35,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterService;
@@ -254,4 +252,11 @@ public class ServiceDescriptorRegistry
     	return (ActionService)getService(ACTION_SERVICE);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getPermissionService()
+     */
+    public PermissionService getPermissionService()
+    {
+        return (PermissionService)getService(PERMISSIONS_SERVICE);
+    }
 }
