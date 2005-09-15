@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -522,7 +523,14 @@ public final class Export extends Tool
         /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
          */
-        public void value(NodeRef nodeRef, QName property, Object value)
+        public void value(NodeRef nodeRef, QName property, String value)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Collection)
+         */
+        public void value(NodeRef nodeRef, QName property, Collection<String> values)
         {
         }
 

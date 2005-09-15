@@ -7,7 +7,7 @@
 	<jcrtest:testtype view:childName="testdata">
 	   <!-- Properties for XXXPropertyTests -->
 	   <jcrtest:booleanProp>true</jcrtest:booleanProp>
-	   
+
        <jcrtest:children>
           <jcrtest:testtype view:childName="firstChild"/>
 
@@ -18,6 +18,16 @@
                 <jcrtest:testtype view:childName="sameNameSibling"/>
              </jcrtest:children>
           </jcrtest:testtype>
+
+          <!-- Multi-valued Property -->
+          <jcrtest:testtype view:childName="multiValued">
+               <jcrtest:multiProp>
+                  <view:value>value one</view:value>
+                  <view:value>value two</view:value>
+                  <view:value>value three</view:value>
+               </jcrtest:multiProp>
+          </jcrtest:testtype>	   
+          
        </jcrtest:children>
 	</jcrtest:testtype>
 

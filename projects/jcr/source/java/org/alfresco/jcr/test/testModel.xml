@@ -21,6 +21,10 @@
             <property name="jcrtest:booleanProp">
                <type>d:boolean</type>
             </property>
+            <property name="jcrtest:multiProp">
+               <type>d:text</type>
+               <multiple>true</multiple>
+            </property>
          </properties>
          <associations>
             <child-association name="jcrtest:children">

@@ -91,8 +91,7 @@ public class ValueConverter
         
         return convert(javaClass, value);
     }
-    
-    
+
     /**
      * General conversion method to Object types (note it cannot support
      * conversion to primary types due the restrictions of reflection. Use the
@@ -105,18 +104,6 @@ public class ValueConverter
      */
     public static <T> T convert(Class<T> c, Object value)
     {
-        // If multi value then default to using the first
-        if (value instanceof Collection)
-        {
-            Object valueObject = null;
-            for (Object o : (Collection) value)
-            {
-                valueObject = o;
-                break;
-            }
-            return convert(c, valueObject);
-        }
-        
         if(value == null)
         {
             return null;
@@ -141,6 +128,59 @@ public class ValueConverter
 
     }
 
+    /**
+    /**
+     * General conversion method to convert collection contents to the specified
+     * type.
+     * 
+     * @param propertyType - the target property type
+     * @param value - the value to be converted
+     * @return - the converted value as the correct type
+     */
+    public static Collection convert(DataTypeDefinition propertyType, Collection values)
+    {
+        ParameterCheck.mandatory("Property type definition", propertyType);
+        
+        // Convert property type to java class
+        Class javaClass = null;
+        String javaClassName = propertyType.getJavaClassName();
+        try
+        {
+            javaClass = Class.forName(javaClassName);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new DictionaryException("Java class " + javaClassName + " of property type " + propertyType.getName() + " is invalid", e);
+        }
+        
+        return convert(javaClass, values);
+    }
+    
+    /**
+     * General conversion method to convert collection contents to the specified
+     * type.
+     * 
+     * @param <T> The target type for the result of the conversion
+     * @param c - a class for the target type
+     * @param value - the collection to be converted
+     * @return - the converted collection
+     */
+    public static <T> Collection<T> convert(Class<T> c, Collection values)
+    {
+        if(values == null)
+        {
+            return null;
+        }
+
+        Collection<T> converted = new ArrayList<T>(values.size());
+        for (Object value : values)
+        {
+            converted.add(convert(c, value));
+        }
+
+        return converted;
+    }
+        
     /**
      * Is the value multi valued
      * 
@@ -169,27 +209,6 @@ public class ValueConverter
         }
     }
 
-    /**
-     * Get a typed iterator over the values in the multi valued collection
-     * Also works for single value 
-     * 
-     * next() may fail with conversion failures as we convert as we go.
-     * 
-     * @param <T> The target type
-     * @param c - the traget class
-     * @param value - the value to convert
-     * @return - a simple iterator over the values
-     */
-    public static <T> Iterator<T> iterator(Class<T> c, Object value)
-    {
-        Collection coll = createCollection(value);
-        Iterator it = coll.iterator();
-
-        Iterator<T> retit = new ConvertingIterator<T>(it, c);
-
-        return retit;
-    }
-
     private static Collection createCollection(Object value)
     {
         Collection coll;
@@ -216,136 +235,7 @@ public class ValueConverter
     public static <T> Collection<T> getCollection(Class<T> c, Object value)
     {
         Collection coll = createCollection(value);
-        return new ConvertingCollection<T>(coll, c);
-    }
-    
-    /**
-     * Helper call for converting as iteratong over a collection
-     * @author andyh
-     *
-     * @param <T>
-     */
-    private static class ConvertingIterator<T> implements Iterator<T>
-    {
-        Iterator it;
-
-        Class type;
-
-        ConvertingIterator(Iterator it, Class type)
-        {
-            this.it = it;
-            this.type = type;
-        }
-
-        public boolean hasNext()
-        {
-            return it.hasNext();
-        }
-
-        public T next()
-        {
-            return (T) ValueConverter.convert(type, it.next());
-        }
-
-        public void remove()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-    }
-    
-    private static class ConvertingCollection<T> implements Collection<T>
-    {
-        private Collection<?> base;
-        private Class c;
-        
-        ConvertingCollection(Collection<?> base, Class c)
-        {
-            super();
-            this.base = base;
-            this.c = c;
-        }
-
-        public boolean add(T o)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean addAll(Collection c)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public void clear()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean contains(Object o)
-        {
-            return base.contains(o);
-        }
-
-        public boolean containsAll(Collection<?> c)
-        {
-            return base.containsAll(c);
-        }
-
-        public boolean equals(Object o)
-        {
-           return base.equals(o);
-        }
-
-        public int hashCode()
-        {
-           return base.hashCode();
-        }
-
-        public boolean isEmpty()
-        {
-           return base.isEmpty();
-        }
-
-        public Iterator<T> iterator()
-        {
-            Iterator it = base.iterator();
-            Iterator<T> retit = new ConvertingIterator<T>(it, c);
-            return retit;
-        }
-
-        public boolean remove(Object o)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean removeAll(Collection c)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean retainAll(Collection c)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public int size()
-        {
-            return base.size();
-        }
-
-        public Object[] toArray()
-        {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException();
-        }
-
-        public <O> O[] toArray(O[] a)
-        {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException();
-        }
-        
-        
+        return convert(c, coll);
     }
     
     /**

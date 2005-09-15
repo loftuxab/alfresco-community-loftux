@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 
 import junit.framework.TestCase;
 
@@ -230,11 +229,6 @@ public class ValueConverterTest extends TestCase
         assertEquals(true, ValueConverter.isMultiValued(list));
         assertEquals(14, ValueConverter.size(list));
         
-        for(Iterator<String>  it = ValueConverter.iterator(String.class, list); it.hasNext(); /**/)
-        {
-           System.out.println("Value is "+it.next()); 
-        }
-        
         for(String stringValue: ValueConverter.getCollection(String.class, list))
         {
             System.out.println("Value is "+stringValue); 
@@ -269,11 +263,6 @@ public class ValueConverterTest extends TestCase
         assertEquals(false, ValueConverter.isMultiValued(integer));
         assertEquals(1, ValueConverter.size(integer));
         
-        for(Iterator<String>  it = ValueConverter.iterator(String.class, integer); it.hasNext(); /**/)
-        {
-           System.out.println("Value is "+it.next()); 
-        }
-        
         for(String stringValue: ValueConverter.getCollection(String.class, integer))
         {
             System.out.println("Value is "+stringValue); 
@@ -281,19 +270,13 @@ public class ValueConverterTest extends TestCase
         
     }
     
-    public void testMultiAsSingle()
-    {
-        ArrayList<Object> list = makeList();
-        assertEquals(true, ValueConverter.convert(Boolean.class, list).booleanValue());
-    }
-    
     public void testNullAndEmpty()
     {
         assertNull(ValueConverter.convert(Boolean.class, null));
         ArrayList<Object> list = new ArrayList<Object>();
-        assertNull(ValueConverter.convert(Boolean.class, list));
+        assertNotNull(ValueConverter.convert(Boolean.class, list));
         list.add(null);
-        assertNull(ValueConverter.convert(Boolean.class, list));
+        assertNotNull(ValueConverter.convert(Boolean.class, list));
         
     }
 }

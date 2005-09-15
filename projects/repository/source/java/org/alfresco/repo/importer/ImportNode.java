@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.importer;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public interface ImportNode
      * @param className  the type or aspect
      * @return  the properties
      */
-    public Map<QName, String> getProperties(QName className);
+    public Map<QName,Serializable> getProperties(QName className);
 
     /**
      * @return  the aspects of this node

@@ -18,6 +18,7 @@ package org.alfresco.jcr.item;
 
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Collection;
 
 import javax.jcr.AccessDeniedException;
 import javax.jcr.Item;
@@ -174,36 +175,67 @@ public class PropertyImpl extends ItemImpl implements Property
         return valueImpl;
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getValues()
+     */
     public Value[] getValues() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        // get values from node property
+        checkMultiValued();
+        Collection values = (Collection)getPropertyValue();
+        int type = getType();
+
+        // construct JCR wrappers
+        ValueImpl[] valueImpls = new ValueImpl[values.size()];
+        int i = 0;
+        for (Object value : values)
+        {
+            // TODO: Could consider returning proxied value implementation (but i don't think is necessary)
+            valueImpls[i++] = new ValueImpl(session, type, value);
+        }
+        
+        return valueImpls;
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getString()
+     */
     public String getString() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
         return JCRValue.stringValue(getPropertyValue());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getStream()
+     */
     public InputStream getStream() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
         return JCRValue.streamValue(getPropertyValue());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getLong()
+     */
     public long getLong() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
         return JCRValue.longValue(getPropertyValue());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getDouble()
+     */
     public double getDouble() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
         return JCRValue.doubleValue(getPropertyValue());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getDate()
+     */
     public Calendar getDate() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
@@ -237,10 +269,20 @@ public class PropertyImpl extends ItemImpl implements Property
         return JCRValue.getLength(getPropertyValue());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Property#getLengths()
+     */
     public long[] getLengths() throws ValueFormatException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        checkMultiValued();
+        Collection values = (Collection)getPropertyValue();
+        long[] lengths = new long[values.size()];
+        int i = 0;
+        for (Object value : values)
+        {
+            lengths[i++] = JCRValue.getLength(value);
+        }
+        return lengths;
     }
 
     /* (non-Javadoc)
@@ -257,6 +299,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public int getType() throws RepositoryException
     {
+        // TODO: The type should be based on the property value (in the case of undefined required type)
         return DataTypeMap.convertDataTypeToPropertyType(getPropertyDefinition().getDataType());
     }
 
@@ -375,6 +418,7 @@ public class PropertyImpl extends ItemImpl implements Property
 
         // TODO: Handle Content Property Type
         
+        // TODO: We may need to copy value here...
         NodeService nodeService = node.session.getServiceRegistry().getNodeService();
         value = nodeService.getProperty(node.getNodeRef(), name);
         
@@ -383,6 +427,14 @@ public class PropertyImpl extends ItemImpl implements Property
         {
             throw new RepositoryException("Property " + name + " has been removed.");
         }
+        
+        // Note: Internal check to ensure that value is single or multi-valued as expected
+        boolean multiValued = getPropertyDefinition().isMultiValued();
+        if (multiValued != (value instanceof Collection))
+        {
+            throw new RepositoryException("Alfresco value does not match multi-valued definition of " + multiValued);
+        }
+        
         return value;
     }
     
@@ -398,6 +450,21 @@ public class PropertyImpl extends ItemImpl implements Property
         {
             // Expected exception for JSR-170
             throw new ValueFormatException("Property " + name + " is multi-valued.");
+        }
+    }
+
+    /**
+     * Checks that this property is single valued.
+     * 
+     * @throws ValueFormatException  if value is multi-valued
+     */
+    private void checkMultiValued()
+        throws ValueFormatException
+    {
+        if (!getPropertyDefinition().isMultiValued())
+        {
+            // Expected exception for JSR-170
+            throw new ValueFormatException("Property " + name + " is single-valued.");
         }
     }
     

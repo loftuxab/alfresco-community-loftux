@@ -53,7 +53,7 @@ public class ImporterComponentTest extends BaseSpringTest
     }
 
     
-    public void xtestImport()
+    public void testImport()
         throws Exception
     {
         InputStream test = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/importer/importercomponent_test.xml");
@@ -68,7 +68,7 @@ public class ImporterComponentTest extends BaseSpringTest
     }
     
     
-    public void testBootstrap()
+    public void xtestBootstrap()
     {
         Properties configuration = new Properties();
         configuration.put("companySpaceName", "test company name");

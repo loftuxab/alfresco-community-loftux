@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -358,8 +360,8 @@ public class ImporterComponent
             }
             else
             {
-                Map<QName, String> typeProperties = context.getProperties(nodeType.getName());
-                String name = typeProperties.get(ContentModel.PROP_NAME);
+                Map<QName, Serializable> typeProperties = context.getProperties(nodeType.getName());
+                String name = (String)typeProperties.get(ContentModel.PROP_NAME);
                 if (name == null || name.length() == 0)
                 {
                     throw new ImporterException("Cannot import node of type " + nodeType.getName() + " - it does not have a name");
@@ -371,7 +373,7 @@ public class ImporterComponent
             }
             
             // Build initial map of properties
-            Map<QName, String> initialProperties = new HashMap<QName, String>();
+            Map<QName, Serializable> initialProperties = new HashMap<QName, Serializable>();
             initialProperties.putAll(context.getProperties(nodeType.getName()));
             List<AspectDefinition> defaultAspects = nodeType.getDefaultAspects();
             for (AspectDefinition aspect: defaultAspects)
@@ -391,7 +393,7 @@ public class ImporterComponent
             {
                 if (nodeService.hasAspect(nodeRef, aspect) == false)
                 {
-                    Map<QName, String> aspectProperties = context.getProperties(aspect);
+                    Map<QName, Serializable> aspectProperties = context.getProperties(aspect);
                     Map<QName, Serializable> boundAspectProperties = bindProperties(aspectProperties);
                     nodeService.addAspect(nodeRef, aspect, boundAspectProperties);
                     reportAspectAdded(nodeRef, aspect);
@@ -446,20 +448,38 @@ public class ImporterComponent
          * @param properties
          * @return
          */
-        private Map<QName, Serializable> bindProperties(Map<QName, String> properties)
+        private Map<QName, Serializable> bindProperties(Map<QName, Serializable> properties)
         {
             Map<QName, Serializable> boundProperties = new HashMap<QName, Serializable>(properties.size());
             for (QName property : properties.keySet())
             {
+                // get property definition
                 PropertyDefinition propDef = dictionaryService.getProperty(property);
                 if (propDef == null)
                 {
                     throw new ImporterException("Property " + property + " does not exist in the repository dictionary");
                 }
-                String value = bindPlaceHolder(properties.get(property), configuration);
-                Serializable object = (Serializable)ValueConverter.convert(propDef.getDataType(), value);
-                boundProperties.put(property, object);
+                
+                // bind property value to configuration and convert to appropriate type
+                Serializable value = properties.get(property);
+                if (value instanceof Collection)
+                {
+                    List<Serializable> boundCollection = new ArrayList<Serializable>();
+                    for (String collectionValue : (Collection<String>)value)
+                    {
+                        String strValue = bindPlaceHolder(collectionValue, configuration);
+                        boundCollection.add(strValue);
+                    }
+                    value = (Serializable)ValueConverter.convert(propDef.getDataType(), boundCollection);
+                }
+                else
+                {
+                    value = bindPlaceHolder((String)value, configuration);
+                    value = (Serializable)ValueConverter.convert(propDef.getDataType(), value);
+                }
+                boundProperties.put(property, value);
             }
+            
             return boundProperties;
         }
 

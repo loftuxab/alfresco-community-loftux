@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -352,18 +351,25 @@ public class ExporterComponent
                 else
                 {
                     // Export all other datatypes
-                    Object value = null; 
-                    PropertyDefinition propDef = dictionaryService.getProperty(property);
                     try
                     {
-                        value = ValueConverter.convert(propDef.getDataType(), properties.get(property));
+                        Object value = properties.get(property);
+                        if (value instanceof Collection)
+                        {
+                            Collection<String> strValues = ValueConverter.convert(String.class, (Collection)value);
+                            exporter.value(nodeRef, property, strValues);
+                        }
+                        else
+                        {
+                            String strValue = ValueConverter.convert(String.class, value);
+                            exporter.value(nodeRef, property, strValue);
+                        }
                     }
                     catch(UnsupportedOperationException e)
                     {
-                        exporter.warning("Value of property " + property + " is incompatible for its datatype " + propDef.getDataType().getName());
-                        value = properties.get(property);
+                        exporter.warning("Value of property " + property + " could not be converted to xml string");
+                        exporter.value(nodeRef, property, properties.get(property).toString());
                     }
-                    exporter.value(nodeRef, property, value);
                 }
                 
                 exporter.endProperty(nodeRef, property);

@@ -16,9 +16,13 @@
  */
 package org.alfresco.repo.importer.view;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +34,7 @@ import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.QName;
 
 
@@ -48,8 +53,8 @@ import org.alfresco.service.namespace.QName;
     private String childName;
     private Map<QName, AspectDefinition> nodeAspects = new HashMap<QName, AspectDefinition>();
     private Map<QName, ChildAssociationDefinition> nodeChildAssocs = new HashMap<QName, ChildAssociationDefinition>();
-    private Map<QName, Map<QName, String>> classProperties = new HashMap<QName, Map<QName, String>>();
-    private Map<QName, String> nodeProperties = new HashMap<QName, String>();
+    private Map<QName, Map<QName, Serializable>> classProperties = new HashMap<QName, Map<QName, Serializable>>();
+    private Map<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
 
 
     /**
@@ -146,22 +151,48 @@ import org.alfresco.service.namespace.QName;
         }
         
         // Store property value
-        Map<QName, String> properties = classProperties.get(owningClass.getName());
+        Map<QName, Serializable> properties = classProperties.get(owningClass.getName());
         if (properties == null)
         {
-            properties = new HashMap<QName, String>();
+            properties = new HashMap<QName, Serializable>();
             classProperties.put(owningClass.getName(), properties);
         }
-        properties.put(propDef.getName(), value);
-        nodeProperties.put(propDef.getName(), value);
+        
+        // Handle single / multi-valued cases
+        Serializable newValue = value;
+        Serializable existingValue = properties.get(propDef.getName());
+        if (existingValue != null)
+        {
+            // convert from single to multi-valued
+            if (!propDef.isMultiValued())
+            {
+                throw new ImporterException("Cannot import multiple values for single-valued property " + propDef.getName());
+            }
+            if (existingValue instanceof Collection)
+            {
+                // add to existing collection of values
+                ((Collection<Serializable>)existingValue).add(value);
+                newValue = existingValue;
+            }
+            else
+            {
+                // convert single to multi-valued
+                List<Serializable>values = new ArrayList<Serializable>();
+                values.add((String)existingValue);
+                values.add(value);
+                newValue = (Serializable)values;
+            }
+        }
+        properties.put(propDef.getName(), newValue);
+        nodeProperties.put(propDef.getName(), newValue);
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.importer.ImportNode#getProperties(org.alfresco.service.namespace.QName)
      */
-    public Map<QName, String> getProperties(QName className)
+    public Map<QName,Serializable> getProperties(QName className)
     {
-        Map<QName, String> properties = classProperties.get(className);
+        Map<QName, Serializable> properties = classProperties.get(className);
         if (properties == null)
         {
             properties = Collections.emptyMap();

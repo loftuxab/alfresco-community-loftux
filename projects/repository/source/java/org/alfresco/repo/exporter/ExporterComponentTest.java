@@ -17,17 +17,18 @@
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.util.Collection;
+import java.util.Properties;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterService;
+import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
@@ -39,6 +40,7 @@ public class ExporterComponentTest extends BaseSpringTest
 {
 
     private ExporterService exporterService;
+    private ImporterService importerService;
     private StoreRef storeRef;
 
     
@@ -46,9 +48,11 @@ public class ExporterComponentTest extends BaseSpringTest
     protected void onSetUpInTransaction() throws Exception
     {
         exporterService = (ExporterService)applicationContext.getBean("exporterComponent");
+        importerService = (ImporterService)applicationContext.getBean("importerComponent");
         
         // Create the store
-        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+//        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test");
     }
 
     
@@ -57,12 +61,21 @@ public class ExporterComponentTest extends BaseSpringTest
     {
         TestProgress testProgress = new TestProgress();
         Location location = new Location(storeRef);
+
+        // import
+        InputStream test = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/importer/importercomponent_test.xml");
+        InputStreamReader testReader = new InputStreamReader(test, "UTF-8");
+        Properties configuration = new Properties();
+        configuration.put("username", "fredb");
+        importerService.importView(testReader, location, configuration, null);        
+        System.out.println(NodeStoreInspector.dumpNodeStore((NodeService)applicationContext.getBean("NodeService"), storeRef));
         
+        // now export
+        location.setPath("/system");
         File tempFile = TempFileProvider.createTempFile("xmlexporttest", ".xml");
         OutputStream output = new FileOutputStream(tempFile);
         exporterService.exportView(output, location, true, testProgress);
         output.close();
-        System.out.println(NodeStoreInspector.dumpNodeStore((NodeService)applicationContext.getBean("NodeService"), storeRef));
     }
 
     
@@ -115,9 +128,14 @@ public class ExporterComponentTest extends BaseSpringTest
 //            System.out.println("TestProgress: end property " + property);
         }
 
-        public void value(NodeRef nodeRef, QName property, Object value)
+        public void value(NodeRef nodeRef, QName property, String value)
         {
-//            System.out.println("TestProgress: value " + value);
+//            System.out.println("TestProgress: single value " + value);
+        }
+
+        public void value(NodeRef nodeRef, QName property, Collection values)
+        {
+//          System.out.println("TestProgress: multi value " + value);
         }
 
         public void content(NodeRef nodeRef, QName property, InputStream content)
@@ -144,6 +162,7 @@ public class ExporterComponentTest extends BaseSpringTest
         {
             System.out.println("TestProgress: end");
         }
+
     }
     
 }

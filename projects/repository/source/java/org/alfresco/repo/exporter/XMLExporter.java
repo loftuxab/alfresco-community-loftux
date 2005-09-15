@@ -17,13 +17,13 @@
 package org.alfresco.repo.exporter;
 
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.namespace.NamespaceService;
@@ -42,8 +42,10 @@ import org.xml.sax.helpers.AttributesImpl;
     implements Exporter
 {
     private final static String VIEW_LOCALNAME = "view";
+    private final static String VIEW_VALUE = "value";
     private final static String CHILDNAME_LOCALNAME = "childName";
     private static QName VIEW_QNAME; 
+    private static QName VALUE_QNAME; 
     private static QName CHILDNAME_QNAME; 
     
     private NamespaceService namespaceService;
@@ -66,6 +68,7 @@ import org.xml.sax.helpers.AttributesImpl;
         this.contentHandler = contentHandler;
         
         VIEW_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, namespaceService);
+        VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, namespaceService);
         CHILDNAME_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, CHILDNAME_LOCALNAME, namespaceService);
     }
     
@@ -219,31 +222,41 @@ import org.xml.sax.helpers.AttributesImpl;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
-    public void value(NodeRef nodeRef, QName property, Object value)
+    public void value(NodeRef nodeRef, QName property, String value)
     {
         if (value != null)
         {
             try
             {
-                String strValue;
-                if (value instanceof Date)
-                {
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                    strValue = format.format((Date)value);
-                }
-                else
-                {
-                    strValue = value.toString();
-                }
-                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+                contentHandler.characters(value.toCharArray(), 0, value.length());
             }
             catch (SAXException e)
             {
-                throw new ExporterException("Failed to process value - property " + toPrefixString(property), e);
+                throw new ExporterException("Failed to process value event - nodeRef " + nodeRef + "; property " + toPrefixString(property) + "; value " + value, e);
             }
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Collection)
+     */
+    public void value(NodeRef nodeRef, QName property, Collection<String> values)
+    {
+        try
+        {
+            for (String value : values)
+            {
+                contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
+                contentHandler.characters(value.toCharArray(), 0, value.length());
+                contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, toPrefixString(VALUE_QNAME));
+            }
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process multi-value event - nodeRef " + nodeRef + "; property " + toPrefixString(property), e);
+        }
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
      */

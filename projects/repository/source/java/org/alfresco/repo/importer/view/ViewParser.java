@@ -50,6 +50,7 @@ public class ViewParser implements Parser
     
     // View schema elements and attributes
     private static final String VIEW_CHILD_NAME_ATTR = "childName";    
+    private static final QName VIEW_VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "value");    
     
     // XML Pull Parser Factory
     private XmlPullParserFactory factory;
@@ -289,20 +290,49 @@ public class ViewParser implements Parser
     {
         NodeContext context = (NodeContext)contextStack.peek();
         
-        // Extract value
-        String value = null;
         int eventType = xpp.next();
         if (eventType == XmlPullParser.TEXT)
         {
-            value = xpp.getText();
+            // Extract single value
+            String value = xpp.getText();
             eventType = xpp.next();
+            if (eventType == XmlPullParser.END_TAG)
+            {
+                context.addProperty(propDef, value);
+            }
         }
+
+        // Extract multi value
+        while (eventType == XmlPullParser.START_TAG)
+        {
+            QName name = getName(xpp);
+            if (!name.equals(VIEW_VALUE_QNAME))
+            {
+                throw new ImporterException("Invalid view structure - expected element " + VIEW_VALUE_QNAME + " for property " + propDef.getName());
+            }
+            eventType = xpp.next();
+            if (eventType == XmlPullParser.TEXT)
+            {
+                String value = xpp.getText();
+                context.addProperty(propDef, value);
+                eventType = xpp.next();
+            }
+            if (eventType != XmlPullParser.END_TAG)
+            {
+                throw new ImporterException("Value for property " + propDef.getName() + " has not been defined correctly - missing end tag");
+            }
+            eventType = xpp.next();
+            if (eventType == XmlPullParser.TEXT)
+            {
+                eventType = xpp.next();
+            }
+        }
+
+        // End of Property
         if (eventType != XmlPullParser.END_TAG)
         {
-            throw new ImporterException("Property " + propDef.getName() + " definition is invalid - it cannot contain any elements");
+            throw new ImporterException("Property " + propDef.getName() + " definition is invalid");
         }
-        
-        context.addProperty(propDef, value);
         
         if (logger.isDebugEnabled())
             logger.debug(indentLog("Processed property " + propDef.getName(), contextStack.size()));

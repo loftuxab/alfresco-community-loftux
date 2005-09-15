@@ -5,7 +5,7 @@
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
            xmlns:cm="http://www.alfresco.org/model/content/1.0">
    
-   <cm:systemfolder>
+   <cm:systemfolder view:childName="system">
       <cm:name>System</cm:name>
       <cm:orderedchildren>true</cm:orderedchildren>
       <cm:contains>
@@ -27,7 +27,12 @@
          <!-- note: if no explicit view:childName, take from name if one exists -->
          <cm:cmobject>
             <cm:translatable/>
+            <cm:generalclassifiable/>
             <cm:name>Some Content</cm:name>
+            <cm:categories>
+                <view:value>one</view:value>
+                <view:value>two</view:value>
+            </cm:categories>
             <cm:translations view:idref="xyz"/>
          </cm:cmobject>
    
