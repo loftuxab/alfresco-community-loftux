@@ -144,7 +144,7 @@
                                  <tr>
                                     <td>
                                        <div style="padding:4px">
-                                          <h:selectOneListbox id="roles" style="width:250px" size="4">
+                                          <h:selectOneListbox id="roles" style="width:250px" size="5">
                                              <f:selectItems value="#{InviteUsersWizard.roles}" />
                                           </h:selectOneListbox>
                                        </div>

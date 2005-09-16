@@ -16,6 +16,7 @@
  */
 package org.alfresco.web.ui.common.component.evaluator;
 
+import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
 /**
@@ -46,6 +47,29 @@ public class StringEqualsEvaluator extends BaseEvaluator
       }
       
       return result;
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
+    */
+   public void restoreState(FacesContext context, Object state)
+   {
+      Object values[] = (Object[])state;
+      // standard component attributes are restored by the super class
+      super.restoreState(context, values[0]);
+      this.condition = (String)values[1];
+   }
+   
+   /**
+    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
+    */
+   public Object saveState(FacesContext context)
+   {
+      Object values[] = new Object[2];
+      // standard component attributes are saved by the super class
+      values[0] = super.saveState(context);
+      values[1] = this.condition;
+      return (values);
    }
    
    /**

@@ -82,24 +82,26 @@
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" />
                               
                               <%-- checkin, checkout and undo checkout --%>
-                              <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
-                                 <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" padding="4"
-                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
-                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                 </a:actionLink>
-                              </a:booleanEvaluator>
-                              <a:booleanEvaluator value="#{DocumentDetailsBean.owner == true}">
-                                 <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" padding="4"
-                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
-                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                 </a:actionLink>
-                              </a:booleanEvaluator>
-                              <a:booleanEvaluator value="#{DocumentDetailsBean.owner == true}">
-                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" padding="4" 
-                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
-                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                 </a:actionLink>
-                              </a:booleanEvaluator>
+                              <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
+                                 <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
+                                    <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" padding="4"
+                                                  actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                 </a:booleanEvaluator>
+                                 <a:booleanEvaluator value="#{DocumentDetailsBean.owner == true}">
+                                    <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" padding="4"
+                                                  actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                 </a:booleanEvaluator>
+                                 <a:booleanEvaluator value="#{DocumentDetailsBean.owner == true}">
+                                    <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" padding="4" 
+                                                  actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                 </a:booleanEvaluator>
+                              </r:permissionEvaluator>
                               
                               <%-- approve and reject --%>
                               <a:booleanEvaluator value="#{DocumentDetailsBean.approveStepName != null && DocumentDetailsBean.workingCopy == false && DocumentDetailsBean.locked == false}">
@@ -118,22 +120,26 @@
                               <a:menu itemSpacing="4" image="/images/icons/more.gif" menuStyleClass="moreActionsMenu"
                                       label="#{msg.more_options}" tooltip="#{msg.more_options_file}" style="padding-left:20px">
                                  <%-- edit and update --%>
-                                 <a:booleanEvaluator value="#{(DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false) || DocumentDetailsBean.owner == true}">
-                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif"
-                                                  actionListener="#{CheckinCheckoutBean.editFile}">
-                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                    </a:actionLink>
-                                    <a:actionLink value="#{msg.update}" image="/images/icons/update.gif"
-                                                  actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
-                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                    </a:actionLink>
-                                 </a:booleanEvaluator>
+                                 <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
+                                    <a:booleanEvaluator value="#{(DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false) || DocumentDetailsBean.owner == true}">
+                                       <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif"
+                                                     actionListener="#{CheckinCheckoutBean.editFile}">
+                                          <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                       </a:actionLink>
+                                       <a:actionLink value="#{msg.update}" image="/images/icons/update.gif"
+                                                     actionListener="#{CheckinCheckoutBean.setupContentAction}" action="updateFile">
+                                          <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                       </a:actionLink>
+                                    </a:booleanEvaluator>
+                                 </r:permissionEvaluator>
                                  
                                  <%-- cut --%>
-                                 <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif"
-                                               actionListener="#{ClipboardBean.cutNode}">
-                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                 </a:actionLink>
+                                 <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Delete">
+                                    <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif"
+                                                  actionListener="#{ClipboardBean.cutNode}">
+                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                    </a:actionLink>
+                                 </r:permissionEvaluator>
                                  
                                  <%-- copy --%>
                                  <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif"
@@ -142,19 +148,21 @@
                                  </a:actionLink>
                                     
                                  <%-- delete --%>
-                                 <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
-                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif"
-                                                  actionListener="#{BrowseBean.setupContentAction}" action="deleteFile">
-                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                    </a:actionLink>
-                                 </a:booleanEvaluator>
+                                 <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Delete">
+                                    <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
+                                       <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif"
+                                                     actionListener="#{BrowseBean.setupContentAction}" action="deleteFile">
+                                          <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                       </a:actionLink>
+                                    </a:booleanEvaluator>
+                                 </r:permissionEvaluator>
                                  
                                  <%-- create shortcut --%>
                                  <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                  </a:actionLink>
                                  
-                                 <%-- other action --%>
+                                 <%-- custom action --%>
                                  <a:actionLink value="#{msg.other_action}" image="/images/icons/action.gif" action="createAction" actionListener="#{NewActionWizard.startWizard}" />
                               </a:menu>
                            </td>
@@ -231,9 +239,11 @@
                                                       externalConfig="true" />
                                           <h:outputText id="no-inline-msg" value="<br/>#{msg.not_inline_editable}<br/><br/>"
                                                rendered="#{DocumentDetailsBean.inlineEditable == false}" escape="false" />
-                                          <a:actionLink id="make-inline" value="#{msg.allow_inline_editing}" 
-                                               action="#{DocumentDetailsBean.applyInlineEditable}"
-                                               rendered="#{DocumentDetailsBean.inlineEditable == false}" />
+                                          <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write" id="eval_inline">
+                                             <a:actionLink id="make-inline" value="#{msg.allow_inline_editing}" 
+                                                  action="#{DocumentDetailsBean.applyInlineEditable}"
+                                                  rendered="#{DocumentDetailsBean.inlineEditable == false}" />
+                                          </r:permissionEvaluator>
                                           <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>
@@ -298,9 +308,11 @@
                                        rendered="#{DocumentDetailsBean.categorised == false}">
                                  <h:outputText id="no-category-msg" value="#{msg.not_in_category}<br/><br/>" 
                                                escape="false"/>
-                                 <a:actionLink id="make-classifiable" value="#{msg.allow_categorization}" 
-                                               action="#{DocumentDetailsBean.applyClassifiable}"
-                                               rendered="#{DocumentDetailsBean.locked == false}" />
+                                 <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write" id="eval_cat">
+                                    <a:actionLink id="make-classifiable" value="#{msg.allow_categorization}" 
+                                                  action="#{DocumentDetailsBean.applyClassifiable}"
+                                                  rendered="#{DocumentDetailsBean.locked == false}" />
+                                 </r:permissionEvaluator>
                               </a:panel>
                               <br/>
                               <a:panel label="#{msg.version_history}" id="version-history-panel" progressive="true" expanded="false"
@@ -354,9 +366,11 @@
                                        rendered="#{DocumentDetailsBean.versionable == false}">
                                  <h:outputText id="no-history-msg" value="#{msg.not_versioned}<br/><br/>" 
                                                escape="false" />
-                                 <a:actionLink id="make-versionable" value="#{msg.allow_versioning}"
-                                               action="#{DocumentDetailsBean.applyVersionable}" 
-                                               rendered="#{DocumentDetailsBean.locked == false}" />
+                                 <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write" id="eval_ver">
+                                    <a:actionLink id="make-versionable" value="#{msg.allow_versioning}"
+                                                  action="#{DocumentDetailsBean.applyVersionable}" 
+                                                  rendered="#{DocumentDetailsBean.locked == false}" />
+                                 </r:permissionEvaluator>
                               </a:panel>
                               <br/>
                            </td>
