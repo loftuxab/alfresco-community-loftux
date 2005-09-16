@@ -72,22 +72,34 @@ public class DownloadContentServlet extends HttpServlet
       
       try
       {
-         AuthenticationHelper.authenticate(getServletContext(), req, res);
-         
-         WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-         // TODO: add compression here?
-         //       see http://servlets.com/jservlet2/examples/ch06/ViewResourceCompress.java for example
-         //       only really needed if we don't use the built in compression of the servlet container
-         
          // The URL contains multiple parts
          // /alfresco/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
          // the protocol, followed by the store, followed by the Id
          // the last part is only used for mimetype and browser use
+         // may be followed by valid ticket for external use: ?ticket=1234567890 
          String uri = req.getRequestURI();
          
          if (logger.isDebugEnabled())
             logger.debug("Processing URL: " + uri);
          
+         // see if a ticket has been supplied
+         int index = uri.indexOf("?ticket=");
+         if (index == -1)
+         {
+            AuthenticationHelper.authenticate(getServletContext(), req, res);
+         }
+         else
+         {
+            // extract ticket from URI, use to authenticate
+            String ticket = uri.substring(index + 8);
+            AuthenticationHelper.authenticate(getServletContext(), req, res, ticket);
+            uri = uri.substring(0, index);
+         }
+         
+         WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+         // TODO: add compression here?
+         //       see http://servlets.com/jservlet2/examples/ch06/ViewResourceCompress.java for example
+         //       only really needed if we don't use the built in compression of the servlet container
          StringTokenizer t = new StringTokenizer(uri, "/");
          if (t.countTokens() < 7)
          {
