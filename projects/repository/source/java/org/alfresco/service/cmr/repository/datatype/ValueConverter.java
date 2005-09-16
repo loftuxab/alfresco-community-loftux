@@ -188,7 +188,7 @@ public class ValueConverter
      */
     public static boolean isMultiValued(Object value)
     {
-        return ((value instanceof Collection) && (((Collection) value).size() > 1));
+        return (value instanceof Collection);
     }
 
     /**
@@ -407,7 +407,8 @@ public class ValueConverter
 
         if (converter == null)
         {
-            throw new UnsupportedOperationException("There are is no conversion registered from source type " + source.getName() + " to " + dest);
+            throw new UnsupportedOperationException(
+                    "There are is no conversion registered from source type " + source.getName() + " to " + dest);
 
         }
         return converter;
