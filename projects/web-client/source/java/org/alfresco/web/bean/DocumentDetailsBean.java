@@ -17,6 +17,7 @@
 package org.alfresco.web.bean;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +39,14 @@ import org.alfresco.service.cmr.version.VersionHistory;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewRuleWizard;
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.repo.component.template.TemplateNode;
 import org.apache.log4j.Logger;
@@ -280,7 +283,8 @@ public class DocumentDetailsBean
       catch (Throwable e)
       {
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to update category", e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), "error_update_category"), e.getMessage()), e);
       }
       
       return outcome;
@@ -527,7 +531,8 @@ public class DocumentDetailsBean
       catch (Throwable e)
       {
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to update simple workflow", e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), "error_update_simpleworkflow"), e.getMessage()), e);
       }
       
       return outcome;
@@ -627,7 +632,8 @@ public class DocumentDetailsBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to approve the document", e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), "error_workflow_approve"), e.getMessage()), e);
       }
    }
    
@@ -731,7 +737,8 @@ public class DocumentDetailsBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to approve the document", e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), "error_workflow_reject"), e.getMessage()), e);
       }
    }
    
@@ -760,7 +767,8 @@ public class DocumentDetailsBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to apply the 'classifiable' aspect to the document", e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), "error_aspect_classify"), e.getMessage()), e);
       }
    }
    
@@ -789,7 +797,8 @@ public class DocumentDetailsBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to apply the 'versionable' aspect to the document", e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), "error_aspect_versioning"), e.getMessage()), e);
       }
    }
    
@@ -829,7 +838,8 @@ public class DocumentDetailsBean
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
-         throw new AlfrescoRuntimeException("Failed to apply the 'inlineeditable' aspect to the document", e);
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), "error_aspect_inlineeditable"), e.getMessage()), e);
       }
       
       // force recreation of the details view - this means the properties sheet component will reinit
