@@ -63,12 +63,12 @@ public class DataTypeMap
      * @return  JCR property type
      * @throws RepositoryException
      */
-    public static int convertDataTypeToPropertyType(DataTypeDefinition datatype)
+    public static int convertDataTypeToPropertyType(QName datatype)
     {
-        Integer propertyType = dataTypeToPropertyType.get(datatype.getName());
+        Integer propertyType = dataTypeToPropertyType.get(datatype);
         if (propertyType == null)
         {
-            throw new AlfrescoRuntimeException("Cannot map Alfresco data type " + datatype.getName() + " to JCR property type.");
+            throw new AlfrescoRuntimeException("Cannot map Alfresco data type " + datatype + " to JCR property type.");
         }
         return propertyType;
     }

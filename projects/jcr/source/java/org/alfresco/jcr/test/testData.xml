@@ -1,5 +1,6 @@
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
-           xmlns:jcrtest="http://www.alfresco.org/test/jcr/1.0">
+           xmlns:jcrtest="http://www.alfresco.org/test/jcr/1.0"
+           xmlns:cm="http://www.alfresco.org/model/content/1.0">
 
     <jcrtest:testtype view:childName="testroot">
     </jcrtest:testtype>
@@ -27,6 +28,14 @@
                   <view:value>value three</view:value>
                </jcrtest:multiProp>
           </jcrtest:testtype>	   
+
+          <!-- Some Content -->
+          <cm:content view:childName="contentValue">
+			<cm:name>Test Content</cm:name>
+			<cm:encoding>UTF-8</cm:encoding>
+			<cm:mimetype>text/plain</cm:mimetype>
+			<cm:contentUrl>org/alfresco/jcr/test/testContent.txt</cm:contentUrl>
+          </cm:content>
           
        </jcrtest:children>
 	</jcrtest:testtype>

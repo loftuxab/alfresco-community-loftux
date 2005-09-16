@@ -23,6 +23,8 @@ import javax.jcr.version.OnParentVersionAction;
 
 import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 
 /**
  * Alfresco implementation of a JCR Property Definition
@@ -69,7 +71,12 @@ public class PropertyDefinitionImpl implements PropertyDefinition
      */
     public int getRequiredType()
     {
-        return DataTypeMap.convertDataTypeToPropertyType(propDef.getDataType());
+        // TODO: Switch on data type
+        if (propDef.getName().equals(ContentModel.PROP_CONTENT_URL))
+        {
+            return DataTypeMap.convertDataTypeToPropertyType(DataTypeDefinition.CONTENT);
+        }
+        return DataTypeMap.convertDataTypeToPropertyType(propDef.getDataType().getName());
     }
     
     /* (non-Javadoc)

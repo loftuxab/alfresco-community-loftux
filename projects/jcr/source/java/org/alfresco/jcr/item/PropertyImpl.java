@@ -38,7 +38,10 @@ import javax.jcr.version.VersionException;
 import org.alfresco.jcr.dictionary.DataTypeMap;
 import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
 import org.alfresco.jcr.proxy.JCRProxyFactory;
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.QName;
@@ -300,7 +303,12 @@ public class PropertyImpl extends ItemImpl implements Property
     public int getType() throws RepositoryException
     {
         // TODO: The type should be based on the property value (in the case of undefined required type)
-        return DataTypeMap.convertDataTypeToPropertyType(getPropertyDefinition().getDataType());
+        // TODO: Switch on data type
+        if (name.equals(ContentModel.PROP_CONTENT_URL))
+        {
+            return DataTypeMap.convertDataTypeToPropertyType(DataTypeDefinition.CONTENT);
+        }
+        return DataTypeMap.convertDataTypeToPropertyType(getPropertyDefinition().getDataType().getName());
     }
 
     /* (non-Javadoc)
@@ -414,25 +422,37 @@ public class PropertyImpl extends ItemImpl implements Property
     protected Object getPropertyValue()
         throws RepositoryException
     {
-        Object value; 
+        Object value = null; 
 
-        // TODO: Handle Content Property Type
-        
-        // TODO: We may need to copy value here...
-        NodeService nodeService = node.session.getServiceRegistry().getNodeService();
-        value = nodeService.getProperty(node.getNodeRef(), name);
-        
-        // TODO: Check - If value is now null, then effectively the property has been removed
-        if (value == null)
+        // TODO: Switch on data type
+        if (name.equals(ContentModel.PROP_CONTENT_URL))
         {
-            throw new RepositoryException("Property " + name + " has been removed.");
+            // Retrieve content reader as value
+            ContentService contentService = node.session.getServiceRegistry().getContentService();
+            value = contentService.getReader(node.getNodeRef());
+            if (value == null)
+            {
+                // TODO: Check - If value is now null, then effectively the property has been removed
+                throw new RepositoryException("Property " + name + " has been removed.");
+            }
         }
-        
-        // Note: Internal check to ensure that value is single or multi-valued as expected
-        boolean multiValued = getPropertyDefinition().isMultiValued();
-        if (multiValued != (value instanceof Collection))
+        else
         {
-            throw new RepositoryException("Alfresco value does not match multi-valued definition of " + multiValued);
+            // TODO: We may need to copy value here...
+            NodeService nodeService = node.session.getServiceRegistry().getNodeService();
+            value = nodeService.getProperty(node.getNodeRef(), name);
+            if (value == null)
+            {
+                // TODO: Check - If value is now null, then effectively the property has been removed
+                throw new RepositoryException("Property " + name + " has been removed.");
+            }
+            
+            // Note: Internal check to ensure that value is single or multi-valued as expected
+            boolean multiValued = getPropertyDefinition().isMultiValued();
+            if (multiValued != (value instanceof Collection))
+            {
+                throw new RepositoryException("Alfresco value does not match multi-valued definition of " + multiValued);
+            }
         }
         
         return value;

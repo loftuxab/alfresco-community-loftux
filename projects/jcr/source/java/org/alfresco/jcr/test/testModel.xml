@@ -29,7 +29,7 @@
          <associations>
             <child-association name="jcrtest:children">
                <target>
-                  <class>jcrtest:testtype</class>
+                  <class>sys:base</class>
                </target>
             </child-association>
          </associations>

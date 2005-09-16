@@ -17,6 +17,8 @@
 package org.alfresco.service.cmr.repository.datatype;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -31,6 +33,7 @@ import java.util.Map;
 
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
@@ -122,9 +125,14 @@ public class ValueConverter
         }
 
         // Find the correct conversion - if available and do the converiosn
-        Converter converter = getConversion(value.getClass(), c);
+        Converter converter = getConversion(value, c);
+        if (converter == null)
+        {
+            throw new UnsupportedOperationException(
+                    "There is no conversion registered for the value " + value.getClass().getName() + " to " + c);
+        }
+        
         return (T) converter.convert(value);
-
     }
 
     /**
@@ -362,8 +370,57 @@ public class ValueConverter
         return convert(Number.class, value).doubleValue();
     }
 
+    
     /**
-     * Find a conversion 
+     * Find conversion for the specified object
+     * 
+     * Note: Takes into account the class of the object and any interfaces it may
+     *       also support.
+     * 
+     * @param <F>
+     * @param <T>
+     * @param source
+     * @param dest
+     * @return
+     */
+    private static <T> Converter getConversion(Object value, Class<T> dest)
+    {
+        Converter converter = null;    
+        if (value == null)
+        {
+            return null;
+        }
+
+        // find via class of value
+        Class valueClass = value.getClass();
+        converter = getConversion(valueClass, dest);
+        if (converter != null)
+        {
+            return converter;
+        }
+        
+        // find via supported interfaces of value
+        do
+        {
+            Class[] ifClasses = valueClass.getInterfaces();
+            for (Class ifClass : ifClasses)
+            {
+                converter = getConversion(ifClass, dest);
+                if (converter != null)
+                {
+                    return converter;
+                }
+            }
+            valueClass = valueClass.getSuperclass();
+        }
+        while (valueClass != null);
+        
+        return null;
+    }
+
+
+    /**
+     * Find a conversion for a specific Class 
      * 
      * @param <F>
      * @param <T>
@@ -405,12 +462,6 @@ public class ValueConverter
         }
         while ((converter == null) && ((clazz = clazz.getSuperclass()) != null));
 
-        if (converter == null)
-        {
-            throw new UnsupportedOperationException(
-                    "There are is no conversion registered from source type " + source.getName() + " to " + dest);
-
-        }
         return converter;
     }
 
@@ -482,7 +533,7 @@ public class ValueConverter
                 }
                 catch (ParseException e)
                 {
-                    throw new RuntimeException(e);
+                    throw new UnsupportedOperationException("Failed to parse number " + source, e);
                 }
             }
 
@@ -570,7 +621,7 @@ public class ValueConverter
                 }
                 catch (ParseException e)
                 {
-                    throw new RuntimeException(e);
+                    throw new UnsupportedOperationException("Failed to parse date" + source, e);
                 }
             }
 
@@ -613,7 +664,7 @@ public class ValueConverter
                         }
                         catch (UnsupportedEncodingException e)
                         {
-                            throw new RuntimeException(e);
+                            throw new UnsupportedOperationException("Encoding not supported", e);
                         }
                     }
 
@@ -1027,9 +1078,38 @@ public class ValueConverter
             {
                 return source.getContentInputStream();
             }
-
         });
         
+        map.put(String.class, new Converter<ContentReader, String>()
+        {
+            public String convert(ContentReader source)
+            {
+                String encoding = source.getEncoding();
+                if (encoding == null || !encoding.equals("UTF-8"))
+                {
+                    throw new UnsupportedOperationException("Cannot convert non UTF-8 streams to String.");
+                }
+                
+                // TODO: Throw error on size limit
+        
+                return source.getContentString();
+            }
+        });
+        
+        map.put(Date.class, new TwoStageConverter<ContentReader, Date, String>(map.get(String.class), getConversion(String.class, Date.class)));
+
+        map.put(Double.class, new TwoStageConverter<ContentReader, Double, String>(map.get(String.class), getConversion(String.class, Double.class)));
+
+        map.put(Long.class, new TwoStageConverter<ContentReader, Long, String>(map.get(String.class), getConversion(String.class, Long.class)));
+
+        map.put(Boolean.class, new TwoStageConverter<ContentReader, Boolean, String>(map.get(String.class), getConversion(String.class, Boolean.class)));
+        
+        map.put(QName.class, new TwoStageConverter<ContentReader, QName, String>(map.get(String.class), getConversion(String.class, QName.class)));
+     
+        map.put(Path.class, new TwoStageConverter<ContentReader, Path, String>(map.get(String.class), getConversion(String.class, Path.class)));
+        
+        map.put(NodeRef.class, new TwoStageConverter<ContentReader, NodeRef, String>(map.get(String.class), getConversion(String.class, NodeRef.class)));
+
     }
 
     // Support for pluggable conversions

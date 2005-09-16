@@ -25,6 +25,7 @@ import javax.jcr.ValueFormatException;
 
 import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.service.cmr.repository.ContentReader;
 
 
 /**
@@ -76,8 +77,10 @@ public class ValueImpl implements Value
      */
     public String getString() throws ValueFormatException, IllegalStateException, RepositoryException
     {
+        isValidState(ValueState.Value);
+        String value = JCRValue.stringValue(getValue());
         enterState(ValueState.Value);
-        return JCRValue.stringValue(value);
+        return value;
     }
 
     /* (non-Javadoc)
@@ -85,11 +88,12 @@ public class ValueImpl implements Value
      */
     public InputStream getStream() throws IllegalStateException, RepositoryException
     {
-        enterState(ValueState.Stream);
+        isValidState(ValueState.Stream);
         if (stream == null)
         {
             stream = JCRValue.streamValue(value);
         }
+        enterState(ValueState.Stream);
         return stream;
     }
 
@@ -98,8 +102,10 @@ public class ValueImpl implements Value
      */
     public long getLong() throws ValueFormatException, IllegalStateException, RepositoryException
     {
+        isValidState(ValueState.Value);
+        long value = JCRValue.longValue(getValue());
         enterState(ValueState.Value);
-        return JCRValue.longValue(value);
+        return value;
     }
 
     /* (non-Javadoc)
@@ -107,8 +113,10 @@ public class ValueImpl implements Value
      */
     public double getDouble() throws ValueFormatException, IllegalStateException, RepositoryException
     {
+        isValidState(ValueState.Value);
+        double value = JCRValue.doubleValue(getValue());
         enterState(ValueState.Value);
-        return JCRValue.doubleValue(value);
+        return value;
     }
 
     /* (non-Javadoc)
@@ -116,8 +124,10 @@ public class ValueImpl implements Value
      */
     public Calendar getDate() throws ValueFormatException, IllegalStateException, RepositoryException
     {
+        isValidState(ValueState.Value);
+        Calendar value = JCRValue.dateValue(getValue());
         enterState(ValueState.Value);
-        return JCRValue.dateValue(value);
+        return value;
     }
 
     /* (non-Javadoc)
@@ -125,8 +135,10 @@ public class ValueImpl implements Value
      */
     public boolean getBoolean() throws ValueFormatException, IllegalStateException, RepositoryException
     {
+        isValidState(ValueState.Value);
+        boolean value = JCRValue.booleanValue(getValue());
         enterState(ValueState.Value);
-        return JCRValue.booleanValue(value);
+        return value;
     }
 
     /* (non-Javadoc)
@@ -136,20 +148,83 @@ public class ValueImpl implements Value
     {
         return datatype;
     }
+
+    /**
+     * Retrieve Value
+     * 
+     * Note: When retrieving non stream values against a backed stream, the content reader
+     *       has to be re-created.
+     * 
+     * @return  the value
+     */
+    private Object getValue()
+    {
+        if (value instanceof ContentReader && state == ValueState.Value)
+        {
+            value = ((ContentReader)value).getReader();
+        }
+        return value;
+    }
     
     /**
-     * Enter a new value state
+     * Check for valid state
      * 
-     * @param state  the new state to enter
-     * @throws IllegalStateException  cannot enter new state
+     * @param state  the state to check
+     * @throws IllegalStateException  state is not valid
      */
-    private void enterState(ValueState state)
+    private void isValidState(ValueState state)
     {
         if (this.state != ValueState.None && this.state != state)
         {
             throw new IllegalStateException("This value has already been retrieved as a " + state + " and cannot be retrieved as a " + ValueState.Stream + ".");
         }
+    }
+    
+    /**
+     * Enter state
+     * 
+     * @param state  the state to enter
+     */
+    private void enterState(ValueState state)
+    {
         this.state = state;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == this)
+        {
+            return true;
+        }
+        if (!(obj instanceof ValueImpl))
+        {
+            return false;
+        }
+        ValueImpl other = (ValueImpl)obj;
+
+        // check data type first
+        if (datatype != other.datatype)
+        {
+            return false;
+        }
+        
+        // handle case where values are content streams
+        if (value instanceof ContentReader)
+        {
+            String thisUrl = ((ContentReader)value).getContentUrl();
+            String otherUrl = ((ContentReader)other).getContentUrl();
+            return thisUrl.equals(otherUrl);
+        }
+
+        // handle other value types
+        return value.equals(other.value);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return value.hashCode() * 32 + datatype;
     }
 
 }

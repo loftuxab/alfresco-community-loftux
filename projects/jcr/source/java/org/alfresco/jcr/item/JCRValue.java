@@ -17,6 +17,7 @@
 package org.alfresco.jcr.item;
 
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -25,6 +26,7 @@ import javax.jcr.ValueFormatException;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.datatype.ValueConverter;
 
@@ -48,8 +50,17 @@ public class JCRValue
      */
     public static long getLength(Object value) throws ValueFormatException, RepositoryException
     {
-        // TODO: Handle streams
+        // Handle streams
+        if (value instanceof ContentReader)
+        {
+            return ((ContentReader)value).getLength();
+        }
+        if (value instanceof InputStream)
+        {
+            return -1;
+        }
         
+        // Handle all other data types by converting to string
         String strValue = (String)ValueConverter.convert(String.class, value);
         return strValue.length();
     }
