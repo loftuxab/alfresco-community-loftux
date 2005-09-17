@@ -54,7 +54,7 @@ public class UIMenu extends SelfRenderingComponent
       
       // output a textual label with an optional icon to show the menu
       String menuId = getNextMenuId(context);
-      out.write("<a href='#' onclick=\"javascript:_toggleMenu('");
+      out.write("<a href='#' onclick=\"javascript:_toggleMenu(event, '");
       out.write(menuId);
       out.write("');return false;\"");
       outputAttribute(out, getAttributes().get("style"), "style");

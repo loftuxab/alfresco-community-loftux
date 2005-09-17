@@ -61,4 +61,18 @@ public final class AuthenticationHelper
          return true;
       }
    }
+   
+   public static boolean authenticate(ServletContext context, HttpServletRequest httpRequest, HttpServletResponse httpResponse, String ticket)
+      throws IOException
+   {
+      // setup the authentication context
+      WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+      AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
+      auth.validate(ticket);
+      
+      // Set the current locale
+      I18NUtil.setLocale(Application.getLanguage(httpRequest.getSession()));
+      
+      return true;
+   }
 }

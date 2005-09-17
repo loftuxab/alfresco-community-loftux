@@ -8,7 +8,7 @@ var _lastMenu = null;
 var _timeoutId = null;
 
 // toggle a dynamic menu dropping down
-function _toggleMenu(menuId)
+function _toggleMenu(e, menuId)
 {
    // hide any open menu
    if (_lastMenu != null && _lastMenu != menuId)
@@ -21,18 +21,39 @@ function _toggleMenu(menuId)
    if (document.getElementById(menuId).style.display == 'none')
    {
       document.getElementById(menuId).style.display = 'block';
+      
       _lastMenu = menuId;
+      
+      // set global onclick handler to hide menu
+   	e.cancelBubble = true;
+   	if (e.stopPropagation)
+   	{
+   	   e.stopPropagation();
+   	}
+      document.onclick = _hideLastMenu;
    }
    else
    {
       document.getElementById(menuId).style.display = 'none';
+      document.onclick = null;
    }
 }
 
-// Hide the specified menu DIV
+// Hide the specified menu
 function _hideMenu(id)
 {
    document.getElementById(id).style.display = 'none';
+}
+
+// Hide the last opened menu
+function _hideLastMenu()
+{
+   if (_lastMenu != null)
+   {
+      document.getElementById(_lastMenu).style.display = 'none';
+      _lastMenu = null;
+      document.onclick = null;
+   }
 }
 
 // menu DIV onmouseover handler

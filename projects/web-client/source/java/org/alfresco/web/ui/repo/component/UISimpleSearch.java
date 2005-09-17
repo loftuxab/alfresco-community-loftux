@@ -192,7 +192,7 @@ public class UISimpleSearch extends UICommand
             bundle.getString(MSG_GO), "_searchSubmit();");
       
       out.write(Utils.buildImageTag(context, "/images/icons/search_controls.gif", 27, 13,
-            bundle.getString(MSG_OPTIONS), "javascript:_toggleMenu('_alfsearch');"));
+            bundle.getString(MSG_OPTIONS), "javascript:_toggleMenu(event, '_alfsearch');"));
       
       // dynamic DIV area containing search options
       out.write("<br><div id='_alfsearch' style='position:absolute;display:none'" +
