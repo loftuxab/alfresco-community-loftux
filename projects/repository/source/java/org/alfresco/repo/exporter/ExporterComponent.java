@@ -33,7 +33,7 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ExportStreamHandler;
 import org.alfresco.service.cmr.view.Exporter;
@@ -356,12 +356,12 @@ public class ExporterComponent
                         Object value = properties.get(property);
                         if (value instanceof Collection)
                         {
-                            Collection<String> strValues = ValueConverter.convert(String.class, (Collection)value);
+                            Collection<String> strValues = DefaultTypeConverter.INSTANCE.convert(String.class, (Collection)value);
                             exporter.value(nodeRef, property, strValues);
                         }
                         else
                         {
-                            String strValue = ValueConverter.convert(String.class, value);
+                            String strValue = DefaultTypeConverter.INSTANCE.convert(String.class, value);
                             exporter.value(nodeRef, property, strValue);
                         }
                     }

@@ -562,7 +562,7 @@ public final class Repository
       {
          // get a reference to the system types folder node
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+         resolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
          
          NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
          List<NodeRef> results = searchService.selectNodes(
@@ -596,7 +596,7 @@ public final class Repository
       {
          // get a reference to the system/people folder node
          DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+         resolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
     
          NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
          List<NodeRef> results = searchService.selectNodes(

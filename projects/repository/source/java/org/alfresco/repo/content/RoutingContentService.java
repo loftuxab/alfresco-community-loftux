@@ -40,7 +40,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -166,7 +166,7 @@ public class RoutingContentService implements ContentService
         Object contentUrlProperty = nodeService.getProperty(
                 nodeRef,
                 ContentModel.PROP_CONTENT_URL);
-        String contentUrl = ValueConverter.convert(String.class, contentUrlProperty);
+        String contentUrl = DefaultTypeConverter.INSTANCE.convert(String.class, contentUrlProperty);
         // check that the URL is available
         if (contentUrl == null)
         {

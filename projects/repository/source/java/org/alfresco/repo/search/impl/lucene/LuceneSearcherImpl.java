@@ -39,7 +39,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.XPathException;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
@@ -434,7 +434,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 }
                 else
                 {
-                    value = ValueConverter.convert(String.class, it.next());
+                    value = DefaultTypeConverter.INSTANCE.convert(String.class, it.next());
                 }
                 buffer.replace(index, endIndex + 1, value);
             }
@@ -573,7 +573,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             }
             else
             {
-                String propertyString = ValueConverter.convert(
+                String propertyString = DefaultTypeConverter.INSTANCE.convert(
                         String.class,
                         nodeService.getProperty(nodeRef, propertyQName));
                 return propertyString.toLowerCase().matches(pattern);

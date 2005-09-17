@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.AccessControlException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import javax.jcr.ItemExistsException;
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.LoginException;
 import javax.jcr.NamespaceException;
+import javax.jcr.NamespaceRegistry;
 import javax.jcr.NoSuchWorkspaceException;
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
@@ -50,6 +50,7 @@ import javax.jcr.version.VersionException;
 
 import org.alfresco.jcr.item.ItemImpl;
 import org.alfresco.jcr.item.ItemResolver;
+import org.alfresco.jcr.item.JCRTypeConverter;
 import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.repository.RepositoryImpl;
@@ -69,7 +70,7 @@ import org.xml.sax.SAXException;
  * 
  * @author David Caruana
  */
-public class SessionImpl implements Session, SessionContext
+public class SessionImpl implements Session
 {
     /** Parent Repository */ 
     private RepositoryImpl repository;
@@ -84,10 +85,16 @@ public class SessionImpl implements Session, SessionContext
     private StoreRef workspaceStore;
     
     /** Dynamic Namespace for this session */
-    NamespacePrefixResolver namespaceResolver;
+    private NamespaceRegistryImpl namespaceRegistry;
     
+    /** Workspace */
+    private WorkspaceImpl workspace = null;
+    
+    /** Type Converter */
+    private JCRTypeConverter typeConverter = null;
+    
+    /** Session Proxy */
     private Session proxy = null;
-    
     
     /**
      * Construct
@@ -104,7 +111,8 @@ public class SessionImpl implements Session, SessionContext
         this.repository = repository;
         this.ticket = ticket;
         this.attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
-        this.namespaceResolver = new DynamicNamespacePrefixResolver(repository.getServiceRegistry().getNamespaceService());
+        this.namespaceRegistry = new NamespaceRegistryImpl(new DynamicNamespacePrefixResolver(repository.getServiceRegistry().getNamespaceService()));
+        this.typeConverter = new JCRTypeConverter(this);
         this.workspaceStore = getWorkspaceStore(workspaceName);
     }
 
@@ -155,9 +163,40 @@ public class SessionImpl implements Session, SessionContext
      */
     public NamespacePrefixResolver getNamespaceResolver()
     {
-        return namespaceResolver;
+        return namespaceRegistry.getNamespaceResolver();
     }
 
+    /**
+     * Get the Namespace Registry
+     * 
+     * @return  the namespace registry
+     */
+    public NamespaceRegistry getNamespaceRegistry()
+    {
+        return namespaceRegistry;
+    }
+
+    /**
+     * Get the Type Converter
+     *
+     * @return the type converter
+     */
+    public JCRTypeConverter getTypeConverter()
+    {
+        return typeConverter;
+    }
+    
+    /**
+     * Get the Workspace Store
+     * 
+     * @return  the workspace store reference
+     */
+    public StoreRef getWorkspaceStore()
+    {
+        return workspaceStore;
+    }
+    
+    
     //
     // JCR Session
     //
@@ -200,8 +239,11 @@ public class SessionImpl implements Session, SessionContext
      */
     public Workspace getWorkspace()
     {
-        // TODO Auto-generated method stub
-        return null;
+        if (workspace == null)
+        {
+            workspace = new WorkspaceImpl(this);
+        }
+        return workspace.getProxy();
     }
 
     /* (non-Javadoc)
@@ -362,8 +404,7 @@ public class SessionImpl implements Session, SessionContext
      */
     public void setNamespacePrefix(String prefix, String uri) throws NamespaceException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -371,8 +412,7 @@ public class SessionImpl implements Session, SessionContext
      */
     public String[] getNamespacePrefixes() throws RepositoryException
     {
-        Collection<String> prefixes = namespaceResolver.getPrefixes();
-        return prefixes.toArray(new String[prefixes.size()]);
+        return namespaceRegistry.getPrefixes();
     }
 
     /* (non-Javadoc)
@@ -380,12 +420,7 @@ public class SessionImpl implements Session, SessionContext
      */
     public String getNamespaceURI(String prefix) throws NamespaceException, RepositoryException
     {
-        String uri = namespaceResolver.getNamespaceURI(prefix);
-        if (uri == null)
-        {
-            throw new NamespaceException("Prefix " + prefix + " is unknown.");
-        }
-        return uri;
+        return namespaceRegistry.getURI(prefix);
     }
 
     /* (non-Javadoc)
@@ -393,13 +428,7 @@ public class SessionImpl implements Session, SessionContext
      */
     public String getNamespacePrefix(String uri) throws NamespaceException, RepositoryException
     {
-        Collection<String> prefixes = namespaceResolver.getPrefixes(uri);
-        if (prefixes.size() == 0)
-        {
-            throw new NamespaceException("URI " + uri + " is unknown.");
-        }
-        // Return first prefix registered for uri
-        return prefixes.iterator().next();
+        return namespaceRegistry.getPrefix(uri);
     }
 
     /* (non-Javadoc)

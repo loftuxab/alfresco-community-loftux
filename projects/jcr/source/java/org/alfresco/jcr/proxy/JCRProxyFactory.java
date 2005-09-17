@@ -24,7 +24,7 @@ import java.lang.reflect.Proxy;
 import javax.jcr.RepositoryException;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.jcr.session.SessionContext;
+import org.alfresco.jcr.session.SessionImpl;
 
 
 /**
@@ -48,7 +48,7 @@ public class JCRProxyFactory
      * @param context  the session context
      * @return  the proxied target
      */
-    public static Object create(Object target, Class proxyInterface, SessionContext context)
+    public static Object create(Object target, Class proxyInterface, SessionImpl context)
     {
         InvocationHandler handler = new SessionContextInvocationHandler(target, context);
         return Proxy.newProxyInstance(proxyInterface.getClassLoader(), new Class[]{proxyInterface}, handler);
@@ -63,7 +63,7 @@ public class JCRProxyFactory
     private static class SessionContextInvocationHandler implements InvocationHandler
     {
         private Object target;
-        private SessionContext context;
+        private SessionImpl context;
 
         /**
          * Constuct.
@@ -71,7 +71,7 @@ public class JCRProxyFactory
          * @param instance  the object instance holding the method
          * @param delegateMethod  the method to invoke
          */
-        private SessionContextInvocationHandler(Object target, SessionContext context)
+        private SessionContextInvocationHandler(Object target, SessionImpl context)
         {
             this.target = target;
             this.context = context;

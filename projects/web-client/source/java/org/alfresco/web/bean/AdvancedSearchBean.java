@@ -27,8 +27,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.util.Conversion;
-import org.alfresco.web.app.Application;
+import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.bean.repository.Repository;
 
 /**
@@ -406,14 +405,14 @@ public class AdvancedSearchBean
          }
          if (this.createdDateChecked == true)
          {
-            String strCreatedDate = Conversion.dateToXmlDate(this.createdDateFrom).substring(0, 10);
-            String strCreatedDateTo = Conversion.dateToXmlDate(this.createdDateTo).substring(0, 10);
+            String strCreatedDate = ISO8601DateFormat.format(this.createdDateFrom).substring(0, 10);
+            String strCreatedDateTo = ISO8601DateFormat.format(this.createdDateTo).substring(0, 10);
             search.addAdditionalAttribute(ContentModel.PROP_CREATED, "[" + strCreatedDate + " TO " + strCreatedDateTo + "]");
          }
          if (this.modifiedDateChecked == true)
          {
-            String strModifiedDate = Conversion.dateToXmlDate(this.modifiedDateFrom).substring(0, 10);
-            String strModifiedDateTo = Conversion.dateToXmlDate(this.modifiedDateTo).substring(0, 10);
+            String strModifiedDate = ISO8601DateFormat.format(this.modifiedDateFrom).substring(0, 10);
+            String strModifiedDateTo = ISO8601DateFormat.format(this.modifiedDateTo).substring(0, 10);
             search.addAdditionalAttribute(ContentModel.PROP_MODIFIED, "[" + strModifiedDate + " TO " + strModifiedDateTo + "]");
          }
          

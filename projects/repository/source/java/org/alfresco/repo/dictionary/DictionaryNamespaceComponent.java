@@ -80,5 +80,25 @@ public class DictionaryNamespaceComponent implements NamespaceService
     {
         return namespaceDAO.getPrefixes(namespaceURI);
     }
+
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.service.namespace.NamespaceService#registerNamespace(java.lang.String, java.lang.String)
+     */
+    public void registerNamespace(String prefix, String uri)
+    {
+        // TODO:
+        throw new UnsupportedOperationException();        
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.namespace.NamespaceService#registerNamespace(java.lang.String, java.lang.String)
+     */
+    public void unregisterNamespace(String prefix)
+    {
+        // TODO:
+        throw new UnsupportedOperationException();        
+    }
     
 }

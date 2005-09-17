@@ -119,7 +119,7 @@ public class QueryCollectionImpl implements QueryCollection
                     Element uriElement = nsElement.element(URI.getName());
                     if((prefixElement != null) && (nsElement != null))
                     {
-                        dnpr.addDynamicNamespace(prefixElement.getText(), uriElement.getText());
+                        dnpr.registerNamespace(prefixElement.getText(), uriElement.getText());
                     }
                 }
             }

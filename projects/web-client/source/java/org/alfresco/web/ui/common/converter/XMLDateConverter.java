@@ -22,7 +22,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.DateTimeConverter;
 
-import org.alfresco.util.Conversion;
+import org.alfresco.util.ISO8601DateFormat;
 
 /**
  * Converter class to convert an XML date representation into a Date
@@ -41,7 +41,7 @@ public class XMLDateConverter extends DateTimeConverter
     */
    public Object getAsObject(FacesContext context, UIComponent component, String value)
    {
-      return Conversion.dateFromXmlDate(value);
+      return ISO8601DateFormat.parse(value);
    }
 
    /**
@@ -53,7 +53,7 @@ public class XMLDateConverter extends DateTimeConverter
       
       if (value instanceof String)
       {
-         Date date = Conversion.dateFromXmlDate((String)value);
+         Date date = ISO8601DateFormat.parse((String)value);
          str = super.getAsString(context, component, date);
       }
       else

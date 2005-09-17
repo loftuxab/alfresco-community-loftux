@@ -21,6 +21,21 @@
             <property name="jcrtest:booleanProp">
                <type>d:boolean</type>
             </property>
+            <property name="jcrtest:dateProp">
+               <type>d:date</type>
+            </property>
+            <property name="jcrtest:doubleProp">
+               <type>d:double</type>
+            </property>
+            <property name="jcrtest:longProp">
+               <type>d:long</type>
+            </property>
+            <property name="jcrtest:nameProp">
+               <type>d:qname</type>
+            </property>
+            <property name="jcrtest:stringProp">
+               <type>d:text</type>
+            </property>
             <property name="jcrtest:multiProp">
                <type>d:text</type>
                <multiple>true</multiple>

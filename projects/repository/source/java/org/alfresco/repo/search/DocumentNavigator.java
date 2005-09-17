@@ -27,7 +27,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -150,7 +150,7 @@ public class DocumentNavigator extends DefaultNavigator
     {
         // Only the first property of multi-valued properties is displayed
         // A multivalue attribute makes no sense in the xml world
-        return ValueConverter.convert(String.class, ((Property) o).value);
+        return DefaultTypeConverter.INSTANCE.convert(String.class, ((Property) o).value);
     }
 
     public String getCommentStringValue(Object o)

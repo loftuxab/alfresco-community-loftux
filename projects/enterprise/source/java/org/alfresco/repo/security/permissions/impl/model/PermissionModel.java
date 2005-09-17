@@ -177,7 +177,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
             for (Iterator it = namespacesElement.elementIterator(NAMESPACE); it.hasNext(); /**/)
             {
                 Element nameSpaceElement = (Element) it.next();
-                nspr.addDynamicNamespace(nameSpaceElement.attributeValue(NAMESPACE_PREFIX), nameSpaceElement
+                nspr.registerNamespace(nameSpaceElement.attributeValue(NAMESPACE_PREFIX), nameSpaceElement
                         .attributeValue(NAMESPACE_URI));
             }
         }

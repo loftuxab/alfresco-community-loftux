@@ -30,7 +30,7 @@ import java.util.Set;
  * @author andyh
  * 
  */
-public class DynamicNamespacePrefixResolver implements NamespacePrefixResolver
+public class DynamicNamespacePrefixResolver implements NamespaceService
 {
 
     /**
@@ -60,7 +60,7 @@ public class DynamicNamespacePrefixResolver implements NamespacePrefixResolver
      * @param prefix
      * @param uri
      */
-    public void addDynamicNamespace(String prefix, String uri)
+    public void registerNamespace(String prefix, String uri)
     {
         map.put(prefix, uri);
     }
@@ -70,7 +70,7 @@ public class DynamicNamespacePrefixResolver implements NamespacePrefixResolver
      * 
      * @param prefix
      */
-    public void removeDynamicNamespace(String prefix)
+    public void unregisterNamespace(String prefix)
     {
         map.remove(prefix);
     }
@@ -123,5 +123,15 @@ public class DynamicNamespacePrefixResolver implements NamespacePrefixResolver
        return prefixes;
     }
     
+    public Collection<String> getURIs()
+    {
+       Set<String> uris = new HashSet<String>();
+       if(delegate != null)
+       {
+          uris.addAll(delegate.getURIs());
+       }
+       uris.addAll(map.keySet());
+       return uris;
+    }
     
 }

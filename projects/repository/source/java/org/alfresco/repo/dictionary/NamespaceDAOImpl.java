@@ -25,7 +25,9 @@ import java.util.List;
 import org.alfresco.service.namespace.NamespaceException;
 
 /**
- * Simple in-memory namespace DAO 
+ * Simple in-memory namespace DAO
+ * 
+ * TODO: Remove the many to one mapping of prefixes to URIs
  */
 public class NamespaceDAOImpl implements NamespaceDAO
 {
@@ -34,9 +36,6 @@ public class NamespaceDAOImpl implements NamespaceDAO
     private HashMap<String, String> prefixes = new HashMap<String, String>();
 
     
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.dictionary.impl.NamespaceDAO#getURIs()
-     */
     public Collection<String> getURIs()
     {
         return Collections.unmodifiableCollection(uris);

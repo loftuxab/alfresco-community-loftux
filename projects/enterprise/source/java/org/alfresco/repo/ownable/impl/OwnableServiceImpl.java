@@ -23,7 +23,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.ownable.OwnableService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.InitializingBean;
@@ -74,11 +74,11 @@ public class OwnableServiceImpl implements OwnableService, InitializingBean
         //
         if(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_OWNABLE))
         {
-           userName = ValueConverter.convert(String.class, nodeService.getProperty(nodeRef, ContentModel.PROP_OWNER));
+           userName = DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(nodeRef, ContentModel.PROP_OWNER));
         }
         else if(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_AUDITABLE))
         {
-            userName = ValueConverter.convert(String.class, nodeService.getProperty(nodeRef, ContentModel.PROP_CREATOR));
+            userName = DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(nodeRef, ContentModel.PROP_CREATOR));
         }
         return userName;
     }

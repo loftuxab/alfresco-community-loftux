@@ -263,6 +263,28 @@ public final class QName implements QNamePattern, Serializable
 
 
     /**
+     * Gets a prefix resolved version of this QName
+     * 
+     * @param resolver  namespace prefix resolver
+     * @return QName with prefix resolved
+     */
+    public QName getPrefixedQName(NamespacePrefixResolver resolver)
+    {
+        Collection<String> prefixes = resolver.getPrefixes(namespaceURI);
+        if (prefixes.size() == 0)
+        {
+            throw new NamespaceException("A namespace prefix is not registered for uri " + namespaceURI);
+        }
+        String resolvedPrefix = prefixes.iterator().next();
+        if (prefix != null && prefix.equals(resolvedPrefix))
+        {
+            return this;
+        }
+        return new QName(namespaceURI, localName, resolvedPrefix);        
+    }
+    
+    
+    /**
      * Two QNames are equal only when both their name and namespace match.
      * 
      * Note: The prefix is ignored during the comparison.

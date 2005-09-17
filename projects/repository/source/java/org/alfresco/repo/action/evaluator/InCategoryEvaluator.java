@@ -30,7 +30,7 @@ import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -125,7 +125,7 @@ public class InCategoryEvaluator extends ActionConditionEvaluatorAbstractBase
 				{
 					// Check to see if the category value is in the list of currently set category values
 					Serializable value = this.nodeService.getProperty(actionedUponNodeRef, categoryProperty);
-                    Collection<NodeRef> actualCategories = ValueConverter.getCollection(NodeRef.class, value);
+                    Collection<NodeRef> actualCategories = DefaultTypeConverter.INSTANCE.getCollection(NodeRef.class, value);
 					for (NodeRef nodeRef : actualCategories)
                     {
                         if (nodeRef.equals(categoryValue) == true)

@@ -36,7 +36,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -97,7 +97,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         }
 
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-        String password = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "password",
+        String password = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(QName.createQName("usr", "password",
                 namespacePrefixResolver)));
         // String salt = ValueConverter.convert(String.class,
         // properties.get(QName.createQName("usr", "salt",
@@ -226,7 +226,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
 
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
 
-        String salt = ValueConverter.convert(String.class, properties.get(QName.createQName("usr", "salt",
+        String salt = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(QName.createQName("usr", "salt",
                 namespacePrefixResolver)));
 
         return salt;

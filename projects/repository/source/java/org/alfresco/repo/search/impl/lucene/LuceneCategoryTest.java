@@ -607,10 +607,10 @@ public class LuceneCategoryTest extends TestCase
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
     {
         DynamicNamespacePrefixResolver nspr = new DynamicNamespacePrefixResolver(null);
-        nspr.addDynamicNamespace(NamespaceService.CONTENT_MODEL_PREFIX, NamespaceService.CONTENT_MODEL_1_0_URI);
-        nspr.addDynamicNamespace("namespace", "namespace");
-        nspr.addDynamicNamespace("test", TEST_NAMESPACE);
-        nspr.addDynamicNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
+        nspr.registerNamespace(NamespaceService.CONTENT_MODEL_PREFIX, NamespaceService.CONTENT_MODEL_1_0_URI);
+        nspr.registerNamespace("namespace", "namespace");
+        nspr.registerNamespace("test", TEST_NAMESPACE);
+        nspr.registerNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;
     }
     

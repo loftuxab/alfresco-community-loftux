@@ -16,8 +16,6 @@
  */
 package org.alfresco.repo.dictionary;
 
-import java.util.Collection;
-
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 
 
@@ -31,16 +29,6 @@ import org.alfresco.service.namespace.NamespacePrefixResolver;
 public interface NamespaceDAO extends NamespacePrefixResolver
 {
     
-    /**
-     * @return all registered URIs
-     */
-    public Collection<String> getURIs();
-
-    /**
-     * @return  all registered prefixes
-     */
-    public Collection<String> getPrefixes();
-
     /**
      * Add a namespace URI
      * 

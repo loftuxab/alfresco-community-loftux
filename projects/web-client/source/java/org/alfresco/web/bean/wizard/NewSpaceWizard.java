@@ -206,7 +206,7 @@ public class NewSpaceWizard extends AbstractWizardBean
             {
                // get hold of the Templates node
                DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
-               namespacePrefixResolver.addDynamicNamespace(NamespaceService.APP_MODEL_PREFIX, NamespaceService.APP_MODEL_1_0_URI);
+               namespacePrefixResolver.registerNamespace(NamespaceService.APP_MODEL_PREFIX, NamespaceService.APP_MODEL_1_0_URI);
                
                String actNs = NamespaceService.APP_MODEL_PREFIX;
                String xpath = actNs + ":" + 

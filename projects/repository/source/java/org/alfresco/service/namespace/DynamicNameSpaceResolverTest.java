@@ -29,12 +29,12 @@ public class DynamicNameSpaceResolverTest extends TestCase
     public void testOne()
     {
         DynamicNamespacePrefixResolver dnpr = new DynamicNamespacePrefixResolver(null);
-        dnpr.addDynamicNamespace("one", "http:/namespace/one");
-        dnpr.addDynamicNamespace("two", "http:/namespace/two");
-        dnpr.addDynamicNamespace("three", "http:/namespace/three");
-        dnpr.addDynamicNamespace("oneagain", "http:/namespace/one");
-        dnpr.addDynamicNamespace("four", "http:/namespace/one");
-        dnpr.addDynamicNamespace("four", "http:/namespace/four");
+        dnpr.registerNamespace("one", "http:/namespace/one");
+        dnpr.registerNamespace("two", "http:/namespace/two");
+        dnpr.registerNamespace("three", "http:/namespace/three");
+        dnpr.registerNamespace("oneagain", "http:/namespace/one");
+        dnpr.registerNamespace("four", "http:/namespace/one");
+        dnpr.registerNamespace("four", "http:/namespace/four");
         
         assertEquals("http:/namespace/one", dnpr.getNamespaceURI("one"));
         assertEquals("http:/namespace/two", dnpr.getNamespaceURI("two"));
@@ -43,7 +43,7 @@ public class DynamicNameSpaceResolverTest extends TestCase
         assertEquals("http:/namespace/four", dnpr.getNamespaceURI("four"));
         assertEquals(null, dnpr.getNamespaceURI("five"));
         
-        dnpr.removeDynamicNamespace("four");
+        dnpr.unregisterNamespace("four");
         assertEquals(null, dnpr.getNamespaceURI("four"));
         
         assertEquals(0, dnpr.getPrefixes("http:/namespace/four").size());
@@ -57,24 +57,24 @@ public class DynamicNameSpaceResolverTest extends TestCase
     public void testTwo()
     {
         DynamicNamespacePrefixResolver dnpr1 = new DynamicNamespacePrefixResolver(null);
-        dnpr1.addDynamicNamespace("one", "http:/namespace/one");
-        dnpr1.addDynamicNamespace("two", "http:/namespace/two");
-        dnpr1.addDynamicNamespace("three", "http:/namespace/three");
-        dnpr1.addDynamicNamespace("oneagain", "http:/namespace/one");
-        dnpr1.addDynamicNamespace("four", "http:/namespace/one");
-        dnpr1.addDynamicNamespace("four", "http:/namespace/four");
-        dnpr1.addDynamicNamespace("five", "http:/namespace/five");
-        dnpr1.addDynamicNamespace("six", "http:/namespace/six");
+        dnpr1.registerNamespace("one", "http:/namespace/one");
+        dnpr1.registerNamespace("two", "http:/namespace/two");
+        dnpr1.registerNamespace("three", "http:/namespace/three");
+        dnpr1.registerNamespace("oneagain", "http:/namespace/one");
+        dnpr1.registerNamespace("four", "http:/namespace/one");
+        dnpr1.registerNamespace("four", "http:/namespace/four");
+        dnpr1.registerNamespace("five", "http:/namespace/five");
+        dnpr1.registerNamespace("six", "http:/namespace/six");
         
         DynamicNamespacePrefixResolver dnpr2 = new DynamicNamespacePrefixResolver(dnpr1);
-        dnpr2.addDynamicNamespace("a", "http:/namespace/one");
-        dnpr2.addDynamicNamespace("b", "http:/namespace/two");
-        dnpr2.addDynamicNamespace("c", "http:/namespace/three");
-        dnpr2.addDynamicNamespace("d", "http:/namespace/one");
-        dnpr2.addDynamicNamespace("e", "http:/namespace/one");
-        dnpr2.addDynamicNamespace("f", "http:/namespace/four");
-        dnpr2.addDynamicNamespace("five", "http:/namespace/one");
-        dnpr2.addDynamicNamespace("six", "http:/namespace/seven");
+        dnpr2.registerNamespace("a", "http:/namespace/one");
+        dnpr2.registerNamespace("b", "http:/namespace/two");
+        dnpr2.registerNamespace("c", "http:/namespace/three");
+        dnpr2.registerNamespace("d", "http:/namespace/one");
+        dnpr2.registerNamespace("e", "http:/namespace/one");
+        dnpr2.registerNamespace("f", "http:/namespace/four");
+        dnpr2.registerNamespace("five", "http:/namespace/one");
+        dnpr2.registerNamespace("six", "http:/namespace/seven");
         
         assertEquals("http:/namespace/one", dnpr2.getNamespaceURI("one"));
         assertEquals("http:/namespace/two", dnpr2.getNamespaceURI("two"));
@@ -82,7 +82,7 @@ public class DynamicNameSpaceResolverTest extends TestCase
         assertEquals("http:/namespace/one", dnpr2.getNamespaceURI("oneagain"));
         assertEquals("http:/namespace/four", dnpr2.getNamespaceURI("four"));
         assertEquals("http:/namespace/one", dnpr2.getNamespaceURI("five"));
-        dnpr2.removeDynamicNamespace("five");
+        dnpr2.unregisterNamespace("five");
         
         assertEquals("http:/namespace/five", dnpr2.getNamespaceURI("five"));
         assertEquals("http:/namespace/one", dnpr2.getNamespaceURI("a"));

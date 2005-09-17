@@ -53,7 +53,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
@@ -1332,7 +1332,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         if (value != null)
         {
             // convert value to String
-            for (String strValue : ValueConverter.getCollection(String.class, value))
+            for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
             {
                 if (strValue != null)
                 {
@@ -1410,7 +1410,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 {
                     if (propDef.getDataType().getName().equals(DataTypeDefinition.CATEGORY))
                     {
-                        for (NodeRef catRef : ValueConverter.getCollection(NodeRef.class, properties.get(propDef.getName())))
+                        for (NodeRef catRef : DefaultTypeConverter.INSTANCE.getCollection(NodeRef.class, properties.get(propDef.getName())))
                         {
                             if (catRef != null)
                             {
@@ -1597,7 +1597,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         if (value != null)
                         {
                             // convert value to String
-                            for (String strValue : ValueConverter.getCollection(String.class, value))
+                            for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
                             {
 
                                 // TODO: Need converter here

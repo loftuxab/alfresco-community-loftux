@@ -16,8 +16,6 @@
  */
 package org.alfresco.service.namespace;
 
-import java.util.Collection;
-
 
 
 /**
@@ -74,10 +72,19 @@ public interface NamespaceService extends NamespacePrefixResolver
     
     
     /**
-     * Gets all registered Namespace URIs
+     * Register a prefix for namespace uri. 
      * 
-     * @return collection of all registered namespace URIs
+     * @param prefix
+     * @param uri
      */
-    public Collection<String> getURIs();
+    public void registerNamespace(String prefix, String uri);
+    
+
+    /**
+     * Unregister a prefix.
+     * 
+     * @param prefix
+     */
+    public void unregisterNamespace(String prefix);
     
 }

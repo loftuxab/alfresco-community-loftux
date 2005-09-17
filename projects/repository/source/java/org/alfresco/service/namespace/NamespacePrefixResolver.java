@@ -52,4 +52,12 @@ public interface NamespacePrefixResolver
      * @return collection of all registered namespace prefixes
      */
     Collection<String> getPrefixes();
+
+    /**
+     * Gets all registered Uris
+     * 
+     * @return collection of all registered namespace uris
+     */
+    Collection<String> getURIs();
+
 }

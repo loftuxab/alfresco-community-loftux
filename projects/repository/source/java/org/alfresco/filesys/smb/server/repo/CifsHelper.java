@@ -42,7 +42,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -205,7 +205,7 @@ public class CifsHelper
             long size = 0L;
             if (propSize != null)       // it can be null if no content has been uploaded yet
             {
-                size = ValueConverter.longValue(propSize);
+                size = DefaultTypeConverter.INSTANCE.longValue(propSize);
             }
             fileInfo.setSize(size);
             
@@ -219,14 +219,14 @@ public class CifsHelper
         Object propCreated = nodeProperties.get(ContentModel.PROP_CREATED);
         if (propCreated != null)
         {
-            long created = ValueConverter.longValue(propCreated);
+            long created = DefaultTypeConverter.INSTANCE.longValue(propCreated);
             fileInfo.setCreationDateTime(created);
         }
         // modified
         Object propModified = nodeProperties.get(ContentModel.PROP_MODIFIED);
         if (propModified != null)
         {
-            long modified = ValueConverter.longValue(propModified);
+            long modified = DefaultTypeConverter.INSTANCE.longValue(propModified);
             fileInfo.setModifyDateTime(modified);
         }
         // name (only relevant if the path had something on it)
@@ -235,7 +235,7 @@ public class CifsHelper
             Object propName = nodeProperties.get(ContentModel.PROP_NAME);
             if (propName != null)
             {
-                String name = ValueConverter.convert(String.class, propName);
+                String name = DefaultTypeConverter.INSTANCE.convert(String.class, propName);
                 fileInfo.setFileName(name);
             }
         }

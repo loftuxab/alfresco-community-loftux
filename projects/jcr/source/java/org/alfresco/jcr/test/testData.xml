@@ -8,6 +8,11 @@
 	<jcrtest:testtype view:childName="testdata">
 	   <!-- Properties for XXXPropertyTests -->
 	   <jcrtest:booleanProp>true</jcrtest:booleanProp>
+	   <jcrtest:dateProp>2005-09-16T18:20:05.034Z</jcrtest:dateProp>
+	   <jcrtest:doubleProp>3.141592653589793</jcrtest:doubleProp>
+	   <jcrtest:longProp>90834953485278298</jcrtest:longProp>
+	   <jcrtest:nameProp>{http://www.alfresco.org/test/jcr/1.0}test</jcrtest:nameProp>
+	   <jcrtest:stringProp>2005-09-16T20:20:05.555+01:00</jcrtest:stringProp>
 
        <jcrtest:children>
           <jcrtest:testtype view:childName="firstChild"/>

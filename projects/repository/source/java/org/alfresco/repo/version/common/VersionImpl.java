@@ -22,8 +22,8 @@ import java.util.Map;
 
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter.Converter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.repository.datatype.TypeConverter;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionServiceException;
 import org.alfresco.service.cmr.version.VersionType;
@@ -167,10 +167,10 @@ public class VersionImpl implements Version
      */
     static
     {
-        ValueConverter.addConverter(
+        DefaultTypeConverter.INSTANCE.addConverter(
                 String.class, 
                 VersionType.class, 
-                new Converter<String, VersionType>()
+                new TypeConverter.Converter<String, VersionType>()
                 {
                     public VersionType convert(String source)
                     {
@@ -179,10 +179,10 @@ public class VersionImpl implements Version
         
                 });
         
-        ValueConverter.addConverter(
+        DefaultTypeConverter.INSTANCE.addConverter(
                 VersionType.class,
                 String.class,
-                new Converter<VersionType, String>()
+                new TypeConverter.Converter<VersionType, String>()
                 {
                     public String convert(VersionType source)
                     {

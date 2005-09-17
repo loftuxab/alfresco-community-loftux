@@ -181,11 +181,11 @@ import org.apache.commons.logging.LogFactory;
             {
                 throw new NamespaceException("URI " + uri + " cannot be imported as it is not defined (with prefix " + imported.getPrefix());
             }
-            prefixResolver.addDynamicNamespace(imported.getPrefix(), uri);
+            prefixResolver.registerNamespace(imported.getPrefix(), uri);
         }
         for (M2Namespace defined : model.getNamespaces())
         {
-            prefixResolver.addDynamicNamespace(defined.getPrefix(), defined.getUri());
+            prefixResolver.registerNamespace(defined.getPrefix(), defined.getUri());
         }
         return prefixResolver;
     }

@@ -266,6 +266,14 @@ public class QNameTest extends TestCase
             return prefixes;
         }
         
+        public Collection<String> getURIs()
+        {
+            HashSet<String> uris = new HashSet<String>();
+            uris.add(NamespaceService.DEFAULT_URI);
+            uris.add(NamespaceService.ALFRESCO_URI);
+            return uris;
+        }
+        
     }
     
 }

@@ -40,7 +40,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImportStreamHandler;
 import org.alfresco.service.cmr.view.ImporterException;
@@ -470,12 +470,12 @@ public class ImporterComponent
                         String strValue = bindPlaceHolder(collectionValue, configuration);
                         boundCollection.add(strValue);
                     }
-                    value = (Serializable)ValueConverter.convert(propDef.getDataType(), boundCollection);
+                    value = (Serializable)DefaultTypeConverter.INSTANCE.convert(propDef.getDataType(), boundCollection);
                 }
                 else
                 {
                     value = bindPlaceHolder((String)value, configuration);
-                    value = (Serializable)ValueConverter.convert(propDef.getDataType(), value);
+                    value = (Serializable)DefaultTypeConverter.INSTANCE.convert(propDef.getDataType(), value);
                 }
                 boundProperties.put(property, value);
             }

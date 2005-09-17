@@ -41,9 +41,11 @@ import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.namespace.QName;
 
 
@@ -206,7 +208,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public String getString() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.stringValue(getPropertyValue());
+        return session.getTypeConverter().stringValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -215,7 +217,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public InputStream getStream() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.streamValue(getPropertyValue());
+        return session.getTypeConverter().streamValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -224,7 +226,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public long getLong() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.longValue(getPropertyValue());
+        return session.getTypeConverter().longValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -233,7 +235,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public double getDouble() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.doubleValue(getPropertyValue());
+        return session.getTypeConverter().doubleValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -242,7 +244,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public Calendar getDate() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.dateValue(getPropertyValue());
+        return session.getTypeConverter().dateValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -251,7 +253,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public boolean getBoolean() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.booleanValue(getPropertyValue());
+        return session.getTypeConverter().booleanValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -260,7 +262,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public Node getNode() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.referenceValue(session, getPropertyValue());
+        return session.getTypeConverter().referenceValue(session, getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -269,7 +271,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public long getLength() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return JCRValue.getLength(getPropertyValue());
+        return getPropertyLength(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -283,7 +285,7 @@ public class PropertyImpl extends ItemImpl implements Property
         int i = 0;
         for (Object value : values)
         {
-            lengths[i++] = JCRValue.getLength(value);
+            lengths[i++] = getPropertyLength(value);
         }
         return lengths;
     }
@@ -458,6 +460,31 @@ public class PropertyImpl extends ItemImpl implements Property
         return value;
     }
     
+    /**
+     * Get Length of a Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws RepositoryException
+     */
+    public static long getPropertyLength(Object value) throws ValueFormatException, RepositoryException
+    {
+        // Handle streams
+        if (value instanceof ContentReader)
+        {
+            return ((ContentReader)value).getLength();
+        }
+        if (value instanceof InputStream)
+        {
+            return -1;
+        }
+        
+        // Handle all other data types by converting to string
+        String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
+        return strValue.length();
+    }
+        
     /**
      * Checks that this property is single valued.
      * 

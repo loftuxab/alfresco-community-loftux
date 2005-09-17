@@ -78,7 +78,7 @@ public class ValueImpl implements Value
     public String getString() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        String value = JCRValue.stringValue(getValue());
+        String value = session.getTypeConverter().stringValue(getValue());
         enterState(ValueState.Value);
         return value;
     }
@@ -91,7 +91,7 @@ public class ValueImpl implements Value
         isValidState(ValueState.Stream);
         if (stream == null)
         {
-            stream = JCRValue.streamValue(value);
+            stream = session.getTypeConverter().streamValue(value);
         }
         enterState(ValueState.Stream);
         return stream;
@@ -103,7 +103,7 @@ public class ValueImpl implements Value
     public long getLong() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        long value = JCRValue.longValue(getValue());
+        long value = session.getTypeConverter().longValue(getValue());
         enterState(ValueState.Value);
         return value;
     }
@@ -114,7 +114,7 @@ public class ValueImpl implements Value
     public double getDouble() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        double value = JCRValue.doubleValue(getValue());
+        double value = session.getTypeConverter().doubleValue(getValue());
         enterState(ValueState.Value);
         return value;
     }
@@ -125,7 +125,7 @@ public class ValueImpl implements Value
     public Calendar getDate() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        Calendar value = JCRValue.dateValue(getValue());
+        Calendar value = session.getTypeConverter().dateValue(getValue());
         enterState(ValueState.Value);
         return value;
     }
@@ -136,7 +136,7 @@ public class ValueImpl implements Value
     public boolean getBoolean() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        boolean value = JCRValue.booleanValue(getValue());
+        boolean value = session.getTypeConverter().booleanValue(getValue());
         enterState(ValueState.Value);
         return value;
     }

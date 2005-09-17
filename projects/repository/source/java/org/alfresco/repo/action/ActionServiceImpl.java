@@ -446,7 +446,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
 		{
 			DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
-			namespacePrefixResolver.addDynamicNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+			namespacePrefixResolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
 			
 			List<NodeRef> nodeRefs = searchService.selectNodes(
 					getSavedActionFolderRef(nodeRef),

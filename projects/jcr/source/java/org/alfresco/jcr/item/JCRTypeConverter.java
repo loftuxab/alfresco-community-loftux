@@ -17,18 +17,17 @@
 package org.alfresco.jcr.item;
 
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.session.SessionImpl;
-import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.datatype.ValueConverter;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.repository.datatype.TypeConverter;
+import org.alfresco.service.namespace.QName;
 
 
 /**
@@ -37,34 +36,21 @@ import org.alfresco.service.cmr.repository.datatype.ValueConverter;
  * @author David Caruana
  *
  */
-public class JCRValue
+public class JCRTypeConverter
 {
-
+    private TypeConverter jcrTypeConverter;
+    
     /**
-     * Get Length of a Value
+     * Construct 
      * 
-     * @param value
-     * @return
-     * @throws ValueFormatException
-     * @throws RepositoryException
+     * @param session
      */
-    public static long getLength(Object value) throws ValueFormatException, RepositoryException
+    public JCRTypeConverter(SessionImpl session)
     {
-        // Handle streams
-        if (value instanceof ContentReader)
-        {
-            return ((ContentReader)value).getLength();
-        }
-        if (value instanceof InputStream)
-        {
-            return -1;
-        }
-        
-        // Handle all other data types by converting to string
-        String strValue = (String)ValueConverter.convert(String.class, value);
-        return strValue.length();
+        this.jcrTypeConverter = new SessionTypeConverter(session);
     }
     
+
     /**
      * Convert to JCR Reference Value
      * 
@@ -74,24 +60,18 @@ public class JCRValue
      * @throws ValueFormatException
      * @throws RepositoryException
      */
-    public static NodeImpl referenceValue(SessionImpl session, Object value) throws ValueFormatException, RepositoryException
+    public NodeImpl referenceValue(SessionImpl session, Object value) throws ValueFormatException, RepositoryException
     {
-        if (value instanceof NodeRef)
+        try
         {
-            return new NodeImpl(session, (NodeRef)value);
+            NodeRef nodeRef = (NodeRef)jcrTypeConverter.convert(NodeRef.class, value);
+            return new NodeImpl(session, nodeRef);
         }
-        else if (value instanceof String)
+        catch(Exception e)
         {
-            try
-            {
-                return new NodeImpl(session, new NodeRef((String)value));
-            }
-            catch(AlfrescoRuntimeException e)
-            {
-                throw new ValueFormatException("Node Reference " + value + " is invalid.");
-            }
+            translateException(e);
+            throw new RepositoryException(e);
         }
-        throw new ValueFormatException("Cannot convert value to Reference.");
     }
         
     /**
@@ -102,11 +82,11 @@ public class JCRValue
      * @throws ValueFormatException
      * @throws RepositoryException
      */
-    public static String stringValue(Object value) throws ValueFormatException, RepositoryException 
+    public String stringValue(Object value) throws ValueFormatException, RepositoryException 
     {
         try
         {
-            return (String)ValueConverter.convert(String.class, value);
+            return (String)jcrTypeConverter.convert(String.class, value);
         }
         catch(Exception e)
         {
@@ -123,11 +103,11 @@ public class JCRValue
      * @throws IllegalStateException
      * @throws RepositoryException
      */
-    public static InputStream streamValue(Object value) throws IllegalStateException, RepositoryException
+    public InputStream streamValue(Object value) throws IllegalStateException, RepositoryException
     {
         try
         {
-            return (InputStream)ValueConverter.convert(InputStream.class, value);
+            return (InputStream)jcrTypeConverter.convert(InputStream.class, value);
         }
         catch(Exception e)
         {
@@ -145,11 +125,11 @@ public class JCRValue
      * @throws IllegalStateException
      * @throws RepositoryException
      */
-    public static long longValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
+    public long longValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try
         {
-            return ValueConverter.longValue(value);
+            return jcrTypeConverter.longValue(value);
         }
         catch(Exception e)
         {
@@ -167,11 +147,11 @@ public class JCRValue
      * @throws IllegalStateException
      * @throws RepositoryException
      */
-    public static double doubleValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
+    public double doubleValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try
         {
-            return ValueConverter.doubleValue(value);
+            return jcrTypeConverter.doubleValue(value);
         }
         catch(Exception e)
         {
@@ -189,11 +169,11 @@ public class JCRValue
      * @throws IllegalStateException
      * @throws RepositoryException
      */
-    public static Calendar dateValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
+    public Calendar dateValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try
         {
-            Date date = (Date)ValueConverter.convert(Date.class, value);
+            Date date = (Date)jcrTypeConverter.convert(Date.class, value);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             return calendar;
@@ -214,11 +194,11 @@ public class JCRValue
      * @throws IllegalStateException
      * @throws RepositoryException
      */
-    public static boolean booleanValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
+    public boolean booleanValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
         try
         {
-            return ValueConverter.booleanValue(value);
+            return jcrTypeConverter.booleanValue(value);
         }
         catch(Exception e)
         {
@@ -236,10 +216,57 @@ public class JCRValue
      */
     private static void translateException(Exception e) throws ValueFormatException 
     {
-        if (e instanceof UnsupportedOperationException)
+        if (e instanceof UnsupportedOperationException ||
+            e instanceof NumberFormatException)
         {
             throw new ValueFormatException(e);
         }
     }
 
+
+    /**
+     * Data Type Converter that takes into account JCR session context
+     * 
+     * @author David Caruana
+     */
+    private static class SessionTypeConverter extends TypeConverter
+    {
+        private SessionImpl session;
+        
+        /**
+         * Construct
+         * 
+         * @param session  session context
+         */
+        public SessionTypeConverter(SessionImpl session)
+        {
+            this.session = session;
+            
+            /**
+             * Converter for translating QName to string as prefix:localName 
+             */
+            addConverter(QName.class, String.class, new TypeConverter.Converter<QName, String>()
+            {
+                public String convert(QName source)
+                {
+                    return source.toPrefixString(SessionTypeConverter.this.session.getNamespaceResolver());
+                }
+            });
+        }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.repository.datatype.TypeConverter#getConverter(java.lang.Class, java.lang.Class)
+         */
+        @Override
+        public <F, T> Converter getConverter(Class<F> source, Class<T> dest)
+        {
+            Converter converter = super.getConverter(source, dest);
+            if (converter == null)
+            {
+                converter = DefaultTypeConverter.INSTANCE.getConverter(source, dest);
+            }
+            return converter;
+        }
+    }
+    
 }
