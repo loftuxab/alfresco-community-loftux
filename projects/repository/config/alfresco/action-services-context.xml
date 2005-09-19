@@ -96,6 +96,15 @@
         </property>
     </bean>
 
+	<bean id="has-aspect" class="org.alfresco.repo.action.evaluator.HasAspectEvaluator" parent="action-condition-evaluator">
+        <property name="publicCondition">
+        	<value>false</value>
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+    </bean>
+
     <!-- Actions -->
 
     <bean id="action-executer" init-method="init">
