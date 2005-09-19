@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
@@ -88,6 +89,9 @@ public class NewUserWizard extends AbstractWizardBean
    /** PermissionService bean reference */
    private PermissionService permissionService;
    
+   /** PersonService bean reference */
+   private PersonService personService;
+   
    /** action context */
    private Node person = null;
    
@@ -120,6 +124,15 @@ public class NewUserWizard extends AbstractWizardBean
    public void setPermissionService(PermissionService permissionService)
    {
       this.permissionService = permissionService;
+   }
+   
+   /**
+    * Set the person service.
+    * @param personService
+    */
+   public void setPersonService(PersonService personService)
+   {
+       this.personService = personService;
    }
    
    /**
@@ -394,13 +407,8 @@ public class NewUserWizard extends AbstractWizardBean
             
             // create the node to represent the Person
             String assocName = QName.createValidLocalName(this.userName);
-            NodeRef newPerson = this.nodeService.createNode(
-                  peopleNode,
-                  ContentModel.ASSOC_CHILDREN,
-                  ContentModel.TYPE_PERSON,
-                  ContentModel.TYPE_PERSON,
-                  props).getChildRef();
             
+            NodeRef newPerson = this.personService.createPerson(props);
            
             this.permissionService.setPermission(newPerson, this.userName, permissionService.getAllPermission(), true);
             
@@ -796,14 +804,15 @@ public class NewUserWizard extends AbstractWizardBean
          uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
          this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
          
-         // apply the default permissions model
-         // first set no inheritance so we can setup new permissions
-         this.permissionService.setInheritParentPermissions(nodeRef, false);
+        
          // then we set maximium permissions to the owner of the space
          // so by default other users (except admin) will NOT have access to the space
          this.permissionService.setPermission(nodeRef, ContextListener.ADMIN, permissionService.getAllPermission(), true);
          this.permissionService.setPermission(nodeRef, this.userName, permissionService.getAllPermission(), true);
          this.permissionService.setPermission(nodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
+         
+         // now detach (if we did this first we could not set anhy permissions!)
+         this.permissionService.setInheritParentPermissions(nodeRef, false);
          
          // return the ID of the created space
          homeSpaceId = nodeRef.getId();

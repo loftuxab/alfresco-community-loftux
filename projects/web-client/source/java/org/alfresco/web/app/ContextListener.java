@@ -43,6 +43,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -181,53 +182,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             // This is required to allow authenticate() to succeed during
             // login
 
-            List<NodeRef> results = searchService.selectNodes(rootNodeRef, RepositoryAuthenticationDao.PEOPLE_FOLDER,
-                  null, namespaceService, false);
-            NodeRef typesNode = null;
-            if (results.size() == 0)
-            {
-
-               List<ChildAssociationRef> result = nodeService.getChildAssocs(rootNodeRef, QName.createQName("sys",
-                     "system", namespaceService));
-               NodeRef sysNode = null;
-               if (result.size() == 0)
-               {
-                  sysNode = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
-                        QName.createQName("sys", "system", namespaceService), ContentModel.TYPE_CONTAINER)
-                        .getChildRef();
-               }
-               else
-               {
-                  sysNode = result.get(0).getChildRef();
-               }
-               result = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people", namespaceService));
-
-               if (result.size() == 0)
-               {
-                  typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN,
-                        QName.createQName("sys", "people", namespaceService), ContentModel.TYPE_CONTAINER)
-                        .getChildRef();
-               }
-               else
-               {
-                  typesNode = result.get(0).getChildRef();
-               }
-
-            }
-            else
-            {
-               typesNode = results.get(0);
-            }
-
-            nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, // expecting
-                  // this
-                  // qname
-                  // path
-                  // in
-                  // the
-                  // authentication
-                  // methods
-                  ContentModel.TYPE_PERSON, props);
+            PersonService personService = (PersonService) ctx.getBean("personService");
+            personService.createPerson(props);
          }
 
          PermissionService permissionService = (PermissionService) ctx.getBean("permissionService");

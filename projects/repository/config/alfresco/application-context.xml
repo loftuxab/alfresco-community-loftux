@@ -679,21 +679,46 @@
              <property name="authenticationDao">
                 <ref bean="alfDaoImpl" />
              </property>
-             <property name="nodeService">
-                <ref bean="nodeService" />
-             </property>
-             <property name="searchService">
-                <ref bean="searchService" />
-             </property>
-             <property name="dictionaryService">
-                <ref bean="dictionaryService" />
-             </property>
-             <property name="namespacePrefixResolver">
-                <ref bean="namespaceService" />
-             </property>
            </bean>
         </property>
         <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+  
+  <bean id="personService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.service.cmr.security.PersonService</value>
+        </property>
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+    <bean id="personServiceImpl" class="org.alfresco.repo.security.person.PersonServiceImpl">
+       <property name="nodeService">
+          <ref bean="nodeService" />
+       </property>
+       <property name="searchService">
+          <ref bean="searchService" />
+       </property>
+       <property name="dictionaryService">
+          <ref bean="dictionaryService" />
+       </property>
+       <property name="namespacePrefixResolver">
+          <ref bean="namespaceService" />
+       </property>
+       <property name="storeUrl">
+          <value>workspace://SpacesStore</value>
+       </property>
+       <property name="createMissingPeople">
+         <value>false</value>
+       </property>
+    </bean>
+    </property>
+    <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
             </props>

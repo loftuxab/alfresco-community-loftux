@@ -16,8 +16,6 @@
  */
 package org.alfresco.repo.security.authentication;
 
-import java.util.List;
-
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.GrantedAuthorityImpl;
@@ -29,34 +27,11 @@ import net.sf.acegisecurity.context.security.SecureContextImpl;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.dao.User;
 
-import org.alfresco.repo.search.QueryParameterDefImpl;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.QueryParameterDefinition;
-import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
-import org.alfresco.service.namespace.QName;
-
 public class AuthenticationComponentImpl implements AuthenticationComponent
 {
     private static final String SYSTEM_USER_NAME = "System";
     
-    public static final String SYSTEM_FOLDER = "/sys:system";
-
-    public static final String PEOPLE_FOLDER = SYSTEM_FOLDER + "/sys:people";
-
     private MutableAuthenticationDao authenticationDao;
-
-    private NodeService nodeService;
-
-    private SearchService searchService;
-
-    private DictionaryService dictionaryService;
-
-    private NamespacePrefixResolver namespacePrefixResolver;
 
     public AuthenticationComponentImpl()
     {
@@ -106,22 +81,7 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
         return authentication;
     }
 
-    public NodeRef getPerson(StoreRef storeRef, String userName) throws AuthenticationException
-    {
-        NodeRef rootNode = nodeService.getRootNode(storeRef);
-        QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
-        DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
-        defs[0] = new QueryParameterDefImpl(QName.createQName("cm", "var", namespacePrefixResolver), text, true,
-                userName);
-        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER
-                + "/cm:person[@cm:userName = $cm:var ]", defs, namespacePrefixResolver, false);
-        if (results.size() != 1)
-        {
-            throw new AuthenticationException("No user for " + userName);
-        }
-        return results.get(0);
-    }
-
+ 
     public Authentication getCurrentAuthentication() throws AuthenticationException
     {
         Context context = ContextHolder.getContext();
@@ -135,26 +95,6 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
     public void setAuthenticationDao(MutableAuthenticationDao authenticationDao)
     {
         this.authenticationDao = authenticationDao;
-    }
-
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dictionaryService = dictionaryService;
-    }
-
-    public void setNamespacePrefixResolver(NamespacePrefixResolver namespacePrefixResolver)
-    {
-        this.namespacePrefixResolver = namespacePrefixResolver;
-    }
-
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-
-    public void setSearchService(SearchService searchService)
-    {
-        this.searchService = searchService;
     }
 
     public Authentication setSystemUserAsCurrentUser()

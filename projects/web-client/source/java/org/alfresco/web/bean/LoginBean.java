@@ -29,13 +29,13 @@ import javax.faces.validator.ValidatorException;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.servlet.AuthenticationHelper;
 import org.alfresco.web.bean.repository.Repository;
@@ -66,9 +66,9 @@ public class LoginBean
    /**
     * @param authenticationComponent    The AuthenticationComponent to set.
     */
-   public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+   public void setPersonService(PersonService personService)
    {
-      this.authenticationComponent = authenticationComponent;
+      this.personService = personService;
    }
 
    /**
@@ -257,9 +257,8 @@ public class LoginBean
             
             // setup User object and Home space ID
             User user = new User(this.username, this.authenticationService.getCurrentTicket(),
-                  authenticationComponent.getPerson(Repository.getStoreRef(), this.username));
-            String homeSpaceId = (String) this.nodeService.getProperty(authenticationComponent.getPerson(
-                  Repository.getStoreRef(), this.username), ContentModel.PROP_HOMEFOLDER);
+                  personService.getPerson(this.username));
+            String homeSpaceId = (String) this.nodeService.getProperty(personService.getPerson(this.username), ContentModel.PROP_HOMEFOLDER);
             NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
             
             // check that the home space node exists - else user cannot login
@@ -391,7 +390,7 @@ public class LoginBean
    private String language = null;
 
    /** AuthenticationComponent bean reference */
-   private AuthenticationComponent authenticationComponent;
+   private PersonService personService;
    
    /** AuthenticationService bean reference */
    private AuthenticationService authenticationService;

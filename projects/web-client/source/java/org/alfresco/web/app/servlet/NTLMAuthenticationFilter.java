@@ -46,8 +46,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -452,6 +452,7 @@ public class NTLMAuthenticationFilter implements Filter
                             WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(m_context);
                             AuthenticationService authService = (AuthenticationService)ctx.getBean("authenticationService");
                             AuthenticationComponent authComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
+                            PersonService personService = (PersonService)ctx.getBean("personService");
     
                             authComponent.setCurrentUser(userName);
                             
@@ -459,9 +460,9 @@ public class NTLMAuthenticationFilter implements Filter
                             
                             NodeService nodeService = (NodeService) ctx.getBean("nodeService");
                           
-                            User user = new User(userName, authService.getCurrentTicket(), authComponent.getPerson(Repository.getStoreRef(), userName));
+                            User user = new User(userName, authService.getCurrentTicket(), personService.getPerson(userName));
                             
-                            String homeSpaceId = (String)nodeService.getProperty(authComponent.getPerson(Repository.getStoreRef(), userName), ContentModel.PROP_HOMEFOLDER);
+                            String homeSpaceId = (String)nodeService.getProperty(personService.getPerson(userName), ContentModel.PROP_HOMEFOLDER);
                             user.setHomeSpaceId(homeSpaceId);
                             
                             httpSess.setAttribute(AuthenticationHelper.AUTHENTICATION_USER, user);

@@ -18,9 +18,6 @@ package org.alfresco.repo.security.authentication;
 
 import net.sf.acegisecurity.Authentication;
 
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
-
 public interface AuthenticationComponent
 {
 
@@ -41,16 +38,6 @@ public interface AuthenticationComponent
      */
     
     public Authentication setCurrentAuthentication(Authentication authentication);
-    
-    /**
-     * Get the person information for the user 
-     * 
-     * @param storeRef
-     * @param userName
-     * @return
-     * @throws AuthenticationException
-     */
-    public NodeRef getPerson(StoreRef storeRef, String userName) throws AuthenticationException;
     
     /**
      * 
