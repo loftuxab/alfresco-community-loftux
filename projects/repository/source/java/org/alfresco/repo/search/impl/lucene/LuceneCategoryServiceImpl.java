@@ -183,10 +183,9 @@ public class LuceneCategoryServiceImpl implements CategoryService
         // The caller closes the result set
     }
 
-    public Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName attributeQName, Depth depth)
+    public Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName aspectQName, Depth depth)
     {
-        QName qname = dictionaryService.getProperty(attributeQName).getContainerClass().getName();
-        return getChildren(getCategoryRootNode(storeRef, qname), Mode.SUB_CATEGORIES, depth);
+        return getChildren(getCategoryRootNode(storeRef, aspectQName), Mode.SUB_CATEGORIES, depth);
     }
 
     private NodeRef getCategoryRootNode(StoreRef storeRef, QName qname)

@@ -62,11 +62,11 @@ public interface CategoryService
     /**
      * Get a list of all the categories appropriate for a given property
      * 
-     * @param attributeQName
+     * @param aspectQName
      * @param depth - the enum depth for what level to recover
      * @return a collection of all the nodes found identified by thier ChildAssocRef's
      */
-    Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName attributeQName, Depth depth );
+    Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName aspectQName, Depth depth );
 
     /**
      * Get all the root categories
