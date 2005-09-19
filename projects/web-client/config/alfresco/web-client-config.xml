@@ -129,6 +129,12 @@
       </property-sheet>
    </config>
    
+   <config evaluator="aspect-name" condition="translatable">
+      <property-sheet>
+         <show-association name="translations" displayLabel="Translations" />
+      </property-sheet>
+   </config>
+   
    <config evaluator="string-compare" condition="Action Wizards">
       <aspects>
          <aspect id="generalclassifiable" description="Classifiable"/>
@@ -138,6 +144,7 @@
          <aspect id="summarizable" description="Summarizable"/>
          <aspect id="versionable" description="Versionable"/>
          <aspect id="templatable" description="Templatable"/>
+         <aspect id="translatable" description="Translatable"/>
       </aspects>
       <transformers>
          <transformer id="text/html" description="HTML" />

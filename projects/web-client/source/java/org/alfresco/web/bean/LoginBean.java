@@ -37,7 +37,6 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.app.servlet.AuthenticationHelper;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
@@ -342,18 +341,19 @@ public class LoginBean
    public String logout()
    {
       FacesContext context = FacesContext.getCurrentInstance();
-
-      // invalidate User ticket
+      
       Map session = context.getExternalContext().getSessionMap();
       User user = (User) session.get(AuthenticationHelper.AUTHENTICATION_USER);
+      
+      // clear Session for this user
+      context.getExternalContext().getSessionMap().clear();
+      
+      // invalidate User ticket
       if (user != null)
       {
          this.authenticationService.invalidateTicket(user.getTicket());
       }
-
-      // clear Session for this user
-      context.getExternalContext().getSessionMap().clear();
-
+      
       // set language to last used
       if (this.language != null && this.language.length() != 0)
       {

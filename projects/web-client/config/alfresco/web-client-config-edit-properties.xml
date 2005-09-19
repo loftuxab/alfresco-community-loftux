@@ -32,6 +32,12 @@
       </property-sheet>
    </config>
    
+   <config evaluator="aspect-name" condition="translatable">
+      <property-sheet>
+         <show-association name="translations" displayLabel="Translations" />
+      </property-sheet>
+   </config>
+   
    <config evaluator="aspect-name" condition="app:inlineeditable">
       <property-sheet>
          <show-property name="app:editInline" displayLabel="Edit Inline" />
