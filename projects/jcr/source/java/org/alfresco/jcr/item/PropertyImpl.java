@@ -37,7 +37,7 @@ import javax.jcr.version.VersionException;
 
 import org.alfresco.jcr.dictionary.DataTypeMap;
 import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
-import org.alfresco.jcr.proxy.JCRProxyFactory;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -334,7 +334,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public Node getParent() throws ItemNotFoundException, AccessDeniedException, RepositoryException
     {
-        return node;
+        return node.getProxy();
     }
 
     /* (non-Javadoc)
@@ -342,10 +342,10 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public String getPath() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Path path = nodeService.getPath(node.getNodeRef());
         path.append(new JCRPath.SimpleElement(getName()));
-        return path.toString();
+        return path.toPrefixString(session.getNamespaceResolver());
     }
 
     /* (non-Javadoc)
@@ -353,7 +353,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public int getDepth() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Path path = nodeService.getPath(node.getNodeRef());
         // Note: Property is one depth lower than its node
         return path.size();
@@ -430,7 +430,7 @@ public class PropertyImpl extends ItemImpl implements Property
         if (name.equals(ContentModel.PROP_CONTENT_URL))
         {
             // Retrieve content reader as value
-            ContentService contentService = node.session.getServiceRegistry().getContentService();
+            ContentService contentService = node.session.getRepositoryImpl().getServiceRegistry().getContentService();
             value = contentService.getReader(node.getNodeRef());
             if (value == null)
             {
@@ -441,7 +441,7 @@ public class PropertyImpl extends ItemImpl implements Property
         else
         {
             // TODO: We may need to copy value here...
-            NodeService nodeService = node.session.getServiceRegistry().getNodeService();
+            NodeService nodeService = node.session.getRepositoryImpl().getServiceRegistry().getNodeService();
             value = nodeService.getProperty(node.getNodeRef(), name);
             if (value == null)
             {
@@ -522,7 +522,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     private org.alfresco.service.cmr.dictionary.PropertyDefinition getPropertyDefinition()
     {
-        DictionaryService dictionary = session.getServiceRegistry().getDictionaryService();
+        DictionaryService dictionary = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
         return dictionary.getProperty(name);
     }
     

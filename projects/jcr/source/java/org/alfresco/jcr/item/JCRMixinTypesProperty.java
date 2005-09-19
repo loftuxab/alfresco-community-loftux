@@ -52,7 +52,7 @@ public class JCRMixinTypesProperty extends PropertyImpl
     {
         // get aspects from node
         NodeImpl nodeImpl = getNodeImpl();
-        NodeService nodeService = nodeImpl.session.getServiceRegistry().getNodeService();
+        NodeService nodeService = nodeImpl.session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Set<QName> aspects = nodeService.getAspects(nodeImpl.getNodeRef());
 
         // resolve against session namespace prefix resolver

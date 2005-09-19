@@ -21,8 +21,8 @@ import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.PropertyDefinition;
 import javax.jcr.version.OnParentVersionAction;
 
-import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 

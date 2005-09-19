@@ -14,55 +14,57 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.item;
+package org.alfresco.jcr.dictionary;
 
 import java.util.List;
 
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
+import javax.jcr.nodetype.NodeType;
+import javax.jcr.nodetype.NodeTypeIterator;
 
 import org.alfresco.jcr.util.AbstractRangeIterator;
+import org.alfresco.service.namespace.QName;
 
 
 /**
- * Alfresco implementation of a Property Iterator
+ * Alfresco implementation of a Node Type Iterator
  * 
  * @author David Caruana
  */
-public class PropertyListIterator extends AbstractRangeIterator
-    implements PropertyIterator
+public class NodeTypeNameIterator extends AbstractRangeIterator
+    implements NodeTypeIterator
 {
-    private List<PropertyImpl> properties;
+    private NodeTypeManagerImpl typeManager;
+    private List<QName> nodeTypeNames;
     
     
     /**
      * Construct
      * 
      * @param context  session context
-     * @param properties  property list
+     * @param nodeTypes  node type list
      */
-    public PropertyListIterator(List<PropertyImpl> properties)
+    public NodeTypeNameIterator(NodeTypeManagerImpl typeManager, List<QName> nodeTypeNames)
     {
-        this.properties = properties;
+        this.typeManager = typeManager;
+        this.nodeTypeNames = nodeTypeNames;
     }
     
     /* (non-Javadoc)
-     * @see javax.jcr.PropertyIterator#nextProperty()
+     * @see javax.jcr.nodetype.NodeTypeIterator#nextNodeType()
      */
-    public Property nextProperty()
+    public NodeType nextNodeType()
     {
         long position = skip();
-        PropertyImpl propertyImpl = properties.get((int)position);
-        return propertyImpl.getProxy();
+        QName name = nodeTypeNames.get((int)position);
+        return typeManager.getNodeTypeImpl(name);
     }
 
-    
     /* (non-Javadoc)
      * @see javax.jcr.RangeIterator#getSize()
      */
     public long getSize()
     {
-        return properties.size();
+        return nodeTypeNames.size();
     }
 
     /* (non-Javadoc)
@@ -70,7 +72,7 @@ public class PropertyListIterator extends AbstractRangeIterator
      */
     public Object next()
     {
-        return nextProperty();
+        return nextNodeType();
     }
 
 }

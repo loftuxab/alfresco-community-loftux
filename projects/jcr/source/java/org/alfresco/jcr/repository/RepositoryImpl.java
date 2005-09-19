@@ -28,6 +28,7 @@ import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.jcr.dictionary.NamespaceRegistryImpl;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.ServiceRegistry;
@@ -64,6 +65,10 @@ public class RepositoryImpl implements Repository
     private ServiceRegistry serviceRegistry;
     private String defaultWorkspace = null;
 
+    // Services
+    private NamespaceRegistryImpl namespaceRegistry = null;
+    
+    
     //
     // Dependency Injection
     //
@@ -99,6 +104,18 @@ public class RepositoryImpl implements Repository
     }
 
     /**
+     * Initialisation
+     */
+    public void init()
+    {
+        if (serviceRegistry == null || authenticationService == null)
+        {
+            throw new IllegalStateException("Service Registry has not been specified.");
+        }
+        namespaceRegistry = new NamespaceRegistryImpl(false, serviceRegistry.getNamespaceService());
+    }
+    
+    /**
      * Get the authentication service
      * 
      * @return  the authentication service
@@ -118,6 +135,14 @@ public class RepositoryImpl implements Repository
         return serviceRegistry;
     }
 
+    /**
+     * Get the Namespace Registry
+     */
+    public NamespaceRegistryImpl getNamespaceRegistry()
+    {
+        return namespaceRegistry;
+    }
+    
     /* (non-Javadoc)
      * @see javax.jcr.Repository#getDescriptorKeys()
      */

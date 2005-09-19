@@ -23,8 +23,8 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 
-import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.ContentReader;
 
 

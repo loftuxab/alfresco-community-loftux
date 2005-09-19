@@ -22,6 +22,7 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.jcr.util.AbstractRangeIterator;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 
 

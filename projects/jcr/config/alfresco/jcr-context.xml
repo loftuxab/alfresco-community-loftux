@@ -5,7 +5,7 @@
 
     <import resource="classpath:alfresco/application-context.xml" />
 
-    <bean id="JCR.Repository" class="org.alfresco.jcr.repository.RepositoryImpl">
+    <bean id="JCR.Repository" class="org.alfresco.jcr.repository.RepositoryImpl" init-method="init">
         <property name="authenticationService"><ref bean="authenticationService"/></property>
         <property name="serviceRegistry"><ref bean="ServiceRegistry"/></property>
         <property name="defaultWorkspace"><value>SpacesStore</value></property>

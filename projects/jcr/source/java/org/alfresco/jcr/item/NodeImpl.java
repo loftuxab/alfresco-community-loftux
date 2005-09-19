@@ -50,8 +50,8 @@ import javax.jcr.version.VersionException;
 import javax.jcr.version.VersionHistory;
 
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
-import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -256,7 +256,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeIterator getNodes() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);        
         NodeIterator iterator = new ChildAssocNodeIteratorImpl(session, childAssocs);
         return iterator;
@@ -267,7 +267,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeIterator getNodes(String namePattern) throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         JCRPatternMatch match = new JCRPatternMatch(namePattern, session.getNamespaceResolver());
         List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, match);        
         NodeIterator iterator = new ChildAssocNodeIteratorImpl(session, childAssocs);
@@ -342,7 +342,7 @@ public class NodeImpl extends ItemImpl implements Node
         if (name != null)
         {
             // TODO: Look at more efficient approach
-            SearchService searchService = session.getServiceRegistry().getSearchService();
+            SearchService searchService = session.getRepositoryImpl().getServiceRegistry().getSearchService();
             List<NodeRef> siblings = searchService.selectNodes(nodeRef, "../" + name, null, session.getNamespaceResolver(), false);
             for (NodeRef sibling : siblings)
             {
@@ -393,7 +393,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean hasNodes() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);        
         return childAssocs.size() > 0;
     }
@@ -412,11 +412,9 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeType getPrimaryNodeType() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         QName type = nodeService.getType(nodeRef);
-        DictionaryService dictionaryService = session.getServiceRegistry().getDictionaryService();
-        ClassDefinition classDefinition = dictionaryService.getClass(type);
-        return new NodeTypeImpl(session, classDefinition).getProxy();
+        return session.getTypeManager().getNodeTypeImpl(type);
     }
 
     /* (non-Javadoc)
@@ -424,22 +422,18 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeType[] getMixinNodeTypes() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
-        DictionaryService dictionaryService = session.getServiceRegistry().getDictionaryService();
-        
         // Add aspects defined by node
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Set<QName> aspects = nodeService.getAspects(nodeRef);
         NodeType[] nodeTypes = new NodeType[aspects.size() + 1];
         int i = 0;
         for (QName aspect : aspects)
         {
-            ClassDefinition classDefinition = dictionaryService.getClass(aspect);
-            nodeTypes[i++] = new NodeTypeImpl(session, classDefinition).getProxy(); 
+            nodeTypes[i++] = session.getTypeManager().getNodeTypeImpl(aspect); 
         }
         
         // Add mix:referenceable aspect (to represent the Alfresco sys:referenceable aspect)
-        ClassDefinition classDefinition = dictionaryService.getClass(NodeTypeImpl.MIX_REFERENCEABLE);
-        nodeTypes[i] = new NodeTypeImpl(session, classDefinition).getProxy();
+        nodeTypes[i] = session.getTypeManager().getNodeTypeImpl(NodeTypeImpl.MIX_REFERENCEABLE);
         
         return nodeTypes;
     }
@@ -458,8 +452,8 @@ public class NodeImpl extends ItemImpl implements Node
         }
 
         // determine via class hierarchy
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
-        DictionaryService dictionaryService = session.getServiceRegistry().getDictionaryService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
 
         // first, check the type
         QName type = nodeService.getType(nodeRef);
@@ -672,7 +666,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public String getName() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         ChildAssociationRef parentAssoc = nodeService.getPrimaryParent(nodeRef);
         QName childName = parentAssoc.getQName();
         return (childName == null) ? "" : childName.toPrefixString(session.getNamespaceResolver());
@@ -691,7 +685,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Node getParent() throws ItemNotFoundException, AccessDeniedException, RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         ChildAssociationRef parentAssoc = nodeService.getPrimaryParent(nodeRef);
         if (parentAssoc == null || parentAssoc.getParentRef() == null)
         {
@@ -707,8 +701,8 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public String getPath() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
-        SearchService searchService = session.getServiceRegistry().getSearchService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        SearchService searchService = session.getRepositoryImpl().getServiceRegistry().getSearchService();
         Path path = nodeService.getPath(nodeRef);
         
         // Add indexes for same name siblings
@@ -746,7 +740,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public int getDepth() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Path path = nodeService.getPath(nodeRef);
         // Note: Root is at depth 0
         return path.size() -1;
@@ -758,7 +752,7 @@ public class NodeImpl extends ItemImpl implements Node
     public Item getAncestor(int depth) throws ItemNotFoundException, AccessDeniedException, RepositoryException
     {
         // Retrieve primary parent path for node
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Path path = nodeService.getPath(nodeRef);
         if (depth < 0 || depth > (path.size() - 1))
         {

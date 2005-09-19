@@ -24,11 +24,8 @@ import javax.jcr.nodetype.NodeDefinition;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.PropertyDefinition;
 
-import org.alfresco.jcr.proxy.JCRProxyFactory;
 import org.alfresco.jcr.repository.JCRNamespace;
-import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -45,10 +42,8 @@ public class NodeTypeImpl implements NodeType
     public static QName MIX_REFERENCEABLE = QName.createQName(JCRNamespace.MIX_URI, "referenceable");
 
     
-    private SessionImpl session;
+    private NodeTypeManagerImpl typeManager;
     private ClassDefinition classDefinition;
-    private NodeType proxy = null;
-    private DictionaryService dictionaryService;
 
     
     /**
@@ -56,33 +51,18 @@ public class NodeTypeImpl implements NodeType
      * 
      * @param classDefinition  Alfresco class definition
      */    
-    public NodeTypeImpl(SessionImpl session, ClassDefinition classDefinition)
+    public NodeTypeImpl(NodeTypeManagerImpl typeManager, ClassDefinition classDefinition)
     {
-        this.session = session;
+        this.typeManager = typeManager;
         this.classDefinition = classDefinition;
-        this.dictionaryService = session.getServiceRegistry().getDictionaryService();
     }
 
-    /**
-     * Get proxied Node Type
-     * 
-     * @return  proxy
-     */
-    public NodeType getProxy()
-    {
-        if (proxy == null)
-        {
-            proxy = (NodeType)JCRProxyFactory.create(this, NodeType.class, session);
-        }
-        return proxy;
-    }
-    
     /* (non-Javadoc)
      * @see javax.jcr.nodetype.NodeType#getName()
      */
     public String getName()
     {
-        return classDefinition.getName().toPrefixString(session.getNamespaceResolver());
+        return classDefinition.getName().toPrefixString(typeManager.getNamespaceService());
     }
 
     /* (non-Javadoc)
@@ -149,14 +129,12 @@ public class NodeTypeImpl implements NodeType
             }
             else
             {
-                ClassDefinition ntBaseDef = dictionaryService.getClass(NT_BASE);
-                return new NodeType[] { new NodeTypeImpl(session, ntBaseDef) };
+                return new NodeType[] { typeManager.getNodeTypeImpl(NT_BASE) };
             }
         }
         
         // return the supertype
-        ClassDefinition parentDef = dictionaryService.getClass(parent);
-        return new NodeType[] { new NodeTypeImpl(session, parentDef) };
+        return new NodeType[] { typeManager.getNodeTypeImpl(parent) };
     }
 
     /* (non-Javadoc)
@@ -164,7 +142,7 @@ public class NodeTypeImpl implements NodeType
      */
     public boolean isNodeType(String nodeTypeName)
     {
-        QName name = QName.createQName(nodeTypeName, session.getNamespaceResolver());
+        QName name = QName.createQName(nodeTypeName, typeManager.getNamespaceService());
         
         // is it one of standard types
         if (name.equals(NodeTypeImpl.NT_BASE))
@@ -173,7 +151,7 @@ public class NodeTypeImpl implements NodeType
         }
 
         // is it part of this class hierarchy
-        return dictionaryService.isSubClass(name, classDefinition.getName());
+        return typeManager.getDictionaryService().isSubClass(name, classDefinition.getName());
     }
 
     public PropertyDefinition[] getPropertyDefinitions()

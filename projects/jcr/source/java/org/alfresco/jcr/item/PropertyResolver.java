@@ -44,7 +44,7 @@ public class PropertyResolver
     public static List<PropertyImpl> createProperties(NodeImpl node, QNamePattern pattern)
     {
         // Create list of properties from node itself
-        NodeService nodeService = node.session.getServiceRegistry().getNodeService();
+        NodeService nodeService = node.session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Map<QName, Serializable> properties = nodeService.getProperties(node.getNodeRef());
         List<PropertyImpl> propertyList = new ArrayList<PropertyImpl>(properties.size());        
         for (Map.Entry<QName, Serializable> entry : properties.entrySet())
@@ -103,7 +103,7 @@ public class PropertyResolver
             return new JCRMixinTypesProperty(node);
         }
 
-        NodeService nodeService = node.session.getServiceRegistry().getNodeService();
+        NodeService nodeService = node.session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Serializable value = nodeService.getProperty(node.getNodeRef(), propertyName);
         if (value == null)
         {
@@ -130,7 +130,7 @@ public class PropertyResolver
             return true;
         }
 
-        NodeService nodeService = node.session.getServiceRegistry().getNodeService();
+        NodeService nodeService = node.session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Serializable value = nodeService.getProperty(node.getNodeRef(), propertyName);
         return value != null;
     }

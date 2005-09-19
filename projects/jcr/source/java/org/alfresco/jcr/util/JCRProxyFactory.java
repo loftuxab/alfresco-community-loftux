@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.proxy;
+package org.alfresco.jcr.util;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -107,7 +107,7 @@ public class JCRProxyFactory
                 String ticket = context.getTicket();
                 if (ticket != null)
                 {
-                    context.getAuthenticationService().validate(context.getTicket());
+                    context.getRepositoryImpl().getAuthenticationService().validate(context.getTicket());
                 }
 
                 // invoke underlying service
@@ -125,7 +125,7 @@ public class JCRProxyFactory
             finally
             {
                 // clear authentication context
-                context.getAuthenticationService().clearCurrentSecurityContext();
+                context.getRepositoryImpl().getAuthenticationService().clearCurrentSecurityContext();
             }
         }
     

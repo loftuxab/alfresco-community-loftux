@@ -46,7 +46,7 @@ public class JCRPrimaryTypeProperty extends PropertyImpl
     protected Object getPropertyValue() throws RepositoryException
     {
         NodeImpl nodeImpl = getNodeImpl();
-        NodeService nodeService = nodeImpl.session.getServiceRegistry().getNodeService();
+        NodeService nodeService = nodeImpl.session.getRepositoryImpl().getServiceRegistry().getNodeService();
         QName type = nodeService.getType(nodeImpl.getNodeRef());
         return type.toPrefixString(nodeImpl.session.getNamespaceResolver());
     }

@@ -40,7 +40,7 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 
-import org.alfresco.jcr.proxy.JCRProxyFactory;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.xml.sax.ContentHandler;
@@ -148,13 +148,12 @@ public class WorkspaceImpl implements Workspace
      */
     public NamespaceRegistry getNamespaceRegistry() throws RepositoryException
     {
-        return session.getNamespaceRegistry();
+        return session.getRepositoryImpl().getNamespaceRegistry();
     }
 
     public NodeTypeManager getNodeTypeManager() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        return session.getTypeManager();
     }
 
     /* (non-Javadoc)
@@ -170,12 +169,12 @@ public class WorkspaceImpl implements Workspace
      */
     public String[] getAccessibleWorkspaceNames() throws RepositoryException
     {
-        NodeService nodeService = session.getServiceRegistry().getNodeService();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         List<StoreRef> storeRefs = nodeService.getStores();
         List<String> workspaceStores = new ArrayList<String>();
         for (StoreRef storeRef : storeRefs)
         {
-            if (storeRef.equals(StoreRef.PROTOCOL_WORKSPACE))
+            if (storeRef.getProtocol().equals(StoreRef.PROTOCOL_WORKSPACE))
             {
                 workspaceStores.add(storeRef.getIdentifier());
             }

@@ -19,6 +19,7 @@ package org.alfresco.jcr.item;
 import java.util.List;
 
 import javax.jcr.PathNotFoundException;
+import javax.jcr.UnsupportedRepositoryOperationException;
 
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -56,7 +57,6 @@ public class ItemResolver
         else
         {
             // TODO: create property
-            throw new UnsupportedOperationException();
         }
         
         if (item == null)
@@ -100,7 +100,7 @@ public class ItemResolver
         boolean exists = nodeExists(context, from, path);
         if (!exists)
         {
-            throw new UnsupportedOperationException();
+            // TODO: Check for property
         }
         return exists;
     }
@@ -133,7 +133,7 @@ public class ItemResolver
         
         // TODO: Support JCR Path
         // TODO: Catch malformed path and return false (per Specification)
-        SearchService search = context.getServiceRegistry().getSearchService(); 
+        SearchService search = context.getRepositoryImpl().getServiceRegistry().getSearchService(); 
         List<NodeRef> nodeRefs = search.selectNodes(from, path, null, context.getNamespaceResolver(), false);
         if (nodeRefs != null && nodeRefs.size() > 0)
         {

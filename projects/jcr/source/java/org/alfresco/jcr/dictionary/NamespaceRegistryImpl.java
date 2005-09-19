@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.session;
+package org.alfresco.jcr.dictionary;
 
 import java.util.Collection;
 
@@ -24,8 +24,7 @@ import javax.jcr.NamespaceRegistry;
 import javax.jcr.RepositoryException;
 import javax.jcr.UnsupportedRepositoryOperationException;
 
-import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
 
 
 /**
@@ -36,27 +35,29 @@ import org.alfresco.service.namespace.NamespacePrefixResolver;
 public class NamespaceRegistryImpl implements NamespaceRegistry
 {
 
-    private DynamicNamespacePrefixResolver resolver;
+    private boolean allowRegistration;
+    private NamespaceService namespaceService;
     
     
     /**
      * Construct
      * 
-     * @param resolver  namespace resolver
+     * @param namespaceService  namespace service
      */
-    public NamespaceRegistryImpl(DynamicNamespacePrefixResolver resolver)
+    public NamespaceRegistryImpl(boolean allowRegistraton, NamespaceService namespaceService)
     {
-        this.resolver = resolver;
+        this.allowRegistration = allowRegistraton;
+        this.namespaceService = namespaceService;
     }
-    
+
     /**
-     * Get Namespace resolver
+     * Get the namespace prefix resolver
      * 
-     * @return namespace prefix resolver
+     * @return  the namespace prefix resolver
      */
-    public NamespacePrefixResolver getNamespaceResolver()
+    public NamespaceService getNamespaceService()
     {
-        return resolver;
+        return this.namespaceService;
     }
     
     /* (non-Javadoc)
@@ -64,7 +65,18 @@ public class NamespaceRegistryImpl implements NamespaceRegistry
      */
     public void registerNamespace(String prefix, String uri) throws NamespaceException, UnsupportedRepositoryOperationException, AccessDeniedException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        try
+        {
+            if (!allowRegistration)
+            {
+                throw new UnsupportedRepositoryOperationException();
+            }
+            namespaceService.registerNamespace(prefix, uri);
+        }
+        catch(org.alfresco.service.namespace.NamespaceException e)
+        {
+            throw new NamespaceException(e);
+        }
     }
 
     /* (non-Javadoc)
@@ -72,7 +84,18 @@ public class NamespaceRegistryImpl implements NamespaceRegistry
      */
     public void unregisterNamespace(String prefix) throws NamespaceException, UnsupportedRepositoryOperationException, AccessDeniedException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        try
+        {
+            if (!allowRegistration)
+            {
+                throw new UnsupportedRepositoryOperationException();
+            }
+            namespaceService.unregisterNamespace(prefix);
+        }
+        catch(org.alfresco.service.namespace.NamespaceException e)
+        {
+            throw new NamespaceException(e);
+        }
     }
 
     /* (non-Javadoc)
@@ -80,7 +103,7 @@ public class NamespaceRegistryImpl implements NamespaceRegistry
      */
     public String[] getPrefixes() throws RepositoryException
     {
-        Collection<String> prefixes = resolver.getPrefixes();
+        Collection<String> prefixes = namespaceService.getPrefixes();
         return prefixes.toArray(new String[prefixes.size()]);
     }
 
@@ -89,7 +112,7 @@ public class NamespaceRegistryImpl implements NamespaceRegistry
      */
     public String[] getURIs() throws RepositoryException
     {
-        Collection<String> uris = resolver.getURIs();
+        Collection<String> uris = namespaceService.getURIs();
         return uris.toArray(new String[uris.size()]);        
     }
 
@@ -98,7 +121,7 @@ public class NamespaceRegistryImpl implements NamespaceRegistry
      */
     public String getURI(String prefix) throws NamespaceException, RepositoryException
     {
-        String uri = resolver.getNamespaceURI(prefix);
+        String uri = namespaceService.getNamespaceURI(prefix);
         if (uri == null)
         {
             throw new NamespaceException("Prefix " + prefix + " is unknown.");
@@ -111,7 +134,7 @@ public class NamespaceRegistryImpl implements NamespaceRegistry
      */
     public String getPrefix(String uri) throws NamespaceException, RepositoryException
     {
-        Collection<String> prefixes = resolver.getPrefixes(uri);
+        Collection<String> prefixes = namespaceService.getPrefixes(uri);
         if (prefixes.size() == 0)
         {
             throw new NamespaceException("URI " + uri + " is unknown.");
