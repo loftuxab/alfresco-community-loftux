@@ -42,7 +42,7 @@ public class AuthenticationWebService implements AuthenticationServiceSoapPort
     */
    public void setAuthenticationService(AuthenticationService authenticationSvc)
    {
-      this.authenticationService = authenticationSvc;
+      this.authenticationService = authenticationSvc; 
    }
 
    /**

@@ -166,7 +166,7 @@ public class VersionImplTest extends TestCase
      */
     public void testGetNodeRef()
     {
-        NodeRef nodeRef = this.version.getNodeRef();
+        NodeRef nodeRef = this.version.getFrozenStateNodeRef();
         assertNotNull(nodeRef);
         assertEquals(nodeRef.toString(), this.nodeRef.toString());
     }

@@ -66,7 +66,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("checkinExternal");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.example.webservice.types.Predicate.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "comments"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue"), org.alfresco.example.webservice.types.NamedValue[].class, false, false);
         oper.addParameter(param);
@@ -110,6 +110,8 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
         oper.setName("lock");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.example.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "user"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "lockChildren"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "lockType"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "LockTypeEnum"), org.alfresco.example.webservice.authoring.LockTypeEnum.class, false, false);
@@ -130,6 +132,8 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("unlock");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.example.webservice.types.Predicate.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "user"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "unlockChildren"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
         oper.addParameter(param);
@@ -707,7 +711,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
      * Checkin an external content resource thus replacing the existing
      * working content.
      */
-    public org.alfresco.example.webservice.types.Reference checkinExternal(org.alfresco.example.webservice.types.Predicate items, org.alfresco.example.webservice.types.NamedValue[] comments, boolean keepCheckedOut, org.alfresco.example.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault {
+    public org.alfresco.example.webservice.types.Reference checkinExternal(org.alfresco.example.webservice.types.Reference items, org.alfresco.example.webservice.types.NamedValue[] comments, boolean keepCheckedOut, org.alfresco.example.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -799,7 +803,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
     /**
      * Locks a content resource.
      */
-    public org.alfresco.example.webservice.types.Reference[] lock(org.alfresco.example.webservice.types.Predicate items, boolean lockChildren, org.alfresco.example.webservice.authoring.LockTypeEnum lockType) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault {
+    public org.alfresco.example.webservice.types.Reference[] lock(org.alfresco.example.webservice.types.Predicate items, java.lang.String user, boolean lockChildren, org.alfresco.example.webservice.authoring.LockTypeEnum lockType) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -815,7 +819,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {items, new java.lang.Boolean(lockChildren), lockType});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {items, user, new java.lang.Boolean(lockChildren), lockType});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
@@ -845,7 +849,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
     /**
      * Unlocks a content resource.
      */
-    public org.alfresco.example.webservice.types.Reference[] unlock(org.alfresco.example.webservice.types.Predicate items, boolean unlockChildren) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault {
+    public org.alfresco.example.webservice.types.Reference[] unlock(org.alfresco.example.webservice.types.Predicate items, java.lang.String user, boolean unlockChildren) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -861,7 +865,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {items, new java.lang.Boolean(unlockChildren)});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {items, user, new java.lang.Boolean(unlockChildren)});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;

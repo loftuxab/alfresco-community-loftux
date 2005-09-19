@@ -16,14 +16,19 @@
  */
 package org.alfresco.repo.webservice;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.webservice.axis.QueryConfigHandler;
+import org.alfresco.repo.webservice.types.NamedValue;
 import org.alfresco.repo.webservice.types.ParentReference;
 import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Query;
@@ -31,12 +36,15 @@ import org.alfresco.repo.webservice.types.QueryLanguageEnum;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.repo.webservice.types.Store;
 import org.alfresco.repo.webservice.types.StoreEnum;
+import org.alfresco.repo.webservice.types.Version;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.axis.MessageContext;
@@ -67,6 +75,17 @@ public class Utils
    public static StoreRef convertToStoreRef(Store store)
    {
       return new StoreRef(store.getScheme().getValue(), store.getAddress());
+   }
+   
+   /**
+    * Converts a store reference ot a Store type
+    * 
+    * @param    ref     the store reference
+    * @return           the store
+    */
+   public static Store convertToStore(StoreRef ref)
+   {
+       return new Store(StoreEnum.fromValue(ref.getProtocol()), ref.getIdentifier());
    }
    
    /**
@@ -278,5 +297,58 @@ public class Utils
       }
       
       return batchSize;
+   }
+
+   /**
+    * Converts a repository version object into a web service version object.
+    * 
+    * @param version    the repository version object
+    * @return           the web service version object
+    */
+   public static Version convertToVersion(org.alfresco.service.cmr.version.Version version)
+   {
+       Version webServiceVersion = new Version();
+       
+       // Set the basic properties
+       webServiceVersion.setId(Utils.convertToReference(version.getFrozenStateNodeRef()));
+       webServiceVersion.setCreator(version.getCreator());
+       webServiceVersion.setLabel(version.getVersionLabel());
+       
+       // Set the created date
+       Date createdDate = version.getCreatedDate();
+       Calendar calendar = Calendar.getInstance();
+       calendar.setTime(createdDate);
+       webServiceVersion.setCreated(calendar);
+       
+       // Set the falg to indicate whether the version was mojor or minor
+       boolean isMajor = false;
+       VersionType versionType = version.getVersionType();
+       if (versionType != null && versionType.equals(VersionType.MAJOR) == true)
+       {
+           isMajor = true;
+       }       
+       webServiceVersion.setMajor(isMajor);
+       
+       // Set the commetary values
+       Map<String, Serializable> versionProps = version.getVersionProperties();
+       NamedValue[] namedValues = new NamedValue[versionProps.size()];
+       int iIndex = 0;
+       for (Map.Entry<String, Serializable> entry : versionProps.entrySet())
+       {
+           String value = null;
+           try
+           {
+              DefaultTypeConverter.INSTANCE.convert(String.class, entry.getValue());
+           }
+           catch (Throwable exception)
+           {
+               value = entry.getValue().toString();
+           }
+           namedValues[iIndex] = new NamedValue(entry.getKey(), value);
+           iIndex ++;
+       }       
+       webServiceVersion.setCommentaries(namedValues);
+       
+       return webServiceVersion;
    }
 }

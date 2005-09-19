@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.repository.datatype.TypeConverter;
 import org.alfresco.service.cmr.version.Version;
@@ -125,9 +126,7 @@ public class VersionImpl implements Version
     }
     
     /**
-     * Get the map containing the version property values
-     * 
-     * @return  the map containing the version properties
+     * @see org.alfresco.service.cmr.version.Version#getVersionProperties()
      */
     public Map<String, Serializable> getVersionProperties()
     {
@@ -135,11 +134,7 @@ public class VersionImpl implements Version
     }
 
     /**
-     * Gets the value of a named version property.
-     * 
-     * @param name the name of the property
-     * @return the value of the property, null if the property is undefined.
-     * 
+     * @see org.alfresco.service.cmr.version.Version#getVersionProperty(java.lang.String)
      */
     public Serializable getVersionProperty(String name)
     {
@@ -150,14 +145,22 @@ public class VersionImpl implements Version
         }
         return result;
     }
+    
+    /**
+     * @see org.alfresco.service.cmr.version.Version#getVersionedNodeRef()
+     */
+    public NodeRef getVersionedNodeRef()
+    {
+        String storeProtocol = (String)this.versionProperties.get(VersionModel.PROP_FROZEN_NODE_STORE_PROTOCOL);
+        String storeId = (String)this.versionProperties.get(VersionModel.PROP_FROZEN_NODE_STORE_ID);
+        String nodeId = (String)this.versionProperties.get(VersionModel.PROP_FROZEN_NODE_ID);
+        return new NodeRef(new StoreRef(storeProtocol, storeId), nodeId);
+    }
 
     /**
-     * Gets the reference to the node that contains the frozen state of the
-     * version.
-     * 
-     * @return a node reference
+     * @see org.alfresco.service.cmr.version.Version#getFrozenStateNodeRef()
      */
-    public NodeRef getNodeRef()
+    public NodeRef getFrozenStateNodeRef()
     {
         return this.nodeRef;
     }

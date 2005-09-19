@@ -23,7 +23,7 @@ public interface AuthoringServiceSoapPort extends java.rmi.Remote {
      * Checkin an external content resource thus replacing the existing
      * working content.
      */
-    public org.alfresco.example.webservice.types.Reference checkinExternal(org.alfresco.example.webservice.types.Predicate items, org.alfresco.example.webservice.types.NamedValue[] comments, boolean keepCheckedOut, org.alfresco.example.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
+    public org.alfresco.example.webservice.types.Reference checkinExternal(org.alfresco.example.webservice.types.Reference items, org.alfresco.example.webservice.types.NamedValue[] comments, boolean keepCheckedOut, org.alfresco.example.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
 
     /**
      * Cancels the checkout.
@@ -33,12 +33,12 @@ public interface AuthoringServiceSoapPort extends java.rmi.Remote {
     /**
      * Locks a content resource.
      */
-    public org.alfresco.example.webservice.types.Reference[] lock(org.alfresco.example.webservice.types.Predicate items, boolean lockChildren, org.alfresco.example.webservice.authoring.LockTypeEnum lockType) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
+    public org.alfresco.example.webservice.types.Reference[] lock(org.alfresco.example.webservice.types.Predicate items, java.lang.String user, boolean lockChildren, org.alfresco.example.webservice.authoring.LockTypeEnum lockType) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
 
     /**
      * Unlocks a content resource.
      */
-    public org.alfresco.example.webservice.types.Reference[] unlock(org.alfresco.example.webservice.types.Predicate items, boolean unlockChildren) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
+    public org.alfresco.example.webservice.types.Reference[] unlock(org.alfresco.example.webservice.types.Predicate items, java.lang.String user, boolean unlockChildren) throws java.rmi.RemoteException, org.alfresco.example.webservice.authoring.AuthoringFault;
 
     /**
      * Gets the lock status of the specified nodes.

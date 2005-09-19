@@ -35,7 +35,7 @@
     <xsd:simpleType name="StoreEnum">
     	<xsd:restriction base="xsd:string">
     		<xsd:enumeration value="workspace"/>
-    		<xsd:enumeration value="version"/>
+    		<xsd:enumeration value="versionStore"/>
     		<xsd:enumeration value="user"/>
     		<xsd:enumeration value="search"/>
     		<xsd:enumeration value="http"/>

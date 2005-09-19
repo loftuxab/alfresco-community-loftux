@@ -81,6 +81,15 @@
       <property name="checkOutCheckinService">
          <ref bean="checkOutCheckInService"/>
       </property>
+      <property name="lockService">
+         <ref bean="lockService"/>
+      </property>
+      <property name="versionService">
+         <ref bean="versionService"/>
+      </property>
+      <property name="transactionService">
+         <ref bean="transactionComponent"/>
+      </property>
    </bean>
    
    <bean id="classificationWebService" class="org.alfresco.repo.webservice.classification.ClassificationWebService">

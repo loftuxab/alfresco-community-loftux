@@ -167,11 +167,11 @@ public class DocumentDetailsBean
             for (Version version : history.getAllVersions())
             {
                // create a map node representation of the version
-               MapNode clientVersion = new MapNode(version.getNodeRef(), this.nodeService);
+               MapNode clientVersion = new MapNode(version.getFrozenStateNodeRef(), this.nodeService);
                clientVersion.put("versionLabel", version.getVersionLabel());
                clientVersion.put("author", clientVersion.get("creator"));
                clientVersion.put("versionDate", version.getCreatedDate());
-               clientVersion.put("url", DownloadContentServlet.generateDownloadURL(version.getNodeRef(), 
+               clientVersion.put("url", DownloadContentServlet.generateDownloadURL(version.getFrozenStateNodeRef(), 
                      clientVersion.getName()));
                
                // add the client side version to the list

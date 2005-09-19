@@ -305,7 +305,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         }
         
         // Check that the node reference is correct
-        NodeRef nodeRef = newVersion.getNodeRef();
+        NodeRef nodeRef = newVersion.getFrozenStateNodeRef();
         assertNotNull(nodeRef);
         assertEquals(
                 VersionModel.STORE_ID, 

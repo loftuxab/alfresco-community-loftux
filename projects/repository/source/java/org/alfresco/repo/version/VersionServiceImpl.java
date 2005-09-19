@@ -82,6 +82,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     /**
      * The repository searcher
      */
+    @SuppressWarnings("unused")
     private SearchService searcher;       	
     
     /**
@@ -258,15 +259,13 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * @param  versionNumber        the version number
      * @return                      the newly created version
      * @throws ReservedVersionNameException
-     *                              thrown if there is a name clash in the version properties  
-     * @throws AspectMissingException    
-     *                              thrown if the version aspect is missing from the node   
+     *                              thrown if there is a name clash in the version properties   
      */
     private Version createVersion(
             NodeRef nodeRef, 
             Map<String, Serializable> origVersionProperties, 
             int versionNumber)
-            throws ReservedVersionNameException, AspectMissingException
+            throws ReservedVersionNameException
     {
 
 		// Copy the version properties (to prevent unexpected side effects to the caller)
@@ -276,8 +275,11 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             versionProperties.putAll(origVersionProperties);
         }
 		
-        // Check for the version aspect
-        checkForVersionAspect(nodeRef);
+        // If the version aspect is not there then add it
+        if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
+        {
+            this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+        }
         
         // Call the policy behaviour
 		invokeBeforeCreateVersion(nodeRef);		
@@ -372,19 +374,18 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * @see org.alfresco.service.cmr.version.VersionService#getVersionHistory(NodeRef)
      */
     public VersionHistory getVersionHistory(NodeRef nodeRef)
-        throws AspectMissingException
     {
-        // Check for the version aspect
-        checkForVersionAspect(nodeRef);
-        
         VersionHistory versionHistory = null;
         
-        NodeRef versionHistoryRef = getVersionHistoryNodeRef(nodeRef);
-        if (versionHistoryRef != null)
+        if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == true)
         {
-            versionHistory = buildVersionHistory(versionHistoryRef, nodeRef);
+            NodeRef versionHistoryRef = getVersionHistoryNodeRef(nodeRef);
+            if (versionHistoryRef != null)
+            {
+                versionHistory = buildVersionHistory(versionHistoryRef, nodeRef);
+            }
         }
-        
+            
         return versionHistory;
     }       
 	
@@ -853,7 +854,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             throw new VersionServiceException(MSGID_ERR_REVERT_MISMATCH);
         }
         
-		NodeRef versionNodeRef = version.getNodeRef();
+		NodeRef versionNodeRef = version.getFrozenStateNodeRef();
 		
 		// Revert the property values
 		this.nodeService.setProperties(nodeRef, this.nodeService.getProperties(versionNodeRef));

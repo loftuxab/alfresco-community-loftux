@@ -16,18 +16,22 @@
  */
 package org.alfresco.example.webservice.authoring;
 
+
 import javax.xml.rpc.ServiceException;
 
 import junit.framework.AssertionFailedError;
 
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
-import org.alfresco.example.webservice.content.ContentServiceLocator;
-import org.alfresco.example.webservice.content.ContentServiceSoapBindingStub;
-import org.alfresco.example.webservice.types.Content;
+import org.alfresco.example.webservice.content.ReadResult;
 import org.alfresco.example.webservice.types.ContentFormat;
+import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.ParentReference;
 import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Reference;
+import org.alfresco.example.webservice.types.Version;
+import org.alfresco.example.webservice.types.VersionHistory;
+import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.service.namespace.QName;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.commons.logging.Log;
@@ -35,292 +39,329 @@ import org.apache.commons.logging.LogFactory;
 
 public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
 {
-   private static Log logger = LogFactory.getLog(AuthoringServiceSystemTest.class);
-   
-   private static String versionedNodeId;
-   private static final String INITIAL_VERSION_CONTENT = "Content of the initial version";
-   private static final String FIRST_VERSION_CONTENT = "Content of the first version";
-   private static final String SECOND_VERSION_CONTENT = "The content for the second version is completely different";
-   private static final String THIRD_VERSION_CONTENT = "The third version is short!";
-   
-   private AuthoringServiceSoapBindingStub authoringService;
+    @SuppressWarnings("unused")
+    private static Log logger = LogFactory.getLog(AuthoringServiceSystemTest.class);
 
-   @Override
-   protected void setUp() throws Exception
-   {
-      super.setUp();
+    private static final String INITIAL_VERSION_CONTENT = "Content of the initial version";
+    private static final String SECOND_VERSION_CONTENT = "The content for the second version is completely different";
+    
+    private static final String VALUE_DESCRIPTION = "description";
 
-      try 
-      {
-         EngineConfiguration config = new FileProvider(getResourcesDir(), "client-deploy.wsdd");
-         this.authoringService = (AuthoringServiceSoapBindingStub)new AuthoringServiceLocator(config).getAuthoringService();
-      }
-      catch (ServiceException jre) 
-      {
-         if (jre.getLinkedCause() != null)
-         {
-            jre.getLinkedCause().printStackTrace();
-         }
-         
-         throw new AssertionFailedError("JAX-RPC ServiceException caught: " + jre);
-      }
-      
-      assertNotNull("authoringService is null", this.authoringService);
-      
-      // Time out after a minute
-      this.authoringService.setTimeout(60000);
-   }
-   
-   public void testCreateNode() throws Exception
-   {
-      ContentServiceSoapBindingStub contentService = null;
-      try 
-      {
-         EngineConfiguration config = new FileProvider(getResourcesDir(), "client-deploy.wsdd");
-         contentService = (ContentServiceSoapBindingStub)new ContentServiceLocator(config).getContentService();
-         assertNotNull("contentService is null", contentService);
-         contentService.setTimeout(60000);
-      }
-      catch (Exception e) 
-      {
-         fail("Could not instantiate the content service" + e.toString());
-      }
-      
-      // get the root node (hard code for now until we have a way to query for the root node)
-      ParentReference root = new ParentReference();
-      root.setStore(STORE);
-      root.setUuid(companyHomeId);
-      
-      String mimetype = "text/plain";
-      Content content = contentService.create(root, "version-test.txt", new ContentFormat(mimetype, "UTF-8"), 
-            INITIAL_VERSION_CONTENT.getBytes());
-      assertNotNull("returned content should not be null", content);
-      assertNotNull("format should not be null", content.getFormat());
-      assertEquals("Mimetype should match what was sent", mimetype, content.getFormat().getMimetype());
-      versionedNodeId = content.getReference().getUuid();
-      logger.debug("created new content with id: " + versionedNodeId);
-   }
-   
-   /**
-    * Tests the checkout service method
-    * 
-    * @throws Exception
-    */
-   public void testCheckout() throws Exception
-   {
-      Reference ref = new Reference();
-      ref.setStore(STORE);
-      ref.setUuid(versionedNodeId);
-      Predicate predicate = new Predicate();
-      predicate.setNodes(new Reference[] {ref});
-      
-      CheckoutResult result = this.authoringService.checkout(predicate, null);
-      assertNotNull("The result should not be null", result);
-      assertEquals("There should only be 1 original reference", 1, result.getOriginals().length);
-      assertEquals("There should only be 1 working copy reference", 1, result.getWorkingCopies().length);
-   }
-   
-   /**
-    * Tests the checkout service method passing a destination for the working copy
-    * 
-    * @throws Exception
-    */
-   public void xtestCheckoutWithDestination() throws Exception
-   {
-      Reference ref = new Reference();
-      ref.setStore(STORE);
-      ref.setUuid(versionedNodeId);
-      Predicate predicate = new Predicate();
-      predicate.setNodes(new Reference[] {ref});
-      
-      // define the parent reference as a path based reference
-      ParentReference checkoutLocation = new ParentReference();
-      checkoutLocation.setStore(STORE);
-      checkoutLocation.setPath("//*[@cm:name = 'Alfresco Tutorial']");
-      
-      CheckoutResult result = this.authoringService.checkout(predicate, checkoutLocation);
-      assertNotNull("The result should not be null", result);
-      assertEquals("There should only be 1 original reference", 1, result.getOriginals().length);
-      assertEquals("There should only be 1 working copy reference", 1, result.getWorkingCopies().length);
-   }
-   
-   /**
-    * Tests the checkin service method
-    * 
-    * @throws Exception
-    */
-   public void testCheckin() throws Exception
-   {
-      try
-      {
-         this.authoringService.checkin(null, null, false);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+    private AuthoringServiceSoapBindingStub authoringService;
 
-   /**
-    * Tests the checkinExternal service method
-    * 
-    * @throws Exception
-    */
-   public void testCheckinExternal() throws Exception
-   {
-      try
-      {
-         this.authoringService.checkinExternal(null, null, false, null, null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
 
-   /**
-    * Tests the cancelCheckout service method
-    * 
-    * @throws Exception
-    */
-   public void testCancelCheckout() throws Exception
-   {
-      try
-      {
-         this.authoringService.cancelCheckout(null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+        try
+        {
+            EngineConfiguration config = new FileProvider(getResourcesDir(),
+                    "client-deploy.wsdd");
+            this.authoringService = (AuthoringServiceSoapBindingStub) new AuthoringServiceLocator(
+                    config).getAuthoringService();
+        } 
+        catch (ServiceException jre)
+        {
+            if (jre.getLinkedCause() != null)
+            {
+                jre.getLinkedCause().printStackTrace();
+            }
 
-   /**
-    * Tests the lock service method
-    * 
-    * @throws Exception
-    */
-   public void testLock() throws Exception
-   {
-      try
-      {
-         this.authoringService.lock(null, false, null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+            throw new AssertionFailedError("JAX-RPC ServiceException caught: "
+                    + jre);
+        }
 
-   /**
-    * Tests the unlock service method
-    * 
-    * @throws Exception
-    */
-   public void testUnlock() throws Exception
-   {
-      try
-      {
-         this.authoringService.unlock(null, false);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+        assertNotNull(this.authoringService);
 
-   /**
-    * Tests the getLockStatus service method
-    * 
-    * @throws Exception
-    */
-   public void testGetLockStatus() throws Exception
-   {
-      try
-      {
-         this.authoringService.getLockStatus(null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+        // Time out after a minute
+        this.authoringService.setTimeout(60000);
+    }
 
-   /**
-    * Tests the createVersion service method
-    * 
-    * @throws Exception
-    */
-   public void testCreateVersion() throws Exception
-   {
-      try
-      {
-         this.authoringService.createVersion(null, null, false);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+    /**
+     * Tests the checkout service method
+     * 
+     * @throws Exception
+     */
+    public void testCheckout() throws Exception
+    {
+        doCheckOut();
+        
+        // TODO test multiple checkout
+    }
+    
+    /**
+     * Reusable method to do a standard checkout
+     * 
+     * @return
+     * @throws Exception
+     */
+    private Reference doCheckOut() throws Exception
+    {
+        // Use the helper to create the verionable node
+        Reference reference = createContentAtRoot("version_test.txt", INITIAL_VERSION_CONTENT);        
+        Predicate predicate = convertToPredicate(reference);
 
-   /**
-    * Tests the getVersionHistory service method
-    * 
-    * @throws Exception
-    */
-   public void testGetVersionHistory() throws Exception
-   {
-      try
-      {
-         this.authoringService.getVersionHistory(null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+        // Check the content out (to the same detination)
+        CheckoutResult result = this.authoringService.checkout(predicate, null);
+        assertNotNull(result);
+        assertEquals(1, result.getOriginals().length);
+        assertEquals(1, result.getWorkingCopies().length);
+        
+        // TODO need to check that the working copy and the origional are in the correct states ...
+        
+        return result.getWorkingCopies()[0];
+    }
 
-   /**
-    * Tests the revertVersion service method
-    * 
-    * @throws Exception
-    */
-   public void testRevertVersion() throws Exception
-   {
-      try
-      {
-         this.authoringService.revertVersion(null, null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+    /**
+     * Tests the checkout service method passing a destination for the working
+     * copy
+     * 
+     * @throws Exception
+     */
+    public void testCheckoutWithDestination() throws Exception
+    {
+        Reference reference = createContentAtRoot("version_test.txt", INITIAL_VERSION_CONTENT);
+        Predicate predicate = convertToPredicate(reference);        
+        ParentReference parentReference = getFolderParentReference(QName.createQName("{test}workingCopy"));
+        
+        // Checkout the content to the folder
+        CheckoutResult result = this.authoringService.checkout(predicate, parentReference);
+        assertNotNull(result);
+        assertEquals(1, result.getOriginals().length);
+        assertEquals(1, result.getWorkingCopies().length);
+        
+        // TODO need to check that the working copy and the origional are in the correct states
+    }
 
-   /**
-    * Tests the deleteAllVersions service method
-    * 
-    * @throws Exception
-    */
-   public void testDeleteAllVersions() throws Exception
-   {
-      try
-      {
-         this.authoringService.deleteAllVersions(null);
-         fail("This method should have thrown an authoring fault");
-      }
-      catch (AuthoringFault af)
-      {
-         // expected to get this
-      }
-   }
+    /**
+     * Tests the checkin service method
+     * 
+     * @throws Exception
+     */
+    public void testCheckin() throws Exception
+    {
+        // First we need to check a document out
+        Reference workingCopy = doCheckOut();
+        
+        // Check in but keep checked out
+        Predicate predicate = convertToPredicate(workingCopy);
+        NamedValue[] comments = getVersionComments();
+        CheckinResult checkinResult = this.authoringService.checkin(predicate, comments, true);
+        
+        // Check the result
+        assertNotNull(checkinResult);
+        assertEquals(1, checkinResult.getCheckedIn().length);
+        assertEquals(1, checkinResult.getWorkingCopies().length);
+        // TODO check that state of the orig and working copies
+        
+        // Checkin but don't keep checked out
+        Predicate predicate2 = convertToPredicate(checkinResult.getWorkingCopies()[0]);
+        CheckinResult checkinResult2 = this.authoringService.checkin(predicate2, comments, false);
+        
+        // Check the result
+        assertNotNull(checkinResult2);
+        assertEquals(1, checkinResult2.getCheckedIn().length);
+        assertNull(checkinResult2.getWorkingCopies());
+        // TODO check the above behaviour ...
+        // TODO check that the state of the org and working copies
+        
+        // TODO check multiple checkin
+    }
+
+    /**
+     * Helper method to get a list of version comments
+     * 
+     * @return
+     */
+    private NamedValue[] getVersionComments()
+    {
+        NamedValue[] comments = new NamedValue[1];
+        comments[0] = new NamedValue(org.alfresco.service.cmr.version.Version.PROP_DESCRIPTION, VALUE_DESCRIPTION);
+        return comments;
+    }
+
+    /**
+     * Tests the checkinExternal service method
+     * 
+     * @throws Exception
+     */
+    public void testCheckinExternal() throws Exception
+    {
+        // First we need to check a document out
+        Reference workingCopy = doCheckOut();
+        
+        // Check in with external content
+        NamedValue[] comments = getVersionComments();
+        ContentFormat contentFormat = new ContentFormat(MimetypeMap.MIMETYPE_TEXT_PLAIN, "UTF-8");
+        Reference origionalNode = this.authoringService.checkinExternal(workingCopy, comments, false, contentFormat, SECOND_VERSION_CONTENT.getBytes());
+        
+        // Check the origianl Node
+        assertNotNull(origionalNode);
+        ReadResult readResult = this.contentService.read(origionalNode);
+        assertNotNull(readResult);
+        String checkedInContent = getContentAsString(readResult.getUrl());
+        assertNotNull(checkedInContent);
+        assertEquals(SECOND_VERSION_CONTENT, checkedInContent);
+    }
+
+    /**
+     * Tests the cancelCheckout service method
+     * 
+     * @throws Exception
+     */
+    public void testCancelCheckout() throws Exception
+    {
+        // Check out a node
+        Reference workingCopy = doCheckOut();
+        
+        // Cancel the check out
+        Predicate predicate = convertToPredicate(workingCopy);
+        CancelCheckoutResult result = this.authoringService.cancelCheckout(predicate);
+        
+        // Check the result
+        assertNotNull(result);
+        assertEquals(1, result.getOriginals().length);
+        // TODO check that state of the orig and that the working copy has been deleted
+        
+        // TODO I don't think that the working copies should be returned in the result since they have been deleted !!
+    }
+
+    /**
+     * Tests the lock service methods, lock, unlock and getStaus
+     * 
+     * @throws Exception
+     */
+    public void testLockUnLockGetStatus() throws Exception
+    {
+        Reference reference = createContentAtRoot("lock_test1.txt", INITIAL_VERSION_CONTENT);        
+        Predicate predicate = convertToPredicate(reference);
+        
+        // Get the status 
+        checkLockStatus(predicate, null, null);
+        
+        // Lock with a write lock
+        Reference[] lockedRefs = this.authoringService.lock(predicate, USERNAME, false, LockTypeEnum.write);
+        assertNotNull(lockedRefs);
+        assertEquals(1, lockedRefs.length);        
+        // TODO check in more detail
+        
+        // Get the status
+        checkLockStatus(predicate, USERNAME, LockTypeEnum.write);
+        
+        // Unlock (bad)
+        try
+        {
+            this.authoringService.unlock(predicate, "bad", false);
+            fail("This should have thrown an exception.");
+        }
+        catch (Throwable exception)
+        {
+            // Good .. we where expceting this
+        }
+        
+        // Unlock (good)
+        Reference[] unlocked = this.authoringService.unlock(predicate, USERNAME, false);
+        assertNotNull(unlocked);
+        assertEquals(1, unlocked.length);
+        
+        // Get the status
+        checkLockStatus(predicate, null, null);
+        
+        // Read lock
+        Reference[] lockedRefs2 = this.authoringService.lock(predicate, USERNAME, false, LockTypeEnum.read);
+        
+        assertNotNull(lockedRefs2);
+        assertEquals(1, lockedRefs2.length);
+        // TODO check in more detail
+        
+        // Get the status
+        checkLockStatus(predicate, USERNAME, LockTypeEnum.read);
+    }
+    
+    private void checkLockStatus(Predicate predicate, String lockOwner, LockTypeEnum lockType)
+        throws Exception
+    {
+        LockStatus[] lockStatus1 = this.authoringService.getLockStatus(predicate);
+        assertNotNull(lockStatus1);
+        assertEquals(1, lockStatus1.length);
+        LockStatus ls1 = lockStatus1[0];
+        assertNotNull(ls1);
+        assertEquals(lockOwner, ls1.getLockOwner());
+        assertEquals(lockType, ls1.getLockType());
+    }
+
+    /**
+     * Tests the createVersion service method
+     * 
+     * @throws Exception
+     */
+    public void testVersionMethods() throws Exception
+    {
+        Reference reference = createContentAtRoot("create_version_test.txt", INITIAL_VERSION_CONTENT);        
+        Predicate predicate = convertToPredicate(reference);
+        
+        // Get the version history (before its been versioned)
+        VersionHistory emptyVersionHistory = this.authoringService.getVersionHistory(reference);
+        assertNotNull(emptyVersionHistory);
+        assertNull(emptyVersionHistory.getVersions());
+        
+        // Create the version
+        VersionResult result = this.authoringService.createVersion(predicate, getVersionComments(), false);        
+        assertNotNull(result);
+        assertEquals(1, result.getNodes().length);
+        assertEquals(1, result.getVersions().length);
+        Version version = result.getVersions()[0];
+        assertEquals("1.0", version.getLabel());
+        // TODO check commentaries
+        // TODO check creator
+        
+        // Get the version history
+        VersionHistory versionHistory = this.authoringService.getVersionHistory(reference);
+        assertNotNull(versionHistory);
+        assertEquals(1, versionHistory.getVersions().length);
+        // TODO some more tests ...
+        
+        // Update the content
+        this.contentService.write(reference, SECOND_VERSION_CONTENT.getBytes());
+        
+        // Create another version
+        VersionResult versionResult2 = this.authoringService.createVersion(predicate, getVersionComments(), false);
+        assertNotNull(versionResult2);
+        assertEquals(1, versionResult2.getNodes().length);
+        assertEquals(1, versionResult2.getVersions().length);
+        Version version2 = versionResult2.getVersions()[0];
+        assertEquals("1.1", version2.getLabel());
+        // TODO check commentaries
+        // TODO check creator
+        
+        // Check the version history
+        VersionHistory versionHistory2 = this.authoringService.getVersionHistory(reference);
+        assertNotNull(versionHistory2);
+        assertEquals(2, versionHistory2.getVersions().length);
+        // TODO some more tests ...
+        
+        // Confirm the current content of the node
+        ReadResult readResult1 = this.contentService.read(reference);
+        String content1 = getContentAsString(readResult1.getUrl());
+        assertEquals(SECOND_VERSION_CONTENT, content1);
+        
+        // Revert the node to the first version
+        this.authoringService.revertVersion(reference, "1.0");
+        
+        // Confirm that the state of the node has been reverted
+        ReadResult readResult2 = this.contentService.read(reference);
+        String content2 = getContentAsString(readResult2.getUrl());
+        assertEquals(INITIAL_VERSION_CONTENT, content2);
+        
+        // Now delete the version history
+        VersionHistory deletedVersionHistory = this.authoringService.deleteAllVersions(reference);
+        assertNotNull(deletedVersionHistory);
+        assertNull(deletedVersionHistory.getVersions());
+        
+        // Check the version history
+        VersionHistory versionHistory3 = this.authoringService.getVersionHistory(reference);
+        assertNotNull(versionHistory3);
+        assertNull(versionHistory3.getVersions());        
+    }
 }

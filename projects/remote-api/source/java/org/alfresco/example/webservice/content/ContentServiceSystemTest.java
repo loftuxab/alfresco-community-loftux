@@ -20,18 +20,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.xml.rpc.ServiceException;
-
-import junit.framework.AssertionFailedError;
-
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
 import org.alfresco.example.webservice.types.Content;
 import org.alfresco.example.webservice.types.ContentFormat;
 import org.alfresco.example.webservice.types.ParentReference;
 import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Reference;
-import org.apache.axis.EngineConfiguration;
-import org.apache.axis.configuration.FileProvider;
+import org.alfresco.model.ContentModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,35 +37,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
    private static final String UPDATED_CONTENT = "This is some updated content to test the write service call";
    
    private static String newContentId;
-   private ContentServiceSoapBindingStub contentService;
    private String fileName = "unit-test.txt";
-   
-
-   @Override
-   protected void setUp() throws Exception
-   {
-      super.setUp();
-
-      try 
-      {
-         EngineConfiguration config = new FileProvider(getResourcesDir(), "client-deploy.wsdd");
-         this.contentService = (ContentServiceSoapBindingStub)new ContentServiceLocator(config).getContentService();
-      }
-      catch (ServiceException jre) 
-      {
-         if (jre.getLinkedCause() != null)
-         {
-            jre.getLinkedCause().printStackTrace();
-         }
-         
-         throw new AssertionFailedError("JAX-RPC ServiceException caught: " + jre);
-      }
-      
-      assertNotNull("contentService is null", this.contentService);
-      
-      // Time out after a minute
-      this.contentService.setTimeout(60000);
-   }
    
    /**
     * Tests the create content service method
@@ -80,17 +47,18 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
    public void testCreate() throws Exception
    {
       // get the root node (hard code for now until we have a way to query for the root node)
-      ParentReference root = new ParentReference();
-      root.setStore(STORE);
-      root.setUuid(companyHomeId);
+      ParentReference parent = getFolderParentReference(ContentModel.ASSOC_CONTAINS);
       
+      // Create the content
       String mimetype = "text/plain";
-      Content content = this.contentService.create(root, this.fileName, new ContentFormat(mimetype, "UTF-8"), CONTENT.getBytes());
-      assertNotNull("returned content should not be null", content);
-      assertNotNull("format should not be null", content.getFormat());
+      Content content = this.contentService.create(parent, this.fileName, new ContentFormat(mimetype, "UTF-8"), CONTENT.getBytes());
+      
+      // Check the content
+      assertNotNull("Returned content should not be null", content);
+      assertNotNull("Format should not be null", content.getFormat());
       assertEquals("Mimetype should match what was sent", mimetype, content.getFormat().getMimetype());
       newContentId = content.getReference().getUuid();
-      logger.debug("created new content with id: " + newContentId);
+      logger.debug("Created new content with id: " + newContentId);
    }
    
    /**
@@ -106,7 +74,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       }
       
       Reference node = new Reference();
-      node.setStore(STORE);
+      node.setStore(getStore());
       node.setUuid(newContentId);
       
       ReadResult result = this.contentService.read(node);
@@ -131,7 +99,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       }
       
       Reference node = new Reference();
-      node.setStore(STORE);
+      node.setStore(getStore());
       node.setUuid(newContentId);
       
       this.contentService.write(node, UPDATED_CONTENT.getBytes());
@@ -150,20 +118,11 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
                on the URL */
                
       // read the contents of the URL and make sure they match
-      StringBuilder readContent = new StringBuilder();
-      URL url = new URL(result.getUrl());
-      URLConnection conn = url.openConnection();
-      InputStream is = conn.getInputStream();
-      int read = is.read();
-      while (read != -1)
-      {
-         readContent.append((char)read);
-         read = is.read();
-      }
+      String contentValue = getContentAsString(result.getUrl());
       
       // make sure the content in the repository is correct
-      logger.debug("Content from repository: " + readContent.toString());
-      assertEquals("Content does not match", UPDATED_CONTENT, readContent.toString());
+      logger.debug("Content from repository: " + contentValue);
+      assertEquals("Content does not match", UPDATED_CONTENT, contentValue);
    }
    
    /**
@@ -180,7 +139,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       
       // create the predicate representation of the content
       Reference ref = new Reference();
-      ref.setStore(STORE);
+      ref.setStore(getStore());
       ref.setUuid(newContentId);
       Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
       
@@ -207,7 +166,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       
       // create the predicate representation of the content
       Reference ref = new Reference();
-      ref.setStore(STORE);
+      ref.setStore(getStore());
       ref.setUuid(newContentId);
       Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
       
@@ -255,7 +214,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
       
       // create the predicate representation of the content
       Reference ref = new Reference();
-      ref.setStore(STORE);
+      ref.setStore(getStore());
       ref.setUuid(newContentId);
       Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
       

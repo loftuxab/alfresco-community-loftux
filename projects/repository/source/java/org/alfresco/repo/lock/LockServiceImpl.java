@@ -134,7 +134,7 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType)
      */
     public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType)
-        throws UnableToAquireLockException, AspectMissingException
+        throws UnableToAquireLockException
     {
         // Check for lock aspect
         checkForLockApsect(nodeRef);
@@ -171,9 +171,9 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, LockType, boolean)
      */
     public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType, boolean lockChildren)
-        throws UnableToAquireLockException, AspectMissingException
+        throws UnableToAquireLockException
     {
-        lock(nodeRef, userName, LockType.WRITE_LOCK);
+        lock(nodeRef, userName, lockType);
         
         if (lockChildren == true)
         {
@@ -189,12 +189,12 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.service.cmr.lock.LockService#lock(java.util.Collection, java.lang.String, LockType)
      */
     public synchronized void lock(Collection<NodeRef> nodeRefs, String userName, LockType lockType)
-        throws UnableToAquireLockException, AspectMissingException
+        throws UnableToAquireLockException
     {        
         // Lock each of the specifed nodes
         for (NodeRef nodeRef : nodeRefs)
         {
-            lock(nodeRef, userName, LockType.WRITE_LOCK);
+            lock(nodeRef, userName, lockType);
         }        
     }
 
@@ -202,7 +202,7 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String)
      */
     public synchronized void unlock(NodeRef nodeRef, String userName)
-        throws UnableToReleaseLockException, AspectMissingException
+        throws UnableToReleaseLockException
     {
         // Check for lock aspect
         checkForLockApsect(nodeRef);
@@ -233,7 +233,7 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String, boolean)
      */
     public synchronized void unlock(NodeRef nodeRef, String userName, boolean unlockChildren)
-        throws UnableToReleaseLockException, AspectMissingException
+        throws UnableToReleaseLockException
     {
         // Unlock the parent
         unlock(nodeRef, userName);
@@ -253,7 +253,7 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.repo.lock.LockService#unlock(Collection<NodeRef>, String)
      */
     public synchronized void unlock(Collection<NodeRef> nodeRefs, String userName)
-        throws UnableToReleaseLockException, AspectMissingException
+        throws UnableToReleaseLockException
     {        
         for (NodeRef nodeRef : nodeRefs)
         {
@@ -264,7 +264,7 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#getLockStatus(NodeRef)
      */
-    public LockStatus getLockStatus(NodeRef nodeRef) throws AspectMissingException
+    public LockStatus getLockStatus(NodeRef nodeRef) 
     {
         return getLockStatus(nodeRef, getUserName());
     }
@@ -273,24 +273,23 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.service.cmr.lock.LockService#getLockStatus(NodeRef, String)
      */
     public LockStatus getLockStatus(NodeRef nodeRef, String userName)
-        throws AspectMissingException
     {
-        // Check for lock aspect
-        checkForLockApsect(nodeRef);
-        
         LockStatus result = LockStatus.NO_LOCK;
         
-        // Get the current lock owner
-        String currentUserRef = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
-        if (currentUserRef != null)
+        if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE) == true)
         {
-            if (currentUserRef.equals(userName) == true)
+            // Get the current lock owner
+            String currentUserRef = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
+            if (currentUserRef != null)
             {
-                result = LockStatus.LOCK_OWNER;
-            }
-            else
-            {
-                result = LockStatus.LOCKED;
+                if (currentUserRef.equals(userName) == true)
+                {
+                    result = LockStatus.LOCK_OWNER;
+                }
+                else
+                {
+                    result = LockStatus.LOCKED;
+                }
             }
         }
         
@@ -302,35 +301,31 @@ public class LockServiceImpl implements LockService
      * @see LockService#getLockType(NodeRef)
      */
     public LockType getLockType(NodeRef nodeRef)
-        throws AspectMissingException
     {
         LockType result = null;
         
-        // Check for the lock aspect
-        checkForLockApsect(nodeRef);
-        
-        String lockTypeString = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_TYPE);
-        if (lockTypeString != null)
+        if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE) == true)
         {
-            result = LockType.valueOf(lockTypeString);
+            String lockTypeString = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_TYPE);
+            if (lockTypeString != null)
+            {
+                result = LockType.valueOf(lockTypeString);
+            }
         }
         
         return result;
     }
     
     /**
-     * Checks for the lock aspect.  Throws an expception if it is missing.
+     * Checks for the lock aspect.  Adds if missing.
      * 
      * @param nodeRef   the node reference
-     * @throws AspectMissingException
-     *                  thrown if the lock aspect is missing
      */
     private void checkForLockApsect(NodeRef nodeRef)
-        throws AspectMissingException
     {
         if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE) == false)
         {
-            throw new AspectMissingException(ContentModel.ASPECT_LOCKABLE, nodeRef);
+            this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_LOCKABLE, null);
         }
     }
 	

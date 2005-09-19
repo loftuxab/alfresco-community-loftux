@@ -90,10 +90,20 @@ public interface Version extends Serializable
     public Serializable getVersionProperty(String name);
 
     /**
+     * Gets a reference to the node that this version was created from.
+     * <p>
+     * Note that this reference will be to the current state of the versioned
+     * node which may now correspond to a later version.
+     * 
+     * @return  a node reference
+     */
+    public NodeRef getVersionedNodeRef();
+    
+    /**
      * Gets the reference to the node that contains the frozen state of the
      * version.
      * 
      * @return  a node reference
      */
-    public NodeRef getNodeRef();
+    public NodeRef getFrozenStateNodeRef();
 }

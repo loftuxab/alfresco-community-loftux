@@ -99,7 +99,7 @@ public class AddFeaturesActionExecuter extends ActionExecuterAbstractBase
     }
 
     /**
-     * Add parameter definitions
+     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefintions(java.util.List)
      */
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 

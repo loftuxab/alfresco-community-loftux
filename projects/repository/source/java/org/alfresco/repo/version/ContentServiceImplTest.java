@@ -60,7 +60,7 @@ public class ContentServiceImplTest extends BaseVersionStoreTest
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
-        NodeRef versionNodeRef = version.getNodeRef();
+        NodeRef versionNodeRef = version.getFrozenStateNodeRef();
 		
         // Get the content reader for the frozen node
         ContentReader contentReader = this.contentService.getReader(versionNodeRef);
@@ -72,7 +72,7 @@ public class ContentServiceImplTest extends BaseVersionStoreTest
         assertNotNull(contentWriter);
         contentWriter.putContent(UPDATED_CONTENT);        
         Version version2 = createVersion(versionableNode, this.versionProperties);
-        NodeRef version2NodeRef = version2.getNodeRef();
+        NodeRef version2NodeRef = version2.getFrozenStateNodeRef();
 		
         // Get the content reader for the new verisoned content
         ContentReader contentReader2 = this.contentService.getReader(version2NodeRef);
@@ -94,7 +94,7 @@ public class ContentServiceImplTest extends BaseVersionStoreTest
         // Get writer is not supported by the version content service
         try
         {
-            ContentWriter contentWriter = this.contentService.getUpdatingWriter(version.getNodeRef());
+            ContentWriter contentWriter = this.contentService.getUpdatingWriter(version.getFrozenStateNodeRef());
             contentWriter.putContent("bobbins");
             fail("This operation is not supported.");
         }

@@ -57,6 +57,8 @@ public class VersionHistoryImpl implements VersionHistory
      */
     private HashMap<String, Version> versions = null;
     
+    private Version rootVersion;
+    
     /**
      * Constructor, ensures the root version is set.
      * 
@@ -74,6 +76,7 @@ public class VersionHistoryImpl implements VersionHistory
         this.versionHistory = new HashMap<String, String>();
         this.versions = new HashMap<String, Version>();
         
+        this.rootVersion = rootVersion;
         this.rootVersionLabel = rootVersion.getVersionLabel();
         addVersion(rootVersion, null);        
     }    
@@ -85,7 +88,7 @@ public class VersionHistoryImpl implements VersionHistory
      */
     public Version getRootVersion()
     {
-        return getVersion(this.rootVersionLabel);
+        return this.rootVersion;
     }
     
     /**

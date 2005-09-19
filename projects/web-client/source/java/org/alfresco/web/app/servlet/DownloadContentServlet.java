@@ -96,7 +96,7 @@ public class DownloadContentServlet extends HttpServlet
          else
          {
             // extract ticket from URI, use to authenticate
-            String ticket = params.substring(index + 8);
+            String ticket = params.substring(index + 7);
             AuthenticationHelper.authenticate(getServletContext(), req, res, ticket);
          }
          

@@ -88,7 +88,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         Version version = createVersion(versionableNode, this.versionProperties);
 	
         // Get the type from the versioned state
-        QName versionedType = this.lightWeightVersionStoreNodeService.getType(version.getNodeRef());
+        QName versionedType = this.lightWeightVersionStoreNodeService.getType(version.getFrozenStateNodeRef());
         assertNotNull(versionedType);
         assertEquals(this.dbNodeService.getType(versionableNode), versionedType);
     }
@@ -108,7 +108,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         Version version = createVersion(versionableNode, this.versionProperties);
         
         // Get the properties of the versioned state 
-        Map<QName, Serializable> versionedProperties = this.lightWeightVersionStoreNodeService.getProperties(version.getNodeRef());
+        Map<QName, Serializable> versionedProperties = this.lightWeightVersionStoreNodeService.getProperties(version.getFrozenStateNodeRef());
         //assertEquals(origProps.size(), versionedProperties.size());
         for (QName key : origProps.keySet())
         {
@@ -132,7 +132,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         
         // Check the property values can be retrieved
         Serializable value1 = this.lightWeightVersionStoreNodeService.getProperty(
-                version.getNodeRef(),
+                version.getFrozenStateNodeRef(),
                 PROP_1);
         assertEquals(VALUE_1, value1);
     }
@@ -175,7 +175,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         }
         
         // Get the children of the versioned node
-        Collection<ChildAssociationRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getNodeRef());
+        Collection<ChildAssociationRef> versionedChildren = this.lightWeightVersionStoreNodeService.getChildAssocs(version.getFrozenStateNodeRef());
         assertNotNull(versionedChildren);
         assertEquals(origionalChildren.size(), versionedChildren.size());
         
@@ -213,7 +213,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         Version version = createVersion(versionableNode, this.versionProperties);
 
         List<AssociationRef> assocs = this.lightWeightVersionStoreNodeService.getTargetAssocs(
-                version.getNodeRef(), 
+                version.getFrozenStateNodeRef(), 
                 RegexQNamePattern.MATCH_ALL);
         assertNotNull(assocs);
         assertEquals(origAssocs.size(), assocs.size());
@@ -231,12 +231,12 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         Version version = createVersion(versionableNode, this.versionProperties);
         
         boolean test1 = this.lightWeightVersionStoreNodeService.hasAspect(
-                version.getNodeRef(), 
+                version.getFrozenStateNodeRef(), 
                 ContentModel.ASPECT_UIFACETS);
         assertFalse(test1);
         
         boolean test2 = this.lightWeightVersionStoreNodeService.hasAspect(
-                version.getNodeRef(),
+                version.getFrozenStateNodeRef(),
                 ContentModel.ASPECT_VERSIONABLE);
         assertTrue(test2);
     }
@@ -253,7 +253,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
         
-        Set<QName> aspects = this.lightWeightVersionStoreNodeService.getAspects(version.getNodeRef());
+        Set<QName> aspects = this.lightWeightVersionStoreNodeService.getAspects(version.getFrozenStateNodeRef());
         assertEquals(origAspects.size(), aspects.size());
         
         // TODO check that the set's contain the same items
@@ -269,7 +269,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
-        NodeRef nodeRef = version.getNodeRef();
+        NodeRef nodeRef = version.getFrozenStateNodeRef();
         
         List<ChildAssociationRef> results = this.lightWeightVersionStoreNodeService.getParentAssocs(nodeRef);
         assertNotNull(results);
@@ -290,7 +290,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
         
         // Create a new version
         Version version = createVersion(versionableNode, this.versionProperties);
-        NodeRef nodeRef = version.getNodeRef();
+        NodeRef nodeRef = version.getFrozenStateNodeRef();
         
         ChildAssociationRef childAssoc = this.lightWeightVersionStoreNodeService.getPrimaryParent(nodeRef);
         assertNotNull(childAssoc);

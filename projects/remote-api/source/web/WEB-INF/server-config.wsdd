@@ -635,7 +635,7 @@
         <fault name="AuthoringFault" qname="fns:AuthoringFault" xmlns:fns="http://www.alfresco.org/ws/service/authoring/1.0" class="org.alfresco.repo.webservice.authoring.AuthoringFault" type="tns:AuthoringFault" xmlns:tns="http://www.alfresco.org/ws/service/authoring/1.0"/>
       </operation>
       <operation name="checkinExternal" qname="operNS:checkinExternal" xmlns:operNS="http://www.alfresco.org/ws/service/authoring/1.0" returnQName="retNS:checkinExternalReturn" xmlns:retNS="http://www.alfresco.org/ws/service/authoring/1.0" returnType="rtns:Reference" xmlns:rtns="http://www.alfresco.org/ws/model/content/1.0" soapAction="http://www.alfresco.org/ws/service/authoring/1.0/checkinExternal" >
-        <parameter qname="pns:items" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:Predicate" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
+        <parameter qname="pns:items" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:Reference" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
         <parameter qname="pns:comments" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:NamedValue" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
         <parameter qname="pns:keepCheckedOut" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:boolean" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:format" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:ContentFormat" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
@@ -648,12 +648,14 @@
       </operation>
       <operation name="lock" qname="operNS:lock" xmlns:operNS="http://www.alfresco.org/ws/service/authoring/1.0" returnQName="retNS:lockReturn" xmlns:retNS="http://www.alfresco.org/ws/service/authoring/1.0" returnType="rtns:Reference" xmlns:rtns="http://www.alfresco.org/ws/model/content/1.0" soapAction="http://www.alfresco.org/ws/service/authoring/1.0/lock" >
         <parameter qname="pns:items" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:Predicate" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
+        <parameter qname="pns:user" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:lockChildren" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:boolean" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:lockType" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:LockTypeEnum" xmlns:tns="http://www.alfresco.org/ws/service/authoring/1.0"/>
         <fault name="AuthoringFault" qname="fns:AuthoringFault" xmlns:fns="http://www.alfresco.org/ws/service/authoring/1.0" class="org.alfresco.repo.webservice.authoring.AuthoringFault" type="tns:AuthoringFault" xmlns:tns="http://www.alfresco.org/ws/service/authoring/1.0"/>
       </operation>
       <operation name="unlock" qname="operNS:unlock" xmlns:operNS="http://www.alfresco.org/ws/service/authoring/1.0" returnQName="retNS:unlockReturn" xmlns:retNS="http://www.alfresco.org/ws/service/authoring/1.0" returnType="rtns:Reference" xmlns:rtns="http://www.alfresco.org/ws/model/content/1.0" soapAction="http://www.alfresco.org/ws/service/authoring/1.0/unlock" >
         <parameter qname="pns:items" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:Predicate" xmlns:tns="http://www.alfresco.org/ws/model/content/1.0"/>
+        <parameter qname="pns:user" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:unlockChildren" xmlns:pns="http://www.alfresco.org/ws/service/authoring/1.0" type="tns:boolean" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <fault name="AuthoringFault" qname="fns:AuthoringFault" xmlns:fns="http://www.alfresco.org/ws/service/authoring/1.0" class="org.alfresco.repo.webservice.authoring.AuthoringFault" type="tns:AuthoringFault" xmlns:tns="http://www.alfresco.org/ws/service/authoring/1.0"/>
       </operation>

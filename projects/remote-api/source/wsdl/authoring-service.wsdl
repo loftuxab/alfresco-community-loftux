@@ -52,7 +52,7 @@
          <element name="checkinExternal">
             <complexType>
                <sequence>
-                  <element name="items" type="cms:Predicate"/>
+                  <element name="items" type="cms:Reference"/>
                   <element name="comments" type="cms:NamedValue" minOccurs="0" maxOccurs="unbounded"/>
                   <element name="keepCheckedOut" type="xsd:boolean"/>
                   <element name="format" type="cms:ContentFormat"/>
@@ -89,6 +89,7 @@
             <complexType>
                <sequence>
                   <element name="items" type="cms:Predicate"/>
+                  <element name="user" type="xsd:string"/>
                   <element name="lockChildren" type="xsd:boolean"/>
                   <element name="lockType" type="author:LockTypeEnum"/>
                </sequence>
@@ -107,6 +108,7 @@
             <complexType>
                <sequence>
                   <element name="items" type="cms:Predicate"/>
+                  <element name="user" type="xsd:string"/>
                   <element name="unlockChildren" type="xsd:boolean"/>
                </sequence>
             </complexType>
@@ -228,16 +230,16 @@
          <complexType name="LockStatus">
             <sequence>
                <element name="node" type="cms:Reference"/>
-               <element name="lockType" type="author:LockTypeEnum"/>
-               <element name="lockOwner" type="cms:Reference"/>
+               <element name="lockType" type="author:LockTypeEnum" maxOccurs="1" minOccurs="0" nillable="true"/>
+               <element name="lockOwner" type="xsd:string" maxOccurs="1" minOccurs="0" nillable="true"/>
             </sequence>
          </complexType>
          <element name="LockStatus" type="author:LockStatus"/>
          
          <complexType name="VersionResult">
             <sequence>
-               <element name="node" type="cms:Reference"/>
-               <element name="version" type="cms:Version"/>
+               <element name="nodes" type="cms:Reference" minOccurs="0" maxOccurs="unbounded"/>
+               <element name="versions" type="cms:Version" minOccurs="0" maxOccurs="unbounded"/>
             </sequence>
          </complexType>
          <element name="VersionResult" type="author:VersionResult"/>

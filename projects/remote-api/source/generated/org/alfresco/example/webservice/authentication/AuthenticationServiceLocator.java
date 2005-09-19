@@ -9,6 +9,10 @@ package org.alfresco.example.webservice.authentication;
 
 public class AuthenticationServiceLocator extends org.apache.axis.client.Service implements org.alfresco.example.webservice.authentication.AuthenticationService {
 
+/**
+ * Provides simple authentication capability.
+ */
+
     public AuthenticationServiceLocator() {
     }
 

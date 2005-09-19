@@ -21,6 +21,7 @@ import javax.xml.rpc.ServiceException;
 import junit.framework.AssertionFailedError;
 
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
+import org.alfresco.example.webservice.WebServiceBootstrapSystemTest;
 import org.alfresco.example.webservice.types.ClassDefinition;
 import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.NodeDefinition;
@@ -34,8 +35,6 @@ import org.alfresco.example.webservice.types.ResultSet;
 import org.alfresco.example.webservice.types.ResultSetRow;
 import org.alfresco.example.webservice.types.ResultSetRowNode;
 import org.alfresco.example.webservice.types.Store;
-import org.alfresco.example.webservice.types.StoreEnum;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.commons.logging.Log;
@@ -44,9 +43,7 @@ import org.apache.commons.logging.LogFactory;
 public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 {
    private static Log logger = LogFactory.getLog(RepositoryServiceSystemTest.class);
-   private static Store STORE = new Store(StoreEnum.workspace, "SpacesStore");
-   private static StoreRef STORE_REF = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-
+   
    private RepositoryServiceSoapBindingStub repoService;
 
    @Override
@@ -83,11 +80,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    public void testGetStores() throws Exception
    {
       Store[] stores = this.repoService.getStores();
-      assertNotNull("stores array should not be null", stores);
-      logger.debug("store1 = " + stores[0].getScheme() + ":" + stores[0].getAddress());
-      logger.debug("store2 = " + stores[1].getScheme() + ":" + stores[1].getAddress());
-      logger.debug("store3 = " + stores[2].getScheme() + ":" + stores[2].getAddress());
-      assertTrue("There should be 3 stores", stores.length == 3);
+      assertNotNull("Stores array should not be null", stores);
+      assertTrue("There should be at least 1 store", stores.length >= 1);
    }
    
    /**
@@ -100,7 +94,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       //Query query = new Query(QueryLanguageEnum.lucene, "*");
       Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
       
-      QueryResult queryResult = this.repoService.query(STORE, query, false);
+      QueryResult queryResult = this.repoService.query(getStore(), query, false);
       assertNotNull("queryResult should not be null", queryResult);
       
       ResultSet resultSet = queryResult.getResultSet();
@@ -138,13 +132,13 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       Query query = new Query(QueryLanguageEnum.lucene, "*");
       
       // add the query configuration header to the call
-      int batchSize = 75;
+      int batchSize = 5;
       QueryConfiguration queryCfg = new QueryConfiguration();
       queryCfg.setFetchSize(batchSize);
       this.repoService.setHeader(new RepositoryServiceLocator().getServiceName().getNamespaceURI(), "QueryHeader", queryCfg);
       
       // get the first set of results back
-      QueryResult queryResult = this.repoService.query(STORE, query, false);
+      QueryResult queryResult = this.repoService.query(getStore(), query, false);
       assertNotNull("queryResult should not be null", queryResult);
       String querySession = queryResult.getQuerySession();
       String origQuerySession = querySession;
@@ -196,10 +190,9 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    public void testQueryParents() throws Exception
    {
       // query for all the child nodes of the root
-      Reference node = new Reference();
-      node.setStore(STORE);
-      node.setUuid(rootId);     // find a query to retrieve this maybe type == store_root?
-      logger.debug("Retrieving children for node: " + rootId + "....");
+      Reference node = getRootNodeReference();
+      String rootId = node.getUuid();
+      
       QueryResult rootChildren = this.repoService.queryChildren(node);
       
       assertNotNull("rootChildren should not be null", rootChildren);
@@ -215,7 +208,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       logger.debug("Retrieving parents for first node found: " + id + "....");
       
       node = new Reference();
-      node.setStore(STORE);
+      node.setStore(getStore());
       node.setUuid(id);
       QueryResult parents = this.repoService.queryParents(node);
       
@@ -235,7 +228,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
          String nodeId = rowNode.getId();
          logger.debug("parent node = " + nodeId + ", type = " + rowNode.getType());
          
-         if (nodeId.equals(rootId))
+         if (nodeId.equals(rootId) == true)
          {
             rootFound = true;
          }
@@ -272,7 +265,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
    {
       // get hold of a node we know some info about so we can test the returned values (the Alfresco Tutorial PDF)
       Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
-      QueryResult queryResult = this.repoService.query(STORE, query, false);
+      QueryResult queryResult = this.repoService.query(getStore(), query, false);
       assertNotNull("queryResult should not be null", queryResult);
       ResultSet resultSet = queryResult.getResultSet();
       assertNotNull("The result set should not be null", resultSet);
@@ -282,7 +275,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       
       // create a predicate object to to send to describe method
       Reference ref = new Reference();
-      ref.setStore(STORE);
+      ref.setStore(getStore());
       ref.setUuid(id);
       Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
       
@@ -364,7 +357,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
       
       Predicate predicate = new Predicate();
       predicate.setQuery(query);
-      predicate.setStore(STORE);
+      predicate.setStore(getStore());
       
       // call the service and make sure we get some details back
       NodeDefinition[] nodeDefs = this.repoService.describe(predicate);
@@ -397,10 +390,10 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     */
    public void testPathReference() throws Exception
    {
-      // setup a predicate to find the 'Company Home' folder using an xpath
+      // setup a predicate to find the test folder using an xpath
       Reference ref = new Reference();
-      ref.setStore(STORE);
-      ref.setPath("//*[@cm:name = 'Company Home']");
+      ref.setStore(getStore());
+      ref.setPath("//*[@cm:name = '" + WebServiceBootstrapSystemTest.FOLDER_NAME + "']");
       Predicate predicate = new Predicate();
       predicate.setNodes(new Reference[] {ref});
 

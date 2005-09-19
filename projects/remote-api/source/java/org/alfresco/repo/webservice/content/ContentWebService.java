@@ -217,13 +217,16 @@ public class ContentWebService extends AbstractWebService implements ContentServ
          contentProps.put(ContentModel.PROP_NAME, name);
          contentProps.put(ContentModel.PROP_ENCODING, format.getEncoding());
          contentProps.put(ContentModel.PROP_MIME_TYPE, format.getMimetype());
+         contentProps.put(ContentModel.PROP_NAME, name);
+         
+         // TODO what do we do if the parent assoc type or name is not set ???
+         // TODO need to fix this you cos the old tests arn't going to work
          
          // create the node to represent the content
-         String assocName = QName.createValidLocalName(name);
          ChildAssociationRef assocRef = this.nodeService.createNode(
                parentNodeRef,
-               ContentModel.ASSOC_CONTAINS,
-               QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, assocName),
+               QName.createQName(parent.getAssociationType()),
+               QName.createQName(parent.getChildName()),
                ContentModel.TYPE_CONTENT,
                contentProps);
          

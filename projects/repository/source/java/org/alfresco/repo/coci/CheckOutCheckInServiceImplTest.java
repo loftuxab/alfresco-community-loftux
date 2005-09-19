@@ -231,7 +231,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		assertNotNull(version);
 		assertEquals("description", version.getDescription());
 		assertEquals(VersionType.MAJOR, version.getVersionType());
-		NodeRef versionNodeRef = version.getNodeRef();
+		NodeRef versionNodeRef = version.getFrozenStateNodeRef();
 		assertNotNull(versionNodeRef);
 		
 		// Check the verioned content

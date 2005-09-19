@@ -8,6 +8,10 @@
 package org.alfresco.example.webservice.authentication;
 
 public interface AuthenticationService extends javax.xml.rpc.Service {
+
+/**
+ * Provides simple authentication capability.
+ */
     public java.lang.String getAuthenticationServiceAddress();
 
     public org.alfresco.example.webservice.authentication.AuthenticationServiceSoapPort getAuthenticationService() throws javax.xml.rpc.ServiceException;

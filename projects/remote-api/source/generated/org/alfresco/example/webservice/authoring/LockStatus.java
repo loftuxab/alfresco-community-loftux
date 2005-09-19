@@ -10,7 +10,7 @@ package org.alfresco.example.webservice.authoring;
 public class LockStatus  implements java.io.Serializable {
     private org.alfresco.example.webservice.types.Reference node;
     private org.alfresco.example.webservice.authoring.LockTypeEnum lockType;
-    private org.alfresco.example.webservice.types.Reference lockOwner;
+    private java.lang.String lockOwner;
 
     public LockStatus() {
     }
@@ -18,7 +18,7 @@ public class LockStatus  implements java.io.Serializable {
     public LockStatus(
            org.alfresco.example.webservice.types.Reference node,
            org.alfresco.example.webservice.authoring.LockTypeEnum lockType,
-           org.alfresco.example.webservice.types.Reference lockOwner) {
+           java.lang.String lockOwner) {
            this.node = node;
            this.lockType = lockType;
            this.lockOwner = lockOwner;
@@ -70,7 +70,7 @@ public class LockStatus  implements java.io.Serializable {
      * 
      * @return lockOwner
      */
-    public org.alfresco.example.webservice.types.Reference getLockOwner() {
+    public java.lang.String getLockOwner() {
         return lockOwner;
     }
 
@@ -80,7 +80,7 @@ public class LockStatus  implements java.io.Serializable {
      * 
      * @param lockOwner
      */
-    public void setLockOwner(org.alfresco.example.webservice.types.Reference lockOwner) {
+    public void setLockOwner(java.lang.String lockOwner) {
         this.lockOwner = lockOwner;
     }
 
@@ -145,13 +145,15 @@ public class LockStatus  implements java.io.Serializable {
         elemField.setFieldName("lockType");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "lockType"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "LockTypeEnum"));
-        elemField.setNillable(false);
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("lockOwner");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "lockOwner"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"));
-        elemField.setNillable(false);
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 

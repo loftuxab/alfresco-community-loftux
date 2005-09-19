@@ -170,14 +170,7 @@ public class LockServiceImplTest extends BaseSpringTest
         }
         
         // Test with no apect node
-        try
-        {
-            this.lockService.lock(this.noAspectNode, this.goodUserNodeRef, LockType.WRITE_LOCK);
-            fail("This node has no lock aspect.");
-        }
-        catch (AspectMissingException exception)
-        {
-        }
+        this.lockService.lock(this.noAspectNode, this.goodUserNodeRef, LockType.WRITE_LOCK);        
     }
 
     /**
@@ -234,14 +227,7 @@ public class LockServiceImplTest extends BaseSpringTest
         }
         
         // Test with no apect node
-        try
-        {
-            this.lockService.unlock(this.noAspectNode, this.goodUserNodeRef);
-            fail("This node has no lock aspect.");
-        }
-        catch (AspectMissingException exception)
-        {
-        }
+        this.lockService.unlock(this.noAspectNode, this.goodUserNodeRef);
     }
     
     // TODO
@@ -275,14 +261,7 @@ public class LockServiceImplTest extends BaseSpringTest
         assertEquals(LockStatus.LOCK_OWNER, lockStatus3);
                 
         // Test with no apect node
-        try
-        {
-            this.lockService.getLockStatus(this.noAspectNode, this.goodUserNodeRef);
-            fail("This node has no lock aspect.");
-        }
-        catch (AspectMissingException exception)
-        {
-        }
+        this.lockService.getLockStatus(this.noAspectNode, this.goodUserNodeRef);
         
         // Test method overload
         LockStatus lockStatus4 = this.lockService.getLockStatus(this.parentNode); 
@@ -316,13 +295,6 @@ public class LockServiceImplTest extends BaseSpringTest
         assertEquals(LockType.READ_ONLY_LOCK, lockType4);
         
         // Test with no apect node
-        try
-        {
-            this.lockService.getLockType(this.noAspectNode);
-            fail("This node has no lock aspect.");
-        }
-        catch (AspectMissingException exception)
-        {
-        }
+        this.lockService.getLockType(this.noAspectNode);
     }
 }

@@ -168,6 +168,8 @@ public class RepositoryWebService extends AbstractWebService implements Reposito
             logger.error("Unexpected error occurred", e);
          }
          
+         e.printStackTrace();
+         
          throw new RepositoryFault(0, e.getMessage());
       }
    }

@@ -41,11 +41,9 @@ public interface LockService
     * @param  lockType the lock type
     * @throws UnableToAquireLockException
     *                  thrown if the lock could not be obtained
-    * @throws LockAspectMissing
-    *                   thrown if the lock aspect is missing
     */
    public void lock(NodeRef nodeRef, String userName, LockType lockType)
-       throws UnableToAquireLockException, AspectMissingException;
+       throws UnableToAquireLockException;
    
    /**
     * Places a lock on a node and optionally on all its children.  
@@ -65,11 +63,9 @@ public interface LockService
     * 
     * @throws UnableToAquireLockException
     *                        thrown if the lock could not be obtained
-    * @throws LockAspectMissing
-    *                        thrown if the lock aspect is missing
     */
    public void lock(NodeRef nodeRef, String userName, LockType lockType, boolean lockChildren)
-       throws UnableToAquireLockException, AspectMissingException;
+       throws UnableToAquireLockException;
    
    /**
     * Places a lock on all the nodes referenced in the passed list.  
@@ -86,11 +82,9 @@ public interface LockService
     * @param  lockType the type of lock being created
     * @throws UnableToAquireLockException
     *                  thrown if the lock could not be obtained
-    * @throws LockAspectMissing
-    *                   thrown if the lock aspect is missing
     */
    public void lock(Collection<NodeRef> nodeRefs, String userName, LockType lockType)
-       throws UnableToAquireLockException, AspectMissingException;
+       throws UnableToAquireLockException;
    
    /**
     * Removes the lock on a node.  
@@ -101,12 +95,10 @@ public interface LockService
     * @param  nodeRef  a reference to a node
     * @param  userName  the user reference
     * @throws UnableToReleaseLockException
-    *                  thrown if the lock could not be released
-    * @thrown AspectMissingException
-    *                   thrown if the lock aspect is missing                 
+    *                  thrown if the lock could not be released             
     */
    public void unlock(NodeRef nodeRef, String userName)
-       throws UnableToReleaseLockException, AspectMissingException;
+       throws UnableToReleaseLockException;
    
    /**
     * Removes the lock on a node and optional on its children.  
@@ -127,11 +119,9 @@ public interface LockService
     *                        of the node will also be unlocked, false otherwise
     * @throws UnableToReleaseLockException
     *                  thrown if the lock could not be released
-    * @thrown AspectMissingException
-    *                   thrown if the lock aspect is missing
     */
    public void unlock(NodeRef nodeRef, String userName, boolean lockChildren)
-       throws UnableToReleaseLockException, AspectMissingException;
+       throws UnableToReleaseLockException;
    
    /**
     * Removes a lock on the nodes provided.
@@ -150,11 +140,9 @@ public interface LockService
     * @param  userName   the user reference
     * @throws UnableToReleaseLockException
     *                  thrown if the lock could not be released
-    * @thrown AspectMissingException
-    *                   thrown if the lock aspect is missing
     */
    public void unlock(Collection<NodeRef> nodeRefs, String userName)
-       throws UnableToReleaseLockException, AspectMissingException;
+       throws UnableToReleaseLockException;
    
    /**
     * Gets the lock status for the node reference relative to the current user.
@@ -163,11 +151,8 @@ public interface LockService
     * 
     * @param nodeRef    the node reference
     * @return           the lock status
-    * @throws AspectMissingException
-    *                   thrown if the lock aspect is missing
     */
-   public LockStatus getLockStatus(NodeRef nodeRef)
-       throws AspectMissingException;
+   public LockStatus getLockStatus(NodeRef nodeRef);
    
    /**
     * Indicates the current lock status for the user against the passed node.
@@ -182,11 +167,8 @@ public interface LockService
     * @param nodeRef    the node reference
     * @param userName    the user reference
     * @return           the status of the lock in relation to the user
-    * @thrown AspectMissingException
-    *                   thrown if the lock aspect is missing
     */
-   public LockStatus getLockStatus(NodeRef nodeRef, String userName)
-       throws AspectMissingException;
+   public LockStatus getLockStatus(NodeRef nodeRef, String userName);
    
    /**
     * Gets the lock type for the node indicated.  
@@ -198,11 +180,8 @@ public interface LockService
     * @param  nodeRef  the node reference
     * @return          the lock type, null is returned if the object in question has no
     *                  lock
-    * @throws AspectMissingException
-    *                  thrown if the lock aspect is missing
     */
-   public LockType getLockType(NodeRef nodeRef)
-       throws AspectMissingException;
+   public LockType getLockType(NodeRef nodeRef);
    
    /**
     * Checks to see if the node is locked or not.  Gets the user reference from the current 
@@ -212,12 +191,8 @@ public interface LockService
     * lock type.
     * 
     * @param nodeRef   the node reference
-    * @throws NodeLockedException
-    *                  thrown if the node is determined to be locked based on the user ref and lock 
-    *                  type
     */
-   public void checkForLock(NodeRef nodeRef)
-   	  throws NodeLockedException;
+   public void checkForLock(NodeRef nodeRef);
    
    /**
     * Checks to see if the node is locked or not.
