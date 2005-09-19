@@ -38,7 +38,6 @@ import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;

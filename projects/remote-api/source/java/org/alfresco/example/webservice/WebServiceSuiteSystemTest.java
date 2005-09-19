@@ -17,14 +17,14 @@
 package org.alfresco.example.webservice;
 
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.alfresco.example.webservice.authentication.AuthenticationServiceSystemTest;
 import org.alfresco.example.webservice.authoring.AuthoringServiceSystemTest;
 import org.alfresco.example.webservice.classification.ClassificationServiceSystemTest;
 import org.alfresco.example.webservice.content.ContentServiceSystemTest;
 import org.alfresco.example.webservice.repository.RepositoryServiceSystemTest;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 public class WebServiceSuiteSystemTest extends TestSuite
 {

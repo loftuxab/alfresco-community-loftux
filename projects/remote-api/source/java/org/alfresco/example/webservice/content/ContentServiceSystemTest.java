@@ -16,10 +16,6 @@
  */
 package org.alfresco.example.webservice.content;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
 import org.alfresco.example.webservice.types.Content;
 import org.alfresco.example.webservice.types.ContentFormat;

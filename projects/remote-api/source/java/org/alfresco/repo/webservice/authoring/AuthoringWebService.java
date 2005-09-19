@@ -566,6 +566,7 @@ public class AuthoringWebService extends AbstractWebService implements
         }
         catch (Throwable e)
         {
+            
            if (logger.isDebugEnabled())
            {
               logger.error("Unexpected error occurred", e);
@@ -583,10 +584,10 @@ public class AuthoringWebService extends AbstractWebService implements
         {
             switch (lockType)
             {
-                case (WRITE_LOCK):
+                case WRITE_LOCK:
                     result =  LockTypeEnum.write;
                     break;
-                case (READ_ONLY_LOCK):
+                case READ_ONLY_LOCK:
                     result = LockTypeEnum.read;
                     break;                
             }
