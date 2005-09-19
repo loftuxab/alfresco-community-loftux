@@ -96,12 +96,6 @@ public class Node implements Serializable
       }
       
       this.properties = new QNameMap<String, Object>(this);
-      this.childAssociations = new QNameMap(this);
-      this.childAssociationsAdded = new HashMap<String, Map<String, ChildAssociationRef>>();
-      this.childAssociationsRemoved = new HashMap<String, Map<String, ChildAssociationRef>>();
-      this.associations = new QNameMap(this);
-      this.associationsAdded = new HashMap<String, Map<String, AssociationRef>>();
-      this.associationsRemoved = new HashMap<String, Map<String, AssociationRef>>();
    }
 
    /**
@@ -128,10 +122,12 @@ public class Node implements Serializable
     * @return All the associations this node has as a Map, using the association
     *         type as the key
     */
-   public Map getAssociations()
+   public final Map getAssociations()
    {
       if (this.assocsRetrieved == false)
       {
+         associations = new QNameMap(this);
+         
          List<AssociationRef> assocs = this.nodeService.getTargetAssocs(this.nodeRef, RegexQNamePattern.MATCH_ALL);
          
          for (AssociationRef assocRef: assocs)
@@ -161,8 +157,12 @@ public class Node implements Serializable
     * 
     * @return Map of Maps of AssociationRefs
     */
-   public Map<String, Map<String, AssociationRef>> getAddedAssociations()
+   public final Map<String, Map<String, AssociationRef>> getAddedAssociations()
    {
+      if (this.associationsAdded == null)
+      {
+         this.associationsAdded = new HashMap<String, Map<String, AssociationRef>>();
+      }
       return this.associationsAdded;
    }
    
@@ -171,8 +171,12 @@ public class Node implements Serializable
     * 
     * @return Map of Maps of AssociationRefs
     */
-   public Map<String, Map<String, AssociationRef>> getRemovedAssociations()
+   public final Map<String, Map<String, AssociationRef>> getRemovedAssociations()
    {
+      if (this.associationsRemoved == null)
+      {
+         this.associationsRemoved = new HashMap<String, Map<String, AssociationRef>>();
+      }
       return this.associationsRemoved;
    }
    
@@ -180,10 +184,12 @@ public class Node implements Serializable
     * @return All the child associations this node has as a Map, using the association
     *         type as the key
     */
-   public Map getChildAssociations()
+   public final Map getChildAssociations()
    {
       if (this.childAssocsRetrieved == false)
       {
+         this.childAssociations = new QNameMap(this);
+         
          List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(this.nodeRef);
          
          for (ChildAssociationRef assocRef: assocs)
@@ -213,8 +219,12 @@ public class Node implements Serializable
     * 
     * @return Map of Maps of ChildAssociationRefs
     */
-   public Map<String, Map<String, ChildAssociationRef>> getAddedChildAssociations()
+   public final Map<String, Map<String, ChildAssociationRef>> getAddedChildAssociations()
    {
+      if (this.childAssociationsAdded == null)
+      {
+         this.childAssociationsAdded = new HashMap<String, Map<String, ChildAssociationRef>>();
+      }
       return this.childAssociationsAdded;
    }
    
@@ -223,8 +233,12 @@ public class Node implements Serializable
     * 
     * @return Map of Maps of ChildAssociationRefs
     */
-   public Map<String, Map<String, ChildAssociationRef>> getRemovedChildAssociations()
+   public final Map<String, Map<String, ChildAssociationRef>> getRemovedChildAssociations()
    {
+      if (this.childAssociationsRemoved == null)
+      {
+         this.childAssociationsRemoved = new HashMap<String, Map<String, ChildAssociationRef>>();
+      }
       return this.childAssociationsRemoved;
    }
    
@@ -377,14 +391,14 @@ public class Node implements Serializable
       this.aspects = null;
       this.permissions = null;
       
-      this.associations.clear();
-      this.associationsAdded.clear();
-      this.associationsRemoved.clear();
+      this.associations = null;
+      this.associationsAdded = null;
+      this.associationsRemoved = null;
       this.assocsRetrieved = false;
       
-      this.childAssociations.clear();
-      this.childAssociationsAdded.clear();
-      this.childAssociationsRemoved.clear();
+      this.childAssociations = null;
+      this.childAssociationsAdded = null;
+      this.childAssociationsRemoved = null;
       this.childAssocsRetrieved = false;
    }
    

@@ -171,7 +171,7 @@ public class DocumentDetailsBean
                clientVersion.put("versionLabel", version.getVersionLabel());
                clientVersion.put("author", clientVersion.get("creator"));
                clientVersion.put("versionDate", version.getCreatedDate());
-               clientVersion.put("url", DownloadContentServlet.generateDownloadURL(version.getFrozenStateNodeRef(), 
+               clientVersion.put("url", DownloadContentServlet.generateBrowserURL(version.getFrozenStateNodeRef(), 
                      clientVersion.getName()));
                
                // add the client side version to the list
