@@ -203,7 +203,7 @@
                                  <table width=100% cellspacing=0 cellpadding=0 border=0>
                                     <tr>
                                        <td align=left>
-                                          <a:actionLink value="#{msg.view_in_browser}" href="#{DocumentDetailsBean.browserUrl}" />
+                                          <a:actionLink value="#{msg.view_in_browser}" href="#{DocumentDetailsBean.browserUrl}" id="link1" />
                                        </td>
                                     </tr>
                                  </table>
