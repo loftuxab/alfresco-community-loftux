@@ -25,18 +25,18 @@ import javax.faces.context.ResponseWriter;
 
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
-import org.alfresco.web.ui.repo.component.property.UIProperty;
+import org.alfresco.web.ui.repo.component.property.UIAssociation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Renderer for the UIProperty component
+ * Renderer for the UIAssociation component
  * 
  * @author gavinc
  */
-public class PropertyRenderer extends BaseRenderer
+public class AssociationRenderer extends BaseRenderer
 {
-   private static Log logger = LogFactory.getLog(PropertyRenderer.class);
+   private static Log logger = LogFactory.getLog(AssociationRenderer.class);
    
    /**
     * @see javax.faces.render.Renderer#encodeBegin(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
@@ -62,21 +62,21 @@ public class PropertyRenderer extends BaseRenderer
          return;
       }
       
-      UIProperty property = (UIProperty)component;
+      UIAssociation association = (UIAssociation)component;
       ResponseWriter out = context.getResponseWriter();
       
       // make sure there are exactly 2 child components
-      int count = property.getChildCount();
+      int count = association.getChildCount();
       
       if (count == 2)
       {
          // get the label and the control
-         List<UIComponent> kids = property.getChildren();
+         List<UIComponent> kids = association.getChildren();
          UIComponent label = kids.get(0);
          UIComponent control = kids.get(1);
          
          // place a style class on the label column if necessary
-         String labelStylceClass = (String)property.getParent().getAttributes().get("labelStyleClass");
+         String labelStylceClass = (String)association.getParent().getAttributes().get("labelStyleClass");
          out.write("</td><td");
          if (labelStylceClass != null)
          {
@@ -88,7 +88,7 @@ public class PropertyRenderer extends BaseRenderer
          // encode the label
          Utils.encodeRecursive(context, label);
          // encode the control
-         out.write("</td><td>");
+         context.getResponseWriter().write("</td><td>");
          Utils.encodeRecursive(context, control);
          
          // NOTE: we'll allow the property sheet's grid renderer close off the last <td>
@@ -110,5 +110,4 @@ public class PropertyRenderer extends BaseRenderer
    {
       return true;
    }
-
 }

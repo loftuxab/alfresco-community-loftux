@@ -15,6 +15,26 @@
    </component>
    
    <component>
+      <component-type>org.alfresco.faces.Association</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.property.UIAssociation</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.AssociationEditor</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.property.UIAssociationEditor</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.ChildAssociation</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.property.UIChildAssociation</component-class>
+   </component>
+   
+   <component>
+      <component-type>org.alfresco.faces.ChildAssociationEditor</component-type>
+      <component-class>org.alfresco.web.ui.repo.component.property.UIChildAssociationEditor</component-class>
+   </component>
+   
+   <component>
       <component-type>org.alfresco.faces.NodeDescendants</component-type>
       <component-class>org.alfresco.web.ui.repo.component.UINodeDescendants</component-class>
    </component>
@@ -78,13 +98,28 @@
       <component-type>org.alfresco.faces.Template</component-type>
       <component-class>org.alfresco.web.ui.repo.component.template.UITemplate</component-class>
    </component>
-   
+
+   <!-- ==================== CONVERTERS ==================== -->
+   <converter>
+      <converter-id>org.alfresco.faces.CategoryConverter</converter-id>
+      <converter-class>org.alfresco.web.ui.repo.converter.CategoryConverter</converter-class>
+   </converter>
+
    <component>
       <component-type>org.alfresco.faces.PermissionEvaluator</component-type>
       <component-class>org.alfresco.web.ui.repo.component.evaluator.PermissionEvaluator</component-class>
    </component>
+
+   <converter>
+      <converter-id>org.alfresco.faces.AssociationConverter</converter-id>
+      <converter-class>org.alfresco.web.ui.repo.converter.AssociationConverter</converter-class>
+   </converter>
    
-   
+   <converter>
+      <converter-id>org.alfresco.faces.ChildAssociationConverter</converter-id>
+      <converter-class>org.alfresco.web.ui.repo.converter.ChildAssociationConverter</converter-class>
+   </converter>
+
    <!-- ==================== RENDERERS ==================== -->
    <render-kit>
       <renderer>
@@ -103,6 +138,18 @@
          <component-family>org.alfresco.faces.Property</component-family>
          <renderer-type>org.alfresco.faces.PropertyRenderer</renderer-type>
          <renderer-class>org.alfresco.web.ui.repo.renderer.property.PropertyRenderer</renderer-class>
+      </renderer>
+      
+      <renderer>
+         <component-family>org.alfresco.faces.Association</component-family>
+         <renderer-type>org.alfresco.faces.AssociationRenderer</renderer-type>
+         <renderer-class>org.alfresco.web.ui.repo.renderer.property.AssociationRenderer</renderer-class>
+      </renderer>
+      
+      <renderer>
+         <component-family>org.alfresco.faces.ChildAssociation</component-family>
+         <renderer-type>org.alfresco.faces.ChildAssociationRenderer</renderer-type>
+         <renderer-class>org.alfresco.web.ui.repo.renderer.property.ChildAssociationRenderer</renderer-class>
       </renderer>
    </render-kit>
       

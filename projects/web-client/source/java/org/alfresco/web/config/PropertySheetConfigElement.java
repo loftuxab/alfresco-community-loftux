@@ -33,12 +33,12 @@ import org.alfresco.config.element.GenericConfigElement;
  */
 public class PropertySheetConfigElement extends ConfigElementAdapter
 {
-   // TODO: Currently this object just deals with properties to show, in the
-   //       future it will also deal with properties to hide.
+   // TODO: Currently this object just deals with properties and associations to show,
+   //       in the future it will also deal with properties and associations to hide.
    
-   private List<PropertyConfig> properties = new ArrayList<PropertyConfig>();
-   private Map<String, PropertyConfig> propertiesMap = new HashMap<String, PropertyConfig>();
-   private List<String> propertyNames = new ArrayList<String>();
+   private List<ItemConfig> items = new ArrayList<ItemConfig>();
+   private Map<String, ItemConfig> itemsMap = new HashMap<String, ItemConfig>();
+   private List<String> itemNames = new ArrayList<String>();
    private boolean kidsPopulated = false;
    
    /**
@@ -69,17 +69,31 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
       
       List<ConfigElement> kids = null;
       
-      if (this.properties.size() > 0)
+      if (this.items.size() > 0)
       {
          if (this.kidsPopulated == false)
          {
-            Iterator<PropertyConfig> props = this.properties.iterator();
-            while (props.hasNext())
+            Iterator<ItemConfig> items = this.items.iterator();
+            while (items.hasNext())
             {
-               PropertyConfig pc = props.next();
-               GenericConfigElement ce = new GenericConfigElement(PropertySheetElementReader.ELEMENT_SHOW_PROPERTY);
+               ItemConfig pc = items.next();
+               GenericConfigElement ce = null;
+               if (pc instanceof PropertyConfig)
+               {
+                  ce = new GenericConfigElement(PropertySheetElementReader.ELEMENT_SHOW_PROPERTY);
+               }
+               else if (pc instanceof AssociationConfig)
+               {
+                  ce = new GenericConfigElement(PropertySheetElementReader.ELEMENT_SHOW_ASSOC);
+               }
+               else
+               {
+                  ce = new GenericConfigElement(PropertySheetElementReader.ELEMENT_SHOW_CHILD_ASSOC);
+               }
+               
                ce.addAttribute(PropertySheetElementReader.ATTR_NAME, pc.getName());
                ce.addAttribute(PropertySheetElementReader.ATTR_DISPLAY_LABEL, pc.getDisplayLabel());
+               ce.addAttribute(PropertySheetElementReader.ATTR_DISPLAY_LABEL_ID, pc.getDisplayLabelId());
                ce.addAttribute(PropertySheetElementReader.ATTR_READ_ONLY, Boolean.toString(pc.isReadOnly()));
                ce.addAttribute(PropertySheetElementReader.ATTR_CONVERTER, pc.getConverter());
                this.children.add(ce);
@@ -102,34 +116,34 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
       PropertySheetConfigElement combined = new PropertySheetConfigElement();
       
       // add all the existing properties
-      Iterator<PropertyConfig> props = this.getPropertiesToShow().iterator();
-      while (props.hasNext())
+      Iterator<ItemConfig> items = this.getItemsToShow().iterator();
+      while (items.hasNext())
       {
-         combined.addProperty(props.next());
+         combined.addItem(items.next());
       }
       
       // add all the properties from the given element
-      props = ((PropertySheetConfigElement)configElement).getPropertiesToShow().iterator();
-      while (props.hasNext())
+      items = ((PropertySheetConfigElement)configElement).getItemsToShow().iterator();
+      while (items.hasNext())
       {
-         combined.addProperty(props.next());
+         combined.addItem(items.next());
       }
       
       return combined;
    }
    
    /**
-    * Adds a property to show
+    * Adds an item to show
     * 
-    * @param propertyConfig A pre-configured property config object
+    * @param itemConfig A pre-configured property or association config object
     */
-   public void addProperty(PropertyConfig propertyConfig)
+   public void addItem(ItemConfig itemConfig)
    {
-      if (this.propertiesMap.containsKey(propertyConfig.getName()) == false)
+      if (this.itemsMap.containsKey(itemConfig.getName()) == false)
       {
-         this.properties.add(propertyConfig);
-         this.propertiesMap.put(propertyConfig.getName(), propertyConfig);
-         this.propertyNames.add(propertyConfig.getName());
+         this.items.add(itemConfig);
+         this.itemsMap.put(itemConfig.getName(), itemConfig);
+         this.itemNames.add(itemConfig.getName());
       }
    }
    
@@ -138,52 +152,84 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
     * 
     * @param name The name of the property
     * @param displayLabel Display label to use for the property
+    * @param displayLabelId Display label message id to use for the property
     * @param readOnly Sets whether the property should be rendered as read only
     * @param converter The name of a converter to apply to the property control
     */
-   public void addProperty(String name, String displayLabel, String readOnly, String converter)
+   public void addProperty(String name, String displayLabel, String displayLabelId, String readOnly, String converter)
    {
-      addProperty(new PropertyConfig(name, displayLabel, Boolean.parseBoolean(readOnly), converter));
+      addItem(new PropertyConfig(name, displayLabel, displayLabelId, Boolean.parseBoolean(readOnly), converter));
    }
    
    /**
-    * @return Returns the list
+    * Adds an association to show
+    * 
+    * @param name The name of the association
+    * @param displayLabel Display label to use for the property
+    * @param displayLabelId Display label message id to use for the property
+    * @param readOnly Sets whether the association should be rendered as read only
+    * @param converter The name of a converter to apply to the association control
     */
-   public List<String> getPropertyNamesToShow()
+   public void addAssociation(String name, String displayLabel, String displayLabelId, String readOnly, String converter)
    {
-      return this.propertyNames;
+      addItem(new AssociationConfig(name, displayLabel, displayLabelId, Boolean.parseBoolean(readOnly), converter));
    }
    
    /**
-    * @return Returns the list of property config objects that represent those to display
+    * Adds a child association to show
+    * 
+    * @param name The name of the child association
+    * @param displayLabel Display label to use for the property
+    * @param displayLabelId Display label message id to use for the property
+    * @param readOnly Sets whether the association should be rendered as read only
+    * @param converter The name of a converter to apply to the association control
     */
-   public List<PropertyConfig> getPropertiesToShow()
+   public void addChildAssociation(String name, String displayLabel, String displayLabelId, String readOnly, String converter)
    {
-      return this.properties;
+      addItem(new ChildAssociationConfig(name, displayLabel, displayLabelId, Boolean.parseBoolean(readOnly), converter));
    }
    
    /**
-    * @return Returns a map of the property names to show
+    * @return Returns a list of item names to display
     */
-   public Map<String, PropertyConfig> getPropertiesMapToShow()
+   public List<String> getItemNamesToShow()
    {
-      return this.propertiesMap;
+      return this.itemNames;
    }
    
    /**
-    * Inner class to represent a configured property 
+    * @return Returns the list of item config objects that represent those to display
     */
-   public class PropertyConfig
+   public List<ItemConfig> getItemsToShow()
+   {
+      return this.items;
+   }
+   
+   /**
+    * @return Returns a map of the item names to show
+    */
+   public Map<String, ItemConfig> getItemsMapToShow()
+   {
+      return this.itemsMap;
+   }
+   
+   /**
+    * Inner class to represent a configured property sheet item
+    */
+   public abstract class ItemConfig
    {
       private String name;
       private String displayLabel;
+      private String displayLabelId;
       private String converter;
       private boolean readOnly;
       
-      public PropertyConfig(String name, String displayLabel, boolean readOnly, String converter)
+      public ItemConfig(String name, String displayLabel, String displayLabelId, 
+            boolean readOnly, String converter)
       {
          this.name = name;
          this.displayLabel = displayLabel;
+         this.displayLabelId = displayLabelId;
          this.readOnly = readOnly;
          this.converter = converter;
       }
@@ -194,6 +240,14 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
       public String getDisplayLabel()
       {
          return this.displayLabel;
+      }
+      
+      /**
+       * @return The display label message id
+       */
+      public String getDisplayLabelId()
+      {
+         return this.displayLabelId;
       }
       
       /**
@@ -225,9 +279,46 @@ public class PropertySheetConfigElement extends ConfigElementAdapter
          StringBuilder buffer = new StringBuilder(super.toString());
          buffer.append(" (name=").append(this.name);
          buffer.append(" displaylabel=").append(this.displayLabel);
+         buffer.append(" displaylabelId=").append(this.displayLabelId);
          buffer.append(" converter=").append(this.converter);
          buffer.append(" readonly=").append(this.readOnly).append(")");
          return buffer.toString();
+      }
+   }
+   
+   /**
+    * Inner class to represent a configured property
+    */
+   public class PropertyConfig extends ItemConfig
+   {
+      public PropertyConfig(String name, String displayLabel, String displayLabelId, 
+            boolean readOnly, String converter)
+      {
+         super(name, displayLabel, displayLabelId, readOnly, converter);
+      }
+   }
+   
+   /**
+    * Inner class to represent a configured association
+    */
+   public class AssociationConfig extends ItemConfig
+   {
+      public AssociationConfig(String name, String displayLabel, String displayLabelId, 
+            boolean readOnly, String converter)
+      {
+         super(name, displayLabel, displayLabelId, readOnly, converter);
+      }
+   }
+   
+   /**
+    * Inner class to represent a configured child association
+    */
+   public class ChildAssociationConfig extends ItemConfig
+   {
+      public ChildAssociationConfig(String name, String displayLabel, String displayLabelId, 
+            boolean readOnly, String converter)
+      {
+         super(name, displayLabel, displayLabelId, readOnly, converter);
       }
    }
 }

@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
@@ -108,5 +109,27 @@ public final class DataDictionary
       }
       
       return propDef;
+   }
+   
+   /**
+    * Returns the association definition for the given association on the given node
+    * 
+    * @param node The node from which to get the association
+    * @param association The association to find the definition for
+    * @return The association definition or null if the association is not known
+    */
+   public AssociationDefinition getAssociationDefinition(Node node, String association)
+   {
+      AssociationDefinition assocDef = null;
+      
+      TypeDefinition typeDef = getTypeDef(node.getType(), node.getAspects());
+      
+      if (typeDef != null)
+      {
+         Map<QName, AssociationDefinition> assocs = typeDef.getAssociations();
+         assocDef = assocs.get(Repository.resolveToQName(association));
+      }
+      
+      return assocDef;
    }
 }

@@ -17,17 +17,22 @@
 package org.alfresco.web.bean.repository;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,6 +57,16 @@ public class Node implements Serializable
    private boolean propsRetrieved = false;
    private Map<String, Boolean> permissions;
    protected NodeService nodeService;
+   
+   private boolean childAssocsRetrieved = false;
+   private QNameMap childAssociations;
+   private Map<String, Map<String, ChildAssociationRef>> childAssociationsAdded;
+   private Map<String, Map<String, ChildAssociationRef>> childAssociationsRemoved;
+   
+   private boolean assocsRetrieved = false;
+   private QNameMap associations;
+   private Map<String, Map<String, AssociationRef>> associationsAdded;
+   private Map<String, Map<String, AssociationRef>> associationsRemoved;
    
    /**
     * Constructor
@@ -81,6 +96,12 @@ public class Node implements Serializable
       }
       
       this.properties = new QNameMap<String, Object>(this);
+      this.childAssociations = new QNameMap(this);
+      this.childAssociationsAdded = new HashMap<String, Map<String, ChildAssociationRef>>();
+      this.childAssociationsRemoved = new HashMap<String, Map<String, ChildAssociationRef>>();
+      this.associations = new QNameMap(this);
+      this.associationsAdded = new HashMap<String, Map<String, AssociationRef>>();
+      this.associationsRemoved = new HashMap<String, Map<String, AssociationRef>>();
    }
 
    /**
@@ -100,7 +121,111 @@ public class Node implements Serializable
          this.propsRetrieved = true;
       }
       
-      return properties;
+      return this.properties;
+   }
+   
+   /**
+    * @return All the associations this node has as a Map, using the association
+    *         type as the key
+    */
+   public Map getAssociations()
+   {
+      if (this.assocsRetrieved == false)
+      {
+         List<AssociationRef> assocs = this.nodeService.getTargetAssocs(this.nodeRef, RegexQNamePattern.MATCH_ALL);
+         
+         for (AssociationRef assocRef: assocs)
+         {
+            String assocName = assocRef.getTypeQName().toString();
+            
+            List list = (List)this.associations.get(assocName);
+            // create the list if this is first association with 'assocName'
+            if (list == null)
+            {
+               list = new ArrayList<AssociationRef>();
+               this.associations.put(assocName, list);
+            }
+            
+            // add the association to the list
+            list.add(assocRef);
+         }
+         
+         this.assocsRetrieved = true;
+      }
+      
+      return this.associations;
+   }
+   
+   /**
+    * Returns all the associations added to this node in this UI session
+    * 
+    * @return Map of Maps of AssociationRefs
+    */
+   public Map<String, Map<String, AssociationRef>> getAddedAssociations()
+   {
+      return this.associationsAdded;
+   }
+   
+   /**
+    * Returns all the associations removed from this node is this UI session
+    * 
+    * @return Map of Maps of AssociationRefs
+    */
+   public Map<String, Map<String, AssociationRef>> getRemovedAssociations()
+   {
+      return this.associationsRemoved;
+   }
+   
+   /**
+    * @return All the child associations this node has as a Map, using the association
+    *         type as the key
+    */
+   public Map getChildAssociations()
+   {
+      if (this.childAssocsRetrieved == false)
+      {
+         List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(this.nodeRef);
+         
+         for (ChildAssociationRef assocRef: assocs)
+         {
+            String assocName = assocRef.getTypeQName().toString();
+            
+            List list = (List)this.childAssociations.get(assocName);
+            // create the list if this is first association with 'assocName'
+            if (list == null)
+            {
+               list = new ArrayList<ChildAssociationRef>();
+               this.childAssociations.put(assocName, list);
+            }
+            
+            // add the association to the list
+            list.add(assocRef);
+         }
+         
+         this.childAssocsRetrieved = true;
+      }
+      
+      return this.childAssociations;
+   }
+   
+   /**
+    * Returns all the child associations added to this node in this UI session
+    * 
+    * @return Map of Maps of ChildAssociationRefs
+    */
+   public Map<String, Map<String, ChildAssociationRef>> getAddedChildAssociations()
+   {
+      return this.childAssociationsAdded;
+   }
+   
+   /**
+    * Returns all the child associations removed from this node is this UI session
+    * 
+    * @return Map of Maps of ChildAssociationRefs
+    */
+   public Map<String, Map<String, ChildAssociationRef>> getRemovedChildAssociations()
+   {
+      return this.childAssociationsRemoved;
    }
    
    /**
@@ -115,6 +240,8 @@ public class Node implements Serializable
    }
    
    /**
+    * Determines whether the given property name is held by this node 
+    * 
     * @param propertyName Property to test existence of
     * @return true if property exists, false otherwise
     */
@@ -249,6 +376,16 @@ public class Node implements Serializable
       this.propsRetrieved = false;
       this.aspects = null;
       this.permissions = null;
+      
+      this.associations.clear();
+      this.associationsAdded.clear();
+      this.associationsRemoved.clear();
+      this.assocsRetrieved = false;
+      
+      this.childAssociations.clear();
+      this.childAssociationsAdded.clear();
+      this.childAssociationsRemoved.clear();
+      this.childAssocsRetrieved = false;
    }
    
    /**

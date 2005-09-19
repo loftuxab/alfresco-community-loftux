@@ -27,6 +27,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 
@@ -48,6 +49,15 @@ public class UICategorySelector extends AbstractItemSelector
       return "org.alfresco.faces.CategorySelector";
    }
    
+   /**
+    * 
+    * @see org.alfresco.web.ui.repo.component.AbstractItemSelector#getDefaultLabel()
+    */
+   public String getDefaultLabel()
+   {
+      return Application.getMessage(FacesContext.getCurrentInstance(), "select_category_prompt");
+   }
+
    /**
     * Use Spring JSF integration to return the category service bean instance
     * 

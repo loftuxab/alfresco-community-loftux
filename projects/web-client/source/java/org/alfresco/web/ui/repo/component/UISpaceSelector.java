@@ -47,6 +47,15 @@ public class UISpaceSelector extends AbstractItemSelector
    }
 
    /**
+    * 
+    * @see org.alfresco.web.ui.repo.component.AbstractItemSelector#getDefaultLabel()
+    */
+   public String getDefaultLabel()
+   {
+      return Application.getMessage(FacesContext.getCurrentInstance(), "select_space_prompt");
+   }
+   
+   /**
     * Returns the parent id of the current space or null if the parent space is the company home space
     * 
     * @see org.alfresco.web.ui.repo.component.AbstractItemSelector#getParentNodeId(javax.faces.context.FacesContext)

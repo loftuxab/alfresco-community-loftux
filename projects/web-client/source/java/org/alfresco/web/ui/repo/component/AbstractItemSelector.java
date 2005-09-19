@@ -89,6 +89,13 @@ public abstract class AbstractItemSelector extends UIInput
    public abstract String getFamily();
    
    /**
+    * Retrieves the default label to show if none has been defined and nothing has been selected
+    * 
+    * @return Default label
+    */
+   public abstract String getDefaultLabel();
+   
+   /**
     * Retrieves the id of the parent node of the current navigation node
     * 
     * @param context The Faces context
@@ -250,6 +257,12 @@ public abstract class AbstractItemSelector extends UIInput
                if (valueId == null)
                {
                   label = getLabel();
+                  
+                  // if the label is still null get the default from the message bundle
+                  if (label == null)
+                  {
+                     label = getDefaultLabel();
+                  }
                }
                else
                {

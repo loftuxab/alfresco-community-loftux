@@ -25,6 +25,7 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
+import org.alfresco.web.config.PropertySheetConfigElement.ItemConfig;
 import org.alfresco.web.config.PropertySheetConfigElement.PropertyConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,7 +69,7 @@ public class WebClientConfigTest extends BaseTest
 
       // get the property names from the global section and make sure it is the
       // name property
-      List<String> propNames = ((PropertySheetConfigElement) globalPropSheet).getPropertyNamesToShow();
+      List<String> propNames = ((PropertySheetConfigElement) globalPropSheet).getItemNamesToShow();
       logger.info("propNames = " + propNames);
       assertTrue("There should only be one property in the list", propNames.size() == 1);
       assertTrue("The property name should be 'name'", propNames.get(0).equals("name"));
@@ -80,24 +81,24 @@ public class WebClientConfigTest extends BaseTest
       PropertySheetConfigElement spacePropConfig = (PropertySheetConfigElement) spaceAspectConfig
             .getConfigElement("property-sheet");
       assertNotNull("Space aspect property config should not be null", spacePropConfig);
-      propNames = spacePropConfig.getPropertyNamesToShow();
+      propNames = spacePropConfig.getItemNamesToShow();
       logger.info("propNames = " + propNames);
       assertTrue("There should be 5 properties in the list", propNames.size() == 5);
 
       // make sure the property sheet config has come back with the correct data
-      Map<String, PropertyConfig> props = spacePropConfig.getPropertiesMapToShow();
-      PropertyConfig descProp = props.get("description");
+      Map<String, ItemConfig> props = spacePropConfig.getItemsMapToShow();
+      ItemConfig descProp = props.get("description");
       assertNotNull("description property config should not be null", descProp);
       assertEquals("display label for description should be 'Description'", descProp.getDisplayLabel(), 
             "Description");
       assertFalse("read only for description should be 'false'", descProp.isReadOnly());
 
-      PropertyConfig createdDataProp = props.get("createddate");
+      ItemConfig createdDataProp = props.get("createddate");
       assertNotNull("createddate property config should not be null", createdDataProp);
       assertEquals("display label for createddate should be null", null, createdDataProp.getDisplayLabel());
       assertTrue("read only for createddate should be 'true'", createdDataProp.isReadOnly());
 
-      PropertyConfig iconProp = props.get("icon");
+      ItemConfig iconProp = props.get("icon");
       assertNotNull("icon property config should not be null", iconProp);
       assertEquals("display label for icon should be null", null, iconProp.getDisplayLabel());
       assertFalse("read only for icon should be 'false'", iconProp.isReadOnly());
@@ -153,7 +154,7 @@ public class WebClientConfigTest extends BaseTest
       assertNotNull("property sheet config should not be null", propsToDisplay);
       
       // get all the property names using the PropertySheetConfigElement implementation
-      List<String> propNames = propsToDisplay.getPropertyNamesToShow();
+      List<String> propNames = propsToDisplay.getItemNamesToShow();
               
       // make sure the generic interfaces are also returning the correct data
       List<ConfigElement> kids = propsToDisplay.getChildren();

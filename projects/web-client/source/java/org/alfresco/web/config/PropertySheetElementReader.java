@@ -32,8 +32,11 @@ public class PropertySheetElementReader implements ConfigElementReader
 {
    public static final String ELEMENT_PROPERTY_SHEET = "property-sheet";
    public static final String ELEMENT_SHOW_PROPERTY = "show-property";
+   public static final String ELEMENT_SHOW_ASSOC = "show-association";
+   public static final String ELEMENT_SHOW_CHILD_ASSOC = "show-child-association";
    public static final String ATTR_NAME = "name";
    public static final String ATTR_DISPLAY_LABEL = "displayLabel";
+   public static final String ATTR_DISPLAY_LABEL_ID = "displayLabelId";
    public static final String ATTR_READ_ONLY = "readOnly";
    public static final String ATTR_CONVERTER = "converter";
    
@@ -56,18 +59,30 @@ public class PropertySheetElementReader implements ConfigElementReader
          
          configElement = new PropertySheetConfigElement();
          
-         // go through the properties to show
-         Iterator<Element> properties = element.elementIterator(ELEMENT_SHOW_PROPERTY);
-         while (properties.hasNext())
+         // go through the items to show
+         Iterator<Element> items = element.elementIterator();
+         while (items.hasNext())
          {
-            Element property = properties.next(); 
-            String propName = property.attributeValue(ATTR_NAME);
-            String label = property.attributeValue(ATTR_DISPLAY_LABEL);
-            String readOnly = property.attributeValue(ATTR_READ_ONLY);
-            String converter = property.attributeValue(ATTR_CONVERTER);
+            Element item = items.next();
+            String propName = item.attributeValue(ATTR_NAME);
+            String label = item.attributeValue(ATTR_DISPLAY_LABEL);
+            String labelId = item.attributeValue(ATTR_DISPLAY_LABEL_ID);
+            String readOnly = item.attributeValue(ATTR_READ_ONLY);
+            String converter = item.attributeValue(ATTR_CONVERTER);
             
-            // add the property to show to the custom config element
-            configElement.addProperty(propName, label, readOnly, converter);
+            if (ELEMENT_SHOW_PROPERTY.equals(item.getName()))
+            {
+               // add the property to show to the custom config element
+               configElement.addProperty(propName, label, labelId, readOnly, converter);
+            }
+            else if (ELEMENT_SHOW_ASSOC.equals(item.getName()))
+            {
+               configElement.addAssociation(propName, label, labelId, readOnly, converter);
+            }
+            else if (ELEMENT_SHOW_CHILD_ASSOC.equals(item.getName()))
+            {
+               configElement.addChildAssociation(propName, label, labelId, readOnly, converter);
+            }
          }
       }
       

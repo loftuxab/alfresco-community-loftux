@@ -39,12 +39,13 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.converter.XMLDateConverter;
 import org.alfresco.web.ui.repo.component.UICategorySelector;
+import org.alfresco.web.ui.repo.converter.CategoryConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
- * Component to represent an individual property
+ * Component to represent an individual property within a property sheet
  * 
  * @author gavinc
  */
@@ -337,13 +338,28 @@ public class UIProperty extends UIPanel implements NamingContainer
          control.setRendererType("javax.faces.Text");
          
          // if it is a date or datetime property add the converter
-         if (typeName.equals(DataTypeDefinition.DATE) || 
-                  typeName.equals(DataTypeDefinition.DATETIME))
+         if (typeName.equals(DataTypeDefinition.DATETIME) )
          {
             XMLDateConverter conv = (XMLDateConverter)context.getApplication().
                createConverter("org.alfresco.faces.XMLDataConverter");
             conv.setType("both");
             conv.setPattern("MMMM, d yyyy HH:mm");
+            control.setConverter(conv);
+         }
+         else if (typeName.equals(DataTypeDefinition.DATE))
+         {
+            XMLDateConverter conv = (XMLDateConverter)context.getApplication().
+               createConverter("org.alfresco.faces.XMLDataConverter");
+            conv.setType("date");
+            conv.setPattern("MMMM, d yyyy");
+            control.setConverter(conv);
+         }
+         else if (typeName.equals(DataTypeDefinition.CATEGORY))
+         {
+            // if the property represents a category try and get the label instead of
+            // showing the id.
+            CategoryConverter conv = (CategoryConverter)context.getApplication().
+               createConverter("org.alfresco.faces.CategoryConverter");
             control.setConverter(conv);
          }
       }
@@ -361,8 +377,18 @@ public class UIProperty extends UIPanel implements NamingContainer
             control = (UICategorySelector)context.getApplication().
                   createComponent("org.alfresco.faces.CategorySelector");
          }
-         else if (typeName.equals(DataTypeDefinition.DATE) || 
-                  typeName.equals(DataTypeDefinition.DATETIME))
+         else if (typeName.equals(DataTypeDefinition.DATETIME))
+         {
+            control = (UIInput)context.getApplication().
+                  createComponent("javax.faces.Input");
+            control.setRendererType("org.alfresco.faces.DatePickerRenderer");
+            control.getAttributes().put("startYear", new Integer(1970));
+            control.getAttributes().put("yearCount", new Integer(50));
+            control.getAttributes().put("style", "margin-right: 7px;");
+            
+            // TODO: also add the relevant properties to display the time for editing
+         }
+         else if (typeName.equals(DataTypeDefinition.DATE))
          {
             control = (UIInput)context.getApplication().
                   createComponent("javax.faces.Input");
@@ -379,6 +405,14 @@ public class UIProperty extends UIPanel implements NamingContainer
             control.setRendererType("javax.faces.Text");
             control.getAttributes().put("size", "35");
             control.getAttributes().put("maxlength", "1024");
+         }
+         
+         // if we are trying to edit a NodeRef or Path property type set it to read-only as 
+         // these are internal properties that shouldn't be edited.
+         if (typeName.equals(DataTypeDefinition.NODE_REF) || typeName.equals(DataTypeDefinition.PATH))
+         {
+            logger.warn("Setting property " + propDef.getName().toString() + " to read-only as it can not be edited");
+            control.getAttributes().put("disabled", Boolean.TRUE);
          }
       
          // set control to disabled state if set to read only or if the
@@ -425,7 +459,7 @@ public class UIProperty extends UIPanel implements NamingContainer
       if (logger.isDebugEnabled())
          logger.debug("Created control " + control + "(" + 
                       control.getClientId(context) + 
-                      ") for '" + propDef.getName().getLocalName() + 
+                      ") for '" + propDef.getName().toString() + 
                       "' and added it to component " + this);
    }
    
