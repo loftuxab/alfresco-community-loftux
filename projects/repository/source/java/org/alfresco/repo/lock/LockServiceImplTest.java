@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
@@ -90,6 +91,9 @@ public class LockServiceImplTest extends BaseSpringTest
                 ContentModel.TYPE_CONTAINER,
                 nodeProperties).getChildRef();
         this.nodeService.addAspect(this.parentNode, ContentModel.ASPECT_LOCKABLE, new HashMap<QName, Serializable>());
+        HashMap<QName, Serializable> audProps = new HashMap<QName, Serializable>();
+        audProps.put(ContentModel.PROP_CREATOR, "Monkey");
+        this.nodeService.addAspect(this.parentNode, ContentModel.ASPECT_AUDITABLE, audProps);
         assertNotNull(this.parentNode);
         
         // Add some children to the node
@@ -139,6 +143,7 @@ public class LockServiceImplTest extends BaseSpringTest
         assertEquals(
                 LockStatus.NO_LOCK, 
                 this.lockService.getLockStatus(this.parentNode, this.goodUserNodeRef));
+ 
         
         // Test valid lock
         this.lockService.lock(this.parentNode, this.goodUserNodeRef, LockType.WRITE_LOCK);
@@ -148,7 +153,7 @@ public class LockServiceImplTest extends BaseSpringTest
         assertEquals(
                 LockStatus.LOCKED,
                 this.lockService.getLockStatus(this.parentNode, this.badUserNodeRef));
-        
+     
         // Test lock when already locked
         try
         {

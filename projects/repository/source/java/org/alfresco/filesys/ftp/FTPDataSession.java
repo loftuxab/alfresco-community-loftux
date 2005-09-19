@@ -318,6 +318,7 @@ public class FTPDataSession implements Runnable
         // Set the socket to close immediately
 
         m_activeSock.setSoLinger(false, 0);
+        m_activeSock.setTcpNoDelay(true);
 
         // Return the data socket
 

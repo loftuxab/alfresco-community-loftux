@@ -225,20 +225,46 @@
       </property>
    </bean>
     
+   <!-- Copy security is enforced via the node service injected into the copy service -->
    <bean id="CopyService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
+   <!-- Again, the node service enforces security here -->
    <bean id="LockService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
+   <!-- Again, the node service enforces security here -->
    <bean id="VersionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
+   <!-- Again, the node service enforces security here -->
    <bean id="CheckoutCheckinService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
+   <!-- Again, the node service enforces security here -->
    <bean id="RuleService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
+   <!-- Again, the node service enforces security here -->
    <bean id="ImporterService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
+   <!-- Again, the node service enforces security here -->
    <bean id="ActionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
-   <bean id="PermissionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   <bean id="PermissionService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
+      <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+      <property name="objectDefinitionSource">
+         <value>
+				org.alfresco.service.cmr.security.PermissionService.getOwnerAuthority=ACL_ALLOW
+                org.alfresco.service.cmr.security.PermissionService.getAllAuthorities=ACL_ALLOW
+                org.alfresco.service.cmr.security.PermissionService.getAllPermission=ACL_ALLOW
+                org.alfresco.service.cmr.security.PermissionService.getPermissions=ACL_NODE.0.sys:base.ReadPermissions
+                org.alfresco.service.cmr.security.PermissionService.getAllPermissions=ACL_NODE.0.sys:base.ReadPermissions
+                org.alfresco.service.cmr.security.PermissionService.getSettablePermissions=ACL_ALLOW
+                org.alfresco.service.cmr.security.PermissionService.hasPermission=ACL_NODE.0.sys:base.ReadPermissions
+                org.alfresco.service.cmr.security.PermissionService.deletePermissions=ACL_NODE.0.sys:base.ChangePermissions
+                org.alfresco.service.cmr.security.PermissionService.deletePermission=ACL_NODE.0.sys:base.ChangePermissions
+                org.alfresco.service.cmr.security.PermissionService.setPermission=ACL_NODE.0.sys:base.ChangePermissions
+                org.alfresco.service.cmr.security.PermissionService.setInheritParentPermissions=ACL_NODE.0.sys:base.ChangePermissions
+         </value>
+      </property>
+   </bean>
     
 </beans>

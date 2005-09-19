@@ -78,6 +78,11 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     private SearchService searchService;
     
     /**
+     * The action service implementation which we need for some things.
+     */
+    RuntimeActionService runtimeActionService;
+    
+    /**
      * The rule cahce (set by default to an inactive rule cache)
      */
     private RuleCache ruleCache = new InactiveRuleCache();
@@ -111,12 +116,22 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     /**
      * Set the action service
      * 
-     * @param actionRegistration  the action service
+     * @param actionService  the action service
      */
     public void setActionService(ActionService actionService)
 	{
 		this.actionService = actionService;
 	}
+    
+    /**
+     * Set the runtime action service
+     * 
+     * @param actionRegistration  the action service
+     */
+    public void setRuntimeActionService(RuntimeActionService runtimeActionService)
+    {
+        this.runtimeActionService = runtimeActionService;
+    }
     
     /**
      * Set the search service
@@ -232,7 +247,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	{
     		if (includeInherited == true)
     		{
-    			// Get any inhertied rules
+    			// Get any inherited rules
     			for (Rule rule : getInheritedRules(nodeRef, ruleTypeName, null))
 				{
     				// Ensure rules are not duplicated in the list
@@ -292,7 +307,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	{
 		List<Rule> inheritedRules = new ArrayList<Rule>();
 		
-		// Create the vistied nodes set if it has not already been created
+		// Create the visited nodes set if it has not already been created
 		if (visitedNodeRefs == null)
 		{
 			visitedNodeRefs = new HashSet<NodeRef>();
@@ -423,7 +438,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 		rule.applyToChildren(isAppliedToChildren);
 		
 		// Populate the composite action details
-		((RuntimeActionService)this.actionService).populateCompositeAction(ruleNodeRef, rule);
+		runtimeActionService.populateCompositeAction(ruleNodeRef, rule);
 		
 		return rule;
 	}
@@ -477,7 +492,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	}
     	
     	// Save the remainder of the rule as a composite action
-    	((RuntimeActionService)this.actionService).saveActionImpl(ruleNodeRef, rule);
+    	runtimeActionService.saveActionImpl(ruleNodeRef, rule);
     }
     
     /**
@@ -518,7 +533,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	@SuppressWarnings("unchecked")
     public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
 	{
-        // First check to seee if the node has been disabled
+        // First check to see if the node has been disabled
         if (this.disabledNodeRefs.contains(actionableNodeRef) == false)
         {
     		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule);
@@ -610,7 +625,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
             this.actionService.executeAction(rule, actionedUponNodeRef);
 	    }
 	}
-	
+    
 	/**
 	 * Register the rule type
 	 * 

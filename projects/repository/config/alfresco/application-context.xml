@@ -271,13 +271,16 @@
 
     <bean id="lockService" class="org.alfresco.repo.lock.LockServiceImpl" init-method="initialise">
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="policyComponent">
             <ref bean="policyComponent" />
         </property>
         <property name="authenticationService">
             <ref bean="authenticationService"></ref>
+        </property>
+        <property name="ownableService">
+            <ref bean="ownableService"></ref>
         </property>
     </bean>
 
@@ -288,7 +291,7 @@
 
     <bean id="versionService" class="org.alfresco.repo.version.VersionServiceImpl" init-method="initialise">
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="dbNodeService">
             <ref bean="dbNodeService" />
@@ -384,13 +387,15 @@
     <!--                 -->
     <!-- Copy Service    -->
     <!--                 -->
+    
+    <!-- Note this uses the node service that enforces permissions so you can only copy what you can see -->
 
     <bean id="copyService" class="org.alfresco.repo.copy.CopyServiceImpl" init-method="init">
         <property name="dictionaryService">
             <ref bean="dictionaryService" />
         </property>
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="policyComponent">
             <ref bean="policyComponent" />
@@ -407,16 +412,16 @@
     <bean id="checkOutCheckInService" class="org.alfresco.repo.coci.CheckOutCheckInServiceImpl"
         init-method="init">
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="versionService">
             <ref bean="versionService" />
         </property>
         <property name="lockService">
-            <ref bean="lockService" />
+            <ref bean="LockService" />
         </property>
         <property name="copyService">
-            <ref bean="copyService" />
+            <ref bean="CopyService" />
         </property>
         <property name="policyComponent">
             <ref bean="policyComponent" />
@@ -730,13 +735,13 @@
             <ref bean="dictionaryService" />
         </property>
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="searchService">
-            <ref bean="searchService" />
+            <ref bean="SearchService" />
         </property>
         <property name="contentService">
-            <ref bean="contentService" />
+            <ref bean="ContentService" />
         </property>
     </bean>
 

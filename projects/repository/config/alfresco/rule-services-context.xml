@@ -7,13 +7,16 @@
    
    <bean id="ruleService" class="org.alfresco.repo.rule.RuleServiceImpl">
 		<property name="nodeService">
-			<ref bean="nodeService"/>
+			<ref bean="NodeService"/>
 		</property>		
 	    <property name="actionService">
+		    <ref bean="ActionService"/>
+	    </property>	
+        <property name="runtimeActionService">
 		    <ref bean="actionService"/>
 	    </property>	
 	    <property name="searchService">
-		    <ref bean="searchService"/>
+		    <ref bean="SearchService"/>
 	    </property>
    </bean>
    

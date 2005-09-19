@@ -7,10 +7,10 @@
 
     <bean id="actionService" class="org.alfresco.repo.action.ActionServiceImpl">
         <property name="nodeService">
-            <ref bean="nodeService" />
+            <ref bean="NodeService" />
         </property>
         <property name="searchService">
-            <ref bean="searchService" />
+            <ref bean="SearchService" />
         </property>  
     	<property name="transactionService">
     		<ref bean="transactionComponent"/>
