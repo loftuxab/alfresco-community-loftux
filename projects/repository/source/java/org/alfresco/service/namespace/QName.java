@@ -19,8 +19,6 @@ package org.alfresco.service.namespace;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.alfresco.util.EqualsHelper;
-
 /**
  * <code>QName</code> represents the qualified name of a Repository item. Each
  * QName consists of a local name qualified by a namespace.
@@ -32,12 +30,12 @@ import org.alfresco.util.EqualsHelper;
  * @author David Caruana
  * 
  */
-public final class QName implements QNamePattern, Serializable
+public final class QName implements QNamePattern, Serializable, Cloneable
 {
     private static final long serialVersionUID = 3977016258204348976L;
 
-    private String namespaceURI;
-    private String localName;
+    private String namespaceURI;                // never null
+    private String localName;                   // never null
     private int hashCode;
     private String prefix;
 
@@ -231,15 +229,12 @@ public final class QName implements QNamePattern, Serializable
         this.hashCode = 0;
     }
 
-
-    /**
-     * Default Constructor
-     */
-    private QName()
+    @Override
+    public Object clone() throws CloneNotSupportedException
     {
+        return super.clone();
     }
 
-    
     /**
      * Gets the name
      * 
@@ -302,8 +297,9 @@ public final class QName implements QNamePattern, Serializable
         if (object instanceof QName)
         {
             QName other = (QName) object;
-            return (EqualsHelper.nullSafeEquals(this.namespaceURI, other.namespaceURI) &&
-                    EqualsHelper.nullSafeEquals(this.localName, other.localName));
+            // namespaceURI and localname are not allowed to be null
+            return (this.namespaceURI.equals(other.namespaceURI) &&
+                    this.localName.equals(other.localName));
         }
         else
         {
@@ -327,14 +323,12 @@ public final class QName implements QNamePattern, Serializable
      */
     public int hashCode()
     {
-        int h = this.hashCode;
-        if (h == 0)
+        if (this.hashCode == 0)
         {
-            h = localName.hashCode();
-            h = 37 * h + namespaceURI.hashCode();
-            this.hashCode = h;
+            // the hashcode assignment is atomic - it is only an integer
+            this.hashCode = ((37 * localName.hashCode()) + namespaceURI.hashCode());
         }
-        return h;
+        return this.hashCode;
     }
 
 

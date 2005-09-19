@@ -32,8 +32,7 @@ public class NodeAssocImpl implements NodeAssoc
     private long id;
     private Node source;
     private Node target;
-    private String typeNamespaceUri;
-    private String typeLocalName;
+    private QName typeQName;
     private transient AssociationRef nodeAssocRef;
 
     public NodeAssocImpl()
@@ -63,7 +62,7 @@ public class NodeAssocImpl implements NodeAssoc
         if (nodeAssocRef == null)
         {
             nodeAssocRef = new AssociationRef(getSource().getNodeRef(),
-                    QName.createQName(getTypeNamespaceUri(), getTypeLocalName()),
+                    this.typeQName,
                     getTarget().getNodeRef());
         }
         return nodeAssocRef;
@@ -102,7 +101,7 @@ public class NodeAssocImpl implements NodeAssoc
     
     public int hashCode()
     {
-        return (this.getTypeLocalName() == null ? 0 : getTypeLocalName().hashCode());
+        return (typeQName == null ? 0 : typeQName.hashCode());
     }
 
     public long getId()
@@ -144,54 +143,13 @@ public class NodeAssocImpl implements NodeAssoc
         this.target = target;
     }
 
-    /**
-     * @see #getNamespaceUri()
-     * @see #getLocalName()
-     */
     public QName getTypeQName()
     {
-        return QName.createQName(getTypeNamespaceUri(), getTypeLocalName());
+        return typeQName;
     }
 
-    /**
-     * @see #setNamespaceUri(String)
-     * @see #setLocalName(String)
-     */
-    public void setTypeQName(QName qname)
+    public void setTypeQName(QName typeQName)
     {
-        setTypeNamespaceUri(qname.getNamespaceURI());
-        setTypeLocalName(qname.getLocalName());
-    }
-
-    /**
-     * For Hibernate use only
-     */
-    private String getTypeNamespaceUri()
-    {
-        return typeNamespaceUri;
-    }
-
-    /**
-     * For Hibernate use only
-     */
-    private void setTypeNamespaceUri(String typeNamespaceUri)
-    {
-        this.typeNamespaceUri = typeNamespaceUri;
-    }
-
-    /**
-     * For Hibernate use only
-     */
-    private String getTypeLocalName()
-    {
-        return typeLocalName;
-    }
-
-    /**
-     * For Hibernate use only
-     */
-    private void setTypeLocalName(String name)
-    {
-        this.typeLocalName = name;
+        this.typeQName = typeQName;
     }
 }

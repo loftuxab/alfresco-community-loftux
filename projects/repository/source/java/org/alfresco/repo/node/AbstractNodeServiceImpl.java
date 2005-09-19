@@ -17,12 +17,14 @@
 package org.alfresco.repo.node;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeAddAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateChildAssociationPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeCreateNodePolicy;
@@ -49,8 +51,10 @@ import org.alfresco.repo.search.Indexer;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -532,6 +536,80 @@ public abstract class AbstractNodeServiceImpl implements NodeService
                 "   assoc qname: " + assocQName);
     }
     
+    /**
+     * Helper method to convert the <code>Serializable</code> value into a full,
+     * persistable {@link PropertyValue}.
+     * <p>
+     * Where the property definition is null, the value will take on the
+     * {@link DataTypeDefinition#ANY generic ANY} value.
+     * 
+     * @param propertyDef the property dictionary definition, may be null
+     * @param value the value, which will be converted according to the definition -
+     *      may be null
+     * @return Returns the persistable property value
+     */
+    protected PropertyValue makePropertyValue(PropertyDefinition propertyDef, Serializable value)
+    {
+        // get property attributes
+        QName propertyTypeQName = null;
+        if (propertyDef == null)                // property not recognised
+        {
+            // allow it for now - persisting excess properties can be useful sometimes
+            propertyTypeQName = DataTypeDefinition.ANY;
+        }
+        else
+        {
+            propertyTypeQName = propertyDef.getDataType().getName();
+            // check that multi-valued properties are allowed
+            boolean isMultiValued = propertyDef.isMultiValued();
+            if (isMultiValued && !(value instanceof Collection))
+            {
+                throw new DictionaryException("A multi-valued property must be a collection: \n" +
+                        "   Property: " + propertyDef + "\n" +
+                        "   Value: " + value);
+            }
+            else if (!isMultiValued && (value instanceof Collection))
+            {
+                throw new DictionaryException("A single-valued property may not be a collection: \n" +
+                        "   Property: " + propertyDef + "\n" +
+                        "   Value: " + value);
+            }
+        }
+        PropertyValue propertyValue = new PropertyValue(propertyTypeQName, value);
+        // done
+        return propertyValue;
+    }
+    
+    /**
+     * Extracts the externally-visible property from the {@link PropertyValue propertyValue}.
+     * 
+     * @param propertyDef
+     * @param propertyValue
+     * @return Returns the value of the property in the format dictated by the property
+     *      definition, or null if the property value is null 
+     */
+    protected Serializable makeSerializableValue(PropertyDefinition propertyDef, PropertyValue propertyValue)
+    {
+        if (propertyValue == null)
+        {
+            return null;
+        }
+        // get property attributes
+        QName propertyTypeQName = null;
+        boolean isMultiValued = false;
+        if (propertyDef == null)
+        {
+            // allow this for now
+            propertyTypeQName = DataTypeDefinition.ANY;
+        }
+        else
+        {
+            propertyTypeQName = propertyDef.getDataType().getName();
+        }
+        Serializable value = propertyValue.getValue(propertyTypeQName);
+        // done
+        return value;
+    }
     
     /**
      * Checks that the type of the association is recognised and that the association may

@@ -34,6 +34,7 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
+import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.node.AbstractNodeServiceImpl;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -424,11 +425,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // if the aspect was present, remove the associated properties
         if (removed)
         {
-            Map<String, Serializable> nodeProperties = node.getProperties();
+            Map<QName, PropertyValue> nodeProperties = node.getProperties();
             Map<QName,PropertyDefinition> propertyDefs = aspectDef.getProperties();
             for (QName propertyName : propertyDefs.keySet())
             {
-                nodeProperties.remove(propertyName.toString());
+                nodeProperties.remove(propertyName);
             }
             
             // Invoke policy behaviours
@@ -567,21 +568,19 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public Map<QName, Serializable> getProperties(NodeRef nodeRef) throws InvalidNodeRefException
     {
         Node node = getNodeNotNull(nodeRef);
-        Map<String, Serializable> nodeProperties = node.getProperties();
+        Map<QName, PropertyValue> nodeProperties = node.getProperties();
         Map<QName, Serializable> ret = new HashMap<QName, Serializable>(nodeProperties.size());
         // copy values
-        for (Map.Entry entry: nodeProperties.entrySet())
+        for (Map.Entry<QName, PropertyValue> entry: nodeProperties.entrySet())
         {
-            String key = (String) entry.getKey();
-            Serializable value = (Serializable) entry.getValue();
-            // check if the property is a null
-            if (value instanceof DbNodeServiceImpl.NullPropertyValue)
-            {
-                value = null;
-            }
-            QName qname = QName.createQName(key.toString());
+            QName propertyQName = entry.getKey();
+            PropertyValue propertyValue = entry.getValue();
+            // get the property definition
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
+            // convert to the correct type
+            Serializable value = makeSerializableValue(propertyDef, propertyValue);
             // copy across
-            ret.put(qname, value);
+            ret.put(propertyQName, value);
         }
         // spoof referencable properties
         addReferencableProperties(nodeRef, ret);
@@ -604,15 +603,16 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             return nodeRef.getId();
         }
-        
+
+        // get the property from the node
         Node node = getNodeNotNull(nodeRef);
-        Map<String, Serializable> properties = node.getProperties();
-        Serializable value = properties.get(qname.toString());
-        // check if the property is a null
-        if (value instanceof DbNodeServiceImpl.NullPropertyValue)
-        {
-            value = null;
-        }
+        Map<QName, PropertyValue> properties = node.getProperties();
+        PropertyValue propertyValue = properties.get(qname);
+        
+        // get the property definition
+        PropertyDefinition propertyDef = dictionaryService.getProperty(qname);
+        // convert to the correct type
+        Serializable value = makeSerializableValue(propertyDef, propertyValue);
         // done
         return value;
     }
@@ -621,7 +621,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      * Ensures that all required properties are present on the node and copies the
      * property values to the <code>Node</code>.
      * <p>
-     * Null-valued properties are removed.
+     * To remove a property, <b>remove it from the map</b> before calling this method.
+     * Null-valued properties are allowed.
      * <p>
      * If any of the values are null, a marker object is put in to mimic nulls.  They will be turned back into
      * a real nulls when the properties are requested again.
@@ -632,7 +633,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
 		// Invoke policy behaviours
 		invokeBeforeUpdateNode(nodeRef);
-		
+
         if (properties == null)
         {
             throw new IllegalArgumentException("Properties may not be null");
@@ -643,22 +644,22 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // find the node
         Node node = getNodeNotNull(nodeRef);
+        QName nodeTypeQName = node.getTypeQName();
         // get the properties before
         Map<QName, Serializable> propertiesBefore = getProperties(nodeRef);
 
         // copy properties onto node
-        Map<String, Serializable> nodeProperties = node.getProperties();
+        Map<QName, PropertyValue> nodeProperties = node.getProperties();
         nodeProperties.clear();
-        // copy all the values across
-        for (QName qname : properties.keySet())
+        
+        // check the property type and copy the values across
+        for (QName propertyQName : properties.keySet())
         {
-            Serializable value = properties.get(qname);
-            // if the value is null, it gets replaced with a dummy serializable
-            if (value == null)
-            {
-                value = new DbNodeServiceImpl.NullPropertyValue();
-            }
-            nodeProperties.put(qname.toString(), value);
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
+            Serializable value = properties.get(propertyQName);
+            // get a persistable value
+            PropertyValue propertyValue = makePropertyValue(propertyDef, value);
+            nodeProperties.put(propertyQName, propertyValue);
         }
         
         // store the properties after the change
@@ -668,13 +669,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		invokeOnUpdateNode(nodeRef);
         invokeOnUpdateProperties(nodeRef, propertiesBefore, propertiesAfter);
     }
-
+    
     /**
      * Gets the properties map, sets the value (null is allowed) and checks that the new set
      * of properties is valid.
-     * <p>
-     * If the value is null, a marker object is put in to mimic a null.  It will be turned back into
-     * a real null when the property is requested again.
      * 
      * @see DbNodeServiceImpl.NullPropertyValue
      */
@@ -682,13 +680,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Assert.notNull(qname);
         
-        // if the value is null, it gets replaced with a dummy serializable
-        if (value == null)
-        {
-            value = new DbNodeServiceImpl.NullPropertyValue();
-        }
-        
-		// Invoke policy behaviours
+        // Invoke policy behaviours
 		invokeBeforeUpdateNode(nodeRef);
 		
         // get the node
@@ -696,8 +688,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // get properties before
         Map<QName, Serializable> propertiesBefore = getProperties(nodeRef);
         
-        Map<String, Serializable> properties = node.getProperties();
-        properties.put(qname.toString(), value);
+        Map<QName, PropertyValue> properties = node.getProperties();
+        PropertyDefinition propertyDef = dictionaryService.getProperty(qname);
+        // get a persistable value
+        PropertyValue propertyValue = makePropertyValue(propertyDef, value);
+        properties.put(qname, propertyValue);
 
         // get properties after the change
         Map<QName, Serializable> propertiesAfter = getProperties(nodeRef);
@@ -745,7 +740,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         for (ChildAssoc assoc : parentAssocs)
         {
             // does the qname match the pattern?
-            if (!qnamePattern.isMatch(assoc.getQName()))
+            if (!qnamePattern.isMatch(assoc.getQname()))
             {
                 // no match - ignore
                 continue;
@@ -777,7 +772,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         for (ChildAssoc assoc : filteredSet)
         {
             // does the qname match the pattern?
-            if (!qnamePattern.isMatch(assoc.getQName()))
+            if (!qnamePattern.isMatch(assoc.getQname()))
             {
                 // no match - ignore
                 continue;
@@ -1004,12 +999,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             }
             // build a path element
             NodeRef parentRef = assoc.getParent().getNodeRef();
-            QName qname = assoc.getQName();
+            QName qname = assoc.getQname();
             NodeRef childRef = assoc.getChild().getNodeRef();
             boolean isPrimary = assoc.getIsPrimary();
             // build a real association reference
             ChildAssociationRef assocRef = new ChildAssociationRef(assoc.getTypeQName(), parentRef, qname, childRef, isPrimary, -1);
-            // TODO: Issue - Is ordering relevant here?
+            // Ordering is not important here: We are building distinct paths upwards
             Path.Element element = new Path.ChildAssocElement(assocRef);
             // create a new path that builds on the current path
             Path path = new Path();
@@ -1067,13 +1062,5 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // done
         return paths;
-    }
-    
-    /**
-     * Simple marker class to allow setting and retrieval of null property values. 
-     */
-    private static class NullPropertyValue implements Serializable
-    {
-        private static final long serialVersionUID = 3977860683100664115L;
     }
 }

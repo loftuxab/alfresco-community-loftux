@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.domain.hibernate;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +25,7 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
+import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -43,14 +43,13 @@ public class NodeImpl implements Node
 {
     private NodeKey key;
     private Store store;
-    private String typeNamespaceUri;
-    private String typeLocalName;
+    private QName typeQName;
     private Set<QName> aspects;
     private Set<NodeAssoc> sourceNodeAssocs;
     private Set<NodeAssoc> targetNodeAssocs;
     private Set<ChildAssoc> parentAssocs;
     private Set<ChildAssoc> childAssocs;
-    private Map<String, Serializable> properties;
+    private Map<QName, PropertyValue> properties;
     private transient NodeRef nodeRef;
 
     public NodeImpl()
@@ -60,7 +59,7 @@ public class NodeImpl implements Node
         targetNodeAssocs = new HashSet<NodeAssoc>(3);
         parentAssocs = new HashSet<ChildAssoc>(3);
         childAssocs = new HashSet<ChildAssoc>(3, 0.75F);
-        properties = new HashMap<String, Serializable>(5);
+        properties = new HashMap<QName, PropertyValue>(5);
     }
     
     public boolean equals(Object obj)
@@ -105,59 +104,16 @@ public class NodeImpl implements Node
         this.nodeRef = null;
     }
 
-    /**
-     * @see #getTypeNamespaceUri()
-     * @see #getTypeLocalName()
-     */
     public QName getTypeQName()
     {
-        return QName.createQName(typeNamespaceUri, typeLocalName);
+        return typeQName;
     }
 
-    /**
-     * @see #setTypeNamespaceUri(String)
-     * @see #setTypeLocalName(String)
-     */
-    public void setTypeQName(QName qname)
+    public void setTypeQName(QName typeQName)
     {
-        setTypeNamespaceUri(qname.getNamespaceURI());
-        setTypeLocalName(qname.getLocalName());
+        this.typeQName = typeQName;
     }
 
-    /**
-     * For Hibernate use
-     */
-    private String getTypeNamespaceUri()
-    {
-        return typeNamespaceUri;
-    }
-
-    /**
-     * For Hibernate use
-     */
-    private synchronized void setTypeNamespaceUri(String namespaceUri)
-    {
-        this.typeNamespaceUri = namespaceUri;
-        this.nodeRef = null;
-    }
-
-    /**
-     * For Hibernate use
-     */
-    private String getTypeLocalName()
-    {
-        return typeLocalName;
-    }
-
-    /**
-     * For Hibernate use
-     */
-    private synchronized void setTypeLocalName(String localName)
-    {
-        this.typeLocalName = localName;
-        this.nodeRef = null;
-    }
-    
     public Set<QName> getAspects()
     {
         return aspects;
@@ -223,7 +179,7 @@ public class NodeImpl implements Node
         this.childAssocs = childAssocs;
     }
 
-    public Map<String, Serializable> getProperties()
+    public Map<QName, PropertyValue> getProperties()
     {
         return properties;
     }
@@ -231,7 +187,7 @@ public class NodeImpl implements Node
     /**
      * For Hibernate use
      */
-    private void setProperties(Map<String, Serializable> properties)
+    private void setProperties(Map<QName, PropertyValue> properties)
     {
         this.properties = properties;
     }

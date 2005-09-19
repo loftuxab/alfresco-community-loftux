@@ -45,6 +45,62 @@
             <aspect>test:titled</aspect>
          </mandatory-aspects>
       </type>
+
+      <type name="test:many-properties">
+         <title>Busy</title>
+         <parent>sys:base</parent>
+         <properties>
+            <property name="test:booleanValue">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:integerValue">
+               <type>d:int</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:longValue">
+               <type>d:long</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:floatValue">
+               <type>d:float</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:doubleValue">
+               <type>d:double</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:stringValue">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:dateValue">
+               <type>d:date</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:serializableValue">
+               <type>d:any</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:nodeRefValue">
+               <type>d:noderef</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:qnameValue">
+               <type>d:qname</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:nullValue">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:multiValue">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <multiple>true</multiple>
+            </property>
+         </properties>
+      </type>
    </types>
    
    <aspects>

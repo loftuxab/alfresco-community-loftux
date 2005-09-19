@@ -30,8 +30,10 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
+import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseHibernateTest;
@@ -133,8 +135,10 @@ public class HibernateNodeTest extends BaseHibernateTest
 		node.setKey(key);
         node.setTypeQName(ContentModel.TYPE_CONTAINER);
         // give it a property map
-        Map<String, Serializable> propertyMap = new HashMap<String, Serializable>(5);
-        propertyMap.put("{}A", "AAA");
+        Map<QName, PropertyValue> propertyMap = new HashMap<QName, PropertyValue>(5);
+        QName propertyQName = QName.createQName("{}A");
+        PropertyValue propertyValue = new PropertyValue(DataTypeDefinition.TEXT, "AAA");
+        propertyMap.put(propertyQName, propertyValue);
         node.getProperties().putAll(propertyMap);
         // persist it
         Serializable id = getSession().save(node);
@@ -146,7 +150,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         propertyMap = node.getProperties();
         assertNotNull("Map not persisted", propertyMap);
         // ensure that the value is present
-        assertNotNull("Property value not present in map", propertyMap.get("{}A"));
+        assertNotNull("Property value not present in map", QName.createQName("{}A"));
     }
 
     /**
@@ -255,7 +259,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         ChildAssoc assoc1 = new ChildAssocImpl();
         assoc1.setIsPrimary(true);
         assoc1.setTypeQName(QName.createQName(null, "type1"));
-        assoc1.setQName(QName.createQName(null, "number1"));
+        assoc1.setQname(QName.createQName(null, "number1"));
         assoc1.buildAssociation(containerNode, contentNode);
         getSession().save(assoc1);
 
@@ -263,7 +267,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         ChildAssoc assoc2 = new ChildAssocImpl();
         assoc2.setIsPrimary(true);
         assoc2.setTypeQName(QName.createQName(null, "type1"));
-        assoc2.setQName(QName.createQName(null, "number2"));
+        assoc2.setQname(QName.createQName(null, "number2"));
         assoc2.buildAssociation(containerNode, contentNode);
         getSession().save(assoc2);
         
@@ -322,9 +326,8 @@ public class HibernateNodeTest extends BaseHibernateTest
         aspects.add(ContentModel.ASPECT_AUDITABLE);
         
         // add some properties
-        Map<String, Serializable> properties = node.getProperties();
-        Serializable value = "ABC";
-        properties.put(ContentModel.PROP_NAME.toString(), value);
+        Map<QName, PropertyValue> properties = node.getProperties();
+        properties.put(ContentModel.PROP_NAME, new PropertyValue(DataTypeDefinition.TEXT, "ABC"));
         
         // check that the session hands back the same instance
         Node checkNode = (Node) getSession().get(NodeImpl.class, key);
@@ -337,9 +340,9 @@ public class HibernateNodeTest extends BaseHibernateTest
         QName checkQName = (QName) checkAspects.toArray()[0];
         assertTrue("QName retrieved was not the same instance", checkQName == ContentModel.ASPECT_AUDITABLE);
         
-        Map<String, Serializable> checkProperties = checkNode.getProperties();
+        Map<QName, PropertyValue> checkProperties = checkNode.getProperties();
         assertTrue("Propery map retrieved was not the same instance", checkProperties == properties);
-        assertTrue("Property not found", checkProperties.containsKey(ContentModel.PROP_NAME.toString()));
+        assertTrue("Property not found", checkProperties.containsKey(ContentModel.PROP_NAME));
 //        assertTrue("Property value instance retrieved not the same", checkProperties)
 
         flushAndClear();

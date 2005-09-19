@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.domain;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,7 +47,7 @@ public interface Node
     
     public QName getTypeQName();
     
-    public void setTypeQName(QName qname);
+    public void setTypeQName(QName typeQName);
     
     public Set<QName> getAspects();
     
@@ -66,7 +65,7 @@ public interface Node
 
     public Set<ChildAssoc> getParentAssocs();
 
-    public Map<String, Serializable> getProperties();
+    public Map<QName, PropertyValue> getProperties();
 
     /**
      * Convenience method to get the reference to the node

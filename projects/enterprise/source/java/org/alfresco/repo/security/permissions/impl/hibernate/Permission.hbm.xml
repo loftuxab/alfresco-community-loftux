@@ -18,7 +18,7 @@
         <cache usage="read-write" />
 
         <composite-id name="nodeKey" class="org.alfresco.repo.domain.NodeKey">
-           <key-property name="protocol" length="100" />
+           <key-property name="protocol" length="50" />
            <key-property name="identifier" length="100" />
            <key-property name="guid" length="36"/>
         </composite-id>
@@ -35,7 +35,7 @@
             cascade="delete" >
             <cache usage="read-write" />
             <key>
-               <column name="protocol"  />
+               <column name="protocol" length="50" />
                <column name="identifier" length="100" />
                <column name="guid" length="36" />
             </key>
@@ -67,8 +67,8 @@
         <many-to-one 
             name="nodePermissionEntry" 
             class="org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntryImpl" 
-            lazy="true" fetch="select" optimistic-lock="true" not-null="true"  > 
-              <column name="protocol" length="100" />
+            lazy="no-proxy" fetch="select" optimistic-lock="true" not-null="true"  > 
+              <column name="protocol" length="50" />
               <column name="identifier" length="100" />
               <column name="guid" length="36"/>
         </many-to-one>
@@ -76,7 +76,7 @@
         <many-to-one 
             name="permissionReference" 
             class="org.alfresco.repo.security.permissions.impl.hibernate.PermissionReferenceImpl" 
-            lazy="true" fetch="select" optimistic-lock="true" not-null="false">
+            lazy="no-proxy" fetch="select" optimistic-lock="true" not-null="false">
             <column name="typeUri" length="100" />
             <column name="typeName" length="100" />
             <column name="name" length="100" />
@@ -85,7 +85,7 @@
         <many-to-one 
             name="recipient" 
             class="org.alfresco.repo.security.permissions.impl.hibernate.RecipientImpl" 
-            lazy="true" fetch="select" optimistic-lock="true" not-null="false">
+            lazy="no-proxy" fetch="select" optimistic-lock="true" not-null="false">
         </many-to-one>
         
         <property name="allowed" column="allowed" type="boolean" not-null="true" />

@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -322,14 +323,14 @@ public class DefaultTypeConverter
         INSTANCE.addDynamicTwoStageConverter(Number.class, String.class, InputStream.class);
         
         //
-        // Date ->
+        // Date, Timestamp ->
         //
 
-        INSTANCE.addConverter(Date.class, Number.class, new TypeConverter.Converter<Date, Number>()
+        INSTANCE.addConverter(Timestamp.class, Date.class, new TypeConverter.Converter<Timestamp, Date>()
         {
-            public Number convert(Date source)
+            public Date convert(Timestamp source)
             {
-                return Long.valueOf(source.getTime());
+                return new Date(source.getTime());
             }
         });
 

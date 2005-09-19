@@ -69,12 +69,12 @@ public interface ChildAssoc extends Comparable<ChildAssoc>
     /**
      * @return Returns the qualified name of this association 
      */
-    public QName getQName();
+    public QName getQname();
 
     /**
      * @param qname the qualified name of the association
      */
-    public void setQName(QName qname);
+    public void setQname(QName qname);
 
     public boolean getIsPrimary();
 

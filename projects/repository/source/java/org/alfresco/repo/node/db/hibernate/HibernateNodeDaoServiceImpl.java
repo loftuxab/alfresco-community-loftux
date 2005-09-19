@@ -275,7 +275,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         ChildAssoc assoc = new ChildAssocImpl();
         assoc.setTypeQName(assocTypeQName);
         assoc.setIsPrimary(isPrimary);
-        assoc.setQName(qname);
+        assoc.setQname(qname);
         assoc.buildAssociation(parentNode, childNode);
         // persist
         getHibernateTemplate().save(assoc);
@@ -404,8 +404,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 query.setString("sourceKeyProtocol", sourceKey.getProtocol())
                      .setString("sourceKeyIdentifier", sourceKey.getIdentifier())
                      .setString("sourceKeyGuid", sourceKey.getGuid())
-                     .setString("assocTypeNamespaceUri", assocTypeQName.getNamespaceURI())
-                     .setString("assocTypeLocalName", assocTypeQName.getLocalName())
+                     .setString("assocTypeQName", assocTypeQName.toString())
                      .setString("targetKeyProtocol", targetKey.getProtocol())
                      .setString("targetKeyIdentifier", targetKey.getIdentifier())
                      .setString("targetKeyGuid", targetKey.getGuid());
@@ -435,8 +434,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 query.setString("sourceKeyProtocol", sourceKey.getProtocol())
                      .setString("sourceKeyIdentifier", sourceKey.getIdentifier())
                      .setString("sourceKeyGuid", sourceKey.getGuid())
-                     .setString("assocTypeNamespaceUri", assocTypeQName.getNamespaceURI())
-                     .setString("assocTypeLocalName", assocTypeQName.getLocalName());
+                     .setString("assocTypeQName", assocTypeQName.toString());
                 return query.list();
             }
         };
@@ -457,8 +455,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 query.setString("targetKeyProtocol", targetKey.getProtocol())
                      .setString("targetKeyIdentifier", targetKey.getIdentifier())
                      .setString("targetKeyGuid", targetKey.getGuid())
-                     .setString("assocTypeNamespaceUri", assocTypeQName.getNamespaceURI())
-                     .setString("assocTypeLocalName", assocTypeQName.getLocalName());
+                     .setString("assocTypeQName", assocTypeQName.toString());
                 return query.list();
             }
         };

@@ -18,8 +18,10 @@ package org.alfresco.repo.node;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,19 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
     public static final QName ASSOC_TYPE_QNAME_TEST_CHILDREN = ContentModel.ASSOC_CHILDREN;
     public static final QName ASSOC_TYPE_QNAME_TEST_NEXT = QName.createQName(NAMESPACE, "next");
+    public static final QName TYPE_QNAME_TEST_MANY_PROPERTIES = QName.createQName(NAMESPACE, "many-properties");
+    public static final QName PROP_QNAME_BOOLEAN_VALUE = QName.createQName(NAMESPACE, "booleanValue");
+    public static final QName PROP_QNAME_INTEGER_VALUE = QName.createQName(NAMESPACE, "integerValue");
+    public static final QName PROP_QNAME_LONG_VALUE = QName.createQName(NAMESPACE, "longValue");
+    public static final QName PROP_QNAME_FLOAT_VALUE = QName.createQName(NAMESPACE, "floatValue");
+    public static final QName PROP_QNAME_DOUBLE_VALUE = QName.createQName(NAMESPACE, "doubleValue");
+    public static final QName PROP_QNAME_STRING_VALUE = QName.createQName(NAMESPACE, "stringValue");
+    public static final QName PROP_QNAME_DATE_VALUE = QName.createQName(NAMESPACE, "dateValue");
+    public static final QName PROP_QNAME_SERIALIZABLE_VALUE = QName.createQName(NAMESPACE, "serializableValue");
+    public static final QName PROP_QNAME_NODEREF_VALUE = QName.createQName(NAMESPACE, "nodeRefValue");
+    public static final QName PROP_QNAME_QNAME_VALUE = QName.createQName(NAMESPACE, "qnameValue");
+    public static final QName PROP_QNAME_NULL_VALUE = QName.createQName(NAMESPACE, "nullValue");
+    public static final QName PROP_QNAME_MULTI_VALUE = QName.createQName(NAMESPACE, "multiValue");
     
     protected DictionaryService dictionaryService;
     protected NodeService nodeService;
@@ -704,6 +719,51 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         catch (IllegalArgumentException e)
         {
             fail("Null property values are allowed in the map");
+        }
+    }
+    
+    /**
+     * Check that properties go in and come out in the correct format
+     */
+    public void testPropertyTypes() throws Exception
+    {
+        ArrayList<String> listProperty = new ArrayList<String>(2);
+        listProperty.add("ABC");
+        listProperty.add("DEF");
+        
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(17);
+        properties.put(PROP_QNAME_BOOLEAN_VALUE, true);
+        properties.put(PROP_QNAME_INTEGER_VALUE, 123);
+        properties.put(PROP_QNAME_LONG_VALUE, 123L);
+        properties.put(PROP_QNAME_FLOAT_VALUE, 123.0F);
+        properties.put(PROP_QNAME_DOUBLE_VALUE, 123.0);
+        properties.put(PROP_QNAME_STRING_VALUE, "123.0");
+        properties.put(PROP_QNAME_DATE_VALUE, new Date());
+        properties.put(PROP_QNAME_SERIALIZABLE_VALUE, "456");
+        properties.put(PROP_QNAME_NODEREF_VALUE, rootNodeRef);
+        properties.put(PROP_QNAME_QNAME_VALUE, TYPE_QNAME_TEST_CONTENT);
+        properties.put(PROP_QNAME_NULL_VALUE, null);
+        properties.put(PROP_QNAME_MULTI_VALUE, listProperty);
+        
+        // create a new node
+        NodeRef nodeRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("pathA"),
+                ContentModel.TYPE_CONTAINER,
+                properties).getChildRef();
+        
+        // persist
+        flushAndClear();
+        
+        // get the properties back
+        Map<QName, Serializable> checkProperties = nodeService.getProperties(nodeRef);
+        // check
+        for (QName qname : properties.keySet())
+        {
+            Serializable value = properties.get(qname);
+            Serializable checkValue = checkProperties.get(qname);
+            assertEquals("Property mismatch - " + qname, value, checkValue);
         }
     }
     
