@@ -78,12 +78,17 @@ public class DownloadContentServlet extends HttpServlet
          // the last part is only used for mimetype and browser use
          // may be followed by valid ticket for external use: ?ticket=1234567890 
          String uri = req.getRequestURI();
+         String params = req.getQueryString();
          
          if (logger.isDebugEnabled())
-            logger.debug("Processing URL: " + uri);
+            logger.debug("Processing URL: " + uri + (params != null ? ("?" + params) : ""));
          
          // see if a ticket has been supplied
-         int index = uri.indexOf("?ticket=");
+         int index = -1;
+         if (params != null)
+         {
+            index = params.indexOf("ticket=");
+         }
          if (index == -1)
          {
             AuthenticationHelper.authenticate(getServletContext(), req, res);
@@ -91,9 +96,8 @@ public class DownloadContentServlet extends HttpServlet
          else
          {
             // extract ticket from URI, use to authenticate
-            String ticket = uri.substring(index + 8);
+            String ticket = params.substring(index + 8);
             AuthenticationHelper.authenticate(getServletContext(), req, res, ticket);
-            uri = uri.substring(0, index);
          }
          
          WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
