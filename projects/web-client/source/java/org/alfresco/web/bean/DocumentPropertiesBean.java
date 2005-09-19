@@ -33,6 +33,8 @@ import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -113,6 +115,48 @@ public class DocumentPropertiesBean
          
          // send the properties back to the repository
          this.nodeService.setProperties(this.browseBean.getDocument().getNodeRef(), properties);
+         
+         // we also need to persist any association changes that may have been made
+         
+         // add any associations added in the UI
+         Map<String, Map<String, AssociationRef>> addedAssocs = this.editableNode.getAddedAssociations();
+         for (Map<String, AssociationRef> typedAssoc : addedAssocs.values())
+         {
+            for (AssociationRef assoc : typedAssoc.values())
+            {
+               this.nodeService.createAssociation(assoc.getSourceRef(), assoc.getTargetRef(), assoc.getTypeQName());
+            }
+         }
+         
+         // remove any association removed in the UI
+         Map<String, Map<String, AssociationRef>> removedAssocs = this.editableNode.getRemovedAssociations();
+         for (Map<String, AssociationRef> typedAssoc : removedAssocs.values())
+         {
+            for (AssociationRef assoc : typedAssoc.values())
+            {
+               this.nodeService.removeAssociation(assoc.getSourceRef(), assoc.getTargetRef(), assoc.getTypeQName());
+            }
+         }
+         
+         // add any child associations added in the UI
+         Map<String, Map<String, ChildAssociationRef>> addedChildAssocs = this.editableNode.getAddedChildAssociations();
+         for (Map<String, ChildAssociationRef> typedAssoc : addedChildAssocs.values())
+         {
+            for (ChildAssociationRef assoc : typedAssoc.values())
+            {
+               this.nodeService.addChild(assoc.getParentRef(), assoc.getChildRef(), assoc.getTypeQName(), assoc.getTypeQName());
+            }
+         }
+         
+         // remove any child association removed in the UI
+         Map<String, Map<String, ChildAssociationRef>> removedChildAssocs = this.editableNode.getRemovedChildAssociations();
+         for (Map<String, ChildAssociationRef> typedAssoc : removedChildAssocs.values())
+         {
+            for (ChildAssociationRef assoc : typedAssoc.values())
+            {
+               this.nodeService.removeChild(assoc.getParentRef(), assoc.getChildRef());
+            }
+         }
          
          // commit the transaction
          tx.commit();
