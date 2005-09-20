@@ -69,7 +69,7 @@ public class PermissionServiceNOOPImpl
     /* (non-Javadoc)
      * @see org.alfresco.repo.security.permissions.PermissionService#getAllPermissions(org.alfresco.service.cmr.repository.NodeRef)
      */
-    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef)
+    public Set<AccessPermission> getAllSetPermissions(NodeRef nodeRef)
     {
         return null;
     }
@@ -127,4 +127,6 @@ public class PermissionServiceNOOPImpl
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
     }
+    
+    
 }

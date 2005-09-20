@@ -67,6 +67,22 @@ public interface AuthenticationService
     public void deleteAuthentication(String userName) throws AuthenticationException;
     
     /**
+     * Enable or disable an authentication entry
+     * 
+     * @param userName
+     * @param enabled
+     */
+    public void setAuthenticationEnabled(String userName, boolean enabled);
+    
+    /**
+     * Is an authentication enabled or disabled?
+     * 
+     * @param userName
+     * @return
+     */
+    public boolean getAuthenticationEnabled(String userName);
+    
+    /**
      * Carry out an authentication attempt. If successful the user is set to the current user.
      * The current user is a part of the thread context.
      * 

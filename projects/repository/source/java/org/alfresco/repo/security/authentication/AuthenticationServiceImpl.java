@@ -68,7 +68,7 @@ public class AuthenticationServiceImpl implements AuthenticationService
     {
         try
         {
-            authenticationDao.createUser(userName, new String(password));
+            authenticationDao.createUser(userName, password);
         }
         catch (net.sf.acegisecurity.AuthenticationException ae)
         {
@@ -81,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService
     {
         try
         {
-            authenticationDao.updateUser(userName, new String(newPassword));
+            authenticationDao.updateUser(userName, newPassword);
         }
         catch (net.sf.acegisecurity.AuthenticationException ae)
         {
@@ -93,7 +93,7 @@ public class AuthenticationServiceImpl implements AuthenticationService
     {
         try
         {
-            authenticationDao.updateUser(userName, new String(newPassword));
+            authenticationDao.updateUser(userName, newPassword);
         }
         catch (net.sf.acegisecurity.AuthenticationException ae)
         {
@@ -111,6 +111,18 @@ public class AuthenticationServiceImpl implements AuthenticationService
         {
             throw new AuthenticationException(ae.getMessage(), ae);
         }
+    }
+
+    
+    
+    public boolean getAuthenticationEnabled(String userName)
+    {
+        return authenticationDao.getEnabled(userName);
+    }
+
+    public void setAuthenticationEnabled(String userName, boolean enabled)
+    {
+        authenticationDao.setEnabled(userName, enabled);
     }
 
     public void authenticate(String userName, char[] password) throws AuthenticationException

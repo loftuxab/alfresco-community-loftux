@@ -22,18 +22,24 @@
          <parent>sys:base</parent>
          <properties>
             <property name="usr:username">
-               <type>d:text</type>
+               <type>d:text</type> `
             </property>
             <property name="usr:password">
                <type>d:text</type>
             </property>
-            <property name="usr:accountEnabled">
+            <property name="usr:enabled">
                <type>d:boolean</type>
             </property>
-            <property name="usr:accountExpiry">
+            <property name="usr:accountExpires">
+               <type>d:boolean</type>
+            </property>
+            <property name="usr:accountExpiryDate">
                <type>d:datetime</type>
             </property>
-            <property name="usr:credentialsExpiry">
+            <property name="usr:credentialsExpire">
+               <type>d:boolean</type>
+            </property>
+            <property name="usr:credentialsExpiryDate">
                <type>d:datetime</type>
             </property>
             <property name="usr:accountLocked">

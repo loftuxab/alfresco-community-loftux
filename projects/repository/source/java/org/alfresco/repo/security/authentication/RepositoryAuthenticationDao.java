@@ -17,6 +17,7 @@
 package org.alfresco.repo.security.authentication;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         return results.get(0);
     }
 
-    public void createUser(String userName, String rawPassword) throws AuthenticationException
+    public void createUser(String userName, char[] rawPassword) throws AuthenticationException
     {
         NodeRef userRef = getUserOrNull(userName);
         if (userRef != null)
@@ -140,7 +141,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         properties.put(ContentModel.PROP_USER_USERNAME, userName);
         String salt = GUID.generate();
         properties.put(ContentModel.PROP_SALT, salt);
-        properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(rawPassword, salt));
+        properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(new String(rawPassword), salt));
         nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_USER, ContentModel.TYPE_USER,
                 properties);
     }
@@ -176,7 +177,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         return typesNode;
     }
 
-    public void updateUser(String userName, String rawPassword) throws AuthenticationException
+    public void updateUser(String userName, char[] rawPassword) throws AuthenticationException
     {
         NodeRef userRef = getUserOrNull(userName);
         if (userRef == null)
@@ -188,7 +189,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         properties.remove(ContentModel.PROP_SALT);
         properties.put(ContentModel.PROP_SALT, salt);
         properties.remove(ContentModel.PROP_PASSWORD);
-        properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(rawPassword, salt));
+        properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(new String(rawPassword), salt));
         nodeService.setProperties(userRef, properties);
     }
 
@@ -235,6 +236,90 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     public boolean userExists(String userName)
     {
        return (getUserOrNull(userName) != null);
+    }
+
+    public boolean getAccountExpires(String userName)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public Date getAccountExpiryDate(String userName)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean getAccountHasExpired(String userName)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean getAccountlocked(String userName)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean getCredentialsExpire(String userName)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public Date getCredentialsExpiryDate(String userName)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean getCredentialsHaveExpired(String userName)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean getEnabled(String userName)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setAccountExpires(String userName, boolean expires)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setAccountExpiryDate(String userName, Date exipryDate)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setCredentialsExpire(String userName, boolean expires)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setCredentialsExpiryDate(String userName, Date exipryDate)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setEnabled(String userName, boolean enabled)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void setLocked(String userName, boolean locked)
+    {
+        // TODO Auto-generated method stub
+        
     }
     
     

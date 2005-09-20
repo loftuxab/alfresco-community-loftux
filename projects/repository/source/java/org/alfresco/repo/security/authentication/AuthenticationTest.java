@@ -150,7 +150,7 @@ public class AuthenticationTest extends TestCase
         dao.setNamespaceService(getNamespacePrefixReolsver(""));
         dao.setPasswordEncoder(passwordEncoder);
 
-        dao.createUser("Andy", "cabbage");
+        dao.createUser("Andy", "cabbage".toCharArray());
         assertNotNull(dao.getUserOrNull("Andy"));
 
         UserDetails AndyDetails = (UserDetails) dao.loadUserByUsername("Andy");
@@ -166,7 +166,7 @@ public class AuthenticationTest extends TestCase
         assertEquals(1, AndyDetails.getAuthorities().length);
 
         Object oldSalt = dao.getSalt(AndyDetails);
-        dao.updateUser("Andy", "carrot");
+        dao.updateUser("Andy", "carrot".toCharArray());
         UserDetails newDetails = (UserDetails) dao.loadUserByUsername("Andy");
         assertNotNull(newDetails);
         assertEquals("Andy", newDetails.getUsername());
@@ -187,7 +187,7 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthentication()
     {
-        dao.createUser("Andy", "squash");
+        dao.createUser("Andy", "squash".toCharArray());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "squash");
         token.setAuthenticated(false);
@@ -201,7 +201,7 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationFailure()
     {
-        dao.createUser("Andy", "squash");
+        dao.createUser("Andy", "squash".toCharArray());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "turnip");
         token.setAuthenticated(false);
@@ -222,7 +222,7 @@ public class AuthenticationTest extends TestCase
 
     public void testTicket()
     {
-        dao.createUser("Andy", "ticket");
+        dao.createUser("Andy", "ticket".toCharArray());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "ticket");
         token.setAuthenticated(false);
@@ -267,7 +267,7 @@ public class AuthenticationTest extends TestCase
         tc.setTicketsExpire(false);
         tc.setValidDuration("P0D");
 
-        dao.createUser("Andy", "ticket");
+        dao.createUser("Andy", "ticket".toCharArray());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "ticket");
         token.setAuthenticated(false);
@@ -290,7 +290,7 @@ public class AuthenticationTest extends TestCase
         tc.setTicketsExpire(false);
         tc.setValidDuration("P0D");
 
-        dao.createUser("Andy", "ticket");
+        dao.createUser("Andy", "ticket".toCharArray());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "ticket");
         token.setAuthenticated(false);
@@ -321,7 +321,7 @@ public class AuthenticationTest extends TestCase
         tc.setTicketsExpire(true);
         tc.setValidDuration("P5S");
 
-        dao.createUser("Andy", "ticket");
+        dao.createUser("Andy", "ticket".toCharArray());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "ticket");
         token.setAuthenticated(false);
@@ -366,7 +366,7 @@ public class AuthenticationTest extends TestCase
         tc.setTicketsExpire(true);
         tc.setValidDuration("P1D");
 
-        dao.createUser("Andy", "ticket");
+        dao.createUser("Andy", "ticket".toCharArray());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "ticket");
         token.setAuthenticated(false);

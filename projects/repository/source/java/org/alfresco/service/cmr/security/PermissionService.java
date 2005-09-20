@@ -124,14 +124,14 @@ public interface PermissionService
     public Set<AccessPermission> getPermissions(NodeRef nodeRef);
 
     /**
-     * Get all the AccessPermissions that are granted/denied to anyone for the
+     * Get all the AccessPermissions that are set for anyone for the
      * given node
      * 
      * @param nodeRef -
      *            the reference to the node
      * @return the set of allowed permissions
      */
-    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef);
+    public Set<AccessPermission> getAllSetPermissions(NodeRef nodeRef);
 
     /**
      * Get the permissions that can be set for a given node

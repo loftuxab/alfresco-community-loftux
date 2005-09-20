@@ -194,9 +194,15 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         return getAllPermissionsImpl(nodeRef, true, true);
     }
 
-    public Set<AccessPermission> getAllPermissions(NodeRef nodeRef)
+    public Set<AccessPermission> getAllSetPermissions(NodeRef nodeRef)
     {
-        return null;
+        HashSet<AccessPermission> accessPermissions = new HashSet<AccessPermission>();
+        NodePermissionEntry nodePremissionEntry = getSetPermissions(nodeRef);
+        for(PermissionEntry pe : nodePremissionEntry.getPermissionEntries())
+        {
+            accessPermissions.add(new AccessPermissionImpl(pe.getPermissionReference().toString(), pe.getAccessStatus(), pe.getAuthority()));
+        }
+        return accessPermissions;
     }
 
     private Set<AccessPermission> getAllPermissionsImpl(NodeRef nodeRef, boolean includeTrue, boolean includeFalse)
