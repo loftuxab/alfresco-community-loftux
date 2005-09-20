@@ -166,7 +166,7 @@ public class PropertyValue implements Cloneable, Serializable
             @Override
             protected ValueType getPersistedType()
             {
-                return ValueType.STRING;
+                return ValueType.SERIALIZABLE;
             }
 
             @Override

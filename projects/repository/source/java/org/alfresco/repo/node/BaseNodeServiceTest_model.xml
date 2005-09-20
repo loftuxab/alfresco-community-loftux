@@ -90,6 +90,10 @@
                <type>d:qname</type>
                <mandatory>true</mandatory>
             </property>
+            <property name="test:pathValue">
+               <type>d:path</type>
+               <mandatory>true</mandatory>
+            </property>
             <property name="test:nullValue">
                <type>d:text</type>
                <mandatory>true</mandatory>
