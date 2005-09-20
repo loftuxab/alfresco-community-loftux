@@ -20,6 +20,7 @@
          <ref bean="mimetypeMap" />
       </constructor-arg>
    </bean>
+
    <!--
    <bean id="transformer.JMagick" class="org.alfresco.repo.content.transform.magick.JMagickContentTransformer" init-method="init">
       <property name="mimetypeMap">
@@ -67,6 +68,26 @@
             <ref bean="transformer.OpenOffice" />
 <!--            <ref bean="transformer.JMagick" /> -->
             <ref bean="transformer.ImageMagick" />
+         </list>
+      </property>
+   </bean>
+
+   <bean id="metadataExtracterRegistry" class="org.alfresco.repo.content.metadata.MetadataExtracterRegistry" >
+      <constructor-arg>
+         <ref bean="mimetypeMap" />
+      </constructor-arg>
+      <!-- metadata extracters -->
+      <property name="extracters">
+         <list>
+		    <bean class="org.alfresco.repo.content.metadata.PdfBoxMetadataExtracter" />
+		    <bean class="org.alfresco.repo.content.metadata.OfficeMetadataExtracter" />
+		    <bean class="org.alfresco.repo.content.metadata.HtmlMetadataExtracter" />
+		    <bean class="org.alfresco.repo.content.metadata.StringMetadataExtracter" />
+		    <bean class="org.alfresco.repo.content.metadata.UnoMetadataExtracter" >
+		       <constructor-arg>
+        	      <ref bean="mimetypeMap" />
+		       </constructor-arg>
+		    </bean>
          </list>
       </property>
    </bean>

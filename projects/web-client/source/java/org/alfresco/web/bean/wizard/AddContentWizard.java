@@ -17,12 +17,19 @@
 package org.alfresco.web.bean.wizard;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.content.filestore.FileContentReader;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.FileUploadBean;
 import org.alfresco.web.bean.repository.Repository;
@@ -57,7 +64,7 @@ public class AddContentWizard extends BaseContentWizard
    {
       String outcome = super.next();
       
-      // if the outcome is "properties" we pre-set the content type and title
+      // if the outcome is "properties" we pre-set the content type and other
       // fields accordingly
       if (outcome.equals("properties"))
       {
@@ -70,6 +77,18 @@ public class AddContentWizard extends BaseContentWizard
             this.inlineEdit = (this.contentType.equals(MimetypeMap.MIMETYPE_HTML));
          }
          
+         // Try and extract metadata from the file 
+         ContentReader cr = new FileContentReader(this.file);
+         cr.setMimetype(this.contentType);
+         // create properties for content type
+         Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(5, 1.0f);
+                  
+         if (Repository.extractMetadata(FacesContext.getCurrentInstance(), cr, contentProps))
+         {
+            this.author = safeToString(contentProps.get(ContentModel.PROP_CREATOR));
+            this.title = safeToString(contentProps.get(ContentModel.PROP_TITLE));
+            this.description = safeToString(contentProps.get(ContentModel.PROP_DESCRIPTION));
+         }
          if (this.title == null)
          {
             this.title = this.fileName;
@@ -79,6 +98,16 @@ public class AddContentWizard extends BaseContentWizard
       return outcome;
    }
    
+   private String safeToString(Serializable value)
+   {
+      if (value == null)
+         return null;
+      else if (value instanceof String)
+         return (String)value;
+      else
+         return value.toString();
+   }
+
    /**
     * Deals with the finish button being pressed
     * 

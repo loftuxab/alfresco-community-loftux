@@ -274,6 +274,12 @@
          <mimetype mimetype="application/zip" display="ZIP">
             <extension>zip</extension>
          </mimetype>
+         <mimetype mimetype="application/vnd.oasis.opendocument.text" display="OpenDocument Text (OpenOffice.org 2.0)">
+            <extension>odt</extension>
+         </mimetype>
+	     <mimetype mimetype="application/vnd.sun.xml.writer" display="OpenOffice.org 1.0 / StarOffice6.0 Writer 6.0">
+	       <extension>sxw</extension>
+	     </mimetype>
       </mimetypes>
    </config>
    

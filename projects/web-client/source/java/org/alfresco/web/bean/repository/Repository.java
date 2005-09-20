@@ -16,6 +16,7 @@
  */
 package org.alfresco.web.bean.repository;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,11 +32,14 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.content.metadata.MetadataExtracter;
+import org.alfresco.repo.content.metadata.MetadataExtracterRegistry;
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -73,6 +77,8 @@ public final class Repository
    private static final String DEFAULT_FILE_IMAGE16 = IMAGE_PREFIX16 + "_default" + IMAGE_POSTFIX;
    private static final String DEFAULT_FILE_IMAGE32 = IMAGE_PREFIX32 + "_default" + IMAGE_POSTFIX;
    
+   private static final String METADATA_EXTACTER_REGISTRY = "metadataExtracterRegistry";  
+
    private static Logger logger = Logger.getLogger(Repository.class);
    private static final Map<String, String> s_fileExtensionMap = new HashMap<String, String>(89, 1.0f);
    
@@ -476,7 +482,49 @@ public final class Repository
    {
        return (ConfigurableService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("configurableService");
    }
+
+   /**
+    * Return the Metadata Extracter Registry
+    * 
+    * @param context Faces Context
+    * @return the MetadataExtracterRegistry
+    */
+   public static MetadataExtracterRegistry getMetadataExtracterRegistry(FacesContext context)
+   {
+       return (MetadataExtracterRegistry)FacesContextUtils.getRequiredWebApplicationContext(
+               context).getBean(METADATA_EXTACTER_REGISTRY);
+   }
    
+   /**
+    * Extracts the metadata of a "raw" piece of content into a map. 
+    * 
+    * @param context Faces Context
+    * @param reader Content reader for the source content to extract from 
+    * @param destination Map of metadata to set metadata values into
+    * @return True if an extracter was found
+    */
+   public static boolean extractMetadata(FacesContext context, ContentReader reader, Map<QName, Serializable> destination)
+   {
+      // check that source mimetype is available
+      String mimetype = reader.getMimetype();
+      if (mimetype == null)
+      {
+         throw new AlfrescoRuntimeException("The content reader mimetype must be set: " + reader);
+      }
+
+      // look for a transformer
+      MetadataExtracter extracter = getMetadataExtracterRegistry(context).getExtracter(mimetype);
+      if (extracter == null)
+      {
+         // No metadata extracter is not a failure, but we flag it 
+         return false;
+      }
+      
+      // we have a transformer, so do it
+      extracter.extract(reader, destination);
+      return true;
+   }
+
    /**
     * Query a list of Person type nodes from the repo
     * It is currently assumed that all Person nodes exist below the Repository root node
@@ -729,4 +777,7 @@ public final class Repository
       
       return namespaceService;
    }
+
+      
+   
 }
