@@ -24,7 +24,7 @@ import org.alfresco.repo.content.MimetypeMap;
  */
 public class UnoMetadataExtracterTest extends AbstractMetadataExtracterTest
 {
-    private MetadataExtracter extracter;
+    private UnoMetadataExtracter extracter;
 
     public void onSetUpInTransaction() throws Exception
     {
@@ -41,6 +41,11 @@ public class UnoMetadataExtracterTest extends AbstractMetadataExtracterTest
 
     public void testReliability() throws Exception
     {
+        if (!extracter.isConnected())
+        {
+            return;
+        }
+        
         double reliability = 0.0;
         reliability = extracter.getReliability(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         assertEquals("Mimetype text should not be supported", 0.0, reliability);
@@ -54,11 +59,21 @@ public class UnoMetadataExtracterTest extends AbstractMetadataExtracterTest
 
     public void testOOo20WriterExtraction() throws Exception
     {
+        if (!extracter.isConnected())
+        {
+            return;
+        }
+        
         testCommonMetadata(extractFromExtension("odt", MimetypeMap.MIMETYPE_OPENDOCUMENT_TEXT));
     }
 
     public void testOOo10WriterExtraction() throws Exception
     {
+        if (!extracter.isConnected())
+        {
+            return;
+        }
+        
         testCommonMetadata(extractFromExtension("sxw", MimetypeMap.MIMETYPE_OPENOFFICE_WRITER));
     }
 }
