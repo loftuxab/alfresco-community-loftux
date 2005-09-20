@@ -47,6 +47,7 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.web.app.portlet.AlfrescoFacesPortlet;
 import org.alfresco.web.app.servlet.AuthenticationHelper;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
@@ -250,7 +251,16 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
    {
       if (logger.isDebugEnabled()) logger.debug("HTTP session destroyed: " + event.getSession().getId());
 
-      User user = (User) event.getSession().getAttribute(AuthenticationHelper.AUTHENTICATION_USER);
+      User user;
+      if (Application.inPortalServer() == false)
+      {
+         user = (User)event.getSession().getAttribute(AuthenticationHelper.AUTHENTICATION_USER);
+      }
+      else
+      {
+         user = (User)event.getSession().getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + AuthenticationHelper.AUTHENTICATION_USER);
+      }
+      
       if (user != null)
       {
          // invalidate ticket

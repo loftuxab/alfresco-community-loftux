@@ -214,20 +214,11 @@ public class UsersBean implements IContextListener
       catch (Exception e)
       {
          // rollback the transaction
-         try
-         {
-            if (tx != null)
-            {
-               tx.rollback();
-            }
-         }
-         catch (Exception ex)
-         {
-         }
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(FacesContext
                .getCurrentInstance(), ERROR_DELETE), e.getMessage()), e);
       }
-
+      
       return DEFAULT_OUTCOME;
    }
 

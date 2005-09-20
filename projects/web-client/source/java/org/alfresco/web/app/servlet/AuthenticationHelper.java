@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.app.portlet.AlfrescoFacesPortlet;
 import org.alfresco.web.bean.repository.User;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -39,8 +40,17 @@ public final class AuthenticationHelper
    public static boolean authenticate(ServletContext context, HttpServletRequest httpRequest, HttpServletResponse httpResponse)
       throws IOException
    {
-      // examine the session for our User object
-      User user = (User)httpRequest.getSession().getAttribute(AUTHENTICATION_USER);
+      // examine the appropriate session for our User object
+      User user;
+      if (Application.inPortalServer() == false)
+      {
+         user = (User)httpRequest.getSession().getAttribute(AUTHENTICATION_USER);
+      }
+      else
+      {
+         user = (User)httpRequest.getSession().getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + AUTHENTICATION_USER);
+      }
+      
       if (user == null)
       {
          // no user/ticket - redirect to login page

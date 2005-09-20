@@ -26,6 +26,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.faces.validator.ValidatorException;
+import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
@@ -344,8 +347,17 @@ public class LoginBean
       Map session = context.getExternalContext().getSessionMap();
       User user = (User) session.get(AuthenticationHelper.AUTHENTICATION_USER);
       
-      // clear Session for this user
-      context.getExternalContext().getSessionMap().clear();
+      // invalidate Session for this user
+      if (Application.inPortalServer() == false)
+      {
+         HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+         request.getSession().invalidate();
+      }
+      else
+      {
+         PortletRequest request = (PortletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+         request.getPortletSession().invalidate();
+      }
       
       // invalidate User ticket
       if (user != null)
