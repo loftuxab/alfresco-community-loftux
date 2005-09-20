@@ -94,6 +94,10 @@
                <type>d:path</type>
                <mandatory>true</mandatory>
             </property>
+            <property name="test:categoryValue">
+               <type>d:category</type>
+               <mandatory>true</mandatory>
+            </property>
             <property name="test:nullValue">
                <type>d:text</type>
                <mandatory>true</mandatory>

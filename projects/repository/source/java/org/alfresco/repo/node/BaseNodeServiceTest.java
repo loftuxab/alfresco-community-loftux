@@ -89,6 +89,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName PROP_QNAME_NODEREF_VALUE = QName.createQName(NAMESPACE, "nodeRefValue");
     public static final QName PROP_QNAME_QNAME_VALUE = QName.createQName(NAMESPACE, "qnameValue");
     public static final QName PROP_QNAME_PATH_VALUE = QName.createQName(NAMESPACE, "pathValue");
+    public static final QName PROP_QNAME_CATEGORY_VALUE = QName.createQName(NAMESPACE, "categoryValue");
     public static final QName PROP_QNAME_NULL_VALUE = QName.createQName(NAMESPACE, "nullValue");
     public static final QName PROP_QNAME_MULTI_VALUE = QName.createQName(NAMESPACE, "multiValue");
     
@@ -747,6 +748,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         properties.put(PROP_QNAME_NODEREF_VALUE, rootNodeRef);
         properties.put(PROP_QNAME_QNAME_VALUE, TYPE_QNAME_TEST_CONTENT);
         properties.put(PROP_QNAME_PATH_VALUE, pathProperty);
+        properties.put(PROP_QNAME_CATEGORY_VALUE, rootNodeRef);
         properties.put(PROP_QNAME_NULL_VALUE, null);
         properties.put(PROP_QNAME_MULTI_VALUE, listProperty);
         
