@@ -4,7 +4,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
-	<classpathentry exported="true" sourcepath="src/hibernate3_src.zip" kind="lib" path="lib/hibernate3.jar"/>
+	<classpathentry exported="true" sourcepath="src/hibernate-3.1-beta2_src.zip" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsp.jar"/>
@@ -75,6 +75,5 @@
 	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.10-bin.jar"/>
 	<classpathentry exported="true" sourcepath="src/jcr_src.zip" kind="lib" path="lib/jcr-1.0.jar"/>
 	<classpathentry exported="true" sourcepath="W:/freemarker-2.3.3/src" kind="lib" path="lib/freemarker.jar"/>
-	<classpathentry kind="lib" path="lib/cglib-nodep-2.1.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
