@@ -258,7 +258,7 @@
                 org.alfresco.service.cmr.security.PermissionService.getPermissions=ACL_NODE.0.sys:base.ReadPermissions
                 org.alfresco.service.cmr.security.PermissionService.getAllSetPermissions=ACL_NODE.0.sys:base.ReadPermissions
                 org.alfresco.service.cmr.security.PermissionService.getSettablePermissions=ACL_ALLOW
-                org.alfresco.service.cmr.security.PermissionService.hasPermission=ACL_NODE.0.sys:base.ReadPermissions
+                org.alfresco.service.cmr.security.PermissionService.hasPermission=ACL_ALLOW
                 org.alfresco.service.cmr.security.PermissionService.deletePermissions=ACL_NODE.0.sys:base.ChangePermissions
                 org.alfresco.service.cmr.security.PermissionService.deletePermission=ACL_NODE.0.sys:base.ChangePermissions
                 org.alfresco.service.cmr.security.PermissionService.setPermission=ACL_NODE.0.sys:base.ChangePermissions
