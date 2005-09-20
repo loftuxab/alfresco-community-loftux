@@ -113,12 +113,12 @@ import org.alfresco.service.namespace.QName;
     }
     
     /**
-     * @see #getTitle()
+     * @see #getName()
      */
     @Override
     public String toString()
     {
-        return getTitle();
+        return getName();
     }
     
     /* (non-Javadoc)
