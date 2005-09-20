@@ -24,8 +24,6 @@ import java.util.Set;
 
 import org.alfresco.service.cmr.dictionary.InvalidAspectException;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
-import org.alfresco.service.cmr.search.QueryParameterDefinition;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 
@@ -441,53 +439,4 @@ public interface NodeService
      * @throws InvalidNodeRefException if the node could not be found
      */
     public List<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException;
-    
-    /**
-     * @deprecated
-     * @see org.alfresco.service.cmr.search.SearchService#selectNodes(NodeRef, String, QueryParameterDefinition[], NamespacePrefixResolver, boolean)
-     */
-    @Deprecated
-    public List<NodeRef> selectNodes(
-            NodeRef contextNodeRef,
-            String xpath,
-            QueryParameterDefinition[] parameters,
-            NamespacePrefixResolver namespacePrefixResolver,
-            boolean followAllParentLinks)
-            throws InvalidNodeRefException, XPathException;
-
-    /**
-     * @deprecated
-     * @see org.alfresco.service.cmr.search.SearchService#selectProperties(NodeRef, String, QueryParameterDefinition[], NamespacePrefixResolver, boolean)
-     */
-    @Deprecated
-    public List<Serializable> selectProperties(
-            NodeRef contextNodeRef,
-            String xpath,
-            QueryParameterDefinition[] parameters,
-            NamespacePrefixResolver namespacePrefixResolver,
-            boolean followAllParentLinks)
-            throws InvalidNodeRefException, XPathException;
-
-    /**
-     * @deprecated
-     * @see org.alfresco.service.cmr.search.SearchService#contains(NodeRef, QName, String)
-     */
-    @Deprecated
-    public boolean contains(
-            NodeRef nodeRef,
-            QName propertyQName,
-            String googleLikePattern)
-            throws InvalidNodeRefException;
-    
-    /**
-     * @deprecated
-     * @see org.alfresco.service.cmr.search.SearchService#like(NodeRef, QName, String, boolean)
-     */
-    @Deprecated
-    public boolean like(
-            NodeRef nodeRef,
-            QName propertyQName,
-            String sqlLikePattern,
-            boolean includeFTS)
-            throws InvalidNodeRefException;
 }

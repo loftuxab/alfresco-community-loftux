@@ -63,9 +63,6 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.XPathException;
-import org.alfresco.service.cmr.search.QueryParameterDefinition;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -750,29 +747,5 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             throwDictionaryException("Unknown ClassDefinition subclass: " + targetDef,
                     sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
         }
-    }
-
-    @Deprecated
-    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
-    {
-        throw new UnsupportedOperationException("Methods moved to SearchService");
-    }
-
-    @Deprecated
-    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
-    {
-        throw new UnsupportedOperationException("Methods moved to SearchService");
-    }
-
-    @Deprecated
-    public boolean like(NodeRef nodeRef, QName propertyQName, String sqlLikePattern, boolean includeFTS) throws InvalidNodeRefException
-    {
-        throw new UnsupportedOperationException("Methods moved to SearchService");
-    }
-
-    @Deprecated
-    public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern) throws InvalidNodeRefException
-    {
-        throw new UnsupportedOperationException("Methods moved to SearchService");
     }
 }
