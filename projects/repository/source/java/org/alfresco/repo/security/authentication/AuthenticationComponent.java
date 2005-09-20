@@ -20,6 +20,15 @@ import net.sf.acegisecurity.Authentication;
 
 public interface AuthenticationComponent
 {
+    
+    /**
+     * Authenticate
+     * 
+     * @param userName
+     * @param password
+     * @throws AuthenticationException
+     */     
+    public void authenticate(String userName, char[] password) throws AuthenticationException;
 
     /**
      * Explicitly set the current user to be authenticated.
@@ -60,5 +69,28 @@ public interface AuthenticationComponent
      * @return
      */
     public String getSystemUserName();
+    
+    /**
+     * Get the current user name.
+     * 
+     * @return
+     * @throws AuthenticationException
+     */
+    public String getCurrentUserName() throws AuthenticationException;
+    
+    /**
+     * Get the enum that describes NTLM integration
+     * 
+     * @return
+     */
+    public NTLMMode getNTLMMOde();
+    
+    /**
+     * Get the MD4 password hash, as required by NTLM based authentication methods.
+     * 
+     * @param userName
+     * @return
+     */
+    public String getMD4HashedPassword(String userName);
     
 }

@@ -633,7 +633,7 @@
         </property>
     </bean>
 
-    <bean id="passwordEncoder" class="net.sf.acegisecurity.providers.encoding.ShaPasswordEncoder"></bean>
+    <bean id="passwordEncoder" class="org.alfresco.repo.security.authentication.MD4PasswordEncoder"></bean>
 
     <!-- TODO: Move to public-services-context -->
 
@@ -646,9 +646,6 @@
         </property>
         <property name="target">
             <bean class="org.alfresco.repo.security.authentication.AuthenticationServiceImpl">
-                <property name="authenticationManager">
-                    <ref bean="authenticationManager" />
-                </property>
                 <property name="authenticationDao">
                     <ref bean="alfDaoImpl" />
                 </property>
@@ -679,6 +676,9 @@
              <property name="authenticationDao">
                 <ref bean="alfDaoImpl" />
              </property>
+             <property name="authenticationManager">
+                <ref bean="authenticationManager" />
+             </property>
            </bean>
         </property>
         <property name="transactionAttributes">
@@ -689,7 +689,7 @@
     </bean>
 
   
-  <bean id="personService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="personService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
             <value>org.alfresco.service.cmr.security.PersonService</value>
         </property>
@@ -697,28 +697,28 @@
             <ref bean="transactionManager" />
         </property>
         <property name="target">
-    <bean id="personServiceImpl" class="org.alfresco.repo.security.person.PersonServiceImpl">
-       <property name="nodeService">
-          <ref bean="nodeService" />
-       </property>
-       <property name="searchService">
-          <ref bean="searchService" />
-       </property>
-       <property name="dictionaryService">
-          <ref bean="dictionaryService" />
-       </property>
-       <property name="namespacePrefixResolver">
-          <ref bean="namespaceService" />
-       </property>
-       <property name="storeUrl">
-          <value>workspace://SpacesStore</value>
-       </property>
-       <property name="createMissingPeople">
-         <value>false</value>
-       </property>
-    </bean>
-    </property>
-    <property name="transactionAttributes">
+           <bean id="personServiceImpl" class="org.alfresco.repo.security.person.PersonServiceImpl">
+              <property name="nodeService">
+                 <ref bean="nodeService" />
+              </property>
+              <property name="searchService">
+                 <ref bean="searchService" />
+              </property>
+              <property name="dictionaryService">
+                 <ref bean="dictionaryService" />
+              </property>
+              <property name="namespacePrefixResolver">
+                 <ref bean="namespaceService" />
+              </property>
+              <property name="storeUrl">
+                 <value>workspace://SpacesStore</value>
+              </property>
+              <property name="createMissingPeople">
+                 <value>false</value>
+              </property>
+           </bean>
+        </property>
+        <property name="transactionAttributes">
             <props>
                 <prop key="*">PROPAGATION_REQUIRED</prop>
             </props>

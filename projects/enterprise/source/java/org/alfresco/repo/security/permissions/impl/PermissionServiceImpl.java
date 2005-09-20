@@ -200,7 +200,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         NodePermissionEntry nodePremissionEntry = getSetPermissions(nodeRef);
         for(PermissionEntry pe : nodePremissionEntry.getPermissionEntries())
         {
-            accessPermissions.add(new AccessPermissionImpl(pe.getPermissionReference().toString(), pe.getAccessStatus(), pe.getAuthority()));
+            accessPermissions.add(new AccessPermissionImpl(getPermission(pe.getPermissionReference()), pe.getAccessStatus(), pe.getAuthority()));
         }
         return accessPermissions;
     }
@@ -213,13 +213,13 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         {
             if (hasPermission(nodeRef, pr) == AccessStatus.ALLOWED)
             {
-                accessPermissions.add(new AccessPermissionImpl(pr.toString(), AccessStatus.ALLOWED, userName));
+                accessPermissions.add(new AccessPermissionImpl(getPermission(pr), AccessStatus.ALLOWED, userName));
             }
             else
             {
                 if (includeFalse)
                 {
-                    accessPermissions.add(new AccessPermissionImpl(pr.toString(), AccessStatus.DENIED, userName));
+                    accessPermissions.add(new AccessPermissionImpl(getPermission(pr), AccessStatus.DENIED, userName));
                 }
             }
         }

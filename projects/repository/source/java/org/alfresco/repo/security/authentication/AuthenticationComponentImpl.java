@@ -17,6 +17,7 @@
 package org.alfresco.repo.security.authentication;
 
 import net.sf.acegisecurity.Authentication;
+import net.sf.acegisecurity.AuthenticationManager;
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.GrantedAuthorityImpl;
 import net.sf.acegisecurity.UserDetails;
@@ -30,32 +31,72 @@ import net.sf.acegisecurity.providers.dao.User;
 public class AuthenticationComponentImpl implements AuthenticationComponent
 {
     private static final String SYSTEM_USER_NAME = "System";
-    
+
     private MutableAuthenticationDao authenticationDao;
+
+    AuthenticationManager authenticationManager;
 
     public AuthenticationComponentImpl()
     {
         super();
     }
 
+    public void setAuthenticationManager(AuthenticationManager authenticationManager)
+    {
+        this.authenticationManager = authenticationManager;
+    }
+
+    public void authenticate(String userName, char[] password) throws AuthenticationException
+    {
+        try
+        {
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userName,
+                    new String(password));
+            authenticationManager.authenticate(authentication);
+            setCurrentUser(userName);
+
+        }
+        catch (net.sf.acegisecurity.AuthenticationException ae)
+        {
+            throw new AuthenticationException(ae.getMessage(), ae);
+        }
+    }
+
     public Authentication setCurrentUser(String userName)
     {
-        UserDetails ud;
-        if(userName.equals(SYSTEM_USER_NAME))
+        try
         {
-            GrantedAuthority[] gas = new GrantedAuthority[1];
-            gas[0] = new GrantedAuthorityImpl("ROLE_SYSTEM");
-            ud = new User(SYSTEM_USER_NAME, "", true, true, true, true, gas);
+            UserDetails ud;
+            if (userName.equals(SYSTEM_USER_NAME))
+            {
+                GrantedAuthority[] gas = new GrantedAuthority[1];
+                gas[0] = new GrantedAuthorityImpl("ROLE_SYSTEM");
+                ud = new User(SYSTEM_USER_NAME, "", true, true, true, true, gas);
+            }
+            else
+            {
+                ud = (UserDetails) authenticationDao.loadUserByUsername(userName);
+            }
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, "", ud
+                    .getAuthorities());
+            auth.setDetails(ud);
+            auth.setAuthenticated(true);
+            return setCurrentAuthentication(auth);
         }
-        else
+        catch (net.sf.acegisecurity.AuthenticationException ae)
         {
-            ud = (UserDetails) authenticationDao.loadUserByUsername(userName);
+            throw new AuthenticationException(ae.getMessage(), ae);
         }
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, "", ud.getAuthorities());
-        auth.setDetails(ud);
-        auth.setAuthenticated(true);
-        return setCurrentAuthentication(auth);
+    }
 
+    public String getCurrentUserName() throws AuthenticationException
+    {
+        Context context = ContextHolder.getContext();
+        if ((context == null) || !(context instanceof SecureContext))
+        {
+            return null;
+        }
+        return getUserName(((SecureContext) context).getAuthentication());
     }
 
     public void clearCurrentSecurityContext()
@@ -81,7 +122,6 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
         return authentication;
     }
 
- 
     public Authentication getCurrentAuthentication() throws AuthenticationException
     {
         Context context = ContextHolder.getContext();
@@ -105,6 +145,27 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
     public String getSystemUserName()
     {
         return SYSTEM_USER_NAME;
+    }
+
+    private String getUserName(Authentication authentication)
+    {
+        String username = authentication.getPrincipal().toString();
+
+        if (authentication.getPrincipal() instanceof UserDetails)
+        {
+            username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        }
+        return username;
+    }
+
+    public String getMD4HashedPassword(String userName)
+    {
+        return authenticationDao.getMD4HashedPassword(userName);
+    }
+
+    public NTLMMode getNTLMMOde()
+    {
+        return NTLMMode.MD4_PROVIDER;
     }
 
 }

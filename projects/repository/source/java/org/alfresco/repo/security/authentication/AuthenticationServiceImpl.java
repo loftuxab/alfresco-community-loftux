@@ -18,14 +18,6 @@ package org.alfresco.repo.security.authentication;
 
 import java.util.Set;
 
-import net.sf.acegisecurity.Authentication;
-import net.sf.acegisecurity.AuthenticationManager;
-import net.sf.acegisecurity.UserDetails;
-import net.sf.acegisecurity.context.Context;
-import net.sf.acegisecurity.context.ContextHolder;
-import net.sf.acegisecurity.context.security.SecureContext;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 
@@ -34,8 +26,6 @@ public class AuthenticationServiceImpl implements AuthenticationService
     MutableAuthenticationDao authenticationDao;
 
     AuthenticationComponent authenticationComponent;
-
-    AuthenticationManager authenticationManager;
 
     TicketComponent ticketComponent;
 
@@ -47,11 +37,6 @@ public class AuthenticationServiceImpl implements AuthenticationService
     public void setAuthenticationDao(MutableAuthenticationDao authenticationDao)
     {
         this.authenticationDao = authenticationDao;
-    }
-
-    public void setAuthenticationManager(AuthenticationManager authenticationManager)
-    {
-        this.authenticationManager = authenticationManager;
     }
 
     public void setTicketComponent(TicketComponent ticketComponent)
@@ -66,89 +51,44 @@ public class AuthenticationServiceImpl implements AuthenticationService
 
     public void createAuthentication(String userName, char[] password) throws AuthenticationException
     {
-        try
-        {
-            authenticationDao.createUser(userName, password);
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
+        authenticationDao.createUser(userName, password);
     }
 
     public void updateAuthentication(String userName, char[] oldPassword, char[] newPassword)
             throws AuthenticationException
     {
-        try
-        {
-            authenticationDao.updateUser(userName, newPassword);
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
+        authenticationDao.updateUser(userName, newPassword);
     }
 
     public void setAuthentication(String userName, char[] newPassword) throws AuthenticationException
     {
-        try
-        {
-            authenticationDao.updateUser(userName, newPassword);
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
+        authenticationDao.updateUser(userName, newPassword);
     }
 
     public void deleteAuthentication(String userName) throws AuthenticationException
     {
-        try
-        {
-            authenticationDao.deleteUser(userName);
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
+
+        authenticationDao.deleteUser(userName);
     }
 
-    
-    
-    public boolean getAuthenticationEnabled(String userName)
+    public boolean getAuthenticationEnabled(String userName) throws AuthenticationException
     {
         return authenticationDao.getEnabled(userName);
     }
 
-    public void setAuthenticationEnabled(String userName, boolean enabled)
+    public void setAuthenticationEnabled(String userName, boolean enabled) throws AuthenticationException
     {
         authenticationDao.setEnabled(userName, enabled);
     }
 
     public void authenticate(String userName, char[] password) throws AuthenticationException
     {
-        try
-        {
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userName,
-                    new String(password));
-            authenticationManager.authenticate(authentication);
-            authenticationComponent.setCurrentUser(userName);
-
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
+        authenticationComponent.authenticate(userName, password);
     }
 
     public String getCurrentUserName() throws AuthenticationException
     {
-        Context context = ContextHolder.getContext();
-        if ((context == null) || !(context instanceof SecureContext))
-        {
-            return null;
-        }
-        return getUserName(((SecureContext) context).getAuthentication());
+        return authenticationComponent.getCurrentUserName();
     }
 
     public void invalidateUserSession(String userName) throws AuthenticationException
@@ -159,17 +99,6 @@ public class AuthenticationServiceImpl implements AuthenticationService
     public void invalidateTicket(String ticket) throws AuthenticationException
     {
         ticketComponent.invalidateTicketById(ticket);
-    }
-
-    private String getUserName(Authentication authentication)
-    {
-        String username = authentication.getPrincipal().toString();
-
-        if (authentication.getPrincipal() instanceof UserDetails)
-        {
-            username = ((UserDetails) authentication.getPrincipal()).getUsername();
-        }
-        return username;
     }
 
     public void validate(String ticket) throws AuthenticationException

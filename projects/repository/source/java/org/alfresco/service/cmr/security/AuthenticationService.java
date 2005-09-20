@@ -72,7 +72,7 @@ public interface AuthenticationService
      * @param userName
      * @param enabled
      */
-    public void setAuthenticationEnabled(String userName, boolean enabled);
+    public void setAuthenticationEnabled(String userName, boolean enabled) throws AuthenticationException;
     
     /**
      * Is an authentication enabled or disabled?
@@ -80,7 +80,7 @@ public interface AuthenticationService
      * @param userName
      * @return
      */
-    public boolean getAuthenticationEnabled(String userName);
+    public boolean getAuthenticationEnabled(String userName) throws AuthenticationException;
     
     /**
      * Carry out an authentication attempt. If successful the user is set to the current user.

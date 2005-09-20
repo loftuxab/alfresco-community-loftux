@@ -42,7 +42,6 @@ import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.GUID;
 import org.springframework.dao.DataAccessException;
 
 public class RepositoryAuthenticationDao implements MutableAuthenticationDao
@@ -98,13 +97,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         }
 
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-        String password = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(QName.createQName("usr", "password",
-                namespacePrefixResolver)));
-        // String salt = ValueConverter.convert(String.class,
-        // properties.get(QName.createQName("usr", "salt",
-        // namespacePrefixResolver)));
-
-        // TODO: Get roles correctly
+        String password = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_PASSWORD));
 
         GrantedAuthority[] gas = new GrantedAuthority[1];
         gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
@@ -139,11 +132,12 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef typesNode = getOrCreateTypeLocation();
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_USER_USERNAME, userName);
-        String salt = GUID.generate();
+        String salt = null; //GUID.generate();
         properties.put(ContentModel.PROP_SALT, salt);
         properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(new String(rawPassword), salt));
         nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_USER, ContentModel.TYPE_USER,
                 properties);
+       
     }
 
     private NodeRef getOrCreateTypeLocation()
@@ -185,7 +179,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
             throw new AuthenticationException("User does not exist: " + userName);
         }
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-        String salt = GUID.generate();
+        String salt = null; //GUID.generate();
         properties.remove(ContentModel.PROP_SALT);
         properties.put(ContentModel.PROP_SALT, salt);
         properties.remove(ContentModel.PROP_PASSWORD);
@@ -219,18 +213,19 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
 
     public Object getSalt(UserDetails userDetails)
     {   
-        NodeRef userRef = getUserOrNull(userDetails.getUsername());
-        if (userRef == null)
-        {
-            throw new UsernameNotFoundException("Could not find user by userName: " + userDetails.getUsername());
-        }
-
-        Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-
-        String salt = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(QName.createQName("usr", "salt",
-                namespacePrefixResolver)));
-
-        return salt;
+//        NodeRef userRef = getUserOrNull(userDetails.getUsername());
+//        if (userRef == null)
+//        {
+//            throw new UsernameNotFoundException("Could not find user by userName: " + userDetails.getUsername());
+//        }
+//
+//        Map<QName, Serializable> properties = nodeService.getProperties(userRef);
+//
+//        String salt = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(QName.createQName("usr", "salt",
+//                namespacePrefixResolver)));
+//
+//        return salt;
+        return null;
     }
 
     public boolean userExists(String userName)
@@ -297,7 +292,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         // TODO Auto-generated method stub
         
     }
-
+    
     public void setCredentialsExpire(String userName, boolean expires)
     {
         // TODO Auto-generated method stub
@@ -321,6 +316,21 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         // TODO Auto-generated method stub
         
     }
+
+    public String getMD4HashedPassword(String userName)
+    {
+        NodeRef userNode = getUserOrNull(userName);
+        if(userName == null)
+        {
+            return null;
+        }
+        else 
+        {
+            String password = DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(userNode, ContentModel.PROP_PASSWORD));
+            return password;
+        }
+    }
+    
     
     
 }

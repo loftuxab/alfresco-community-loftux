@@ -184,4 +184,12 @@ public interface MutableAuthenticationDao extends AuthenticationDao, SaltSource
      * @return
      */
     public Date getCredentialsExpiryDate(String userName);
+    
+    /**
+     * Get the MD4 password hash
+     * 
+     * @param userName
+     * @return
+     */
+    public String getMD4HashedPassword(String userName);
 }
