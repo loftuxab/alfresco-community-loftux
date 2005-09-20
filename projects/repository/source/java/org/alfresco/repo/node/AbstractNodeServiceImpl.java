@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.node.NodeServicePolicies.BeforeAddAspectPolicy;
@@ -575,9 +576,21 @@ public abstract class AbstractNodeServiceImpl implements NodeService
                         "   Value: " + value);
             }
         }
-        PropertyValue propertyValue = new PropertyValue(propertyTypeQName, value);
-        // done
-        return propertyValue;
+        try
+        {
+            PropertyValue propertyValue = new PropertyValue(propertyTypeQName, value);
+            // done
+            return propertyValue;
+        }
+        catch (UnsupportedOperationException e)
+        {
+            throw new AlfrescoRuntimeException(
+                    "The property value is not compatible with the type defined for the property: \n" +
+                    "   property: " + (propertyDef == null ? "unknown" : propertyDef) + "\n" +
+                    "   value: " + value + "\n" +
+                    "   value type: " + value.getClass(),
+                    e);
+        }
     }
     
     /**
@@ -606,9 +619,20 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         {
             propertyTypeQName = propertyDef.getDataType().getName();
         }
-        Serializable value = propertyValue.getValue(propertyTypeQName);
-        // done
-        return value;
+        try
+        {
+            Serializable value = propertyValue.getValue(propertyTypeQName);
+            // done
+            return value;
+        }
+        catch (UnsupportedOperationException e)
+        {
+            throw new AlfrescoRuntimeException(
+                    "The property value is not compatible with the type defined for the property: \n" +
+                    "   property: " + (propertyDef == null ? "unknown" : propertyDef) + "\n" +
+                    "   property value: " + propertyValue,
+                    e);
+        }
     }
     
     /**

@@ -251,6 +251,16 @@ public class PropertyValue implements Cloneable, Serializable
     {
     }
     
+    /**
+     * Construct a new property value.
+     * 
+     * @param typeQName the dictionary-defined property type to store the property as
+     * @param value the value to store.  This will be converted into a format compatible
+     *      with the type given
+     * 
+     * @throws java.lang.UnsupportedOperationException if the value cannot be converted to the
+     *      type given
+     */
     public PropertyValue(QName typeQName, Serializable value)
     {
         this.actualType = makeValueType(typeQName);
@@ -466,6 +476,9 @@ public class PropertyValue implements Cloneable, Serializable
      * @param typeQName the type required for the return value
      * @return Returns the value of this property as the desired type, or a <code>Collection</code>
      *      of values of the required type
+     * 
+     * @throws java.lang.UnsupportedOperationException if the value cannot be converted to the
+     *      type given
      * 
      * @see DataTypeDefinition#ANY The static qualified names for the types
      */

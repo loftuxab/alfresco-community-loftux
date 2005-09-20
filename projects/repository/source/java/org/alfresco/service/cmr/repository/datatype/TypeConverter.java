@@ -46,6 +46,7 @@ public class TypeConverter
      * @param value - the value to be converted
      * @return - the converted value as the correct type
      */
+    @SuppressWarnings("unchecked")
     public final Object convert(DataTypeDefinition propertyType, Object value)
     {
         ParameterCheck.mandatory("Property type definition", propertyType);
@@ -74,7 +75,9 @@ public class TypeConverter
      * @param c - a class for the target type
      * @param value - the value to be converted
      * @return - the converted value as the correct type
+     * @throws UnsupportedOperationException if the conversion cannot be performed
      */
+    @SuppressWarnings("unchecked")
     public final <T> T convert(Class<T> c, Object value)
     {
         if(value == null)
@@ -100,7 +103,10 @@ public class TypeConverter
         if (converter == null)
         {
             throw new UnsupportedOperationException(
-                    "There is no conversion registered for the value " + value.getClass().getName() + " to " + c);
+                    "There is no conversion registered for the value: \n" +
+                    "   value class: " + value.getClass().getName() + "\n" +
+                    "   to class: " + c.getName() + "\n" +
+                    "   value: " + value.toString());
         }
         
         return (T) converter.convert(value);
@@ -113,7 +119,10 @@ public class TypeConverter
      * @param propertyType - the target property type
      * @param value - the value to be converted
      * @return - the converted value as the correct type
+     * @throws DictionaryException if the property type's registered java class is invalid
+     * @throws UnsupportedOperationException if the conversion cannot be performed
      */
+    @SuppressWarnings("unchecked")
     public final Collection convert(DataTypeDefinition propertyType, Collection values)
     {
         ParameterCheck.mandatory("Property type definition", propertyType);
@@ -141,6 +150,7 @@ public class TypeConverter
      * @param c - a class for the target type
      * @param value - the collection to be converted
      * @return - the converted collection
+     * @throws UnsupportedOperationException if the conversion cannot be performed
      */
     public final <T> Collection<T> convert(Class<T> c, Collection values)
     {
@@ -389,6 +399,7 @@ public class TypeConverter
      * @param dest
      * @return
      */
+    @SuppressWarnings("unchecked")
     public final <T> Converter getConverter(Object value, Class<T> dest)
     {
         Converter converter = null;    
@@ -512,6 +523,7 @@ public class TypeConverter
             this.second = second;
         }
 
+        @SuppressWarnings("unchecked")
         public T convert(F source)
         {
             return (T) second.convert((I) first.convert(source));
@@ -540,6 +552,7 @@ public class TypeConverter
             this.to = to;
         }
         
+        @SuppressWarnings("unchecked")
         public T convert(F source)
         {
             Converter iConverter = TypeConverter.this.getConverter(from, intermediate);
