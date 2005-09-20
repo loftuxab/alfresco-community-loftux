@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,6 +73,7 @@ public class NodeServiceImpl implements NodeService, VersionModel
     /**
      * The repository searcher
      */
+    @SuppressWarnings("unused")
     private SearchService searcher;
     
     /**
@@ -257,8 +259,7 @@ public class NodeServiceImpl implements NodeService, VersionModel
      */
     public boolean hasAspect(NodeRef nodeRef, QName aspectRef) throws InvalidNodeRefException, InvalidAspectException
     {
-        Set<QName> aspects = (Set<QName>)this.dbNodeService.getProperty(convertNodeRef(nodeRef), PROP_QNAME_FROZEN_ASPECTS);
-        return aspects.contains(aspectRef);
+        return getAspects(nodeRef).contains(aspectRef);
     }
 
     /**
@@ -275,7 +276,8 @@ public class NodeServiceImpl implements NodeService, VersionModel
      */
     public Set<QName> getAspects(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return (Set<QName>)this.dbNodeService.getProperty(convertNodeRef(nodeRef), PROP_QNAME_FROZEN_ASPECTS);
+        return new HashSet<QName>(
+                (ArrayList<QName>)this.dbNodeService.getProperty(convertNodeRef(nodeRef), PROP_QNAME_FROZEN_ASPECTS));
     }
 
     /**

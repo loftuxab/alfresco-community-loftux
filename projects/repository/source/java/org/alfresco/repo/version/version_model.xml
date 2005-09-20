@@ -33,7 +33,7 @@
          <parent>sys:base</parent>         
          <properties>
             <property name="ver:qname">
-               <type>d:text</type>
+               <type>d:qname</type>
             </property>
             <property name="ver:value">
                <type>d:any</type>
@@ -71,12 +71,6 @@
             <property name="ver:versionLabel">
                <type>d:text</type>
             </property>
-            <!--<property name="ver:createdDate">
-               <type>d:datetime</type>
-            </property>
-            <property name="ver:modifiedDate">
-               <type>d:datetime</type>
-            </property>-->
             <property name="ver:frozenNodeId">
                <type>d:guid</type>
             </property>
@@ -87,7 +81,7 @@
                <type>d:text</type>
             </property>
             <property name="ver:frozenNodeType">
-               <type>d:text</type>
+               <type>d:qname</type>
             </property>
             <property name="ver:frozenAspects">
                <type>d:qname</type>

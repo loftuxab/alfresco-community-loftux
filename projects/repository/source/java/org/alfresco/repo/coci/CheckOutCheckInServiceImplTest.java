@@ -281,15 +281,8 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		NodeRef workingCopy = this.cociService.checkout(noVersionNodeRef);
 		this.cociService.checkin(workingCopy, new HashMap<String, Serializable>());
 		
-		try
-		{
-			// Check that the origional node has no version history dispite sending verion props
-			this.versionService.getVersionHistory(noVersionNodeRef);
-			fail("aspect should be missing");
-		}
-		catch (AspectMissingException exception)
-		{
-		}
+		// Check that the origional node has no version history dispite sending verion props
+		assertNull(this.versionService.getVersionHistory(noVersionNodeRef));		
 	}
 	
 	/**

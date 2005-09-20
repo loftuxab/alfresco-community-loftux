@@ -454,7 +454,7 @@
                <type>d:noderef</type>
                <protected>true</protected>
                <mandatory>true</mandatory>
-               <multiple>true</multiple>
+               <multiple>false</multiple>
             </property>
          </properties>
       </aspect>
@@ -463,7 +463,7 @@
          <title>Working Copy</title>
          <properties>
             <property name="cm:workingCopyOwner">
-               <type>d:noderef</type>
+               <type>d:text</type>
                <protected>true</protected>
                <mandatory>true</mandatory>
             </property>
@@ -483,7 +483,7 @@
          <title>Lockable</title>
          <properties>
             <property name="cm:lockOwner">
-               <type>d:noderef</type>
+               <type>d:text</type>
                <protected>true</protected>
             </property>
             <property name="cm:lockType">
