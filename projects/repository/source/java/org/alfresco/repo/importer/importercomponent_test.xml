@@ -30,8 +30,8 @@
             <cm:generalclassifiable/>
             <cm:name>Some Content</cm:name>
             <cm:categories>
-                <view:value>one</view:value>
-                <view:value>two</view:value>
+                <view:value>workspace://SpacesStore/one</view:value>
+                <view:value>workspace://SpacesStore/two</view:value>
             </cm:categories>
             <cm:translations view:idref="xyz"/>
          </cm:cmobject>
