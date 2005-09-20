@@ -225,15 +225,7 @@ public class LuceneCategoryTest extends TestCase
     private HashMap<QName, Serializable> createMap(String name, NodeRef[] nodeRefs)
     {
         HashMap<QName, Serializable> map = new HashMap<QName, Serializable>();
-        Serializable value = null;
-        if(nodeRefs.length > 1)
-        {
-            value = (Serializable) Arrays.asList(nodeRefs);
-        }
-        else if(nodeRefs.length == 1)
-        {
-            value = nodeRefs[0];
-        }
+        Serializable value = (Serializable) Arrays.asList(nodeRefs);
         map.put(QName.createQName(TEST_NAMESPACE, name), value);
         return map;
     }
