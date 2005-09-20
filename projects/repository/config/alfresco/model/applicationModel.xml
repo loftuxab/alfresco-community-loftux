@@ -141,7 +141,7 @@
                <protected>true</protected>
             </property>
             <property name="app:approveFolder">
-               <type>d:path</type>
+               <type>d:noderef</type>
                <protected>true</protected>
             </property>
             <property name="app:approveMove">
@@ -152,7 +152,7 @@
                <protected>true</protected>
             </property>
             <property name="app:rejectFolder">
-               <type>d:path</type>
+               <type>d:noderef</type>
                <protected>true</protected>
             </property>
             <property name="app:rejectMove">

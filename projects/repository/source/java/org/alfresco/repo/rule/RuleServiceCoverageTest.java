@@ -197,7 +197,7 @@ public class RuleServiceCoverageTest extends TestCase
         genCatProp.setIndexed(true);
         genCatProp.setIndexedAtomically(true);
         genCatProp.setMandatory(true);
-        genCatProp.setMultiValued(true);
+        genCatProp.setMultiValued(false);
         genCatProp.setStoredInIndex(true);
         genCatProp.setTokenisedInIndex(true);
         genCatProp.setType("d:" + DataTypeDefinition.CATEGORY.getLocalName());        

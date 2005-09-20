@@ -221,7 +221,7 @@ public class PropertyValue implements Cloneable, Serializable
         valueTypesByPropertyType.put(DataTypeDefinition.FLOAT, ValueType.FLOAT);
         valueTypesByPropertyType.put(DataTypeDefinition.DATE, ValueType.DATE);
         valueTypesByPropertyType.put(DataTypeDefinition.DATETIME, ValueType.DATE);
-        valueTypesByPropertyType.put(DataTypeDefinition.CATEGORY, ValueType.STRING);
+        valueTypesByPropertyType.put(DataTypeDefinition.CATEGORY, ValueType.NODEREF);
         valueTypesByPropertyType.put(DataTypeDefinition.CONTENT, ValueType.STRING);
         valueTypesByPropertyType.put(DataTypeDefinition.TEXT, ValueType.STRING);
         valueTypesByPropertyType.put(DataTypeDefinition.GUID, ValueType.STRING);
