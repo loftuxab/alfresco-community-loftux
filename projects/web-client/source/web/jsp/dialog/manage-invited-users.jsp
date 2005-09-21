@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_users">
+<r:page titleId="title_invited_users">
 
 <f:view>
    
@@ -70,14 +70,16 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainTitle"><h:outputText value="#{msg.manage_users}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{msg.manageusers_description}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.manage_invited_users}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.manage_invited_users_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100 style="padding-left:2px">
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px;" styleClass="mainSubTitle" value="#{msg.actions}" /><br/>
-                              <a:actionLink value="#{msg.create_user}" image="/images/icons/adduser.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
+                              <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="ChangePermissions">
+                                 <a:actionLink value="#{msg.invite}" image="/images/icons/invite.gif" padding="4" action="inviteUsers" actionListener="#{InviteUsersWizard.startWizard}" />
+                              </r:permissionEvaluator>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100 style="padding-left:2px">
@@ -113,9 +115,9 @@
                               
                               <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.users}">
                               
-                              <a:richList id="users-list" binding="#{UsersBean.usersRichList}" viewMode="details" pageSize="10"
+                              <a:richList id="users-list" binding="#{UserMembersBean.usersRichList}" viewMode="details" pageSize="10"
                                     styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
-                                    value="#{UsersBean.users}" var="r" initialSortColumn="userName" initialSortDescending="true">
+                                    value="#{UserMembersBean.users}" var="r" initialSortColumn="userName" initialSortDescending="true">
                                  
                                  <%-- Primary column with full name --%>
                                  <a:column primary="true" width="200" style="padding:2px;text-align:left">
@@ -136,12 +138,12 @@
                                     <h:outputText value="#{r.userName}" />
                                  </a:column>
                                  
-                                 <%-- Home Space Path column --%>
+                                 <%-- Roles column --%>
                                  <a:column style="text-align:left">
                                     <f:facet name="header">
-                                       <h:outputText value="#{msg.homespace}"/>
+                                       <a:sortLink label="#{msg.roles}" value="roles" styleClass="header"/>
                                     </f:facet>
-                                    <r:nodePath value="#{r.homeSpace}" disabled="true" showLeaf="true" />
+                                    <h:outputText value="#{r.roles}" />
                                  </a:column>
                                  
                                  <%-- Actions column --%>
@@ -149,14 +151,12 @@
                                     <f:facet name="header">
                                        <h:outputText value="#{msg.actions}"/>
                                     </f:facet>
-                                    <a:actionLink value="#{msg.modify}" image="/images/icons/edituser.gif" showLink="false" action="editUser" actionListener="#{NewUserWizard.startWizardForEdit}">
+                                    <a:actionLink value="#{msg.change_roles}" image="/images/icons/edituser.gif" showLink="false" action="editRoles" actionListener="#{UserMembersBean.setupUserAction}">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
-                                    <a:booleanEvaluator value="#{r.userName != 'admin'}">
-                                       <a:actionLink value="#{msg.delete}" image="/images/icons/delete_person.gif" showLink="false" action="deleteUser" actionListener="#{UsersBean.setupUserAction}">
-                                          <f:param name="id" value="#{r.id}" />
-                                       </a:actionLink>
-                                    </a:booleanEvaluator>
+                                    <a:actionLink value="#{msg.remove}" image="/images/icons/delete_person.gif" showLink="false" action="removeUser" actionListener="#{UserMembersBean.setupUserAction}">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
                                  </a:column>
                                  
                                  <a:dataPager/>

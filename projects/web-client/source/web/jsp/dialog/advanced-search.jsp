@@ -26,6 +26,17 @@
 
 <r:page titleId="title_advanced_search">
 
+<script language="JavaScript1.2">
+
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("advsearch:search-text").focus();
+   }
+   
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -106,7 +117,7 @@
                               <table cellpadding="2" cellspacing="2" border="0" valign="top">
                                  
                                  <tr>
-                                    <td colspan=3><h:outputText value="#{msg.look_for}" />:&nbsp;<h:inputText value="#{AdvancedSearchBean.text}" size="42" maxlength="1024" />&nbsp;*</td>
+                                    <td colspan=3><h:outputText value="#{msg.look_for}" />:&nbsp;<h:inputText id="search-text" value="#{AdvancedSearchBean.text}" size="42" maxlength="1024" />&nbsp;*</td>
                                  </tr>
                                  
                                  <tr>

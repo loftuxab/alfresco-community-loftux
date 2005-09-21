@@ -23,20 +23,14 @@ import java.text.MessageFormat;
 import javax.faces.context.FacesContext;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.config.ConfigService;
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.log4j.Logger;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.jsf.FacesContextUtils;
 
 import freemarker.cache.MruCacheStorage;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 /**
  * FreeMarker implementation the template processor interface

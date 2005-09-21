@@ -27,6 +27,15 @@
 <r:page titleId="title_create_content_props">
 
 <script language="JavaScript1.2">
+
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("create-content-props:file-name").focus();
+      checkButtonState();
+   }
+   
    function checkButtonState()
    {
       if (document.getElementById("create-content-props:file-name").value.length == 0 ||

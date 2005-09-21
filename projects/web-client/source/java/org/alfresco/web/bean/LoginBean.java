@@ -67,7 +67,7 @@ public class LoginBean
    }
 
    /**
-    * @param authenticationComponent    The AuthenticationComponent to set.
+    * @param personService             The personService to set.
     */
    public void setPersonService(PersonService personService)
    {
@@ -401,7 +401,7 @@ public class LoginBean
    /** language locale selection */
    private String language = null;
 
-   /** AuthenticationComponent bean reference */
+   /** PersonService bean reference */
    private PersonService personService;
    
    /** AuthenticationService bean reference */

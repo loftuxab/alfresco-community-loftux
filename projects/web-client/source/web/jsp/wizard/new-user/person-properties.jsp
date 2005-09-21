@@ -27,6 +27,15 @@
 <r:page titleId="title_new_user_person_props">
 
 <script language="JavaScript1.2">
+
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("person-props:firstName").focus();
+      updateButtonState();
+   }
+
    function updateButtonState()
    {
       if (document.getElementById("person-props:firstName").value.length == 0 ||

@@ -27,6 +27,15 @@
 <r:page titleId="title_new_user_user_props">
 
 <script language="JavaScript1.2">
+
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("user-props:userName").focus();
+      updateButtonState();
+   }
+
    function updateButtonState()
    {
       if (document.getElementById("user-props:password").disabled == false)
@@ -138,10 +147,10 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{NewUserWizard.stepTitle}" /></td>
+                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewUserWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="#{NewUserWizard.stepDescription}" /></td>
+                                    <td colspan="2" class="mainSubText"><h:outputText value="#{NewUserWizard.stepDescription}" /></td>
                                  </tr>
                                  
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
@@ -180,9 +189,9 @@
                                     </td>
                                  </tr>
                                  
-                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{NewUserWizard.stepInstructions}" /></td>
+                                    <td colspan="2"><h:outputText value="#{NewUserWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>

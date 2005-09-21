@@ -27,6 +27,15 @@
 <r:page titleId="title_add_content_props">
 
 <script language="JavaScript1.2">
+
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("add-content-properties:file-name").focus();
+      checkButtonState();
+   }
+
    function checkButtonState()
    {
       if (document.getElementById("add-content-properties:file-name").value.length == 0 ||

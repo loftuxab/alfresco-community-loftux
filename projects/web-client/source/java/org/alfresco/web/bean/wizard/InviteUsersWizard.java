@@ -35,6 +35,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
@@ -63,6 +64,9 @@ public class InviteUsersWizard extends AbstractWizardBean
    private static final String STEP2_TITLE_ID = "invite_step2_title";
    private static final String STEP2_DESCRIPTION_ID = "invite_step2_desc";
    private static final String FINISH_INSTRUCTION_ID = "invite_finish_instruction";
+   
+   private static final String INVITE_USERS = "users";
+   private static final String INVITE_ALL = "all";
    
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
@@ -133,7 +137,7 @@ public class InviteUsersWizard extends AbstractWizardBean
     */
    public String finish()
    {
-      String outcome = "browse";
+      String outcome = FINISH_OUTCOME;
       
       UserTransaction tx = null;
       
@@ -158,68 +162,48 @@ public class InviteUsersWizard extends AbstractWizardBean
             from = "alfresco@alfresco.org";
          }
          
-         // set permissions for each user and send them a mail
-         for (int i=0; i<this.userGroupRoles.size(); i++)
+         if (INVITE_USERS.equals(getInvite()))
          {
-            UserGroupRole userGroupRole = this.userGroupRoles.get(i);
-            NodeRef person = userGroupRole.UserGroup;
-            
-            // find the selected permission ref from it's name and apply for the specified user
-            Set<String> perms = getFolderPermissions();
-            for (String permission : perms)
+            // set permissions for each user and send them a mail
+            for (int i=0; i<this.userGroupRoles.size(); i++)
             {
-               if (userGroupRole.Role.equals(permission))
-               {
-                  this.permissionService.setPermission(this.navigator.getCurrentNode().getNodeRef(),
-                        (String)this.nodeService.getProperty(person, ContentModel.PROP_USERNAME),
-                        permission,
-                        true);
-                  break;
-               }
-            }
-            
-            // Create the mail message for each user to send too
-            if ("yes".equals(this.notify))
-            {
-               String to = (String)this.nodeService.getProperty(person, ContentModel.PROP_EMAIL);
+               UserGroupRole userGroupRole = this.userGroupRoles.get(i);
+               NodeRef person = userGroupRole.UserGroup;
                
-               if (to != null && to.length() != 0)
+               // find the selected permission ref from it's name and apply for the specified user
+               Set<String> perms = getFolderPermissions();
+               for (String permission : perms)
                {
-                  String msgRole = Application.getMessage(context, MSG_INVITED_ROLE);
-                  String roleText = userGroupRole.Role;
-                  String roleMessage = MessageFormat.format(msgRole, new Object[] {roleText});
-                  
-                  String body = this.internalSubject + "\r\n\r\n" + roleMessage + "\r\n\r\n";
-                  if (this.body != null && this.body.length() != 0)
+                  if (userGroupRole.Role.equals(permission))
                   {
-                     body += this.body;
-                  }
-                  
-                  SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-                  simpleMailMessage.setTo(to);
-                  simpleMailMessage.setSubject(subject);
-                  simpleMailMessage.setText(body);
-                  simpleMailMessage.setFrom(from);
-                  
-                  if (logger.isDebugEnabled())
-                     logger.debug("Sending notification email to: " + to + "\n...with subject:\n" + subject + "\n...with body:\n" + body);
-                  
-                  try
-                  {
-                     // Send the message
-                     this.mailSender.send(simpleMailMessage);
-                  }
-                  catch (Throwable e)
-                  {
-                     // don't stop the action but let admins know email is not getting sent
-                     logger.error("Failed to send email to " + to, e);
+                     this.permissionService.setPermission(this.navigator.getCurrentNode().getNodeRef(),
+                           (String)this.nodeService.getProperty(person, ContentModel.PROP_USERNAME),
+                           permission,
+                           true);
+                     break;
                   }
                }
+            
+               // Create the mail message for each user to send too
+               if ("yes".equals(this.notify))
+               {
+                  notifyUser(person, from, userGroupRole.Role);
+               }
             }
+         }
+         else if (INVITE_ALL.equals(getInvite()))
+         {
+            // set ALL users permssions to GUEST
+            this.permissionService.setPermission(this.navigator.getCurrentNode().getNodeRef(),
+                  this.permissionService.getAllAuthorities(),
+                  this.permissionService.GUEST,
+                  true);
          }
          
          // commit the transaction
          tx.commit();
+         
+         UIContextService.getInstance(context).notifyBeans();
       }
       catch (Exception e)
       {
@@ -231,6 +215,50 @@ public class InviteUsersWizard extends AbstractWizardBean
       }
       
       return outcome;
+   }
+   
+   /**
+    * Send an email notification to the specified user
+    * 
+    * @param person     Person node representing the user
+    * @param from       From text message
+    * @param roleText   The role display label for the user invite notification
+    */
+   private void notifyUser(NodeRef person, String from, String roleText)
+   {
+      String to = (String)this.nodeService.getProperty(person, ContentModel.PROP_EMAIL);
+      
+      if (to != null && to.length() != 0)
+      {
+         String msgRole = Application.getMessage(FacesContext.getCurrentInstance(), MSG_INVITED_ROLE);
+         String roleMessage = MessageFormat.format(msgRole, new Object[] {roleText});
+         
+         String body = this.internalSubject + "\r\n\r\n" + roleMessage + "\r\n\r\n";
+         if (this.body != null && this.body.length() != 0)
+         {
+            body += this.body;
+         }
+         
+         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+         simpleMailMessage.setTo(to);
+         simpleMailMessage.setSubject(subject);
+         simpleMailMessage.setText(body);
+         simpleMailMessage.setFrom(from);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Sending notification email to: " + to + "\n...with subject:\n" + subject + "\n...with body:\n" + body);
+         
+         try
+         {
+            // Send the message
+            this.mailSender.send(simpleMailMessage);
+         }
+         catch (Throwable e)
+         {
+            // don't stop the action but let admins know email is not getting sent
+            logger.error("Failed to send email to " + to, e);
+         }
+      }
    }
    
    /**
@@ -280,8 +308,6 @@ public class InviteUsersWizard extends AbstractWizardBean
                null,
                this.namespaceService,
                false);
-         
-         // TODO: sort this list! Maybe by Last name?
          
          items = new SelectItem[nodes.size()];
          for (int index=0; index<nodes.size(); index++)

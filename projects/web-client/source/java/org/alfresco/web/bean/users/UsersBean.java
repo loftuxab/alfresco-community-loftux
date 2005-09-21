@@ -188,8 +188,7 @@ public class UsersBean implements IContextListener
    }
 
    /**
-    * Action handler called when the OK button is clicked on the Delete User
-    * page
+    * Action handler called when the OK button is clicked on the Delete User page
     */
    public String deleteOK()
    {

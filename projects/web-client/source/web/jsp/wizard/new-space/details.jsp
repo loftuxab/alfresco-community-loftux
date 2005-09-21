@@ -27,6 +27,15 @@
 <r:page titleId="title_new_space_details">
 
 <script language="JavaScript1.2">
+
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("new-space-details:name").focus();
+      checkButtonState();
+   }
+
    function checkButtonState()
    {
       if (document.getElementById("new-space-details:name").value.length == 0 ||

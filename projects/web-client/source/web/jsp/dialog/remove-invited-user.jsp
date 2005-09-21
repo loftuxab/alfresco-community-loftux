@@ -24,38 +24,15 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_create_space">
-
-<script language="JavaScript1.2">
-
-   window.onload = pageLoaded;
-   
-   function pageLoaded()
-   {
-      document.getElementById("new-space:name").focus();
-      checkButtonState();
-   }
-   
-   function checkButtonState()
-   {
-      if (document.getElementById("new-space:name").value.length == 0 )
-      {
-         document.getElementById("new-space:ok-button").disabled = true;
-      }
-      else
-      {
-         document.getElementById("new-space:ok-button").disabled = false;
-      }
-   }
-
-</script>
+<r:page titleId="title_remove_invited_user">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="new-space">
+   <%-- set the form name here --%>
+   <h:form acceptCharset="UTF-8" id="remove-user">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -84,18 +61,18 @@
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
                   <td bgcolor="#EEEEEE">
-                  
+                     
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/create_space_large.gif" />
+                              <h:graphicImage url="/images/icons/delete_large.gif"/>
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
-                              <div class="mainTitle"><h:outputText value="#{msg.new_space}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{msg.newspace_description}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.remove_user}" /> '<h:outputText value="#{UserMembersBean.person.properties.userName}" />'</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.remove_invited_user_info}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -112,57 +89,28 @@
                </tr>
                
                <%-- Details --%>
-               <tr valign=top>                  
+               <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
-                     <table cellspacing="0" cellpadding="3" border="0" width="100%">
+                     <table cellspacing="0" cellpadding="4" border="0" width="100%">
                         <tr>
+                           
                            <td width="100%" valign="top">
-                              
-                              <a:errors message="#{msg.error_create_space_dialog}" styleClass="errorMessage" />
-                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                              <table cellpadding="2" cellspacing="2" border="0">
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.space_props}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.name}" />:</td>
-                                    <td>
-                                       <h:inputText id="name" value="#{NewSpaceDialog.name}" size="35" maxlength="1024" 
-                                                    onkeyup="javascript:checkButtonState();" onchange="javascript:checkButtonState();"/>&nbsp;*
+                                    <td class="mainSubTitle">
+                                       <h:outputFormat value="#{msg.remove_invited_user_confirm}">
+                                          <f:param value="#{UserMembersBean.person.properties.userName}"/>
+                                       </h:outputFormat>
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td><h:outputText value="#{msg.description}" />:</td>
                                     <td>
-                                       <h:inputText value="#{NewSpaceDialog.description}" size="35" maxlength="1024" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading">&nbsp;<h:outputText value="#{msg.other_options}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.choose_space_icon}" />:</td>
+                                       <%-- Error Messages --%>
+                                       <%-- messages tag to show messages not handled by other specific message tags --%>
+                                       <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                                     <td>
-                                       <table border="0" cellpadding="0" cellspacing="0"><tr><td>
-                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                                       <a:imagePickerRadio columns="6" spacing="4" value="#{NewSpaceDialog.icon}">
-                                          <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
-                                          <a:listItem value="space-icon-star" image="/images/icons/space-icon-star.gif" />
-                                          <a:listItem value="space-icon-doc" image="/images/icons/space-icon-doc.gif" />
-                                          <a:listItem value="space-icon-pen" image="/images/icons/space-icon-pen.gif" />
-                                          <a:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
-                                          <a:listItem value="space-icon-image" image="/images/icons/space-icon-image.gif" />
-                                       </a:imagePickerRadio>
-                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                                       </td></tr></table>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2"><h:outputText value="#{msg.create_space_finish}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -173,13 +121,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="#{msg.new_space}" action="#{NewSpaceDialog.finish}" 
-                                                        styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.delete}" action="#{UserMembersBean.deleteOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
+                                 <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel}" action="#{NewSpaceDialog.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="cancel" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
