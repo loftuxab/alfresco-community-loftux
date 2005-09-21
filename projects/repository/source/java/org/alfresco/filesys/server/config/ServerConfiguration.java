@@ -67,6 +67,7 @@ import org.alfresco.filesys.smb.Dialect;
 import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.util.IPAddress;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -273,17 +274,20 @@ public class ServerConfiguration
     /** flag indicating successful initialisation */
     private boolean initialised;
 
+    private AuthenticationService authenticationService;
+
     /**
      * Class constructor
      * 
      * @param config ConfigService
      */
-    public ServerConfiguration(AuthenticationManager authMgr, String configPath, DiskInterface diskInterface)
+    public ServerConfiguration(AuthenticationManager authMgr, AuthenticationService authenticationService, String configPath, DiskInterface diskInterface)
     {
         // Save details
 
         this.diskInterface = diskInterface;
         this.acegiAuthMgr = authMgr;
+        this.authenticationService = authenticationService;
         this.configLocation = configPath;
 
         // Allocate the shared device list
@@ -1671,6 +1675,16 @@ public class ServerConfiguration
         return m_authenticator;
     }
 
+    /**
+     * Get the alfreso authentication service.
+     * 
+     * @return
+     */
+    public final AuthenticationService getAuthenticationService()
+    {
+        return authenticationService;
+    }
+    
     /**
      * Return the local address that the SMB server should bind to.
      * 

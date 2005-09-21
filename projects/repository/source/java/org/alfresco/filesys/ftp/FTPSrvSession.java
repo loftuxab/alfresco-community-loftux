@@ -16,15 +16,45 @@
  */
 package org.alfresco.filesys.ftp;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import org.alfresco.filesys.server.*;
-import org.alfresco.filesys.server.filesys.*;
-import org.alfresco.filesys.server.auth.*;
-import org.alfresco.filesys.server.auth.acl.*;
-import org.alfresco.filesys.server.core.*;
+import org.alfresco.filesys.server.SrvSession;
+import org.alfresco.filesys.server.auth.ClientInfo;
+import org.alfresco.filesys.server.auth.SrvAuthenticator;
+import org.alfresco.filesys.server.auth.acl.AccessControl;
+import org.alfresco.filesys.server.auth.acl.AccessControlManager;
+import org.alfresco.filesys.server.core.SharedDevice;
+import org.alfresco.filesys.server.core.SharedDeviceList;
+import org.alfresco.filesys.server.filesys.AccessMode;
+import org.alfresco.filesys.server.filesys.DiskDeviceContext;
+import org.alfresco.filesys.server.filesys.DiskFullException;
+import org.alfresco.filesys.server.filesys.DiskInterface;
+import org.alfresco.filesys.server.filesys.DiskSharedDevice;
+import org.alfresco.filesys.server.filesys.FileAction;
+import org.alfresco.filesys.server.filesys.FileAttribute;
+import org.alfresco.filesys.server.filesys.FileInfo;
+import org.alfresco.filesys.server.filesys.FileOpenParams;
+import org.alfresco.filesys.server.filesys.FileStatus;
+import org.alfresco.filesys.server.filesys.NetworkFile;
+import org.alfresco.filesys.server.filesys.NotifyChange;
+import org.alfresco.filesys.server.filesys.SearchContext;
+import org.alfresco.filesys.server.filesys.TreeConnection;
+import org.alfresco.filesys.server.filesys.TreeConnectionHash;
+import org.alfresco.repo.security.authentication.AuthenticationException;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,15 +74,26 @@ public class FTPSrvSession extends SrvSession implements Runnable
     //
     // Debug flag values
 
-    public static final int DBG_STATE     = 0x00000001; // Session state changes
-    public static final int DBG_SEARCH    = 0x00000002; // File/directory search
-    public static final int DBG_INFO      = 0x00000004; // Information requests
-    public static final int DBG_FILE      = 0x00000008; // File open/close/info
-    public static final int DBG_FILEIO    = 0x00000010; // File read/write
-    public static final int DBG_ERROR     = 0x00000020; // Errors
-    public static final int DBG_PKTTYPE   = 0x00000040; // Received packet type
-    public static final int DBG_TIMING    = 0x00000080; // Time packet processing
-    public static final int DBG_DATAPORT  = 0x00000100; // Data port
+    public static final int DBG_STATE = 0x00000001; // Session state changes
+
+    public static final int DBG_SEARCH = 0x00000002; // File/directory search
+
+    public static final int DBG_INFO = 0x00000004; // Information requests
+
+    public static final int DBG_FILE = 0x00000008; // File open/close/info
+
+    public static final int DBG_FILEIO = 0x00000010; // File read/write
+
+    public static final int DBG_ERROR = 0x00000020; // Errors
+
+    public static final int DBG_PKTTYPE = 0x00000040; // Received packet type
+
+    public static final int DBG_TIMING = 0x00000080; // Time packet
+
+    // processing
+
+    public static final int DBG_DATAPORT = 0x00000100; // Data port
+
     public static final int DBG_DIRECTORY = 0x00000200; // Directory commands
 
     // Anonymous user name
@@ -61,13 +102,16 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
     // Root directory and FTP directory seperator
 
-    private static final String ROOT_DIRECTORY   = "/";
-    private static final String FTP_SEPERATOR    = "/";
+    private static final String ROOT_DIRECTORY = "/";
+
+    private static final String FTP_SEPERATOR = "/";
+
     private static final char FTP_SEPERATOR_CHAR = '/';
 
     // Share relative path directory seperator
 
-    private static final String DIR_SEPERATOR    = "\\";
+    private static final String DIR_SEPERATOR = "\\";
+
     private static final char DIR_SEPERATOR_CHAR = '\\';
 
     // File transfer buffer size
@@ -79,9 +123,9 @@ public class FTPSrvSession extends SrvSession implements Runnable
     protected final static String CRLF = "\r\n";
 
     // LIST command options
-    
-    protected final static String LIST_OPTION_HIDDEN    = "-a";
-    
+
+    protected final static String LIST_OPTION_HIDDEN = "-a";
+
     // Session socket
 
     private Socket m_sock;
@@ -89,9 +133,11 @@ public class FTPSrvSession extends SrvSession implements Runnable
     // Input/output streams to remote client
 
     private InputStreamReader m_in;
+
     private char[] m_inbuf;
 
     private OutputStreamWriter m_out;
+
     private StringBuffer m_outbuf;
 
     // Data connection
@@ -127,8 +173,10 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Class constructor
      * 
-     * @param sock Socket
-     * @param srv FTPServer
+     * @param sock
+     *            Socket
+     * @param srv
+     *            FTPServer
      */
     public FTPSrvSession(Socket sock, FTPNetworkServer srv)
     {
@@ -138,7 +186,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
         m_sock = sock;
 
-        // Set the socket linger options, so the socket closes immediately when closed
+        // Set the socket linger options, so the socket closes immediately when
+        // closed
 
         try
         {
@@ -179,7 +228,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
             m_dataSess = null;
         }
 
-        // Close the socket first, if the client is still connected this should allow the
+        // Close the socket first, if the client is still connected this should
+        // allow the
         // input/output streams
         // to be closed
 
@@ -274,7 +324,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Set the default path for the session
      * 
-     * @param rootPath FTPPath
+     * @param rootPath
+     *            FTPPath
      */
     public final void setRootPath(FTPPath rootPath)
     {
@@ -288,8 +339,10 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Get the path details for the current request
      * 
-     * @param req FTPRequest
-     * @param filePath boolean
+     * @param req
+     *            FTPRequest
+     * @param filePath
+     *            boolean
      * @return FTPPath
      */
     protected final FTPPath generatePathForRequest(FTPRequest req, boolean filePath)
@@ -300,9 +353,12 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Get the path details for the current request
      * 
-     * @param req FTPRequest
-     * @param filePath boolean
-     * @param checkExists boolean
+     * @param req
+     *            FTPRequest
+     * @param filePath
+     *            boolean
+     * @param checkExists
+     *            boolean
      * @return FTPPath
      */
     protected final FTPPath generatePathForRequest(FTPRequest req, boolean filePath, boolean checkExists)
@@ -312,7 +368,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
         String path = convertToFTPSeperators(req.getArgument());
 
-        // Check if the path is the root directory and there is a default root path configured
+        // Check if the path is the root directory and there is a default root
+        // path configured
 
         FTPPath ftpPath = null;
 
@@ -365,12 +422,14 @@ public class FTPSrvSession extends SrvSession implements Runnable
         else
         {
 
-            // Check for the special '.' directory, just return the current working directory
+            // Check for the special '.' directory, just return the current
+            // working directory
 
             if (path.equals("."))
                 return m_cwd;
 
-            // Check for the special '..' directory, if already at the root directory return an
+            // Check for the special '..' directory, if already at the root
+            // directory return an
             // error
 
             if (path.equals(".."))
@@ -391,7 +450,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                     return null;
             }
 
-            // Create a copy of the current working directory and append the new file/directory name
+            // Create a copy of the current working directory and append the new
+            // file/directory name
 
             ftpPath = new FTPPath(m_cwd);
 
@@ -453,7 +513,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 if (sts == FileStatus.NotExist)
                 {
 
-                    // Get the path string, check if there is a leading seperator
+                    // Get the path string, check if there is a leading
+                    // seperator
 
                     String pathStr = req.getArgument();
                     if (pathStr.startsWith(FTP_SEPERATOR) == false)
@@ -491,7 +552,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Convert a path string from share path seperators to FTP path seperators
      * 
-     * @param path String
+     * @param path
+     *            String
      * @return String
      */
     protected final String convertToFTPSeperators(String path)
@@ -510,7 +572,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Find the required disk shared device
      * 
-     * @param name String
+     * @param name
+     *            String
      * @return DiskSharedDevice
      */
     protected final DiskSharedDevice findShare(String name)
@@ -536,7 +599,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Set the binary mode flag
      * 
-     * @param bin boolean
+     * @param bin
+     *            boolean
      */
     protected final void setBinary(boolean bin)
     {
@@ -546,8 +610,10 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Send an FTP command response
      * 
-     * @param stsCode int
-     * @param msg String
+     * @param stsCode
+     *            int
+     * @param msg
+     *            String
      * @exception IOException
      */
     protected final void sendFTPResponse(int stsCode, String msg) throws IOException
@@ -583,7 +649,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Send an FTP command response
      * 
-     * @param msg StringBuffer
+     * @param msg
+     *            StringBuffer
      * @exception IOException
      */
     protected final void sendFTPResponse(StringBuffer msg) throws IOException
@@ -602,7 +669,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a user command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procUser(FTPRequest req) throws IOException
@@ -651,19 +719,21 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a password command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procPassword(FTPRequest req) throws IOException
     {
 
-        // Check if the client information has been set, this indicates a user command has been
+        // Check if the client information has been set, this indicates a user
+        // command has been
         // received
 
         if (hasClientInformation() == false)
         {
-            sendFTPResponse(500, "Syntax error, command " + FTPCommand.getCommandName(req.isCommand())
-                    + " unrecognized");
+            sendFTPResponse(500, "Syntax error, command "
+                    + FTPCommand.getCommandName(req.isCommand()) + " unrecognized");
             return;
         }
 
@@ -692,21 +762,18 @@ public class FTPSrvSession extends SrvSession implements Runnable
         else
         {
 
-            // Get the client information and store the received plain text password
+            // Get the client information and store the received plain text
+            // password
 
             getClientInformation().setPassword(req.getArgument());
 
             // Authenticate the user
 
-            SrvAuthenticator auth = getServer().getConfiguration().getAuthenticator();
-
-            int access = auth.authenticateUserPlainText(getClientInformation(), this);
-
-            if (access == SrvAuthenticator.AUTH_ALLOW)
+            try
             {
-
-                // User successfully logged on
-
+                AuthenticationService authService = getServer().getConfiguration().getAuthenticationService();
+                authService.authenticate(getClientInformation().getUserName(), getClientInformation()
+                        .getPasswordAsString().toCharArray());
                 sendFTPResponse(230, "User logged in, proceed");
                 setLoggedOn(true);
 
@@ -715,25 +782,48 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
                     logger.debug("User " + getClientInformation().getUserName() + ", logon successful");
             }
-            else
+            catch (AuthenticationException ae)
             {
+                // Fall back to local auth
 
-                // Return an access denied error
+                SrvAuthenticator auth = getServer().getConfiguration().getAuthenticator();
 
-                sendFTPResponse(530, "Access denied");
+                int access = auth.authenticateUserPlainText(getClientInformation(), this);
 
-                // DEBUG
+                if (access == SrvAuthenticator.AUTH_ALLOW)
+                {
 
-                if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
-                    logger.debug("User " + getClientInformation().getUserName() + ", logon failed");
+                    // User successfully logged on
 
-                // Close the connection
+                    sendFTPResponse(230, "User logged in, proceed");
+                    setLoggedOn(true);
 
-                closeSession();
+                    // DEBUG
+
+                    if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
+                        logger.debug("User " + getClientInformation().getUserName() + ", logon successful");
+                }
+                else
+                {
+
+                    // Return an access denied error
+
+                    sendFTPResponse(530, "Access denied");
+
+                    // DEBUG
+
+                    if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
+                        logger.debug("User " + getClientInformation().getUserName() + ", logon failed");
+
+                    // Close the connection
+
+                    closeSession();
+                }
             }
         }
 
-        // If the user has successfully logged on to the FTP server then inform listeners
+        // If the user has successfully logged on to the FTP server then inform
+        // listeners
 
         if (isLoggedOn())
             getFTPServer().sessionLoggedOn(this);
@@ -742,7 +832,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a port command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procPort(FTPRequest req) throws IOException
@@ -775,8 +866,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
         // Parse the client address
 
-        String addrStr = token.nextToken() + "." + token.nextToken() + "." + token.nextToken() + "."
-                + token.nextToken();
+        String addrStr = token.nextToken()
+                + "." + token.nextToken() + "." + token.nextToken() + "." + token.nextToken();
         InetAddress addr = null;
 
         try
@@ -804,7 +895,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
             return;
         }
 
-        // Create an active data session, the actual socket connection will be made later
+        // Create an active data session, the actual socket connection will be
+        // made later
 
         m_dataSess = getFTPServer().allocateDataSession(this, addr, port);
 
@@ -821,7 +913,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a passive command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procPassive(FTPRequest req) throws IOException
@@ -879,7 +972,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a print working directory command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procPrintWorkDir(FTPRequest req) throws IOException
@@ -900,14 +994,15 @@ public class FTPSrvSession extends SrvSession implements Runnable
         // DEBUG
 
         if (logger.isDebugEnabled() && hasDebug(DBG_DIRECTORY))
-            logger.debug("Pwd ftp=" + m_cwd.getFTPPath() + ", share=" + m_cwd.getShareName() + ", path="
-                    + m_cwd.getSharePath());
+            logger.debug("Pwd ftp="
+                    + m_cwd.getFTPPath() + ", share=" + m_cwd.getShareName() + ", path=" + m_cwd.getSharePath());
     }
 
     /**
      * Process a change working directory command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procChangeWorkDir(FTPRequest req) throws IOException
@@ -949,14 +1044,15 @@ public class FTPSrvSession extends SrvSession implements Runnable
         // DEBUG
 
         if (logger.isDebugEnabled() && hasDebug(DBG_DIRECTORY))
-            logger.debug("Cwd ftp=" + m_cwd.getFTPPath() + ", share=" + m_cwd.getShareName() + ", path="
-                    + m_cwd.getSharePath());
+            logger.debug("Cwd ftp="
+                    + m_cwd.getFTPPath() + ", share=" + m_cwd.getShareName() + ", path=" + m_cwd.getSharePath());
     }
 
     /**
      * Process a change directory up command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procCdup(FTPRequest req) throws IOException
@@ -997,14 +1093,15 @@ public class FTPSrvSession extends SrvSession implements Runnable
         // DEBUG
 
         if (logger.isDebugEnabled() && hasDebug(DBG_DIRECTORY))
-            logger.debug("Cdup ftp=" + m_cwd.getFTPPath() + ", share=" + m_cwd.getShareName() + ", path="
-                    + m_cwd.getSharePath());
+            logger.debug("Cdup ftp="
+                    + m_cwd.getFTPPath() + ", share=" + m_cwd.getShareName() + ", path=" + m_cwd.getSharePath());
     }
 
     /**
      * Process a long directory listing command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procList(FTPRequest req) throws IOException
@@ -1019,27 +1116,28 @@ public class FTPSrvSession extends SrvSession implements Runnable
         }
 
         // Check if the client has requested hidden files, via the '-a' option
-        
+
         boolean hidden = false;
-        
-        if ( req.hasArgument() && req.getArgument().startsWith(LIST_OPTION_HIDDEN))
+
+        if (req.hasArgument() && req.getArgument().startsWith(LIST_OPTION_HIDDEN))
         {
             // Indicate that we want hidden files in the listing
-            
+
             hidden = true;
-            
-            // Remove the option from the command argument, and update the request
-            
+
+            // Remove the option from the command argument, and update the
+            // request
+
             String arg = req.getArgument();
             int pos = arg.indexOf(" ");
-            if ( pos > 0)
-                arg = arg.substring( pos + 1);
+            if (pos > 0)
+                arg = arg.substring(pos + 1);
             else
                 arg = null;
-            
-            req.updateArgument( arg);
+
+            req.updateArgument(arg);
         }
-        
+
         // Create the path for the file listing
 
         FTPPath ftpPath = m_cwd;
@@ -1160,17 +1258,17 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                     dataWrt.write(str.toString());
                 }
-                
+
                 // Flush the data stream
-                
+
                 dataWrt.flush();
             }
-            
+
             // Close the data stream and socket
-            
+
             dataWrt.close();
             dataWrt = null;
-            
+
             getFTPServer().releaseDataSession(m_dataSess);
             m_dataSess = null;
 
@@ -1184,8 +1282,7 @@ public class FTPSrvSession extends SrvSession implements Runnable
             // Failed to send file listing
 
             sendFTPResponse(451, "Error reading file list");
-        }
-        finally
+        } finally
         {
 
             // Close the data stream to the client
@@ -1206,7 +1303,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a short directory listing command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procNList(FTPRequest req) throws IOException
@@ -1336,8 +1434,7 @@ public class FTPSrvSession extends SrvSession implements Runnable
             // Failed to send file listing
 
             sendFTPResponse(451, "Error reading file list");
-        }
-        finally
+        } finally
         {
 
             // Close the data stream to the client
@@ -1358,7 +1455,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a system status command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procSystemStatus(FTPRequest req) throws IOException
@@ -1372,7 +1470,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a server status command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procServerStatus(FTPRequest req) throws IOException
@@ -1386,7 +1485,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a help command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procHelp(FTPRequest req) throws IOException
@@ -1400,7 +1500,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a no-op command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procNoop(FTPRequest req) throws IOException
@@ -1414,7 +1515,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a quit command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procQuit(FTPRequest req) throws IOException
@@ -1437,7 +1539,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a type command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procType(FTPRequest req) throws IOException
@@ -1480,7 +1583,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a restart command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procRestart(FTPRequest req) throws IOException
@@ -1527,7 +1631,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a return file command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procReturnFile(FTPRequest req) throws IOException
@@ -1559,13 +1664,13 @@ public class FTPSrvSession extends SrvSession implements Runnable
         }
 
         // Check if the path is the root directory
-        
-        if ( ftpPath.isRootPath() || ftpPath.isRootSharePath())
+
+        if (ftpPath.isRootPath() || ftpPath.isRootSharePath())
         {
             sendFTPResponse(550, "That is a directory");
             return;
         }
-        
+
         // Send the intermediate response
 
         sendFTPResponse(150, "Connection accepted");
@@ -1599,8 +1704,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
         // DEBUG
 
         if (logger.isDebugEnabled() && hasDebug(DBG_FILE))
-            logger.debug("Returning ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
-                    + ftpPath.getSharePath());
+            logger.debug("Returning ftp="
+                    + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path=" + ftpPath.getSharePath());
 
         // Send the file to the client
 
@@ -1620,7 +1725,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
             tree = getTreeConnection(ftpPath.getSharedDevice());
 
-            // Check if the file exists and it is a file, if so then open the file
+            // Check if the file exists and it is a file, if so then open the
+            // file
 
             disk = (DiskInterface) ftpPath.getSharedDevice().getInterface();
 
@@ -1668,7 +1774,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 if (logger.isDebugEnabled() && hasDebug(DBG_FILEIO))
                     logger.debug(" Write len=" + len + " bytes");
 
-                // Write the current data block to the client, update the file position
+                // Write the current data block to the client, update the file
+                // position
 
                 if (len > 0)
                 {
@@ -1723,7 +1830,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 m_dataSess = null;
             }
 
-            // Indicate that there was an error during transmission of the file data
+            // Indicate that there was an error during transmission of the file
+            // data
 
             sendFTPResponse(426, "Data connection closed by client");
         }
@@ -1735,11 +1843,11 @@ public class FTPSrvSession extends SrvSession implements Runnable
             if (logger.isDebugEnabled() && hasDebug(DBG_ERROR))
                 logger.debug(" Error during transfer", ex);
 
-            // Indicate that there was an error during transmission of the file data
+            // Indicate that there was an error during transmission of the file
+            // data
 
             sendFTPResponse(426, "Error during transmission");
-        }
-        finally
+        } finally
         {
 
             // Close the network file
@@ -1765,7 +1873,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a store file command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procStoreFile(FTPRequest req) throws IOException
@@ -1902,7 +2011,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
             // DEBUG
 
             if (logger.isDebugEnabled() && hasDebug(DBG_FILE))
-                logger.debug("Storing ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
+                logger.debug("Storing ftp="
+                        + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
                         + ftpPath.getSharePath());
 
             // Allocate the buffer for the file data
@@ -1919,7 +2029,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 if (logger.isDebugEnabled() && hasDebug(DBG_FILEIO))
                     logger.debug(" Receive len=" + len + " bytes");
 
-                // Write the current data block to the file, update the file position
+                // Write the current data block to the file, update the file
+                // position
 
                 disk.writeFile(this, tree, netFile, buf, 0, len, filePos);
                 filePos += len;
@@ -1964,7 +2075,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 m_dataSess = null;
             }
 
-            // Indicate that there was an error during transmission of the file data
+            // Indicate that there was an error during transmission of the file
+            // data
 
             sendFTPResponse(426, "Data connection closed by client");
         }
@@ -1997,11 +2109,11 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 logger.debug(" Error during transfer", ex);
             ex.printStackTrace();
 
-            // Indicate that there was an error during transmission of the file data
+            // Indicate that there was an error during transmission of the file
+            // data
 
             sendFTPResponse(426, "Error during transmission");
-        }
-        finally
+        } finally
         {
 
             // Close the network file
@@ -2027,7 +2139,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a delete file command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procDeleteFile(FTPRequest req) throws IOException
@@ -2093,7 +2206,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                 disk.deleteFile(this, tree, ftpPath.getSharePath());
 
-                // Check if there are any file/directory change notify requests active
+                // Check if there are any file/directory change notify requests
+                // active
 
                 DiskDeviceContext diskCtx = (DiskDeviceContext) tree.getContext();
                 if (diskCtx.hasChangeHandler())
@@ -2102,16 +2216,17 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 // DEBUG
 
                 if (logger.isDebugEnabled() && hasDebug(DBG_FILE))
-                    logger.debug("Deleted ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName()
-                            + ", path=" + ftpPath.getSharePath());
+                    logger.debug("Deleted ftp="
+                            + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
+                            + ftpPath.getSharePath());
             }
             else
             {
 
                 // File does not exist or is a directory
 
-                sendFTPResponse(550, "File " + req.getArgument()
-                        + (sts == FileStatus.NotExist ? " not available" : " is a directory"));
+                sendFTPResponse(550, "File "
+                        + req.getArgument() + (sts == FileStatus.NotExist ? " not available" : " is a directory"));
                 return;
             }
         }
@@ -2129,7 +2244,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a rename from command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procRenameFrom(FTPRequest req) throws IOException
@@ -2195,23 +2311,25 @@ public class FTPSrvSession extends SrvSession implements Runnable
             if (sts != FileStatus.NotExist)
             {
 
-                // Save the rename from file details, rename to command should follow
+                // Save the rename from file details, rename to command should
+                // follow
 
                 m_renameFrom = ftpPath;
 
                 // DEBUG
 
                 if (logger.isDebugEnabled() && hasDebug(DBG_FILE))
-                    logger.debug("RenameFrom ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName()
-                            + ", path=" + ftpPath.getSharePath());
+                    logger.debug("RenameFrom ftp="
+                            + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
+                            + ftpPath.getSharePath());
             }
             else
             {
 
                 // File/directory does not exist
 
-                sendFTPResponse(550, "File " + req.getArgument()
-                        + (sts == FileStatus.NotExist ? " not available" : " is a directory"));
+                sendFTPResponse(550, "File "
+                        + req.getArgument() + (sts == FileStatus.NotExist ? " not available" : " is a directory"));
                 return;
             }
         }
@@ -2229,7 +2347,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a rename to command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procRenameTo(FTPRequest req) throws IOException
@@ -2311,7 +2430,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                 disk.renameFile(this, tree, m_renameFrom.getSharePath(), ftpPath.getSharePath());
 
-                // Check if there are any file/directory change notify requests active
+                // Check if there are any file/directory change notify requests
+                // active
 
                 DiskDeviceContext diskCtx = (DiskDeviceContext) tree.getContext();
                 if (diskCtx.hasChangeHandler())
@@ -2320,16 +2440,17 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 // DEBUG
 
                 if (logger.isDebugEnabled() && hasDebug(DBG_FILE))
-                    logger.debug("RenameTo ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName()
-                            + ", path=" + ftpPath.getSharePath());
+                    logger.debug("RenameTo ftp="
+                            + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
+                            + ftpPath.getSharePath());
             }
             else
             {
 
                 // File does not exist or is a directory
 
-                sendFTPResponse(550, "File " + req.getArgument()
-                        + (sts == FileStatus.NotExist ? " not available" : " is a directory"));
+                sendFTPResponse(550, "File "
+                        + req.getArgument() + (sts == FileStatus.NotExist ? " not available" : " is a directory"));
                 return;
             }
         }
@@ -2337,8 +2458,7 @@ public class FTPSrvSession extends SrvSession implements Runnable
         {
             sendFTPResponse(450, "File action not taken");
             return;
-        }
-        finally
+        } finally
         {
 
             // Clear the rename details
@@ -2354,7 +2474,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a create directory command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procCreateDirectory(FTPRequest req) throws IOException
@@ -2434,8 +2555,9 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 // DEBUG
 
                 if (logger.isDebugEnabled() && hasDebug(DBG_DIRECTORY))
-                    logger.debug("CreateDir ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName()
-                            + ", path=" + ftpPath.getSharePath());
+                    logger.debug("CreateDir ftp="
+                            + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
+                            + ftpPath.getSharePath());
             }
             else
             {
@@ -2461,7 +2583,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a delete directory command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procRemoveDirectory(FTPRequest req) throws IOException
@@ -2492,7 +2615,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
             return;
         }
 
-        // Check if the path is the root directory, cannot delete directories from the root
+        // Check if the path is the root directory, cannot delete directories
+        // from the root
         // directory
         // as it maps to the list of available disk shares.
 
@@ -2538,7 +2662,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                 disk.deleteDirectory(this, tree, ftpPath.getSharePath());
 
-                // Check if there are any file/directory change notify requests active
+                // Check if there are any file/directory change notify requests
+                // active
 
                 DiskDeviceContext diskCtx = (DiskDeviceContext) tree.getContext();
                 if (diskCtx.hasChangeHandler())
@@ -2547,13 +2672,15 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 // DEBUG
 
                 if (logger.isDebugEnabled() && hasDebug(DBG_DIRECTORY))
-                    logger.debug("DeleteDir ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName()
-                            + ", path=" + ftpPath.getSharePath());
+                    logger.debug("DeleteDir ftp="
+                            + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", path="
+                            + ftpPath.getSharePath());
             }
             else
             {
 
-                // File already exists with that name or directory does not exist return an error
+                // File already exists with that name or directory does not
+                // exist return an error
 
                 sendFTPResponse(550, sts == FileStatus.FileExists ? "File exists with that name"
                         : "Directory does not exist");
@@ -2574,7 +2701,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a modify date/time command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procModifyDateTime(FTPRequest req) throws IOException
@@ -2588,7 +2716,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a file size command
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procFileSize(FTPRequest req) throws IOException
@@ -2652,8 +2781,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
             // DEBUG
 
             if (logger.isDebugEnabled() && hasDebug(DBG_FILE))
-                logger.debug("File size ftp=" + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", size="
-                        + finfo.getSize());
+                logger.debug("File size ftp="
+                        + ftpPath.getFTPPath() + ", share=" + ftpPath.getShareName() + ", size=" + finfo.getSize());
         }
         catch (Exception ex)
         {
@@ -2664,7 +2793,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a structure command. This command is obsolete.
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procStructure(FTPRequest req) throws IOException
@@ -2683,7 +2813,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process a mode command. This command is obsolete.
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procMode(FTPRequest req) throws IOException
@@ -2702,7 +2833,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
     /**
      * Process an allocate command. This command is obsolete.
      * 
-     * @param req FTPRequest
+     * @param req
+     *            FTPRequest
      * @exception IOException
      */
     protected final void procAllocate(FTPRequest req) throws IOException
@@ -2714,11 +2846,15 @@ public class FTPSrvSession extends SrvSession implements Runnable
     }
 
     /**
-     * Build a list of file name or file information objects for the specified server path
+     * Build a list of file name or file information objects for the specified
+     * server path
      * 
-     * @param path FTPPath
-     * @param nameOnly boolean
-     * @param hidden boolean
+     * @param path
+     *            FTPPath
+     * @param nameOnly
+     *            boolean
+     * @param hidden
+     *            boolean
      * @return Vector<FileInfo>
      */
     protected final Vector<FileInfo> listFilesForPath(FTPPath path, boolean nameOnly, boolean hidden)
@@ -2758,7 +2894,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                     if (nameOnly == false)
                     {
 
-                        // Create a file information object for the top level directory details
+                        // Create a file information object for the top level
+                        // directory details
 
                         FileInfo finfo = new FileInfo(shr.getName(), 0L, FileAttribute.Directory);
                         files.add(finfo);
@@ -2788,9 +2925,9 @@ public class FTPSrvSession extends SrvSession implements Runnable
             SearchContext ctx = null;
 
             int searchAttr = FileAttribute.Directory + FileAttribute.Normal;
-            if ( hidden)
+            if (hidden)
                 searchAttr += FileAttribute.Hidden;
-            
+
             try
             {
                 disk = (DiskInterface) path.getSharedDevice().getInterface();
@@ -2876,7 +3013,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                     m_shares.addShare(shr);
             }
 
-            // Check if there is an access control manager available, if so then filter the list of
+            // Check if there is an access control manager available, if so then
+            // filter the list of
             // shared filesystems
 
             if (getServer().hasAccessControlManager())
@@ -2898,10 +3036,11 @@ public class FTPSrvSession extends SrvSession implements Runnable
     }
 
     /**
-     * Get a tree connection for the specified shared device. Creates and caches a new tree
-     * connection if required.
+     * Get a tree connection for the specified shared device. Creates and caches
+     * a new tree connection if required.
      * 
-     * @param share SharedDevice
+     * @param share
+     *            SharedDevice
      * @return TreeConnection
      */
     protected final TreeConnection getTreeConnection(SharedDevice share)
@@ -2990,7 +3129,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                 rdlen = m_in.read(m_inbuf);
 
-                // Check if there is no more data, the other side has dropped the connection
+                // Check if there is no more data, the other side has dropped
+                // the connection
 
                 if (rdlen == -1)
                 {
@@ -3017,7 +3157,7 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                 if (logger.isDebugEnabled() && hasDebug(DBG_PKTTYPE))
                     logger.debug("Cmd " + ftpReq);
-                
+
                 // Parse the received command, and validate
 
                 ftpReq.setCommandLine(cmd);
@@ -3206,8 +3346,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                 default:
                     if (ftpReq.isCommand() != FTPCommand.InvalidCmd)
-                        sendFTPResponse(502, "Command " + FTPCommand.getCommandName(ftpReq.isCommand())
-                                + " not implemented");
+                        sendFTPResponse(502, "Command "
+                                + FTPCommand.getCommandName(ftpReq.isCommand()) + " not implemented");
                     else
                         sendFTPResponse(502, "Command not implemented");
                     break;
@@ -3220,8 +3360,8 @@ public class FTPSrvSession extends SrvSession implements Runnable
                     endTime = System.currentTimeMillis();
                     long duration = endTime - startTime;
                     if (duration > 20)
-                        logger.debug("Processed cmd " + FTPCommand.getCommandName(ftpReq.isCommand()) + " in "
-                                + duration + "ms");
+                        logger.debug("Processed cmd "
+                                + FTPCommand.getCommandName(ftpReq.isCommand()) + " in " + duration + "ms");
                 }
 
             } // end while state
