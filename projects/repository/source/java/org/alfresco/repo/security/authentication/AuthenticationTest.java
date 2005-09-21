@@ -17,16 +17,22 @@
 package org.alfresco.repo.security.authentication;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
+import net.sf.acegisecurity.AccountExpiredException;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationManager;
 import net.sf.acegisecurity.BadCredentialsException;
+import net.sf.acegisecurity.CredentialsExpiredException;
 import net.sf.acegisecurity.DisabledException;
+import net.sf.acegisecurity.LockedException;
 import net.sf.acegisecurity.UserDetails;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.dao.SaltSource;
@@ -184,16 +190,38 @@ public class AuthenticationTest extends TestCase
 
         dao.deleteUser("Andy");
         assertNull(dao.getUserOrNull("Andy"));
+        
+        MessageDigest digester;
+        try
+        {
+            digester = MessageDigest.getInstance("MD4");
+            System.out.println("Digester from "+digester.getProvider());
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            System.out.println("No digester");
+        }
+        
     }
 
     public void testAuthentication()
     {
-        dao.createUser("Andy", "squash".toCharArray());
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("Andy", "squash");
+        dao.createUser("GUEST", "".toCharArray());
+        
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("GUEST", "");
         token.setAuthenticated(false);
 
         Authentication result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
+        dao.createUser("Andy", "squash".toCharArray());
+
+        token = new UsernamePasswordAuthenticationToken("Andy", "squash");
+        token.setAuthenticated(false);
+
+        result = authenticationManager.authenticate(token);
         assertNotNull(result);
         
         dao.setEnabled("Andy", false);
@@ -212,7 +240,67 @@ public class AuthenticationTest extends TestCase
         result = authenticationManager.authenticate(token);
         assertNotNull(result);
         
-       
+        dao.setLocked("Andy", true);
+        try
+        {
+            result = authenticationManager.authenticate(token);
+            assertNotNull(result);
+            assertNotNull(null);
+        }
+        catch (LockedException e)
+        {
+            // Expected
+        }
+        
+        dao.setLocked("Andy", false);
+        result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
+        dao.setAccountExpires("Andy", true);
+        dao.setCredentialsExpire("Andy", true);
+        result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
+        dao.setAccountExpiryDate("Andy", null);
+        dao.setCredentialsExpiryDate("Andy", null);
+        result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
+        dao.setAccountExpiryDate("Andy", new Date(new Date().getTime()+10000));
+        dao.setCredentialsExpiryDate("Andy", new Date(new Date().getTime()+10000));
+        result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
+        dao.setAccountExpiryDate("Andy", new Date(new Date().getTime()-10000));
+        try
+        {
+            result = authenticationManager.authenticate(token);
+            assertNotNull(result);
+            assertNotNull(null);
+        }
+        catch (AccountExpiredException e)
+        {
+            // Expected
+        }
+        dao.setAccountExpiryDate("Andy", new Date(new Date().getTime()+10000));
+        result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
+        dao.setCredentialsExpiryDate("Andy", new Date(new Date().getTime()-10000));
+        try
+        {
+            result = authenticationManager.authenticate(token);
+            assertNotNull(result);
+            assertNotNull(null);
+        }
+        catch (CredentialsExpiredException e)
+        {
+            // Expected
+        }
+        dao.setCredentialsExpiryDate("Andy", new Date(new Date().getTime()+10000));
+        result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
         
         dao.deleteUser("Andy");
         //assertNull(dao.getUserOrNull("Andy"));
@@ -419,6 +507,9 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService()
     {
+        authenticationService.createAuthentication("GUEST", "".toCharArray());
+        authenticationService.authenticate("GUEST", "".toCharArray());
+        
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
 

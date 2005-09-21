@@ -103,7 +103,8 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         GrantedAuthority[] gas = new GrantedAuthority[1];
         gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
 
-        UserDetails ud = new User(userName, password, getEnabled(userName), !getAccountHasExpired(userName), !getCredentialsHaveExpired(userName), !getAccountlocked(userName), gas);
+        UserDetails ud = new User(userName, password, getEnabled(userName), !getAccountHasExpired(userName),
+                !getCredentialsHaveExpired(userName), !getAccountlocked(userName), gas);
         return ud;
     }
 
@@ -248,8 +249,15 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         {
             return false;
         }
-        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
-                ContentModel.PROP_ACCOUNT_EXPIRES));
+        Serializable ser = nodeService.getProperty(userNode, ContentModel.PROP_ACCOUNT_EXPIRES);
+        if (ser == null)
+        {
+            return false;
+        }
+        else
+        {
+            return DefaultTypeConverter.INSTANCE.booleanValue(ser);
+        }
     }
 
     public Date getAccountExpiryDate(String userName)
@@ -289,7 +297,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
             }
             else
             {
-                return (date.compareTo(new Date()) > 1);
+                return (date.compareTo(new Date()) < 1);
             }
         }
         else
@@ -305,8 +313,15 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         {
             return false;
         }
-        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
-                ContentModel.PROP_ACCOUNT_LOCKED));
+        Serializable ser = nodeService.getProperty(userNode, ContentModel.PROP_ACCOUNT_LOCKED);
+        if (ser == null)
+        {
+            return false;
+        }
+        else
+        {
+            return DefaultTypeConverter.INSTANCE.booleanValue(ser);
+        }
     }
 
     public boolean getCredentialsExpire(String userName)
@@ -316,8 +331,15 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         {
             return false;
         }
-        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
-                ContentModel.PROP_CREDENTIALS_EXPIRE));
+        Serializable ser = nodeService.getProperty(userNode, ContentModel.PROP_CREDENTIALS_EXPIRE);
+        if (ser == null)
+        {
+            return false;
+        }
+        else
+        {
+            return DefaultTypeConverter.INSTANCE.booleanValue(ser);
+        }
     }
 
     public Date getCredentialsExpiryDate(String userName)
@@ -350,14 +372,14 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
                 ContentModel.PROP_CREDENTIALS_EXPIRE)))
         {
             Date date = DefaultTypeConverter.INSTANCE.convert(Date.class, nodeService.getProperty(userNode,
-                    ContentModel.PROP_CREDENTIALS_EXPIRE));
+                    ContentModel.PROP_CREDENTIALS_EXPIRY_DATE));
             if (date == null)
             {
                 return false;
             }
             else
             {
-                return (date.compareTo(new Date()) > 1);
+                return (date.compareTo(new Date()) < 1);
             }
         }
         else
@@ -373,7 +395,15 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         {
             return false;
         }
-        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode, ContentModel.PROP_ENABLED));
+        Serializable ser = nodeService.getProperty(userNode, ContentModel.PROP_ENABLED);
+        if (ser == null)
+        {
+            return true;
+        }
+        else
+        {
+            return DefaultTypeConverter.INSTANCE.booleanValue(ser);
+        }
     }
 
     public void setAccountExpires(String userName, boolean expires)
@@ -381,7 +411,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef userNode = getUserOrNull(userName);
         if (userNode == null)
         {
-            throw new AuthenticationException("User not found: "+userName);
+            throw new AuthenticationException("User not found: " + userName);
         }
         nodeService.setProperty(userNode, ContentModel.PROP_ACCOUNT_EXPIRES, Boolean.valueOf(expires));
     }
@@ -391,7 +421,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef userNode = getUserOrNull(userName);
         if (userNode == null)
         {
-            throw new AuthenticationException("User not found: "+userName);
+            throw new AuthenticationException("User not found: " + userName);
         }
         nodeService.setProperty(userNode, ContentModel.PROP_ACCOUNT_EXPIRY_DATE, exipryDate);
 
@@ -402,7 +432,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef userNode = getUserOrNull(userName);
         if (userNode == null)
         {
-            throw new AuthenticationException("User not found: "+userName);
+            throw new AuthenticationException("User not found: " + userName);
         }
         nodeService.setProperty(userNode, ContentModel.PROP_CREDENTIALS_EXPIRE, Boolean.valueOf(expires));
     }
@@ -412,7 +442,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef userNode = getUserOrNull(userName);
         if (userNode == null)
         {
-            throw new AuthenticationException("User not found: "+userName);
+            throw new AuthenticationException("User not found: " + userName);
         }
         nodeService.setProperty(userNode, ContentModel.PROP_CREDENTIALS_EXPIRY_DATE, exipryDate);
 
@@ -423,7 +453,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef userNode = getUserOrNull(userName);
         if (userNode == null)
         {
-            throw new AuthenticationException("User not found: "+userName);
+            throw new AuthenticationException("User not found: " + userName);
         }
         nodeService.setProperty(userNode, ContentModel.PROP_ENABLED, Boolean.valueOf(enabled));
     }
@@ -433,7 +463,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef userNode = getUserOrNull(userName);
         if (userNode == null)
         {
-            throw new AuthenticationException("User not found: "+userName);
+            throw new AuthenticationException("User not found: " + userName);
         }
         nodeService.setProperty(userNode, ContentModel.PROP_ACCOUNT_LOCKED, Boolean.valueOf(locked));
     }
