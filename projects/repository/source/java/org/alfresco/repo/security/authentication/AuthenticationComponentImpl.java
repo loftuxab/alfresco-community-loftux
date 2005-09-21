@@ -163,7 +163,7 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
         return authenticationDao.getMD4HashedPassword(userName);
     }
 
-    public NTLMMode getNTLMMOde()
+    public NTLMMode getNTLMMode()
     {
         return NTLMMode.MD4_PROVIDER;
     }

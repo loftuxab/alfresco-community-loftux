@@ -83,7 +83,7 @@ public interface AuthenticationComponent
      * 
      * @return
      */
-    public NTLMMode getNTLMMOde();
+    public NTLMMode getNTLMMode();
     
     /**
      * Get the MD4 password hash, as required by NTLM based authentication methods.
