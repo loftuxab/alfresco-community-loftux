@@ -12,7 +12,7 @@ public interface ClassificationServiceSoapPort extends java.rmi.Remote {
     /**
      * Gets available classifications.
      */
-    public org.alfresco.repo.webservice.types.Classification[] getClassifications() throws java.rmi.RemoteException, org.alfresco.repo.webservice.classification.ClassificationFault;
+    public org.alfresco.repo.webservice.types.Classification[] getClassifications(org.alfresco.repo.webservice.types.Store store) throws java.rmi.RemoteException, org.alfresco.repo.webservice.classification.ClassificationFault;
 
     /**
      * Gets child categories for the specified parent category.
@@ -34,5 +34,5 @@ public interface ClassificationServiceSoapPort extends java.rmi.Remote {
      * in the meta model i.e. is it an aspect, which property holds the applied
      * category.
      */
-    public org.alfresco.repo.webservice.types.ClassDefinition describeClassification(org.alfresco.repo.webservice.types.Reference classification) throws java.rmi.RemoteException, org.alfresco.repo.webservice.classification.ClassificationFault;
+    public org.alfresco.repo.webservice.types.ClassDefinition describeClassification(java.lang.String classification) throws java.rmi.RemoteException, org.alfresco.repo.webservice.classification.ClassificationFault;
 }

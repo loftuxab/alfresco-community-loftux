@@ -389,7 +389,7 @@ public class RepositoryWebService extends AbstractWebService implements Reposito
       TypeDefinition ddTypeDef = this.dictionaryService.getType(this.nodeService.getType(nodeRef));
       
       // create the web service ClassDefinition type from the data dictionary TypeDefinition
-      ClassDefinition typeDef = setupClassDefObject(ddTypeDef);
+      ClassDefinition typeDef = Utils.setupClassDefObject(ddTypeDef);
       
       // create the web service ClassDefinition types to represent the aspects
       ClassDefinition[] aspectDefs = null;
@@ -400,7 +400,7 @@ public class RepositoryWebService extends AbstractWebService implements Reposito
          int pos = 0;
          for (AspectDefinition ddAspectDef : aspects)
          {
-            aspectDefs[pos] = setupClassDefObject(ddAspectDef);
+            aspectDefs[pos] = Utils.setupClassDefObject(ddAspectDef);
             pos++;
          }
       }
@@ -408,166 +408,5 @@ public class RepositoryWebService extends AbstractWebService implements Reposito
       return new NodeDefinition(typeDef, aspectDefs);
    }
    
-   /**
-    * Creates a ClassDefinition web service type object for the given
-    * repository ClassDefinition
-    * 
-    * @param ddClassDef The repository ClassDefinition to generate
-    * @return The web service ClassDefinition representation
-    */
-   private ClassDefinition setupClassDefObject(org.alfresco.service.cmr.dictionary.ClassDefinition ddClassDef)
-   {
-      ClassDefinition classDef = new ClassDefinition();
-      classDef.setName(ddClassDef.getName().toString());
-      classDef.setIsAspect(ddClassDef.isAspect());
-      
-      if (ddClassDef.getTitle() != null)
-      {
-         classDef.setTitle(ddClassDef.getTitle());
-      }
-      if (ddClassDef.getDescription() != null)
-      {
-         classDef.setDescription(ddClassDef.getDescription());
-      }
-      if (ddClassDef.getParentName() != null)
-      {
-         classDef.setSuperClass(ddClassDef.getParentName().toString());
-      }
-      
-      // represent the properties
-      Map<QName, org.alfresco.service.cmr.dictionary.PropertyDefinition> props = ddClassDef.getProperties();
-      if (props != null)
-      {
-         PropertyDefinition[] propDefs = new PropertyDefinition[props.size()];
-         int pos = 0;
-         for (org.alfresco.service.cmr.dictionary.PropertyDefinition ddPropDef : props.values())
-         {
-            PropertyDefinition propDef = new PropertyDefinition();
-            propDef.setName(ddPropDef.getName().toString());
-            propDef.setDataType(ddPropDef.getDataType().getName().toString());
-            propDef.setMandatory(ddPropDef.isMandatory()); 
-            propDef.setReadOnly(ddPropDef.isProtected());
-            if (ddPropDef.getDefaultValue() != null)
-            {
-               propDef.setDefaultValue(ddPropDef.getDefaultValue());
-            }
-            if (ddPropDef.getTitle() != null)
-            {
-               propDef.setTitle(ddPropDef.getTitle());
-            }
-            if (ddPropDef.getDescription() != null)
-            {
-               propDef.setDescription(ddPropDef.getDescription());
-            }
-            
-            // add it to the array
-            propDefs[pos] = propDef;
-            pos++;
-         }
-         
-         // add properties to the overall ClassDefinition
-         classDef.setProperties(propDefs);
-      }
-      
-      // represent the associations
-      Map<QName, org.alfresco.service.cmr.dictionary.AssociationDefinition> assocs = ddClassDef.getAssociations();
-      if (assocs != null)
-      {
-         AssociationDefinition[] assocDefs = new AssociationDefinition[assocs.size()];
-         int pos = 0;
-         for (org.alfresco.service.cmr.dictionary.AssociationDefinition ddAssocDef : assocs.values())
-         {
-            AssociationDefinition assocDef = new AssociationDefinition();
-            assocDef.setName(ddAssocDef.getName().toString());
-            assocDef.setIsChild(ddAssocDef.isChild());
-            if (ddAssocDef.getTitle() != null)
-            {
-               assocDef.setTitle(ddAssocDef.getTitle());
-            }
-            if (ddAssocDef.getDescription() != null)
-            {
-               assocDef.setDescription(ddAssocDef.getDescription());
-            }
-            
-            RoleDefinition sourceRole = new RoleDefinition();
-            if (ddAssocDef.getSourceRoleName() != null)
-            {
-               sourceRole.setName(ddAssocDef.getSourceRoleName().toString());
-            }
-            sourceRole.setCardinality(setupSourceCardinalityObject(ddAssocDef));
-            assocDef.setSourceRole(sourceRole);
-            
-            RoleDefinition targetRole = new RoleDefinition();
-            if (ddAssocDef.getTargetRoleName() != null)
-            {
-               targetRole.setName(ddAssocDef.getTargetRoleName().toString());
-            }
-            targetRole.setCardinality(setupTargetCardinalityObject(ddAssocDef));;
-            assocDef.setTargetRole(targetRole);
-            assocDef.setTargetClass(ddAssocDef.getTargetClass().getName().toString());
-         }
-      }
-      
-      return classDef;
-   }
    
-   /**
-    * Creates a web service Cardinality type for the source from the given repository AssociationDefinition
-    * 
-    * @param ddAssocDef The AssociationDefinition to get the cardinality from 
-    * @return The Cardinality
-    */
-   private Cardinality setupSourceCardinalityObject(org.alfresco.service.cmr.dictionary.AssociationDefinition ddAssocDef)
-   {
-      if (ddAssocDef.isSourceMandatory() == false && ddAssocDef.isSourceMany() == false)
-      {
-         // 0..1
-         return Cardinality.value1;
-      }
-      else if (ddAssocDef.isSourceMandatory() && ddAssocDef.isSourceMany() == false)
-      {
-         // 1
-         return Cardinality.value2;
-      }
-      else if (ddAssocDef.isSourceMandatory() && ddAssocDef.isSourceMany())
-      {
-         // 1..*
-         return Cardinality.value4;
-      }
-      else
-      {
-         // *
-         return Cardinality.value3;
-      }
-   }
-   
-   /**
-    * Creates a web service Cardinality type for the target from the given repository AssociationDefinition
-    * 
-    * @param ddAssocDef The AssociationDefinition to get the cardinality from 
-    * @return The Cardinality
-    */
-   private Cardinality setupTargetCardinalityObject(org.alfresco.service.cmr.dictionary.AssociationDefinition ddAssocDef)
-   {
-      if (ddAssocDef.isTargetMandatory() == false && ddAssocDef.isTargetMany() == false)
-      {
-         // 0..1
-         return Cardinality.value1;
-      }
-      else if (ddAssocDef.isTargetMandatory() && ddAssocDef.isTargetMany() == false)
-      {
-         // 1
-         return Cardinality.value2;
-      }
-      else if (ddAssocDef.isTargetMandatory() && ddAssocDef.isTargetMany())
-      {
-         // 1..*
-         return Cardinality.value4;
-      }
-      else
-      {
-         // *
-         return Cardinality.value3;
-      }
-   }
 }

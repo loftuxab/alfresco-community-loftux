@@ -17,6 +17,7 @@
 package org.alfresco.service.cmr.search;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -91,5 +92,4 @@ public interface CategoryService
      * @param attributeName
      */
     NodeRef newCategory(QName typeName, String attributeName);
-
 }

@@ -25,6 +25,8 @@ public class ClassificationServiceSoapBindingStub extends org.apache.axis.client
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getClassifications");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/classification/1.0", "store"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Store"), org.alfresco.example.webservice.types.Store.class, false, false);
+        oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Classification"));
         oper.setReturnClass(org.alfresco.example.webservice.types.Classification[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/classification/1.0", "getClassificationsReturn"));
@@ -93,7 +95,7 @@ public class ClassificationServiceSoapBindingStub extends org.apache.axis.client
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("describeClassification");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/classification/1.0", "classification"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.example.webservice.types.Reference.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/classification/1.0", "classification"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Name"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ClassDefinition"));
         oper.setReturnClass(org.alfresco.example.webservice.types.ClassDefinition.class);
@@ -454,7 +456,7 @@ public class ClassificationServiceSoapBindingStub extends org.apache.axis.client
     /**
      * Gets available classifications.
      */
-    public org.alfresco.example.webservice.types.Classification[] getClassifications() throws java.rmi.RemoteException, org.alfresco.example.webservice.classification.ClassificationFault {
+    public org.alfresco.example.webservice.types.Classification[] getClassifications(org.alfresco.example.webservice.types.Store store) throws java.rmi.RemoteException, org.alfresco.example.webservice.classification.ClassificationFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -470,7 +472,7 @@ public class ClassificationServiceSoapBindingStub extends org.apache.axis.client
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {store});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
@@ -640,7 +642,7 @@ public class ClassificationServiceSoapBindingStub extends org.apache.axis.client
      * in the meta model i.e. is it an aspect, which property holds the applied
      * category.
      */
-    public org.alfresco.example.webservice.types.ClassDefinition describeClassification(org.alfresco.example.webservice.types.Reference classification) throws java.rmi.RemoteException, org.alfresco.example.webservice.classification.ClassificationFault {
+    public org.alfresco.example.webservice.types.ClassDefinition describeClassification(java.lang.String classification) throws java.rmi.RemoteException, org.alfresco.example.webservice.classification.ClassificationFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }

@@ -8,17 +8,17 @@
 package org.alfresco.example.webservice.classification;
 
 public class AppliedCategory  implements java.io.Serializable {
-    private org.alfresco.example.webservice.types.Reference classification;
-    private org.alfresco.example.webservice.types.Reference category;
+    private java.lang.String classification;
+    private org.alfresco.example.webservice.types.Reference[] categories;
 
     public AppliedCategory() {
     }
 
     public AppliedCategory(
-           org.alfresco.example.webservice.types.Reference classification,
-           org.alfresco.example.webservice.types.Reference category) {
+           java.lang.String classification,
+           org.alfresco.example.webservice.types.Reference[] categories) {
            this.classification = classification;
-           this.category = category;
+           this.categories = categories;
     }
 
 
@@ -27,7 +27,7 @@ public class AppliedCategory  implements java.io.Serializable {
      * 
      * @return classification
      */
-    public org.alfresco.example.webservice.types.Reference getClassification() {
+    public java.lang.String getClassification() {
         return classification;
     }
 
@@ -37,28 +37,36 @@ public class AppliedCategory  implements java.io.Serializable {
      * 
      * @param classification
      */
-    public void setClassification(org.alfresco.example.webservice.types.Reference classification) {
+    public void setClassification(java.lang.String classification) {
         this.classification = classification;
     }
 
 
     /**
-     * Gets the category value for this AppliedCategory.
+     * Gets the categories value for this AppliedCategory.
      * 
-     * @return category
+     * @return categories
      */
-    public org.alfresco.example.webservice.types.Reference getCategory() {
-        return category;
+    public org.alfresco.example.webservice.types.Reference[] getCategories() {
+        return categories;
     }
 
 
     /**
-     * Sets the category value for this AppliedCategory.
+     * Sets the categories value for this AppliedCategory.
      * 
-     * @param category
+     * @param categories
      */
-    public void setCategory(org.alfresco.example.webservice.types.Reference category) {
-        this.category = category;
+    public void setCategories(org.alfresco.example.webservice.types.Reference[] categories) {
+        this.categories = categories;
+    }
+
+    public org.alfresco.example.webservice.types.Reference getCategories(int i) {
+        return this.categories[i];
+    }
+
+    public void setCategories(int i, org.alfresco.example.webservice.types.Reference _value) {
+        this.categories[i] = _value;
     }
 
     private java.lang.Object __equalsCalc = null;
@@ -76,9 +84,9 @@ public class AppliedCategory  implements java.io.Serializable {
             ((this.classification==null && other.getClassification()==null) || 
              (this.classification!=null &&
               this.classification.equals(other.getClassification()))) &&
-            ((this.category==null && other.getCategory()==null) || 
-             (this.category!=null &&
-              this.category.equals(other.getCategory())));
+            ((this.categories==null && other.getCategories()==null) || 
+             (this.categories!=null &&
+              java.util.Arrays.equals(this.categories, other.getCategories())));
         __equalsCalc = null;
         return _equals;
     }
@@ -93,8 +101,16 @@ public class AppliedCategory  implements java.io.Serializable {
         if (getClassification() != null) {
             _hashCode += getClassification().hashCode();
         }
-        if (getCategory() != null) {
-            _hashCode += getCategory().hashCode();
+        if (getCategories() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getCategories());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getCategories(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -109,14 +125,16 @@ public class AppliedCategory  implements java.io.Serializable {
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("classification");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/classification/1.0", "classification"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Name"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("category");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/classification/1.0", "category"));
+        elemField.setFieldName("categories");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/classification/1.0", "categories"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"));
+        elemField.setMinOccurs(0);
         elemField.setNillable(false);
+        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
     }
 

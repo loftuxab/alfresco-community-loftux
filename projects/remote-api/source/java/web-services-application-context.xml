@@ -105,6 +105,15 @@
       <property name="namespaceService">
          <ref bean="namespaceService"/>
       </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService"/>
+      </property>
+      <property name="categoryService">
+         <ref bean="CategoryService"/>
+      </property>
+      <property name="transactionService">
+         <ref bean="transactionComponent"/>
+      </property>
    </bean>
  
 </beans>

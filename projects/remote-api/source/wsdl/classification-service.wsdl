@@ -16,7 +16,9 @@
       <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/classification/1.0" xmlns="http://www.w3.org/2001/XMLSchema">
          <element name="getClassifications">
             <complexType>
-               <sequence/>
+               <sequence>
+                  <element name="store" type="cms:Store"/>
+               </sequence>
             </complexType>
          </element>
          
@@ -80,7 +82,7 @@
          <element name="describeClassification">
             <complexType>
                <sequence>
-                  <element name="classification" type="cms:Reference"/>
+                  <element name="classification" type="cms:Name"/>
                </sequence>
             </complexType>
          </element>
@@ -103,8 +105,8 @@
          
          <complexType name="AppliedCategory">
             <sequence>
-               <element name="classification" type="cms:Reference"/>
-               <element name="category" type="cms:Reference"/>
+               <element name="classification" type="cms:Name"/>
+               <element name="categories" type="cms:Reference" maxOccurs="unbounded" minOccurs="0"/>
             </sequence>
          </complexType>
          <element name="AppliedCategory" type="cls:AppliedCategory"/>

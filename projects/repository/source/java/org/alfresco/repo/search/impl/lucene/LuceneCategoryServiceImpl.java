@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.IndexerException;
@@ -185,10 +187,16 @@ public class LuceneCategoryServiceImpl implements CategoryService
 
     public Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName aspectQName, Depth depth)
     {
-        return getChildren(getCategoryRootNode(storeRef, aspectQName), Mode.SUB_CATEGORIES, depth);
+        Collection<ChildAssociationRef> assocs = new ArrayList<ChildAssociationRef>();
+        Set<NodeRef> nodeRefs = getCategoryRootNode(storeRef, aspectQName);
+        for (NodeRef nodeRef : nodeRefs)
+        {
+            assocs.addAll(getChildren(nodeRef, Mode.SUB_CATEGORIES, depth));
+        }
+        return assocs;
     }
 
-    private NodeRef getCategoryRootNode(StoreRef storeRef, QName qname)
+    private Set<NodeRef> getCategoryRootNode(StoreRef storeRef, QName qname)
     {
         ResultSet resultSet = null;
         try
@@ -196,14 +204,13 @@ public class LuceneCategoryServiceImpl implements CategoryService
             resultSet = indexerAndSearcher.getSearcher(storeRef, false).query(storeRef, "lucene", "PATH_WITH_REPEATS:\"/" + getPrefix(qname.getNamespaceURI()) + qname.getLocalName() + "\"",
                     null, null);
 
-            if (resultSet.length() != 1)
+            Set<NodeRef> nodeRefs = new HashSet<NodeRef>(resultSet.length());
+            for (ResultSetRow row : resultSet)
             {
-                return null;
+                nodeRefs.add(row.getNodeRef());
             }
-            else
-            {
-                return resultSet.getNodeRef(0);
-            }
+            
+            return nodeRefs;
         }
         finally
         {

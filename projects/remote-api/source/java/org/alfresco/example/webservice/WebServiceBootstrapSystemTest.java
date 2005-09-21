@@ -1,23 +1,36 @@
 package org.alfresco.example.webservice;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.transaction.UserTransaction;
+
 import junit.framework.TestCase;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.CategoryService;
+import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class WebServiceBootstrapSystemTest extends TestCase
@@ -40,8 +53,6 @@ public class WebServiceBootstrapSystemTest extends TestCase
     
     private static final String TEST_CONTENT = "This is some test content.  This is some test content.";
     
-    private NodeService nodeService;
-    private ContentService contentService;
     
     /**
      * Runs the bootstrap and populates the property file with the infomration required for the tests
@@ -51,38 +62,69 @@ public class WebServiceBootstrapSystemTest extends TestCase
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:alfresco/application-context.xml");
         
         // Get the services
-        this.nodeService = (NodeService)applicationContext.getBean("NodeService");
-        this.contentService = (ContentService)applicationContext.getBean("ContentService");
+        TransactionService transactionService = (TransactionService)applicationContext.getBean("transactionComponent");
+        AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
+        NodeService nodeService = (NodeService)applicationContext.getBean("NodeService");
+        ContentService contentService = (ContentService)applicationContext.getBean("contentService");       
+        ImporterService importerService = (ImporterService)applicationContext.getBean("importerComponent");
         
-        // Create the store
-        StoreRef storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
-        NodeRef rootNodeRef = rootNodeRef = this.nodeService.getRootNode(storeRef);
+        UserTransaction userTransaction = transactionService.getUserTransaction();
+        authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
+
+        StoreRef storeRef = null;
+        NodeRef rootNodeRef = null;
+        NodeRef folderNodeRef = null;
         
-        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
-        folderProps.put(ContentModel.PROP_NAME, FOLDER_NAME);
+        try
+        {
+            userTransaction.begin();
+            
+            // Create the store
+            storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+            rootNodeRef = rootNodeRef = nodeService.getRootNode(storeRef);
+            
+            // Import the categories
+            InputStream viewStream = getClass().getClassLoader().getResourceAsStream("alfresco/bootstrap/categories.xml");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(viewStream));
+            Location importLocation = new Location(storeRef);
+            importLocation.setPath("/");
+            importerService.importView(reader, importLocation, null, null);
+            
+            // Folder properties
+            Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+            folderProps.put(ContentModel.PROP_NAME, FOLDER_NAME);
+            
+            // Create a folder
+            folderNodeRef = nodeService.createNode(
+                                            rootNodeRef, 
+                                            ContentModel.ASSOC_CHILDREN,
+                                            ContentModel.ASSOC_CHILDREN,
+                                            ContentModel.TYPE_FOLDER,
+                                            folderProps).getChildRef();
+            
+            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3);
+            contentProps.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
+            contentProps.put(ContentModel.PROP_NAME, CONTENT_NAME);
+            
+            // Create some test content        
+            NodeRef testContent = nodeService.createNode(
+                    rootNodeRef,
+                    ContentModel.ASSOC_CHILDREN,
+                    ContentModel.ASSOC_CHILDREN,
+                    ContentModel.TYPE_CONTENT,
+                    contentProps).getChildRef();
+            contentService.getUpdatingWriter(testContent).putContent(TEST_CONTENT);
         
-        // Create a folder
-        NodeRef folderNodeRef = this.nodeService.createNode(
-                                        rootNodeRef, 
-                                        ContentModel.ASSOC_CHILDREN,
-                                        ContentModel.ASSOC_CHILDREN,
-                                        ContentModel.TYPE_FOLDER,
-                                        folderProps).getChildRef();
-        
-        Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3);
-        contentProps.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
-        contentProps.put(ContentModel.PROP_NAME, CONTENT_NAME);
-        
-        // Create some test content        
-        NodeRef testContent = this.nodeService.createNode(
-                rootNodeRef,
-                ContentModel.ASSOC_CHILDREN,
-                ContentModel.ASSOC_CHILDREN,
-                ContentModel.TYPE_CONTENT,
-                contentProps).getChildRef();
-        this.contentService.getUpdatingWriter(testContent).putContent(TEST_CONTENT);
-        
+            userTransaction.commit();
+        }
+        catch(Throwable e)
+        {
+            // rollback the transaction
+            try { if (userTransaction != null) {userTransaction.rollback();} } catch (Exception ex) {}
+            try {authenticationComponent.clearCurrentSecurityContext(); } catch (Exception ex) {}
+            throw new AlfrescoRuntimeException("Bootstrap failed", e);
+        }
         
         Properties properties = new Properties();
         properties.put(PROP_STORE_REF, storeRef.toString());
@@ -100,6 +142,8 @@ public class WebServiceBootstrapSystemTest extends TestCase
             e.printStackTrace();
             fail("Unable to store bootstrap details.");
         }
+        
+        //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
     
     public static Properties getBootstrapProperties()

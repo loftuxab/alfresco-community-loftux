@@ -314,8 +314,16 @@
 			<xsd:group ref="cms:TextualDescription"></xsd:group>
 		</xsd:sequence>
 	</xsd:complexType>
-
+	
 	<xsd:complexType name="Classification">
+		<xsd:sequence>
+		    <xsd:element name="classification" type="cms:Name"></xsd:element>
+			<xsd:element name="rootCategory" type="cms:Category"></xsd:element>
+		    <xsd:group ref="cms:TextualDescription"></xsd:group>
+		</xsd:sequence>
+	</xsd:complexType> 
+
+	<!-- <xsd:complexType name="Classification">
 		<xsd:complexContent>
 			<xsd:extension base="cms:Category">
 				<xsd:sequence>
@@ -323,6 +331,6 @@
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
-	</xsd:complexType>
+	</xsd:complexType> -->
 
 </xsd:schema>
