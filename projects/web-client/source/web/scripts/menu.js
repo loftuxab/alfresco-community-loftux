@@ -59,6 +59,7 @@ function _hideLastMenu()
 // menu DIV onmouseover handler
 function _menuIn(id)
 {
+   document.onclick = null;
    if (_timeoutId != null)
    {
       clearTimeout(_timeoutId);
@@ -69,6 +70,7 @@ function _menuIn(id)
 // menu DIV onmouseout handler
 function _menuOut(id)
 {
+   document.onclick = _hideLastMenu;
    if (_timeoutId != null)
    {
       clearTimeout(_timeoutId);
@@ -76,5 +78,5 @@ function _menuOut(id)
    }
    
    // hide the menu after a seconds delay
-   _timeoutId = window.setTimeout("_hideMenu('" + id + "')", 1000);
+   _timeoutId = window.setTimeout("_hideMenu('" + id + "')", 2000);
 }
