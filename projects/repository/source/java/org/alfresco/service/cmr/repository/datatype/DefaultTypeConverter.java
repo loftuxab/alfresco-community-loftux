@@ -333,6 +333,14 @@ public class DefaultTypeConverter
                 return new Date(source.getTime());
             }
         });
+        
+        INSTANCE.addConverter(Date.class, Number.class, new TypeConverter.Converter<Date, Number>()
+        {
+            public Number convert(Date source)
+            {
+                return Long.valueOf(source.getTime());
+            }
+        });
 
         INSTANCE.addConverter(Date.class, String.class, new TypeConverter.Converter<Date, String>()
         {
