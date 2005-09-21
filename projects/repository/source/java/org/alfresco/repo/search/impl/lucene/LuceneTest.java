@@ -193,7 +193,7 @@ public class LuceneTest extends TestCase
         testProperties.put(QName.createQName(TEST_NAMESPACE, "boolean-ista"), Boolean.valueOf(true));
         testProperties.put(QName.createQName(TEST_NAMESPACE, "qname-ista"), QName.createQName("{wibble}wobble"));
         testProperties.put(QName.createQName(TEST_NAMESPACE, "guid-ista"), "My-GUID");
-        testProperties.put(QName.createQName(TEST_NAMESPACE, "category-ista"), "CategoryId");
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "category-ista"), new NodeRef(storeRef, "CategoryId"));
         testProperties.put(QName.createQName(TEST_NAMESPACE, "noderef-ista"), n1);
         testProperties.put(QName.createQName(TEST_NAMESPACE, "path-ista"), nodeService.getPath(n3));
         testProperties.put(QName.createQName(TEST_NAMESPACE, "null"), null);

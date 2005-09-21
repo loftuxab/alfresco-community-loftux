@@ -192,15 +192,19 @@ public class PropertyValue implements Cloneable, Serializable
             ArrayList<Serializable> arrayList = new ArrayList<Serializable>(collection.size());
             for (Object object : collection)
             {
-                if (!(object instanceof Serializable))
+                Serializable newValue = null;
+                if (object != null)
                 {
-                    throw new AlfrescoRuntimeException("Collection values must contain Serializable instances: \n" +
-                            "   value type: " + this + "\n" +
-                            "   collection: " + collection + "\n" +
-                            "   value: " + object);
+                    if (!(object instanceof Serializable))
+                    {
+                        throw new AlfrescoRuntimeException("Collection values must contain Serializable instances: \n" +
+                                "   value type: " + this + "\n" +
+                                "   collection: " + collection + "\n" +
+                                "   value: " + object);
+                    }
+                    Serializable value = (Serializable) object;
+                    newValue = convert(value);
                 }
-                Serializable value = (Serializable) object;
-                Serializable newValue = convert(value);
                 arrayList.add(newValue);
             }
             // done
