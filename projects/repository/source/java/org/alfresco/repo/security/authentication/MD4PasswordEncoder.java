@@ -30,7 +30,7 @@ import cryptix.jce.provider.CryptixCrypto;
 
 /**
  * <p>
- * MD5 implementation of PasswordEncoder.
+ * MD4 implementation of PasswordEncoder.
  * </p>
  * 
  * <p>
@@ -39,7 +39,7 @@ import cryptix.jce.provider.CryptixCrypto;
  * </p>
  * 
  * <P>
- * As MD5 is a one-way hash, the salt can contain any characters.
+ * As MD4 is a one-way hash, the salt can contain any characters.
  * </p>
  */
 public class MD4PasswordEncoder extends BaseDigestPasswordEncoder implements PasswordEncoder
@@ -49,7 +49,7 @@ public class MD4PasswordEncoder extends BaseDigestPasswordEncoder implements Pas
     {
         try
         {
-            MessageDigest digester = MessageDigest.getInstance("MD4");
+            MessageDigest.getInstance("MD4");
         }
         catch (NoSuchAlgorithmException e)
         {
