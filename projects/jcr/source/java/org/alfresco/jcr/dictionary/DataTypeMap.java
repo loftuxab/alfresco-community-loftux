@@ -53,6 +53,7 @@ public class DataTypeMap
         dataTypeToPropertyType.put(DataTypeDefinition.CATEGORY, PropertyType.STRING);  // TODO: Check this mapping
         dataTypeToPropertyType.put(DataTypeDefinition.NODE_REF, PropertyType.REFERENCE);
         dataTypeToPropertyType.put(DataTypeDefinition.PATH, PropertyType.PATH);
+        dataTypeToPropertyType.put(DataTypeDefinition.ANY, PropertyType.UNDEFINED);
     }
     
     

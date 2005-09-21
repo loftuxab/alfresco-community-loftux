@@ -54,6 +54,7 @@ import org.alfresco.jcr.item.ItemImpl;
 import org.alfresco.jcr.item.ItemResolver;
 import org.alfresco.jcr.item.JCRTypeConverter;
 import org.alfresco.jcr.item.NodeImpl;
+import org.alfresco.jcr.item.ValueFactoryImpl;
 import org.alfresco.jcr.repository.RepositoryImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -95,6 +96,9 @@ public class SessionImpl implements Session
     /** Type Manager */
     private NodeTypeManagerImpl typeManager = null;
     
+    /** Value Factory */
+    private ValueFactoryImpl valueFactory = null;
+    
     /** Session Proxy */
     private Session proxy = null;
     
@@ -115,7 +119,8 @@ public class SessionImpl implements Session
         this.attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
         this.typeConverter = new JCRTypeConverter(this);
         this.namespaceResolver = new NamespaceRegistryImpl(true, new JCRNamespacePrefixResolver(repository.getServiceRegistry().getNamespaceService()));
-        this.typeManager = new NodeTypeManagerImpl(repository.getServiceRegistry().getDictionaryService(), namespaceResolver.getNamespaceService());
+        this.typeManager = new NodeTypeManagerImpl(this, namespaceResolver.getNamespaceService());
+        this.valueFactory = new ValueFactoryImpl(this);
         this.workspaceStore = getWorkspaceStore(workspaceName);
     }
 
@@ -333,7 +338,7 @@ public class SessionImpl implements Session
      */
     public ValueFactory getValueFactory() throws UnsupportedRepositoryOperationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        return valueFactory.getProxy();
     }
 
     /* (non-Javadoc)

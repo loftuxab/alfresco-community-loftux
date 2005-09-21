@@ -21,9 +21,11 @@ import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.PropertyDefinition;
 import javax.jcr.version.OnParentVersionAction;
 
-import org.alfresco.jcr.session.SessionImpl;
-import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.jcr.item.JCRMixinTypesProperty;
+import org.alfresco.jcr.item.JCRPrimaryTypeProperty;
+import org.alfresco.jcr.item.ValueImpl;
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 
 /**
@@ -34,10 +36,7 @@ import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 public class PropertyDefinitionImpl implements PropertyDefinition
 {
     /** Session */
-    private SessionImpl session;
-    
-    /** Proxy */
-    private PropertyDefinition proxy;
+    private NodeTypeManagerImpl typeManager;
     
     /** Alfresco Property Definition */
     private org.alfresco.service.cmr.dictionary.PropertyDefinition propDef;
@@ -48,24 +47,12 @@ public class PropertyDefinitionImpl implements PropertyDefinition
      * 
      * @param propDef  Alfresco Property Definition
      */
-    public PropertyDefinitionImpl(SessionImpl session, org.alfresco.service.cmr.dictionary.PropertyDefinition propDef)
+    public PropertyDefinitionImpl(NodeTypeManagerImpl typeManager, org.alfresco.service.cmr.dictionary.PropertyDefinition propDef)
     {
-        this.session = session;
+        this.typeManager = typeManager;
         this.propDef = propDef;
     }
 
-    /**
-     * Get proxied JCR PropertyDefinition
-     */
-    public PropertyDefinition getProxy()
-    {
-        if (proxy == null)
-        {
-            proxy = (PropertyDefinition)JCRProxyFactory.create(this, PropertyDefinition.class, session); 
-        }
-        return proxy;
-    }
-    
     /* (non-Javadoc)
      * @see javax.jcr.nodetype.PropertyDefinition#getRequiredType()
      */
@@ -84,7 +71,7 @@ public class PropertyDefinitionImpl implements PropertyDefinition
      */
     public String[] getValueConstraints()
     {
-        return null;
+        return new String[] {};
     }
 
     /* (non-Javadoc)
@@ -92,8 +79,12 @@ public class PropertyDefinitionImpl implements PropertyDefinition
      */
     public Value[] getDefaultValues()
     {
-        // TODO Auto-generated method stub
-        return null;
+        String defaultValue = propDef.getDefaultValue();
+        if (defaultValue == null)
+        {
+            return null;
+        }
+        return new Value[] { new ValueImpl(typeManager.getSession(), getRequiredType(), defaultValue) };
     }
 
     /* (non-Javadoc)
@@ -104,10 +95,13 @@ public class PropertyDefinitionImpl implements PropertyDefinition
         return propDef.isMultiValued();
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.nodetype.ItemDefinition#getDeclaringNodeType()
+     */
     public NodeType getDeclaringNodeType()
     {
-        // TODO Auto-generated method stub
-        return null;
+        ClassDefinition declaringClass = propDef.getContainerClass();
+        return typeManager.getNodeTypeImpl(declaringClass.getName());
     }
 
     /* (non-Javadoc)
@@ -115,7 +109,7 @@ public class PropertyDefinitionImpl implements PropertyDefinition
      */
     public String getName()
     {
-        return propDef.getName().toPrefixString(session.getNamespaceResolver());
+        return propDef.getName().toPrefixString(typeManager.getNamespaceService());
     }
     
     /* (non-Javadoc)
@@ -123,7 +117,7 @@ public class PropertyDefinitionImpl implements PropertyDefinition
      */
     public boolean isAutoCreated()
     {
-        return false;
+        return isMandatory();
     }
 
     /* (non-Javadoc)
@@ -139,8 +133,15 @@ public class PropertyDefinitionImpl implements PropertyDefinition
      */
     public int getOnParentVersion()
     {
+        // TODO: There's no equivalent in Alfresco, so hard code for now
+        if (propDef.getName().equals(JCRPrimaryTypeProperty.PROPERTY_NAME) ||
+            propDef.getName().equals(JCRMixinTypesProperty.PROPERTY_NAME))
+        {    
+            return OnParentVersionAction.COMPUTE;
+        }
+        
         // TODO: Check this
-        return OnParentVersionAction.IGNORE;
+        return OnParentVersionAction.INITIALIZE;
     }
 
     /* (non-Javadoc)

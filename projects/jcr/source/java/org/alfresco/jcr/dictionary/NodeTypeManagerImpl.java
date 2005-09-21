@@ -26,8 +26,9 @@ import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeIterator;
 import javax.jcr.nodetype.NodeTypeManager;
 
+import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -39,7 +40,7 @@ import org.alfresco.service.namespace.QName;
  */
 public class NodeTypeManagerImpl implements NodeTypeManager
 {
-    private DictionaryService dictionaryService;
+    private SessionImpl session;
     private NamespaceService namespaceService;
     
     /**
@@ -48,9 +49,9 @@ public class NodeTypeManagerImpl implements NodeTypeManager
      * @param dictionaryService  dictionary service
      * @param namespaceService  namespace service (global repository registry)
      */
-    public NodeTypeManagerImpl(DictionaryService dictionaryService, NamespaceService namespaceService)
+    public NodeTypeManagerImpl(SessionImpl session, NamespaceService namespaceService)
     {
-        this.dictionaryService = dictionaryService;
+        this.session = session;
         this.namespaceService = namespaceService;
     }
     
@@ -59,9 +60,9 @@ public class NodeTypeManagerImpl implements NodeTypeManager
      * 
      * @return  the dictionary service
      */    
-    public DictionaryService getDictionaryService()
+    public SessionImpl getSession()
     {
-        return dictionaryService;
+        return session;
     }
 
     /**
@@ -84,12 +85,30 @@ public class NodeTypeManagerImpl implements NodeTypeManager
     {
         // TODO: Might be worth caching here... wait and see
         NodeTypeImpl nodeType = null;
-        ClassDefinition definition = dictionaryService.getClass(nodeTypeName);
+        ClassDefinition definition = session.getRepositoryImpl().getServiceRegistry().getDictionaryService().getClass(nodeTypeName);
         if (definition != null)
         {
             nodeType = new NodeTypeImpl(this, definition);
         }
         return nodeType;
+    }
+
+    /**
+     * Get Property Definition Implementation for given Property Name
+     * 
+     * @param propertyName  alfresco property name 
+     * @return  the property
+     */
+    public PropertyDefinitionImpl getPropertyDefinitionImpl(QName propertyName)
+    {
+        // TODO: Might be worth caching here... wait and see
+        PropertyDefinitionImpl propDef = null;
+        PropertyDefinition definition = session.getRepositoryImpl().getServiceRegistry().getDictionaryService().getProperty(propertyName);
+        if (definition != null)
+        {
+            propDef = new PropertyDefinitionImpl(this, definition);
+        }
+        return propDef;
     }
     
     /* (non-Javadoc)
@@ -111,8 +130,8 @@ public class NodeTypeManagerImpl implements NodeTypeManager
      */
     public NodeTypeIterator getAllNodeTypes() throws RepositoryException
     {
-        Collection<QName> typeNames = dictionaryService.getAllTypes();
-        Collection<QName> aspectNames = dictionaryService.getAllAspects();
+        Collection<QName> typeNames = session.getRepositoryImpl().getServiceRegistry().getDictionaryService().getAllTypes();
+        Collection<QName> aspectNames = session.getRepositoryImpl().getServiceRegistry().getDictionaryService().getAllAspects();
         List<QName> typesList = new ArrayList<QName>(typeNames.size() + aspectNames.size());
         typesList.addAll(typeNames);
         typesList.addAll(aspectNames);
@@ -124,7 +143,7 @@ public class NodeTypeManagerImpl implements NodeTypeManager
      */
     public NodeTypeIterator getPrimaryNodeTypes() throws RepositoryException
     {
-        Collection<QName> typeNames = dictionaryService.getAllTypes();
+        Collection<QName> typeNames = session.getRepositoryImpl().getServiceRegistry().getDictionaryService().getAllTypes();
         List<QName> typesList = new ArrayList<QName>(typeNames.size());
         typesList.addAll(typeNames);
         return new NodeTypeNameIterator(this, typesList);
@@ -135,7 +154,7 @@ public class NodeTypeManagerImpl implements NodeTypeManager
      */
     public NodeTypeIterator getMixinNodeTypes() throws RepositoryException
     {
-        Collection<QName> typeNames = dictionaryService.getAllAspects();
+        Collection<QName> typeNames = session.getRepositoryImpl().getServiceRegistry().getDictionaryService().getAllAspects();
         List<QName> typesList = new ArrayList<QName>(typeNames.size());
         typesList.addAll(typeNames);
         return new NodeTypeNameIterator(this, typesList);

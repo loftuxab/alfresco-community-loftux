@@ -18,14 +18,22 @@ package org.alfresco.jcr.dictionary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.jcr.PropertyType;
+import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.jcr.nodetype.NodeDefinition;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.PropertyDefinition;
 
+import org.alfresco.jcr.item.JCRMixinTypesProperty;
+import org.alfresco.jcr.item.JCRPrimaryTypeProperty;
+import org.alfresco.jcr.item.ValueImpl;
 import org.alfresco.jcr.repository.JCRNamespace;
+import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -151,31 +159,87 @@ public class NodeTypeImpl implements NodeType
         }
 
         // is it part of this class hierarchy
-        return typeManager.getDictionaryService().isSubClass(name, classDefinition.getName());
+        return typeManager.getSession().getRepositoryImpl().getServiceRegistry().getDictionaryService().isSubClass(name, classDefinition.getName());
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.nodetype.NodeType#getPropertyDefinitions()
+     */
     public PropertyDefinition[] getPropertyDefinitions()
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<QName, org.alfresco.service.cmr.dictionary.PropertyDefinition> propDefs = classDefinition.getProperties();
+        PropertyDefinition[] defs = new PropertyDefinition[propDefs.size() + (classDefinition.isAspect() ? 0 : 2)];
+        int i = 0;
+        for (org.alfresco.service.cmr.dictionary.PropertyDefinition propDef : propDefs.values())
+        {
+            defs[i++] = new PropertyDefinitionImpl(typeManager, propDef);
+        }
+        
+        if (!classDefinition.isAspect())
+        {
+            // add nt:base properties
+            defs[i++] = typeManager.getPropertyDefinitionImpl(JCRPrimaryTypeProperty.PROPERTY_NAME);
+            defs[i++] = typeManager.getPropertyDefinitionImpl(JCRMixinTypesProperty.PROPERTY_NAME);
+        }
+        
+        return defs;
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.nodetype.NodeType#getDeclaredPropertyDefinitions()
+     */
     public PropertyDefinition[] getDeclaredPropertyDefinitions()
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<QName, org.alfresco.service.cmr.dictionary.PropertyDefinition> propDefs = classDefinition.getProperties();
+        List<PropertyDefinition> defs = new ArrayList<PropertyDefinition>();
+        for (org.alfresco.service.cmr.dictionary.PropertyDefinition propDef : propDefs.values())
+        {
+            if (propDef.getContainerClass().equals(classDefinition))
+            {
+                defs.add(new PropertyDefinitionImpl(typeManager, propDef));
+            }
+        }
+        
+        if (classDefinition.equals(NT_BASE))
+        {
+            // add nt:base properties
+            defs.add(typeManager.getPropertyDefinitionImpl(JCRPrimaryTypeProperty.PROPERTY_NAME));
+            defs.add(typeManager.getPropertyDefinitionImpl(JCRMixinTypesProperty.PROPERTY_NAME));
+        }
+        
+        return defs.toArray(new PropertyDefinition[defs.size()]);
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.nodetype.NodeType#getChildNodeDefinitions()
+     */
     public NodeDefinition[] getChildNodeDefinitions()
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<QName, ChildAssociationDefinition> assocDefs = classDefinition.getChildAssociations();
+        NodeDefinition[] defs = new NodeDefinition[assocDefs.size()];
+        int i = 0;
+        for (ChildAssociationDefinition assocDef : assocDefs.values())
+        {
+            defs[i++] = new NodeDefinitionImpl(typeManager, assocDef);
+        }
+        return defs;
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.nodetype.NodeType#getDeclaredChildNodeDefinitions()
+     */
     public NodeDefinition[] getDeclaredChildNodeDefinitions()
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<QName, ChildAssociationDefinition> assocDefs = classDefinition.getChildAssociations();
+        List<NodeDefinition> defs = new ArrayList<NodeDefinition>();
+        for (ChildAssociationDefinition assocDef : assocDefs.values())
+        {
+            if (assocDef.getSourceClass().equals(classDefinition))
+            {
+                defs.add(new NodeDefinitionImpl(typeManager, assocDef));
+            }
+        }
+        return defs.toArray(new NodeDefinition[defs.size()]);
     }
 
     /* (non-Javadoc)
@@ -183,7 +247,49 @@ public class NodeTypeImpl implements NodeType
      */
     public boolean canSetProperty(String propertyName, Value value)
     {
-        // Note: Assumption is that for level 1 we can return false
+        try
+        {
+            // is an attempt to remove property being made
+            if (value == null)
+            {
+                return canRemoveItem(propertyName);
+            }
+            
+            // retrieve property definition
+            QName propertyQName = QName.createQName(propertyName, typeManager.getNamespaceService());
+            Map<QName, org.alfresco.service.cmr.dictionary.PropertyDefinition> propDefs = classDefinition.getProperties();
+            org.alfresco.service.cmr.dictionary.PropertyDefinition propDef = propDefs.get(propertyQName);
+            if (propDef == null)
+            {
+                // Alfresco doesn't have residual properties yet
+                return false;
+            }
+            
+            // is property read-write
+            if (propDef.isProtected() || propDef.isMultiValued())
+            {
+                return false;
+            }
+            
+            // get required type to convert to
+            int requiredType = DataTypeMap.convertDataTypeToPropertyType(propDef.getDataType().getName());
+            if (requiredType == PropertyType.UNDEFINED)
+            {
+                requiredType = value.getType();
+            }
+
+            // convert value to required type
+            // Note: Invalid conversion will throw exception
+            ValueImpl.getValue(typeManager.getSession().getTypeConverter(), requiredType, value);
+            
+            // Note: conversion succeeded
+            return true;
+        }
+        catch(RepositoryException e)
+        {
+            // Note: Not much can be done really            
+        }
+        
         return false;
     }
 
@@ -192,7 +298,70 @@ public class NodeTypeImpl implements NodeType
      */
     public boolean canSetProperty(String propertyName, Value[] values)
     {
-        // Note: Assumption is that for level 1 we can return false
+        try
+        {
+            // is an attempt to remove property being made
+            if (values == null)
+            {
+                return canRemoveItem(propertyName);
+            }
+            
+            // retrieve property definition
+            QName propertyQName = QName.createQName(propertyName, typeManager.getNamespaceService());
+            Map<QName, org.alfresco.service.cmr.dictionary.PropertyDefinition> propDefs = classDefinition.getProperties();
+            org.alfresco.service.cmr.dictionary.PropertyDefinition propDef = propDefs.get(propertyQName);
+            if (propDef == null)
+            {
+                // Alfresco doesn't have residual properties yet
+                return false;
+            }
+            
+            // is property read write
+            if (propDef.isProtected() || !propDef.isMultiValued())
+            {
+                return false;
+            }
+
+            // determine type of values to check
+            int valueType = PropertyType.UNDEFINED;
+            for (Value value : values)
+            {
+                if (value != null)
+                {
+                    if (valueType != PropertyType.UNDEFINED && value.getType() != valueType)
+                    {
+                        // do not allow collection mixed type values
+                        return false;
+                    }
+                    valueType = value.getType();
+                }
+            }
+            
+            // get required type to convert to
+            int requiredType = DataTypeMap.convertDataTypeToPropertyType(propDef.getDataType().getName());
+            if (requiredType == PropertyType.UNDEFINED)
+            {
+                requiredType = valueType;
+            }
+
+            // convert values to required format
+            // Note: Invalid conversion will throw exception
+            for (Value value : values)
+            {
+                if (value != null)
+                {
+                    ValueImpl.getValue(typeManager.getSession().getTypeConverter(), requiredType, value);
+                }
+            }
+            
+            // Note: conversion succeeded
+            return true;
+        }
+        catch(RepositoryException e)
+        {
+            // Note: Not much can be done really            
+        }
+        
         return false;
     }
 
@@ -201,7 +370,7 @@ public class NodeTypeImpl implements NodeType
      */
     public boolean canAddChildNode(String childNodeName)
     {
-        // Note: Assumption is that for level 1 we can return false
+        // NOTE: Alfresco does not have default primary type notion
         return false;
     }
 
@@ -210,8 +379,17 @@ public class NodeTypeImpl implements NodeType
      */
     public boolean canAddChildNode(String childNodeName, String nodeTypeName)
     {
-        // Note: Assumption is that for level 1 we can return false
-        return false;
+        boolean canAdd = false;
+        Map<QName, ChildAssociationDefinition> assocDefs = classDefinition.getChildAssociations();
+        QName childNodeQName = QName.createQName(childNodeName, typeManager.getNamespaceService());
+        ChildAssociationDefinition assocDef = assocDefs.get(childNodeQName);
+        if (assocDef != null)
+        {
+            QName nodeTypeQName = QName.createQName(nodeTypeName, typeManager.getNamespaceService());
+            DictionaryService dictionaryService = typeManager.getSession().getRepositoryImpl().getServiceRegistry().getDictionaryService();
+            canAdd = dictionaryService.isSubClass(nodeTypeQName, assocDef.getTargetClass().getName());
+        }
+        return canAdd;
     }
 
     /* (non-Javadoc)
@@ -219,8 +397,27 @@ public class NodeTypeImpl implements NodeType
      */
     public boolean canRemoveItem(String itemName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        boolean isProtected = false;
+        boolean isMandatory = false;
+        
+        // TODO: Property and Association names can clash? What to do?
+        QName itemQName = QName.createQName(itemName, typeManager.getNamespaceService());
+        Map<QName, org.alfresco.service.cmr.dictionary.PropertyDefinition> propDefs = classDefinition.getProperties();
+        org.alfresco.service.cmr.dictionary.PropertyDefinition propDef = propDefs.get(itemQName);
+        if (propDef != null)
+        {
+            isProtected = propDef.isProtected();
+            isMandatory = propDef.isMandatory();
+        }
+        Map<QName, ChildAssociationDefinition> assocDefs = classDefinition.getChildAssociations();
+        ChildAssociationDefinition assocDef = assocDefs.get(itemQName);
+        if (assocDef != null)
+        {
+            isProtected |= assocDef.isProtected();
+            isMandatory |= assocDef.isTargetMandatory();
+        }
+        
+        return !isProtected && !isMandatory;
     }
     
 }

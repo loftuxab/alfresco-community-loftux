@@ -17,14 +17,16 @@
    
    <types>
       
-      <!-- TODO: Fill out this definition -->
       <type name="nt:base">
          <properties>
             <property name="jcr:primaryType">
                <type>d:qname</type>
+               <protected>true</protected>
+               <mandatory>true</mandatory>
             </property>
             <property name="jcr:mixinTypes">
                <type>d:qname</type>
+               <protected>true</protected>
                <multiple>true</multiple>
             </property>
          </properties>
@@ -38,6 +40,8 @@
          <properties>
             <property name="jcr:uuid">
                <type>d:text</type>
+               <protected>true</protected>
+               <mandatory>true</mandatory>
             </property>
          </properties>
       </aspect>

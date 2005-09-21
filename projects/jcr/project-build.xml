@@ -34,7 +34,7 @@
    
    <target name="start-tck" depends="init">
       <exec dir="${dir.deploy.tck}/bin/tck-webapp" executable="cmd.exe" spawn="true">
-         <arg line="/k start server.bat" />
+         <arg line="/k start server.bat -debug socket" />
       </exec>
    </target>  
    

@@ -17,6 +17,8 @@
 package org.alfresco.service.cmr.repository.datatype;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -26,6 +28,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
@@ -590,6 +593,58 @@ public class DefaultTypeConverter
         INSTANCE.addDynamicTwoStageConverter(ContentReader.class, String.class, Path.class);
 
         INSTANCE.addDynamicTwoStageConverter(ContentReader.class, String.class, NodeRef.class);
+
+        //
+        // Input Stream
+        //
+        
+        INSTANCE.addConverter(InputStream.class, String.class, new TypeConverter.Converter<InputStream, String>()
+        {
+            public String convert(InputStream source)
+            {
+                try
+                {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[8192];
+                    int read;
+                    while ((read = source.read(buffer)) > 0)
+                    {
+                        out.write(buffer, 0, read);
+                    }
+                    byte[] data = out.toByteArray();
+                    return new String(data, "UTF-8");
+                } 
+                catch (UnsupportedEncodingException e)
+                {
+                    throw new UnsupportedOperationException("Cannot convert input stream to String.", e);
+                }
+                catch (IOException e)
+                {
+                    throw new AlfrescoRuntimeException("Conversion from stream to string failed", e);
+                }
+                finally
+                {
+                    if (source != null)
+                    {
+                        try { source.close(); } catch(IOException e) {};
+                    }
+                }
+            }
+        });
+
+        INSTANCE.addDynamicTwoStageConverter(InputStream.class, String.class, Date.class);
+        
+        INSTANCE.addDynamicTwoStageConverter(InputStream.class, String.class, Double.class);
+        
+        INSTANCE.addDynamicTwoStageConverter(InputStream.class, String.class, Long.class);
+
+        INSTANCE.addDynamicTwoStageConverter(InputStream.class, String.class, Boolean.class);
+
+        INSTANCE.addDynamicTwoStageConverter(InputStream.class, String.class, QName.class);
+
+        INSTANCE.addDynamicTwoStageConverter(InputStream.class, String.class, Path.class);
+
+        INSTANCE.addDynamicTwoStageConverter(InputStream.class, String.class, NodeRef.class);
         
     }
 

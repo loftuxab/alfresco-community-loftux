@@ -19,7 +19,6 @@ package org.alfresco.jcr.item;
 import java.util.List;
 
 import javax.jcr.PathNotFoundException;
-import javax.jcr.UnsupportedRepositoryOperationException;
 
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;

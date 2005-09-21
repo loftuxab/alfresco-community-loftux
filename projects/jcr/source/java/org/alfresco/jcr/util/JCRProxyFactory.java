@@ -104,6 +104,7 @@ public class JCRProxyFactory
             try
             {
                 // setup authentication context
+                // TODO: throw error when session is not live?
                 String ticket = context.getTicket();
                 if (ticket != null)
                 {

@@ -19,6 +19,8 @@ package org.alfresco.jcr.item;
 import java.util.StringTokenizer;
 
 import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
 
 /**
  * JCR Path Helper
@@ -34,34 +36,46 @@ public class JCRPath
      * 
      * @param strPath
      */
-    public JCRPath(String strPath)
+    public JCRPath(NamespacePrefixResolver resolver, String strPath)
     {
+        // TODO: replace this simple parse for full path syntax
+        boolean root = false;
+        int pos = 0;
         path = new Path();
-        StringTokenizer tokenizer = new StringTokenizer(strPath, "/", false);
+        StringTokenizer tokenizer = new StringTokenizer(strPath, "/", true);
         while (tokenizer.hasMoreTokens())
         {
-            path.append(new SimpleElement(tokenizer.nextToken()));
+            String token = tokenizer.nextToken();
+            if (pos == 0 && token.equals("/"))
+            {
+                root = true;
+            }
+            else
+            {
+                if (root)
+                {
+                    path.append(new RootSimpleElement(resolver, token));
+                    root = false;
+                }
+                else
+                {
+                    path.append(new SimpleElement(resolver, token));
+                }
+            }
+            pos++;
         }
     }
     
     /**
-     * Return a new Path representing this path to the specified depth
-     *  
-     * @param depth  the path depth (0 based)
-     * @return  the sub-path
+     * Get the Path
+     * 
+     * @return  the underling path
      */
-    public Path subPath(int depth)
+    public Path getPath()
     {
-        return path.subPath(depth);
+        return path;
     }
 
-    /**
-     * @return  the count of path elements
-     */
-    public int size()
-    {
-        return path.size();
-    }
     
     @Override
     public String toString()
@@ -77,22 +91,45 @@ public class JCRPath
     public static class SimpleElement extends Path.Element
     {
         private static final long serialVersionUID = -6510331182652872996L;
-        private String path;
+        private QName path;
+        
+        /**
+         * @param resolver namespace prefix resolver
+         * @param path  path element name
+         */
+        public SimpleElement(QName path)
+        {
+            this.path = path;
+        }
 
         /**
          * @param path  path element name
          */
-        public SimpleElement(String path)
+        public SimpleElement(NamespacePrefixResolver resolver, String path)
         {
-            this.path = path;
+            this.path = QName.createQName(path, resolver);
+        }
+
+        /**
+         * Get the QName representation of Path
+         */
+        public QName getQName()
+        {
+            return path;
         }
         
         @Override
         public String getElementString()
         {
-            return path;
+            return path.toString();
         }
 
+        @Override
+        public String getPrefixedString(NamespacePrefixResolver resolver)
+        {
+            return path.toPrefixString(resolver);
+        }
+        
         /* (non-Javadoc)
          * @see java.lang.Object#equals(java.lang.Object)
          */
@@ -117,6 +154,39 @@ public class JCRPath
         {
             return path.hashCode();
         }
+
     }
 
+    /**
+     * Root Path Element
+     * 
+     * @author David Caruana
+     */
+    public static class RootSimpleElement extends SimpleElement
+    {
+        private static final long serialVersionUID = -4827016063963328324L;
+
+        /**
+         * Construct
+         * 
+         * @param path
+         */
+        public RootSimpleElement(NamespacePrefixResolver resolver, String path)
+        {
+            super(resolver, path);
+        }
+        
+        @Override
+        public String getElementString()
+        {
+            return "/" + super.getElementString();
+        }
+        
+        @Override
+        public String getPrefixedString(NamespacePrefixResolver resolver)
+        {
+            return "/" + super.getPrefixedString(resolver);
+        }
+    }
+    
 }

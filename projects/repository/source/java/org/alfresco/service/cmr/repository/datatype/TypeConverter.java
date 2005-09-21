@@ -381,10 +381,11 @@ public class TypeConverter
      * @param intermediate
      * @param destination
      */
-    public final <F, I, T> void addDynamicTwoStageConverter(Class<F> source, Class<I> intermediate, Class<T> destination)
+    public final <F, I, T> Converter<F, T> addDynamicTwoStageConverter(Class<F> source, Class<I> intermediate, Class<T> destination)
     {
         Converter<F, T> converter = new TypeConverter.DynamicTwoStageConverter<F, I, T>(source, intermediate, destination);
         addConverter(source, destination, converter);
+        return converter;
     }
 
     /**
@@ -539,7 +540,7 @@ public class TypeConverter
      * @param <I> Intermediate type
      * @param <T> To Type
      */
-    private class DynamicTwoStageConverter<F, I, T> implements Converter<F, T>
+    protected class DynamicTwoStageConverter<F, I, T> implements Converter<F, T>
     {
         Class<F> from;
         Class<I> intermediate;
@@ -550,6 +551,30 @@ public class TypeConverter
             this.from = from;
             this.intermediate = intermediate;
             this.to = to;
+        }
+        
+        /**
+         * @return  from class
+         */
+        public Class<F> getFrom()
+        {
+            return from;
+        }
+        
+        /**
+         * @return  intermediate class
+         */
+        public Class<I> getIntermediate()
+        {
+            return intermediate;
+        }
+        
+        /**
+         * @return  to class
+         */
+        public Class<T> getTo()
+        {
+            return to;
         }
         
         @SuppressWarnings("unchecked")

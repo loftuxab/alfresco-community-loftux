@@ -17,7 +17,7 @@
 package org.alfresco.service.namespace;
 
 
-public class InvalidQNameException extends RuntimeException
+public class InvalidQNameException extends NamespaceException
 {
    private static final long serialVersionUID = 7851788938794302629L;
    

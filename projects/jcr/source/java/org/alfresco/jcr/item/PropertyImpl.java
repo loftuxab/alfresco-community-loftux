@@ -262,7 +262,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public Node getNode() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return session.getTypeConverter().referenceValue(session, getPropertyValue());
+        return session.getTypeConverter().referenceValue(getPropertyValue());
     }
 
     /* (non-Javadoc)
@@ -295,8 +295,8 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public PropertyDefinition getDefinition() throws RepositoryException
     {
-        PropertyDefinitionImpl propDefImpl = new PropertyDefinitionImpl(session, getPropertyDefinition());
-        return propDefImpl.getProxy();
+        PropertyDefinitionImpl propDefImpl = new PropertyDefinitionImpl(session.getTypeManager(), getPropertyDefinition());
+        return propDefImpl;
     }
 
     /* (non-Javadoc)
@@ -344,7 +344,7 @@ public class PropertyImpl extends ItemImpl implements Property
     {
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Path path = nodeService.getPath(node.getNodeRef());
-        path.append(new JCRPath.SimpleElement(getName()));
+        path.append(new JCRPath.SimpleElement(name));
         return path.toPrefixString(session.getNamespaceResolver());
     }
 

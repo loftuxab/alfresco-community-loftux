@@ -25,8 +25,10 @@ import javax.jcr.ValueFormatException;
 
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.repository.datatype.TypeConverter;
+import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.QName;
 
 
@@ -38,7 +40,7 @@ import org.alfresco.service.namespace.QName;
  */
 public class JCRTypeConverter
 {
-    private TypeConverter jcrTypeConverter;
+    private SessionTypeConverter jcrTypeConverter;
     
     /**
      * Construct 
@@ -50,7 +52,17 @@ public class JCRTypeConverter
         this.jcrTypeConverter = new SessionTypeConverter(session);
     }
     
-
+    /**
+     * Get the underlying Converter
+     * 
+     * @return  type converter
+     */
+    public TypeConverter getConverter()
+    {
+        return jcrTypeConverter;
+    }
+    
+    
     /**
      * Convert to JCR Reference Value
      * 
@@ -60,12 +72,12 @@ public class JCRTypeConverter
      * @throws ValueFormatException
      * @throws RepositoryException
      */
-    public NodeImpl referenceValue(SessionImpl session, Object value) throws ValueFormatException, RepositoryException
+    public NodeImpl referenceValue(Object value) throws ValueFormatException, RepositoryException
     {
         try
         {
             NodeRef nodeRef = (NodeRef)jcrTypeConverter.convert(NodeRef.class, value);
-            return new NodeImpl(session, nodeRef);
+            return new NodeImpl(jcrTypeConverter.getSession(), nodeRef);
         }
         catch(Exception e)
         {
@@ -206,7 +218,50 @@ public class JCRTypeConverter
             throw new RepositoryException(e);
         }
     }
+    
+    /**
+     * Convert to JCR Name Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws IllegalStateException
+     * @throws RepositoryException
+     */
+    public QName nameValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
+    {
+        try
+        {
+            return jcrTypeConverter.convert(QName.class, value);
+        }
+        catch(Exception e)
+        {
+            translateException(e);
+            throw new RepositoryException(e);
+        }
+    }
 
+    /**
+     * Convert to JCR Path Value
+     * 
+     * @param value
+     * @return
+     * @throws ValueFormatException
+     * @throws IllegalStateException
+     * @throws RepositoryException
+     */
+    public Path pathValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
+    {
+        try
+        {
+            return jcrTypeConverter.convert(Path.class, value);
+        }
+        catch(Exception e)
+        {
+            translateException(e);
+            throw new RepositoryException(e);
+        }
+    }
 
     /**
      * Catch and translate value conversion errors
@@ -242,6 +297,43 @@ public class JCRTypeConverter
         {
             this.session = session;
             
+            
+            /**
+             * Converter to translating string to QName as prefix:localName
+             */
+            addConverter(String.class, QName.class, new TypeConverter.Converter<String, QName>()
+            {
+                public QName convert(String source)
+                {
+                    try
+                    {
+                        return QName.createQName(source, SessionTypeConverter.this.session.getNamespaceResolver());
+                    }
+                    catch(NamespaceException e)
+                    {
+                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                    }
+                }
+            });
+
+            /**
+             * Converter to translating string to QName as prefix:localName
+             */
+            addConverter(String.class, Path.class, new TypeConverter.Converter<String, Path>()
+            {
+                public Path convert(String source)
+                {
+                    try
+                    {
+                        return new JCRPath(SessionTypeConverter.this.session.getNamespaceResolver(), source).getPath();
+                    }
+                    catch(NamespaceException e)
+                    {
+                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                    }
+                }
+            });
+
             /**
              * Converter for translating QName to string as prefix:localName 
              */
@@ -249,9 +341,44 @@ public class JCRTypeConverter
             {
                 public String convert(QName source)
                 {
-                    return source.toPrefixString(SessionTypeConverter.this.session.getNamespaceResolver());
+                    try
+                    {
+                        return source.toPrefixString(SessionTypeConverter.this.session.getNamespaceResolver());
+                    }
+                    catch(NamespaceException e)
+                    {
+                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                    }
                 }
             });
+
+            /**
+             * Converter for translating Path to string as prefix:localName 
+             */
+            addConverter(Path.class, String.class, new TypeConverter.Converter<Path, String>()
+            {
+                public String convert(Path source)
+                {
+                    try
+                    {
+                        return source.toPrefixString(SessionTypeConverter.this.session.getNamespaceResolver());
+                    }
+                    catch(NamespaceException e)
+                    {
+                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                    }
+                }
+            });
+        }
+
+        /**
+         * Get the session
+         * 
+         * @return  session
+         */
+        public SessionImpl getSession()
+        {
+            return session;
         }
         
         /* (non-Javadoc)
@@ -264,6 +391,11 @@ public class JCRTypeConverter
             if (converter == null)
             {
                 converter = DefaultTypeConverter.INSTANCE.getConverter(source, dest);
+                if (converter instanceof DynamicTwoStageConverter)
+                {
+                    DynamicTwoStageConverter dynamic = (DynamicTwoStageConverter)converter;
+                    converter = addDynamicTwoStageConverter(dynamic.getFrom(), dynamic.getIntermediate(), dynamic.getTo());
+                }
             }
             return converter;
         }

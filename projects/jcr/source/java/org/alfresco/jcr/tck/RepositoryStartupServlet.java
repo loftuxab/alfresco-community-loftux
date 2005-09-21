@@ -66,12 +66,14 @@ public class RepositoryStartupServlet extends HttpServlet
             env.put(Context.PROVIDER_URL, "http://www.alfresco.org");
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.day.crx.jndi.provider.MemoryInitialContextFactory");
             jndiContext = new InitialContext(env);
-            jndiContext.bind(repositoryName, repository);
+            jndiContext.bind(repositoryName, (Repository)repository);
         }
         catch (NamingException e)
         {
             throw new ServletException(e);
         }
+        
+        System.out.println("Start Alfresco Repository");
     }
 
     /**

@@ -52,7 +52,6 @@ import javax.jcr.version.VersionHistory;
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -279,10 +278,11 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property getProperty(String relPath) throws PathNotFoundException, RepositoryException
     {
-        JCRPath path = new JCRPath(relPath);
+        JCRPath jcrPath = new JCRPath(session.getNamespaceResolver(), relPath);
+        Path path = jcrPath.getPath();
         if (path.size() == 1)
         {
-            QName propertyName = QName.createQName(relPath, session.getNamespaceResolver());
+            QName propertyName = ((JCRPath.SimpleElement)path.get(0)).getQName();
             return PropertyResolver.createProperty(this, propertyName).getProxy();
         }
 
@@ -378,10 +378,11 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean hasProperty(String relPath) throws RepositoryException
     {
-        JCRPath path = new JCRPath(relPath);
+        JCRPath jcrPath = new JCRPath(session.getNamespaceResolver(), relPath);
+        Path path = jcrPath.getPath();
         if (path.size() == 1)
         {
-            QName propertyName = QName.createQName(relPath, session.getNamespaceResolver());
+            QName propertyName = ((JCRPath.SimpleElement)path.get(0)).getQName();
             return PropertyResolver.hasProperty(this, propertyName);
         }
 

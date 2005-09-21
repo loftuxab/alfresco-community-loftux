@@ -19,6 +19,7 @@ package org.alfresco.jcr.item;
 import java.io.InputStream;
 import java.util.Calendar;
 
+import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
@@ -78,9 +79,10 @@ public class ValueImpl implements Value
     public String getString() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        String value = session.getTypeConverter().stringValue(getValue());
+        String typedValue = session.getTypeConverter().stringValue(getInternalValue());
+        value = typedValue;
         enterState(ValueState.Value);
-        return value;
+        return typedValue;
     }
 
     /* (non-Javadoc)
@@ -103,9 +105,10 @@ public class ValueImpl implements Value
     public long getLong() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        long value = session.getTypeConverter().longValue(getValue());
+        long typedValue = session.getTypeConverter().longValue(getInternalValue());
+        value = typedValue;
         enterState(ValueState.Value);
-        return value;
+        return typedValue;
     }
 
     /* (non-Javadoc)
@@ -114,9 +117,10 @@ public class ValueImpl implements Value
     public double getDouble() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        double value = session.getTypeConverter().doubleValue(getValue());
+        double typedValue = session.getTypeConverter().doubleValue(getInternalValue());
+        value = typedValue;
         enterState(ValueState.Value);
-        return value;
+        return typedValue;
     }
 
     /* (non-Javadoc)
@@ -125,9 +129,10 @@ public class ValueImpl implements Value
     public Calendar getDate() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        Calendar value = session.getTypeConverter().dateValue(getValue());
+        Calendar typedValue = session.getTypeConverter().dateValue(getInternalValue());
+        value = typedValue.getTime();
         enterState(ValueState.Value);
-        return value;
+        return typedValue;
     }
 
     /* (non-Javadoc)
@@ -136,9 +141,10 @@ public class ValueImpl implements Value
     public boolean getBoolean() throws ValueFormatException, IllegalStateException, RepositoryException
     {
         isValidState(ValueState.Value);
-        boolean value = session.getTypeConverter().booleanValue(getValue());
+        boolean typedValue = session.getTypeConverter().booleanValue(getInternalValue());
+        value = typedValue;
         enterState(ValueState.Value);
-        return value;
+        return typedValue;
     }
 
     /* (non-Javadoc)
@@ -148,7 +154,91 @@ public class ValueImpl implements Value
     {
         return datatype;
     }
-
+    
+    /**
+     * Get value
+     * 
+     * @param value  the value wrapper to extract from
+     * @return  the value
+     */
+    public static Object getValue(Value value) throws RepositoryException
+    {
+        Object objValue = null;
+        int valueType = value.getType();
+        
+        switch(valueType)
+        {
+            case PropertyType.STRING:
+            case PropertyType.NAME:
+            case PropertyType.PATH:
+                objValue = value.getString();
+                break;
+            case PropertyType.LONG:
+                objValue = value.getLong();
+                break;
+            case PropertyType.DOUBLE:
+                objValue = value.getDouble();
+                break;
+            case PropertyType.BOOLEAN:
+                objValue = value.getBoolean();
+                break;
+            case PropertyType.DATE:
+                objValue = value.getDate();
+                break;
+            case PropertyType.BINARY:
+                objValue = value.getStream();
+                break;
+            default:
+                // Note: fallthrough
+                break;
+        }
+        
+        return objValue;
+    }
+    
+    /**
+     * Get typed value 
+     * 
+     * @param value  the value to extract from
+     * @return  the wrapped object
+     */
+    public static Object getValue(JCRTypeConverter typeConverter, int requiredType, Value value) throws RepositoryException
+    {
+        Object objValue = null;
+        
+        switch(requiredType)
+        {
+            case PropertyType.STRING:
+                objValue = value.getString();
+                break;
+            case PropertyType.LONG:
+                objValue = value.getLong();
+                break;
+            case PropertyType.DOUBLE:
+                objValue = value.getDouble();
+                break;
+            case PropertyType.BOOLEAN:
+                objValue = value.getBoolean();
+                break;
+            case PropertyType.DATE:
+                objValue = value.getDate();
+                break;
+            case PropertyType.BINARY:
+                objValue = value.getStream();
+                break;
+            case PropertyType.NAME:
+                objValue = typeConverter.nameValue(ValueImpl.getValue(value));
+                break;
+            case PropertyType.PATH:
+                objValue = typeConverter.pathValue(ValueImpl.getValue(value));
+                break;
+            default:
+                throw new ValueFormatException("Unsupported Value Type " + requiredType);
+        }
+        
+        return objValue;
+    }
+    
     /**
      * Retrieve Value
      * 
@@ -157,7 +247,7 @@ public class ValueImpl implements Value
      * 
      * @return  the value
      */
-    private Object getValue()
+    private Object getInternalValue()
     {
         if (value instanceof ContentReader && state == ValueState.Value)
         {
