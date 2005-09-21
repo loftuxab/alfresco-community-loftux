@@ -54,22 +54,6 @@ Install MySQL
 - Install by following MySQL's installation instructions
 
 
-Create Database
----------------
-
-Then create a database schema named 'alfresco', e.g.:
-   mysqladmin -u root create database alfresco
-
-Then create a new user with full rights on this database, e.g.:
-   mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost' identified by 'alfresco' with grant option;"
-
-To check that this is working correctly, start MySQL and connect to the database:
-   mysql -u alfresco -p
-   mysql> use alfresco;
-   Database changed
-   mysql> quit
-
-
 Install Alfresco Tomcat Bundle
 ------------------------------
 
@@ -77,6 +61,24 @@ Install Alfresco Tomcat Bundle
 - Download the "Alfresco Linux Tomcat Bundle" option
 - Create a directory named 'alfresco'
 - Tar uncompress alfresco-tomcat-xxxxxx.tar.gz in the '~/alfresco' directory
+
+
+Set Paths
+---------
+
+Edit 'paths_tc.sh' and set the variables to the locations where MySQL, Java and Tomcat
+are installed.
+
+
+Create Database
+---------------
+
+Navigate to the '~/alfresco' folder and run 'db_setup.sh' if you did a new
+install of MySQL above.  
+
+This creates a MySQL database named 'alfresco' with a user 
+account and password of 'alfresco'.
+
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -93,7 +95,7 @@ in /opt/OpenOffice.org1.1.4
 - Download the Linux version
 - Install OpenOffice into your home directory, i.e. ~/OpenOffice.org1.1.4
 - Start one of the OpenOffice programs to go through initial registration, then close it
-- Rename the 'zstart_oo.sh' in '~/alfresco' to 'start_oo.sh'
+- Edit '~/alfresco/start_oo.sh' and set the correct location for OpenOffice
 - Stop and restart the Alfresco server if it is already running
 
 
@@ -101,8 +103,8 @@ in /opt/OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Ensure that the MySQL server is running, then navigate to the '~/alfresco/tomcat' directory
-- Run 'bin/startup.sh' to start Tomcat
+Ensure that the MySQL server is running, then navigate to the '~/alfresco' directory
+- Run 'alf_start_tc.sh'
 - If you wish to use OpenOffice document transformations, run '../start_oo.sh'
 - You can now try Alfresco by visiting:
 

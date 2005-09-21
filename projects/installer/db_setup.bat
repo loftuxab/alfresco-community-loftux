@@ -3,14 +3,10 @@ rem ---------------------------------------
 rem MySQL create DB command
 rem ---------------------------------------
 
-echo Starting MySQL...
-start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
-rem sleep 3
+call paths_tc.bat
 
-echo Creating Alfresco database...
-c:\mysql\bin\mysqladmin -u root create alfresco
-c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost' identified by 'alfresco' with grant option;"
+echo Creating Alfresco database and user...
+"%MYSQL_HOME%\bin\mysql" -u root -p < db_setup.sql
 
-echo Shutting down MySQL...
-c:\mysql\bin\mysqladmin -u root shutdown
+echo Database prepared.
 

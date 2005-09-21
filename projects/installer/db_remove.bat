@@ -1,18 +1,12 @@
 @echo off
 rem ---------------------------------------
-rem MySQL create DB command
+rem MySQL remove DB command
 rem ---------------------------------------
 
-echo Starting MySQL...
-start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
-rem sleep 3
+call paths_tc.bat
 
-echo Deleting Alfresco database...
-c:\mysql\bin\mysqladmin -u root drop alfresco
-
-echo Shutting down MySQL...
-c:\mysql\bin\mysqladmin -u root shutdown
+echo Deleting Alfresco database and user...
+"%MYSQL_HOME%\bin\mysql" -u root -p < db_remove.sql
 
 echo Deleting indexes...
-del /s /q tomcat\alfresco\contentstore tomcat\alfresco\lucene-indexes
-del /s /q jboss\alfresco\contentstore jboss\alfresco\lucene-indexes
+del /s /q alf_data

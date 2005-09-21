@@ -3,21 +3,14 @@ rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
+call paths_tc.bat
+
 rem ---------------------------------------
 rem Shutdown Tomcat
 rem ---------------------------------------
 
 echo Shutting down Tomcat...
-cd tomcat
-call bin\shutdown.bat
-cd ..
-
-rem ---------------------------------------
-rem Shutdown MySQL
-rem ---------------------------------------
-
-echo Shutting down MySQL...
-c:\mysql\bin\mysqladmin -u root shutdown
+call "%CATALINA_HOME%\bin\shutdown.bat"
 
 rem ---------------------------------------
 rem Stop OpenOffice for transformations

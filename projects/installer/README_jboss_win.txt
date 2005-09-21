@@ -47,15 +47,17 @@ Install JDK 5.0
 Install MySQL
 -------------
 
+- If you already have MySQL 4.1 installed, skip to "Install Alfresco"
+
 - Browse to http://dev.mysql.com/downloads/mysql/4.1.html
-- Download the Windows "without installer" option (~37M)
-- Unzip the download in C:\
-
-This will create a folder 'C:\mysql-4.xxxxx'.  Rename this folder to:
-C:\mysql
-
-If you already have a MySQL installation, you will either have to uninstall
-it first, or make any changes as implied by the Manual Installation notes below.
+- Download the "Windows (x86)" option (~37M)
+- Install once downloaded (run setup.exe)
+- Use Typical setup type
+- You may skip the MySQL.com sign-up
+- Configure using options appropriate to required use
+  - for demo, choose default selected options
+  - for non-English or non-West European languages, choose UTF8 Character set
+  - install as a Windows service
 
 
 Install Alfresco JBoss Bundle
@@ -67,11 +69,23 @@ Install Alfresco JBoss Bundle
 - Unzip alfresco-jboss-xxxxxx.zip in C:\alfresco
 
 
+Set Paths
+---------
+
+Edit 'paths_tc.bat' and set the variables to the locations where MySQL, Java and Tomcat
+are installed:
+- For the JBoss bundle, this will be 'C:\alfresco\jboss
+- For MySQL, the default is 'C:\Program Files\MySQL\MySQL Server 4.1'
+- For Java, the default is 'C:\Program Files\Java\jdk1.5.0_04'
+
+
 Create Database
 ---------------
 
 Navigate to the 'C:\alfresco' folder and run 'db_setup.bat' if you did a new
-install of MySQL above.  This creates a MySQL database named 'alfresco' with a user 
+install of MySQL above.  
+
+This creates a MySQL database named 'alfresco' with a user 
 account and password of 'alfresco'.
 
 You have now installed all the components needed to run the Alfresco server.

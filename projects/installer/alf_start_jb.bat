@@ -3,28 +3,16 @@ rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
-if not "%JAVA_HOME%" == "" goto javaOk
-echo Please set the JAVA_HOME environment variable.
-pause
-goto end
-
-:javaOk
-
-rem ---------------------------------------
-rem Start DB (MySQL) in a minimised console
-rem ---------------------------------------
-
-echo Starting MySQL...
-start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
+set JBOSS_HOME=C:\alfresco\jboss
+set JAVA_HOME=C:\Program Files\Java\jdk1.5.0_04
+set PATH=%JAVA_HOME%/bin:%PATH%
 
 rem ---------------------------------------
 rem Start JBoss
 rem ---------------------------------------
 
 echo Starting JBoss...
-cd jboss
-start "JBoss Server" cmd /c bin\run.bat
-cd ..
+start "JBoss Server" cmd /c %JBOSS_HOME%\bin\run.bat
 
 rem ---------------------------------------
 rem Start OpenOffice for transformations

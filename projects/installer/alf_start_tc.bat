@@ -3,29 +3,14 @@ rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
-if not "%JAVA_HOME%" == "" goto javaOk
-echo Please set the JAVA_HOME environment variable.
-pause
-goto end
-
-:javaOk
-
-rem ---------------------------------------
-rem Start DB (MySQL) in a minimised console
-rem ---------------------------------------
-
-echo Starting MySQL...
-start "MySQL Server" /min cmd /c c:\mysql\bin\mysqld-nt --console
-rem sleep 3
+call paths_tc.bat
 
 rem ---------------------------------------
 rem Start Tomcat
 rem ---------------------------------------
 
 echo Starting Tomcat...
-cd tomcat
-call bin\startup.bat
-cd ..
+call "%CATALINA_HOME%\bin\startup.bat"
 
 rem ---------------------------------------
 rem Start OpenOffice for transformations
