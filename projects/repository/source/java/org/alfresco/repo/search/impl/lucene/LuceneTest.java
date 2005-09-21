@@ -54,6 +54,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
@@ -886,7 +887,7 @@ public class LuceneTest extends TestCase
         results.close();
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "category-ista")) + ":\"CategoryId\"", null, null);
+                +escapeQName(QName.createQName(TEST_NAMESPACE, "category-ista")) + ":\""+DefaultTypeConverter.INSTANCE.convert(String.class, new NodeRef(rootNodeRef.getStoreRef(), "CategoryId"))+"\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
