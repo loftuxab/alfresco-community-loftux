@@ -772,6 +772,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
             Serializable checkValue = checkProperties.get(qname);
             assertEquals("Property mismatch - " + qname, value, checkValue);
         }
+        
+        // check multi-valued properties are created where necessary
+        nodeService.setProperty(nodeRef, PROP_QNAME_MULTI_VALUE, "GHI");
+        Serializable checkProperty = nodeService.getProperty(nodeRef, PROP_QNAME_MULTI_VALUE);
+        assertTrue("Property not converted to a Collection", checkProperty instanceof Collection);
+        assertTrue("Collection doesn't contain value", ((Collection)checkProperty).contains("GHI"));
     }
     
     /**

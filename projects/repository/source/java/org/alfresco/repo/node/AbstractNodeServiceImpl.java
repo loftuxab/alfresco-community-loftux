@@ -18,6 +18,7 @@ package org.alfresco.repo.node;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -540,6 +541,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * <p>
      * Where the property definition is null, the value will take on the
      * {@link DataTypeDefinition#ANY generic ANY} value.
+     * <p>
+     * Where the property definition specifies a multi-valued property but the
+     * value provided is not a collection, the value will be wrapped in a collection.
      * 
      * @param propertyDef the property dictionary definition, may be null
      * @param value the value, which will be converted according to the definition -
@@ -562,9 +566,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             boolean isMultiValued = propertyDef.isMultiValued();
             if (isMultiValued && !(value instanceof Collection))
             {
-                throw new DictionaryException("A multi-valued property must be a collection: \n" +
-                        "   Property: " + propertyDef + "\n" +
-                        "   Value: " + value);
+                // put the value into a collection
+                // the implementation gives back a Serializable list
+                value = (Serializable) Collections.singletonList(value);
             }
             else if (!isMultiValued && (value instanceof Collection))
             {
