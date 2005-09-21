@@ -64,15 +64,15 @@ public class TestData
             MutableAuthenticationDao authDAO = (MutableAuthenticationDao)applicationContext.getBean("alfDaoImpl");
             if (authDAO.userExists("superuser") == false)
             {
-                authDAO.createUser("superuser", null);
+                authDAO.createUser("superuser", "".toCharArray());
             }
             if (authDAO.userExists("user") == false)
             {
-                authDAO.createUser("user", null);
+                authDAO.createUser("user", "".toCharArray());
             }
             if (authDAO.userExists("anonymous") == false)
             {
-                authDAO.createUser("anonymous", null);
+                authDAO.createUser("anonymous", "".toCharArray());
             }
         }
 

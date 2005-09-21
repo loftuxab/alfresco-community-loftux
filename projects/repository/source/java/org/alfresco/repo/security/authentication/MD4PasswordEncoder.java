@@ -18,12 +18,15 @@ package org.alfresco.repo.security.authentication;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 
 import net.sf.acegisecurity.providers.encoding.BaseDigestPasswordEncoder;
 import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+
+import cryptix.jce.provider.CryptixCrypto;
 
 /**
  * <p>
@@ -42,6 +45,19 @@ import org.apache.commons.codec.binary.Hex;
 public class MD4PasswordEncoder extends BaseDigestPasswordEncoder implements PasswordEncoder
 {
 
+    static
+    {
+        try
+        {
+            MessageDigest digester = MessageDigest.getInstance("MD4");
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            Security.addProvider(new CryptixCrypto());
+        }
+    }
+
+    
     public MD4PasswordEncoder()
     {
         super();
