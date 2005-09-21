@@ -37,12 +37,12 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * Support for accessing persisted permission information.
  * 
- * This class maps between persisted objects and the external API defined in the PermissionsDAO interface.
+ * This class maps between persisted objects and the external API defined in the
+ * PermissionsDAO interface.
  * 
  * @author andyh
  */
-public class HibernatePermissionsDAO extends HibernateDaoSupport implements
-        PermissionsDAO
+public class HibernatePermissionsDAO extends HibernateDaoSupport implements PermissionsDAO
 {
 
     public HibernatePermissionsDAO()
@@ -53,18 +53,19 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     public NodePermissionEntry getPermissions(NodeRef nodeRef)
     {
         // Create the object if it is not found.
-        // Null objects are not cached in hibernate 
-        // If the object does not exist it will repeatedly query to check its non existence.
-        
-        return createSimpleNodePermissionEntry(getHibernateNodePermissionEntry(
-                nodeRef, true));
+        // Null objects are not cached in hibernate
+        // If the object does not exist it will repeatedly query to check its
+        // non existence.
+
+        return createSimpleNodePermissionEntry(getHibernateNodePermissionEntry(nodeRef, true));
     }
 
     /**
      * Get the persisted NodePermissionEntry
      * 
      * @param nodeRef
-     * @param create - create the object if it is missing
+     * @param create -
+     *            create the object if it is missing
      * @return
      */
     private org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry getHibernateNodePermissionEntry(
@@ -74,8 +75,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         NodeKey nodeKey = getNodeKey(nodeRef);
         try
         {
-            Object obj = getHibernateTemplate().get(
-                    NodePermissionEntryImpl.class, nodeKey);
+            Object obj = getHibernateTemplate().get(NodePermissionEntryImpl.class, nodeKey);
             // Create if required
             if ((obj == null) && create)
             {
@@ -86,7 +86,8 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
                 return entry;
             }
             return (org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry) obj;
-        } catch (DataAccessException e)
+        }
+        catch (DataAccessException e)
         {
             if (e.contains(ObjectDeletedException.class))
             {
@@ -98,7 +99,8 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
                     entry.setInherits(true);
                     getHibernateTemplate().save(entry);
                     return entry;
-                } else
+                }
+                else
                 {
                     return null;
                 }
@@ -108,15 +110,15 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     }
 
     /**
-     * Get a node key from a node reference 
+     * Get a node key from a node reference
      * 
      * @param nodeRef
      * @return
      */
     private NodeKey getNodeKey(NodeRef nodeRef)
     {
-        NodeKey nodeKey = new NodeKey(nodeRef.getStoreRef().getProtocol(),
-                nodeRef.getStoreRef().getIdentifier(), nodeRef.getId());
+        NodeKey nodeKey = new NodeKey(nodeRef.getStoreRef().getProtocol(), nodeRef.getStoreRef().getIdentifier(),
+                nodeRef.getId());
         return nodeKey;
     }
 
@@ -133,8 +135,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     private void deleteHibernateNodePermissionEntry(
             org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry hibernateNodePermissionEntry)
     {
-        deleteHibernatePermissionEntries(hibernateNodePermissionEntry
-                .getPermissionEntries());
+        deleteHibernatePermissionEntries(hibernateNodePermissionEntry.getPermissionEntries());
         getHibernateTemplate().delete(hibernateNodePermissionEntry);
     }
 
@@ -173,8 +174,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
             for (org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry current : found
                     .getPermissionEntries())
             {
-                if (permissionEntry
-                        .equals(createSimplePermissionEntry(current)))
+                if (permissionEntry.equals(createSimplePermissionEntry(current)))
                 {
                     deletable.add(current);
                 }
@@ -187,23 +187,43 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         }
     }
 
-    public void deletePermissions(NodeRef nodeRef, String authority,
-            PermissionReference perm, boolean allow)
+    public void clearPermission(NodeRef nodeRef, String authority)
     {
-        SimplePermissionEntry spe = new SimplePermissionEntry(nodeRef,
-                perm == null ? null : new SimplePermissionReference(perm
-                        .getQName(), perm.getName()), authority, allow ? AccessStatus.ALLOWED : AccessStatus.DENIED);
+        org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry found = getHibernateNodePermissionEntry(
+                nodeRef, false);
+        if (found != null)
+        {
+            Set<org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry> deletable = new HashSet<org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry>();
+
+            for (org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry current : found
+                    .getPermissionEntries())
+            {
+                if (createSimplePermissionEntry(current).getAuthority().equals(authority))
+                {
+                    deletable.add(current);
+                }
+            }
+
+            for (org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry current : deletable)
+            {
+                deleteHibernatePermissionEntry(current);
+            }
+        }
+    }
+
+    public void deletePermissions(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow)
+    {
+        SimplePermissionEntry spe = new SimplePermissionEntry(nodeRef, perm == null ? null
+                : new SimplePermissionReference(perm.getQName(), perm.getName()), authority,
+                allow ? AccessStatus.ALLOWED : AccessStatus.DENIED);
         deletePermissions(spe);
     }
 
-    public void setPermission(NodeRef nodeRef, String authority,
-            PermissionReference perm, boolean allow)
+    public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow)
     {
         deletePermissions(nodeRef, authority, perm, allow);
-        PermissionEntryImpl entry = PermissionEntryImpl.create(
-                getHibernateNodePermissionEntry(nodeRef, true),
-                getHibernatePermissionReference(perm, true),
-                getHibernateAuthority(authority, true), allow);
+        PermissionEntryImpl entry = PermissionEntryImpl.create(getHibernateNodePermissionEntry(nodeRef, true),
+                getHibernatePermissionReference(perm, true), getHibernateAuthority(authority, true), allow);
         getHibernateTemplate().save(entry);
     }
 
@@ -219,13 +239,13 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         Recipient key = new RecipientImpl();
         key.setRecipient(authority);
 
-        Recipient found = (Recipient) getHibernateTemplate().get(
-                RecipientImpl.class, key);
+        Recipient found = (Recipient) getHibernateTemplate().get(RecipientImpl.class, key);
         if ((found == null) && create)
         {
             getHibernateTemplate().save(key);
             return key;
-        } else
+        }
+        else
         {
             return found;
         }
@@ -233,7 +253,8 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
     }
 
     /**
-     * Utility method to find and optionally create a persisted permission reference.
+     * Utility method to find and optionally create a persisted permission
+     * reference.
      * 
      * @param perm
      * @param create
@@ -249,13 +270,14 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
 
         org.alfresco.repo.security.permissions.impl.hibernate.PermissionReference found;
 
-        found = (org.alfresco.repo.security.permissions.impl.hibernate.PermissionReference) getHibernateTemplate()
-                .get(PermissionReferenceImpl.class, key);
+        found = (org.alfresco.repo.security.permissions.impl.hibernate.PermissionReference) getHibernateTemplate().get(
+                PermissionReferenceImpl.class, key);
         if ((found == null) && create)
         {
             getHibernateTemplate().save(key);
             return key;
-        } else
+        }
+        else
         {
             return found;
         }
@@ -264,9 +286,8 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
 
     public void setPermission(PermissionEntry permissionEntry)
     {
-        setPermission(permissionEntry.getNodeRef(), permissionEntry
-                .getAuthority(), permissionEntry.getPermissionReference(),
-                permissionEntry.isAllowed());
+        setPermission(permissionEntry.getNodeRef(), permissionEntry.getAuthority(), permissionEntry
+                .getPermissionReference(), permissionEntry.isAllowed());
     }
 
     public void setPermission(NodePermissionEntry nodePermissionEntry)
@@ -282,16 +303,14 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         }
     }
 
-    public void setInheritParentPermissions(NodeRef nodeRef,
-            boolean inheritParentPermissions)
+    public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
-        getHibernateNodePermissionEntry(nodeRef, true).setInherits(
-                inheritParentPermissions);
+        getHibernateNodePermissionEntry(nodeRef, true).setInherits(inheritParentPermissions);
     }
 
     // Utility methods to create simple detached objects for the outside world
-    // We do not pass out the hibernate objects 
-    
+    // We do not pass out the hibernate objects
+
     private static SimpleNodePermissionEntry createSimpleNodePermissionEntry(
             org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry npe)
     {
@@ -299,8 +318,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         {
             return null;
         }
-        SimpleNodePermissionEntry snpe = new SimpleNodePermissionEntry(npe
-                .getNodeRef(), npe.getInherits(),
+        SimpleNodePermissionEntry snpe = new SimpleNodePermissionEntry(npe.getNodeRef(), npe.getInherits(),
                 createSimplePermissionEntries(npe.getPermissionEntries()));
         return snpe;
     }
@@ -327,10 +345,9 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         {
             return null;
         }
-        return new SimplePermissionEntry(pe.getNodePermissionEntry()
-                .getNodeRef(), createSimplePermissionReference(pe
-                .getPermissionReference()), pe.getRecipient().getRecipient(),
-                pe.isAllowed() ? AccessStatus.ALLOWED : AccessStatus.DENIED);
+        return new SimplePermissionEntry(pe.getNodePermissionEntry().getNodeRef(), createSimplePermissionReference(pe
+                .getPermissionReference()), pe.getRecipient().getRecipient(), pe.isAllowed() ? AccessStatus.ALLOWED
+                : AccessStatus.DENIED);
     }
 
     private static SimplePermissionReference createSimplePermissionReference(
@@ -340,8 +357,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements
         {
             return null;
         }
-        return new SimplePermissionReference(QName.createQName(pr.getTypeUri(),
-                pr.getTypeName()), pr.getName());
+        return new SimplePermissionReference(QName.createQName(pr.getTypeUri(), pr.getTypeName()), pr.getName());
     }
 
 }

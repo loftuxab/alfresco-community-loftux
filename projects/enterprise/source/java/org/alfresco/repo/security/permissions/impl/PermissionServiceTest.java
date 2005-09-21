@@ -1699,6 +1699,27 @@ public class PermissionServiceTest extends AbstractPermissionTest
         
     }
     
+    public void testClearPermission()
+    {
+        assertEquals(0, permissionService.getAllSetPermissions(rootNodeRef).size());
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "andy",
+                AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "andy",
+                AccessStatus.ALLOWED));
+        assertEquals(2, permissionService.getAllSetPermissions(rootNodeRef).size());
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ), "lemur",
+                AccessStatus.ALLOWED));
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ_CHILDREN), "lemur",
+                AccessStatus.ALLOWED));
+        assertEquals(4, permissionService.getAllSetPermissions(rootNodeRef).size());
+        
+        permissionService.clearPermission(rootNodeRef, "andy");
+        assertEquals(2, permissionService.getAllSetPermissions(rootNodeRef).size());
+        permissionService.clearPermission(rootNodeRef, "lemur");
+        assertEquals(0, permissionService.getAllSetPermissions(rootNodeRef).size());
+        
+    }
+    
     
     // TODO: Test permissions on missing nodes
 }

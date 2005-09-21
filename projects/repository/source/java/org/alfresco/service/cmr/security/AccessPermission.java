@@ -46,4 +46,12 @@ public interface AccessPermission
      * @return
      */
     public String getAuthority();
+    
+ 
+    /**
+     * Get the type of authority to which this permission applies.
+     * 
+     * @return
+     */
+    public AuthorityType getAuthorityType();
 }

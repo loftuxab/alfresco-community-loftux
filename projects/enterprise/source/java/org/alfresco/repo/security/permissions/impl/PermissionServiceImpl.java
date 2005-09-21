@@ -38,6 +38,8 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
 import org.apache.commons.logging.Log;
@@ -233,12 +235,32 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         private AccessStatus accessStatus;
 
         private String authority;
+        
+        private AuthorityType authorityType;
 
         AccessPermissionImpl(String permission, AccessStatus accessStatus, String authority)
         {
             this.permission = permission;
             this.accessStatus = accessStatus;
             this.authority = authority;
+            
+            if(authority.equals(PermissionService.ALL_AUTHORITIES))
+            {
+                authorityType = AuthorityType.EVERYONE;
+            }
+            else if(authority.equals(PermissionService.OWNER_AUTHORITY))
+            {
+                authorityType = AuthorityType.OWNER;
+            }
+            else if(authority.startsWith("GROUP_"))
+            {
+                authorityType = AuthorityType.GROUP;
+            }
+            else
+            {
+                authorityType = AuthorityType.USER;
+            }
+            
         }
 
         public String getPermission()
@@ -254,6 +276,13 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         public String getAuthority()
         {
             return authority;
+        }
+        
+        
+
+        public AuthorityType getAuthorityType()
+        {
+            return authorityType;
         }
 
         @Override
@@ -430,7 +459,13 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     public void deletePermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow)
     {
         permissionsDAO.deletePermissions(nodeRef, authority, perm, allow);
+    }
+    
+    
 
+    public void clearPermission(NodeRef nodeRef, String authority)
+    {
+        permissionsDAO.clearPermission(nodeRef, authority);
     }
 
     public void setPermission(NodeRef nodeRef, String authority, PermissionReference perm, boolean allow)

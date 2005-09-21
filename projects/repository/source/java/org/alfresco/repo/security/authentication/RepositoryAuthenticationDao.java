@@ -62,7 +62,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     private PasswordEncoder passwordEncoder;
 
     private StoreRef userStoreRef;
-    
+
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
@@ -87,7 +87,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     {
         this.searchService = searchService;
     }
-    
+
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException, DataAccessException
     {
         NodeRef userRef = getUserOrNull(userName);
@@ -97,12 +97,13 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         }
 
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-        String password = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_PASSWORD));
+        String password = DefaultTypeConverter.INSTANCE.convert(String.class, properties
+                .get(ContentModel.PROP_PASSWORD));
 
         GrantedAuthority[] gas = new GrantedAuthority[1];
         gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
 
-        UserDetails ud = new User(userName, password, true, true, true, true, gas);
+        UserDetails ud = new User(userName, password, getEnabled(userName), !getAccountHasExpired(userName), !getCredentialsHaveExpired(userName), !getAccountlocked(userName), gas);
         return ud;
     }
 
@@ -132,12 +133,16 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef typesNode = getOrCreateTypeLocation();
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_USER_USERNAME, userName);
-        String salt = null; //GUID.generate();
+        String salt = null; // GUID.generate();
         properties.put(ContentModel.PROP_SALT, salt);
         properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(new String(rawPassword), salt));
+        properties.put(ContentModel.PROP_ACCOUNT_EXPIRES, Boolean.valueOf(false));
+        properties.put(ContentModel.PROP_CREDENTIALS_EXPIRE, Boolean.valueOf(false));
+        properties.put(ContentModel.PROP_ENABLED, Boolean.valueOf(true));
+        properties.put(ContentModel.PROP_ACCOUNT_LOCKED, Boolean.valueOf(false));
         nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_USER, ContentModel.TYPE_USER,
                 properties);
-       
+
     }
 
     private NodeRef getOrCreateTypeLocation()
@@ -179,7 +184,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
             throw new AuthenticationException("User does not exist: " + userName);
         }
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-        String salt = null; //GUID.generate();
+        String salt = null; // GUID.generate();
         properties.remove(ContentModel.PROP_SALT);
         properties.put(ContentModel.PROP_SALT, salt);
         properties.remove(ContentModel.PROP_PASSWORD);
@@ -212,125 +217,240 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     }
 
     public Object getSalt(UserDetails userDetails)
-    {   
-//        NodeRef userRef = getUserOrNull(userDetails.getUsername());
-//        if (userRef == null)
-//        {
-//            throw new UsernameNotFoundException("Could not find user by userName: " + userDetails.getUsername());
-//        }
-//
-//        Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-//
-//        String salt = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(QName.createQName("usr", "salt",
-//                namespacePrefixResolver)));
-//
-//        return salt;
+    {
+        // NodeRef userRef = getUserOrNull(userDetails.getUsername());
+        // if (userRef == null)
+        // {
+        // throw new UsernameNotFoundException("Could not find user by userName:
+        // " + userDetails.getUsername());
+        // }
+        //
+        // Map<QName, Serializable> properties =
+        // nodeService.getProperties(userRef);
+        //
+        // String salt = DefaultTypeConverter.INSTANCE.convert(String.class,
+        // properties.get(QName.createQName("usr", "salt",
+        // namespacePrefixResolver)));
+        //
+        // return salt;
         return null;
     }
 
     public boolean userExists(String userName)
     {
-       return (getUserOrNull(userName) != null);
+        return (getUserOrNull(userName) != null);
     }
 
     public boolean getAccountExpires(String userName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return false;
+        }
+        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
+                ContentModel.PROP_ACCOUNT_EXPIRES));
     }
 
     public Date getAccountExpiryDate(String userName)
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return null;
+        }
+        if (DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
+                ContentModel.PROP_ACCOUNT_EXPIRES)))
+        {
+            return DefaultTypeConverter.INSTANCE.convert(Date.class, nodeService.getProperty(userNode,
+                    ContentModel.PROP_ACCOUNT_EXPIRY_DATE));
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public boolean getAccountHasExpired(String userName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return false;
+        }
+        if (DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
+                ContentModel.PROP_ACCOUNT_EXPIRES)))
+        {
+            Date date = DefaultTypeConverter.INSTANCE.convert(Date.class, nodeService.getProperty(userNode,
+                    ContentModel.PROP_ACCOUNT_EXPIRY_DATE));
+            if (date == null)
+            {
+                return false;
+            }
+            else
+            {
+                return (date.compareTo(new Date()) > 1);
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean getAccountlocked(String userName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return false;
+        }
+        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
+                ContentModel.PROP_ACCOUNT_LOCKED));
     }
 
     public boolean getCredentialsExpire(String userName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return false;
+        }
+        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
+                ContentModel.PROP_CREDENTIALS_EXPIRE));
     }
 
     public Date getCredentialsExpiryDate(String userName)
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return null;
+        }
+        if (DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
+                ContentModel.PROP_CREDENTIALS_EXPIRE)))
+        {
+            return DefaultTypeConverter.INSTANCE.convert(Date.class, nodeService.getProperty(userNode,
+                    ContentModel.PROP_CREDENTIALS_EXPIRY_DATE));
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public boolean getCredentialsHaveExpired(String userName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return false;
+        }
+        if (DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode,
+                ContentModel.PROP_CREDENTIALS_EXPIRE)))
+        {
+            Date date = DefaultTypeConverter.INSTANCE.convert(Date.class, nodeService.getProperty(userNode,
+                    ContentModel.PROP_CREDENTIALS_EXPIRE));
+            if (date == null)
+            {
+                return false;
+            }
+            else
+            {
+                return (date.compareTo(new Date()) > 1);
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean getEnabled(String userName)
     {
-        // TODO Auto-generated method stub
-        return false;
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            return false;
+        }
+        return DefaultTypeConverter.INSTANCE.booleanValue(nodeService.getProperty(userNode, ContentModel.PROP_ENABLED));
     }
 
     public void setAccountExpires(String userName, boolean expires)
     {
-        // TODO Auto-generated method stub
-        
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            throw new AuthenticationException("User not found: "+userName);
+        }
+        nodeService.setProperty(userNode, ContentModel.PROP_ACCOUNT_EXPIRES, Boolean.valueOf(expires));
     }
 
     public void setAccountExpiryDate(String userName, Date exipryDate)
     {
-        // TODO Auto-generated method stub
-        
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            throw new AuthenticationException("User not found: "+userName);
+        }
+        nodeService.setProperty(userNode, ContentModel.PROP_ACCOUNT_EXPIRY_DATE, exipryDate);
+
     }
-    
+
     public void setCredentialsExpire(String userName, boolean expires)
     {
-        // TODO Auto-generated method stub
-        
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            throw new AuthenticationException("User not found: "+userName);
+        }
+        nodeService.setProperty(userNode, ContentModel.PROP_CREDENTIALS_EXPIRE, Boolean.valueOf(expires));
     }
 
     public void setCredentialsExpiryDate(String userName, Date exipryDate)
     {
-        // TODO Auto-generated method stub
-        
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            throw new AuthenticationException("User not found: "+userName);
+        }
+        nodeService.setProperty(userNode, ContentModel.PROP_CREDENTIALS_EXPIRY_DATE, exipryDate);
+
     }
 
     public void setEnabled(String userName, boolean enabled)
     {
-        // TODO Auto-generated method stub
-        
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            throw new AuthenticationException("User not found: "+userName);
+        }
+        nodeService.setProperty(userNode, ContentModel.PROP_ENABLED, Boolean.valueOf(enabled));
     }
 
     public void setLocked(String userName, boolean locked)
     {
-        // TODO Auto-generated method stub
-        
+        NodeRef userNode = getUserOrNull(userName);
+        if (userNode == null)
+        {
+            throw new AuthenticationException("User not found: "+userName);
+        }
+        nodeService.setProperty(userNode, ContentModel.PROP_ACCOUNT_LOCKED, Boolean.valueOf(locked));
     }
 
     public String getMD4HashedPassword(String userName)
     {
         NodeRef userNode = getUserOrNull(userName);
-        if(userName == null)
+        if (userName == null)
         {
             return null;
         }
-        else 
+        else
         {
-            String password = DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(userNode, ContentModel.PROP_PASSWORD));
+            String password = DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(userNode,
+                    ContentModel.PROP_PASSWORD));
             return password;
         }
     }
-    
-    
-    
+
 }

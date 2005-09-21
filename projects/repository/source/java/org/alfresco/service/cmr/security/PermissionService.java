@@ -167,6 +167,14 @@ public interface PermissionService
     public void deletePermissions(NodeRef nodeRef);
 
     /**
+     * Delete all permission for the given authority.
+     * 
+     * @param nodeRef
+     * @param authority
+     */
+    public void clearPermission(NodeRef nodeRef, String authority);
+    
+    /**
      * Find and delete a permission by node, authentication and permission
      * definition.
      * 

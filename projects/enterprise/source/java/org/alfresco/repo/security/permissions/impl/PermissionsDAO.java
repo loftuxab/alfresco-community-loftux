@@ -108,4 +108,12 @@ public interface PermissionsDAO
      */
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
 
+    /**
+     * Clear all the permissions set for a given authentication
+     * 
+     * @param nodeRef
+     * @param authority
+     */
+    public void clearPermission(NodeRef nodeRef, String authority);
+
 }

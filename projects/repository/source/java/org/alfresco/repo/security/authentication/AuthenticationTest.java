@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationManager;
 import net.sf.acegisecurity.BadCredentialsException;
+import net.sf.acegisecurity.DisabledException;
 import net.sf.acegisecurity.UserDetails;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.dao.SaltSource;
@@ -194,6 +195,24 @@ public class AuthenticationTest extends TestCase
 
         Authentication result = authenticationManager.authenticate(token);
         assertNotNull(result);
+        
+        dao.setEnabled("Andy", false);
+        try
+        {
+            result = authenticationManager.authenticate(token);
+            assertNotNull(result);
+            assertNotNull(null);
+        }
+        catch (DisabledException e)
+        {
+            // Expected
+        }
+        
+        dao.setEnabled("Andy", true);
+        result = authenticationManager.authenticate(token);
+        assertNotNull(result);
+        
+       
         
         dao.deleteUser("Andy");
         //assertNull(dao.getUserOrNull("Andy"));

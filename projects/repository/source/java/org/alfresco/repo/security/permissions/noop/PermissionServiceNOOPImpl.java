@@ -127,6 +127,11 @@ public class PermissionServiceNOOPImpl
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
     }
+
+    public void clearPermission(NodeRef nodeRef, String authority)
+    {
+        
+    }
     
     
 }
