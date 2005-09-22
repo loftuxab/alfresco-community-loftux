@@ -17,6 +17,7 @@
 package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -57,8 +58,6 @@ public class ExternalAccessServlet extends HttpServlet
       
       // The URL contains multiple parts
       // /alfresco/navigate/<outcome>
-      // the protocol, followed by the store, followed by the Id
-      // the last part is only used for mimetype and browser use
       String uri = req.getRequestURI();
       
       if (logger.isDebugEnabled())
@@ -99,18 +98,20 @@ public class ExternalAccessServlet extends HttpServlet
       res.sendRedirect(req.getContextPath() + "/faces");
    }
    
-   /*
-   public final static String generateExternalURL(NodeRef ref, String name)
+   
+   public final static String generateExternalURL(String outcome, String args)
    {
-      return MessageFormat.format(EXTERNAL_URL, new Object[] {
-            // TODO: get context path here?
-            ref.getStoreRef().getProtocol(),
-            ref.getStoreRef().getIdentifier(),
-            ref.getId(),
-            name} );
+      if (args == null)
+      {
+         return MessageFormat.format(EXTERNAL_URL, new Object[] {outcome} );
+      }
+      else
+      {
+         return MessageFormat.format(EXTERNAL_URL_ARGS, new Object[] {outcome, args} );
+      }
    }
    
    // example: http://<server>/alfresco/navigate/<outcome>[/<workspace>/<store>/<nodeId>]
-   private static final String EXTERNAL_URL  = "http://{0}:{1}/{2}/navigate/{3}/{4}/{5}/{6}";
-   */
+   private static final String EXTERNAL_URL  = "/navigate/{3}";
+   private static final String EXTERNAL_URL_ARGS  = "/navigate/{3}/{4}";
 }

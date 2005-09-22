@@ -391,8 +391,8 @@ public class LoginBean
    public static final String LOGIN_OUTCOME_KEY = "_alfOutcome";
    public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";
 
-   private final static String OUTCOME_DOCDETAILS = "showDocDetails";
-   private final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";
+   public final static String OUTCOME_DOCDETAILS = "showDocDetails";
+   public final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";
 
    /** user name */
    private String username = null;

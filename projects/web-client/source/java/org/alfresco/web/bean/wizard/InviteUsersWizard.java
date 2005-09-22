@@ -36,6 +36,8 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.app.servlet.ExternalAccessServlet;
+import org.alfresco.web.bean.LoginBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
@@ -190,7 +192,7 @@ public class InviteUsersWizard extends AbstractWizardBean
                // Create the mail message for each user to send too
                if ("yes".equals(this.notify))
                {
-                  notifyUser(person, from, userGroupRole.Role);
+                  notifyUser(person, folderNodeRef, from, userGroupRole.Role);
                }
             }
          }
@@ -225,10 +227,11 @@ public class InviteUsersWizard extends AbstractWizardBean
     * Send an email notification to the specified user
     * 
     * @param person     Person node representing the user
+    * @param folder     Folder node they are invited too
     * @param from       From text message
     * @param roleText   The role display label for the user invite notification
     */
-   private void notifyUser(NodeRef person, String from, String roleText)
+   private void notifyUser(NodeRef person, NodeRef folder, String from, String roleText)
    {
       String to = (String)this.nodeService.getProperty(person, ContentModel.PROP_EMAIL);
       
@@ -237,13 +240,17 @@ public class InviteUsersWizard extends AbstractWizardBean
          String msgRole = Application.getMessage(FacesContext.getCurrentInstance(), MSG_INVITED_ROLE);
          String roleMessage = MessageFormat.format(msgRole, new Object[] {roleText});
          
-         String body = this.internalSubject + "\r\n\r\n" + roleMessage + "\r\n\r\n";
+         // TODO: include External Authentication link to the invited space
+         //String args = folder.getStoreRef().getProtocol() + '/' +
+         //   folder.getStoreRef().getIdentifier() + '/' +
+         //   folder.getId();
+         //String url = ExternalAccessServlet.generateExternalURL(LoginBean.OUTCOME_SPACEDETAILS, args);
+         
+         String body = this.internalSubject + "\r\n\r\n" + roleMessage + "\r\n\r\n";// + url + "\r\n\r\n";
          if (this.body != null && this.body.length() != 0)
          {
             body += this.body;
          }
-         
-         // TODO: include External Authentication link to the invited space!
          
          SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
          simpleMailMessage.setTo(to);
