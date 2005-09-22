@@ -70,7 +70,7 @@ Install Alfresco Tomcat Bundle
 Set Paths
 ---------
 
-Edit 'paths_tc_osx.sh' and set the variables to the locations where MySQL, Java and Tomcat
+Edit 'paths_tc.sh' and set the variables to the locations where MySQL, Java and Tomcat
 are installed.
 
 

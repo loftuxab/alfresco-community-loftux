@@ -104,7 +104,7 @@ Running the Alfresco Server
 ===========================
 
 Ensure that the MySQL server is running, then navigate to the '~/alfresco' directory
-- Run 'alf_start_tc.sh'
+- Run 'sudo alf_start_tc.sh'
 - If you wish to use OpenOffice document transformations, run '../start_oo.sh'
 - You can now try Alfresco by visiting:
 
@@ -122,8 +122,8 @@ http://www.alfresco.org/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco/tomcat' folder and run 'bin/shutdown.sh'
-If you started OpenOffice as above, then also run 'killall soffice.bin'
+Navigate to the '~/alfresco' folder and run 'alf_stop_jb.sh'
+If you started OpenOffice as above, then also run 'stop_oo.sh'
 
 
 =====================

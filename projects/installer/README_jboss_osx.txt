@@ -70,7 +70,7 @@ Install Alfresco JBoss Bundle
 Set Paths
 ---------
 
-Edit 'paths_jb_osx.sh' and set the variables to the locations where MySQL, Java and Tomcat
+Edit 'paths_jb.sh' and set the variables to the locations where MySQL, Java and Tomcat
 are installed.
 
 
@@ -108,7 +108,7 @@ Running the Alfresco Server
 
 Ensure that the MySQL server is running.
 Open a new command window and navigate to the '~/alfresco' directory
-- Run 'alf_start_jb_osx.sh' to start JBoss
+- Run 'alf_start_jb.sh' to start JBoss
 - If you wish to use OpenOffice document transformations, run 'start_oo.sh'
 - You can now try Alfresco by visiting:
 
