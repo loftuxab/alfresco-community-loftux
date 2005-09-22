@@ -43,6 +43,7 @@ public class ActionImplTest extends BaseParameterizedItemImplTest
         return new ActionImpl(
         		ID,
                 NAME, 
+                null,
                 this.paramValues);
     }
     
@@ -64,7 +65,7 @@ public class ActionImplTest extends BaseParameterizedItemImplTest
     	action.setTitle("title");
     	action.setDescription("description");
     	action.setExecuteAsynchronously(true);
-    	Action compensatingAction = new ActionImpl(GUID.generate(), "actionDefintionName");
+    	Action compensatingAction = new ActionImpl(GUID.generate(), "actionDefintionName", null);
     	action.setCompensatingAction(compensatingAction);
     	
     	// Check the values have been set

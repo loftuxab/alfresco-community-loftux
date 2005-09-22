@@ -22,6 +22,7 @@ import java.util.List;
 import org.alfresco.repo.action.executer.CompositeActionExecuter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.CompositeAction;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * Composite action implementation
@@ -45,9 +46,9 @@ public class CompositeActionImpl extends ActionImpl implements CompositeAction
 	 * 
 	 * @param id  the action id
 	 */
-	public CompositeActionImpl(String id)
+	public CompositeActionImpl(String id, NodeRef owningNodeRef)
 	{
-		super(id, CompositeActionExecuter.NAME);
+		super(id, CompositeActionExecuter.NAME, owningNodeRef);
 	}
 
 	/**

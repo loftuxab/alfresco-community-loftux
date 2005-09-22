@@ -19,6 +19,8 @@ package org.alfresco.service.cmr.action;
 import java.util.Date;
 import java.util.List;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 
 /**
  * The rule action interface
@@ -61,6 +63,16 @@ public interface Action extends ParameterizedItem
 	 * @param description  the description of the action
 	 */
 	void setDescription(String description);
+    
+    /**
+     * Get the node reference of the node that 'owns' this action.
+     * <p>
+     * The node that 'owns' the action is th one that stores it via its
+     * actionable aspect association.
+     * 
+     * @return  node reference
+     */
+    NodeRef getOwningNodeRef();
 	
 	/**
 	 * Gets a value indicating whether the action should be executed asychronously or not.
@@ -77,20 +89,6 @@ public interface Action extends ParameterizedItem
 	 * @param executeAsynchronously		true if the action is to be executed asychronously, false otherwise.
 	 */
 	void setExecuteAsynchronously(boolean executeAsynchronously);
-	
-	/**
-	 * Gets the action failure behaviour.
-	 * 
-	 * @return	the action failure bahaviour
-	 */
-	//ActionFailureBehaviour getFailureBehaviour();
-	
-	/**
-	 * Sets the action failure behaviour.
-	 * 
-	 * @param failureBehaviour	the action failure behaviour
-	 */
-	//void setFailureBehaviour(ActionFailureBehaviour failureBehaviour);
 	
 	/**
 	 * Get the compensating action.

@@ -206,6 +206,17 @@ public class RuleServiceImplTest extends BaseRuleTest
         assertTrue(allRules.contains(rule4));
         assertTrue(allRules.contains(rule6));
         
+        // Check the owning node ref
+        int count = 0;
+        for (Rule rule : allRules)
+        {
+            if (rule.getOwningNodeRef() == childWithRules)
+            {
+                count++;
+            }
+        }
+        assertEquals(2, count);
+        
         List<? extends Rule> myRules = this.ruleService.getRules(childWithRules, false);
         assertNotNull(myRules);
         assertEquals(2, myRules.size());

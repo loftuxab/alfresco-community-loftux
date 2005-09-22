@@ -273,7 +273,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 					{
 		    			// Create the rule and add to the list
 						NodeRef ruleNodeRef = ruleChildAssocRef.getChildRef();
-						Rule rule = createRule(ruleNodeRef);
+						Rule rule = createRule(nodeRef, ruleNodeRef);
 						allRules.add(rule);
 					}
 		    		
@@ -381,7 +381,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 			NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, ruleId);
 			if (ruleNodeRef != null)
 			{
-				rule = createRule(ruleNodeRef);
+				rule = createRule(nodeRef, ruleNodeRef);
 			}
 		}
 		
@@ -424,14 +424,14 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	 * @param ruleNodeRef	the rule node reference
 	 * @return				the rule
 	 */
-    private Rule createRule(NodeRef ruleNodeRef)
+    private Rule createRule(NodeRef owningNodeRef, NodeRef ruleNodeRef)
 	{
     	// Get the rule properties
 		Map<QName, Serializable> props = this.nodeService.getProperties(ruleNodeRef);
 		
     	// Create the rule
     	String ruleTypeName = (String)props.get(ContentModel.PROP_RULE_TYPE);    	
-		Rule rule = new RuleImpl(ruleNodeRef.getId(), ruleTypeName);
+		Rule rule = new RuleImpl(ruleNodeRef.getId(), ruleTypeName, owningNodeRef);
 		
 		// Set the other rule properties
 		boolean isAppliedToChildren = ((Boolean)props.get(ContentModel.PROP_APPLY_TO_CHILDREN)).booleanValue();
@@ -450,7 +450,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     {
         // Create the new rule, giving it a unique rule id
         String id = GUID.generate();
-        return new RuleImpl(id, ruleTypeName);
+        return new RuleImpl(id, ruleTypeName, null);
     }
 
     /**
@@ -492,7 +492,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	}
     	
     	// Save the remainder of the rule as a composite action
-    	runtimeActionService.saveActionImpl(ruleNodeRef, rule);
+    	runtimeActionService.saveActionImpl(nodeRef, ruleNodeRef, rule);
     }
     
     /**

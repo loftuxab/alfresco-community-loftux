@@ -44,7 +44,7 @@ public interface RuntimeActionService
 	 * @param actionNodeRef	the action node reference
 	 * @param action		the action 
 	 */
-	void saveActionImpl(NodeRef actionNodeRef, Action action);
+	void saveActionImpl(NodeRef owningNodeRef, NodeRef actionNodeRef, Action action);
 	
 	/**
 	 * 

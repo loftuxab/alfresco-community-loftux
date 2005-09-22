@@ -19,6 +19,7 @@ package org.alfresco.repo.rule;
 import java.io.Serializable;
 
 import org.alfresco.repo.action.CompositeActionImpl;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.util.ParameterCheck;
 
@@ -53,9 +54,9 @@ public class RuleImpl extends CompositeActionImpl implements Serializable, Rule
 	 * 
 	 * @param ruleTypeName	the rule type name
 	 */
-	public RuleImpl(String id, String ruleTypeName)
+	public RuleImpl(String id, String ruleTypeName, NodeRef owningNodeRef)
 	{
-		super(id);		
+		super(id, owningNodeRef);		
 		ParameterCheck.mandatory("ruleTypeName", ruleTypeName);
 		
 		this.ruleTypeName = ruleTypeName;

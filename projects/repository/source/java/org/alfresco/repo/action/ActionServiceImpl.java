@@ -248,7 +248,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	public Action createAction(String name)
 	{
-		return new ActionImpl(GUID.generate(),name);
+		return new ActionImpl(GUID.generate(),name, null);
 	}
 	
 	/**
@@ -266,7 +266,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	public CompositeAction createCompositeAction()
 	{
-		return new CompositeActionImpl(GUID.generate());
+		return new CompositeActionImpl(GUID.generate(), null);
 	}
 
 	/**
@@ -500,14 +500,17 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			((ActionImpl)action).setCreatedDate((Date)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_CREATED));
 		}
 		
-		saveActionImpl(actionNodeRef, action);
+		saveActionImpl(nodeRef, actionNodeRef, action);
 	}
 	
 	/**
 	 * @see org.alfresco.repo.action.RuntimeActionService#saveActionImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.action.Action)
 	 */
-	public void saveActionImpl(NodeRef actionNodeRef, Action action)
+	public void saveActionImpl(NodeRef owningNodeRef, NodeRef actionNodeRef, Action action)
 	{
+        // Set the owning node ref
+        ((ActionImpl)action).setOwningNodeRef(owningNodeRef);
+        
 		// Save action properties
 		saveActionProperties(actionNodeRef, action);
 		
@@ -525,7 +528,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		
 		// Update the modified details
 		((ActionImpl)action).setModifier((String)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_MODIFIER));
-		((ActionImpl)action).setModifiedDate((Date)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_MODIFIED));
+		((ActionImpl)action).setModifiedDate((Date)this.nodeService.getProperty(actionNodeRef, ContentModel.PROP_MODIFIED));        
 	}
 
 	/**
@@ -561,7 +564,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	                    ContentModel.TYPE_ACTION,
 	                    props2).getChildRef();
 				
-				saveActionImpl(compensatingActionNodeRef, compensatingAction);
+				saveActionImpl(compensatingAction.getOwningNodeRef(), compensatingActionNodeRef, compensatingAction);
 			}
 		}
 		else
@@ -573,7 +576,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			}
 			else
 			{
-				saveActionImpl(assoc.getChildRef(), compensatingAction);
+				saveActionImpl(compensatingAction.getOwningNodeRef(), assoc.getChildRef(), compensatingAction);
 			}
 		}
 	}
@@ -606,7 +609,8 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			else
 			{
 				// Update the action
-				saveActionImpl(actionNodeRef, idToAction.get(actionNodeRef.getId()));
+                Action action  = idToAction.get(actionNodeRef.getId());
+				saveActionImpl(action.getOwningNodeRef(), actionNodeRef, action);
 				idToAction.remove(actionNodeRef.getId());
 			}
 			
@@ -626,7 +630,8 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
                     ContentModel.TYPE_ACTION,
 					props).getChildRef();
 			
-			saveActionImpl(actionNodeRef, entry.getValue());
+            Action action = entry.getValue();
+			saveActionImpl(action.getOwningNodeRef(), actionNodeRef, action);
 		}
 	}
 
@@ -743,7 +748,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			for (ChildAssociationRef action : actions)
 			{
 				NodeRef actionNodeRef = action.getChildRef();
-				result.add(createAction(actionNodeRef));
+				result.add(createAction(nodeRef, actionNodeRef));
 			}
 		}
 		
@@ -756,7 +761,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 * @param actionNodeRef		the action node reference
 	 * @return					the action
 	 */
-	private Action createAction(NodeRef actionNodeRef)
+	private Action createAction(NodeRef owningNodeRef, NodeRef actionNodeRef)
 	{
 		Action result = null;
 		
@@ -766,13 +771,13 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		if (ContentModel.TYPE_COMPOSITE_ACTION.equals(actionType) == true)
 		{
 			// Create a composite action
-			result = new CompositeActionImpl(actionNodeRef.getId());
+			result = new CompositeActionImpl(actionNodeRef.getId(), owningNodeRef);
 			populateCompositeAction(actionNodeRef, (CompositeAction)result);
 		}
 		else
 		{
 			// Create an action
-			result = new ActionImpl(actionNodeRef.getId(), (String)properties.get(ContentModel.PROP_DEFINITION_NAME));
+			result = new ActionImpl(actionNodeRef.getId(), (String)properties.get(ContentModel.PROP_DEFINITION_NAME), owningNodeRef);
 			populateAction(actionNodeRef, result);
 		}
 		
@@ -825,7 +830,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ContentModel.ASSOC_COMPENSATING_ACTION);
 		if (assocs.size() != 0)
 		{
-			Action compensatingAction = createAction(assocs.get(0).getChildRef());
+			Action compensatingAction = createAction(action.getOwningNodeRef(), assocs.get(0).getChildRef());
 			action.setCompensatingAction(compensatingAction);
 		}
 	}
@@ -877,7 +882,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		for (ChildAssociationRef action : actions)
 		{
 			NodeRef actionNodeRef = action.getChildRef();
-			compositeAction.addAction(createAction(actionNodeRef));
+			compositeAction.addAction(createAction(compositeAction.getOwningNodeRef(), actionNodeRef));
 		}		
 	}
 
@@ -894,7 +899,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, actionId);
 			if (actionNodeRef != null)
 			{
-				result = createAction(actionNodeRef);
+				result = createAction(nodeRef, actionNodeRef);
 			}
 		}
 		

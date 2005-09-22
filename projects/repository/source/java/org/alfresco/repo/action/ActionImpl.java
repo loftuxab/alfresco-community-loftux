@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * Action implementation
@@ -84,6 +85,11 @@ public class ActionImpl extends ParameterizedItemImpl
     private String actionDefinitionName;
     
     /**
+     * The owning node reference
+     */
+    private NodeRef owningNodeRef;
+    
+    /**
      * Action conditions
      */
     private List<ActionCondition> actionConditions = new ArrayList<ActionCondition>();
@@ -94,9 +100,9 @@ public class ActionImpl extends ParameterizedItemImpl
      * @param id					the action id
      * @param actionDefinitionName  the name of the action definition
      */
-    public ActionImpl(String id, String actionDefinitionName)
+    public ActionImpl(String id, String actionDefinitionName, NodeRef owningNodeRef)
     {
-        this(id, actionDefinitionName, null);
+        this(id, actionDefinitionName, owningNodeRef, null);
     }
 
     /**
@@ -109,10 +115,12 @@ public class ActionImpl extends ParameterizedItemImpl
     public ActionImpl(
     		String id,
     		String actionDefinitionName, 
+            NodeRef owningNodeRef,
             Map<String, Serializable> parameterValues)
     {
         super(id, parameterValues);
         this.actionDefinitionName = actionDefinitionName;
+        this.owningNodeRef = owningNodeRef;
     }
     
     /**
@@ -146,6 +154,19 @@ public class ActionImpl extends ParameterizedItemImpl
 	{
 		this.description = description;
 	}
+    
+    /**
+     * @see org.alfresco.service.cmr.action.Action#getOwningNodeRef()
+     */
+    public NodeRef getOwningNodeRef()
+    {
+        return this.owningNodeRef;
+    }
+    
+    public void setOwningNodeRef(NodeRef owningNodeRef)
+    {
+        this.owningNodeRef = owningNodeRef;
+    }
 	
 	/**
 	 * @see org.alfresco.service.cmr.action.Action#getExecuteAsychronously()

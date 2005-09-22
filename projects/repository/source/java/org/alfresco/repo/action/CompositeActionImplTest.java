@@ -37,11 +37,11 @@ public class CompositeActionImplTest extends ActionImplTest
 
 	public void testActions()
     {
-    	Action action1 = new ActionImpl(ACTION1_ID, ACTION1_NAME);
-    	Action action2 = new ActionImpl(ACTION2_ID, ACTION2_NAME);
-    	Action action3 = new ActionImpl(ACTION3_ID, ACTION3_NAME);
+    	Action action1 = new ActionImpl(ACTION1_ID, ACTION1_NAME, null);
+    	Action action2 = new ActionImpl(ACTION2_ID, ACTION2_NAME, null);
+    	Action action3 = new ActionImpl(ACTION3_ID, ACTION3_NAME, null);
 		
-		CompositeAction compositeAction = new CompositeActionImpl(ID);
+		CompositeAction compositeAction = new CompositeActionImpl(ID, null);
     	
     	// Check has no action
     	assertFalse(compositeAction.hasActions());

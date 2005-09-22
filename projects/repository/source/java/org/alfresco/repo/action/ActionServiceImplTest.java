@@ -100,7 +100,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		ActionConditionDefinition nullCondition = this.actionService.getActionConditionDefinition(BAD_NAME);
 		assertNull(nullCondition);		
 	}
-
+    
 	/**
 	 * Test getActionDefintions
 	 */
@@ -374,6 +374,36 @@ public class ActionServiceImplTest extends BaseSpringTest
 		
 		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
 	}
+
+    public void testOwningNodeRef()
+    {
+        // Create the action
+        Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+        String actionId = action.getId();
+        
+        // Set the parameters of the action
+        action.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+        
+        // Set the title and description of the action
+        action.setTitle("title");
+        action.setDescription("description");
+        action.setExecuteAsynchronously(true);
+        
+        // Check the owning node ref
+        assertNull(action.getOwningNodeRef());
+                
+        // Save the action
+        this.actionService.saveAction(this.nodeRef, action);
+        
+        // Check the owning node ref
+        assertEquals(this.nodeRef, action.getOwningNodeRef());
+        
+        // Get the action
+        Action savedAction = this.actionService.getAction(this.nodeRef, actionId);
+        
+        // Check the owning node ref
+        assertEquals(this.nodeRef, savedAction.getOwningNodeRef());;
+    }
 
 	/**
 	 * Test saving an action with conditions
