@@ -83,6 +83,7 @@
 		    <bean class="org.alfresco.repo.content.metadata.OfficeMetadataExtracter" />
 		    <bean class="org.alfresco.repo.content.metadata.HtmlMetadataExtracter" />
 		    <bean class="org.alfresco.repo.content.metadata.StringMetadataExtracter" />
+		    <bean class="org.alfresco.repo.content.metadata.MP3MetadataExtracter" />
 		    <bean class="org.alfresco.repo.content.metadata.UnoMetadataExtracter" >
 		       <constructor-arg>
         	      <ref bean="mimetypeMap" />

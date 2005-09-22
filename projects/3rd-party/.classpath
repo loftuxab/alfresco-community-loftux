@@ -76,5 +76,6 @@
 	<classpathentry exported="true" sourcepath="src/jcr_src.zip" kind="lib" path="lib/jcr-1.0.jar"/>
 	<classpathentry exported="true" sourcepath="W:/freemarker-2.3.3/src" kind="lib" path="lib/freemarker.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-nodep-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
