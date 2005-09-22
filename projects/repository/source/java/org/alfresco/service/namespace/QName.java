@@ -38,8 +38,7 @@ public final class QName implements QNamePattern, Serializable, Cloneable
     private String localName;                   // never null
     private int hashCode;
     private String prefix;
-    private static final char[] INVALID_CHARS = { '/', '.', '{', '}' };
-//    private static final char[] INVALID_CHARS = { '/', '.', '{', '}', ':' };
+    private static final char[] INVALID_CHARS = { '/', '.', '{', '}', ':' };
 
     public static final char NAMESPACE_PREFIX = ':';
     public static final char NAMESPACE_BEGIN = '{';
@@ -205,7 +204,28 @@ public final class QName implements QNamePattern, Serializable, Cloneable
 
         return name;
     }
+    
+    
+    /**
+     * Create a QName
+     * 
+     * @param qname  qualified name of the following format <code>prefix:localName</code>
+     * @return  string array where index 0 => prefix and index 1 => local name
+     */
+    public static String[] splitPrefixedQName(String qname)
+        throws InvalidQNameException, NamespaceException
+    {
+        if (qname != null)
+        {
+            int colonIndex = qname.indexOf(NAMESPACE_PREFIX);
+            String prefix = (colonIndex == -1) ? NamespaceService.DEFAULT_PREFIX : qname.substring(0, colonIndex);
+            String localName = (colonIndex == -1) ? qname : qname.substring(colonIndex +1);
+            return new String[] { prefix, localName };
+        }
+        return null;
+    }
 
+    
     /**
      * Construct QName
      * 

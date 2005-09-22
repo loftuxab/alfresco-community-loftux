@@ -278,7 +278,9 @@ public class ImporterComponent
         {
             if (segments[i] != null && segments[i].length() > 0)
             {
-                validPath.append(QName.createValidLocalName(segments[i]));
+                String[] qnameComponents = QName.splitPrefixedQName(segments[i]);
+                QName segmentQName = QName.createQName(qnameComponents[0], QName.createValidLocalName(qnameComponents[1]), namespaceService); 
+                validPath.append(segmentQName.toPrefixString());
             }
             if (i < (segments.length -1))
             {
@@ -355,8 +357,8 @@ public class ImporterComponent
             if (childName != null)
             {
                 childName = bindPlaceHolder(childName, configuration);
-                childName = QName.createValidLocalName(childName);
-                childQName = QName.createQName(childName, namespaceService); 
+                String[] qnameComponents = QName.splitPrefixedQName(childName);
+                childQName = QName.createQName(qnameComponents[0], QName.createValidLocalName(qnameComponents[1]), namespaceService); 
             }
             else
             {

@@ -68,7 +68,7 @@ public class ImporterComponentTest extends BaseSpringTest
     }
     
     
-    public void xtestBootstrap()
+    public void testBootstrap()
     {
         Properties configuration = new Properties();
         configuration.put("companySpaceName", "test company name");
