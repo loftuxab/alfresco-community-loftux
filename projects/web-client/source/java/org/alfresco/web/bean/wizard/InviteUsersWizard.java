@@ -162,6 +162,8 @@ public class InviteUsersWizard extends AbstractWizardBean
             from = "alfresco@alfresco.org";
          }
          
+         NodeRef folderNodeRef = this.navigator.getCurrentNode().getNodeRef();
+         
          if (INVITE_USERS.equals(getInvite()))
          {
             // set permissions for each user and send them a mail
@@ -176,14 +178,15 @@ public class InviteUsersWizard extends AbstractWizardBean
                {
                   if (userGroupRole.Role.equals(permission))
                   {
-                     this.permissionService.setPermission(this.navigator.getCurrentNode().getNodeRef(),
+                     this.permissionService.setPermission(
+                           folderNodeRef,
                            (String)this.nodeService.getProperty(person, ContentModel.PROP_USERNAME),
                            permission,
                            true);
                      break;
                   }
                }
-            
+               
                // Create the mail message for each user to send too
                if ("yes".equals(this.notify))
                {
@@ -194,7 +197,8 @@ public class InviteUsersWizard extends AbstractWizardBean
          else if (INVITE_ALL.equals(getInvite()))
          {
             // set ALL users permssions to GUEST
-            this.permissionService.setPermission(this.navigator.getCurrentNode().getNodeRef(),
+            this.permissionService.setPermission(
+                  folderNodeRef,
                   this.permissionService.getAllAuthorities(),
                   this.permissionService.GUEST,
                   true);
@@ -238,6 +242,8 @@ public class InviteUsersWizard extends AbstractWizardBean
          {
             body += this.body;
          }
+         
+         // TODO: include External Authentication link to the invited space!
          
          SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
          simpleMailMessage.setTo(to);

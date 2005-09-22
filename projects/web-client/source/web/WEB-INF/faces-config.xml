@@ -476,6 +476,10 @@
          <property-name>personService</property-name>
          <value>#{personService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>ownableService</property-name>
+         <value>#{ownableService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

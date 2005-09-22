@@ -32,10 +32,10 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.ownable.OwnableService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
@@ -92,6 +92,9 @@ public class NewUserWizard extends AbstractWizardBean
    /** PersonService bean reference */
    private PersonService personService;
    
+   /** OwnableService bean reference */
+   private OwnableService ownableService;
+   
    /** action context */
    private Node person = null;
    
@@ -127,12 +130,19 @@ public class NewUserWizard extends AbstractWizardBean
    }
    
    /**
-    * Set the person service.
-    * @param personService
+    * @param personService       The person service.
     */
    public void setPersonService(PersonService personService)
    {
        this.personService = personService;
+   }
+   
+   /**
+    * @param ownableService      The ownableService to set.
+    */
+   public void setOwnableService(OwnableService ownableService)
+   {
+      this.ownableService = ownableService;
    }
    
    /**
@@ -379,8 +389,6 @@ public class NewUserWizard extends AbstractWizardBean
             props.put(ContentModel.PROP_EMAIL, this.email);
             props.put(ContentModel.PROP_ORGID, this.companyId);
             this.nodeService.setProperties(nodeRef, props);
-            
-            // TODO: allow change password - separate screen for this?
          }
          else
          {
@@ -407,15 +415,15 @@ public class NewUserWizard extends AbstractWizardBean
             
             // create the node to represent the Person
             String assocName = QName.createValidLocalName(this.userName);
-            
             NodeRef newPerson = this.personService.createPerson(props);
-           
+            
+            // ensure the user can access their own Person object
             this.permissionService.setPermission(newPerson, this.userName, permissionService.getAllPermission(), true);
             
             if (logger.isDebugEnabled())
                logger.debug("Created Person node for username: " + this.userName);
             
-            // create the ACEGI Authentication instance for this user
+            // create the ACEGI Authentication instance for the new user
             this.authenticationService.createAuthentication(this.userName, this.password.toCharArray());
             
             if (logger.isDebugEnabled())
@@ -758,8 +766,6 @@ public class NewUserWizard extends AbstractWizardBean
       String homeSpaceId = locationId;
       if (spaceName != null && spaceName.length() != 0)
       {
-         StoreRef storeRef = Repository.getStoreRef();
-         
          NodeRef parentRef = new NodeRef(Repository.getStoreRef(), locationId);
          
          // check for existance of home space with same name - return immediately
@@ -804,14 +810,19 @@ public class NewUserWizard extends AbstractWizardBean
          uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
          this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
          
-        
-         // then we set maximium permissions to the owner of the space
-         // so by default other users (except admin) will NOT have access to the space
+         // Admin has full permissions by default
+         // TODO: remove this once admin is outside the ACL checks...
          this.permissionService.setPermission(nodeRef, ContextListener.ADMIN, permissionService.getAllPermission(), true);
+         // give full permissions to the new user
          this.permissionService.setPermission(nodeRef, this.userName, permissionService.getAllPermission(), true);
+         
+         // by default other users (except Admin) will NOT have access to the space at all
+         // the new user is the OWNER of their own space
+         this.ownableService.setOwner(nodeRef, this.userName);
+         // give the OWNER full permissions
          this.permissionService.setPermission(nodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
          
-         // now detach (if we did this first we could not set anhy permissions!)
+         // now detach (if we did this first we could not set any permissions!)
          this.permissionService.setInheritParentPermissions(nodeRef, false);
          
          // return the ID of the created space

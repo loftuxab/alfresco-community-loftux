@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.app.ContextListener;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.NavigationBean;
@@ -207,8 +208,8 @@ public class UserMembersBean implements IContextListener
             }
          }
          
-         // filter invalid users e.g. ROLE_OWNER and current user
-         //permissionMap.remove(permissionService.getOwnerAuthority());
+         // filter invalid users e.g. Admin and current user
+         permissionMap.remove(ContextListener.ADMIN);
          permissionMap.remove(Application.getCurrentUser(context).getUserName());
          
          // for each authentication (username key) found we get the Person
