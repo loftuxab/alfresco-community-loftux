@@ -471,7 +471,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     public String getMD4HashedPassword(String userName)
     {
         NodeRef userNode = getUserOrNull(userName);
-        if (userName == null)
+        if (userNode == null)
         {
             return null;
         }

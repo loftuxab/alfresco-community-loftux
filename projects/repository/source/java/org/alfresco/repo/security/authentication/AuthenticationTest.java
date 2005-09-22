@@ -17,6 +17,7 @@
 package org.alfresco.repo.security.authentication;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -72,7 +73,7 @@ public class AuthenticationTest extends TestCase
 
     private DictionaryService dictionaryService;
 
-    private PasswordEncoder passwordEncoder;
+    private MD4PasswordEncoder passwordEncoder;
 
     private MutableAuthenticationDao dao;
 
@@ -104,7 +105,7 @@ public class AuthenticationTest extends TestCase
         nodeService = (NodeService) ctx.getBean("nodeService");
         searchService = (SearchService) ctx.getBean("searchService");
         dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
-        passwordEncoder = (PasswordEncoder) ctx.getBean("passwordEncoder");
+        passwordEncoder = (MD4PasswordEncoder) ctx.getBean("passwordEncoder");
         ticketComponent = (TicketComponent) ctx.getBean("ticketComponent");
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
         authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
@@ -148,7 +149,7 @@ public class AuthenticationTest extends TestCase
         return properties;
     }
 
-    public void testCreateAndyUserAndOtherCRUD()
+    public void testCreateAndyUserAndOtherCRUD() throws NoSuchAlgorithmException, UnsupportedEncodingException
     {
         RepositoryAuthenticationDao dao = new RepositoryAuthenticationDao();
         dao.setNodeService(nodeService);
@@ -159,6 +160,10 @@ public class AuthenticationTest extends TestCase
 
         dao.createUser("Andy", "cabbage".toCharArray());
         assertNotNull(dao.getUserOrNull("Andy"));
+        
+        byte[] decodedHash = passwordEncoder.decodeHash(dao.getMD4HashedPassword("Andy"));
+        byte[] testHash = MessageDigest.getInstance("MD4").digest("cabbage".getBytes("UnicodeLittleUnmarked"));
+        assertEquals(new String(decodedHash), new String(testHash));
 
         UserDetails AndyDetails = (UserDetails) dao.loadUserByUsername("Andy");
         assertNotNull(AndyDetails);

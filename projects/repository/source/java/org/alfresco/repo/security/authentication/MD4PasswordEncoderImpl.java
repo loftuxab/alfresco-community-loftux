@@ -16,13 +16,14 @@
  */
 package org.alfresco.repo.security.authentication;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 
 import net.sf.acegisecurity.providers.encoding.BaseDigestPasswordEncoder;
-import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
@@ -42,7 +43,7 @@ import cryptix.jce.provider.CryptixCrypto;
  * As MD4 is a one-way hash, the salt can contain any characters.
  * </p>
  */
-public class MD4PasswordEncoder extends BaseDigestPasswordEncoder implements PasswordEncoder
+public class MD4PasswordEncoderImpl extends BaseDigestPasswordEncoder implements MD4PasswordEncoder
 {
 
     static
@@ -58,7 +59,7 @@ public class MD4PasswordEncoder extends BaseDigestPasswordEncoder implements Pas
     }
 
     
-    public MD4PasswordEncoder()
+    public MD4PasswordEncoderImpl()
     {
         super();
         // TODO Auto-generated constructor stub
@@ -89,7 +90,14 @@ public class MD4PasswordEncoder extends BaseDigestPasswordEncoder implements Pas
 
         byte[] encoded = Base64.encodeBase64(md4(input));
 
-        return new String(encoded);
+        try
+        {
+            return new String(encoded, "UTF8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new RuntimeException("UTF8 not supported!", e);
+        }
     }
 
     private byte[] md4(String input)
@@ -97,11 +105,34 @@ public class MD4PasswordEncoder extends BaseDigestPasswordEncoder implements Pas
         try
         {
             MessageDigest digester = MessageDigest.getInstance("MD4");
-            return digester.digest(input.getBytes());
+            return digester.digest(input.getBytes("UnicodeLittleUnmarked"));
         }
         catch (NoSuchAlgorithmException e)
         {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public byte[] decodeHash(String encodedHash)
+    {
+        if (!getEncodeHashAsBase64())
+        {
+            try
+            {
+                return Hex.decodeHex(encodedHash.toCharArray());
+            }
+            catch (DecoderException e)
+            {
+               throw new RuntimeException("Unable to decode password hash");
+            }
+        }
+        else
+        {
+            return Base64.decodeBase64(encodedHash.getBytes());
         }
     }
 

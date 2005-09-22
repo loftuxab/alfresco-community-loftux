@@ -633,7 +633,7 @@
         </property>
     </bean>
 
-    <bean id="passwordEncoder" class="org.alfresco.repo.security.authentication.MD4PasswordEncoder"></bean>
+    <bean id="passwordEncoder" class="org.alfresco.repo.security.authentication.MD4PasswordEncoderImpl"></bean>
 
     <!-- TODO: Move to public-services-context -->
 
