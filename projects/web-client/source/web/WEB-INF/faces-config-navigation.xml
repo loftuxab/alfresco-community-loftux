@@ -537,7 +537,7 @@
          <to-view-id>/jsp/wizard/new-rule/condition-in-category.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>match-text</from-outcome>
+         <from-outcome>compare-property-value</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/condition-contains-text.jsp</to-view-id>
       </navigation-case>
       <navigation-case>

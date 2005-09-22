@@ -26,13 +26,15 @@ import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.DataModel;
+import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
+import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
@@ -57,7 +59,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class NewRuleWizard extends BaseActionWizard
 {
+   // parameter names for actions
+   public static final String PROP_ACTION_NAME = "actionName";
+   public static final String PROP_ACTION_SUMMARY = "actionSummary";
+   
    // parameter names for conditions
+   public static final String PROP_CONDITION_NAME = "conditionName";
+   public static final String PROP_CONDITION_SUMMARY = "conditionSummary";
    public static final String PROP_CONTAINS_TEXT = "containstext";
    
    private static Log logger = LogFactory.getLog(NewRuleWizard.class);
@@ -72,8 +80,6 @@ public class NewRuleWizard extends BaseActionWizard
    private static final String STEP1_TITLE_ID = "new_rule_step1_title";
    private static final String STEP2_TITLE_ID = "new_rule_step2_title";
    private static final String STEP3_TITLE_ID = "new_rule_step3_title";
-   private static final String STEP4_TITLE_ID = "new_rule_step4_title";
-   private static final String STEP5_TITLE_ID = "new_rule_step5_title";
    private static final String FINISH_INSTRUCTION_ID = "new_rule_finish_instruction";
    private static final String FINISH_INSTRUCTION_EDIT_ID = "new_rule_finish_instruction_edit";
    
@@ -82,12 +88,22 @@ public class NewRuleWizard extends BaseActionWizard
    private String description;
    private String type;
    private String condition;
+   private boolean runInBackground;
+   private boolean applyToSubSpaces;
+   
    private RuleService ruleService;
    private RulesBean rulesBean;
+   
    private List<SelectItem> types;
    private List<SelectItem> conditions;
    private Map<String, String> conditionDescriptions;
-   private Map<String, String> conditionProperties;
+   private Map<String, String> currentConditionProperties;
+   
+   private List<Map<String, String>> allActionsProperties;
+   private List<Map<String, String>> allConditionsProperties;
+   
+   private DataModel allActionsDataModel;
+   private DataModel allConditionsDataModel;
    
    /**
     * Deals with the finish button being pressed
@@ -105,27 +121,6 @@ public class NewRuleWizard extends BaseActionWizard
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
-         // set up parameters maps for the condition
-         Map<String, Serializable> conditionParams = new HashMap<String, Serializable>();
-         if (this.condition.equals(ComparePropertyValueEvaluator.NAME))
-         {
-            conditionParams.put(ComparePropertyValueEvaluator.PARAM_VALUE, 
-                  this.conditionProperties.get(PROP_CONTAINS_TEXT));
-         }
-         else if (this.condition.equals(InCategoryEvaluator.NAME))
-         {
-            // put the selected category in the condition params
-            NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), 
-                  this.conditionProperties.get(PROP_CATEGORY));
-            conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, catNodeRef);
-            
-            // add the classifiable aspect
-            conditionParams.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_GEN_CLASSIFIABLE);
-         }
-         
-         // build the action params map based on the selected action instance
-         Map<String, Serializable> actionParams = buildActionParams();
-         
          // get hold of the space the rule will apply to and make sure
          // it is actionable
          Node currentSpace = browseBean.getActionSpace();
@@ -136,11 +131,10 @@ public class NewRuleWizard extends BaseActionWizard
          {
             // update the existing rule in the repository
             rule = this.rulesBean.getCurrentRule();
-            
-            // we know there is only one condition and action
-            // so remove the first one
-            rule.removeActionCondition(rule.getActionConditions().get(0));
-            rule.removeAction(rule.getActions().get(0));
+                        
+            // remove all the conditions and actions from the current rule
+            rule.removeAllActionConditions();
+            rule.removeAllActions();
          }
          else
          {
@@ -150,28 +144,43 @@ public class NewRuleWizard extends BaseActionWizard
          // setup the rule and add it to the space
          rule.setTitle(this.title);
          rule.setDescription(this.description);
+         rule.applyToChildren(this.applyToSubSpaces);
+         rule.setExecuteAsynchronously(this.runInBackground);
          
-         // Add the action to the rule
-         Action action = this.actionService.createAction(this.getAction());
-         action.setParameterValues(actionParams);
-         rule.addAction(action);
+         // add all the conditions to the rule
+         for (Map<String, String> condParams : this.allConditionsProperties)
+         {
+            Map<String, Serializable> repoCondParams = buildConditionParams(condParams);
+            
+            // add the condition to the rule
+            ActionCondition condition = this.actionService.createActionCondition(
+                  condParams.get(PROP_CONDITION_NAME));
+            condition.setParameterValues(repoCondParams);
+            rule.addActionCondition(condition);
+         }
          
-         // Add the condition to the rule
-         ActionCondition condition = this.actionService.createActionCondition(this.getCondition());
-         condition.setParameterValues(conditionParams);
-         rule.addActionCondition(condition);
+         // add all the actions to the rule
+         for (Map<String, String> actionParams : this.allActionsProperties)
+         {
+            // use the base class version of buildActionParams(), but for this we need 
+            // to setup the currentActionProperties and action variables
+            String actionName = actionParams.get(PROP_ACTION_NAME);
+            this.action = actionName;
+            this.currentActionProperties = actionParams;
+            Map<String, Serializable> repoActionParams = buildActionParams();
+            
+            // add the action to the rule
+            Action action = this.actionService.createAction(actionName);
+            action.setParameterValues(repoActionParams);
+            rule.addAction(action);
+         }
          
          // Save the rule
          this.ruleService.saveRule(currentSpace.getNodeRef(), rule);
          
          if (logger.isDebugEnabled())
          {
-            logger.debug(this.editMode ? "Updated" : "Added" 
-                         + " rule '" + this.title + "' with condition '" + 
-                         this.condition + "', action '" + this.action + 
-                         "', condition params of " +
-                         this.conditionProperties + " and action params of " + 
-                         this.actionProperties);
+            logger.debug(this.editMode ? "Updated" : "Added" + " rule '" + this.title + "'");
          }
          
          // commit the transaction
@@ -190,47 +199,200 @@ public class NewRuleWizard extends BaseActionWizard
    }
 
    /**
-    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#next()
+    * Returns the properties for all the conditions as a JSF DataModel
+    * 
+    * @return JSF DataModel representing the condition properties
     */
-   public String next()
+   public DataModel getAllConditionsDataModel()
    {
-      String outcome = super.next();
-      
-      // if the outcome is "no-condition" we must move the step counter
-      // on as there are no settings for "no-condition"
-      if (outcome.equals("no-condition"))
+      if (this.allConditionsDataModel == null)
       {
-         this.currentStep++;
+         this.allConditionsDataModel = new ListDataModel();
+      }
+      
+      this.allConditionsDataModel.setWrappedData(this.allConditionsProperties);
+      
+      return this.allConditionsDataModel;
+   }
+   
+   /**
+    * Displays the settings page for the current condition being added (if required)
+    * 
+    * @return The outcome
+    */
+   public String promptForConditionValues()
+   {
+      String outcome = null;
+      
+      if ("in-category".equals(this.condition) || "compare-property-value".equals(this.condition))
+      {
+         HashMap<String, String> condProps = new HashMap<String, String>(3);
+         condProps.put(PROP_CONDITION_NAME, this.condition);
+         this.currentConditionProperties = condProps;
+         outcome = this.condition;
          
          if (logger.isDebugEnabled())
-            logger.debug("current step is now " + this.currentStep + 
-                         " as there are no settings associated with the selected condition");
+            logger.debug("Added '" + this.condition + "' condition to list");
       }
+      else if ("no-condition".equals(this.condition))
+      {
+         HashMap<String, String> condProps = new HashMap<String, String>(1);
+         condProps.put(PROP_CONDITION_NAME, this.condition);
+         condProps.put(PROP_CONDITION_SUMMARY, Application.getMessage(
+               FacesContext.getCurrentInstance(), "condition_no_condition"));
+         this.allConditionsProperties.add(condProps);
+         
+         // NOTE: we don't set an outcome to stay on the same page as there are 
+         //       no settings related to 'no-condition'
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Add 'no-condition' condition to list");
+      }
+      
+      // reset the selected condition drop down
+      this.condition = null;
       
       return outcome;
    }
    
    /**
-    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#back()
+    * Adds the condition just setup by the user to the list of conditions for the rule
+    * 
+    * @return The outcome
     */
-   public String back()
+   public String addCondition()
    {
-      String outcome = super.back();
+      String summary = buildConditionSummary(this.currentConditionProperties);
       
-      // if the outcome is "no-condition" we must move the step counter
-      // back as there are no settings for "no-condition"
-      if (outcome.equals("no-condition"))
+      if (summary != null)
       {
-         this.currentStep--;
-         
-         if (logger.isDebugEnabled())
-            logger.debug("current step is now " + this.currentStep + 
-                         " as there are no settings associated with the selected condition");
+         this.currentConditionProperties.put(PROP_CONDITION_SUMMARY, summary);
+         this.allConditionsProperties.add(this.currentConditionProperties);
       }
+      
+      // re-display the conditions step
+      return "condition";
+   }
+   
+   /**
+    * Removes the requested condition from the list
+    * 
+    * @return The outcome
+    */
+   public String removeCondition()
+   {
+      // use the built in JSF support for retrieving the object for the
+      // row that was clicked by the user
+      Map conditionToRemove = (Map)this.allConditionsDataModel.getRowData();
+      this.allConditionsProperties.remove(conditionToRemove);
+      
+      // return no outcome to refresh page
+      return null;
+   }
+   
+   /**
+    * Cancels the addition of the condition
+    * 
+    * @return The outcome
+    */
+   public String cancelAddCondition()
+   {
+      this.currentConditionProperties.clear();
+      return "condition";
+   }
+
+   /**
+    * Returns the properties for all the actions as a JSF DataModel
+    * 
+    * @return JSF DataModel representing the action properties
+    */
+   public DataModel getAllActionsDataModel()
+   {
+      if (this.allActionsDataModel == null)
+      {
+         this.allActionsDataModel = new ListDataModel();
+      }
+      
+      this.allActionsDataModel.setWrappedData(this.allActionsProperties);
+      
+      return this.allActionsDataModel;
+   }
+   
+   /**
+    * Displays the settings page for the current action being added
+    * 
+    * @return The outcome
+    */
+   public String promptForActionValues()
+   {
+      String outcome = this.action;
+      
+      HashMap<String, String> actionProps = new HashMap<String, String>(3);
+      actionProps.put(PROP_ACTION_NAME, this.action);
+      this.currentActionProperties = actionProps;
+      
+      if ("simple-workflow".equals(this.action))
+      {
+         this.currentActionProperties.put("approveAction", "move");
+         this.currentActionProperties.put("rejectStepPresent", "yes");
+         this.currentActionProperties.put("rejectAction", "move");
+      }
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Added '" + this.action + "' action to list");
+      
+      // reset the selected condition drop down
+      this.action = null;
       
       return outcome;
    }
-
+   
+   /**
+    * Adds the action just setup by the user to the list of actions for the rule
+    * 
+    * @return The outcome
+    */
+   public String addAction()
+   {
+      String summary = buildActionSummary(this.currentActionProperties);
+      
+      if (summary != null)
+      {
+         this.currentActionProperties.put(PROP_ACTION_SUMMARY, summary);
+         this.allActionsProperties.add(this.currentActionProperties);
+      }
+      
+      // re-display the actions step
+      return "action";
+   }
+   
+   /**
+    * Removes the requested action from the list
+    * 
+    * @return The outcome
+    */
+   public String removeAction()
+   {
+      // use the built in JSF support for retrieving the object for the
+      // row that was clicked by the user
+      Map actionToRemove = (Map)this.allActionsDataModel.getRowData();
+      this.allActionsProperties.remove(actionToRemove);
+      
+      // return no outcome to refresh page
+      return null;
+   }
+   
+   /**
+    * Cancels the addition of the action
+    * 
+    * @return The outcome
+    */
+   public String cancelAddAction()
+   {
+      this.currentActionProperties.clear();
+      return "action";
+   }
+   
    /**
     * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getWizardDescription()
     */
@@ -270,7 +432,7 @@ public class NewRuleWizard extends BaseActionWizard
       
       switch (this.currentStep)
       {
-         case 6:
+         case 4:
          {
             stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_DESCRIPTION_ID);
             break;
@@ -310,16 +472,6 @@ public class NewRuleWizard extends BaseActionWizard
          }
          case 4:
          {
-            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP4_TITLE_ID);
-            break;
-         }
-         case 5:
-         {
-            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP5_TITLE_ID);
-            break;
-         }
-         case 6:
-         {
             stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_TITLE_ID);
             break;
          }
@@ -341,7 +493,7 @@ public class NewRuleWizard extends BaseActionWizard
       
       switch (this.currentStep)
       {
-         case 5:
+         case 3:
          {
             if (this.editMode)
             {
@@ -353,7 +505,7 @@ public class NewRuleWizard extends BaseActionWizard
             }
             break;
          }
-         case 6:
+         case 4:
          {
             if (this.editMode)
             {
@@ -384,21 +536,25 @@ public class NewRuleWizard extends BaseActionWizard
       this.title = null;
       this.description = null;
       this.type = "inbound";
-      this.condition = "no-condition";
+      this.condition = null;
+      this.action = null;
+      this.applyToSubSpaces = false;
+      this.runInBackground = false;
       
       if (this.conditions != null)
       {
          this.conditions.clear();
          this.conditions = null;
       }
-      
+
       if (this.conditionDescriptions != null)
       {
          this.conditionDescriptions.clear();
          this.conditionDescriptions = null;
       }
       
-      this.conditionProperties = new HashMap<String, String>(1);
+      this.allConditionsProperties = new ArrayList<Map<String, String>>();
+      this.allActionsProperties = new ArrayList<Map<String, String>>();
    }
    
    /**
@@ -435,25 +591,36 @@ public class NewRuleWizard extends BaseActionWizard
       this.type = rule.getRuleTypeName();
       this.title = rule.getTitle();
       this.description = rule.getDescription();
-      // we know there is only 1 condition and action
-      this.condition = rule.getActionConditions().get(0).getActionConditionDefinitionName();
-      this.action = rule.getActions().get(0).getActionDefinitionName();
+      this.applyToSubSpaces = rule.isAppliedToChildren();
+      this.runInBackground = rule.getExecuteAsychronously();
       
-      // populate the condition property bag with the relevant values
-      Map<String, Serializable> condProps = rule.getActionConditions().get(0).getParameterValues();
-      if (this.condition.equals(ComparePropertyValueEvaluator.NAME))
+      // populate the conditions list with maps of properties representing each condition
+      List<ActionCondition> conditions = rule.getActionConditions();
+      for (ActionCondition condition : conditions)
       {
-         this.conditionProperties.put(PROP_CONTAINS_TEXT, 
-               (String)condProps.get(ComparePropertyValueEvaluator.PARAM_VALUE));
-      }
-      else if (this.condition.equals(InCategoryEvaluator.NAME))
-      {
-         NodeRef catNodeRef = (NodeRef)condProps.get(InCategoryEvaluator.PARAM_CATEGORY_VALUE);
-         this.conditionProperties.put(PROP_CATEGORY, catNodeRef.getId());
+         Map<String, String> params = populateCondition(condition);
+         this.allConditionsProperties.add(params);
       }
       
-      // populate the action property bag with the relevant values
-      populateActionFromProperties(rule.getActions().get(0).getParameterValues());
+      List<Action> actions = rule.getActions();
+      for (Action action : actions)
+      {
+         // use the base class version of populateActionFromProperties(), 
+         // but for this we need to setup the currentActionProperties and 
+         // action variables
+         this.currentActionProperties = new HashMap<String, String>(3);
+         this.action = action.getActionDefinitionName();
+         populateActionFromProperties(action.getParameterValues());
+         
+         // also add the name and summary 
+         this.currentActionProperties.put(PROP_ACTION_NAME, this.action);
+         // generate the summary
+         this.currentActionProperties.put(PROP_ACTION_SUMMARY, 
+               buildActionSummary(this.currentActionProperties));
+         
+         // add the populated currentActionProperties to the list
+         this.allActionsProperties.add(this.currentActionProperties);
+      }
    }
 
    /**
@@ -461,18 +628,33 @@ public class NewRuleWizard extends BaseActionWizard
     */
    public String getSummary()
    {
-      String summaryCondition = this.actionService.getActionConditionDefinition(
-            this.condition).getTitle();
+      // create the summary using all the conditions
+      StringBuilder conditionsSummary = new StringBuilder();
+      for (Map<String,String> props : this.allConditionsProperties)
+      {
+         conditionsSummary.append(props.get(PROP_CONDITION_SUMMARY));
+         conditionsSummary.append("<br/>");
+      }
       
-      String summaryAction = this.actionService.getActionDefinition(
-            this.action).getTitle();
+      // create the summary using all the actions
+      StringBuilder actionsSummary = new StringBuilder();
+      for (Map<String,String> props : this.allActionsProperties)
+      {
+         actionsSummary.append(props.get(PROP_ACTION_SUMMARY));
+         actionsSummary.append("<br/>");
+      }
       
       ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
       
+      String backgroundYesNo = this.runInBackground ? bundle.getString("no") : bundle.getString("yes");
+      String subSpacesYesNo = this.applyToSubSpaces ? bundle.getString("no") : bundle.getString("yes");
+      
       return buildSummary(
             new String[] {bundle.getString("name"), bundle.getString("description"),
-                          bundle.getString("condition"), bundle.getString("action")},
-            new String[] {this.title, this.description, summaryCondition, summaryAction});
+                          bundle.getString("apply_to_sub_spaces"), bundle.getString("run_in_background"),
+                          bundle.getString("conditions"), bundle.getString("actions")},
+            new String[] {this.title, this.description, backgroundYesNo, subSpacesYesNo, 
+                          conditionsSummary.toString(), actionsSummary.toString()});
    }
    
    /**
@@ -506,6 +688,38 @@ public class NewRuleWizard extends BaseActionWizard
    {
       this.title = title;
    }
+   
+   /**
+    * @return Returns whether the rule should run in the background
+    */
+   public boolean getRunInBackground()
+   {
+      return this.runInBackground;
+   }
+
+   /**
+    * @param runInBackground Sets whether the rule should run in the background
+    */
+   public void setRunInBackground(boolean runInBackground)
+   {
+      this.runInBackground = runInBackground;
+   }
+
+   /**
+    * @return Returns whether the rule should be applied to sub spaces i.e. if it gets inherited
+    */
+   public boolean getApplyToSubSpaces()
+   {
+      return this.applyToSubSpaces;
+   }
+
+   /**
+    * @param applyToSubSpaces Sets whether the rule will get applied to sub spaces
+    */
+   public void setApplyToSubSpaces(boolean applyToSubSpaces)
+   {
+      this.applyToSubSpaces = applyToSubSpaces;
+   }
 
    /**
     * @return Returns the type.
@@ -522,7 +736,7 @@ public class NewRuleWizard extends BaseActionWizard
    {
       this.type = type;
    }
-
+   
    /**
     * @return Returns the selected condition
     */
@@ -558,6 +772,23 @@ public class NewRuleWizard extends BaseActionWizard
    }
 
    /**
+    * @return Returns the list of selectable actions
+    */
+   public List<SelectItem> getActions()
+   {
+      if (this.actions == null)
+      {
+         super.getActions();
+         
+         // add the "Select an action" entry at the beginning of the list
+         this.actions.add(0, new SelectItem("null", 
+               Application.getMessage(FacesContext.getCurrentInstance(), "select_an_action")));
+      }
+      
+      return this.actions;
+   }
+   
+   /**
     * @return Returns the list of selectable conditions
     */
    public List<SelectItem> getConditions()
@@ -568,6 +799,7 @@ public class NewRuleWizard extends BaseActionWizard
          this.conditions = new ArrayList<SelectItem>();
          for (ActionConditionDefinition ruleConditionDef : ruleConditions)
          {
+            // add to SelectItem list
             this.conditions.add(new SelectItem(ruleConditionDef.getName(), 
                   ruleConditionDef.getTitle()));
          }
@@ -575,6 +807,10 @@ public class NewRuleWizard extends BaseActionWizard
          // make sure the list is sorted by the label
          QuickSort sorter = new QuickSort(this.conditions, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
          sorter.sort();
+         
+         // add the "Select a condition" entry at the beginning of the list
+         this.conditions.add(0, new SelectItem("null", 
+               Application.getMessage(FacesContext.getCurrentInstance(), "select_a_condition")));
       }
       
       return this.conditions;
@@ -616,13 +852,13 @@ public class NewRuleWizard extends BaseActionWizard
       
       return this.types;
    }
-
+   
    /**
     * @return Gets the condition settings 
     */
    public Map<String, String> getConditionProperties()
    {
-      return this.conditionProperties;
+      return this.currentConditionProperties;
    }
    
    /**
@@ -646,20 +882,10 @@ public class NewRuleWizard extends BaseActionWizard
          }
          case 3:
          {
-            outcome = this.condition;
-            break;
-         }
-         case 4:
-         {
             outcome = "action";
             break;
          }
-         case 5:
-         {
-            outcome = this.action;
-            break;
-         }
-         case 6:
+         case 4:
          {
             outcome = "summary";
             break;
@@ -671,5 +897,208 @@ public class NewRuleWizard extends BaseActionWizard
       }
       
       return outcome;
-   }   
+   }
+   
+   /**
+    * Builds the Map of properties for the given condition in the format the repo is expecting
+    * 
+    * @param params The Map of properties built from the UI
+    * @return The Map the repo is expecting
+    */
+   protected Map<String, Serializable> buildConditionParams(Map<String, String> params)
+   {
+      Map<String, Serializable> repoParams = new HashMap<String, Serializable>(params.size());
+      
+      String condName = params.get(PROP_CONDITION_NAME);
+      if (condName.equals(ComparePropertyValueEvaluator.NAME))
+      {
+         repoParams.put(ComparePropertyValueEvaluator.PARAM_VALUE, params.get(PROP_CONTAINS_TEXT));
+      }
+      else if (condName.equals(InCategoryEvaluator.NAME))
+      {
+         // put the selected category in the condition params
+         NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), params.get(PROP_CATEGORY));
+         repoParams.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, catNodeRef);
+         
+         // add the classifiable aspect
+         repoParams.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_GEN_CLASSIFIABLE);
+      }
+      
+      return repoParams;
+   }
+   
+   /**
+    * Populates a Map of properties the wizard is expecting for the given condition
+    * 
+    * @param condition The condition to build the map for
+    */
+   protected Map<String, String> populateCondition(ActionCondition condition)
+   {
+      // find out what the condition is called
+      Map<String, String> condProps = new HashMap<String, String>(3);
+      String name = condition.getActionConditionDefinitionName();
+      condProps.put(PROP_CONDITION_NAME, name);
+      
+      // add the appropriate properties
+      Map<String, Serializable> repoCondProps = condition.getParameterValues();
+      if (name.equals(ComparePropertyValueEvaluator.NAME))
+      {
+         condProps.put(PROP_CONTAINS_TEXT, (String)repoCondProps.get(ComparePropertyValueEvaluator.PARAM_VALUE));
+      }
+      else if (name.equals(InCategoryEvaluator.NAME))
+      {
+         NodeRef catNodeRef = (NodeRef)repoCondProps.get(InCategoryEvaluator.PARAM_CATEGORY_VALUE);
+         condProps.put(PROP_CATEGORY, catNodeRef.getId());
+      }
+      
+      // generate the summary 
+      condProps.put(PROP_CONDITION_SUMMARY, buildConditionSummary(condProps));
+      
+      return condProps;
+   }
+   
+   /**
+    * Returns a summary string for the given condition parameters
+    * 
+    * @return The summary or null if a summary could not be built
+    */
+   protected String buildConditionSummary(Map<String, String> props)
+   {
+      String summaryResult = null;
+      
+      String condName = props.get(PROP_CONDITION_NAME);
+      if (condName != null)
+      {
+         StringBuilder summary = new StringBuilder();
+         summary.append(Application.getMessage(FacesContext.getCurrentInstance(), 
+               "condition_" + condName.replace('-', '_')));
+         summary.append(" ");
+         
+         // define a summary to be added for each condition
+         if ("in-category".equals(condName))
+         {
+            NodeRef cat = new NodeRef(Repository.getStoreRef(), props.get(PROP_CATEGORY));
+            String name = Repository.getNameForNode(this.nodeService, cat);
+            summary.append(name);
+         }
+         else if ("compare-property-value".equals(condName))
+         {
+            summary.append("'");
+            summary.append(props.get(PROP_CONTAINS_TEXT));
+            summary.append("'");
+         }
+         
+         summaryResult = summary.toString();
+      }
+      
+      return summaryResult;
+   }
+   
+   /**
+    * Returns a summary string for the given action parameters
+    * 
+    * @return The summary or null if a summary could not be built
+    */
+   protected String buildActionSummary(Map<String, String> props)
+   {
+      String summaryResult = null;
+      
+      String actionName = this.currentActionProperties.get(PROP_ACTION_NAME);
+      if (actionName != null)
+      {
+         StringBuilder summary = new StringBuilder();
+         summary.append(Application.getMessage(FacesContext.getCurrentInstance(), 
+               "action_" + actionName.replace('-', '_')));
+         summary.append(" ");
+         
+         // define a summary to be added for each action
+         if ("add-features".equals(actionName))
+         {
+            String aspect = this.currentActionProperties.get(PROP_ASPECT);
+            
+            // find the label used by looking through the SelectItem list
+            for (SelectItem item : this.getAspects())
+            {
+               if (item.getValue().equals(aspect))
+               {
+                  summary.append("'").append(item.getLabel()).append("'");
+                  break;
+               }
+            }
+         }
+         else if ("simple-workflow".equals(actionName))
+         {
+            // just leave the summary as the title for now
+         }
+         else if ("set-property-value".equals(actionName))
+         {
+            // TODO: add support for this action
+         }
+         else if ("link-category".equals(actionName))
+         {
+            NodeRef cat = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_CATEGORY));
+            String name = Repository.getNameForNode(this.nodeService, cat);
+            summary.append("'").append(name).append("'");
+         }
+         else if ("transform".equals(actionName))
+         {
+            NodeRef space = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_DESTINATION));
+            String name = Repository.getNameForNode(this.nodeService, space);
+            String transformer = this.currentActionProperties.get(PROP_TRANSFORMER);
+            
+            // find the label used by looking through the SelectItem list
+            for (SelectItem item : this.getTransformers())
+            {
+               if (item.getValue().equals(transformer))
+               {
+                  transformer = item.getLabel();
+                  break;
+               }
+            }
+            
+            // recreate the summary object as it contains parameters
+            String msg = MessageFormat.format(summary.toString(), new Object[] {name, transformer});
+            summary = new StringBuilder(msg);
+         }
+         else if ("transform-image".equals(actionName))
+         {
+            NodeRef space = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_DESTINATION));
+            String name = Repository.getNameForNode(this.nodeService, space);
+            String transformer = this.currentActionProperties.get(PROP_IMAGE_TRANSFORMER);
+            
+            // find the label used by looking through the SelectItem list
+            for (SelectItem item : this.getImageTransformers())
+            {
+               if (item.getValue().equals(transformer))
+               {
+                  transformer = item.getLabel();
+                  break;
+               }
+            }
+            
+            // recreate the summary object as it contains parameters
+            String msg = MessageFormat.format(summary.toString(), new Object[] {name, transformer});
+            summary = new StringBuilder(msg);
+         }
+         else if ("copy".equals(actionName) || "move".equals(actionName) || "check-out".equals(actionName))
+         {
+            NodeRef space = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_DESTINATION));
+            String spaceName = Repository.getNameForNode(this.nodeService, space);
+            summary.append("'").append(spaceName).append("'");
+         }
+         else if ("mail".equals(actionName))
+         {
+            // just leave the summary as the title for now
+         }
+         else if ("check-in".equals(actionName))
+         {
+            String comment = this.currentActionProperties.get(PROP_CHECKIN_DESC);
+            summary.append("'").append(comment).append("'");
+         }
+
+         summaryResult = summary.toString();
+      }
+      
+      return summaryResult;
+   }
 }

@@ -26,6 +26,20 @@
 
 <r:page titleId="title_new_rule_condition">
 
+<script language="JavaScript1.2">
+   function itemSelected(inputField)
+   {
+      if (inputField.selectedIndex == 0)
+      {
+         document.getElementById("new-rule-condition:set-add-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-rule-condition:set-add-button").disabled = false;
+      }
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -99,11 +113,9 @@
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
                                           value="2" disabled="true">
                                  <a:listItem value="1" label="1. #{msg.details}" />
-                                 <a:listItem value="2" label="2. #{msg.condition}" />
-                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
-                                 <a:listItem value="4" label="4. #{msg.action}" />
-                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
-                                 <a:listItem value="6" label="6. #{msg.summary}" />
+                                 <a:listItem value="2" label="2. #{msg.conditions}" />
+                                 <a:listItem value="3" label="3. #{msg.actions}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -116,23 +128,59 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{msg.condition}"/>:</td>
-                                    <td width="90%">
+                                    <td>1.</td>
+                                    <td><h:outputText value="#{msg.select_condition}"/></td>
+                                 </tr>
+                                 <tr>
+                                    <td>&nbsp;</td>
+                                    <td width="98%">
                                        <h:selectOneMenu value="#{NewRuleWizard.condition}" 
                                           onchange="javascript:itemSelected(this);">
                                           <f:selectItems value="#{NewRuleWizard.conditions}" />
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
+                                 <%--
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td valign="top"><h:outputText value="#{msg.description}"/>:</td>
+                                    <td valign="top">&nbsp;</td>
                                     <td>
-                                       <div style="width: 260px">
+                                       <div>
                                           <a:dynamicDescription selected="#{NewRuleWizard.condition}">
                                              <a:descriptions value="#{NewRuleWizard.conditionDescriptions}" />
                                           </a:dynamicDescription>
                                        </div>
+                                    </td>
+                                 </tr>
+                                 --%>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>2.</td>
+                                    <td><h:outputText value="#{msg.click_set_and_add}"/></td>
+                                 </tr>
+                                 <tr>
+                                    <td>&nbsp;</td>
+                                    <td><h:commandButton id="set-add-button" value="#{msg.set_and_add_button}" 
+                                                         action="#{NewRuleWizard.promptForConditionValues}"
+                                                         disabled="true"/></td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>3.</td>
+                                    <td><h:outputText value="#{msg.selected_conditions}"/></td>
+                                 </tr>
+                                 <tr>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                       <h:dataTable value="#{NewRuleWizard.allConditionsDataModel}" var="row">
+                                          <h:column>
+                                             <h:outputText value="#{row.conditionSummary}" />
+                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
+                                          </h:column>
+                                          <h:column>
+                                             <h:commandButton value="#{msg.remove}" action="#{NewRuleWizard.removeCondition}"/>
+                                          </h:column>
+                                       </h:dataTable>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
@@ -148,7 +196,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.next_button}" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewRuleWizard.next}" styleClass="wizardButton" 
+                                                        disabled="#{NewRuleWizard.allConditionsDataModel.rowCount == 0}" />
                                     </td>
                                  </tr>
                                  <tr>

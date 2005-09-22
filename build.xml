@@ -93,6 +93,8 @@
    
    <target name="deploy-jboss" depends="init" description="Deploys to JBoss">
       <copy file="${file.deploy}" todir="${dir.deploy.jboss}" />
+      <!-- clean up existing config files -->
+      <delete dir="${dir.deploy.jboss}/../conf/alfresco" quiet="yes"/>
       <!-- push externally visible config files into conf directory -->
       <copy todir="${dir.deploy.jboss}/../conf" >
          <fileset dir="${dir.config.repository}"/>

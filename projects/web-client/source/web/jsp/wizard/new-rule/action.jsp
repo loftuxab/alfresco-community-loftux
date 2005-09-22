@@ -26,6 +26,20 @@
 
 <r:page titleId="title_new_rule_action">
 
+<script language="JavaScript1.2">
+   function itemSelected(inputField)
+   {
+      if (inputField.selectedIndex == 0)
+      {
+         document.getElementById("new-rule-action:set-add-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-rule-action:set-add-button").disabled = false;
+      }
+   }
+</script>
+
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -97,13 +111,11 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
-                                          value="4" disabled="true">
+                                          value="3" disabled="true">
                                  <a:listItem value="1" label="1. #{msg.details}" />
-                                 <a:listItem value="2" label="2. #{msg.condition}" />
-                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
-                                 <a:listItem value="4" label="4. #{msg.action}" />
-                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
-                                 <a:listItem value="6" label="6. #{msg.summary}" />
+                                 <a:listItem value="2" label="2. #{msg.conditions}" />
+                                 <a:listItem value="3" label="3. #{msg.actions}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -116,14 +128,19 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{msg.action}"/>:</td>
-                                    <td width="90%">
-                                       <h:selectOneMenu value="#{NewRuleWizard.action}"
+                                    <td>1.</td>
+                                    <td><h:outputText value="#{msg.select_action}"/></td>
+                                 </tr>
+                                 <tr>
+                                    <td>&nbsp;</td>
+                                    <td width="98%">
+                                       <h:selectOneMenu value="#{NewRuleWizard.action}" 
                                           onchange="javascript:itemSelected(this);">
                                           <f:selectItems value="#{NewRuleWizard.actions}" />
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
+                                 <%--
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td valign="top"><h:outputText value="#{msg.description}"/>:</td>
@@ -133,6 +150,37 @@
                                              <a:descriptions value="#{NewRuleWizard.actionDescriptions}" />
                                           </a:dynamicDescription>
                                        </div>
+                                    </td>
+                                 </tr>
+                                 --%>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>2.</td>
+                                    <td><h:outputText value="#{msg.click_set_and_add}"/></td>
+                                 </tr>
+                                 <tr>
+                                    <td>&nbsp;</td>
+                                    <td><h:commandButton id="set-add-button" value="#{msg.set_and_add_button}" 
+                                                         action="#{NewRuleWizard.promptForActionValues}"
+                                                         disabled="true"/></td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>3.</td>
+                                    <td><h:outputText value="#{msg.selected_actions}"/></td>
+                                 </tr>
+                                 <tr>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                       <h:dataTable value="#{NewRuleWizard.allActionsDataModel}" var="row">
+                                          <h:column>
+                                             <h:outputText value="#{row.actionSummary}" />
+                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
+                                          </h:column>
+                                          <h:column>
+                                             <h:commandButton value="#{msg.remove}" action="#{NewRuleWizard.removeAction}"/>
+                                          </h:column>
+                                       </h:dataTable>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
@@ -148,7 +196,8 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.next_button}" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewRuleWizard.next}" styleClass="wizardButton" 
+                                                        disabled="#{NewRuleWizard.allActionsDataModel.rowCount == 0}"/>
                                     </td>
                                  </tr>
                                  <tr>
@@ -159,7 +208,7 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="#{msg.finish_button}" action="#{NewRuleWizard.finish}" styleClass="wizardButton" 
-                                                        disabled="true" />
+                                                        disabled="#{NewRuleWizard.allActionsDataModel.rowCount == 0}" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

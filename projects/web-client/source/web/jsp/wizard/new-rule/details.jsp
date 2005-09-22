@@ -107,11 +107,9 @@
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
                                           value="1" disabled="true">
                                  <a:listItem value="1" label="1. #{msg.details}" />
-                                 <a:listItem value="2" label="2. #{msg.condition}" />
-                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
-                                 <a:listItem value="4" label="4. #{msg.action}" />
-                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
-                                 <a:listItem value="6" label="6. #{msg.summary}" />
+                                 <a:listItem value="2" label="2. #{msg.conditions}" />
+                                 <a:listItem value="3" label="3. #{msg.actions}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
@@ -145,6 +143,22 @@
                                     <td><h:outputText value="#{msg.description}"/>:</td>
                                     <td>
                                        <h:inputText value="#{NewRuleWizard.description}" size="35" maxlength="1024" />
+                                    </td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.other_properties}" /></td>
+                                 </tr>
+                                 <tr>
+                                    <td colspan="2">
+                                       <h:selectBooleanCheckbox value="#{NewRuleWizard.applyToSubSpaces}"/>
+                                       <h:outputText value="#{msg.apply_to_sub_spaces}"/>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td colspan="2">
+                                       <h:selectBooleanCheckbox value="#{NewRuleWizard.runInBackground}"/>
+                                       <h:outputText value="#{msg.run_in_background}"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

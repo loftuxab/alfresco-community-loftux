@@ -42,13 +42,11 @@
       if (document.getElementById("new-rule-email:subject").value.length == 0 ||
           document.getElementById("new-rule-email:address").value.length == 0)
       {
-         document.getElementById("new-rule-email:next-button").disabled = true;
-         document.getElementById("new-rule-email:finish-button").disabled = true;
+         document.getElementById("new-rule-email:ok-button").disabled = true;
       }
       else
       {
-         document.getElementById("new-rule-email:next-button").disabled = false;
-         document.getElementById("new-rule-email:finish-button").disabled = false;
+         document.getElementById("new-rule-email:ok-button").disabled = false;
       }
    }
 </script>
@@ -120,21 +118,6 @@
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
-                           <td width="20%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
-                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
-                                          value="5" disabled="true">
-                                 <a:listItem value="1" label="1. #{msg.details}" />
-                                 <a:listItem value="2" label="2. #{msg.condition}" />
-                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
-                                 <a:listItem value="4" label="4. #{msg.action}" />
-                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
-                                 <a:listItem value="6" label="6. #{msg.summary}" />
-                              </a:modeList>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
-                           
                            <td width="100%" valign="top">
                               
                               <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
@@ -142,7 +125,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
+                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{msg.set_action_values}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
@@ -182,23 +165,14 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="next-button" value="#{msg.next_button}" action="#{NewRuleWizard.next}" styleClass="wizardButton" />
+                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{NewRuleWizard.addAction}" 
+                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.back_button}" action="#{NewRuleWizard.back}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton id="finish-button" value="#{msg.finish_button}" action="#{NewRuleWizard.finish}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewRuleWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewRuleWizard.cancelAddAction}" 
+                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

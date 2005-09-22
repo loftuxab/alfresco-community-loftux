@@ -42,13 +42,11 @@
           document.getElementById("new-rule-simple-workflow:client-approve-folder").value.length == 0 ||
           rejectValid() == false)
       {
-         document.getElementById("new-rule-simple-workflow:next-button").disabled = true;
-         document.getElementById("new-rule-simple-workflow:finish-button").disabled = true;
+         document.getElementById("new-rule-simple-workflow:ok-button").disabled = true;
       }
       else
       {
-         document.getElementById("new-rule-simple-workflow:next-button").disabled = false;
-         document.getElementById("new-rule-simple-workflow:finish-button").disabled = false;
+         document.getElementById("new-rule-simple-workflow:ok-button").disabled = false;
       }
    }
    
@@ -114,7 +112,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/new_rule_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle"><h:outputText value="#{NewRuleWizard.wizardTitle}" /></div>
                               <div class="mainSubText"><h:outputText value="#{NewRuleWizard.wizardDescription}" /></div>
                            </td>
@@ -138,21 +136,6 @@
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
-                           <td width="20%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
-                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
-                                          value="5" disabled="true">
-                                 <a:listItem value="1" label="1. #{msg.details}" />
-                                 <a:listItem value="2" label="2. #{msg.condition}" />
-                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
-                                 <a:listItem value="4" label="4. #{msg.action}" />
-                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
-                                 <a:listItem value="6" label="6. #{msg.summary}" />
-                              </a:modeList>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
-                           
                            <td width="100%" valign="top">
                               
                               <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
@@ -160,7 +143,7 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
+                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{msg.set_action_values}" /></td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
@@ -181,8 +164,8 @@
                                           <tr>
                                              <td valign="top">
                                                 <h:selectOneRadio value="#{NewRuleWizard.actionProperties.approveAction}">
-                                                   <f:selectItem itemValue="move" itemLabel="Move" />
-                                                   <f:selectItem itemValue="copy" itemLabel="Copy" />
+                                                   <f:selectItem itemValue="move" itemLabel="#{msg.move}" />
+                                                   <f:selectItem itemValue="copy" itemLabel="#{msg.copy}" />
                                                 </h:selectOneRadio>
                                              </td>
                                              <td style="padding-left:6px;"></td>
@@ -209,8 +192,8 @@
                                     <td>
                                        <h:selectOneRadio id="reject-step-present" value="#{NewRuleWizard.actionProperties.rejectStepPresent}"
                                                          onclick="javascript:checkButtonState();" >
-                                          <f:selectItem itemValue="yes" itemLabel="Yes" />
-                                          <f:selectItem itemValue="no" itemLabel="No" />
+                                          <f:selectItem itemValue="yes" itemLabel="#{msg.yes}" />
+                                          <f:selectItem itemValue="no" itemLabel="#{msg.no}" />
                                        </h:selectOneRadio>
                                     </td>
                                  </tr>
@@ -245,8 +228,8 @@
                                                                <td style="padding-left:6px;"></td>
                                                                <td style="padding-top:6px;">
                                                                   <r:spaceSelector label="#{msg.select_destination_prompt}" 
-                                                                          value="#{NewRuleWizard.actionProperties.rejectFolder}" 
-                                                                          initialSelection="#{NavigationBean.currentNodeId}"
+                                                                          value="#{NewRuleWizard.actionProperties.rejectFolder}"
+                                                                          initialSelection="#{NavigationBean.currentNodeId}" 
                                                                           style="border: 1px dashed #cccccc; padding: 6px;"/>
                                                                </td>
                                                             </tr>
@@ -272,25 +255,14 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="next-button" value="#{msg.next_button}" action="#{NewRuleWizard.next}" styleClass="wizardButton" 
-                                                        disabled="true" />
+                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{NewRuleWizard.addAction}" 
+                                                        styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.back_button}" action="#{NewRuleWizard.back}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton id="finish-button" value="#{msg.finish_button}" action="#{NewRuleWizard.finish}" styleClass="wizardButton" 
-                                                        disabled="true" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewRuleWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewRuleWizard.cancelAddAction}" 
+                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

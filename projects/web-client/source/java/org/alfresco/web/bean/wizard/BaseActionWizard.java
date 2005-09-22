@@ -82,6 +82,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    private static Log logger = LogFactory.getLog(BaseActionWizard.class);
    
    // new rule/action wizard specific properties
+   protected boolean multiActionMode = false;
    protected String action;
    protected ActionService actionService;
    protected List<SelectItem> actions;
@@ -90,8 +91,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    protected List<SelectItem> aspects;
    protected List<SelectItem> users;
    protected Map<String, String> actionDescriptions;
-   protected Map<String, String> actionProperties;
-   
+   protected Map<String, String> currentActionProperties;
    
    /**
     * Initialises the wizard
@@ -120,12 +120,12 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          this.actionDescriptions = null;
       }
       
-      this.actionProperties = new HashMap<String, String>(3);
+      this.currentActionProperties = new HashMap<String, String>(3);
       
       // default the approve and reject actions
-      this.actionProperties.put("approveAction", "move");
-      this.actionProperties.put("rejectStepPresent", "yes");
-      this.actionProperties.put("rejectAction", "move");
+      this.currentActionProperties.put("approveAction", "move");
+      this.currentActionProperties.put("rejectStepPresent", "yes");
+      this.currentActionProperties.put("rejectAction", "move");
    }
    
    /**
@@ -140,14 +140,14 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       
       if (this.action.equals(AddFeaturesActionExecuter.NAME))
       {
-         QName aspect = Repository.resolveToQName(this.actionProperties.get(PROP_ASPECT));
+         QName aspect = Repository.resolveToQName(this.currentActionProperties.get(PROP_ASPECT));
          actionParams.put(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, aspect);
       }
       else if (this.action.equals(CopyActionExecuter.NAME))
       {
          // add the destination space id to the action properties
          NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
-               this.actionProperties.get(PROP_DESTINATION));
+               this.currentActionProperties.get(PROP_DESTINATION));
          actionParams.put(CopyActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
          
          // add the type and name of the association to create when the copy
@@ -161,7 +161,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       {
          // add the destination space id to the action properties
          NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
-               this.actionProperties.get(PROP_DESTINATION));
+               this.currentActionProperties.get(PROP_DESTINATION));
          actionParams.put(MoveActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
          
          // add the type and name of the association to create when the move
@@ -175,11 +175,11 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       {
          // add the approve step name
          actionParams.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_STEP,
-               this.actionProperties.get(PROP_APPROVE_STEP_NAME));
+               this.currentActionProperties.get(PROP_APPROVE_STEP_NAME));
          
          // add whether the approve step will copy or move the content
          boolean approveMove = true;
-         String approveAction = this.actionProperties.get(PROP_APPROVE_ACTION);
+         String approveAction = this.currentActionProperties.get(PROP_APPROVE_ACTION);
          if (approveAction != null && approveAction.equals("copy"))
          {
             approveMove = false;
@@ -190,13 +190,13 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          
          // add the destination folder of the content
          NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(), 
-               this.actionProperties.get(PROP_APPROVE_FOLDER));
+               this.currentActionProperties.get(PROP_APPROVE_FOLDER));
          actionParams.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_FOLDER, 
                approveDestNodeRef);
          
          // determine whether we have a reject step or not
          boolean requireReject = true;
-         String rejectStepPresent = this.actionProperties.get(PROP_REJECT_STEP_PRESENT);
+         String rejectStepPresent = this.currentActionProperties.get(PROP_REJECT_STEP_PRESENT);
          if (rejectStepPresent != null && rejectStepPresent.equals("no"))
          {
             requireReject = false;
@@ -206,11 +206,11 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          {
             // add the reject step name
             actionParams.put(SimpleWorkflowActionExecuter.PARAM_REJECT_STEP,
-                  this.actionProperties.get(PROP_REJECT_STEP_NAME));
+                  this.currentActionProperties.get(PROP_REJECT_STEP_NAME));
          
             // add whether the reject step will copy or move the content
             boolean rejectMove = true;
-            String rejectAction = this.actionProperties.get(PROP_REJECT_ACTION);
+            String rejectAction = this.currentActionProperties.get(PROP_REJECT_ACTION);
             if (rejectAction != null && rejectAction.equals("copy"))
             {
                rejectMove = false;
@@ -221,7 +221,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
             
             // add the destination folder of the content
             NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(), 
-                  this.actionProperties.get(PROP_REJECT_FOLDER));
+                  this.currentActionProperties.get(PROP_REJECT_FOLDER));
             actionParams.put(SimpleWorkflowActionExecuter.PARAM_REJECT_FOLDER, 
                   rejectDestNodeRef);
          }
@@ -234,7 +234,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          
          // put the selected category in the action params
          NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), 
-               this.actionProperties.get(PROP_CATEGORY));
+               this.currentActionProperties.get(PROP_CATEGORY));
          actionParams.put(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE, 
                catNodeRef);
       }
@@ -243,7 +243,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          // specify the location the checked out working copy should go
          // add the destination space id to the action properties
          NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
-               this.actionProperties.get(PROP_DESTINATION));
+               this.currentActionProperties.get(PROP_DESTINATION));
          actionParams.put(CheckOutActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
          
          // add the type and name of the association to create when the 
@@ -257,17 +257,17 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       {
          // add the description for the checkin to the action params
          actionParams.put(CheckInActionExecuter.PARAM_DESCRIPTION, 
-               this.actionProperties.get(PROP_CHECKIN_DESC));
+               this.currentActionProperties.get(PROP_CHECKIN_DESC));
       }
       else if (this.action.equals(TransformActionExecuter.NAME))
       {
          // add the transformer to use
          actionParams.put(TransformActionExecuter.PARAM_MIME_TYPE,
-               this.actionProperties.get(PROP_TRANSFORMER));
+               this.currentActionProperties.get(PROP_TRANSFORMER));
          
          // add the destination space id to the action properties
          NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
-               this.actionProperties.get(PROP_DESTINATION));
+               this.currentActionProperties.get(PROP_DESTINATION));
          actionParams.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
          
          // add the type and name of the association to create when the copy
@@ -281,15 +281,15 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       {
          // add the transformer to use
          actionParams.put(ImageTransformActionExecuter.PARAM_MIME_TYPE,
-               this.actionProperties.get(PROP_IMAGE_TRANSFORMER));
+               this.currentActionProperties.get(PROP_IMAGE_TRANSFORMER));
          
          // add the options
          actionParams.put(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND, 
-               this.actionProperties.get(PROP_TRANSFORM_OPTIONS));
+               this.currentActionProperties.get(PROP_TRANSFORM_OPTIONS));
          
          // add the destination space id to the action properties
          NodeRef destNodeRef = new NodeRef(Repository.getStoreRef(), 
-               this.actionProperties.get(PROP_DESTINATION));
+               this.currentActionProperties.get(PROP_DESTINATION));
          actionParams.put(TransformActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
          
          // add the type and name of the association to create when the copy
@@ -303,15 +303,15 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       {
          // add the actual email text to send
          actionParams.put(MailActionExecuter.PARAM_TEXT, 
-               this.actionProperties.get(PROP_MESSAGE));
+               this.currentActionProperties.get(PROP_MESSAGE));
             
          // add the person it's going to
          actionParams.put(MailActionExecuter.PARAM_TO, 
-               this.actionProperties.get(PROP_TO));
+               this.currentActionProperties.get(PROP_TO));
          
          // add the subject for the email
          actionParams.put(MailActionExecuter.PARAM_SUBJECT,
-               this.actionProperties.get(PROP_SUBJECT));
+               this.currentActionProperties.get(PROP_SUBJECT));
       }
       
       return actionParams;
@@ -328,17 +328,17 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       if (this.action.equals(AddFeaturesActionExecuter.NAME))
       {
          QName aspect = (QName)actionProps.get(AddFeaturesActionExecuter.PARAM_ASPECT_NAME);
-         this.actionProperties.put(PROP_ASPECT, aspect.toString());
+         this.currentActionProperties.put(PROP_ASPECT, aspect.toString());
       }
       else if (this.action.equals(CopyActionExecuter.NAME))
       {
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
-         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+         this.currentActionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
       else if (this.action.equals(MoveActionExecuter.NAME))
       {
          NodeRef destNodeRef = (NodeRef)actionProps.get(MoveActionExecuter.PARAM_DESTINATION_FOLDER);
-         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+         this.currentActionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
       else if (this.action.equals(SimpleWorkflowActionExecuter.NAME))
       {
@@ -352,66 +352,66 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          NodeRef rejectFolderNode = (NodeRef)actionProps.get(
                SimpleWorkflowActionExecuter.PARAM_REJECT_FOLDER);
          
-         this.actionProperties.put(PROP_APPROVE_STEP_NAME, approveStep);
-         this.actionProperties.put(PROP_APPROVE_ACTION, approveMove ? "move" : "copy");
-         this.actionProperties.put(PROP_APPROVE_FOLDER, approveFolderNode.getId());
+         this.currentActionProperties.put(PROP_APPROVE_STEP_NAME, approveStep);
+         this.currentActionProperties.put(PROP_APPROVE_ACTION, approveMove ? "move" : "copy");
+         this.currentActionProperties.put(PROP_APPROVE_FOLDER, approveFolderNode.getId());
          
          if (rejectStep == null && rejectMove == null && rejectFolderNode == null)
          {
-            this.actionProperties.put(PROP_REJECT_STEP_PRESENT, "no");
+            this.currentActionProperties.put(PROP_REJECT_STEP_PRESENT, "no");
          }
          else
          {
-            this.actionProperties.put(PROP_REJECT_STEP_PRESENT, "yes");
-            this.actionProperties.put(PROP_REJECT_STEP_NAME, rejectStep);
-            this.actionProperties.put(PROP_REJECT_ACTION, rejectMove ? "move" : "copy");
-            this.actionProperties.put(PROP_REJECT_FOLDER, rejectFolderNode.getId());
+            this.currentActionProperties.put(PROP_REJECT_STEP_PRESENT, "yes");
+            this.currentActionProperties.put(PROP_REJECT_STEP_NAME, rejectStep);
+            this.currentActionProperties.put(PROP_REJECT_ACTION, rejectMove ? "move" : "copy");
+            this.currentActionProperties.put(PROP_REJECT_FOLDER, rejectFolderNode.getId());
          }
       }
       else if (this.action.equals(LinkCategoryActionExecuter.NAME))
       {
          NodeRef catNodeRef = (NodeRef)actionProps.get(LinkCategoryActionExecuter.PARAM_CATEGORY_VALUE);
-         this.actionProperties.put(PROP_CATEGORY, catNodeRef.getId());
+         this.currentActionProperties.put(PROP_CATEGORY, catNodeRef.getId());
       }
       else if (this.action.equals(CheckOutActionExecuter.NAME))
       {
          NodeRef destNodeRef = (NodeRef)actionProps.get(CheckOutActionExecuter.PARAM_DESTINATION_FOLDER);
-         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+         this.currentActionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
       else if (this.action.equals(CheckInActionExecuter.NAME))
       {
          String checkDesc = (String)actionProps.get(CheckInActionExecuter.PARAM_DESCRIPTION);
-         this.actionProperties.put(PROP_CHECKIN_DESC, checkDesc);
+         this.currentActionProperties.put(PROP_CHECKIN_DESC, checkDesc);
       }
       else if (this.action.equals(TransformActionExecuter.NAME))
       {
          String transformer = (String)actionProps.get(TransformActionExecuter.PARAM_MIME_TYPE);
-         this.actionProperties.put(PROP_TRANSFORMER, transformer);
+         this.currentActionProperties.put(PROP_TRANSFORMER, transformer);
          
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
-         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+         this.currentActionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
       else if (this.action.equals(ImageTransformActionExecuter.NAME))
       {
          String transformer = (String)actionProps.get(TransformActionExecuter.PARAM_MIME_TYPE);
-         this.actionProperties.put(PROP_IMAGE_TRANSFORMER, transformer);
+         this.currentActionProperties.put(PROP_IMAGE_TRANSFORMER, transformer);
          
          String options = (String)actionProps.get(ImageTransformActionExecuter.PARAM_CONVERT_COMMAND);
-         this.actionProperties.put(PROP_TRANSFORM_OPTIONS, options != null ? options : "");
+         this.currentActionProperties.put(PROP_TRANSFORM_OPTIONS, options != null ? options : "");
          
          NodeRef destNodeRef = (NodeRef)actionProps.get(CopyActionExecuter.PARAM_DESTINATION_FOLDER);
-         this.actionProperties.put(PROP_DESTINATION, destNodeRef.getId());
+         this.currentActionProperties.put(PROP_DESTINATION, destNodeRef.getId());
       }
       else if (this.action.equals(MailActionExecuter.NAME))
       {
          String subject = (String)actionProps.get(MailActionExecuter.PARAM_SUBJECT);
-         this.actionProperties.put(PROP_SUBJECT, subject);
+         this.currentActionProperties.put(PROP_SUBJECT, subject);
          
          String message = (String)actionProps.get(MailActionExecuter.PARAM_TEXT);
-         this.actionProperties.put(PROP_MESSAGE, message);
+         this.currentActionProperties.put(PROP_MESSAGE, message);
          
          String to = (String)actionProps.get(MailActionExecuter.PARAM_TO);
-         this.actionProperties.put(PROP_TO, to);
+         this.currentActionProperties.put(PROP_TO, to);
       }
    }
 
@@ -486,7 +486,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
     */
    public Map<String, String> getActionProperties()
    {
-      return this.actionProperties;
+      return this.currentActionProperties;
    }
    
    /**

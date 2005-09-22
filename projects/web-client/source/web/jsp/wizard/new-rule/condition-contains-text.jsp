@@ -30,7 +30,7 @@
    function checkButtonState(inputField)
    {
       var disabled = (inputField.value.length == 0);
-      document.getElementById("new-rule-contains-text:next-button").disabled = disabled;
+      document.getElementById("new-rule-contains-text:ok-button").disabled = disabled;
    }
 </script>
 
@@ -101,26 +101,11 @@
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
-                           <td width="20%" valign="top">
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
-                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
-                                          value="3" disabled="true">
-                                 <a:listItem value="1" label="1. #{msg.details}" />
-                                 <a:listItem value="2" label="2. #{msg.condition}" />
-                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
-                                 <a:listItem value="4" label="4. #{msg.action}" />
-                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
-                                 <a:listItem value="6" label="6. #{msg.summary}" />
-                              </a:modeList>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                           </td>
-                           
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{NewRuleWizard.stepTitle}" /></td>
+                                    <td class="mainSubTitle"><h:outputText value="#{msg.set_condition_values}" /></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
@@ -152,26 +137,15 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="next-button" value="#{msg.next_button}" action="#{NewRuleWizard.next}" 
+                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{NewRuleWizard.addCondition}" 
                                                         styleClass="wizardButton" 
                                                         disabled="#{NewRuleWizard.conditionProperties.containstext == null}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.back_button}" action="#{NewRuleWizard.back}" styleClass="wizardButton" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="#{msg.finish_button}" action="#{NewRuleWizard.finish}" styleClass="wizardButton" 
-                                                        disabled="true"/>
-                                    </td>
-                                 </tr>
-                                 <tr><td class="wizardButtonSpacing"></td></tr>
-                                 <tr>
-                                    <td align="center">
-                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewRuleWizard.cancel}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewRuleWizard.cancelAddCondition}" 
+                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>

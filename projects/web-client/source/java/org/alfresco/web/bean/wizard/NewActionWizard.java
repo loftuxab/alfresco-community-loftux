@@ -78,7 +78,7 @@ public class NewActionWizard extends BaseActionWizard
          {
             logger.debug("Executed action '" + this.action + 
                          "' with action params of " + 
-                         this.actionProperties);
+                         this.currentActionProperties);
          }
          
          // reset the current document properties/aspects in case we have changed them

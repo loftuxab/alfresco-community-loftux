@@ -291,7 +291,7 @@ public abstract class AbstractWizardBean
       for (int i=0; i<labels.length; i++)
       {
          String value = values[i];
-         buf.append("<tr><td><b>");
+         buf.append("<tr><td valign='top'><b>");
          buf.append(labels[i]);
          buf.append(":</b></td><td>");
          buf.append(value != null ? value : notSetMsg);
