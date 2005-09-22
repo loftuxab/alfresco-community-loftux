@@ -72,8 +72,6 @@ public class RepositoryStartupServlet extends HttpServlet
         {
             throw new ServletException(e);
         }
-        
-        System.out.println("Start Alfresco Repository");
     }
 
     /**

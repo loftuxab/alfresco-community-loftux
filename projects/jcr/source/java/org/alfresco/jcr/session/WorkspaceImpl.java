@@ -40,6 +40,7 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 
+import org.alfresco.jcr.query.QueryManagerImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -55,6 +56,7 @@ public class WorkspaceImpl implements Workspace
     
     private SessionImpl session;
     private Workspace proxy = null;
+    private QueryManagerImpl queryManager = null;
     
     /**
      * Construct
@@ -137,10 +139,16 @@ public class WorkspaceImpl implements Workspace
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Workspace#getQueryManager()
+     */
     public QueryManager getQueryManager() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        if (queryManager == null)
+        {
+            queryManager = new QueryManagerImpl();
+        }
+        return queryManager;
     }
 
     /* (non-Javadoc)
