@@ -17,6 +17,7 @@
 package org.alfresco.web.ui.repo.component.property;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import javax.faces.el.ValueBinding;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
@@ -139,7 +141,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
          {
             // show all the properties for the current node
             if (logger.isDebugEnabled())
-               logger.debug("Configuring property sheet using node's properties");
+               logger.debug("Configuring property sheet using node's current state");
             
             createComponentsFromNode(context, node);
          }
@@ -342,6 +344,7 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
    private void createComponentsFromNode(FacesContext context, Node node)
       throws IOException
    {
+      // add all the properties of the node to the UI
       Map<String, Object> props = node.getProperties();
       for (String propertyName : props.keySet())
       {
@@ -367,9 +370,60 @@ public class UIPropertySheet extends UIPanel implements NamingContainer
                    "' and added it to property sheet " + this);
       }
       
-      // **********************************
-      // TODO: // get all the associations for the node and create components for all of them.
-      // **********************************
+      // add all the associations of the node to the UI
+      Map associations = node.getAssociations();
+      Iterator iter = associations.keySet().iterator();
+      while (iter.hasNext())
+      {
+         String assocName = (String)iter.next();
+         UIAssociation assocComp = (UIAssociation)context.getApplication().createComponent("org.alfresco.faces.Association");
+         assocComp.setId(context.getViewRoot().createUniqueId());
+         assocComp.setName(assocName);
+         
+         // if this property sheet is set as read only, set all properties to read only
+         if (isReadOnly())
+         {
+            assocComp.setReadOnly(true);
+         }
+         
+         // NOTE: we don't know what the display label is so don't set it
+         
+         this.getChildren().add(assocComp);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Created association component " + assocComp + "(" + 
+                   assocComp.getClientId(context) + 
+                   ") for '" + assocName +
+                   "' and added it to property sheet " + this);
+      }
+      
+      // add all the child associations of the node to the UI
+      Map childAssociations = node.getChildAssociations();
+      iter = childAssociations.keySet().iterator();
+      while (iter.hasNext())
+      {
+         String assocName = (String)iter.next();
+         UIChildAssociation childAssocComp = (UIChildAssociation)context.getApplication().createComponent(
+               "org.alfresco.faces.ChildAssociation");
+         childAssocComp.setId(context.getViewRoot().createUniqueId());
+         childAssocComp.setName(assocName);
+         
+         // if this property sheet is set as read only, set all properties to read only
+         if (isReadOnly())
+         {
+            childAssocComp.setReadOnly(true);
+         }
+         
+         // NOTE: we don't know what the display label is so don't set it
+         
+         this.getChildren().add(childAssocComp);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Created child association component " + childAssocComp + "(" + 
+                   childAssocComp.getClientId(context) + 
+                   ") for '" + assocName +
+                   "' and added it to property sheet " + this);
+      }
    }
    
    /**

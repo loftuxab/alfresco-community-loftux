@@ -84,7 +84,7 @@ public class PropertyRenderer extends BaseRenderer
          }
          
          // close the <td> 
-         out.write(" valign='top'>");
+         out.write(">");
          // encode the label
          Utils.encodeRecursive(context, label);
          // encode the control
