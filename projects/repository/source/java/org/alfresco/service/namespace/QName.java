@@ -38,7 +38,8 @@ public final class QName implements QNamePattern, Serializable, Cloneable
     private String localName;                   // never null
     private int hashCode;
     private String prefix;
-    private static final char[] INVALID_CHARS = { '/', '.', '{', '}', ':' };
+    private static final char[] INVALID_CHARS = { '/', '.', '{', '}' };
+//    private static final char[] INVALID_CHARS = { '/', '.', '{', '}', ':' };
 
     public static final char NAMESPACE_PREFIX = ':';
     public static final char NAMESPACE_BEGIN = '{';
