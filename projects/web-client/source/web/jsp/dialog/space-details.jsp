@@ -188,6 +188,16 @@
                                        <h:outputText id="description" value="#{r.description}" />
                                     </a:column>
                                     
+                                    <%-- Column to show whether the rule is local --%>
+                                    <a:column style="text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="#{msg.local}" value="local" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText value="#{r.local}" >
+                                          <a:convertBoolean/>
+                                       </h:outputText>
+                                    </a:column>
+                                    
                                     <%-- Created Date column for details view mode --%>
                                     <a:column id="col3" style="text-align:left">
                                        <f:facet name="header">

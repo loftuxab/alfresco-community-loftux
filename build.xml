@@ -195,9 +195,9 @@
       </sql>
     
       <!-- cleanup indexes, they could be in several locations so try all of them -->
-      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.repository}/alfresco" />
-      <delete quiet="yes" includeEmptyDirs="true" dir="${home.tomcat}/bin/alfresco" />
-      <delete quiet="yes" includeEmptyDirs="true" dir="${home.jboss}/bin/alfresco" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.repository}/alf_data" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${home.tomcat}/bin/alf_data" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${home.jboss}/bin/alf_data" />
    </target>  
    
    <!-- ********************** -->

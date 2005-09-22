@@ -84,10 +84,10 @@
                               <%-- Filters --%>
                               <h:outputText style="padding-left:26px;padding-bottom:4px;" styleClass="mainSubTitle" value="#{msg.filter_contents}" /><br/>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight"
-                                    value="#{RulesBean.viewMode}" actionListener="#{RulesBean.viewModeChanged}"
+                                    value="#{RulesBean.viewMode}" actionListener="#{RulesBean.viewModeChanged}" 
                                     selectedImage="/images/icons/Details.gif">
+                                 <a:listItem value="inherited" label="#{msg.inherited}" />
                                  <a:listItem value="local" label="#{msg.local}" />
-                                 <%-- TBD <a:listItem value="inherited" label="Inherited" /> --%>
                               </a:modeList>
                            </td>
                         </tr>
@@ -137,7 +137,8 @@
                               <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
                                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
                                           altRowStyleClass="recordSetRowAlt" width="100%" pageSize="10"
-                                          initialSortColumn="title" initialSortDescending="true">
+                                          initialSortColumn="title" initialSortDescending="true"
+                                          binding="#{RulesBean.richList}">
                         
                                  <%-- Primary column for details view mode --%>
                                  <a:column primary="true" width="200" style="padding:2px;text-align:left">
@@ -145,16 +146,28 @@
                                        <a:sortLink label="#{msg.title}" value="title" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
-                                       <a:actionLink value="#{r.title}" image="/images/icons/rule.gif" 
-                                                     actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule"
-                                                     showLink="false">
+                                       <h:panelGroup>
+                                          <a:booleanEvaluator value="#{r.local}">
+                                             <a:actionLink value="#{r.title}" image="/images/icons/rule.gif" 
+                                                           actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule"
+                                                           showLink="false">
+                                                <f:param name="id" value="#{r.id}" />
+                                             </a:actionLink>
+                                          </a:booleanEvaluator>
+                                          <a:booleanEvaluator value="#{r.local == false}">
+                                             <h:graphicImage value="/images/icons/rule.gif" title="#{r.title}" style="vertical-align: middle"/>
+                                          </a:booleanEvaluator>
+                                       </h:panelGroup>
+                                    </f:facet>
+                                    <a:booleanEvaluator value="#{r.local}">
+                                       <a:actionLink value="#{r.title}" actionListener="#{NewRuleWizard.startWizardForEdit}" 
+                                                     action="editRule">
                                           <f:param name="id" value="#{r.id}" />
                                        </a:actionLink>
-                                    </f:facet>
-                                    <a:actionLink value="#{r.title}" actionListener="#{NewRuleWizard.startWizardForEdit}" 
-                                                  action="editRule">
-                                       <f:param name="id" value="#{r.id}" />
-                                    </a:actionLink>
+                                    </a:booleanEvaluator>
+                                    <a:booleanEvaluator value="#{r.local == false}">
+                                       <h:outputText value="#{r.title}"/>
+                                    </a:booleanEvaluator>
                                  </a:column>
                                  
                                  <%-- Description column --%>
@@ -163,6 +176,16 @@
                                        <a:sortLink label="#{msg.description}" value="description" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.description}" />
+                                 </a:column>
+                                 
+                                 <%-- Column to show whether the rule is local --%>
+                                 <a:column style="text-align:left">
+                                    <f:facet name="header">
+                                       <a:sortLink label="#{msg.local}" value="local" styleClass="header"/>
+                                    </f:facet>
+                                    <h:outputText value="#{r.local}" >
+                                       <a:convertBoolean/>
+                                    </h:outputText>
                                  </a:column>
                                  
                                  <%-- Created Date column for details view mode --%>
@@ -190,16 +213,18 @@
                                     <f:facet name="header">
                                        <h:outputText value="#{msg.actions}"/>
                                     </f:facet>
-                                    <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" 
-                                                  styleClass="inlineAction"
-                                                  actionListener="#{RulesBean.setupRuleAction}" action="deleteRule">
-                                       <f:param name="id" value="#{r.id}" />
-                                    </a:actionLink>
-                                    <a:actionLink value="#{msg.change_details}" image="/images/icons/change_rule.gif" 
-                                                  showLink="false" styleClass="inlineAction"
-                                                  actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule">
-                                       <f:param name="id" value="#{r.id}" />
-                                    </a:actionLink>
+                                    <a:booleanEvaluator value="#{r.local}">
+                                       <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" 
+                                                     styleClass="inlineAction"
+                                                     actionListener="#{RulesBean.setupRuleAction}" action="deleteRule">
+                                          <f:param name="id" value="#{r.id}" />
+                                       </a:actionLink>
+                                       <a:actionLink value="#{msg.change_details}" image="/images/icons/change_rule.gif" 
+                                                     showLink="false" styleClass="inlineAction"
+                                                     actionListener="#{NewRuleWizard.startWizardForEdit}" action="editRule">
+                                          <f:param name="id" value="#{r.id}" />
+                                       </a:actionLink>
+                                    </a:booleanEvaluator>
                                  </a:column>
                                  
                                  <a:dataPager/>
