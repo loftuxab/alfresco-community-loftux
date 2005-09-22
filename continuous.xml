@@ -63,7 +63,7 @@
       <zip destfile="${dir.dist}/${file.name.dist.bin.jboss}.zip">
          <zipfileset dir="${dir.project.installer}" 
                      includes="alf_start_jb.bat,alf_stop_jb.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
-                               licenses/**,README_jboss_win.txt,start_oo2.bat,
+                               licenses/**,README_jboss_win.txt,start_oo2.bat,*.sql, paths_jb.bat,
                                stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.sh" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
@@ -85,7 +85,10 @@
       <mkdir dir="${dir.dist}" />
       <tar destfile="${dir.dist}/${file.name.dist.bin.jboss}.tar" longfile="gnu">
          <tarfileset dir="${dir.project.installer}" 
-                     includes="AlfrescoTest.pdf,licenses/**,README_jboss_linux.txt,start_oo.sh,stop_oo.sh" />
+                     includes="AlfrescoTest.pdf,licenses/**,
+                               *.sql,db_setup.sh,db_remove.sh,
+                               README_jboss_linux.txt,start_oo.sh,stop_oo.sh,paths_jb.sh,alf_start_jb.sh,alf_stop_jb.sh,
+                               README_jboss_osx.txt" />
          <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="${file.name.war.alfresco}"
                      prefix="jboss/server/default/deploy" />
@@ -107,7 +110,7 @@
       <zip destfile="${dir.dist}/${file.name.dist.bin.tomcat}.zip">
          <zipfileset dir="${dir.project.installer}" 
                      includes="alf_start_tc.bat,alf_stop_tc.bat,AlfrescoTest.pdf,db_remove.bat,db_setup.bat,
-                               licenses/**,README_tomcat_win.txt,start_oo2.bat,
+                               licenses/**,README_tomcat_win.txt,start_oo2.bat,*.sql, paths_tc.bat,
                                stop_oo.bat,zstart_oo.bat" />
          <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
@@ -125,7 +128,10 @@
       <mkdir dir="${dir.dist}" />
       <tar destfile="${dir.dist}/${file.name.dist.bin.tomcat}.tar" longfile="gnu">
          <tarfileset dir="${dir.project.installer}"
-                     includes="AlfrescoTest.pdf,licenses/**,README_tomcat_linux.txt,start_oo.sh,stop_oo.sh" />
+                     includes="AlfrescoTest.pdf,licenses/**,
+                               *.sql,db_setup.sh,db_remove.sh,
+                               README_tomcat_linux.txt,start_oo.sh,stop_oo.sh,paths_tc.sh,alf_start_tc.sh,alf_stop_tc.sh,
+                               README_tomcat_osx.txt" />
          <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
          <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
          <tarfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.alfresco}"/>
