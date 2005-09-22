@@ -15,6 +15,9 @@
          <ref bean="authenticationService"/>
       </constructor-arg>
       <constructor-arg>
+         <ref bean="authenticationComponent"/>
+      </constructor-arg>
+      <constructor-arg>
          <value>alfresco/file-servers.xml</value>
       </constructor-arg>
       <constructor-arg>

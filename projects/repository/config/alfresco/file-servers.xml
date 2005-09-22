@@ -44,9 +44,7 @@
    </config>
 
    <config evaluator="string-compare" condition="Filesystem Security">
-      <JCEProvider>cryptix.jce.provider.CryptixCrypto</JCEProvider>
-
-      <authenticator type="local">
+      <authenticator type="alfresco">
          <allowGuest/>
       </authenticator>
 

@@ -67,6 +67,7 @@ import org.alfresco.filesys.smb.Dialect;
 import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.util.IPAddress;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -84,15 +85,21 @@ public class ServerConfiguration
     private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol");
 
     // Filesystem configuration constants
+    
     private static final String ConfigArea        = "file-servers";
     private static final String ConfigCIFS        = "CIFS Server";
     private static final String ConfigFTP         = "FTP Server";
     private static final String ConfigFilesystems = "Filesystems";
     private static final String ConfigSecurity    = "Filesystem Security";
 
+    // Server configuration bean name
+    
+    public static final String SERVER_CONFIGURATION = "fileServerConfiguration";
+    
     // SMB/CIFS session debug type strings
     //
-    // Must match the bit mask order.
+    // Must match the bit mask order
+    
     private static final String m_sessDbgStr[] = { "NETBIOS", "STATE", "NEGOTIATE", "TREE", "SEARCH", "INFO", "FILE",
             "FILEIO", "TRANSACT", "ECHO", "ERROR", "IPC", "LOCK", "PKTTYPE", "DCERPC", "STATECACHE", "NOTIFY",
             "STREAMS", "SOCKET" };
@@ -274,14 +281,21 @@ public class ServerConfiguration
     /** flag indicating successful initialisation */
     private boolean initialised;
 
+    // Main authentication service, public API
+    
     private AuthenticationService authenticationService;
 
+    // Authentication component, for internal functions
+    
+    private AuthenticationComponent m_authComponent;
+    
     /**
      * Class constructor
      * 
      * @param config ConfigService
      */
-    public ServerConfiguration(AuthenticationManager authMgr, AuthenticationService authenticationService, String configPath, DiskInterface diskInterface)
+    public ServerConfiguration(AuthenticationManager authMgr, AuthenticationService authenticationService,
+            AuthenticationComponent authComponent, String configPath, DiskInterface diskInterface)
     {
         // Save details
 
@@ -290,6 +304,8 @@ public class ServerConfiguration
         this.authenticationService = authenticationService;
         this.configLocation = configPath;
 
+        m_authComponent = authComponent;
+        
         // Allocate the shared device list
 
         m_shareList = new SharedDeviceList();
@@ -1288,7 +1304,13 @@ public class ServerConfiguration
 
             setJCEProvider(jceElem.getValue());
         }
-
+        else
+        {
+            // Use the default Cryptix JCE provider
+            
+            setJCEProvider("cryptix.jce.provider.CryptixCrypto");
+        }
+        
         // Check if an authenticator has been specified
 
         ConfigElement authElem = config.getConfigElement("authenticator");
@@ -1310,7 +1332,7 @@ public class ServerConfiguration
             {
                 // Load the passthru authenticator dynamically
                 
-                auth = loadAuthenticatorClass("org.alfrsesco.filesys.server.auth.passthru.PassthruAuthenticator");
+                auth = loadAuthenticatorClass("org.alfresco.filesys.server.auth.passthru.PassthruAuthenticator");
                 if ( auth == null)
                     throw new AlfrescoRuntimeException("Failed to load passthru authenticator");
             }
@@ -1318,9 +1340,17 @@ public class ServerConfiguration
             {
                 // Load the Acegi authenticator dynamically
                 
-                auth = loadAuthenticatorClass("org.alfrsesco.filesys.server.auth.passthru.AcegiPassthruAuthenticator");
+                auth = loadAuthenticatorClass("org.alfresco.filesys.server.auth.passthru.AcegiPassthruAuthenticator");
                 if ( auth == null)
                     throw new AlfrescoRuntimeException("Failed to load Acegi passthru authenticator");
+            }
+            else if (authType.equalsIgnoreCase("alfresco"))
+            {
+                // Load the Alfresco authenticator dynamically
+                
+                auth = loadAuthenticatorClass("org.alfresco.filesys.server.auth.AlfrescoAuthenticator");
+                if ( auth == null)
+                    throw new AlfrescoRuntimeException("Failed to load Alfresco authenticator");
             }
             else
                 throw new AlfrescoRuntimeException("Invalid authenticator type, " + authType);
@@ -1683,6 +1713,16 @@ public class ServerConfiguration
     public final AuthenticationService getAuthenticationService()
     {
         return authenticationService;
+    }
+    
+    /**
+     * Return the authentication component, for access to internal functions
+     * 
+     * @return AuthenticationComponent
+     */
+    public final AuthenticationComponent getAuthenticationComponent()
+    {
+        return m_authComponent;
     }
     
     /**

@@ -325,4 +325,14 @@ public abstract class SrvAuthenticator
 
         return p14str.toString().getBytes();
     }
+    
+    /**
+     * Return the password encryptor
+     * 
+     * @return PasswordEncryptor
+     */
+    protected final PasswordEncryptor getEncryptor()
+    {
+        return m_encryptor;
+    }
 }

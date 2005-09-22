@@ -16,6 +16,7 @@
  */
 package org.alfresco.filesys.server.auth;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,8 +29,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Password Encryptor Class
- * <p>
- * Generates LanMan and NTLMv1 encrypted passwords from the plain text password and challenge key.
+ * 
+ * <p>Generates LanMan and NTLMv1 encrypted passwords from the plain text password and challenge key.
+ * 
+ * @author GKSpencer
  */
 public class PasswordEncryptor
 {
@@ -125,28 +128,23 @@ public class PasswordEncryptor
 
         case NTLM1:
 
-            // Create the MD4 hash
-
+            //  Create the MD4 hash
+            
             md4 = MessageDigest.getInstance("MD4");
-            len = pwd.length();
-            if (len > 14)
-                len = 14;
-            pwdBytes = new byte[len * 2];
-
-            for (int i = 0; i < len; i++)
-            {
-                char ch = pwd.charAt(i);
-                pwdBytes[i * 2] = (byte) ch;
-                pwdBytes[i * 2 + 1] = (byte) ((ch >> 8) & 0xFF);
+    
+            try {
+              pwdBytes = pwd.getBytes("UnicodeLittleUnmarked");
             }
-
+            catch (UnsupportedEncodingException ex) {
+            }
+        
             md4.update(pwdBytes);
             byte[] p21 = new byte[21];
             System.arraycopy(md4.digest(), 0, p21, 0, 16);
 
-            // Now use the LM encryption
-
-            encPwd = P24(p21, encryptKey);
+            //  Now use the LM encryption
+                            
+            encPwd = P24(p21,encryptKey);
             break;
 
         // NTLM v2 encryption
@@ -401,5 +399,19 @@ public class PasswordEncryptor
         }
 
         return key;
+    }
+    
+    /**
+     * NTLM1 encryption of the MD4 hashed password
+     * 
+     * @param p21 byte[]
+     * @param c8 byte[]
+     * @return byte[]
+     * @exception NoSuchAlgorithmException
+     */
+    protected final byte[] doNTLM1Encryption(byte[] p21, byte[] c8)
+        throws NoSuchAlgorithmException
+    {
+        return P24(p21, c8);
     }
 }

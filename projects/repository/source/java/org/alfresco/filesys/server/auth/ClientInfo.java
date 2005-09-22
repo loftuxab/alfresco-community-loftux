@@ -16,6 +16,8 @@
  */
 package org.alfresco.filesys.server.auth;
 
+import net.sf.acegisecurity.Authentication;
+
 /**
  * <p>
  * The client information class holds the details of a remote user from a session setup or tree
@@ -60,6 +62,10 @@ public class ClientInfo
 
     private String m_ipAddr;
 
+    // Authentication token
+    
+    private Authentication m_authToken;
+    
     /**
      * Class constructor
      * 
@@ -227,6 +233,26 @@ public class ClientInfo
     }
 
     /**
+     * Check if the client has an authentication token
+     * 
+     * @return boolean
+     */
+    public final boolean hasAuthenticationToken()
+    {
+        return m_authToken != null ? true : false;
+    }
+    
+    /**
+     * Return the authentication token
+     * 
+     * @return Authentication
+     */
+    public final Authentication getAuthenticationToken()
+    {
+        return m_authToken;
+    }
+    
+    /**
      * Set the remote users domain
      * 
      * @param domain Remote users domain
@@ -320,6 +346,16 @@ public class ClientInfo
     }
 
     /**
+     * Set the authentication toekn
+     * 
+     * @param token Authentication
+     */
+    public final void setAuthenticationToken(Authentication token)
+    {
+        m_authToken = token;
+    }
+    
+    /**
      * Display the client information as a string
      * 
      * @return String
@@ -342,6 +378,12 @@ public class ClientInfo
             str.append(getClientAddress());
         }
 
+        if ( hasAuthenticationToken())
+        {
+            str.append(",token=");
+            str.append(getAuthenticationToken());
+        }
+        
         if (isGuest())
             str.append(",Guest");
         str.append("]");
