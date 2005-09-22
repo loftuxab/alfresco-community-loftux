@@ -196,12 +196,13 @@ public class LoginBean
          throws ValidatorException
    {
       String pass = (String) value;
-      if (pass.length() < 5 || pass.length() > 12)
+      if (pass.length() < 3 || pass.length() > 32)
       {
-         String err = Application.getMessage(context, MSG_PASSWORD_LENGTH);
+         String err = MessageFormat.format(Application.getMessage(context, MSG_PASSWORD_LENGTH),
+               new Object[]{3, 32});
          throw new ValidatorException(new FacesMessage(err));
       }
-
+      
       for (int i = 0; i < pass.length(); i++)
       {
          if (Character.isLetterOrDigit(pass.charAt(i)) == false)
@@ -219,12 +220,13 @@ public class LoginBean
          throws ValidatorException
    {
       String pass = (String) value;
-      if (pass.length() < 5 || pass.length() > 12)
+      if (pass.length() < 3 || pass.length() > 32)
       {
-         String err = Application.getMessage(context, MSG_USERNAME_LENGTH);
+         String err = MessageFormat.format(Application.getMessage(context, MSG_USERNAME_LENGTH),
+               new Object[]{3, 32});
          throw new ValidatorException(new FacesMessage(err));
       }
-
+      
       for (int i = 0; i < pass.length(); i++)
       {
          if (Character.isLetterOrDigit(pass.charAt(i)) == false)
