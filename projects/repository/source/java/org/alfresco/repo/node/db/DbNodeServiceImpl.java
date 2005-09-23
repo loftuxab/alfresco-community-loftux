@@ -34,10 +34,12 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
+import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.node.AbstractNodeServiceImpl;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidAspectException;
@@ -239,6 +241,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // create the node instance
         Node node = nodeDaoService.newNode(store, newId, nodeTypeQName);
         NodeRef childRef = node.getNodeRef();
+        
         // get the parent node
         Node parentNode = getNodeNotNull(parentRef);
         
@@ -261,13 +264,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             this.setProperties(node.getNodeRef(), properties);
         }
+
+        // check that the dictionary wasn't violated
+        checkAssoc(parentRef, childRef, assocTypeQName, assocQName);
         
         // Invoke policy behaviour
 		invokeOnCreateNode(childAssocRef);
         invokeOnUpdateNode(parentRef);
-
-        // check that the dictionary wasn't violated
-        checkAssoc(parentRef, childRef, assocTypeQName, assocQName);
         
 		// done
 		return childAssocRef;
@@ -308,6 +311,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         nodeDaoService.deleteChildAssoc(oldAssoc, false);
         // create a new assoc
         ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocTypeQName, assocQName);
+        
+        // check that the dictionary wasn't violated
+        checkAssoc(newParentRef, nodeToMoveRef, assocTypeQName, assocQName);
 
         // invoke policy behaviour
         invokeOnCreateChildAssociation(newAssoc.getChildAssocRef());
@@ -315,8 +321,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         invokeOnUpdateNode(oldParentNode.getNodeRef());
         invokeOnUpdateNode(newParentRef);
         
-        // check that the dictionary wasn't violated
-        checkAssoc(newParentRef, nodeToMoveRef, assocTypeQName, assocQName);
+        // update the node status
+        NodeStatus nodeStatus = nodeToMove.getStatus();
+        nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
         
         // done
         return newAssoc.getChildAssocRef();
@@ -385,6 +392,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		// Invoke policy behaviours
 		invokeOnUpdateNode(nodeRef);
         invokeOnAddAspect(nodeRef, aspectTypeQName);
+        
+        // update the node status
+        NodeStatus nodeStatus = node.getStatus();
+        nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
     }
 
     /**
@@ -435,6 +446,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             // Invoke policy behaviours
             invokeOnUpdateNode(nodeRef);
             invokeOnRemoveAspect(nodeRef, aspectTypeQName);
+            
+            // update the node status
+            NodeStatus nodeStatus = node.getStatus();
+            nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
         }
     }
 
@@ -668,6 +683,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		// Invoke policy behaviours
 		invokeOnUpdateNode(nodeRef);
         invokeOnUpdateProperties(nodeRef, propertiesBefore, propertiesAfter);
+        
+        // update the node status
+        NodeStatus nodeStatus = node.getStatus();
+        nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
     }
     
     /**
@@ -700,6 +719,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 		// Invoke policy behaviours
 		invokeOnUpdateNode(nodeRef);
         invokeOnUpdateProperties(nodeRef, propertiesBefore, propertiesAfter);
+        
+        // update the node status
+        NodeStatus nodeStatus = node.getStatus();
+        nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
     }
     
     /**

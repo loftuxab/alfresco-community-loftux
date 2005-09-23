@@ -46,7 +46,6 @@ public class NodeKey implements Serializable
 	
 	public NodeKey(String protocol, String identifier, String guid)
 	{
-		this();
 		setGuid(guid);
 		setProtocol(protocol);
 		setIdentifier(identifier);
@@ -63,7 +62,7 @@ public class NodeKey implements Serializable
     
     public int hashCode()
     {
-        return (this.protocol.hashCode() + this.identifier.hashCode() + this.guid.hashCode());
+        return this.guid.hashCode();
     }
 
     public boolean equals(Object obj)
@@ -77,9 +76,10 @@ public class NodeKey implements Serializable
             return false;
         }
         NodeKey that = (NodeKey) obj;
-        return (EqualsHelper.nullSafeEquals(this.protocol, that.protocol) &&
-                EqualsHelper.nullSafeEquals(this.identifier, that.identifier) &&
-                EqualsHelper.nullSafeEquals(this.guid, that.guid));
+        return (EqualsHelper.nullSafeEquals(this.guid, that.guid) &&
+                EqualsHelper.nullSafeEquals(this.protocol, that.protocol) &&
+                EqualsHelper.nullSafeEquals(this.identifier, that.identifier)
+                );
     }
     
     public String getGuid()

@@ -45,8 +45,8 @@ import org.alfresco.repo.search.results.ChildAssocRefResultSet;
 import org.alfresco.repo.search.results.DetachedResultSet;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -67,6 +67,8 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.CachingDateFormat;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -79,6 +81,8 @@ public class LuceneTest extends TestCase
     private static final QName ASSOC_TYPE_QNAME = QName.createQName(TEST_NAMESPACE, "assoc");
 
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+    
+    private static Log logger = LogFactory.getLog(LuceneTest.class);
 
     TransactionService transactionService;
     NodeService nodeService;
@@ -269,6 +273,47 @@ public class LuceneTest extends TestCase
         super(arg0);
     }
 
+    public void testRepeatPerformance() throws Exception
+    {
+        luceneFTS.pause();
+        buildBaseIndex();
+        runBaseTests();
+
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
+        searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
+
+        String query = "ID:\"" + rootNodeRef + "\"";
+        // check that we get the result
+        SearchParameters sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setQuery("lucene", query);
+        ResultSet results = searcher.query(sp);
+        assertEquals("No results found from query", 1, results.length());
+        
+        long start = System.nanoTime();
+        int count = 1000;
+        // repeat
+        for (int i = 0; i < count; i++)
+        {
+            sp.setQuery("lucene", query);
+            results = searcher.query(sp);
+        }
+        long end = System.nanoTime();
+        // dump results
+        double duration = ((double)(end - start))/1E6;      // duration in ms
+        double average = duration / (double) count;
+        System.out.println("Searched for identifier: \n" +
+                "   count: " + count + "\n" +
+                "   average: " + average + " ms/search \n" +
+                "   a million searches could take: " + (1E6 * average)/1E3/60D + " minutes");
+        // anything over 10ms is dire
+        if (average > 10.0)
+        {
+            logger.error("Search taking longer than 10ms: " + query);
+        }
+    }
     
     public void testSort() throws Exception
     {

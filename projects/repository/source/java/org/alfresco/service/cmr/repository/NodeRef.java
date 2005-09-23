@@ -25,14 +25,14 @@ import org.alfresco.error.AlfrescoRuntimeException;
  * 
  * @author Derek Hulley
  */
-public class NodeRef implements EntityRef, Serializable
+public final class NodeRef implements EntityRef, Serializable
 {
    
     private static final long serialVersionUID = 3760844584074227768L;
     private static final String URI_FILLER = "/";
     
-    private StoreRef storeRef;
-    private String id;
+    private final StoreRef storeRef;
+    private final String id;
 
     /**
      * Construct a Node Reference from a Store Reference and Node Id
@@ -72,8 +72,8 @@ public class NodeRef implements EntityRef, Serializable
         {
             throw new AlfrescoRuntimeException("Invalid node ref - does not contain forward slash: " + nodeRef);
         }
-         this.storeRef = new StoreRef(nodeRef.substring(0, lastForwardSlash));
-         this.id = nodeRef.substring(lastForwardSlash+1);
+        this.storeRef = new StoreRef(nodeRef.substring(0, lastForwardSlash));
+        this.id = nodeRef.substring(lastForwardSlash+1);
     }
 
     public String toString()

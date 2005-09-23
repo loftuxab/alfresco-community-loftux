@@ -30,6 +30,7 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
+import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
@@ -77,15 +78,22 @@ public class HibernateNodeTest extends BaseHibernateTest
     {
         assertNotNull("Workspace not initialised", store);
     }
-
+    
 	public void testGetStore() throws Exception
 	{
+        NodeKey key = new NodeKey("Random Protocol", "Random Identifier", "AAA");
+        // create the node status
+        NodeStatus nodeStatus = new NodeStatusImpl();
+        nodeStatus.setKey(key);
+        nodeStatus.setDeleted(false);
+        nodeStatus.setChangeTxnId("txn:123");
+        getSession().save(nodeStatus);
         // create a new Node
         Node node = new NodeImpl();
-		NodeKey key = new NodeKey("Random Protocol", "Random Identifier", "AAA");
 		node.setKey(key);
         node.setStore(store);   // not meaningful as it contradicts the key
         node.setTypeQName(ContentModel.TYPE_CONTAINER);
+        node.setStatus(nodeStatus);
         // persist it
 		try
 		{
@@ -123,17 +131,62 @@ public class HibernateNodeTest extends BaseHibernateTest
 		assertNotNull("Store not present on node", loadedStore);
 		assertEquals("Incorrect store key", store, loadedStore);
 	}
-	
+    
+    public void testNodeStatus()
+    {
+        NodeKey key = new NodeKey(store.getKey(), "AAA");
+        // create the node status
+        NodeStatus nodeStatus = new NodeStatusImpl();
+        nodeStatus.setKey(key);
+        nodeStatus.setDeleted(false);
+        nodeStatus.setChangeTxnId("txn:123");
+        getSession().save(nodeStatus);
+        
+        // it must be able to exist without the node
+        flushAndClear();
+        
+        // create a new Node
+        Node node = new NodeImpl();
+        node.setStore(store);
+        node.setKey(key);
+        node.setStore(store);   // not meaningful as it contradicts the key
+        node.setTypeQName(ContentModel.TYPE_CONTAINER);
+        node.setStatus(nodeStatus);
+        Serializable id = getSession().save(node);
+        
+        // flush
+        flushAndClear();
+        
+        // is the status retrievable
+        node = (Node) getSession().get(NodeImpl.class, id);
+        nodeStatus = node.getStatus();
+        // change the values
+        nodeStatus.setChangeTxnId("txn:456");
+        nodeStatus.setDeleted(true);
+        // delete the node
+        getSession().delete(node);
+        
+        // flush
+        flushAndClear();
+    }
+
     /**
      * Check that properties can be persisted and retrieved
      */
     public void testProperties() throws Exception
     {
+        NodeKey key = new NodeKey(store.getKey(), "AAA");
+        // create the node status
+        NodeStatus nodeStatus = new NodeStatusImpl();
+        nodeStatus.setKey(key);
+        nodeStatus.setDeleted(false);
+        nodeStatus.setChangeTxnId("txn:123");
+        getSession().save(nodeStatus);
         // create a new Node
         Node node = new NodeImpl();
-		NodeKey key = new NodeKey(store.getKey(), "AAA");
 		node.setKey(key);
         node.setTypeQName(ContentModel.TYPE_CONTAINER);
+        node.setStatus(nodeStatus);
         // give it a property map
         Map<QName, PropertyValue> propertyMap = new HashMap<QName, PropertyValue>(5);
         QName propertyQName = QName.createQName("{}A");
@@ -159,12 +212,19 @@ public class HibernateNodeTest extends BaseHibernateTest
      */
     public void testAspects() throws Exception
     {
+        NodeKey key = new NodeKey(store.getKey(), GUID.generate());
+        // create the node status
+        NodeStatus nodeStatus = new NodeStatusImpl();
+        nodeStatus.setKey(key);
+        nodeStatus.setDeleted(false);
+        nodeStatus.setChangeTxnId("txn:123");
+        getSession().save(nodeStatus);
         // make a real node
         Node node = new NodeImpl();
-        NodeKey nodeKey = new NodeKey(store.getKey(), GUID.generate());
-        node.setKey(nodeKey);
+        node.setKey(key);
         node.setStore(store);
         node.setTypeQName(ContentModel.TYPE_CMOBJECT);
+        node.setStatus(nodeStatus);
         
         // add some aspects
         QName aspect1 = QName.createQName(TEST_NAMESPACE, "1");
@@ -193,20 +253,32 @@ public class HibernateNodeTest extends BaseHibernateTest
     
     public void testNodeAssoc() throws Exception
     {
-        // make a real node
-        Node sourceNode = new NodeImpl();
         NodeKey sourceKey = new NodeKey(store.getKey(), GUID.generate());
+        // make a source node
+        NodeStatus sourceNodeStatus = new NodeStatusImpl();
+        sourceNodeStatus.setKey(sourceKey);
+        sourceNodeStatus.setDeleted(false);
+        sourceNodeStatus.setChangeTxnId("txn:123");
+        getSession().save(sourceNodeStatus);
+        Node sourceNode = new NodeImpl();
         sourceNode.setKey(sourceKey);
         sourceNode.setStore(store);
         sourceNode.setTypeQName(ContentModel.TYPE_CMOBJECT);
+        sourceNode.setStatus(sourceNodeStatus);
         Serializable realNodeKey = getSession().save(sourceNode);
         
         // make a container node
-        Node targetNode = new NodeImpl();
         NodeKey targetKey = new NodeKey(store.getKey(), GUID.generate());
+        NodeStatus targetNodeStatus = new NodeStatusImpl();
+        targetNodeStatus.setKey(targetKey);
+        targetNodeStatus.setDeleted(false);
+        targetNodeStatus.setChangeTxnId("txn:123");
+        getSession().save(targetNodeStatus);
+        Node targetNode = new NodeImpl();
         targetNode.setKey(targetKey);
         targetNode.setStore(store);
         targetNode.setTypeQName(ContentModel.TYPE_CONTAINER);
+        targetNode.setStatus(targetNodeStatus);
         Serializable containerNodeKey = getSession().save(targetNode);
         
         // create an association between them
@@ -241,19 +313,31 @@ public class HibernateNodeTest extends BaseHibernateTest
     public void testChildAssoc() throws Exception
     {
         // make a content node
+        NodeKey key = new NodeKey(store.getKey(), GUID.generate());
+        NodeStatus contentNodeStatus = new NodeStatusImpl();
+        contentNodeStatus.setKey(key);
+        contentNodeStatus.setDeleted(false);
+        contentNodeStatus.setChangeTxnId("txn:123");
+        getSession().save(contentNodeStatus);
         Node contentNode = new NodeImpl();
-		NodeKey key = new NodeKey(store.getKey(), GUID.generate());
 		contentNode.setKey(key);
         contentNode.setStore(store);
         contentNode.setTypeQName(ContentModel.TYPE_CONTENT);
+        contentNode.setStatus(contentNodeStatus);
         Serializable contentNodeKey = getSession().save(contentNode);
 
         // make a container node
+        key = new NodeKey(store.getKey(), GUID.generate());
+        NodeStatus containerNodeStatus = new NodeStatusImpl();
+        containerNodeStatus.setKey(key);
+        containerNodeStatus.setDeleted(false);
+        containerNodeStatus.setChangeTxnId("txn:123");
+        getSession().save(containerNodeStatus);
         Node containerNode = new NodeImpl();
-		key = new NodeKey(store.getKey(), GUID.generate());
 		containerNode.setKey(key);
         containerNode.setStore(store);
         containerNode.setTypeQName(ContentModel.TYPE_CONTAINER);
+        containerNode.setStatus(containerNodeStatus);
         Serializable containerNodeKey = getSession().save(containerNode);
         // create an association to the content
         ChildAssoc assoc1 = new ChildAssocImpl();
@@ -315,10 +399,16 @@ public class HibernateNodeTest extends BaseHibernateTest
         NodeKey key = new NodeKey(store.getKey(), GUID.generate());
         
         // make a node
+        NodeStatus nodeStatus = new NodeStatusImpl();
+        nodeStatus.setKey(key);
+        nodeStatus.setDeleted(false);
+        nodeStatus.setChangeTxnId("txn:123");
+        getSession().save(nodeStatus);
         Node node = new NodeImpl();
         node.setKey(key);
         node.setStore(store);
         node.setTypeQName(ContentModel.TYPE_CONTENT);
+        node.setStatus(nodeStatus);
         getSession().save(node);
         
         // add some aspects to the node

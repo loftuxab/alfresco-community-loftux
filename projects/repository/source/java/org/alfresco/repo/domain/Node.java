@@ -48,6 +48,21 @@ public interface Node
     public QName getTypeQName();
     
     public void setTypeQName(QName typeQName);
+
+    /**
+     * Set the status of the node.  This is compulsory, but a node
+     * status may exist without a node being present.
+     * 
+     * @param nodeStatus
+     */
+    public void setStatus(NodeStatus nodeStatus);
+    
+    /**
+     * Get the mandatory node status object
+     * 
+     * @return
+     */
+    public NodeStatus getStatus();
     
     public Set<QName> getAspects();
     

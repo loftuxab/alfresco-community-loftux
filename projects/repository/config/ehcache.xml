@@ -17,6 +17,15 @@
         timeToLiveSeconds="0" 
         overflowToDisk="false" 
         />
+    <!-- 1:1 node:node status -->
+    <cache 
+        name="org.alfresco.repo.domain.hibernate.NodeStatusImpl" 
+        maxElementsInMemory="10000" 
+        eternal="false" 
+        timeToIdleSeconds="0" 
+        timeToLiveSeconds="0" 
+        overflowToDisk="false" 
+        />
     <!-- 1:5 node:aspects -->
     <cache 
         name="org.alfresco.repo.domain.hibernate.NodeImpl.aspects" 

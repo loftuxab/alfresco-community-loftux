@@ -73,6 +73,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final String TEST_PREFIX = "test";
     public static final QName TYPE_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
     public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
+    public static final QName ASPECT_QNAME_TEST_MARKER = QName.createQName(NAMESPACE, "marker");
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
     public static final QName ASSOC_TYPE_QNAME_TEST_CHILDREN = ContentModel.ASSOC_CHILDREN;
@@ -123,7 +124,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // create a first store directly
         StoreRef storeRef = nodeService.createStore(
                 StoreRef.PROTOCOL_WORKSPACE,
-                "Test_" + System.currentTimeMillis());
+                "Test_" + System.nanoTime());
         rootNodeRef = nodeService.getRootNode(storeRef);
     }
     
@@ -331,7 +332,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     private StoreRef createStore() throws Exception
     {
-        StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "my store");
+        StoreRef storeRef = nodeService.createStore(
+                StoreRef.PROTOCOL_WORKSPACE,
+                getName() + "_" + System.nanoTime());
         assertNotNull("No reference returned", storeRef);
         // done
         return storeRef;
@@ -522,18 +525,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     public void testCreateNodeWithProperties() throws Exception
     {
-//        try
-//        {
-//            ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-//                    ASSOC_TYPE_QNAME_TEST_CHILDREN,
-//                    QName.createQName("MyContentNode"),
-//                    TYPE_QNAME_TEST_CONTENT);
-//            fail("Failed to detect missing properties for type");
-//        }
-//        catch (PropertyException e)
-//        {
-//            // exptected
-//        }
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         // fill properties
         fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
@@ -856,6 +847,11 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testGetChildAssocsOnRealNode() throws Exception
     {
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+        // fill properties
+        fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
+        fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
+        
         Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
         ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
         NodeRef n6Ref = n6pn8Ref.getParentRef();
@@ -871,7 +867,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                     n8Ref,
                     ASSOC_TYPE_QNAME_TEST_CHILDREN,
                     QName.createQName(NAMESPACE, "child"),
-                    TYPE_QNAME_TEST_CONTENT);
+                    TYPE_QNAME_TEST_CONTENT,
+                    properties);
             fail("Failed to prevent adding of child nodes to non-containers");
         }
         catch (RuntimeException e)
@@ -922,7 +919,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 rootNodeRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(null, "N1"),
-                TYPE_QNAME_TEST_CONTENT);
+                TYPE_QNAME_TEST_CONTENT,
+                properties);
         NodeRef sourceRef = childAssocRef.getChildRef();
         childAssocRef = nodeService.createNode(
                 rootNodeRef,
@@ -968,11 +966,15 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
         
         // create another
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
+        fillProperties(TYPE_QNAME_TEST_CONTENT, properties);
+        fillProperties(ASPECT_QNAME_TEST_TITLED, properties);
         ChildAssociationRef childAssocRef = nodeService.createNode(
                 rootNodeRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName(null, "N3"),
-                TYPE_QNAME_TEST_CONTENT);
+                TYPE_QNAME_TEST_CONTENT,
+                properties);
         NodeRef anotherTargetRef = childAssocRef.getChildRef();
         AssociationRef anotherAssocRef = nodeService.createAssociation(
                 sourceRef,

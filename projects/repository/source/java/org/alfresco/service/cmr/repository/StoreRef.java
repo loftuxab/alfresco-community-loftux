@@ -27,17 +27,14 @@ import org.alfresco.error.AlfrescoRuntimeException;
  */
 public final class StoreRef implements EntityRef, Serializable
 {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 3905808565129394486L;
 
     public static final String PROTOCOL_WORKSPACE = "workspace";
     
     private static final String URI_FILLER = "://";
 
-    private String protocol;
-    private String identifier;
+    private final String protocol;
+    private final String identifier;
 
     /**
      * @param protocol

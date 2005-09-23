@@ -25,6 +25,15 @@
          <key-property name="guid" length="36"/>
       </composite-id>
       <property name="typeQName" column="type_qname" type="QName" length="255" not-null="true" />
+      <!-- forward assoc to node status -->
+      <one-to-one
+            name="status"
+            class="org.alfresco.repo.domain.hibernate.NodeStatusImpl"
+            constrained="true"
+            lazy="no-proxy"
+            fetch="select">
+      </one-to-one>
+      <!-- forward assoc to properties -->
       <map
             name="properties" 
             table="node_properties"
@@ -53,6 +62,7 @@
             <property name="serializableValue" column="serializable_value" type="serializable" length="16384"/>
          </composite-element>
       </map>
+      <!-- forward assoc to aspects -->
       <set
             name="aspects"
             table="node_aspects"
@@ -144,6 +154,26 @@
          </key>
          <one-to-many class="org.alfresco.repo.domain.hibernate.NodeAssocImpl" />
       </set>
+   </class>
+
+   <class
+         name="org.alfresco.repo.domain.hibernate.NodeStatusImpl"
+         proxy="org.alfresco.repo.domain.NodeStatus"
+         table="node_status"
+         dynamic-update="false"
+         dynamic-insert="false"
+         select-before-update="false" 
+         lazy="true" 
+         optimistic-lock="version"  >
+      <cache usage="read-write" />
+      <!-- composite PK -->
+      <composite-id name="key" class="org.alfresco.repo.domain.NodeKey">
+         <key-property name="protocol" length="50" />
+         <key-property name="identifier" length="100" />
+         <key-property name="guid" length="36"/>
+      </composite-id>
+      <property name="changeTxnId" column="change_txn_id" type="string" length="56" not-null="true" />
+      <property name="deleted" column="deleted" type="boolean" not-null="true" />
    </class>
    
    <class

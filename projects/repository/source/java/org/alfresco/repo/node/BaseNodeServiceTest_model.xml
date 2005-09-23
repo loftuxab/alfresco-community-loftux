@@ -124,6 +124,9 @@
             </property>
          </properties>
       </aspect>
+      <aspect name="test:marker">
+         <title>Marker Aspect</title>
+      </aspect>
    </aspects>
 
 </model>

@@ -26,13 +26,16 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
+import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.domain.StoreKey;
 import org.alfresco.repo.domain.hibernate.ChildAssocImpl;
 import org.alfresco.repo.domain.hibernate.NodeAssocImpl;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
+import org.alfresco.repo.domain.hibernate.NodeStatusImpl;
 import org.alfresco.repo.domain.hibernate.StoreImpl;
 import org.alfresco.repo.node.db.NodeDaoService;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.namespace.QName;
@@ -194,13 +197,24 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
 
     public Node newNode(Store store, String id, QName nodeTypeQName) throws InvalidTypeException
     {
+        NodeKey key = new NodeKey(store.getKey(), id);
+
+        // create the mandatory node status
+        NodeStatus nodeStatus = new NodeStatusImpl();
+        // set required status properties
+        nodeStatus.setKey(key);
+        nodeStatus.setDeleted(false);
+        nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
+        // persist the nodestatus
+        getHibernateTemplate().save(nodeStatus);
+        
         // build a concrete node based on a bootstrap type
         Node node = new NodeImpl();
         // set other required properties
-		NodeKey key = new NodeKey(store.getKey(), id);
 		node.setKey(key);
         node.setTypeQName(nodeTypeQName);
         node.setStore(store);
+        node.setStatus(nodeStatus);
         // persist the node
         getHibernateTemplate().save(node);
         // done
@@ -260,11 +274,38 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         {
             deleteNodeAssoc(assoc);
         }
+        // update the node status
+        NodeStatus nodeStatus = node.getStatus();
+        nodeStatus.setDeleted(true);
+        nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
         // finally delete the node
         getHibernateTemplate().delete(node);
         // done
     }
-    
+
+    /**
+     * Fetch the node status, if it exists
+     */
+    public NodeStatus getNodeStatus(String protocol, String identifier, String id)
+    {
+        try
+        {
+            NodeKey nodeKey = new NodeKey(protocol, identifier, id);
+            Object obj = getHibernateTemplate().get(NodeStatusImpl.class, nodeKey);
+            // done
+            return (NodeStatus) obj;
+        }
+        catch (DataAccessException e)
+        {
+            if (e.contains(ObjectDeletedException.class))
+            {
+                // the object no loner exists
+                return null;
+            }
+            throw e;
+        }
+    }
+
     public ChildAssoc newChildAssoc(
             Node parentNode,
             Node childNode,

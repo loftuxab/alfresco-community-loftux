@@ -22,6 +22,7 @@ import java.util.List;
 import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
+import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.namespace.QName;
@@ -101,6 +102,18 @@ public interface NodeDaoService
      * @param cascade true if the assoc deletions must cascade to primary child nodes
      */
     public void deleteNode(Node node, boolean cascade);
+    
+    /**
+     * Gets the node's status.  If the node <i>never</i> existed, then
+     * <code>null</code> is returned.
+     * 
+     * @param protocol the store protocol
+     * @param identifier the store identifier for the given protocol
+     * @param id the store-specific node status identifier
+     * @return Returns the node status if the node exists or once existed, otherwise
+     *      returns <code>null</code>.
+     */
+    public NodeStatus getNodeStatus(String protocol, String identifier, String id);
     
     /**
      * @return Returns the persisted and filled association

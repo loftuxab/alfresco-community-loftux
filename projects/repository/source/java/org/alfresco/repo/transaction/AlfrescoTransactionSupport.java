@@ -71,12 +71,29 @@ public abstract class AlfrescoTransactionSupport
      */
     public static String getTransactionId()
     {
-        if (!TransactionSynchronizationManager.isSynchronizationActive())
+        /*
+         * Go direct to the synchronizations as we don't want to register a resource if one doesn't exist.
+         * This method is heavily used, so the simple Map lookup on the ThreadLocal is the fastest.
+         */
+        
+        TransactionSynchronizationImpl txnSynch =
+                (TransactionSynchronizationImpl) TransactionSynchronizationManager.getResource(RESOURCE_KEY_TXN_SYNCH);
+        if (txnSynch == null)
         {
-            return null;   // not in a transaction
+            if (TransactionSynchronizationManager.isSynchronizationActive())
+            {
+                // need to lazily register synchronizations
+                return registerSynchronizations().getTransactionId();
+            }
+            else
+            {
+                return null;   // not in a transaction
+            }
         }
-        TransactionSynchronizationImpl txnSynch = getSynchronization();
-        return txnSynch.getTransactionId();
+        else
+        {
+            return txnSynch.getTransactionId();
+        }
     }
     
     /**
@@ -314,8 +331,10 @@ public abstract class AlfrescoTransactionSupport
     
     /**
      * Binds the Alfresco-specific to the transaction resources
+     * 
+     * @return Returns the current or new synchronization implementation
      */
-    private static void registerSynchronizations()
+    private static TransactionSynchronizationImpl registerSynchronizations()
     {
         /*
          * No thread synchronization or locking required as the resources are all threadlocal
@@ -324,15 +343,19 @@ public abstract class AlfrescoTransactionSupport
         {
             throw new AlfrescoRuntimeException("Transaction must be active and synchronization is required");
         }
-        else if (TransactionSynchronizationManager.hasResource(RESOURCE_KEY_TXN_SYNCH))
+        TransactionSynchronizationImpl txnSynch =
+            (TransactionSynchronizationImpl) TransactionSynchronizationManager.getResource(RESOURCE_KEY_TXN_SYNCH);
+        if (txnSynch != null)
         {
             // synchronization already registered
-            return;
+            return txnSynch;
         }
         // we need a unique ID for the transaction
-        String txnId = GUID.generate();
+        StringBuilder sb = new StringBuilder(56);
+        sb.append(System.currentTimeMillis()).append(":").append(GUID.generate());
+        String txnId = sb.toString();
         // register the synchronization
-        TransactionSynchronization txnSynch = new TransactionSynchronizationImpl(txnId);
+        txnSynch = new TransactionSynchronizationImpl(txnId);
         TransactionSynchronizationManager.registerSynchronization(txnSynch);
         // register the resource that will ensure we don't duplication the synchronization
         TransactionSynchronizationManager.bindResource(RESOURCE_KEY_TXN_SYNCH, txnSynch);
@@ -341,6 +364,7 @@ public abstract class AlfrescoTransactionSupport
         {
             logger.debug("Bound txn synch: " + txnSynch);
         }
+        return txnSynch;
     }
     
     /**
@@ -379,11 +403,11 @@ public abstract class AlfrescoTransactionSupport
      */
     private static class TransactionSynchronizationImpl extends TransactionSynchronizationAdapter
     {
-        private String txnId;
-        private Set<NodeDaoService> nodeDaoServices;
-        private Set<IntegrityChecker> integrityCheckers;
-        private Set<LuceneIndexerAndSearcherFactory> lucenes;
-        private Set<TransactionListener> listeners;
+        private final String txnId;
+        private final Set<NodeDaoService> nodeDaoServices;
+        private final Set<IntegrityChecker> integrityCheckers;
+        private final Set<LuceneIndexerAndSearcherFactory> lucenes;
+        private final Set<TransactionListener> listeners;
         private final Map<Object, Object> resources;
         
         /**

@@ -25,6 +25,7 @@ import org.alfresco.repo.domain.ChildAssoc;
 import org.alfresco.repo.domain.Node;
 import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeKey;
+import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -37,13 +38,13 @@ import org.alfresco.service.namespace.QName;
  * Hibernate specific.
  * 
  * @author Derek Hulley
- * 
  */
 public class NodeImpl implements Node
 {
     private NodeKey key;
     private Store store;
     private QName typeQName;
+    private NodeStatus status;
     private Set<QName> aspects;
     private Set<NodeAssoc> sourceNodeAssocs;
     private Set<NodeAssoc> targetNodeAssocs;
@@ -112,6 +113,16 @@ public class NodeImpl implements Node
     public void setTypeQName(QName typeQName)
     {
         this.typeQName = typeQName;
+    }
+
+    public NodeStatus getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(NodeStatus status)
+    {
+        this.status = status;
     }
 
     public Set<QName> getAspects()
