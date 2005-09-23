@@ -104,7 +104,7 @@ public class WorkspaceImpl implements Workspace
      */
     public void copy(String srcAbsPath, String destAbsPath) throws ConstraintViolationException, VersionException, AccessDeniedException, PathNotFoundException, ItemExistsException, LockException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -112,7 +112,7 @@ public class WorkspaceImpl implements Workspace
      */
     public void copy(String srcWorkspace, String srcAbsPath, String destAbsPath) throws NoSuchWorkspaceException, ConstraintViolationException, VersionException, AccessDeniedException, PathNotFoundException, ItemExistsException, LockException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -120,7 +120,7 @@ public class WorkspaceImpl implements Workspace
      */
     public void clone(String srcWorkspace, String srcAbsPath, String destAbsPath, boolean removeExisting) throws NoSuchWorkspaceException, ConstraintViolationException, VersionException, AccessDeniedException, PathNotFoundException, ItemExistsException, LockException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -128,7 +128,7 @@ public class WorkspaceImpl implements Workspace
      */
     public void move(String srcAbsPath, String destAbsPath) throws ConstraintViolationException, VersionException, AccessDeniedException, PathNotFoundException, ItemExistsException, LockException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -136,7 +136,7 @@ public class WorkspaceImpl implements Workspace
      */
     public void restore(Version[] versions, boolean removeExisting) throws ItemExistsException, UnsupportedRepositoryOperationException, VersionException, LockException, InvalidItemStateException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -172,7 +172,7 @@ public class WorkspaceImpl implements Workspace
      */
     public ObservationManager getObservationManager() throws UnsupportedRepositoryOperationException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -198,7 +198,7 @@ public class WorkspaceImpl implements Workspace
      */
     public ContentHandler getImportContentHandler(String parentAbsPath, int uuidBehavior) throws PathNotFoundException, ConstraintViolationException, VersionException, LockException, AccessDeniedException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /* (non-Javadoc)
@@ -206,7 +206,7 @@ public class WorkspaceImpl implements Workspace
      */
     public void importXML(String parentAbsPath, InputStream in, int uuidBehavior) throws IOException, PathNotFoundException, ItemExistsException, ConstraintViolationException, InvalidSerializedDataException, LockException, AccessDeniedException, RepositoryException
     {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedRepositoryOperationException();
     }
 
 }
