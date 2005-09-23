@@ -19,7 +19,7 @@
                   <cm:userName>${username}</cm:userName>
                   <cm:firstName>Fred</cm:firstName>
                   <cm:lastName>Bloggs</cm:lastName>
-                  <cm:homeFolder>/home/fredb</cm:homeFolder>
+                  <cm:homeFolder>workspace://SpacesStore/ID</cm:homeFolder>
                </cm:person>
             </cm:contains>
          </cm:systemfolder>
