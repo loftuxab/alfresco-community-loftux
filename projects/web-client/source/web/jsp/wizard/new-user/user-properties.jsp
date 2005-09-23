@@ -207,7 +207,7 @@
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.back_button}" action="#{NewUserWizard.back}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewUserWizard.back}" styleClass="wizardButton" immediate="true" />
                                     </td>
                                  </tr>
                                  <tr>
