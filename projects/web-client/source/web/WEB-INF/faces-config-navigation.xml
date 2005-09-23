@@ -537,6 +537,14 @@
          <to-view-id>/jsp/wizard/new-rule/condition-in-category.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>is-subtype</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition-is-subtype.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>has-aspect</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition-has-aspect.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>compare-property-value</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/condition-contains-text.jsp</to-view-id>
       </navigation-case>

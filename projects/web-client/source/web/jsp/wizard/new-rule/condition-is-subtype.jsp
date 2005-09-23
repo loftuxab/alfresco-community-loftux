@@ -24,14 +24,14 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_new_rule_cond_category">
+<r:page titleId="title_new_rule_cond_subtype">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="new-rule-in-category">
+   <h:form acceptCharset="UTF-8" id="new-rule-is-subtype">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -101,11 +101,11 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td valign="top"><h:outputText value="#{msg.category}"/>:</td>
-                                    <td width="90%">
-                                       <r:categorySelector label="#{msg.select_category_prompt}" 
-                                                        value="#{NewRuleWizard.conditionProperties.category}" 
-                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                    <td><nobr><h:outputText value="#{msg.type}"/>:</nobr></td>
+                                    <td width="98%">
+                                       <h:selectOneMenu value="#{NewRuleWizard.conditionProperties.modeltype}">
+                                          <f:selectItems value="#{NewRuleWizard.modelTypes}" />
+                                       </h:selectOneMenu>
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
@@ -121,8 +121,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.ok}" action="#{NewRuleWizard.addCondition}" styleClass="wizardButton" 
-                                                        disabled="#{NewRuleWizard.conditionProperties.category == null}" />
+                                       <h:commandButton value="#{msg.ok}" action="#{NewRuleWizard.addCondition}" styleClass="wizardButton"/>
                                     </td>
                                  </tr>
                                  <tr>

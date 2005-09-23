@@ -254,7 +254,7 @@ public abstract class AbstractItemSelector extends UIInput
                
                // show just the initial or current selection link
                String label;
-               if (valueId == null)
+               if (valueId == null || valueId.length() == 0)
                {
                   label = getLabel();
                   

@@ -134,8 +134,18 @@
          <show-association name="translations" displayLabel="Translations" />
       </property-sheet>
    </config>
+
+   <config evaluator="aspect-name" condition="localizable">
+      <property-sheet>
+         <show-property name="locale" displayLabel="Locale" />
+      </property-sheet>
+   </config>
    
    <config evaluator="string-compare" condition="Action Wizards">
+      <types>
+         <type id="folder" description="Folder"/>
+         <type id="content" description="Content"/>
+      </types>
       <aspects>
          <aspect id="generalclassifiable" description="Classifiable"/>
          <aspect id="complianceable" description="Complianceable"/>

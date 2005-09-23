@@ -31,10 +31,15 @@ import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
+import org.alfresco.repo.action.evaluator.HasAspectEvaluator;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
+import org.alfresco.repo.action.evaluator.IsSubTypeEvaluator;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
@@ -42,6 +47,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.RulesBean;
 import org.alfresco.web.bean.repository.Node;
@@ -51,6 +57,7 @@ import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -67,6 +74,8 @@ public class NewRuleWizard extends BaseActionWizard
    public static final String PROP_CONDITION_NAME = "conditionName";
    public static final String PROP_CONDITION_SUMMARY = "conditionSummary";
    public static final String PROP_CONTAINS_TEXT = "containstext";
+   public static final String PROP_MODEL_TYPE = "modeltype";
+   public static final String PROP_MODEL_ASPECT = "modelaspect";
    
    private static Log logger = LogFactory.getLog(NewRuleWizard.class);
    
@@ -90,10 +99,11 @@ public class NewRuleWizard extends BaseActionWizard
    private String condition;
    private boolean runInBackground;
    private boolean applyToSubSpaces;
-   
+
    private RuleService ruleService;
    private RulesBean rulesBean;
    
+   private List<SelectItem> modelTypes;
    private List<SelectItem> types;
    private List<SelectItem> conditions;
    private Map<String, String> conditionDescriptions;
@@ -223,18 +233,8 @@ public class NewRuleWizard extends BaseActionWizard
    public String promptForConditionValues()
    {
       String outcome = null;
-      
-      if ("in-category".equals(this.condition) || "compare-property-value".equals(this.condition))
-      {
-         HashMap<String, String> condProps = new HashMap<String, String>(3);
-         condProps.put(PROP_CONDITION_NAME, this.condition);
-         this.currentConditionProperties = condProps;
-         outcome = this.condition;
-         
-         if (logger.isDebugEnabled())
-            logger.debug("Added '" + this.condition + "' condition to list");
-      }
-      else if ("no-condition".equals(this.condition))
+
+      if ("no-condition".equals(this.condition))
       {
          HashMap<String, String> condProps = new HashMap<String, String>(1);
          condProps.put(PROP_CONDITION_NAME, this.condition);
@@ -247,6 +247,16 @@ public class NewRuleWizard extends BaseActionWizard
          
          if (logger.isDebugEnabled())
             logger.debug("Add 'no-condition' condition to list");
+      }
+      else if (this.condition != null)
+      {
+         HashMap<String, String> condProps = new HashMap<String, String>(3);
+         condProps.put(PROP_CONDITION_NAME, this.condition);
+         this.currentConditionProperties = condProps;
+         outcome = this.condition;
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Added '" + this.condition + "' condition to list");
       }
       
       // reset the selected condition drop down
@@ -646,14 +656,14 @@ public class NewRuleWizard extends BaseActionWizard
       
       ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
       
-      String backgroundYesNo = this.runInBackground ? bundle.getString("no") : bundle.getString("yes");
-      String subSpacesYesNo = this.applyToSubSpaces ? bundle.getString("no") : bundle.getString("yes");
+      String backgroundYesNo = this.runInBackground ? bundle.getString("yes") : bundle.getString("no");
+      String subSpacesYesNo = this.applyToSubSpaces ? bundle.getString("yes") : bundle.getString("no");
       
       return buildSummary(
             new String[] {bundle.getString("name"), bundle.getString("description"),
                           bundle.getString("apply_to_sub_spaces"), bundle.getString("run_in_background"),
                           bundle.getString("conditions"), bundle.getString("actions")},
-            new String[] {this.title, this.description, backgroundYesNo, subSpacesYesNo, 
+            new String[] {this.title, this.description, subSpacesYesNo, backgroundYesNo, 
                           conditionsSummary.toString(), actionsSummary.toString()});
    }
    
@@ -760,7 +770,7 @@ public class NewRuleWizard extends BaseActionWizard
    {
       this.ruleService = ruleService;
    }
-   
+
    /**
     * Sets the RulesBean instance to be used by the wizard in edit mode
     * 
@@ -789,6 +799,48 @@ public class NewRuleWizard extends BaseActionWizard
    }
    
    /**
+    * Returns a list of the types available in the repository
+    * 
+    * @return List of SelectItem objects
+    */
+   public List<SelectItem> getModelTypes()
+   {
+      if (this.modelTypes == null)
+      {
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("Action Wizards");
+         if (wizardCfg != null)
+         {
+            ConfigElement typesCfg = wizardCfg.getConfigElement("types");
+            if (typesCfg != null)
+            {               
+               this.modelTypes = new ArrayList<SelectItem>();
+               for (ConfigElement child : typesCfg.getChildren())
+               {
+                  QName idQName = Repository.resolveToQName(child.getAttribute("id"));
+                  this.modelTypes.add(new SelectItem(idQName.toString(), child.getAttribute("description")));
+               }
+               
+               // make sure the list is sorted by the label
+               QuickSort sorter = new QuickSort(this.modelTypes, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+               sorter.sort();
+            }
+            else
+            {
+               logger.warn("Could not find types configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find Action Wizards configuration section");
+         }
+      }
+      
+      return this.modelTypes;
+   }
+   
+   /**
     * @return Returns the list of selectable conditions
     */
    public List<SelectItem> getConditions()
@@ -796,7 +848,7 @@ public class NewRuleWizard extends BaseActionWizard
       if (this.conditions == null)
       {
          List<ActionConditionDefinition> ruleConditions = this.actionService.getActionConditionDefinitions();
-         this.conditions = new ArrayList<SelectItem>();
+         this.conditions = new ArrayList<SelectItem>(ruleConditions.size());
          for (ActionConditionDefinition ruleConditionDef : ruleConditions)
          {
             // add to SelectItem list
@@ -824,7 +876,7 @@ public class NewRuleWizard extends BaseActionWizard
       if (this.conditionDescriptions == null)
       {
          List<ActionConditionDefinition> ruleConditions = this.actionService.getActionConditionDefinitions();
-         this.conditionDescriptions = new HashMap<String, String>();
+         this.conditionDescriptions = new HashMap<String, String>(ruleConditions.size());
          for (ActionConditionDefinition ruleConditionDef : ruleConditions)
          {
             this.conditionDescriptions.put(ruleConditionDef.getName(), 
@@ -843,7 +895,7 @@ public class NewRuleWizard extends BaseActionWizard
       if (this.types == null)
       {
          List<RuleType> ruleTypes = this.ruleService.getRuleTypes();
-         this.types = new ArrayList<SelectItem>();
+         this.types = new ArrayList<SelectItem>(ruleTypes.size());
          for (RuleType ruleType : ruleTypes)
          {
             this.types.add(new SelectItem(ruleType.getName(), ruleType.getDisplayLabel()));
@@ -923,6 +975,16 @@ public class NewRuleWizard extends BaseActionWizard
          // add the classifiable aspect
          repoParams.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_GEN_CLASSIFIABLE);
       }
+      else if (condName.equals(IsSubTypeEvaluator.NAME))
+      {
+         // add the model type
+         repoParams.put(IsSubTypeEvaluator.PARAM_TYPE, QName.createQName(params.get(PROP_MODEL_TYPE)));
+      }
+      else if (condName.equals(HasAspectEvaluator.NAME))
+      {
+         // add the aspect
+         repoParams.put(HasAspectEvaluator.PARAM_ASPECT, QName.createQName(params.get(PROP_ASPECT)));
+      }
       
       return repoParams;
    }
@@ -949,6 +1011,14 @@ public class NewRuleWizard extends BaseActionWizard
       {
          NodeRef catNodeRef = (NodeRef)repoCondProps.get(InCategoryEvaluator.PARAM_CATEGORY_VALUE);
          condProps.put(PROP_CATEGORY, catNodeRef.getId());
+      }
+      else if (name.equals(IsSubTypeEvaluator.NAME))
+      {
+         condProps.put(PROP_MODEL_TYPE, ((QName)repoCondProps.get(IsSubTypeEvaluator.PARAM_TYPE)).toString());
+      }
+      else if (name.equals(HasAspectEvaluator.NAME))
+      {
+         condProps.put(PROP_ASPECT, ((QName)repoCondProps.get(HasAspectEvaluator.PARAM_ASPECT)).toString());
       }
       
       // generate the summary 
@@ -986,6 +1056,32 @@ public class NewRuleWizard extends BaseActionWizard
             summary.append("'");
             summary.append(props.get(PROP_CONTAINS_TEXT));
             summary.append("'");
+         }
+         else if ("is-subtype".equals(condName))
+         {
+            // find the label used by looking through the SelectItem list
+            String typeName = props.get(PROP_MODEL_TYPE);
+            for (SelectItem item : this.getModelTypes())
+            {
+               if (item.getValue().equals(typeName))
+               {
+                  summary.append("'").append(item.getLabel()).append("'");
+                  break;
+               }
+            }
+         }
+         else if ("has-aspect".equals(condName))
+         {
+            // find the label used by looking through the SelectItem list
+            String aspectName = props.get(PROP_ASPECT);
+            for (SelectItem item : this.getAspects())
+            {
+               if (item.getValue().equals(aspectName))
+               {
+                  summary.append("'").append(item.getLabel()).append("'");
+                  break;
+               }
+            }
          }
          
          summaryResult = summary.toString();
