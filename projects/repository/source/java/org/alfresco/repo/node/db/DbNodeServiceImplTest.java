@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.node.db;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -111,14 +112,15 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
     public void testNodeStatus() throws Exception
     {
         Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
-        // commit results
-        setComplete();
-        endTransaction();
-        
         // get the node to play with
         ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
         final NodeRef n6Ref = n6pn8Ref.getParentRef();
         final NodeRef n8Ref = n6pn8Ref.getChildRef();
+        final Map<QName, Serializable> properties = nodeService.getProperties(n6Ref);
+
+        // commit results
+        setComplete();
+        endTransaction();
 
         // change property - check status
         TransactionWork<Object> changePropertiesWork = new TransactionWork<Object>()
@@ -206,6 +208,27 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
             }
         };
         TransactionUtil.executeInUserTransaction(txnService, checkCascadeWork);
+        
+        // check node recreation
+        TransactionWork<Object> checkRecreateWork = new TransactionWork<Object>()
+        {
+            public Object doWork()
+            {
+                properties.put(ContentModel.PROP_STORE_PROTOCOL, n6Ref.getStoreRef().getProtocol());
+                properties.put(ContentModel.PROP_STORE_IDENTIFIER, n6Ref.getStoreRef().getIdentifier());
+                properties.put(ContentModel.PROP_NODE_UUID, n6Ref.getId());
+
+                // recreate n6
+                nodeService.createNode(
+                        rootNodeRef,
+                        ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                        QName.createQName(NAMESPACE, "recreated-n6"),
+                        ContentModel.TYPE_CONTAINER,
+                        properties);
+                return null;
+            }
+        };
+        TransactionUtil.executeInUserTransaction(txnService, checkRecreateWork);
     }
     
     private void executeAndCheck(NodeRef nodeRef, TransactionWork<Object> work) throws Exception

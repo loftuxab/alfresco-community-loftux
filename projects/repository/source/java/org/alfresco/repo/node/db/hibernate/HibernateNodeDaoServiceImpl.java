@@ -199,8 +199,12 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     {
         NodeKey key = new NodeKey(store.getKey(), id);
 
-        // create the mandatory node status
-        NodeStatus nodeStatus = new NodeStatusImpl();
+        // create (or reuse) the mandatory node status
+        NodeStatus nodeStatus = (NodeStatus) getHibernateTemplate().get(NodeStatusImpl.class, key);
+        if (nodeStatus == null)
+        {
+            nodeStatus = new NodeStatusImpl();
+        }
         // set required status properties
         nodeStatus.setKey(key);
         nodeStatus.setDeleted(false);
