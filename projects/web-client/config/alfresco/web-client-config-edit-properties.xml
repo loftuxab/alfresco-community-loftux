@@ -1,11 +1,5 @@
 <alfresco-config area="edit-properties">
    
-   <config evaluator="aspect-name" condition="generalclassifiable">
-      <property-sheet>
-         <show-property name="categories" displayLabel="Categories" />
-      </property-sheet>
-   </config>
-   
    <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
          <show-property name="removeAfter" displayLabel="Remove After" />

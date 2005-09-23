@@ -32,11 +32,16 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -57,6 +62,7 @@ import org.springframework.web.jsf.FacesContextUtils;
 public class DocumentPropertiesBean
 {
    private NodeService nodeService;
+   private DictionaryService dictionaryService;
    private BrowseBean browseBean;
    private List<SelectItem> contentTypes;
    private Node editableNode;
@@ -110,7 +116,21 @@ public class DocumentPropertiesBean
          {
             String propName = iterProps.next();
             QName qname = QName.createQName(propName);
-            properties.put(qname, (Serializable)this.editableNode.getProperties().get(propName));
+            
+            // make sure the property is represented correctly
+            Serializable propValue = (Serializable)this.editableNode.getProperties().get(propName);
+            PropertyDefinition propDef = this.dictionaryService.getProperty(qname);
+            if (propDef != null)
+            {
+               if (propDef.getDataType().getName().equals(DataTypeDefinition.CATEGORY) || 
+                   propDef.getDataType().getName().equals(DataTypeDefinition.NODE_REF))
+               {
+                  // we need to change the id to a NodeRef
+                  propValue = new NodeRef(Repository.getStoreRef(), (String)propValue);
+               }
+            }
+            
+            properties.put(qname, propValue);
          }
          
          // send the properties back to the repository
@@ -255,6 +275,16 @@ public class DocumentPropertiesBean
    public void setNodeService(NodeService nodeService)
    {
       this.nodeService = nodeService;
+   }
+   
+   /**
+    * Sets the DictionaryService to use when persisting metadata
+    * 
+    * @param dictionaryService The DictionaryService
+    */
+   public void setDictionaryService(DictionaryService dictionaryService)
+   {
+      this.dictionaryService = dictionaryService;
    }
 
    /**

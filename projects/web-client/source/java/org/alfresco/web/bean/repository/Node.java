@@ -109,7 +109,12 @@ public class Node implements Serializable
          
          for (QName qname: props.keySet())
          {
-            this.properties.put(qname.toString(), props.get(qname));
+            Serializable propValue = props.get(qname);
+            if (propValue instanceof NodeRef)
+            {
+               propValue = ((NodeRef)propValue).getId();
+            }
+            this.properties.put(qname.toString(), propValue);
          }
          
          this.propsRetrieved = true;

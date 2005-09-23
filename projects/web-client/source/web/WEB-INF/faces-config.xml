@@ -366,6 +366,10 @@
          <value>#{NodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>dictionaryService</property-name>
+         <value>#{DictionaryService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
       </managed-property>
