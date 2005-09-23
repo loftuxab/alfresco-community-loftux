@@ -119,8 +119,12 @@ public class PropertyMapRowImpl implements Row
             Object objValue = properties.get(propertyName);
             if (objValue != null)
             {
-                int datatype = DataTypeMap.convertDataTypeToPropertyType(columns.get(propertyName).getDataType().getName());
-                value = new ValueImpl(session, datatype, objValue);
+                PropertyDefinition propDef = columns.get(propertyName);
+                if (!propDef.isMultiValued())
+                {
+                    int datatype = DataTypeMap.convertDataTypeToPropertyType(propDef.getDataType().getName());
+                    value = new ValueImpl(session, datatype, objValue);
+                }
             }        
         }
         return value;

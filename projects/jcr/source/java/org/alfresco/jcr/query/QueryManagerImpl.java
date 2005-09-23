@@ -16,6 +16,7 @@
  */
 package org.alfresco.jcr.query;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
 import org.alfresco.jcr.repository.JCRNamespace;
+import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.namespace.QName;
 
 
@@ -39,12 +41,23 @@ public class QueryManagerImpl implements QueryManager
     public static QName JCRPATH_COLUMN = QName.createQName(JCRNamespace.JCR_URI, "path");
     public static QName JCRSCORE_COLUMN = QName.createQName(JCRNamespace.JCR_URI, "score");
     
-    
     /** supported query languages */    
     private static Map<String, Class<? extends QueryImpl>> supportedLanguages = new HashMap<String, Class<? extends QueryImpl>>();
     static
     {
         supportedLanguages.put(Query.XPATH, XPathQueryImpl.class);
+    }
+
+    private SessionImpl session;
+    
+    /**
+     * Construct
+     * 
+     * @param session  session
+     */
+    public QueryManagerImpl(SessionImpl session)
+    {
+        this.session = session;
     }
     
     /* (non-Javadoc)
@@ -62,7 +75,8 @@ public class QueryManagerImpl implements QueryManager
         Class<? extends QueryImpl> queryClass = supportedLanguages.get(language);
         try
         {
-            QueryImpl queryImpl = queryClass.newInstance();
+            Constructor<? extends QueryImpl> constructor = queryClass.getConstructor(new Class[] { SessionImpl.class, String.class } );
+            QueryImpl queryImpl = constructor.newInstance(new Object[] { session, statement } );
             queryImpl.isValidStatement();
             return queryImpl;
         }

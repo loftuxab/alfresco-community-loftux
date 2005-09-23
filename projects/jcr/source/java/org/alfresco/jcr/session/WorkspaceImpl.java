@@ -146,7 +146,7 @@ public class WorkspaceImpl implements Workspace
     {
         if (queryManager == null)
         {
-            queryManager = new QueryManagerImpl();
+            queryManager = new QueryManagerImpl(session);
         }
         return queryManager;
     }
@@ -159,6 +159,9 @@ public class WorkspaceImpl implements Workspace
         return session.getRepositoryImpl().getNamespaceRegistry();
     }
 
+    /* (non-Javadoc)
+     * @see javax.jcr.Workspace#getNodeTypeManager()
+     */
     public NodeTypeManager getNodeTypeManager() throws RepositoryException
     {
         return session.getTypeManager();

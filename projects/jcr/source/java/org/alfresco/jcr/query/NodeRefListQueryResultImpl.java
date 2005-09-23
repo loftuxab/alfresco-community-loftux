@@ -109,6 +109,8 @@ public class NodeRefListQueryResultImpl implements QueryResult
     {
         if (columns == null)
         {
+            columns = new HashMap<QName, PropertyDefinition>();
+            
             // build list of column names from result set
             if (nodeRefs.size() > 0)
             {
@@ -118,11 +120,7 @@ public class NodeRefListQueryResultImpl implements QueryResult
                 Set<QName >aspects = nodeService.getAspects(nodeRefs.get(0));
                 DictionaryService dictionary = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
                 ClassDefinition anonymousClass = dictionary.getAnonymousType(type, aspects);
-                columns = anonymousClass.getProperties();
-            }
-            else
-            {
-                columns = new HashMap<QName, PropertyDefinition>();
+                columns.putAll(anonymousClass.getProperties());
             }
             
             // add JCR required columns

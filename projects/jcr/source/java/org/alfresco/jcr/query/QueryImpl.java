@@ -29,6 +29,7 @@ import javax.jcr.query.Query;
 import javax.jcr.version.VersionException;
 
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.jcr.util.JCRProxyFactory;
 
 
 /**
@@ -44,6 +45,9 @@ public abstract class QueryImpl implements Query
     /** Query Statement */
     private String statement;
     
+    /** Proxy */
+    private Query proxy = null;
+    
     
     /**
      * Construct
@@ -56,6 +60,20 @@ public abstract class QueryImpl implements Query
         this.statement = statement;
     }
 
+    /**
+     * Get proxied JCR Query
+     * 
+     * @return  proxy
+     */
+    public Query getProxy()
+    {
+        if (proxy == null)
+        {
+            proxy = (Query)JCRProxyFactory.create(this, Query.class, session);
+        }
+        return proxy;
+    }
+    
     /**
      * Get Session
      * 
