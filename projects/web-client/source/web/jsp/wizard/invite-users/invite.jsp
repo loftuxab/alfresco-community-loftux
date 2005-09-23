@@ -165,18 +165,15 @@
                                  </tr>
                                  <tr>
                                     <td>
-                                       <table border=0 cellspacing=4 cellpadding=0>
-                                          <tr valign="top">
-                                             <td>
-                                                <h:selectManyListbox id="selection" style="width:250px" size="4">
-                                                   <f:selectItems value="#{InviteUsersWizard.selectedItems}" />
-                                                </h:selectManyListbox>
-                                             </td>
-                                             <td>
-                                                <h:commandButton value="#{msg.remove}" actionListener="#{InviteUsersWizard.removeSelection}" styleClass="wizardButton" />
-                                             </td>
-                                          </tr>
-                                       </table>
+                                       <h:dataTable value="#{InviteUsersWizard.userRolesDataModel}" var="row">
+                                          <h:column>
+                                             <h:outputText value="#{row.label}" />
+                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
+                                          </h:column>
+                                          <h:column>
+                                             <h:commandButton value="#{msg.remove}" actionListener="#{InviteUsersWizard.removeSelection}" />
+                                          </h:column>
+                                       </h:dataTable>
                                     </td>
                                  </tr>
                                  

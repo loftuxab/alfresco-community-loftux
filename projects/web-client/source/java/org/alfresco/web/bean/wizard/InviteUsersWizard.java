@@ -27,6 +27,8 @@ import javax.faces.component.UISelectMany;
 import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.DataModel;
+import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
@@ -39,6 +41,7 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
+import org.alfresco.web.bean.users.UserMembersBean.PermissionWrapper;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIGenericPicker;
 import org.apache.commons.logging.Log;
@@ -81,14 +84,18 @@ public class InviteUsersWizard extends AbstractWizardBean
    /** PermissionService bean reference */
    private PersonService personService;
    
+   /** datamodel for table of roles for users */
+   private DataModel userRolesDataModel = null;
+   
+   /** list of user/group role wrapper objects */
+   private List<UserGroupRole> userGroupRoles = null;
+   
    /** Cache of available folder permissions */
    Set<String> folderPermissions = null;
    
    /** whether to invite all or specify individual users or groups */
    private String invite = "users";
    private String notify = "yes";
-   private List<SelectItem> selectedItems = null;
-   private List<UserGroupRole> userGroupRoles = null;
    private String subject = null;
    private String body = null;
    private String internalSubject = null;
@@ -136,7 +143,6 @@ public class InviteUsersWizard extends AbstractWizardBean
       
       invite = "users";
       notify = "yes";
-      selectedItems = new ArrayList<SelectItem>(8);
       userGroupRoles = new ArrayList<UserGroupRole>(8);
       subject = "";
       body = "";
@@ -182,13 +188,13 @@ public class InviteUsersWizard extends AbstractWizardBean
             for (int i=0; i<this.userGroupRoles.size(); i++)
             {
                UserGroupRole userGroupRole = this.userGroupRoles.get(i);
-               NodeRef person = userGroupRole.UserGroup;
+               NodeRef person = userGroupRole.getUserGroupRef();
                
                // find the selected permission ref from it's name and apply for the specified user
                Set<String> perms = getFolderPermissions();
                for (String permission : perms)
                {
-                  if (userGroupRole.Role.equals(permission))
+                  if (userGroupRole.getRole().equals(permission))
                   {
                      this.permissionService.setPermission(
                            folderNodeRef,
@@ -202,7 +208,7 @@ public class InviteUsersWizard extends AbstractWizardBean
                // Create the mail message for each user to send too
                if ("yes".equals(this.notify))
                {
-                  notifyUser(person, folderNodeRef, from, userGroupRole.Role);
+                  notifyUser(person, folderNodeRef, from, userGroupRole.getRole());
                }
             }
          }
@@ -293,6 +299,23 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
+    * Returns the properties for current user-roles JSF DataModel
+    * 
+    * @return JSF DataModel representing the current user-roles
+    */
+   public DataModel getUserRolesDataModel()
+   {
+      if (this.userRolesDataModel == null)
+      {
+         this.userRolesDataModel = new ListDataModel();
+      }
+      
+      this.userRolesDataModel.setWrappedData(this.userGroupRoles);
+      
+      return this.userRolesDataModel;
+   }
+   
+   /**
     * Query callback method executed by the Generic Picker component.
     * This method is part of the contract to the Generic Picker, it is up to the backing bean
     * to execute whatever query is appropriate and return the results.
@@ -379,12 +402,13 @@ public class InviteUsersWizard extends AbstractWizardBean
                String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
                String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
                
-               // only add if user ref not already present in the list
+               // only add if user ref not already present in the list with same role
                boolean foundExisting = false;
-               String refString = ref.toString();
-               for (int n=0; n<this.selectedItems.size(); n++)
+               for (int n=0; n<this.userGroupRoles.size(); n++)
                {
-                  if (refString.equals(this.selectedItems.get(n).getValue()))
+                  UserGroupRole wrapper = this.userGroupRoles.get(n);
+                  if (ref.equals(wrapper.getUserGroupRef()) &&
+                      role.equals(wrapper.getRole()))
                   {
                      foundExisting = true;
                      break;
@@ -400,8 +424,8 @@ public class InviteUsersWizard extends AbstractWizardBean
                   .append(" (")
                   .append(Application.getMessage(FacesContext.getCurrentInstance(), role))
                   .append(")");
-                  this.selectedItems.add(new SelectItem(refString, label.toString()));
-                  this.userGroupRoles.add(new UserGroupRole(ref, role));
+                  
+                  this.userGroupRoles.add(new UserGroupRole(ref, role, label.toString()));
                }
             }
          }
@@ -409,26 +433,14 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
-    * Action handler called when the Remove button is pressed to remove current selection.
+    * Action handler called when the Remove button is pressed to remove a user+role
     */
    public void removeSelection(ActionEvent event)
    {
-      UISelectMany selector = (UISelectMany)event.getComponent().findComponent("selection");
-      Object[] selection = selector.getSelectedValues();
-      if (selection != null)
+      UserGroupRole wrapper = (UserGroupRole)this.userRolesDataModel.getRowData();
+      if (wrapper != null)
       {
-         for (int i=0; i<selection.length; i++)
-         {
-            String value = (String)selection[i];
-            for (int n=0; n<this.selectedItems.size(); n++)
-            {
-               if (value.equals(this.selectedItems.get(n).getValue()))
-               {
-                  this.selectedItems.remove(n);
-                  this.userGroupRoles.remove(n);
-               }
-            }
-         }
+         this.userGroupRoles.remove(wrapper);
       }
    }
    
@@ -512,22 +524,6 @@ public class InviteUsersWizard extends AbstractWizardBean
    public void setAutomaticText(String automaticText)
    {
       this.automaticText = automaticText;
-   }
-
-   /**
-    * @return Returns the selectedItems.
-    */
-   public List<SelectItem> getSelectedItems()
-   {
-      return this.selectedItems;
-   }
-
-   /**
-    * @param selectedItems The selectedItems to set.
-    */
-   public void setSelectedItems(List<SelectItem> selectedItems)
-   {
-      this.selectedItems = selectedItems;
    }
    
    /**
@@ -737,16 +733,38 @@ public class InviteUsersWizard extends AbstractWizardBean
    /**
     * Simple wrapper class to represent a user/group and a role combination
     */
-   private static class UserGroupRole
+   public static class UserGroupRole
    {
-      public UserGroupRole(NodeRef usergroup, String role)
+      public UserGroupRole(NodeRef usergroup, String role, String label)
       {
-         this.UserGroup = usergroup;
-         this.Role = role;
+         this.userGroup = usergroup;
+         this.role = role;
+         this.label = label;
       }
       
-      public NodeRef UserGroup;
-      public String Role;
+      public String getUserGroup()
+      {
+         return userGroup.toString();
+      }
+      
+      public NodeRef getUserGroupRef()
+      {
+         return this.userGroup;
+      }
+      
+      public String getRole()
+      {
+         return this.role;
+      }
+      
+      public String getLabel()
+      {
+         return this.label;
+      }
+      
+      private NodeRef userGroup;
+      private String role;
+      private String label;
    }
    
    /**
