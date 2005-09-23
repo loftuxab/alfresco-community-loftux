@@ -84,16 +84,9 @@
       </property-sheet>
    </config>
    
-   <config evaluator="aspect-name" condition="auditable">
+   <config evaluator="aspect-name" condition="generalclassifiable">
       <property-sheet>
-         <show-property name="created" displayLabel="Created" readOnly="true" />
-         <show-property name="modified" displayLabel="Modified" readOnly="true" />
-      </property-sheet>
-   </config>
-   
-   <config evaluator="aspect-name" condition="app:inlineeditable">
-      <property-sheet>
-         <show-property name="app:editInline" displayLabel="Edit Inline" converter="org.alfresco.faces.BooleanLabelConverter" />
+         <show-property name="categories" displayLabel="Categories" />
       </property-sheet>
    </config>
    
@@ -102,7 +95,7 @@
          <show-property name="removeAfter" displayLabel="Remove After" />
       </property-sheet>
    </config>
-   
+
    <config evaluator="aspect-name" condition="dublincore">
       <property-sheet>
          <show-property name="publisher" displayLabel="Publisher" />
@@ -129,6 +122,12 @@
       </property-sheet>
    </config>
    
+   <config evaluator="aspect-name" condition="versionable">
+      <property-sheet>
+         <show-property name="versionLabel" displayLabel="Version Label" />
+      </property-sheet>
+   </config>
+   
    <config evaluator="aspect-name" condition="translatable">
       <property-sheet>
          <show-association name="translations" displayLabel="Translations" />
@@ -138,6 +137,19 @@
    <config evaluator="aspect-name" condition="localizable">
       <property-sheet>
          <show-property name="locale" displayLabel="Locale" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="auditable">
+      <property-sheet>
+         <show-property name="created" displayLabel="Created" readOnly="true" />
+         <show-property name="modified" displayLabel="Modified" readOnly="true" />
+      </property-sheet>
+   </config>
+   
+   <config evaluator="aspect-name" condition="app:inlineeditable">
+      <property-sheet>
+         <show-property name="app:editInline" displayLabel="Edit Inline" converter="org.alfresco.faces.BooleanLabelConverter" />
       </property-sheet>
    </config>
    
@@ -155,6 +167,7 @@
          <aspect id="versionable" description="Versionable"/>
          <aspect id="templatable" description="Templatable"/>
          <aspect id="translatable" description="Translatable"/>
+         <aspect id="localizable" description="Localizable"/>
       </aspects>
       <transformers>
          <transformer id="text/html" description="HTML" />
