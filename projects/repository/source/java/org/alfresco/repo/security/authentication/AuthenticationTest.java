@@ -37,7 +37,6 @@ import net.sf.acegisecurity.LockedException;
 import net.sf.acegisecurity.UserDetails;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.dao.SaltSource;
-import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;

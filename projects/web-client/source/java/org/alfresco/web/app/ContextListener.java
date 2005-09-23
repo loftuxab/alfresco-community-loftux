@@ -34,9 +34,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
-import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -102,7 +100,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
       // repo bootstrap code for our client
       UserTransaction tx = null;
-      String companySpaceId = null;
+      NodeRef companySpaceNodeRef = null;
       try
       {
          tx = transactionService.getUserTransaction();
@@ -136,8 +134,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          }
 
          // Extract company space id and store it in the Application object
-         companySpaceId = nodes.get(0).getId();
-         Application.setCompanyRootId(companySpaceId);
+         companySpaceNodeRef = nodes.get(0);
+         Application.setCompanyRootId(companySpaceNodeRef.getId());
 
          // check the admin user exists, create if it doesn't
          MutableAuthenticationDao dao = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
@@ -175,7 +173,7 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             props.put(ContentModel.PROP_USERNAME, ADMIN);
             props.put(ContentModel.PROP_FIRSTNAME, ADMIN_FIRSTNAME);
             props.put(ContentModel.PROP_LASTNAME, ADMIN_LASTNAME);
-            props.put(ContentModel.PROP_HOMEFOLDER, companySpaceId);
+            props.put(ContentModel.PROP_HOMEFOLDER, companySpaceNodeRef);
             props.put(ContentModel.PROP_EMAIL, "");
             props.put(ContentModel.PROP_ORGID, "");
 

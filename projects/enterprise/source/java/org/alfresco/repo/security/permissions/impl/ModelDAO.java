@@ -18,6 +18,7 @@ package org.alfresco.repo.security.permissions.impl;
 
 import java.util.Set;
 
+import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.model.RequiredPermission;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -26,7 +27,7 @@ import org.alfresco.service.namespace.QName;
 /**
  * The API for the alfresco permission model.
  * 
- * @author andyh
+ * @author Andy Hind
  */
 public interface ModelDAO
 {
@@ -93,7 +94,7 @@ public interface ModelDAO
     public Set<PermissionReference> getGranteePermissions(PermissionReference permissionReference);
 
     /**
-     * Is this permission refernce to a permission and not a permissoinSet?
+     * Is this permission refernece to a permission and not a permissoinSet?
      * 
      * @param required
      * @return
@@ -117,5 +118,13 @@ public interface ModelDAO
      * @return
      */
     public PermissionReference getPermissionReference(QName qname, String permissionName);
+    
+    /**
+     * Get the global permissions for the model.
+     * Permissions that apply to all nodes and take precedence over node specific permissions.
+     * 
+     * @return
+     */
+    public Set<? extends PermissionEntry> getGlobalPermissionEntries();
 
 }

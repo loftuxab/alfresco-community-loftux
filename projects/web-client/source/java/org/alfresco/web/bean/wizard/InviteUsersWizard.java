@@ -33,11 +33,10 @@ import javax.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
-import org.alfresco.web.app.servlet.ExternalAccessServlet;
-import org.alfresco.web.bean.LoginBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
@@ -79,6 +78,9 @@ public class InviteUsersWizard extends AbstractWizardBean
    /** PermissionService bean reference */
    private PermissionService permissionService;
    
+   /** PermissionService bean reference */
+   private PersonService personService;
+   
    /** Cache of available folder permissions */
    Set<String> folderPermissions = null;
    
@@ -115,6 +117,14 @@ public class InviteUsersWizard extends AbstractWizardBean
    public void setPermissionService(PermissionService permissionService)
    {
       this.permissionService = permissionService;
+   }
+   
+   /**
+    * @param permissionService  The PermissionService to set.
+    */
+   public void setPersonService(PersonService personService)
+   {
+      this.personService = personService;
    }
 
    /**
@@ -307,7 +317,7 @@ public class InviteUsersWizard extends AbstractWizardBean
          // TODO: if 'invite' drop-down is groups then select from list of groups not users!
          
          // build xpath to match available Person objects
-         NodeRef peopleRef = Repository.getSystemPeopleFolderRef(context, nodeService, searchService);
+         NodeRef peopleRef = personService.getPeopleContainer();
          // NOTE: see SearcherComponentTest
          String xpath = "*[like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "firstName, '%" + contains + "%', false)" +
                  " or " + "like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "lastName, '%" + contains + "%', false)]";

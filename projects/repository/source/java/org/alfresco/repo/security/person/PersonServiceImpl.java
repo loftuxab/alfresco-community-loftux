@@ -17,14 +17,15 @@
 package org.alfresco.repo.security.person;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.QueryParameterDefImpl;
-import org.alfresco.repo.security.authentication.AuthenticationException;
-import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -57,6 +58,20 @@ public class PersonServiceImpl implements PersonService
 
     private boolean createMissingPeople;
 
+    private static Set<QName> mutableProperties;
+
+    static
+    {
+        Set<QName> props = new HashSet<QName>();
+        props.add(ContentModel.PROP_HOMEFOLDER);
+        props.add(ContentModel.PROP_FIRSTNAME);
+        // Middle Name
+        props.add(ContentModel.PROP_LASTNAME);
+        props.add(ContentModel.PROP_EMAIL);
+        props.add(ContentModel.PROP_ORGID);
+        mutableProperties = Collections.unmodifiableSet(props);
+    }
+
     public PersonServiceImpl()
     {
         super();
@@ -65,6 +80,27 @@ public class PersonServiceImpl implements PersonService
     public NodeRef getPerson(String userName)
     {
 
+        NodeRef personNode = getPersonOrNull(userName);
+        if (personNode == null)
+        {
+            if (createMissingPeople())
+            {
+                return createMissingPerson(userName);
+            }
+            else
+            {
+                throw new PersonException("No person found for user name" + userName);
+            }
+
+        }
+        else
+        {
+            return personNode;
+        }
+    }
+
+    public NodeRef getPersonOrNull(String userName)
+    {
         NodeRef rootNode = nodeService.getRootNode(storeRef);
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
@@ -74,10 +110,9 @@ public class PersonServiceImpl implements PersonService
                 + "/cm:person[@cm:userName = $cm:var ]", defs, namespacePrefixResolver, false);
         if (results.size() != 1)
         {
-            throw new AuthenticationException("No user for " + userName);
+            return null;
         }
         return results.get(0);
-
     }
 
     public boolean createMissingPeople()
@@ -87,14 +122,25 @@ public class PersonServiceImpl implements PersonService
 
     public Set<QName> getMutableProperties()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return mutableProperties;
     }
 
-    public void setPersonProperties(NodeRef nodeRef, Map<QName, Serializable> properties)
+    public void setPersonProperties(String userName, Map<QName, Serializable> properties)
     {
-        // TODO Auto-generated method stub
+        NodeRef personNode = getPersonOrNull(userName);
+        if (personNode == null)
+        {
+            if (createMissingPeople())
+            {
+                personNode = createMissingPerson(userName);
+            }
+            else
+            {
+                throw new PersonException("No person found for user name" + userName);
+            }
 
+        }
+        nodeService.setProperties(personNode, properties);
     }
 
     public boolean isMutable()
@@ -102,11 +148,36 @@ public class PersonServiceImpl implements PersonService
         return true;
     }
 
+    private NodeRef createMissingPerson(String userName)
+    {
+        HashMap<QName, Serializable> properties = getDefaultProperties(userName);
+        return createPerson(properties);
+    }
+
+    private HashMap<QName, Serializable> getDefaultProperties(String userName)
+    {
+        HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(ContentModel.PROP_USERNAME, userName);
+        properties.put(ContentModel.PROP_HOMEFOLDER, null);
+        properties.put(ContentModel.PROP_FIRSTNAME, "");
+        properties.put(ContentModel.PROP_LASTNAME, "");
+        properties.put(ContentModel.PROP_EMAIL, "");
+        properties.put(ContentModel.PROP_ORGID, "");
+        return properties;
+    }
+
     public NodeRef createPerson(Map<QName, Serializable> properties)
     {
+        return nodeService.createNode(getPeopleContainer(), ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON,
+                ContentModel.TYPE_PERSON, properties).getChildRef();
+    }
+    
+    
 
+    public NodeRef getPeopleContainer()
+    {
         NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
-        List<NodeRef> results = searchService.selectNodes(rootNodeRef, RepositoryAuthenticationDao.PEOPLE_FOLDER, null,
+        List<NodeRef> results = searchService.selectNodes(rootNodeRef, PEOPLE_FOLDER, null,
                 namespacePrefixResolver, false);
         NodeRef typesNode = null;
         if (results.size() == 0)
@@ -132,81 +203,38 @@ public class PersonServiceImpl implements PersonService
                 typesNode = nodeService.createNode(sysNode, ContentModel.ASSOC_CHILDREN,
                         QName.createQName("sys", "people", namespacePrefixResolver), ContentModel.TYPE_CONTAINER)
                         .getChildRef();
+                return typesNode;
             }
             else
             {
-                typesNode = result.get(0).getChildRef();
+                return result.get(0).getChildRef();
             }
 
         }
         else
         {
-            typesNode = results.get(0);
+            return results.get(0);
         }
-
-        return nodeService.createNode(typesNode, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, // expecting
-                // this
-                // qname
-                // path
-                // in
-                // the
-                // authentication
-                // methods
-                ContentModel.TYPE_PERSON, properties).getChildRef();
-    }
-
-    public Set<String> getGroups(String userName)
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public void deletePerson(String userName)
     {
-        // TODO Auto-generated method stub
+        NodeRef personNodeRef = getPersonOrNull(userName);
+        if (personNodeRef != null)
+        {
+            nodeService.deleteNode(personNodeRef);
+        }
 
     }
 
     public Set<NodeRef> getAllPeople()
     {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Set<String> getAllGroups()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void addPersonToGroup(String groupName, String userName)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void deletePersonFromGroup(String groupName, String userName)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void addSubGroupToGroup(String groupName, String subGroupName)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void deleteSubGroupFromGroup(String groupName, String subGroupName)
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void deleteGroup(String groupName)
-    {
-        // TODO Auto-generated method stub
-
+        NodeRef rootNode = nodeService.getRootNode(storeRef);
+        List<NodeRef> results = searchService.selectNodes(rootNode, PEOPLE_FOLDER + "/cm:person", null,
+                namespacePrefixResolver, false);
+        HashSet<NodeRef> all = new HashSet<NodeRef>();
+        all.addAll(results);
+        return all;
     }
 
     public void setCreateMissingPeople(boolean createMissingPeople)

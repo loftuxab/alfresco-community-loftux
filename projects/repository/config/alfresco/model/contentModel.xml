@@ -113,7 +113,7 @@
                <mandatory>true</mandatory>
             </property>
             <property name="cm:homeFolder">
-               <type>d:text</type>
+               <type>d:noderef</type>
                <mandatory>true</mandatory>
             </property>
              <property name="cm:firstName">

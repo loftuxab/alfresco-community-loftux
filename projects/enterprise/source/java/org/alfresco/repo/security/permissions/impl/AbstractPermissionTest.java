@@ -101,6 +101,8 @@ public class AbstractPermissionTest extends BaseSpringTest
         authenticationService.createAuthentication("andy", "andy".toCharArray());
 
         authenticationService.createAuthentication("lemur", "lemur".toCharArray());
+        
+        authenticationService.createAuthentication("admin", "admin".toCharArray());
     }
 
     protected void onTearDownInTransaction()

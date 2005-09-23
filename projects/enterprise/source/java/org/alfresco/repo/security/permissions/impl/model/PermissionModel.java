@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.repo.security.permissions.NodePermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.ModelDAO;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
@@ -76,7 +76,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
     private static final String PERMISSION_SET = "permissionSet";
 
-    private static final String NODE_PERMISSIONS = "nodePermissions";
+    private static final String GLOBAL_PERMISSION = "globalPermission";
 
     private static final String DENY = "deny";
 
@@ -90,7 +90,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
     private Map<QName, PermissionSet> permissionSets = new HashMap<QName, PermissionSet>();
 
-    private Map<NodeRef, NodePermissionEntry> nodePermissions = new HashMap<NodeRef, NodePermissionEntry>();
+    private Set<GlobalPermissionEntry> globalPermissions = new HashSet<GlobalPermissionEntry>();
 
     private AccessStatus defaultPermission;
 
@@ -188,21 +188,26 @@ public class PermissionModel implements ModelDAO, InitializingBean
         {
             Element permissionSetElement = (Element) psit.next();
             PermissionSet permissionSet = new PermissionSet();
-            permissionSet.initialise(permissionSetElement, nspr);
+            permissionSet.initialise(permissionSetElement, nspr, this);
 
             permissionSets.put(permissionSet.getQName(), permissionSet);
         }
 
+        
+        buildUniquePermissionMap();
+        
         // NodePermissions
 
-        for (Iterator npit = root.elementIterator(NODE_PERMISSIONS); npit.hasNext(); /**/)
+        for (Iterator npit = root.elementIterator(GLOBAL_PERMISSION); npit.hasNext(); /**/)
         {
-            Element nodePermissionElement = (Element) npit.next();
-            NodePermission nodePermission = new NodePermission();
-            nodePermission.initialise(nodePermissionElement, nspr);
+            Element globalPermissionElement = (Element) npit.next();
+            GlobalPermissionEntry globalPermission = new GlobalPermissionEntry();
+            globalPermission.initialise(globalPermissionElement, nspr, this);
+            
+            globalPermissions.add(globalPermission);
         }
 
-        buildUniquePermissionMap();
+        
     }
 
     /*
@@ -251,11 +256,11 @@ public class PermissionModel implements ModelDAO, InitializingBean
         }
     }
 
-    public Map<NodeRef, NodePermissionEntry> getNodePermissions()
+    public Set<? extends PermissionEntry> getGlobalPermissionEntries()
     {
-        return Collections.unmodifiableMap(nodePermissions);
+        return Collections.unmodifiableSet(globalPermissions);
     }
-
+    
     public Map<QName, PermissionSet> getPermissionSets()
     {
         return Collections.unmodifiableMap(permissionSets);

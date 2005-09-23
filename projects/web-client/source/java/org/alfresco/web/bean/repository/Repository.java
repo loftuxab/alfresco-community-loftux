@@ -47,6 +47,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -544,7 +545,8 @@ public final class Repository
          tx = Repository.getUserTransaction(context);
          tx.begin();
          
-         NodeRef peopleRef = getSystemPeopleFolderRef(context, nodeService, searchService);
+         PersonService personService = (PersonService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("personService");
+         NodeRef peopleRef = personService.getPeopleContainer();
          
          // TODO: better to perform an XPath search or a get for a specific child type here?
          List<ChildAssociationRef> childRefs = nodeService.getChildAssocs(peopleRef);
@@ -564,10 +566,10 @@ public final class Repository
                // it is much better for performance to do this now rather than during page bind
                Map<String, Object> props = node.getProperties(); 
                props.put("fullName", ((String)props.get("firstName")) + ' ' + ((String)props.get("lastName")));
-               String homeFolderId = (String)props.get("homeFolder");
-               if (homeFolderId != null)
+               NodeRef homeFolderNodeRef = (NodeRef)props.get("homeFolder");
+               if (homeFolderNodeRef != null)
                {
-                  props.put("homeSpace", new NodeRef(Repository.getStoreRef(), homeFolderId));
+                  props.put("homeSpace", homeFolderNodeRef);
                }
                
                personNodes.add(node);
@@ -593,76 +595,6 @@ public final class Repository
       }
       
       return personNodes;
-   }
-   
-   /**
-    * Return a reference to the special system folder
-    * 
-    * @param context
-    * @param nodeService access to nodes
-    * @param searchService searches for the folder
-    * 
-    * @return NodeRef to System folder
-    */
-   public static NodeRef getSystemFolderRef(FacesContext context, NodeService nodeService, SearchService searchService)
-   {
-      if (systemRef == null)
-      {
-         // get a reference to the system types folder node
-         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
-         
-         NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
-         List<NodeRef> results = searchService.selectNodes(
-               rootNodeRef,
-               RepositoryAuthenticationDao.SYSTEM_FOLDER,
-               null,
-               resolver,
-               false);
-         
-         if (results.size() != 1)
-         {
-            throw new AlfrescoRuntimeException("Unable to find system folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
-         }
-         
-         systemRef = results.get(0);
-      }
-      
-      return systemRef;
-   }
-   
-   /**
-    * Return a reference to the special system folder containing Person instances
-    * 
-    * @param context
-    * 
-    * @return NodeRef to Person folder
-    */
-   public static NodeRef getSystemPeopleFolderRef(FacesContext context, NodeService nodeService, SearchService searchService)
-   {
-      if (peopleRef == null)
-      {
-         // get a reference to the system/people folder node
-         DynamicNamespacePrefixResolver resolver = new DynamicNamespacePrefixResolver(null);
-         resolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
-    
-         NodeRef rootNodeRef = nodeService.getRootNode(Repository.getStoreRef()); 
-         List<NodeRef> results = searchService.selectNodes(
-               rootNodeRef,
-               RepositoryAuthenticationDao.PEOPLE_FOLDER,
-               null,
-               resolver,
-               false);
-         
-         if (results.size() != 1)
-         {
-            throw new AlfrescoRuntimeException("Unable to find system/people folder: " + RepositoryAuthenticationDao.PEOPLE_FOLDER);
-         }
-         
-         peopleRef = results.get(0);
-      }
-      
-      return peopleRef;
    }
    
    /**

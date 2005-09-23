@@ -16,8 +16,6 @@
  */
 package org.alfresco.service.cmr.security;
 
-import java.util.Set;
-
 import org.alfresco.repo.security.authentication.AuthenticationException;
 
 /**
@@ -135,58 +133,6 @@ public interface AuthenticationService
      *
      */
     public void clearCurrentSecurityContext();
-    
-    
-    /**
-     * Get all the roles for the currently authenticated user.
-     * 
-     * @return
-     */
-    public Set<String> getCurrentUserRoles();
-    
-    /**
-     * Get all the groups for the currently authenticated user.
-     * 
-     * @return
-     */
-    public Set<String> getCurrentUserGroups();
-    
-    /**
-     * Get all the roles for the given userName.
-     * 
-     * @param userName
-     * @return
-     */
-    public Set<String> getUserRoles(String userName);
-    
-    /**
-     * Get all the groups for the given userName.
-     * 
-     * @param userName
-     * @return
-     */
-    public Set<String> getUserGroups(String userName);
-    
-    /**
-     * Get all the roles the authentication service knows about.
-     * 
-     * @return
-     */
-    public Set<String> getAllUserRoles();
-    
-    /**
-     * Get all the groups the authentication service knows about.
-     * 
-     * @return
-     */
-    public Set<String> getAllUserGroups();
-    
-    /**
-     * Get all the user names the authentication knows about.
-     * 
-     * @return
-     */
-    public Set<String> getAllUserNames();
     
     /**
      * Is the current user the system user?

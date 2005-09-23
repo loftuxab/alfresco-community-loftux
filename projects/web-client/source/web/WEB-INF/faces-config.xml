@@ -535,6 +535,10 @@
          <value>#{PermissionService}</value>
       </managed-property>
       <managed-property>
+         <property-name>personService</property-name>
+         <value>#{personService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>

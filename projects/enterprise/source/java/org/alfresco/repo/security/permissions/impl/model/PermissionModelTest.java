@@ -18,6 +18,7 @@ package org.alfresco.repo.security.permissions.impl.model;
 
 import java.util.Set;
 
+import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.AbstractPermissionTest;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
@@ -44,5 +45,11 @@ public class PermissionModelTest extends AbstractPermissionTest
         Set<PermissionReference> granters = permissionModelDAO.getGrantingPermissions(new SimplePermissionReference(QName.createQName("sys", "base",
                 namespacePrefixResolver), "ReadProperties"));
         assertEquals(8, granters.size());
+    }
+    
+    public void testGlobalPermissions()
+    {
+        Set<? extends PermissionEntry> globalPermissions = permissionModelDAO.getGlobalPermissionEntries();
+        assertEquals(2, globalPermissions.size());
     }
 }

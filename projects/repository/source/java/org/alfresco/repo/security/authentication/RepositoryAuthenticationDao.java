@@ -47,9 +47,9 @@ import org.springframework.dao.DataAccessException;
 public class RepositoryAuthenticationDao implements MutableAuthenticationDao
 {
 
-    public static final String SYSTEM_FOLDER = "/sys:system";
+    private static final String SYSTEM_FOLDER = "/sys:system";
 
-    public static final String PEOPLE_FOLDER = SYSTEM_FOLDER + "/sys:people";
+    private  static final String PEOPLE_FOLDER = SYSTEM_FOLDER + "/sys:people";
 
     private NodeService nodeService;
 

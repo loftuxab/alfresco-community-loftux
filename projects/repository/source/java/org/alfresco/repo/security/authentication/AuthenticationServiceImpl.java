@@ -16,9 +16,6 @@
  */
 package org.alfresco.repo.security.authentication;
 
-import java.util.Set;
-
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 
 public class AuthenticationServiceImpl implements AuthenticationService
@@ -114,54 +111,6 @@ public class AuthenticationServiceImpl implements AuthenticationService
     public void clearCurrentSecurityContext()
     {
         authenticationComponent.clearCurrentSecurityContext();
-    }
-
-    public Set<String> getCurrentUserRoles()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Set<String> getCurrentUserGroups()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Set<String> getUserRoles(String userName)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Set<String> getUserGroups(String userName)
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Set<String> getAllUserRoles()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Set<String> getAllUserGroups()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Set<String> getAllUserNames()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public NodeRef synchronisePerson(String userName)
-    {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public boolean isCurrentUserTheSystemUser()

@@ -30,8 +30,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.Searcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -61,7 +59,7 @@ import org.apache.lucene.store.FSDirectory;
  * The index deltas are buffered to memory and persisted in the file system as
  * required.
  * 
- * @author andyh
+ * @author Andy Hind
  * 
  */
 

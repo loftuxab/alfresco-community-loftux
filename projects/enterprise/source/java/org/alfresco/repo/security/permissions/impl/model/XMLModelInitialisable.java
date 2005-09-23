@@ -26,5 +26,5 @@ import org.dom4j.Element;
  */
 public interface XMLModelInitialisable
 {
-    public void initialise(Element element, NamespacePrefixResolver nspr);
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel);
 }

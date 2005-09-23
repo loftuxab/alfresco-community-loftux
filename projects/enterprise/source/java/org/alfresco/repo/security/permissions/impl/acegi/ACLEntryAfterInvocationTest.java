@@ -438,6 +438,8 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 
     public void testResultSetFilterAll() throws Exception
     {
+        runAs("admin");
+        
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
 
@@ -498,6 +500,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 
     public void testResultSetFilterForNullParentOnly() throws Exception
     {
+        runAs("admin");
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
 
@@ -559,6 +562,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 
     public void testResultSetFilterNone1() throws Exception
     {
+        runAs("admin");
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
 
@@ -640,6 +644,7 @@ public class ACLEntryAfterInvocationTest extends AbstractPermissionTest
 
     public void testResultSetFilterNone2() throws Exception
     {
+        runAs("admin");
 
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();

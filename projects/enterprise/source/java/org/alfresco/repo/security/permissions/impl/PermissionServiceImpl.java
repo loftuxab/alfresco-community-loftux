@@ -200,9 +200,10 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         HashSet<AccessPermission> accessPermissions = new HashSet<AccessPermission>();
         NodePermissionEntry nodePremissionEntry = getSetPermissions(nodeRef);
-        for(PermissionEntry pe : nodePremissionEntry.getPermissionEntries())
+        for (PermissionEntry pe : nodePremissionEntry.getPermissionEntries())
         {
-            accessPermissions.add(new AccessPermissionImpl(getPermission(pe.getPermissionReference()), pe.getAccessStatus(), pe.getAuthority()));
+            accessPermissions.add(new AccessPermissionImpl(getPermission(pe.getPermissionReference()), pe
+                    .getAccessStatus(), pe.getAuthority()));
         }
         return accessPermissions;
     }
@@ -235,7 +236,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         private AccessStatus accessStatus;
 
         private String authority;
-        
+
         private AuthorityType authorityType;
 
         AccessPermissionImpl(String permission, AccessStatus accessStatus, String authority)
@@ -243,16 +244,16 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             this.permission = permission;
             this.accessStatus = accessStatus;
             this.authority = authority;
-            
-            if(authority.equals(PermissionService.ALL_AUTHORITIES))
+
+            if (authority.equals(PermissionService.ALL_AUTHORITIES))
             {
                 authorityType = AuthorityType.EVERYONE;
             }
-            else if(authority.equals(PermissionService.OWNER_AUTHORITY))
+            else if (authority.equals(PermissionService.OWNER_AUTHORITY))
             {
                 authorityType = AuthorityType.OWNER;
             }
-            else if(authority.startsWith("GROUP_"))
+            else if (authority.startsWith("GROUP_"))
             {
                 authorityType = AuthorityType.GROUP;
             }
@@ -260,7 +261,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             {
                 authorityType = AuthorityType.USER;
             }
-            
+
         }
 
         public String getPermission()
@@ -277,8 +278,6 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         {
             return authority;
         }
-        
-        
 
         public AuthorityType getAuthorityType()
         {
@@ -401,7 +400,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     }
 
     /**
-     * Get the authorisatons for the currently authenticated user
+     * Get the authorisations for the currently authenticated user
      * 
      * @param auth
      * @return
@@ -460,8 +459,6 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         permissionsDAO.deletePermissions(nodeRef, authority, perm, allow);
     }
-    
-    
 
     public void clearPermission(NodeRef nodeRef, String authority)
     {
@@ -495,7 +492,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     /**
      * Support class to test the permission on a node.
      * 
-     * @author andyh
+     * @author Andy Hind
      */
     private class NodeTest
     {
@@ -503,6 +500,11 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
          * The required permission.
          */
         PermissionReference required;
+
+        /*
+         * Granters of the permission
+         */
+        Set<PermissionReference> granters;
 
         /*
          * The additional permissions required at the node level.
@@ -547,6 +549,11 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
             childrenRequirements = modelDAO.getRequiredPermissions(required, typeQName, aspectQNames,
                     RequiredPermission.On.CHILDREN);
+
+            // Find all the permissions that grant the allowed permission
+            // All permissions are treated specially.
+            granters = modelDAO.getGrantingPermissions(required);
+            granters.add(getAllPermissionReference());
         }
 
         /**
@@ -590,7 +597,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             {
                 if (parentRequirements.contains(required))
                 {
-                    if (checkRequired(authorisations, nodeRef, locallyDenied, required))
+                    if (checkGlobalPermissions(authorisations) || checkRequired(authorisations, nodeRef, locallyDenied))
                     {
                         // No need to do the recursive test as it has been found
                         recursiveOut = null;
@@ -609,7 +616,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
                 else
                 {
                     // We have to do the test as no parent will help us out
-                    success &= hasSinglePermission(authorisations, nodeRef, required);
+                    success &= hasSinglePermission(authorisations, nodeRef);
                 }
                 if (!success)
                 {
@@ -630,34 +637,44 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             }
 
             // Check the permission required of the parent
-            ChildAssociationRef car = nodeService.getPrimaryParent(nodeRef);
-            NodePermissionEntry nodePermissions = permissionsDAO.getPermissions(car.getChildRef());
-            if (success
-                    && ((nodePermissions == null) || (nodePermissions.inheritPermissions()))
-                    && (car.getParentRef() != null))
+
+            if (success)
             {
-                locallyDenied.addAll(getDenied(car.getParentRef()));
-                for (PermissionReference pr : parentRequirements)
+                ChildAssociationRef car = nodeService.getPrimaryParent(nodeRef);
+                if (car.getParentRef() != null)
                 {
-                    if (pr.equals(required))
+
+                    NodePermissionEntry nodePermissions = permissionsDAO.getPermissions(car.getChildRef());
+                    if ((nodePermissions == null) || (nodePermissions.inheritPermissions()))
                     {
-                        success &= this.evaluate(authorisations, car.getParentRef(), locallyDenied, recursiveOut);
-                        if ((recursiveOut != null) && recursiveOut.getValue())
+
+                        locallyDenied.addAll(getDenied(car.getParentRef()));
+                        for (PermissionReference pr : parentRequirements)
                         {
-                            if (recursiveIn != null)
+                            if (pr.equals(required))
                             {
-                                recursiveIn.setValue(true);
+                                // Recursive permission
+                                success &= this.evaluate(authorisations, car.getParentRef(), locallyDenied,
+                                        recursiveOut);
+                                if ((recursiveOut != null) && recursiveOut.getValue())
+                                {
+                                    if (recursiveIn != null)
+                                    {
+                                        recursiveIn.setValue(true);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                NodeTest nt = new NodeTest(pr, typeQName, aspectQNames);
+                                success &= nt.evaluate(authorisations, car.getParentRef(), locallyDenied, null);
+                            }
+
+                            if (!success)
+                            {
+                                return false;
                             }
                         }
-                    }
-                    else
-                    {
-                        NodeTest nt = new NodeTest(pr, typeQName, aspectQNames);
-                        success &= nt.evaluate(authorisations, car.getParentRef(), locallyDenied, null);
-                    }
-                    if (!success)
-                    {
-                        return false;
                     }
                 }
             }
@@ -685,8 +702,15 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             return success;
         }
 
-        public boolean hasSinglePermission(Set<String> authorisations, NodeRef nodeRef, PermissionReference perm)
+        public boolean hasSinglePermission(Set<String> authorisations, NodeRef nodeRef)
         {
+            // Check global permission
+
+            if (checkGlobalPermissions(authorisations))
+            {
+                return true;
+            }
+
             Set<Pair<String, PermissionReference>> denied = new HashSet<Pair<String, PermissionReference>>();
 
             // Keep track of permission that are denied
@@ -709,7 +733,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
                 // If the current node allows the permission we are done
                 // The test includes any parent or ancestor requirements
-                if (checkRequired(authorisations, car.getChildRef(), denied, perm))
+                if (checkRequired(authorisations, car.getChildRef(), denied))
                 {
                     return true;
                 }
@@ -738,6 +762,24 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
             return false;
 
+        }
+
+        /**
+         * Check if we have a global permission
+         * 
+         * @param authorisations
+         * @return
+         */
+        private boolean checkGlobalPermissions(Set<String> authorisations)
+        {
+            for (PermissionEntry pe : modelDAO.getGlobalPermissionEntries())
+            {
+                if (isGranted(pe, authorisations, null))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /**
@@ -799,14 +841,8 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
          * @param denied
          * @return
          */
-        boolean checkRequired(Set<String> authorisations, NodeRef nodeRef,
-                Set<Pair<String, PermissionReference>> denied, PermissionReference required)
+        boolean checkRequired(Set<String> authorisations, NodeRef nodeRef, Set<Pair<String, PermissionReference>> denied)
         {
-            // Find all the permissions that grant the allowed permission
-            // All permissions are treated specially.
-            Set<PermissionReference> granters = modelDAO.getGrantingPermissions(required);
-            granters.add(getAllPermissionReference());
-
             NodePermissionEntry nodeEntry = permissionsDAO.getPermissions(nodeRef);
 
             // No permissions set - short cut to deny
@@ -819,7 +855,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             // We could have other voting style mechanisms here
             for (PermissionEntry pe : nodeEntry.getPermissionEntries())
             {
-                if (isGranted(pe, granters, authorisations, denied, nodeRef, required))
+                if (isGranted(pe, authorisations, denied))
                 {
                     return true;
                 }
@@ -838,12 +874,10 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
          *            the set of authorities
          * @param denied -
          *            the set of denied permissions/authority pais
-         * @param nodeRef -
-         *            the node ref
          * @return
          */
-        private boolean isGranted(PermissionEntry pe, Set<PermissionReference> granters, Set<String> authorisations,
-                Set<Pair<String, PermissionReference>> denied, NodeRef nodeRef, PermissionReference required)
+        private boolean isGranted(PermissionEntry pe, Set<String> authorisations,
+                Set<Pair<String, PermissionReference>> denied)
         {
             // If the permission entry denies then we just deny
             if (pe.isDenied())
@@ -853,11 +887,14 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
             // The permission is allowed but we deny it as it is in the denied
             // set
-            Pair<String, PermissionReference> specific = new Pair<String, PermissionReference>(pe.getAuthority(),
-                    required);
-            if (denied.contains(specific))
+            if (denied != null)
             {
-                return false;
+                Pair<String, PermissionReference> specific = new Pair<String, PermissionReference>(pe.getAuthority(),
+                        required);
+                if (denied.contains(specific))
+                {
+                    return false;
+                }
             }
 
             // If the permission has a match in both the authorities and
@@ -879,7 +916,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     /**
      * Helper class to store a pair of objects which may be null
      * 
-     * @author andyh
+     * @author Andy Hind
      */
     private static class Pair<A, B>
     {

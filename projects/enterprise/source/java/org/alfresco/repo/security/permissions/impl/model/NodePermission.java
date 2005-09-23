@@ -71,7 +71,7 @@ public class NodePermission implements NodePermissionEntry, XMLModelInitialisabl
        return Collections.unmodifiableSet(permissionEntries);
     }
 
-    public void initialise(Element element, NamespacePrefixResolver nspr)
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel)
     {
        Attribute nodeRefAttribute = element.attribute(NODE_REF);
        if(nodeRefAttribute != null)
@@ -95,7 +95,7 @@ public class NodePermission implements NodePermissionEntry, XMLModelInitialisabl
        {
            Element permissionEntryElement = (Element) npit.next();
            ModelPermissionEntry permissionEntry = new ModelPermissionEntry(nodeRef);
-           permissionEntry.initialise(permissionEntryElement, nspr);
+           permissionEntry.initialise(permissionEntryElement, nspr, permissionModel);
            permissionEntries.add(permissionEntry);
        }
         

@@ -72,7 +72,7 @@ public class PermissionGroup extends AbstractPermissionReference implements XMLM
         this.container = container;
     }
 
-    public void initialise(Element element, NamespacePrefixResolver nspr)
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel)
     {
         // Name
         name = element.attributeValue(NAME);

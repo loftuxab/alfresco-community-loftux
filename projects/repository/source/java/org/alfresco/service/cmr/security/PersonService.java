@@ -55,6 +55,13 @@ public interface PersonService
     public boolean createMissingPeople();
 
     /**
+     * Set if missing people should be created.
+     * 
+     * @param createMissing
+     */
+    public void setCreateMissingPeople(boolean createMissing);
+    
+    /**
      * Get the list of properties that are mutable. Some service may only allow
      * a limited list of properties to be changed. This may be those persisted
      * in the repository or those that can be changed in some other
@@ -68,10 +75,10 @@ public interface PersonService
      * Set the properties on a person - some of these may be persisted in
      * different locations.
      * 
-     * @param nodeRef - the node ref for the person
+     * @param userName - the user for which the properties should be set.
      * @param properties - the map of properties to set (as the NodeService)
      */
-    public void setPersonProperties(NodeRef nodeRef, Map<QName, Serializable> properties);
+    public void setPersonProperties(String userName, Map<QName, Serializable> properties);
 
     /**
      * Can this service create, delete and update person information?
@@ -91,14 +98,6 @@ public interface PersonService
     public NodeRef createPerson(Map<QName, Serializable> properties);
 
     /**
-     * Get the groups for which the person identified by user name is a member.
-     * 
-     * @param userName
-     * @return A set of string names for the group authorities. By convention these will start with "GROUP_".
-     */
-    public Set<String> getGroups(String userName);
-
-    /**
      * Delete the person identified by the given user name.
      * 
      * @param userName
@@ -111,51 +110,11 @@ public interface PersonService
      * @return a set of people in no specific order. 
      */
     public Set<NodeRef> getAllPeople();
-
-    /**
-     * Get all the groups we know about.
-     * 
-     * @return return a set of group names
-     */
-    public Set<String> getAllGroups();
     
     /**
-     * Add a person to a group.
+     * Return the container that stores people.
      * 
-     * @param groupName
-     * @param userName
+     * @return
      */
-    public void addPersonToGroup(String groupName, String userName);
-    
-    /**
-     * Delete a person from a group.
-     * 
-     * @param groupName
-     * @param userName
-     */
-    public void deletePersonFromGroup(String groupName, String userName);
-    
-    /**
-     * Add a subgroup to a group.
-     * 
-     * @param groupName
-     * @param subGroupName
-     */
-    public void addSubGroupToGroup(String groupName, String subGroupName);
-    
-    /**
-     * Delete a subgroup from a group.
-     * The subgroup will still exist as a group.
-     * 
-     * @param groupName
-     * @param subGroupName
-     */
-    public void deleteSubGroupFromGroup(String groupName, String subGroupName);
-    
-    /**
-     * Delete a group.
-     * 
-     * @param groupName
-     */
-    public void deleteGroup(String groupName);
+    public NodeRef getPeopleContainer();
 }

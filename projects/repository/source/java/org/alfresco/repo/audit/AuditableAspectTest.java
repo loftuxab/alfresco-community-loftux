@@ -86,7 +86,7 @@ public class AuditableAspectTest extends BaseSpringTest
         // Create a person (which doesn't have auditable capability by default)
         Map<QName, Serializable> personProps = new HashMap<QName, Serializable>();
         personProps.put(ContentModel.PROP_USERNAME, "test person");
-        personProps.put(ContentModel.PROP_HOMEFOLDER, "test home folder");
+        personProps.put(ContentModel.PROP_HOMEFOLDER, rootNodeRef);
         personProps.put(ContentModel.PROP_FIRSTNAME, "test first name");
         personProps.put(ContentModel.PROP_LASTNAME, "test last name");
         
@@ -110,7 +110,7 @@ public class AuditableAspectTest extends BaseSpringTest
         // Create a person
         Map<QName, Serializable> personProps = new HashMap<QName, Serializable>();
         personProps.put(ContentModel.PROP_USERNAME, "test person");
-        personProps.put(ContentModel.PROP_HOMEFOLDER, "test home folder");
+        personProps.put(ContentModel.PROP_HOMEFOLDER, rootNodeRef);
         personProps.put(ContentModel.PROP_FIRSTNAME, "test first name");
         personProps.put(ContentModel.PROP_LASTNAME, "test last name");
         
@@ -146,7 +146,7 @@ public class AuditableAspectTest extends BaseSpringTest
         // Create a person (which doesn't have auditable capability by default)
         Map<QName, Serializable> personProps = new HashMap<QName, Serializable>();
         personProps.put(ContentModel.PROP_USERNAME, "test person");
-        personProps.put(ContentModel.PROP_HOMEFOLDER, "test home folder");
+        personProps.put(ContentModel.PROP_HOMEFOLDER, rootNodeRef);
         personProps.put(ContentModel.PROP_FIRSTNAME, "test first name ");
         personProps.put(ContentModel.PROP_LASTNAME, "test last name");
         

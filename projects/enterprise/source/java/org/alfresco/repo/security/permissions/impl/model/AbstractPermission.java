@@ -68,7 +68,7 @@ public abstract class AbstractPermission extends AbstractPermissionReference imp
         this.typeQName = typeQName;
     }
 
-    public void initialise(Element element, NamespacePrefixResolver nspr)
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel)
     {
         name = element.attributeValue(NAME);
         

@@ -49,7 +49,7 @@ public interface PermissionEntry
     /**
      * Get the node ref for the node to which this permission applies.
      * 
-     * This can not be null.
+     * This can only be null for a global permission 
      * 
      * @return
      */

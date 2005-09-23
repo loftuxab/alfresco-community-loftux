@@ -64,9 +64,9 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
        
     }
 
-    public void initialise(Element element, NamespacePrefixResolver nspr)
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel)
     {
-        super.initialise(element, nspr);
+        super.initialise(element, nspr, permissionModel);
         
         Attribute att = element.attribute(EXPOSE);
         if (att != null)

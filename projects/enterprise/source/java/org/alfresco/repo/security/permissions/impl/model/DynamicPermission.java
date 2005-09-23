@@ -36,9 +36,9 @@ public class DynamicPermission extends AbstractPermission implements XMLModelIni
         super(typeQName);
     }
 
-    public void initialise(Element element, NamespacePrefixResolver nspr)
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel)
     {
-        super.initialise(element, nspr);
+        super.initialise(element, nspr, permissionModel);
         evaluatorFullyQualifiedClassName = element.attributeValue(EVALUATOR);   
     }
 

@@ -93,6 +93,7 @@ public class FilteringResultSetTest extends TestCase
         int count = 0;
         for(ResultSetRow row : filtering)
         {
+            assertNotNull(row);
             assertTrue(count < 6);
             count++;
         }

@@ -81,7 +81,18 @@
     </bean>
     
     <bean id="roleVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true"
-        lazy-init="default" autowire="default" dependency-check="default" />
+        lazy-init="default" autowire="default" dependency-check="default" >
+        <property name="rolePrefix">
+            <value>ROLE_</value>
+        </property>
+    </bean>
+    
+    <bean id="groupVoter" class="net.sf.acegisecurity.vote.RoleVoter" abstract="false" singleton="true"
+        lazy-init="default" autowire="default" dependency-check="default" >
+        <property name="rolePrefix">
+            <value>GROUP_</value>
+        </property>
+    </bean>
         
     <bean id="aclEntryVoter" class="org.alfresco.repo.security.permissions.impl.acegi.ACLEntryVoter" abstract="false" singleton="true"
         lazy-init="default" autowire="default" dependency-check="default" >
@@ -104,6 +115,7 @@
       <property name="decisionVoters">
          <list>
             <ref local="roleVoter"/>
+            <ref local="groupVoter"/>
             <ref local="aclEntryVoter"/>
          </list>
       </property>

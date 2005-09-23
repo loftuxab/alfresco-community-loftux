@@ -53,7 +53,7 @@ public class PermissionSet implements XMLModelInitialisable
         super();
     }
     
-    public void initialise(Element element, NamespacePrefixResolver nspr)
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel)
     {
         qname = QName.createQName(element.attributeValue(TYPE), nspr);
         
@@ -71,7 +71,7 @@ public class PermissionSet implements XMLModelInitialisable
         {
             Element permissionGroupElement = (Element)pgit.next();
             PermissionGroup permissionGroup = new PermissionGroup(qname);
-            permissionGroup.initialise(permissionGroupElement, nspr);
+            permissionGroup.initialise(permissionGroupElement, nspr, permissionModel);
             permissionGroups.add(permissionGroup);
         }
         
@@ -79,7 +79,7 @@ public class PermissionSet implements XMLModelInitialisable
         {
             Element permissionElement = (Element)pit.next();
             Permission permission = new Permission(qname);
-            permission.initialise(permissionElement, nspr);
+            permission.initialise(permissionElement, nspr, permissionModel);
             permissions.add(permission);
         }
         

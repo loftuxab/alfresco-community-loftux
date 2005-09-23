@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT permissions (namespaces+, permissionSet*, nodePermissions)>
+<!ELEMENT permissions (namespaces+, permissionSet*, globalPermission*)>
 <!ELEMENT namespaces (namespace+)>
 <!ELEMENT namespace EMPTY>
 <!ATTLIST namespace uri CDATA #REQUIRED>
@@ -29,12 +29,7 @@
 <!ELEMENT grantedToGroup EMPTY >
 <!ATTLIST grantedToGroup type CDATA #IMPLIED>
 <!ATTLIST grantedToGroup permissionGroup CDATA #REQUIRED>
-<!ELEMENT nodePermissions (nodePermission*) >
-<!ATTLIST nodePermissions nodeRef CDATA #IMPLIED >
-<!ATTLIST nodePermissions inheritFromParent (true | false) "true" >
-<!ELEMENT nodePermission (permissionReference) >
-<!ATTLIST nodePermission recipient CDATA #IMPLIED >
-<!ATTLIST nodePermission access (allow | deny) "allow" >
-<!ELEMENT permissionReference EMPTY>
-<!ATTLIST permissionReference name CDATA #REQUIRED>
-<!ATTLIST permissionReference type CDATA #REQUIRED>
+<!ELEMENT globalPermission EMPTY >
+<!ATTLIST globalPermission authority CDATA #IMPLIED>
+<!ATTLIST globalPermission permission CDATA #REQUIRED>
+

@@ -263,15 +263,14 @@ public class LoginBean
             // setup User object and Home space ID
             User user = new User(this.username, this.authenticationService.getCurrentTicket(),
                   personService.getPerson(this.username));
-            String homeSpaceId = (String) this.nodeService.getProperty(personService.getPerson(this.username), ContentModel.PROP_HOMEFOLDER);
-            NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
+            NodeRef homeSpaceRef = (NodeRef) this.nodeService.getProperty(personService.getPerson(this.username), ContentModel.PROP_HOMEFOLDER);
             
             // check that the home space node exists - else user cannot login
             if (this.nodeService.exists(homeSpaceRef) == false)
             {
                throw new InvalidNodeRefException(homeSpaceRef);
             }
-            user.setHomeSpaceId(homeSpaceId);
+            user.setHomeSpaceId(homeSpaceRef.getId());
             
             // put the User object in the Session - the authentication servlet will then allow
             // the app to continue without redirecting to the login page

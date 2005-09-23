@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE permissions>
-
-<!--PUBLIC '-//ALFRECSO//DTD PERMISSIONS//EN' 'permissionSchema.dtd' -->
+<!--  PUBLIC '-//ALFRECSO//DTD PERMISSIONS//EN' 'permissionSchema.dtd' -->
 
 <!-- The base permission model for the repository -->
 
@@ -167,13 +166,14 @@
    </permissionSet>
    
    
-   <!-- Set the permissions for the root node -->
+   <!--                    -->
+   <!-- Global permissions -->
+   <!--                    -->
+      
+   <!-- Admin can do anything -->
+   <globalPermission permission="FullControl" authority="admin"/>
    
-   <nodePermissions>
-      <!-- Everyone has full control for now -->
-      <nodePermission access="allow">
-        <permissionReference type="sys:base" name="FullControl"/>
-      </nodePermission>
-   </nodePermissions>
+   <!-- For now, owners can always see, find and manipulate their stuff -->
+   <globalPermission permission="FullControl" authority="ROLE_OWNER"/>
    
 </permissions>

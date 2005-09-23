@@ -100,7 +100,7 @@ public class ModelPermissionEntry implements PermissionEntry, XMLModelInitialisa
         return access;
     }
 
-    public void initialise(Element element, NamespacePrefixResolver nspr)
+    public void initialise(Element element, NamespacePrefixResolver nspr, PermissionModel permissionModel)
     {
         Attribute recipientAttribute = element.attribute(RECIPIENT);
         if (recipientAttribute != null)

@@ -50,7 +50,28 @@
             </property>
          </properties>
       </type>
-     
+   
+      <type name="usr:group">
+         <title>Temporary Group Type</title>
+         <parent>sys:base</parent>
+         <properties>
+            <property name="usr:groupName">
+               <type>d:text</type>
+            </property>
+         </properties>
+         <associations>
+            <child-association name="usr:members">
+               <target>
+                  <class>usr:user</class>
+               </target>
+            </child-association>
+            <child-association name="usr:subGroups">
+               <target>
+                  <class>usr:group</class>
+               </target>
+            </child-association>
+         </associations>
+      </type>  
 
    </types>
    

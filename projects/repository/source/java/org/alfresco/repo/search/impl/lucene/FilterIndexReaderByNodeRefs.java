@@ -18,20 +18,16 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.FilterIndexReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
 import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.index.TermFreqVector;
 import org.apache.lucene.index.TermPositions;
-import org.apache.lucene.index.FilterIndexReader.FilterTermDocs;
 
 public class FilterIndexReaderByNodeRefs extends FilterIndexReader
 {
