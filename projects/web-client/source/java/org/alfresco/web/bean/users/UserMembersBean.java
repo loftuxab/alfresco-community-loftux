@@ -24,10 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.DataModel;
+import javax.faces.model.ListDataModel;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -48,6 +52,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
+import org.alfresco.web.ui.common.component.UIGenericPicker;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 
 /**
@@ -79,6 +84,15 @@ public class UserMembersBean implements IContextListener
    
    /** action context */
    private Node person = null;
+   
+   /** action context */
+   private String personName = null;
+   
+   /** datamodel for table of roles for current person */
+   private DataModel personRolesDataModel = null;
+   
+   /** roles for current person */
+   private List<PermissionWrapper> personRoles = null;
    
    
    // ------------------------------------------------------------------------------
@@ -153,6 +167,23 @@ public class UserMembersBean implements IContextListener
    }
    
    /**
+    * Returns the properties for current Person roles JSF DataModel
+    * 
+    * @return JSF DataModel representing the current Person roles
+    */
+   public DataModel getPersonRolesDataModel()
+   {
+      if (this.personRolesDataModel == null)
+      {
+         this.personRolesDataModel = new ListDataModel();
+      }
+      
+      this.personRolesDataModel.setWrappedData(this.personRoles);
+      
+      return this.personRolesDataModel;
+   }
+   
+   /**
     * @return Returns the person context.
     */
    public Node getPerson()
@@ -166,6 +197,22 @@ public class UserMembersBean implements IContextListener
    public void setPerson(Node person)
    {
       this.person = person;
+   }
+   
+   /**
+    * @return Returns the personName.
+    */
+   public String getPersonName()
+   {
+      return this.personName;
+   }
+
+   /**
+    * @param personName The personName to set.
+    */
+   public void setPersonName(String personName)
+   {
+      this.personName = personName;
    }
    
    /**
@@ -204,7 +251,8 @@ public class UserMembersBean implements IContextListener
                   userPermissions = new ArrayList<String>(4);
                   permissionMap.put(authority, userPermissions);
                }
-               userPermissions.add(permission.getPermission());
+               // add the display label for the permission name
+               userPermissions.add(Application.getMessage(context, permission.getPermission()));
             }
          }
          
@@ -284,6 +332,8 @@ public class UserMembersBean implements IContextListener
     */
    public void setupUserAction(ActionEvent event)
    {
+      FacesContext context = FacesContext.getCurrentInstance();
+      
       UIActionLink link = (UIActionLink) event.getComponent();
       Map<String, String> params = link.getParameterMap();
       String id = params.get("id");
@@ -297,6 +347,34 @@ public class UserMembersBean implements IContextListener
             
             // remember the Person node
             setPerson(node);
+            
+            // get username authentication key
+            String userName = (String)node.getProperties().get(ContentModel.PROP_USERNAME);
+            
+            // setup convience function for current user full name
+            setPersonName((String)node.getProperties().get(ContentModel.PROP_FIRSTNAME) + ' ' +
+                  (String)node.getProperties().get(ContentModel.PROP_LASTNAME));
+            
+            // setup roles for this person
+            List<PermissionWrapper> userPermissions = new ArrayList<PermissionWrapper>(4);
+            Set<AccessPermission> permissions = permissionService.getAllSetPermissions(navigator.getCurrentNode().getNodeRef());
+            for (AccessPermission permission : permissions)
+            {
+               // we are only interested in Allow and not groups/owner etc.
+               if (permission.getAccessStatus() == AccessStatus.ALLOWED &&
+                   permission.getAuthorityType() == AuthorityType.USER)
+               {
+                  if (userName.equals(permission.getAuthority()))
+                  {
+                     // found a permission for this user authentiaction
+                     PermissionWrapper wrapper = new PermissionWrapper(
+                           permission.getPermission(),
+                           Application.getMessage(context, permission.getPermission()));
+                     userPermissions.add(wrapper);
+                  }
+               }
+            }
+            this.personRoles = userPermissions;
             
             // clear the UI state in preparation for finishing the action
             // and returning to the main page
@@ -315,9 +393,84 @@ public class UserMembersBean implements IContextListener
    }
    
    /**
-    * Action handler called when the OK button is clicked on the Delete User
+    * Action handler called when the Add Role button is pressed to process the current selection
     */
-   public String deleteOK()
+   public void addRole(ActionEvent event)
+   {
+      UISelectOne rolePicker = (UISelectOne)event.getComponent().findComponent("roles");
+      
+      String role = (String)rolePicker.getValue();
+      if (role != null)
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         PermissionWrapper wrapper = new PermissionWrapper(role, Application.getMessage(context, role));
+         this.personRoles.add(wrapper);
+      }
+   }
+   
+   /**
+    * Action handler called when the Remove button is pressed to remove a role from current user
+    */
+   public void removeRole(ActionEvent event)
+   {
+      PermissionWrapper wrapper = (PermissionWrapper)this.personRolesDataModel.getRowData();
+      if (wrapper != null)
+      {
+         this.personRoles.remove(wrapper);
+      }
+   }
+   
+   /**
+    * Action handler called when the Finish button is clicked on the Edit User Roles page
+    */
+   public String finishOK()
+   {
+      String outcome = OUTCOME_FINISH;
+      
+      FacesContext context = FacesContext.getCurrentInstance();
+      
+      // persist new user permissions
+      if (this.personRoles != null && getPerson() != null)
+      {
+         UserTransaction tx = null;
+         try
+         {
+            tx = Repository.getUserTransaction(context);
+            tx.begin();
+            
+            // clear the currently set permissions for this user
+            // and add each of the new permissions in turn
+            NodeRef nodeRef = navigator.getCurrentNode().getNodeRef();
+            String username = (String)getPerson().getProperties().get(ContentModel.PROP_USERNAME);
+            this.permissionService.clearPermission(nodeRef, username);
+            for (PermissionWrapper wrapper : personRoles)
+            {
+               this.permissionService.setPermission(
+                     nodeRef,
+                     username,
+                     wrapper.getPermission(),
+                     true);
+            }
+            
+            tx.commit();
+         }
+         catch (Exception err)
+         {
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+                  context, Repository.ERROR_GENERIC), err.getMessage()), err );
+            try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+            
+            outcome = null;
+         }
+      }
+      
+      return outcome;
+   }
+   
+   /**
+    * Action handler called when the OK button is clicked on the Remove User page
+    */
+   public String removeOK()
    {
       UserTransaction tx = null;
 
@@ -331,7 +484,7 @@ public class UserMembersBean implements IContextListener
          if (getPerson() != null)
          {
             // clear permissions for the specified user
-            String username = (String)getPerson().getProperties().get("userName");
+            String username = (String)getPerson().getProperties().get(ContentModel.PROP_USERNAME);
             this.permissionService.clearPermission(this.navigator.getCurrentNode().getNodeRef(), username);
          }
          
@@ -362,5 +515,31 @@ public class UserMembersBean implements IContextListener
       {
          this.usersRichList.setValue(null);
       }
+   }
+   
+   
+   /**
+    * Wrapper class for list data model to display current roles for user
+    */
+   public static class PermissionWrapper
+   {
+      public PermissionWrapper(String permission, String label)
+      {
+         this.permission = permission;
+         this.label = label;
+      }
+      
+      public String getRole()
+      {
+         return this.label;
+      }
+      
+      public String getPermission()
+      {
+         return this.permission;
+      }
+      
+      private String label;
+      private String permission;
    }
 }

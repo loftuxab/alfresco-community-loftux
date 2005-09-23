@@ -121,7 +121,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.delete}" action="#{UserMembersBean.deleteOK}" styleClass="dialogControls" />
+                                       <h:commandButton value="#{msg.remove}" action="#{UserMembersBean.removeOK}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                                  <tr><td class="dialogButtonSpacing"></td></tr>

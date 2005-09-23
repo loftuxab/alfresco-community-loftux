@@ -97,14 +97,44 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="[TBD]" /></td>
+                                    <td colspan=2 class="mainSubTitle"><h:outputText value="#{msg.change_user_roles}" /></td>
+                                 </tr>
+                                 <tr><td colspan=2 class="paddingRow"></td></tr>
+                                 
+                                 <tr>
+                                    <td><h:outputText value="#{msg.name}" />:</td>
+                                    <td><h:outputText value="#{UserMembersBean.personName}" /></td>
                                  </tr>
                                  
+                                 <tr valign="top">
+                                    <td><h:outputText value="#{msg.roles}" />:</td>
+                                    <td>
+                                       <h:dataTable value="#{UserMembersBean.personRolesDataModel}" var="row">
+                                          <h:column>
+                                             <h:outputText value="#{row.role}" />
+                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
+                                          </h:column>
+                                          <h:column>
+                                             <h:commandButton value="#{msg.remove}" actionListener="#{UserMembersBean.removeRole}" />
+                                          </h:column>
+                                       </h:dataTable>
+                                    </td>
+                                 </tr>
                                  
-                                 <%-- TODO --%>
+                                 <tr valign="top">
+                                    <td><h:outputText value="#{msg.add_role}" />:</td>
+                                    <td>
+                                       <h:selectOneListbox id="roles" style="width:250px" size="5">
+                                          <f:selectItems value="#{InviteUsersWizard.roles}" />
+                                       </h:selectOneListbox>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td></td>
+                                    <td><h:commandButton value="#{msg.add}" actionListener="#{UserMembersBean.addRole}" /></td>
+                                 </tr>
                                  
-                                 
-                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr><td colspan=2 class="paddingRow"></td></tr>
                                  
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -115,7 +145,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.finish_button}" action="finish" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.finish_button}" action="#{UserMembersBean.finishOK}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
