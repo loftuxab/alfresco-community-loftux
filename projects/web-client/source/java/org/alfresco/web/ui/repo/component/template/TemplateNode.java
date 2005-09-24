@@ -16,6 +16,7 @@
  */
 package org.alfresco.web.ui.repo.component.template;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,6 +127,33 @@ public class TemplateNode extends Node
       }
       
       return this.assocs;
+   }
+   
+   /**
+    * @return All the properties known about this node.
+    */
+   public Map<String, Object> getProperties()
+   {
+      if (this.propsRetrieved == false)
+      {
+         Map<QName, Serializable> props = this.nodeService.getProperties(this.nodeRef);
+         
+         for (QName qname: props.keySet())
+         {
+            Serializable propValue = props.get(qname);
+            if (propValue instanceof NodeRef)
+            {
+               // NodeRef object properties are converted to new TemplateNode objects
+               // so they can be used as objects within a template
+               propValue = new TemplateNode(((NodeRef)propValue), this.nodeService);
+            }
+            this.properties.put(qname.toString(), propValue);
+         }
+         
+         this.propsRetrieved = true;
+      }
+      
+      return this.properties;
    }
    
    /**

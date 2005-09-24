@@ -53,9 +53,9 @@ public class Node implements Serializable
    private String path;
    private String id;
    private Set<QName> aspects = null;
-   private QNameMap<String, Object> properties;
-   private boolean propsRetrieved = false;
    private Map<String, Boolean> permissions;
+   protected QNameMap<String, Object> properties;
+   protected boolean propsRetrieved = false;
    protected NodeService nodeService;
    
    private boolean childAssocsRetrieved = false;
@@ -101,7 +101,7 @@ public class Node implements Serializable
    /**
     * @return All the properties known about this node.
     */
-   public final Map<String, Object> getProperties()
+   public Map<String, Object> getProperties()
    {
       if (this.propsRetrieved == false)
       {
