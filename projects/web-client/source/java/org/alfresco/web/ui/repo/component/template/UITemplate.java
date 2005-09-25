@@ -252,6 +252,7 @@ public class UITemplate extends SelfRenderingComponent
          
          // add custom method objects
          root.put("hasAspect", new HasAspectMethod());
+         root.put("message", new I18NMessageMethod());
          
          // merge models
          if (model instanceof Map)
