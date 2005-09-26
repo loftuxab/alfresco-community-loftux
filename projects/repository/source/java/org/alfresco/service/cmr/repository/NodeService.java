@@ -66,6 +66,16 @@ public interface NodeService
     public boolean exists(NodeRef nodeRef);
     
     /**
+     * Gets the ID of the last transaction that caused the node to change.  This includes
+     * deletions, so it is possible that the node being referenced no longer exists.
+     * If the node never existed, then null is returned.
+     * 
+     * @param nodeRef a reference to a current or previously existing node
+     * @return Returns the status of the node, or null if the node never existed 
+     */
+    public NodeRef.Status getNodeStatus(NodeRef nodeRef);
+    
+    /**
      * @param storeRef a reference to an existing store
      * @return Returns a reference to the root node of the store
      * @throws InvalidStoreRefException if the store could not be found

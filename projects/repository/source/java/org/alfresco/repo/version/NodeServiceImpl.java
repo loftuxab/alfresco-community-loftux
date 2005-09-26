@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.NodeRef.Status;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -144,6 +145,14 @@ public class NodeServiceImpl implements NodeService, VersionModel
         return dbNodeService.exists(convertNodeRef(nodeRef));
     }
     
+    /**
+     * Delegates to the <code>NodeService</code> used as the version store implementation
+     */
+    public Status getNodeStatus(NodeRef nodeRef)
+    {
+        return dbNodeService.getNodeStatus(nodeRef);
+    }
+
     /**
      * Convert the incomming node ref (with the version store protocol specified)
      * to the internal representation with the workspace protocol.

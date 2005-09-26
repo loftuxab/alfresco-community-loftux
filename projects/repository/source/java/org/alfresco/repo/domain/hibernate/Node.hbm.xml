@@ -305,4 +305,38 @@
          assoc.typeQName = :assocTypeQName
    </query>
 
+   <query name="node.GetChangeTxnIds">
+      select distinct
+         status.changeTxnId
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+      where
+         status.key.protocol = :storeProtocol and
+         status.key.identifier = :storeIdentifier
+   </query>
+
+   <query name="node.GetChangedNodeStatusesCount">
+      select
+         count(status.changeTxnId)
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+      where
+         status.key.protocol = :storeProtocol and
+         status.key.identifier = :storeIdentifier and
+         status.deleted = :deleted and
+         status.changeTxnId = :changeTxnId
+   </query>
+
+   <query name="node.GetChangedNodeStatuses">
+      select
+         status
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+      where
+         status.key.protocol = :storeProtocol and
+         status.key.identifier = :storeIdentifier and
+         status.deleted = :deleted and
+         status.changeTxnId = :changeTxnId
+   </query>
+
 </hibernate-mapping>

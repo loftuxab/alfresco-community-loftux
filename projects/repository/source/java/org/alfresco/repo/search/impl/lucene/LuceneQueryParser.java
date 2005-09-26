@@ -114,6 +114,11 @@ public class LuceneQueryParser extends QueryParser
                 TermQuery termQuery =  new TermQuery(new Term(field, queryText));
                 return termQuery;
             }
+            else if (field.equals("TX"))
+            {
+                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                return termQuery;
+            }
             else if (field.equals("PARENT"))
             {
                 TermQuery termQuery =  new TermQuery(new Term(field, queryText));

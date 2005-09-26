@@ -412,6 +412,12 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
             // the only condition where this is allowed is if the given node is a root node
             Store store = node.getStore();
             Node rootNode = store.getRootNode();
+            if (rootNode == null)
+            {
+                // a store without a root node - the entire store is hosed
+                throw new DataIntegrityViolationException("Store has no root node: \n" +
+                        "   store: " + store);
+            }
             if (!rootNode.equals(node))
             {
                 // it wasn't the root node

@@ -18,6 +18,7 @@ package org.alfresco.repo.domain.hibernate;
 
 import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.repo.domain.NodeStatus;
+import org.alfresco.util.EqualsHelper;
 
 /**
  * Hibernate implementation of a <b>node status</b>
@@ -30,6 +31,37 @@ public class NodeStatusImpl implements NodeStatus
     private String changeTxnId;
     private boolean deleted;
 
+    public int hashCode()
+    {
+        return (key == null) ? 0 : key.hashCode();
+    }
+    
+    public boolean equals(Object obj)
+    {
+        if (obj == this)
+            return true;
+        else if (obj == null)
+            return false;
+        else if (!(obj instanceof NodeStatusImpl))
+            return false;
+        NodeStatus that = (NodeStatus) obj;
+        return (EqualsHelper.nullSafeEquals(this.key, that.getKey())) &&
+               (EqualsHelper.nullSafeEquals(this.changeTxnId, that.getChangeTxnId())) &&
+               (this.deleted == that.isDeleted());
+                        
+    }
+    
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(50);
+        sb.append("NodeStatus")
+          .append("[key=").append(key)
+          .append(", txn=").append(changeTxnId)
+          .append(", deleted=").append(deleted)
+          .append("]");
+        return sb.toString();
+    }
+    
     public NodeKey getKey()
     {
         return key;

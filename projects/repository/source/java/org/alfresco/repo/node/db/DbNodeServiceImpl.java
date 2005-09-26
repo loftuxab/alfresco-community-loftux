@@ -58,6 +58,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreExistsException;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.NodeRef.Status;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 import org.springframework.util.Assert;
@@ -121,6 +122,24 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         return exists;
     }
     
+    public Status getNodeStatus(NodeRef nodeRef)
+    {
+        NodeStatus nodeStatus = nodeDaoService.getNodeStatus(
+                nodeRef.getStoreRef().getProtocol(),
+                nodeRef.getStoreRef().getIdentifier(),
+                nodeRef.getId());
+        if (nodeStatus == null)     // node never existed
+        {
+            return null;
+        }
+        else
+        {
+            return new NodeRef.Status(
+                    nodeStatus.getChangeTxnId(),
+                    nodeStatus.isDeleted());
+        }
+    }
+
     /**
      * @see NodeDaoService#getStores()
      */

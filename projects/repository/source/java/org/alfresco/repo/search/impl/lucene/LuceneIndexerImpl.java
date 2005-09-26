@@ -1125,6 +1125,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         List<Document> docs = new ArrayList<Document>();
         ChildAssociationRef qNameRef = null;
         Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+        NodeRef.Status nodeStatus = nodeService.getNodeStatus(nodeRef);
 
         Collection<Path> directPaths = nodeService.getPaths(nodeRef, false);
         Collection<Pair<Path, QName>> categoryPaths = getCategoryPaths(nodeRef, properties);
@@ -1137,6 +1138,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         Document xdoc = new Document();
         xdoc.add(new Field("ID", nodeRef.toString(), true, true, false));
+        xdoc.add(new Field("TX", nodeStatus.getChangeTxnId(), true, true, false));
         boolean isAtomic = true;
         for (QName propertyName : properties.keySet())
         {
@@ -1272,7 +1274,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     xdoc.add(new Field("FTSSTATUS", "Dirty", true, true, false));
                 }
             }
-            xdoc.add(new Field("TX", deltaId, true, true, false));
 
             // {
             docs.add(xdoc);

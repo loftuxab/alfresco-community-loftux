@@ -49,7 +49,6 @@
    </bean>
    
    <!-- NodeService implemented to persist to Database -->
-
    <bean id="dbNodeService" class="org.springframework.aop.framework.ProxyFactoryBean">
       <property name="proxyInterfaces">
     	<value>org.alfresco.service.cmr.repository.NodeService</value>

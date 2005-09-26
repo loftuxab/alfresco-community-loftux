@@ -233,14 +233,11 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
     
     private void executeAndCheck(NodeRef nodeRef, TransactionWork<Object> work) throws Exception
     {
-        String protocol = nodeRef.getStoreRef().getProtocol();
-        String identifier = nodeRef.getStoreRef().getIdentifier();
-        String id = nodeRef.getId(); 
-
         UserTransaction txn = txnService.getUserTransaction();
         txn.begin();
         
-        NodeStatus currentStatus = nodeDaoService.getNodeStatus(protocol, identifier, id);
+        NodeRef.Status currentStatus = nodeService.getNodeStatus(nodeRef);
+        assertNotNull(currentStatus);
         String currentTxnId = AlfrescoTransactionSupport.getTransactionId();
         assertNotNull(currentTxnId);
         assertNotSame(currentTxnId, currentStatus.getChangeTxnId());
@@ -248,7 +245,8 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
         {
             work.doWork();
             // get the status
-            NodeStatus newStatus = nodeDaoService.getNodeStatus(protocol, identifier, id);
+            NodeRef.Status newStatus = nodeService.getNodeStatus(nodeRef);
+            assertNotNull(newStatus);
             // check
             assertEquals("Change didn't update status", currentTxnId, newStatus.getChangeTxnId());
             txn.commit();

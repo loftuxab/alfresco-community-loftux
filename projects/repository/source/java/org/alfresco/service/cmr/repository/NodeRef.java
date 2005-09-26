@@ -127,4 +127,35 @@ public final class NodeRef implements EntityRef, Serializable
     {
         return id;
     }
+
+    /**
+     * Helper class to convey the status of a <b>node</b>.
+     * 
+     * @author Derek Hulley
+     */
+    public static class Status
+    {
+        private final String changeTxnId;
+        private final boolean deleted;
+        
+        public Status(String changeTxnId, boolean deleted)
+        {
+            this.changeTxnId = changeTxnId;
+            this.deleted = deleted;
+        }
+        /**
+         * @return Returns the ID of the last transaction to change the node
+         */
+        public String getChangeTxnId()
+        {
+            return changeTxnId;
+        }
+        /**
+         * @return Returns true if the node has been deleted, otherwise false
+         */
+        public boolean isDeleted()
+        {
+            return deleted;
+        }
+    }
 }

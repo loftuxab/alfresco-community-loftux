@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    
+   <!-- full node index recovery -->
+   <bean id="indexRecoveryComponent"
+            class="org.alfresco.repo.node.index.FullIndexRecoveryComponent"
+            init-method="init"
+            depends-on="nodeDaoService" >
+      <property name="sessionFactory">
+         <ref bean="sessionFactory" />
+      </property>
+      <property name="transactionService">
+         <ref bean="transactionComponent" />
+      </property>
+      <property name="indexer">
+         <ref bean="indexerComponent" />
+      </property>
+      <property name="ftsIndexer">
+         <ref bean="LuceneFullTextSearchIndexer" />
+      </property>
+      <property name="searcher">
+         <ref bean="searchService" />
+      </property>
+      <property name="nodeService">
+          <ref bean="nodeService" />
+      </property>
+      <property name="stores">
+        <list>
+            <value>workspace://SpacesStore</value>
+            <value>workspace://lightWeightVersionStore</value>
+            <value>user://alfrescoUserStore</value>
+        </list>
+      </property>
+   </bean>
+    
+</beans>
