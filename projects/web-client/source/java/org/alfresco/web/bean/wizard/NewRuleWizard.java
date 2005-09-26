@@ -177,9 +177,13 @@ public class NewRuleWizard extends BaseActionWizard
             condition.setParameterValues(repoCondParams);
             
             // specify whether the condition result should be inverted (JSF is storing
-            // this as a Boolean, so cater for that)
+            // this as a Boolean object, so cater for that)
             Object not = (Object)condParams.get(PROP_CONDITION_NOT);
             if (not instanceof Boolean)
+            {
+               condition.setInvertCondition(((Boolean)not).booleanValue());
+            }
+            else if (not instanceof String && not.equals("true"))
             {
                condition.setInvertCondition(((Boolean)not).booleanValue());
             }
@@ -1068,7 +1072,8 @@ public class NewRuleWizard extends BaseActionWizard
          // JSF is putting the boolean into the map as a Boolean object so we
          // need to handle that - adding a converter doesn't seem to help!
          Object not = (Object)props.get(PROP_CONDITION_NOT);
-         if (not instanceof Boolean && ((Boolean)not).booleanValue())
+         if ((not instanceof Boolean && ((Boolean)not).booleanValue()) ||
+             (not instanceof String && not.equals("true")))
          {
             msgId = msgId + "_not";
          }
