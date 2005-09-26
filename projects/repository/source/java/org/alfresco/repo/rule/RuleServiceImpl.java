@@ -217,7 +217,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
      */
     public boolean hasRules(NodeRef nodeRef)
     {
-    	return (getRules(nodeRef).size() != 0);
+    	return (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true && getRules(nodeRef).size() != 0);
     } 
 
     /**

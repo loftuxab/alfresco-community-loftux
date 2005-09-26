@@ -180,6 +180,7 @@ public interface ContentModel
     static final QName ASSOC_SAVED_ACTION_FOLDERS = QName.createQName(ACTION_MODEL_URI, "savedActionFolders");
     static final QName TYPE_SAVED_ACTION_FOLDER = QName.createQName(ACTION_MODEL_URI, "savedactionfolder");
     static final QName ASSOC_SAVED_ACTIONS = QName.createQName(ACTION_MODEL_URI, "savedActions");
+    static final QName PROP_CONDITION_INVERT = QName.createQName(ACTION_MODEL_URI, "invert");
     
     //
     // Action Execution History Model Defintions

@@ -78,6 +78,12 @@
 	  <type name="act:actioncondition">	  
 	     <title>Action Condition</title>
 	     <parent>act:actionbase</parent>
+	     <properties>
+            <property name="act:invert">
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
 	  </type>
 	  
 	  <type name="act:actionparameter">

@@ -44,6 +44,7 @@
    <bean id="inbound" class="org.alfresco.repo.rule.RuleTypeImpl" parent="rule-type-base">
       <constructor-arg>
          <list>
+            <ref bean="on-create-node-trigger"/>
          	<ref bean="on-create-child-association-trigger"/>
          	<ref bean="on-content-update-trigger"/>
          </list>
@@ -69,7 +70,10 @@
       </property>
    </bean>
    
-   <bean id="on-create-node-trigger" class="org.alfresco.repo.rule.ruletrigger.SingleChildAssocRefPolicyRuleTrigger" parent="rule-trigger-base">
+   <bean id="on-create-node-trigger" class="org.alfresco.repo.rule.ruletrigger.CreateNodeRuleTrigger" parent="rule-trigger-base">
+      <property name="dictionaryService">
+      	<ref bean="dictionaryService"/>
+      </property>
       <property name="policyName">
          <value>onCreateNode</value>
       </property>

@@ -662,6 +662,8 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			}
 			else
 			{
+                saveConditionProperties(conditionNodeRef, idToCondition.get(conditionNodeRef.getId()));
+                
 				// Update the conditions parameters
 				saveParameters(conditionNodeRef, idToCondition.get(conditionNodeRef.getId()));
 				idToCondition.remove(conditionNodeRef.getId());
@@ -682,12 +684,25 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
                     ContentModel.ASSOC_CONDITIONS,
                     ContentModel.TYPE_ACTION_CONDITION,
 					props).getChildRef();
-			
+            
+            saveConditionProperties(conditionNodeRef, entry.getValue());
 			saveParameters(conditionNodeRef, entry.getValue());
 		}		
 	}
 
-	/**
+    /**
+     * Save the condition properties
+     * 
+     * @param conditionNodeRef
+     * @param condition
+     */
+	private void saveConditionProperties(NodeRef conditionNodeRef, ActionCondition condition)
+    {
+        this.nodeService.setProperty(conditionNodeRef, ContentModel.PROP_CONDITION_INVERT, condition.getInvertCondition());
+        
+    }
+
+    /**
 	 * Saves the parameters associated with an action or condition
 	 * 
 	 * @param parameterizedNodeRef	the parameterized item node reference
@@ -864,6 +879,10 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		Map<QName, Serializable> properties = this.nodeService.getProperties(conditionNodeRef);
 		ActionCondition condition = new ActionConditionImpl(conditionNodeRef.getId(), (String)properties.get(ContentModel.PROP_DEFINITION_NAME));
+        
+        Boolean invert = (Boolean)this.nodeService.getProperty(conditionNodeRef, ContentModel.PROP_CONDITION_INVERT);
+        condition.setInvertCondition(invert.booleanValue());
+        
 		populateParameters(conditionNodeRef, condition);
 		return condition;
 	}

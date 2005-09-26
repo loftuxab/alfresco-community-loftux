@@ -422,6 +422,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		
 		// Set the conditions of the action
 		ActionCondition actionCondition = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+        actionCondition.setInvertCondition(true);
 		ActionCondition actionCondition2 = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
 		actionCondition2.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "*.doc");
 		action.addActionCondition(actionCondition);
@@ -453,11 +454,13 @@ public class ActionServiceImplTest extends BaseSpringTest
 			if (savedCondition.getActionConditionDefinitionName().equals(NoConditionEvaluator.NAME) == true)
 			{
 				assertEquals(0, savedCondition.getParameterValues().size());
+                assertTrue(savedCondition.getInvertCondition());
 			}
 			else if (savedCondition.getActionConditionDefinitionName().equals(ComparePropertyValueEvaluator.NAME) == true)
 			{
 				assertEquals(1, savedCondition.getParameterValues().size());
 				assertEquals("*.doc", savedCondition.getParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE));
+                assertFalse(savedCondition.getInvertCondition());
 			}
 			else
 			{

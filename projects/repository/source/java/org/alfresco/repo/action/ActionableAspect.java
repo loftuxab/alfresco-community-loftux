@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -45,6 +46,8 @@ public class ActionableAspect
 	
 	private PolicyComponent policyComponent;
 	
+    private RuleService ruleService;
+    
 	private NodeService nodeService;
 	
 	public void setPolicyComponent(PolicyComponent policyComponent)
@@ -56,7 +59,12 @@ public class ActionableAspect
 	{
 		this.nodeService = nodeService;
 	}
-	
+   
+	public void setRuleService(RuleService ruleService)
+    {
+        this.ruleService = ruleService;
+    }
+    
 	public void init()
 	{
 		this.policyComponent.bindClassBehaviour(
@@ -84,25 +92,33 @@ public class ActionableAspect
 	{
 		if (ContentModel.ASPECT_ACTIONABLE.equals(aspectTypeQName) == true)
 		{
-			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_NAME_SAVEDACTIONFOLDER);
-			if (assocs.size() == 0)
-			{
-				// Create the saved action folder used by this service
-				this.nodeService.createNode(nodeRef,
-						ContentModel.ASSOC_SAVED_ACTION_FOLDERS,
-					 	ASSOC_NAME_SAVEDACTIONFOLDER,
-					 	ContentModel.TYPE_SAVED_ACTION_FOLDER);
-			}
-			
-			List<ChildAssociationRef> assocs2 = this.nodeService.getChildAssocs(nodeRef, ASSOC_NAME_SAVEDRULESFOLDER);
-			if (assocs2.size() == 0)
-			{
-				// Create the saved action folder used by this service
-				this.nodeService.createNode(nodeRef,
-						ContentModel.ASSOC_SAVED_ACTION_FOLDERS,
-						ASSOC_NAME_SAVEDRULESFOLDER,
-					 	ContentModel.TYPE_SAVED_ACTION_FOLDER);
-			}
+            this.ruleService.disableRules(nodeRef);
+            try
+            {
+    			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_NAME_SAVEDACTIONFOLDER);
+    			if (assocs.size() == 0)
+    			{
+    				// Create the saved action folder used by this service
+    				this.nodeService.createNode(nodeRef,
+    						ContentModel.ASSOC_SAVED_ACTION_FOLDERS,
+    					 	ASSOC_NAME_SAVEDACTIONFOLDER,
+    					 	ContentModel.TYPE_SAVED_ACTION_FOLDER);
+    			}
+    			
+    			List<ChildAssociationRef> assocs2 = this.nodeService.getChildAssocs(nodeRef, ASSOC_NAME_SAVEDRULESFOLDER);
+    			if (assocs2.size() == 0)
+    			{
+    				// Create the saved action folder used by this service
+    				this.nodeService.createNode(nodeRef,
+    						ContentModel.ASSOC_SAVED_ACTION_FOLDERS,
+    						ASSOC_NAME_SAVEDRULESFOLDER,
+    					 	ContentModel.TYPE_SAVED_ACTION_FOLDER);
+    			}
+            }
+            finally
+            {
+                this.ruleService.enableRules(nodeRef);
+            }
 		}
 	}
 	
