@@ -38,7 +38,7 @@
    
    function checkButtonState()
    {
-      if (document.getElementById("edit-simple-workflow:approve-step-name").value.length == 0 ||
+      /*if (document.getElementById("edit-simple-workflow:approve-step-name").value.length == 0 ||
           document.getElementById("edit-simple-workflow:client-approve-folder").value.length == 0 ||
           rejectValid() == false)
       {
@@ -47,19 +47,19 @@
       else
       {
          document.getElementById("edit-simple-workflow:ok-button").disabled = false;
-      }
+      }*/
    }
    
    function rejectValid()
    {
       var result = true;
       
-      if (document.forms['edit-simple-workflow']['edit-simple-workflow:reject-step-present'][0].checked && 
+      /*if (document.forms['edit-simple-workflow']['edit-simple-workflow:reject-step-present'][0].checked && 
           (document.getElementById("edit-simple-workflow:reject-step-name").value.length == 0 ||
            document.getElementById("edit-simple-workflow:client-reject-folder").value.length == 0))
       {
          result = false;
-      }
+      }*/
       
       return result;
    }
@@ -73,8 +73,10 @@
    <h:form acceptCharset="UTF-8" id="edit-simple-workflow">
    
    <%-- add the approve and reject folder ids as hidden fields --%>
-   <h:inputHidden id="client-approve-folder" value="#{DocumentDetailsBean.workflowProperties.approveFolder}" />
-   <h:inputHidden id="client-reject-folder" value="#{DocumentDetailsBean.workflowProperties.rejectFolder}" />
+   <%--
+   <h:inputHidden id="client-approve-folder" value="#{DocumentDetailsBean.workflowProperties.approveFolder.id}" />
+   <h:inputHidden id="client-reject-folder" value="#{DocumentDetailsBean.workflowProperties.rejectFolder.id}" /<
+   --%>
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -245,7 +247,7 @@
                                  <tr>
                                     <td align="center">
                                        <h:commandButton id="ok-button" value="#{msg.ok}" action="#{DocumentDetailsBean.saveWorkflow}" 
-                                                        styleClass="wizardButton" disabled="true" />
+                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
