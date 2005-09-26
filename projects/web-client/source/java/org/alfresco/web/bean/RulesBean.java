@@ -225,7 +225,7 @@ public class RulesBean
     * Inner class to wrap the Rule objects so we can expose a flag to indicate whether
     * the rule is a local or inherited rule
     */
-   public class WrappedRule implements Rule
+   public class WrappedRule
    {
       private Rule rule;
       private NodeRef ruleNode;
@@ -243,6 +243,16 @@ public class RulesBean
       }
       
       /**
+       * Returns the rule being wrapped
+       * 
+       * @return The wrapped Rule
+       */
+      public Rule getRule()
+      {
+         return this.rule;
+      }
+      
+      /**
        * Determines whether the current rule is a local rule or
        * has been inherited from a parent
        * 
@@ -250,327 +260,59 @@ public class RulesBean
        */
       public boolean getLocal()
       {
-         return ruleNode.equals(getOwningNodeRef());
+         return ruleNode.equals(this.rule.getOwningNodeRef());
       }
 
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getOwningNodeRef()
-       */
-      public NodeRef getOwningNodeRef()
-      {
-         return this.rule.getOwningNodeRef();
-      }
+      /** Methods to support sorting of the rules list in a table  */
       
       /**
-       * @see org.alfresco.service.cmr.rule.Rule#isAppliedToChildren()
-       */
-      public boolean isAppliedToChildren()
-      {
-         return this.rule.isAppliedToChildren();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.rule.Rule#applyToChildren(boolean)
-       */
-      public void applyToChildren(boolean isAppliedToChildren)
-      {
-         this.rule.applyToChildren(isAppliedToChildren);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.rule.Rule#getRuleTypeName()
-       */
-      public String getRuleTypeName()
-      {
-         return this.rule.getRuleTypeName();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#hasActions()
-       */
-      public boolean hasActions()
-      {
-         return this.rule.hasActions();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#addAction(org.alfresco.service.cmr.action.Action)
-       */
-      public void addAction(Action action)
-      {
-         this.rule.addAction(action);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#addAction(int, org.alfresco.service.cmr.action.Action)
-       */
-      public void addAction(int index, Action action)
-      {
-         this.rule.addAction(index, action);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#setAction(int, org.alfresco.service.cmr.action.Action)
-       */
-      public void setAction(int index, Action action)
-      {
-         this.rule.setAction(index, action);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#indexOfAction(org.alfresco.service.cmr.action.Action)
-       */
-      public int indexOfAction(Action action)
-      {
-         return this.rule.indexOfAction(action);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#getActions()
-       */
-      public List<Action> getActions()
-      {
-         return this.rule.getActions();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#getAction(int)
-       */
-      public Action getAction(int index)
-      {
-         return this.rule.getAction(index);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#removeAction(org.alfresco.service.cmr.action.Action)
-       */
-      public void removeAction(Action action)
-      {
-         this.rule.removeAction(action);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.CompositeAction#removeAllActions()
-       */
-      public void removeAllActions()
-      {
-         this.rule.removeAllActions();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getActionDefinitionName()
-       */
-      public String getActionDefinitionName()
-      {
-         return this.rule.getActionDefinitionName();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getTitle()
-       */
-      public String getTitle()
-      {
-         return this.rule.getTitle();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#setTitle(java.lang.String)
-       */
-      public void setTitle(String title)
-      {
-         this.rule.setTitle(title);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getDescription()
-       */
-      public String getDescription()
-      {
-         return this.rule.getDescription();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#setDescription(java.lang.String)
-       */
-      public void setDescription(String description)
-      {
-         this.rule.setDescription(description);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getExecuteAsychronously()
-       */
-      public boolean getExecuteAsychronously()
-      {
-         return this.rule.getExecuteAsychronously();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#setExecuteAsynchronously(boolean)
-       */
-      public void setExecuteAsynchronously(boolean executeAsynchronously)
-      {
-         this.rule.setExecuteAsynchronously(executeAsynchronously);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getCompensatingAction()
-       */
-      public Action getCompensatingAction()
-      {
-         return this.rule.getCompensatingAction();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#setCompensatingAction(org.alfresco.service.cmr.action.Action)
-       */
-      public void setCompensatingAction(Action action)
-      {
-         this.rule.setCompensatingAction(action);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getCreatedDate()
-       */
-      public Date getCreatedDate()
-      {
-         return this.rule.getCreatedDate();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getCreator()
-       */
-      public String getCreator()
-      {
-         return this.rule.getCreator();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getModifiedDate()
-       */
-      public Date getModifiedDate()
-      {
-         return this.rule.getModifiedDate();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getModifier()
-       */
-      public String getModifier()
-      {
-         return this.rule.getModifier();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#hasActionConditions()
-       */
-      public boolean hasActionConditions()
-      {
-         return this.rule.hasActionConditions();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#indexOfActionCondition(org.alfresco.service.cmr.action.ActionCondition)
-       */
-      public int indexOfActionCondition(ActionCondition actionCondition)
-      {
-         return this.rule.indexOfActionCondition(actionCondition);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getActionConditions()
-       */
-      public List<ActionCondition> getActionConditions()
-      {
-         return this.rule.getActionConditions();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#getActionCondition(int)
-       */
-      public ActionCondition getActionCondition(int index)
-      {
-         return this.rule.getActionCondition(index);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#addActionCondition(org.alfresco.service.cmr.action.ActionCondition)
-       */
-      public void addActionCondition(ActionCondition actionCondition)
-      {
-         this.rule.addActionCondition(actionCondition);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#addActionCondition(int, org.alfresco.service.cmr.action.ActionCondition)
-       */
-      public void addActionCondition(int index, ActionCondition actionCondition)
-      {
-         this.rule.addActionCondition(index, actionCondition);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#setActionCondition(int, org.alfresco.service.cmr.action.ActionCondition)
-       */
-      public void setActionCondition(int index, ActionCondition actionCondition)
-      {
-         this.rule.setActionCondition(index, actionCondition);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#removeActionCondition(org.alfresco.service.cmr.action.ActionCondition)
-       */
-      public void removeActionCondition(ActionCondition actionCondition)
-      {
-         this.rule.removeActionCondition(actionCondition);
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.Action#removeAllActionConditions()
-       */
-      public void removeAllActionConditions()
-      {
-         this.rule.removeAllActionConditions();
-      }
-
-      /**
-       * @see org.alfresco.service.cmr.action.ParameterizedItem#getId()
+       * Returns the rule id
+       * 
+       * @return The id
        */
       public String getId()
       {
          return this.rule.getId();
       }
-
+      
       /**
-       * @see org.alfresco.service.cmr.action.ParameterizedItem#getParameterValues()
+       * Returns the rule title
+       * 
+       * @return The title
        */
-      public Map<String, Serializable> getParameterValues()
+      public String getTitle()
       {
-         return this.rule.getParameterValues();
+         return this.rule.getTitle();
       }
-
+      
       /**
-       * @see org.alfresco.service.cmr.action.ParameterizedItem#getParameterValue(java.lang.String)
+       * Returns the rule description
+       * 
+       * @return The description
        */
-      public Serializable getParameterValue(String name)
+      public String getDescription()
       {
-         return this.rule.getParameterValue(name);
+         return this.rule.getDescription();
       }
-
+      
       /**
-       * @see org.alfresco.service.cmr.action.ParameterizedItem#setParameterValues(java.util.Map)
+       * Returns the created date
+       * 
+       * @return The created date
        */
-      public void setParameterValues(Map<String, Serializable> parameterValues)
+      public Date getCreatedDate()
       {
-         this.rule.setParameterValues(parameterValues);
+         return this.rule.getCreatedDate();
       }
-
+      
       /**
-       * @see org.alfresco.service.cmr.action.ParameterizedItem#setParameterValue(java.lang.String, java.io.Serializable)
+       * Returns the modfified date
+       * 
+       * @return The modified date
        */
-      public void setParameterValue(String name, Serializable value)
+      public Date getModifiedDate()
       {
-         this.rule.setParameterValue(name, value);
+         return this.rule.getModifiedDate();
       }
    }
 }
