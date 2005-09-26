@@ -23,14 +23,13 @@ import java.util.Set;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
+import javax.jcr.nodetype.NodeType;
+import javax.jcr.nodetype.PropertyDefinition;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.RowIterator;
 
 import org.alfresco.jcr.item.NodeRefNodeIteratorImpl;
 import org.alfresco.jcr.session.SessionImpl;
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -106,6 +105,7 @@ public class NodeRefListQueryResultImpl implements QueryResult
      * @return  list of column definitions
      */
     private Map<QName, PropertyDefinition> getColumnDefinitions()
+        throws RepositoryException
     {
         if (columns == null)
         {
@@ -117,10 +117,22 @@ public class NodeRefListQueryResultImpl implements QueryResult
                 // Base column list on first node ref
                 // TODO: determine on a more formal basis
                 QName type = nodeService.getType(nodeRefs.get(0));
-                Set<QName >aspects = nodeService.getAspects(nodeRefs.get(0));
-                DictionaryService dictionary = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
-                ClassDefinition anonymousClass = dictionary.getAnonymousType(type, aspects);
-                columns.putAll(anonymousClass.getProperties());
+                NodeType nodeType = session.getTypeManager().getNodeType(type.toPrefixString(session.getNamespaceResolver()));
+                PropertyDefinition[] propDefs = nodeType.getPropertyDefinitions();
+                for (PropertyDefinition propDef : propDefs)
+                {
+                    columns.put(QName.createQName(propDef.getName(), session.getNamespaceResolver()), propDef);
+                }
+                Set<QName>aspects = nodeService.getAspects(nodeRefs.get(0));
+                for (QName aspect : aspects)
+                {
+                    NodeType nodeAspect = session.getTypeManager().getNodeType(aspect.toPrefixString(session.getNamespaceResolver()));
+                    propDefs = nodeAspect.getPropertyDefinitions();
+                    for (PropertyDefinition propDef : propDefs)
+                    {
+                        columns.put(QName.createQName(propDef.getName(), session.getNamespaceResolver()), propDef);
+                    }
+                }
             }
             
             // add JCR required columns

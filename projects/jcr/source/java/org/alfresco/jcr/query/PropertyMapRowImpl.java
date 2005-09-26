@@ -23,13 +23,12 @@ import javax.jcr.ItemNotFoundException;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
+import javax.jcr.nodetype.PropertyDefinition;
 import javax.jcr.query.Row;
 
-import org.alfresco.jcr.dictionary.DataTypeMap;
 import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.item.ValueImpl;
 import org.alfresco.jcr.session.SessionImpl;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
@@ -120,10 +119,9 @@ public class PropertyMapRowImpl implements Row
             if (objValue != null)
             {
                 PropertyDefinition propDef = columns.get(propertyName);
-                if (!propDef.isMultiValued())
+                if (!propDef.isMultiple())
                 {
-                    int datatype = DataTypeMap.convertDataTypeToPropertyType(propDef.getDataType().getName());
-                    value = new ValueImpl(session, datatype, objValue);
+                    value = new ValueImpl(session, propDef.getRequiredType(), objValue);
                 }
             }        
         }

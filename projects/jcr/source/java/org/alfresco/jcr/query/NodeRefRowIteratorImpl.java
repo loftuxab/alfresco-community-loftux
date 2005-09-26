@@ -20,12 +20,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.jcr.nodetype.PropertyDefinition;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.AbstractRangeIterator;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
