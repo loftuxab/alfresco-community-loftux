@@ -134,7 +134,7 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "statements"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", "CML"), org.alfresco.example.webservice.types.CML.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "UpdateResult"));
-        oper.setReturnClass(org.alfresco.example.webservice.repository.UpdateResult.class);
+        oper.setReturnClass(org.alfresco.example.webservice.repository.UpdateResult[].class);
         oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "updateReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
@@ -909,7 +909,7 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
      * Executes a CML script to manipulate the contents of a Repository
      * store.
      */
-    public org.alfresco.example.webservice.repository.UpdateResult update(org.alfresco.example.webservice.types.CML statements) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
+    public org.alfresco.example.webservice.repository.UpdateResult[] update(org.alfresco.example.webservice.types.CML statements) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -933,9 +933,9 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         else {
             extractAttachments(_call);
             try {
-                return (org.alfresco.example.webservice.repository.UpdateResult) _resp;
+                return (org.alfresco.example.webservice.repository.UpdateResult[]) _resp;
             } catch (java.lang.Exception _exception) {
-                return (org.alfresco.example.webservice.repository.UpdateResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.UpdateResult.class);
+                return (org.alfresco.example.webservice.repository.UpdateResult[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.repository.UpdateResult[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {

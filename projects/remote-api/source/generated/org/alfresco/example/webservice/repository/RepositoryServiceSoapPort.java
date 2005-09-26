@@ -45,7 +45,7 @@ public interface RepositoryServiceSoapPort extends java.rmi.Remote {
      * Executes a CML script to manipulate the contents of a Repository
      * store.
      */
-    public org.alfresco.example.webservice.repository.UpdateResult update(org.alfresco.example.webservice.types.CML statements) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault;
+    public org.alfresco.example.webservice.repository.UpdateResult[] update(org.alfresco.example.webservice.types.CML statements) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault;
 
     /**
      * Describes a content resource.

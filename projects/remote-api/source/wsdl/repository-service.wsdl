@@ -126,7 +126,7 @@
          <element name="updateResponse">
             <complexType>
                <sequence>
-                  <element name="updateReturn" type="rep:UpdateResult"/>
+                  <element name="updateReturn" type="rep:UpdateResult" minOccurs="0" maxOccurs="unbounded"/>
                </sequence>
             </complexType>
          </element>
@@ -158,9 +158,9 @@
          <complexType name="UpdateResult">
             <sequence>
                <element name="statement" type="xsd:string"/>
-               <element name="updateCount" type="cms:ResultSet"/>
-               <element name="source" type="cms:Reference"/>
-               <element name="destination" type="cms:Reference"/>
+               <element name="updateCount" type="cms:ResultSet" nillable="true"/>
+               <element name="source" type="cms:Reference" nillable="true"/>
+               <element name="destination" type="cms:Reference" nillable="true"/>
             </sequence>
          </complexType>
          <element name="UpdateResult" type="rep:UpdateResult"/>

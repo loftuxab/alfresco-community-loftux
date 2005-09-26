@@ -21,6 +21,22 @@
       </property>
    </bean>
    
+   <!-- CLM Util bean -->
+   <bean id="CMLUtil" class="org.alfresco.repo.webservice.CMLUtil">
+      <property name="nodeService">
+         <ref bean="NodeService"/>
+      </property>
+      <property name="searchService">
+         <ref bean="SearchService"/>
+      </property>
+      <property name="namespaceService">
+         <ref bean="namespaceService"/>
+      </property>
+      <property name="copyService">
+         <ref bean="copyService"/>
+      </property>
+   </bean>
+   
    <!-- Implementations of each exposed web service -->
    
    <bean id="authenticationWebService" class="org.alfresco.repo.webservice.authentication.AuthenticationWebService">
@@ -47,6 +63,9 @@
       </property>
       <property name="querySessionCache">
          <ref bean="querySessionCache"/>
+      </property>
+      <property name="cmlUtil">
+         <ref bean="CMLUtil"/>
       </property>
    </bean>
    
