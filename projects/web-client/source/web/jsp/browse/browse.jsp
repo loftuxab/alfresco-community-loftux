@@ -303,6 +303,11 @@
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
+                           <a:booleanEvaluator value="#{r.templatable == true}">
+                              <a:actionLink value="#{msg.preview}" image="/images/icons/preview.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="previewContent">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </a:booleanEvaluator>
                            <r:permissionEvaluator value="#{r}" allow="Delete">
                               <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" styleClass="inlineAction" actionListener="#{ClipboardBean.cutNode}">
                                  <f:param name="id" value="#{r.id}" />

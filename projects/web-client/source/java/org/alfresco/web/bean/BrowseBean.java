@@ -403,6 +403,7 @@ public class BrowseBean implements IContextListener
                // create our Node representation
                MapNode node = new MapNode(nodeRef, this.nodeService, true);
                node.addPropertyResolver("icon", this.resolverSpaceIcon);
+               node.addPropertyResolver("templatable", this.resolverTemplatable);
                
                this.containerNodes.add(node);
             }
@@ -494,6 +495,7 @@ public class BrowseBean implements IContextListener
                   node.addPropertyResolver("path", this.resolverPath);
                   node.addPropertyResolver("displayPath", this.resolverDisplayPath);
                   node.addPropertyResolver("icon", this.resolverSpaceIcon);
+                  node.addPropertyResolver("templatable", this.resolverTemplatable);
                   
                   this.containerNodes.add(node);
                }
@@ -885,7 +887,7 @@ public class BrowseBean implements IContextListener
          try
          {
             if (logger.isDebugEnabled())
-               logger.debug("Trying to delete space Id: " + node.getId());
+               logger.debug("Trying to delete space: " + node.getId());
             
             this.nodeService.deleteNode(node.getNodeRef());
             
@@ -952,7 +954,7 @@ public class BrowseBean implements IContextListener
          try
          {
             if (logger.isDebugEnabled())
-               logger.debug("Trying to delete content node Id: " + node.getId());
+               logger.debug("Trying to delete content node: " + node.getId());
             
             this.nodeService.deleteNode(node.getNodeRef());
             
