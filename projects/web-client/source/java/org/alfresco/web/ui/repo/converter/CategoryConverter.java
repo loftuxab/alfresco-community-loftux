@@ -53,14 +53,18 @@ public class CategoryConverter implements Converter
          throws ConverterException
    {
       String result = null;
-      
-      if (value != null)
+
+      NodeService service = Repository.getServiceRegistry(context).getNodeService();
+      if (service != null)
       {
-         NodeService service = Repository.getServiceRegistry(context).getNodeService();
-         if (service != null)
+         if (value instanceof String)
          {
-            NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), value.toString());
+            NodeRef nodeRef = new NodeRef(value.toString());
             result = Repository.getNameForNode(service, nodeRef);
+         }
+         else if (value instanceof NodeRef)
+         {
+            result = Repository.getNameForNode(service, (NodeRef)value);
          }
       }
       

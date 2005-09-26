@@ -118,7 +118,7 @@ public class NewRuleWizard extends BaseActionWizard
    private Map<String, String> conditionDescriptions;
    private Map<String, String> currentConditionProperties;
    
-   private List<Map<String, String>> allActionsProperties;
+   private List<Map<String, Serializable>> allActionsProperties;
    private List<Map<String, String>> allConditionsProperties;
    
    private DataModel allActionsDataModel;
@@ -192,11 +192,11 @@ public class NewRuleWizard extends BaseActionWizard
          }
          
          // add all the actions to the rule
-         for (Map<String, String> actionParams : this.allActionsProperties)
+         for (Map<String, Serializable> actionParams : this.allActionsProperties)
          {
             // use the base class version of buildActionParams(), but for this we need 
             // to setup the currentActionProperties and action variables
-            String actionName = actionParams.get(PROP_ACTION_NAME);
+            String actionName = (String)actionParams.get(PROP_ACTION_NAME);
             this.action = actionName;
             this.currentActionProperties = actionParams;
             Map<String, Serializable> repoActionParams = buildActionParams();
@@ -360,7 +360,7 @@ public class NewRuleWizard extends BaseActionWizard
    {
       String outcome = this.action;
       
-      HashMap<String, String> actionProps = new HashMap<String, String>(3);
+      HashMap<String, Serializable> actionProps = new HashMap<String, Serializable>(3);
       actionProps.put(PROP_ACTION_NAME, this.action);
       this.currentActionProperties = actionProps;
       
@@ -587,7 +587,7 @@ public class NewRuleWizard extends BaseActionWizard
       }
       
       this.allConditionsProperties = new ArrayList<Map<String, String>>();
-      this.allActionsProperties = new ArrayList<Map<String, String>>();
+      this.allActionsProperties = new ArrayList<Map<String, Serializable>>();
    }
    
    /**
@@ -641,7 +641,7 @@ public class NewRuleWizard extends BaseActionWizard
          // use the base class version of populateActionFromProperties(), 
          // but for this we need to setup the currentActionProperties and 
          // action variables
-         this.currentActionProperties = new HashMap<String, String>(3);
+         this.currentActionProperties = new HashMap<String, Serializable>(3);
          this.action = action.getActionDefinitionName();
          populateActionFromProperties(action.getParameterValues());
          
@@ -671,7 +671,7 @@ public class NewRuleWizard extends BaseActionWizard
       
       // create the summary using all the actions
       StringBuilder actionsSummary = new StringBuilder();
-      for (Map<String,String> props : this.allActionsProperties)
+      for (Map<String, Serializable> props : this.allActionsProperties)
       {
          actionsSummary.append(props.get(PROP_ACTION_SUMMARY));
          actionsSummary.append("<br/>");
@@ -1135,11 +1135,11 @@ public class NewRuleWizard extends BaseActionWizard
     * 
     * @return The summary or null if a summary could not be built
     */
-   protected String buildActionSummary(Map<String, String> props)
+   protected String buildActionSummary(Map<String, Serializable> props)
    {
       String summaryResult = null;
       
-      String actionName = this.currentActionProperties.get(PROP_ACTION_NAME);
+      String actionName = (String)this.currentActionProperties.get(PROP_ACTION_NAME);
       if (actionName != null)
       {
          StringBuilder summary = new StringBuilder();
@@ -1150,7 +1150,7 @@ public class NewRuleWizard extends BaseActionWizard
          // define a summary to be added for each action
          if ("add-features".equals(actionName))
          {
-            String aspect = this.currentActionProperties.get(PROP_ASPECT);
+            String aspect = (String)this.currentActionProperties.get(PROP_ASPECT);
             
             // find the label used by looking through the SelectItem list
             for (SelectItem item : this.getAspects())
@@ -1172,15 +1172,15 @@ public class NewRuleWizard extends BaseActionWizard
          }
          else if ("link-category".equals(actionName))
          {
-            NodeRef cat = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_CATEGORY));
+            NodeRef cat = (NodeRef)this.currentActionProperties.get(PROP_CATEGORY);
             String name = Repository.getNameForNode(this.nodeService, cat);
             summary.append("'").append(name).append("'");
          }
          else if ("transform".equals(actionName))
          {
-            NodeRef space = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_DESTINATION));
+            NodeRef space = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
             String name = Repository.getNameForNode(this.nodeService, space);
-            String transformer = this.currentActionProperties.get(PROP_TRANSFORMER);
+            String transformer = (String)this.currentActionProperties.get(PROP_TRANSFORMER);
             
             // find the label used by looking through the SelectItem list
             for (SelectItem item : this.getTransformers())
@@ -1198,9 +1198,9 @@ public class NewRuleWizard extends BaseActionWizard
          }
          else if ("transform-image".equals(actionName))
          {
-            NodeRef space = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_DESTINATION));
+            NodeRef space = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
             String name = Repository.getNameForNode(this.nodeService, space);
-            String transformer = this.currentActionProperties.get(PROP_IMAGE_TRANSFORMER);
+            String transformer = (String)this.currentActionProperties.get(PROP_IMAGE_TRANSFORMER);
             
             // find the label used by looking through the SelectItem list
             for (SelectItem item : this.getImageTransformers())
@@ -1218,7 +1218,7 @@ public class NewRuleWizard extends BaseActionWizard
          }
          else if ("copy".equals(actionName) || "move".equals(actionName) || "check-out".equals(actionName))
          {
-            NodeRef space = new NodeRef(Repository.getStoreRef(), this.currentActionProperties.get(PROP_DESTINATION));
+            NodeRef space = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
             String spaceName = Repository.getNameForNode(this.nodeService, space);
             summary.append("'").append(spaceName).append("'");
          }
@@ -1228,7 +1228,7 @@ public class NewRuleWizard extends BaseActionWizard
          }
          else if ("check-in".equals(actionName))
          {
-            String comment = this.currentActionProperties.get(PROP_CHECKIN_DESC);
+            String comment = (String)this.currentActionProperties.get(PROP_CHECKIN_DESC);
             summary.append("'").append(comment).append("'");
          }
 

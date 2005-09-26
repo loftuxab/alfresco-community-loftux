@@ -93,7 +93,7 @@ public class NewUserWizard extends AbstractWizardBean
 
     private String homeSpaceName = null;
 
-    private String homeSpaceLocation = null;
+    private NodeRef homeSpaceLocation = null;
 
     /** AuthenticationService bean reference */
     private AuthenticationService authenticationService;
@@ -179,7 +179,7 @@ public class NewUserWizard extends AbstractWizardBean
         this.email = "";
         this.companyId = "";
         this.homeSpaceName = "";
-        this.homeSpaceLocation = getCompanyHomeSpace().getId();
+        this.homeSpaceLocation = getCompanyHomeSpace();
     }
 
     /**
@@ -207,12 +207,12 @@ public class NewUserWizard extends AbstractWizardBean
             NodeRef parentRef = childAssocRef.getParentRef();
             if (this.nodeService.getRootNode(Repository.getStoreRef()).equals(parentRef) == false)
             {
-                this.homeSpaceLocation = parentRef.getId();
+                this.homeSpaceLocation = parentRef;
                 this.homeSpaceName = Repository.getNameForNode(nodeService, homeFolderRef);
             }
             else
             {
-                this.homeSpaceLocation = homeFolderRef.getId();
+                this.homeSpaceLocation = homeFolderRef;
             }
         }
     }
@@ -397,7 +397,7 @@ public class NewUserWizard extends AbstractWizardBean
                 NodeRef homeSpaceNodeRef;
                 if (this.homeSpaceLocation != null)
                 {
-                    homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName, false);
+                    homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation.getId(), this.homeSpaceName, false);
                 }
                 else
                 {
@@ -418,7 +418,7 @@ public class NewUserWizard extends AbstractWizardBean
                 NodeRef homeSpaceNodeRef;
                 if (this.homeSpaceLocation != null)
                 {
-                    homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation, this.homeSpaceName, true);
+                    homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation.getId(), this.homeSpaceName, true);
                 }
                 else
                 {
@@ -481,8 +481,7 @@ public class NewUserWizard extends AbstractWizardBean
         String homeSpaceLabel = this.homeSpaceName;
         if ((this.homeSpaceName == null || this.homeSpaceName.length() == 0) && this.homeSpaceLocation != null)
         {
-            homeSpaceLabel = Repository.getNameForNode(this.nodeService, new NodeRef(Repository.getStoreRef(),
-                    this.homeSpaceLocation));
+            homeSpaceLabel = Repository.getNameForNode(this.nodeService, this.homeSpaceLocation);
         }
 
         ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
@@ -601,7 +600,7 @@ public class NewUserWizard extends AbstractWizardBean
     /**
      * @return Returns the homeSpaceLocation.
      */
-    public String getHomeSpaceLocation()
+    public NodeRef getHomeSpaceLocation()
     {
         return this.homeSpaceLocation;
     }
@@ -610,7 +609,7 @@ public class NewUserWizard extends AbstractWizardBean
      * @param homeSpaceLocation
      *            The homeSpaceLocation to set.
      */
-    public void setHomeSpaceLocation(String homeSpaceLocation)
+    public void setHomeSpaceLocation(NodeRef homeSpaceLocation)
     {
         this.homeSpaceLocation = homeSpaceLocation;
     }

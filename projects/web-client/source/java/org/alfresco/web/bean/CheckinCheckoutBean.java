@@ -197,7 +197,7 @@ public class CheckinCheckoutBean
    /**
     * @return Returns the selected Space Id.
     */
-   public String getSelectedSpaceId()
+   public NodeRef getSelectedSpaceId()
    {
       return this.selectedSpaceId;
    }
@@ -205,7 +205,7 @@ public class CheckinCheckoutBean
    /**
     * @param selectedSpaceId  The selected Space Id to set.
     */
-   public void setSelectedSpaceId(String selectedSpaceId)
+   public void setSelectedSpaceId(NodeRef selectedSpaceId)
    {
       this.selectedSpaceId = selectedSpaceId;
    }
@@ -410,8 +410,7 @@ public class CheckinCheckoutBean
             if (getCopyLocation().equals(COPYLOCATION_OTHER) && this.selectedSpaceId != null)
             {
                // checkout to a arbituary parent Space 
-               NodeRef destRef = new NodeRef(Repository.getStoreRef(), 
-                     this.selectedSpaceId);
+               NodeRef destRef = this.selectedSpaceId;
                
                ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(destRef);
                workingCopyRef = this.versionOperationsService.checkout(node.getNodeRef(),
@@ -902,7 +901,7 @@ public class CheckinCheckoutBean
    private boolean keepCheckedOut = false;
    private String copyLocation = COPYLOCATION_CURRENT;
    private String versionNotes = "";
-   private String selectedSpaceId = null;
+   private NodeRef selectedSpaceId = null;
    
    /** The BrowseBean to be used by the bean */
    private BrowseBean browseBean;

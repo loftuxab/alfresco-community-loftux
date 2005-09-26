@@ -35,6 +35,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -193,7 +194,7 @@ public abstract class AbstractItemSelector extends UIInput
          String selection = (String)requestMap.get(getClientId(context) + OPTION);
          if (selection != null && selection.length() != 0)
          {
-            ((EditableValueHolder)this).setSubmittedValue(selection);
+            ((EditableValueHolder)this).setSubmittedValue(new NodeRef(Repository.getStoreRef(), selection));
          }
       }
    }
@@ -241,20 +242,28 @@ public abstract class AbstractItemSelector extends UIInput
                tx = Repository.getUserTransaction(context);
                tx.begin();
                
-               String valueId = null;
-               String submittedValue = (String)getSubmittedValue();
+               NodeRef value = null;
+               NodeRef submittedValue = (NodeRef)getSubmittedValue();
                if (submittedValue != null)
                {
-                  valueId = submittedValue;
+                  value = submittedValue;
                }
                else
                {
-                  valueId = (String)getValue();
+                  Object val = getValue();
+                  if (val instanceof NodeRef) 
+                  {
+                     value = (NodeRef)val;
+                  }
+                  else if (val instanceof String && ((String)val).length() != 0)
+                  {
+                     value = new NodeRef((String)val);
+                  }
                }
                
                // show just the initial or current selection link
                String label;
-               if (valueId == null || valueId.length() == 0)
+               if (value == null)
                {
                   label = getLabel();
                   
@@ -266,8 +275,7 @@ public abstract class AbstractItemSelector extends UIInput
                }
                else
                {
-                  NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), valueId);
-                  label = Repository.getNameForNode(getNodeService(context), nodeRef);
+                  label = Repository.getNameForNode(getNodeService(context), value);
                }
                
                // output surrounding span for style purposes
@@ -287,14 +295,22 @@ public abstract class AbstractItemSelector extends UIInput
                
                int theMode = MODE_PERFORM_SELECTION;
                // if we have an initial selection and no value set the initial one up
-               if (valueId == null && this.getInitialSelection() != null)
+               if (value == null && this.getInitialSelection() != null)
                {
-                  valueId = this.getInitialSelection();
+                  value = new NodeRef(Repository.getStoreRef(), this.getInitialSelection());
                   theMode = MODE_INITIAL_SELECTION;
                }
                
                // field value is whether we are picking and the current or parent Id value
-               String fieldValue = encodeFieldValues(theMode, valueId);
+               String fieldValue;
+               if (value != null)
+               {
+                  fieldValue = encodeFieldValues(theMode, value.getId());
+               }
+               else
+               {
+                  fieldValue = encodeFieldValues(theMode, null);
+               }
                buf.append("<a href='#' onclick=\"");
                buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
                buf.append('"');
@@ -318,7 +334,7 @@ public abstract class AbstractItemSelector extends UIInput
             catch (Throwable err)
             {
                try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-               throw new RuntimeException(err);
+               Utils.addErrorMessage(err.getMessage(), err);
             }
             
             break;

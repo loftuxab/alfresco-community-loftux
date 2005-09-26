@@ -97,7 +97,7 @@ public class AdvancedSearchBean
    /**
     * @return Returns the location.
     */
-   public String getLocation()
+   public NodeRef getLocation()
    {
       return this.location;
    }
@@ -105,7 +105,7 @@ public class AdvancedSearchBean
    /**
     * @param location The location to set.
     */
-   public void setLocation(String location)
+   public void setLocation(NodeRef location)
    {
       this.location = location;
    }
@@ -145,7 +145,7 @@ public class AdvancedSearchBean
    /**
     * @return Returns the category.
     */
-   public String getCategory()
+   public NodeRef getCategory()
    {
       return this.category;
    }
@@ -153,7 +153,7 @@ public class AdvancedSearchBean
    /**
     * @param category The category to set.
     */
-   public void setCategory(String category)
+   public void setCategory(NodeRef category)
    {
       this.category = category;
    }
@@ -419,13 +419,13 @@ public class AdvancedSearchBean
          // location path search
          if (this.lookin.equals(LOOKIN_OTHER) && this.location != null)
          {
-            search.setLocation(getPathFromSpaceId(this.location, this.locationChildren));
+            search.setLocation(getPathFromSpaceId(this.location.getId(), this.locationChildren));
          }
          
          // category path search
          if (this.category != null)
          {
-            search.setCategories(new String[]{getPathFromSpaceId(this.category, this.categoryChildren)});
+            search.setCategories(new String[]{getPathFromSpaceId(this.category.getId(), this.categoryChildren)});
          }
          
          outcome = "browse";
@@ -512,10 +512,10 @@ public class AdvancedSearchBean
    private String lookin = LOOKIN_ALL;
    
    /** Space Selector location */
-   private String location = null;
+   private NodeRef location = null;
    
    /** categories to search */
-   private String category = null;
+   private NodeRef category = null;
    
    /** title attribute to search */
    private String title = null;

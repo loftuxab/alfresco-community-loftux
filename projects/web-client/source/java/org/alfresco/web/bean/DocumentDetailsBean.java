@@ -60,7 +60,7 @@ public class DocumentDetailsBean
 {
    private static Logger logger = Logger.getLogger(DocumentDetailsBean.class);
    
-   private String category;
+   private NodeRef category;
    private BrowseBean browseBean;
    private NodeService nodeService;
    private LockService lockService;
@@ -68,7 +68,7 @@ public class DocumentDetailsBean
    private VersionService versionService;
    private NavigationBean navigator;
    
-   private Map<String, String> workflowProperties;
+   private Map<String, Serializable> workflowProperties;
 
    /**
     * Returns the id of the current document
@@ -115,7 +115,7 @@ public class DocumentDetailsBean
     * 
     * @return The current category as an id
     */
-   public String getCategory()
+   public NodeRef getCategory()
    {
       return this.category;
    }
@@ -125,7 +125,7 @@ public class DocumentDetailsBean
     * 
     * @param category The new category 
     */
-   public void setCategory(String category)
+   public void setCategory(NodeRef category)
    {
       this.category = category;
    }
@@ -234,14 +234,7 @@ public class DocumentDetailsBean
       NodeRef catNode = (NodeRef)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
                ContentModel.PROP_CATEGORIES);
       
-      if (catNode != null)
-      {
-         this.category = catNode.getId();
-      }
-      else
-      {
-         this.category = null;
-      }
+      this.category = catNode;
    }
    
    /**
@@ -267,7 +260,7 @@ public class DocumentDetailsBean
                getDocument().getNodeRef());
          
          // create a node ref representation of the selected id and set the new properties
-         updateProps.put(ContentModel.PROP_CATEGORIES, new NodeRef(Repository.getStoreRef(), this.category));
+         updateProps.put(ContentModel.PROP_CATEGORIES, this.category);
          
          // set the properties on the node
          this.nodeService.setProperties(getDocument().getNodeRef(), updateProps);
@@ -383,7 +376,7 @@ public class DocumentDetailsBean
     * 
     * @return Properties of the attached workflow, null if there is no workflow
     */
-   public Map<String, String> getWorkflowProperties()
+   public Map<String, Serializable> getWorkflowProperties()
    {
       if (this.workflowProperties == null && 
           getDocument().hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW))
@@ -407,18 +400,16 @@ public class DocumentDetailsBean
                ContentModel.PROP_REJECT_FOLDER.toString());
 
          // put the workflow properties in a separate map for use by the JSP
-         this.workflowProperties = new HashMap<String, String>(6);
+         this.workflowProperties = new HashMap<String, Serializable>(7);
          this.workflowProperties.put(NewRuleWizard.PROP_APPROVE_STEP_NAME, 
                approveStepName);
          this.workflowProperties.put(NewRuleWizard.PROP_APPROVE_ACTION, 
                approveMove ? "move" : "copy");
-         this.workflowProperties.put(NewRuleWizard.PROP_APPROVE_FOLDER, 
-               approveFolder.getId());
+         this.workflowProperties.put(NewRuleWizard.PROP_APPROVE_FOLDER, approveFolder);
          
          if (rejectStepName == null || rejectMove == null || rejectFolder == null)
          {
-            this.workflowProperties.put(NewRuleWizard.PROP_REJECT_STEP_PRESENT, 
-                  "no");
+            this.workflowProperties.put(NewRuleWizard.PROP_REJECT_STEP_PRESENT, "no");
          }
          else
          {
@@ -429,7 +420,7 @@ public class DocumentDetailsBean
             this.workflowProperties.put(NewRuleWizard.PROP_REJECT_ACTION, 
                   rejectMove ? "move" : "copy");
             this.workflowProperties.put(NewRuleWizard.PROP_REJECT_FOLDER, 
-                  rejectFolder.getId());
+                  rejectFolder);
          }
       }
       
@@ -466,7 +457,7 @@ public class DocumentDetailsBean
          
          // specify whether the approve step will copy or move the content
          boolean approveMove = true;
-         String approveAction = this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_ACTION);
+         String approveAction = (String)this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_ACTION);
          if (approveAction != null && approveAction.equals("copy"))
          {
             approveMove = false;
@@ -474,13 +465,12 @@ public class DocumentDetailsBean
          updateProps.put(ContentModel.PROP_APPROVE_MOVE, new Boolean(approveMove));
          
          // create node ref representation of the destination folder
-         NodeRef approveDestNodeRef = new NodeRef(Repository.getStoreRef(), 
-                  this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_FOLDER));
-         updateProps.put(ContentModel.PROP_APPROVE_FOLDER, approveDestNodeRef);
+         updateProps.put(ContentModel.PROP_APPROVE_FOLDER,
+               this.workflowProperties.get(NewRuleWizard.PROP_APPROVE_FOLDER));
          
          // determine whether there should be a reject step
          boolean requireReject = true;
-         String rejectStepPresent = this.workflowProperties.get(
+         String rejectStepPresent = (String)this.workflowProperties.get(
                NewRuleWizard.PROP_REJECT_STEP_PRESENT);
          if (rejectStepPresent != null && rejectStepPresent.equals("no"))
          {
@@ -495,7 +485,7 @@ public class DocumentDetailsBean
          
             // specify whether the reject step will copy or move the content
             boolean rejectMove = true;
-            String rejectAction = this.workflowProperties.get(
+            String rejectAction = (String)this.workflowProperties.get(
                   NewRuleWizard.PROP_REJECT_ACTION);
             if (rejectAction != null && rejectAction.equals("copy"))
             {
@@ -504,9 +494,8 @@ public class DocumentDetailsBean
             updateProps.put(ContentModel.PROP_REJECT_MOVE, new Boolean(rejectMove));
 
             // create node ref representation of the destination folder
-            NodeRef rejectDestNodeRef = new NodeRef(Repository.getStoreRef(), 
+            updateProps.put(ContentModel.PROP_REJECT_FOLDER,
                   this.workflowProperties.get(NewRuleWizard.PROP_REJECT_FOLDER));
-            updateProps.put(ContentModel.PROP_REJECT_FOLDER, rejectDestNodeRef);
          }
          else
          {

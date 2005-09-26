@@ -76,7 +76,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    private CopyService nodeOperationsService;
    private String createFrom;
    private String spaceType;
-   private String existingSpaceId;
+   private NodeRef existingSpaceId;
    private String templateSpaceId;
    private String copyPolicy;
    private String name;
@@ -162,7 +162,7 @@ public class NewSpaceWizard extends AbstractWizardBean
             else if (this.createFrom.equals("existing"))
             {
                // copy the selected space and update the name, description and icon
-               NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), this.existingSpaceId);
+               NodeRef sourceNode = this.existingSpaceId;
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
                NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
                      ContentModel.ASSOC_CONTAINS,
@@ -567,7 +567,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    /**
     * @return Returns the existingSpaceId.
     */
-   public String getExistingSpaceId()
+   public NodeRef getExistingSpaceId()
    {
       return existingSpaceId;
    }
@@ -575,7 +575,7 @@ public class NewSpaceWizard extends AbstractWizardBean
    /**
     * @param existingSpaceId The existingSpaceId to set.
     */
-   public void setExistingSpaceId(String existingSpaceId)
+   public void setExistingSpaceId(NodeRef existingSpaceId)
    {
       this.existingSpaceId = existingSpaceId;
    }

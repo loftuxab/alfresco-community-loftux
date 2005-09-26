@@ -90,11 +90,6 @@ public class Node implements Serializable
       this.id = nodeRef.getId();
       this.nodeService = nodeService;
       
-      if (this.id == null || this.id.length() == 0)
-      {
-         throw new IllegalArgumentException("The NodeRef id must not be null to create a Node.");
-      }
-      
       this.properties = new QNameMap<String, Object>(this);
    }
 
@@ -110,10 +105,6 @@ public class Node implements Serializable
          for (QName qname: props.keySet())
          {
             Serializable propValue = props.get(qname);
-            if (propValue instanceof NodeRef)
-            {
-               propValue = ((NodeRef)propValue).getId();
-            }
             this.properties.put(qname.toString(), propValue);
          }
          
