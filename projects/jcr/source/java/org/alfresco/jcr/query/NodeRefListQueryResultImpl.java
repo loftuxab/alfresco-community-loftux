@@ -121,7 +121,10 @@ public class NodeRefListQueryResultImpl implements QueryResult
                 PropertyDefinition[] propDefs = nodeType.getPropertyDefinitions();
                 for (PropertyDefinition propDef : propDefs)
                 {
-                    columns.put(QName.createQName(propDef.getName(), session.getNamespaceResolver()), propDef);
+                    if (!propDef.isMultiple())
+                    {
+                        columns.put(QName.createQName(propDef.getName(), session.getNamespaceResolver()), propDef);
+                    }
                 }
                 Set<QName>aspects = nodeService.getAspects(nodeRefs.get(0));
                 for (QName aspect : aspects)
@@ -130,7 +133,10 @@ public class NodeRefListQueryResultImpl implements QueryResult
                     propDefs = nodeAspect.getPropertyDefinitions();
                     for (PropertyDefinition propDef : propDefs)
                     {
-                        columns.put(QName.createQName(propDef.getName(), session.getNamespaceResolver()), propDef);
+                        if (!propDef.isMultiple())
+                        {
+                            columns.put(QName.createQName(propDef.getName(), session.getNamespaceResolver()), propDef);
+                        }
                     }
                 }
             }

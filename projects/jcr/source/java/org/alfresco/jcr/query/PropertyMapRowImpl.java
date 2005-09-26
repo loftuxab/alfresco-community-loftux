@@ -119,10 +119,7 @@ public class PropertyMapRowImpl implements Row
             if (objValue != null)
             {
                 PropertyDefinition propDef = columns.get(propertyName);
-                if (!propDef.isMultiple())
-                {
-                    value = new ValueImpl(session, propDef.getRequiredType(), objValue);
-                }
+                value = new ValueImpl(session, propDef.getRequiredType(), objValue);
             }        
         }
         return value;
