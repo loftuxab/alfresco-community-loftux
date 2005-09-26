@@ -43,6 +43,10 @@ import org.alfresco.repo.action.evaluator.IsSubTypeEvaluator;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
@@ -73,9 +77,12 @@ public class NewRuleWizard extends BaseActionWizard
    // parameter names for conditions
    public static final String PROP_CONDITION_NAME = "conditionName";
    public static final String PROP_CONDITION_SUMMARY = "conditionSummary";
+   public static final String PROP_CONDITION_NOT = "notcondition";
+   public static final String PROP_PROPERTY = "property";
    public static final String PROP_CONTAINS_TEXT = "containstext";
    public static final String PROP_MODEL_TYPE = "modeltype";
    public static final String PROP_MODEL_ASPECT = "modelaspect";
+   public static final String PROP_TYPE_OR_ASPECT = "typeoraspect";
    
    private static Log logger = LogFactory.getLog(NewRuleWizard.class);
    
@@ -100,12 +107,14 @@ public class NewRuleWizard extends BaseActionWizard
    private boolean runInBackground;
    private boolean applyToSubSpaces;
 
+   private DictionaryService dictionaryService;
    private RuleService ruleService;
    private RulesBean rulesBean;
    
    private List<SelectItem> modelTypes;
    private List<SelectItem> types;
    private List<SelectItem> conditions;
+   private List<SelectItem> typesAndAspects;
    private Map<String, String> conditionDescriptions;
    private Map<String, String> currentConditionProperties;
    
@@ -166,6 +175,15 @@ public class NewRuleWizard extends BaseActionWizard
             ActionCondition condition = this.actionService.createActionCondition(
                   condParams.get(PROP_CONDITION_NAME));
             condition.setParameterValues(repoCondParams);
+            
+            // specify whether the condition result should be inverted (JSF is storing
+            // this as a Boolean, so cater for that)
+            Object not = (Object)condParams.get(PROP_CONDITION_NOT);
+            if (not instanceof Boolean)
+            {
+               condition.setInvertCondition(((Boolean)not).booleanValue());
+            }
+            
             rule.addActionCondition(condition);
          }
          
@@ -236,10 +254,11 @@ public class NewRuleWizard extends BaseActionWizard
 
       if ("no-condition".equals(this.condition))
       {
-         HashMap<String, String> condProps = new HashMap<String, String>(1);
+         HashMap<String, String> condProps = new HashMap<String, String>(3);
          condProps.put(PROP_CONDITION_NAME, this.condition);
          condProps.put(PROP_CONDITION_SUMMARY, Application.getMessage(
                FacesContext.getCurrentInstance(), "condition_no_condition"));
+         condProps.put(PROP_CONDITION_NOT, "false");
          this.allConditionsProperties.add(condProps);
          
          // NOTE: we don't set an outcome to stay on the same page as there are 
@@ -770,7 +789,7 @@ public class NewRuleWizard extends BaseActionWizard
    {
       this.ruleService = ruleService;
    }
-
+   
    /**
     * Sets the RulesBean instance to be used by the wizard in edit mode
     * 
@@ -1021,9 +1040,12 @@ public class NewRuleWizard extends BaseActionWizard
          condProps.put(PROP_ASPECT, ((QName)repoCondProps.get(HasAspectEvaluator.PARAM_ASPECT)).toString());
       }
       
+      // specify whether the condition result should be inverted
+      condProps.put(PROP_CONDITION_NOT, Boolean.toString(condition.getInvertCondition()));
+      
       // generate the summary 
       condProps.put(PROP_CONDITION_SUMMARY, buildConditionSummary(condProps));
-      
+         
       return condProps;
    }
    
@@ -1040,8 +1062,21 @@ public class NewRuleWizard extends BaseActionWizard
       if (condName != null)
       {
          StringBuilder summary = new StringBuilder();
-         summary.append(Application.getMessage(FacesContext.getCurrentInstance(), 
-               "condition_" + condName.replace('-', '_')));
+         
+         String msgId = "condition_" + condName.replace('-', '_');
+         
+         // JSF is putting the boolean into the map as a Boolean object so we
+         // need to handle that - adding a converter doesn't seem to help!
+         Object not = (Object)props.get(PROP_CONDITION_NOT);
+         if (not instanceof Boolean && ((Boolean)not).booleanValue())
+         {
+            msgId = msgId + "_not";
+         }
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Looking up condition summary string: " + msgId);
+         
+         summary.append(Application.getMessage(FacesContext.getCurrentInstance(), msgId));
          summary.append(" ");
          
          // define a summary to be added for each condition
@@ -1049,7 +1084,7 @@ public class NewRuleWizard extends BaseActionWizard
          {
             NodeRef cat = new NodeRef(Repository.getStoreRef(), props.get(PROP_CATEGORY));
             String name = Repository.getNameForNode(this.nodeService, cat);
-            summary.append(name);
+            summary.append("'").append(name).append("'");
          }
          else if ("compare-property-value".equals(condName))
          {

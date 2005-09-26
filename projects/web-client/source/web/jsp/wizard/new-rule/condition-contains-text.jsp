@@ -119,6 +119,14 @@
                                                     onkeyup="javascript:checkButtonState(this);" size="35" maxlength="1024" />
                                     </td>
                                  </tr>
+                                 <tr>
+                                    <td>
+                                       <table><tr>
+                                       <td><h:selectBooleanCheckbox value="#{NewRuleWizard.conditionProperties.notcondition}"/></td>
+                                       <td><h:outputText value="#{msg.not_condition_result}"/></td>
+                                       </tr></table>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr><td><h:outputText value="#{msg.condition_contains_hints}"/>:</td></tr>
                                  <tr>

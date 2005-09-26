@@ -151,14 +151,18 @@
                                  </tr>
                                  <tr>
                                     <td colspan="2">
-                                       <h:selectBooleanCheckbox value="#{NewRuleWizard.applyToSubSpaces}"/>
-                                       <h:outputText value="#{msg.apply_to_sub_spaces}"/>
+                                       <table><tr>
+                                       <td><h:selectBooleanCheckbox value="#{NewRuleWizard.applyToSubSpaces}"/></td>
+                                       <td><h:outputText value="#{msg.apply_to_sub_spaces}"/></td>
+                                       </tr></table>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td colspan="2">
-                                       <h:selectBooleanCheckbox value="#{NewRuleWizard.runInBackground}"/>
-                                       <h:outputText value="#{msg.run_in_background}"/>
+                                       <table><tr>
+                                       <td><h:selectBooleanCheckbox value="#{NewRuleWizard.runInBackground}"/></td>
+                                       <td><h:outputText value="#{msg.run_in_background}"/></td>
+                                       </tr></table>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

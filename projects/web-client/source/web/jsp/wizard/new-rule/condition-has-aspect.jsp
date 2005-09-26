@@ -110,6 +110,15 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
+                                    <td colspan="2">
+                                       <table><tr>
+                                       <td><h:selectBooleanCheckbox value="#{NewRuleWizard.conditionProperties.notcondition}"/></td>
+                                       <td><h:outputText value="#{msg.not_condition_result}"/></td>
+                                       </tr></table>
+                                    </td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
