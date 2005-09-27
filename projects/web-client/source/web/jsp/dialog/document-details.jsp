@@ -199,7 +199,8 @@
                         <tr>
                            <td width="100%" valign="top">
                               <a:panel label="#{msg.preview}" id="preview-panel" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       expanded='#{DocumentDetailsBean.panels["preview-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <table width=100% cellspacing=0 cellpadding=0 border=0>
                                     <tr>
                                        <td align=left>
@@ -213,7 +214,8 @@
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
                                        actionListener="#{EditDocPropsDialog.setupDocumentForAction}"
-                                       linkTooltip="#{msg.modify}" rendered="#{DocumentDetailsBean.locked == false}">
+                                       linkTooltip="#{msg.modify}" rendered="#{DocumentDetailsBean.locked == false}"
+                                       expanded='#{DocumentDetailsBean.panels["properties-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
                                        <td width=80 align=center>
@@ -251,7 +253,8 @@
                               </a:panel>
                               <a:panel label="#{msg.properties}" id="properties-panel-locked" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.locked}">
+                                       rendered="#{DocumentDetailsBean.locked}"
+                                       expanded='#{DocumentDetailsBean.panels["properties-panel-locked"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
                                        <td width=80 align=center>
@@ -282,30 +285,34 @@
                                  </table>
                               </a:panel>
                               <br/>
-                              <a:panel label="#{msg.workflow}" id="workflow-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.workflow}" id="workflow-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editSimpleWorkflow" linkIcon="/images/icons/Change_details.gif"
-                                       rendered="#{DocumentDetailsBean.approveStepName != null}" linkTooltip="#{msg.workflow}">
+                                       rendered="#{DocumentDetailsBean.approveStepName != null}" linkTooltip="#{msg.workflow}"
+                                       expanded='#{DocumentDetailsBean.panels["workflow-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="workflow-overview" value="#{DocumentDetailsBean.workflowOverviewHTML}" 
                                                escape="false" />
                               </a:panel>
-                              <a:panel label="#{msg.workflow}" id="no-workflow-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.workflow}" id="no-workflow-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.approveStepName == null}">
+                                       rendered="#{DocumentDetailsBean.approveStepName == null}"
+                                       expanded='#{DocumentDetailsBean.panels["workflow-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="no-workflow-msg" value="#{msg.not_in_workflow}" />
                               </a:panel>
                               <br/>
-                              <a:panel label="#{msg.category}" id="category-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.category}" id="category-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="editCategory" actionListener="#{DocumentDetailsBean.setupCategoryForEdit}"
                                        linkIcon="/images/icons/Change_details.gif" linkTooltip="#{msg.change_category}"
-                                       rendered="#{DocumentDetailsBean.categorised}">
+                                       rendered="#{DocumentDetailsBean.categorised}"
+                                       expanded='#{DocumentDetailsBean.panels["category-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="category-overview" value="#{DocumentDetailsBean.categoriesOverviewHTML}" 
                                                escape="false" />
                               </a:panel>
-                              <a:panel label="#{msg.category}" id="no-category-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.category}" id="no-category-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.categorised == false}">
+                                       rendered="#{DocumentDetailsBean.categorised == false}"
+                                       expanded='#{DocumentDetailsBean.panels["category-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="no-category-msg" value="#{msg.not_in_category}<br/><br/>" 
                                                escape="false"/>
                                  <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write" id="eval_cat">
@@ -315,15 +322,16 @@
                                  </r:permissionEvaluator>
                               </a:panel>
                               <br/>
-                              <a:panel label="#{msg.version_history}" id="version-history-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.version_history}" id="version-history-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.versionable}">
+                                       rendered="#{DocumentDetailsBean.versionable}"
+                                       expanded='#{DocumentDetailsBean.panels["version-history-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  
                                  <a:richList id="versionHistoryList" viewMode="details" value="#{DocumentDetailsBean.versionHistory}" 
                                              var="r" styleClass="recordSet" headerStyleClass="recordSetHeader" 
                                              rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%" 
                                              pageSize="10" initialSortColumn="versionLabel" initialSortDescending="false">
-                        
+                                    
                                     <%-- Primary column for details view mode --%>
                                     <a:column id="col1" primary="true" width="100" style="padding:2px;text-align:left">
                                        <f:facet name="header">
@@ -361,9 +369,10 @@
                                     <a:dataPager/>
                                  </a:richList>
                               </a:panel>
-                              <a:panel label="#{msg.version_history}" id="no-version-history-panel" progressive="true" expanded="false"
+                              <a:panel label="#{msg.version_history}" id="no-version-history-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.versionable == false}">
+                                       rendered="#{DocumentDetailsBean.versionable == false}"
+                                       expanded='#{DocumentDetailsBean.panels["version-history-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="no-history-msg" value="#{msg.not_versioned}<br/><br/>" 
                                                escape="false" />
                                  <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write" id="eval_ver">

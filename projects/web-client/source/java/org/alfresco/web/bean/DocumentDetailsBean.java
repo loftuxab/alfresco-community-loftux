@@ -48,6 +48,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewRuleWizard;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
+import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
 import org.alfresco.web.ui.repo.component.template.TemplateNode;
 import org.apache.log4j.Logger;
 
@@ -70,8 +71,22 @@ public class DocumentDetailsBean
    private VersionService versionService;
    private NavigationBean navigator;
    
+   private Map<String, Boolean> panels = new HashMap(5, 1.0f);
+   
    private Map<String, Serializable> workflowProperties;
 
+
+   /**
+    * Default constructor
+    */
+   public DocumentDetailsBean()
+   {
+      // initial state of some panels that don't use the default
+      panels.put("workflow-panel", false);
+      panels.put("category-panel", false);
+      panels.put("version-history-panel", false);
+   }
+   
    /**
     * Resets any state that may be held by this bean
     */
@@ -944,6 +959,23 @@ public class DocumentDetailsBean
    }
    
    /**
+    * Save the state of the panel that was expanded/collapsed
+    */
+   public void expandPanel(ActionEvent event)
+   {
+      if (event instanceof ExpandedEvent)
+      {
+         String id = event.getComponent().getId();
+         // we prefix some panels with "no-" which we remove to give consistent behaviour in the UI
+         if (id.startsWith("no-") == true)
+         {
+            id = id.substring(3);
+         }
+         this.panels.put(id, ((ExpandedEvent)event).State);
+      }
+   }
+   
+   /**
     * Returns a model for use by a template on the Document Details page.
     * 
     * @return model containing current document and current space info.
@@ -998,6 +1030,22 @@ public class DocumentDetailsBean
    public Node getDocument()
    {
       return this.browseBean.getDocument();
+   }
+   
+   /**
+    * @return Returns the panels expanded state map.
+    */
+   public Map<String, Boolean> getPanels()
+   {
+      return this.panels;
+   }
+
+   /**
+    * @param panels The panels expanded state map.
+    */
+   public void setPanels(Map<String, Boolean> panels)
+   {
+      this.panels = panels;
    }
    
    /**

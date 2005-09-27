@@ -120,15 +120,6 @@ public class DocumentPropertiesBean
             // make sure the property is represented correctly
             Serializable propValue = (Serializable)this.editableNode.getProperties().get(propName);
             PropertyDefinition propDef = this.dictionaryService.getProperty(qname);
-            /*if (propDef != null)
-            {
-               if (propDef.getDataType().getName().equals(DataTypeDefinition.CATEGORY) || 
-                   propDef.getDataType().getName().equals(DataTypeDefinition.NODE_REF))
-               {
-                  // we need to change the id to a NodeRef
-                  propValue = new NodeRef(Repository.getStoreRef(), (String)propValue);
-               }
-            }*/
             
             properties.put(qname, propValue);
          }

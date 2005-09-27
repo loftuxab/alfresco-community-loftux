@@ -16,8 +16,10 @@
  */
 package org.alfresco.web.ui.common.tag;
 
+import javax.faces.FacesException;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
+import javax.faces.el.MethodBinding;
 import javax.servlet.jsp.JspException;
 
 import org.alfresco.web.ui.common.component.UIPanel;
@@ -64,6 +66,18 @@ public class PanelTag extends HtmlComponentTag
       setStringProperty(component, "linkIcon", this.linkIcon);
       setStringProperty(component, "linkStyleClass", this.linkStyleClass);
       setStringProperty(component, "linkTooltip", this.linkTooltip);
+      if (expandedActionListener != null)
+      {
+         if (isValueReference(expandedActionListener))
+         {
+            MethodBinding vb = getFacesContext().getApplication().createMethodBinding(expandedActionListener, ACTION_CLASS_ARGS);
+            ((UIPanel)component).setExpandedActionListener(vb);
+         }
+         else
+         {
+            throw new FacesException("Expanded Action listener method binding incorrectly specified: " + expandedActionListener);
+         }
+      }
    }
    
    /**
@@ -83,6 +97,7 @@ public class PanelTag extends HtmlComponentTag
       this.linkLabel = null;
       this.linkStyleClass = null;
       this.linkTooltip = null;
+      this.expandedActionListener = null;
    }
    
    /**
@@ -227,6 +242,20 @@ public class PanelTag extends HtmlComponentTag
       this.linkTooltip = linkTooltip;
    }
 
+   /**
+    * Set the expandedActionListener
+    *
+    * @param expandedActionListener     the expandedActionListener
+    */
+   public void setExpandedActionListener(String expandedActionListener)
+   {
+      this.expandedActionListener = expandedActionListener;
+   }
+
+
+   /** the expandedActionListener */
+   private String expandedActionListener;
+   
    /** the expanded flag */
    private String expanded;
 

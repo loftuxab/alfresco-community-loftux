@@ -21,11 +21,15 @@ import java.util.Map;
 
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.el.MethodBinding;
 import javax.faces.el.ValueBinding;
+import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.FacesEvent;
 
 import org.alfresco.web.ui.common.PanelGenerator;
 import org.alfresco.web.ui.common.Utils;
@@ -244,12 +248,12 @@ public class UIPanel extends UICommand
       String value = (String)requestMap.get(fieldId);
       
       // we encoded the value to start with our Id
-      if (value != null && value.startsWith(getClientId(context) + NamingContainer.SEPARATOR_CHAR))
+      if (value != null && value.startsWith(getClientId(context)))
       {
          // we were clicked, strip out the value
-         String strippedValue = value.substring(getClientId(context).length() + 1);
+         value = value.substring(getClientId(context).length() + 1);
          
-         if (strippedValue.equals(LINK_CLICKED))
+         if (value.equals(LINK_CLICKED))
          {
             // the action link was clicked, so queue the action event
             ActionEvent event = new ActionEvent(this);
@@ -257,8 +261,9 @@ public class UIPanel extends UICommand
          }
          else
          {
-            // the expand/collapse icon was clicked, so toggle the state 
-            setExpanded( Boolean.valueOf(strippedValue).booleanValue() );
+            // the expand/collapse icon was clicked, so toggle the state
+            ExpandedEvent event = new ExpandedEvent(this, Boolean.parseBoolean(value));
+            queueEvent(event);
          }
          
          //
@@ -276,6 +281,27 @@ public class UIPanel extends UICommand
       }
    }
    
+   /**
+    * @see javax.faces.component.UICommand#broadcast(javax.faces.event.FacesEvent)
+    */
+   public void broadcast(FacesEvent event) throws AbortProcessingException
+   {
+      if (event instanceof ExpandedEvent)
+      {
+         // expanded event - we handle this
+         setExpanded( ((ExpandedEvent)event).State );
+         
+         if (getExpandedActionListener() != null)
+         {
+            Utils.processActionMethod(getFacesContext(), getExpandedActionListener(), (ExpandedEvent)event);
+         }
+      }
+      else
+      {
+         super.broadcast(event);
+      }
+   }
+
    /**
     * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
     */
@@ -295,6 +321,7 @@ public class UIPanel extends UICommand
       this.linkTooltip = (String)values[9];
       this.titleBgcolor = (String)values[10];
       this.titleBorder = (String)values[11];
+      this.expandedActionListener = (MethodBinding)values[12];
    }
    
    /**
@@ -302,7 +329,7 @@ public class UIPanel extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[12];
+      Object values[] = new Object[13];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = (isExpanded() ? Boolean.TRUE : Boolean.FALSE);
@@ -316,12 +343,29 @@ public class UIPanel extends UICommand
       values[9] = this.linkTooltip;
       values[10] = this.titleBgcolor;
       values[11] = this.titleBorder;
+      values[12] = this.expandedActionListener;
       return values;
    }
    
    
    // ------------------------------------------------------------------------------
    // Strongly typed component property accessors 
+   
+   /** 
+    * @param binding    The MethodBinding to call when expand/collapse is performed by the user.
+    */
+   public void setExpandedActionListener(MethodBinding binding)
+   {
+      this.expandedActionListener = binding;
+   }
+   
+   /** 
+    * @return The MethodBinding to call when expand/collapse is performed by the user.
+    */
+   public MethodBinding getExpandedActionListener()
+   {
+      return this.expandedActionListener;
+   }
    
    /**
     * @return Returns the bgcolor.
@@ -606,6 +650,7 @@ public class UIPanel extends UICommand
    
    private final static String LINK_CLICKED = "link-clicked";
    
+   
    // ------------------------------------------------------------------------------
    // Private members 
    
@@ -620,9 +665,28 @@ public class UIPanel extends UICommand
    private String linkIcon = null;
    private String linkTooltip = null;
    private String linkStyleClass = null;
+   private MethodBinding expandedActionListener = null;
    
    // component state
    private boolean hasAdornments = false;
    private boolean hasBorderedTitleArea = false;
    private Boolean expanded = Boolean.TRUE;
+   
+   
+   // ------------------------------------------------------------------------------
+   // Inner classes
+   
+   /**
+    * Class representing the an action relevant when the panel is expanded or collapsed.
+    */
+   public static class ExpandedEvent extends ActionEvent
+   {
+      public ExpandedEvent(UIComponent component, boolean state)
+      {
+         super(component);
+         State = state;
+      }
+      
+      public boolean State;
+   }
 }
