@@ -33,7 +33,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides a bidirectional mapping between well-known mimetypes and
- * the registered file extensions.
+ * the registered file extensions.  All mimetypes and extensions
+ * are stored and handled as lowercase.
  * 
  * @author Derek Hulley
  */
@@ -108,6 +109,8 @@ public class MimetypeMap implements MimetypeService
                 logger.warn("Ignoring empty mimetype " + count);
                 continue;
             }
+            // we store it as lowercase
+            mimetype = mimetype.toLowerCase();
             if (this.mimetypes.contains(mimetype))
             {
                 throw new AlfrescoRuntimeException("Duplicate mimetype definition: " + mimetype);
@@ -132,6 +135,8 @@ public class MimetypeMap implements MimetypeService
                     logger.warn("Ignoring empty extension for mimetype: " + mimetype);
                     continue;
                 }
+                // put to lowercase
+                extension = extension.toLowerCase();
                 this.mimetypesByExtension.put(extension, mimetype);
                 // add to map of extension displays
                 String extensionDisplay = extensionElement.getAttribute(ATTR_DISPLAY);
@@ -213,6 +218,7 @@ public class MimetypeMap implements MimetypeService
      */
     public String guessMimetype(String filename)
     {
+        filename = filename.toLowerCase();
         String mimetype = MIMETYPE_BINARY;
         // extract the extension
         int index = filename.lastIndexOf('.');
