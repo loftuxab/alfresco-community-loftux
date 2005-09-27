@@ -166,7 +166,7 @@ public class AuthenticationTest extends TestCase
 
         UserDetails AndyDetails = (UserDetails) dao.loadUserByUsername("Andy");
         assertNotNull(AndyDetails);
-        assertEquals("Andy", AndyDetails.getUsername());
+        assertEquals(dao.getUserNamesAreCaseSensitive() ? "Andy" : "andy", AndyDetails.getUsername());
         //assertNotNull(dao.getSalt(AndyDetails));
         assertTrue(AndyDetails.isAccountNonExpired());
         assertTrue(AndyDetails.isAccountNonLocked());
@@ -180,7 +180,7 @@ public class AuthenticationTest extends TestCase
         dao.updateUser("Andy", "carrot".toCharArray());
         UserDetails newDetails = (UserDetails) dao.loadUserByUsername("Andy");
         assertNotNull(newDetails);
-        assertEquals("Andy", newDetails.getUsername());
+        assertEquals(dao.getUserNamesAreCaseSensitive() ? "Andy" : "andy", newDetails.getUsername());
        // assertNotNull(dao.getSalt(newDetails));
         assertTrue(newDetails.isAccountNonExpired());
         assertTrue(newDetails.isAccountNonLocked());
@@ -521,7 +521,7 @@ public class AuthenticationTest extends TestCase
         authenticationService.authenticate("Andy", "auth1".toCharArray());
 
         // assert the user is authenticated
-        assertEquals("Andy", authenticationService.getCurrentUserName());
+        assertEquals(dao.getUserNamesAreCaseSensitive() ? "Andy" : "andy", authenticationService.getCurrentUserName());
         // delete the user authentication object
 
         authenticationService.deleteAuthentication("Andy");
@@ -582,7 +582,7 @@ public class AuthenticationTest extends TestCase
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
         
         authenticationComponent.setCurrentUser("Andy");
-        assertEquals("Andy", authenticationService.getCurrentUserName());
+        assertEquals(dao.getUserNamesAreCaseSensitive() ? "Andy" : "andy", authenticationService.getCurrentUserName());
         
     }
     

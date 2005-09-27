@@ -117,4 +117,11 @@ public interface PersonService
      * @return
      */
     public NodeRef getPeopleContainer();
+    
+    /**
+     * Are user names case sensitive?
+     * 
+     * @return
+     */
+    public boolean getUserNamesAreCaseSensitive();
 }

@@ -58,6 +58,8 @@ public class PersonServiceImpl implements PersonService
 
     private boolean createMissingPeople;
 
+    private boolean userNamesAreCaseSensitive;
+
     private static Set<QName> mutableProperties;
 
     static
@@ -77,9 +79,19 @@ public class PersonServiceImpl implements PersonService
         super();
     }
 
-    public NodeRef getPerson(String userName)
+    public boolean getUserNamesAreCaseSensitive()
     {
+        return userNamesAreCaseSensitive;
+    }
 
+    public void setUserNamesAreCaseSensitive(boolean userNamesAreCaseSensitive)
+    {
+        this.userNamesAreCaseSensitive = userNamesAreCaseSensitive;
+    }
+
+    public NodeRef getPerson(String caseSensitiveUserName)
+    {
+        String userName = userNamesAreCaseSensitive ? caseSensitiveUserName : caseSensitiveUserName.toLowerCase();
         NodeRef personNode = getPersonOrNull(userName);
         if (personNode == null)
         {
@@ -99,8 +111,9 @@ public class PersonServiceImpl implements PersonService
         }
     }
 
-    public NodeRef getPersonOrNull(String userName)
+    public NodeRef getPersonOrNull(String caseSensitiveUserName)
     {
+        String userName = userNamesAreCaseSensitive ? caseSensitiveUserName : caseSensitiveUserName.toLowerCase();
         NodeRef rootNode = nodeService.getRootNode(storeRef);
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
@@ -125,8 +138,9 @@ public class PersonServiceImpl implements PersonService
         return mutableProperties;
     }
 
-    public void setPersonProperties(String userName, Map<QName, Serializable> properties)
+    public void setPersonProperties(String caseSensitiveUserName, Map<QName, Serializable> properties)
     {
+        String userName = userNamesAreCaseSensitive ? caseSensitiveUserName : caseSensitiveUserName.toLowerCase();
         NodeRef personNode = getPersonOrNull(userName);
         if (personNode == null)
         {
@@ -171,14 +185,12 @@ public class PersonServiceImpl implements PersonService
         return nodeService.createNode(getPeopleContainer(), ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON,
                 ContentModel.TYPE_PERSON, properties).getChildRef();
     }
-    
-    
 
     public NodeRef getPeopleContainer()
     {
         NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
-        List<NodeRef> results = searchService.selectNodes(rootNodeRef, PEOPLE_FOLDER, null,
-                namespacePrefixResolver, false);
+        List<NodeRef> results = searchService.selectNodes(rootNodeRef, PEOPLE_FOLDER, null, namespacePrefixResolver,
+                false);
         NodeRef typesNode = null;
         if (results.size() == 0)
         {

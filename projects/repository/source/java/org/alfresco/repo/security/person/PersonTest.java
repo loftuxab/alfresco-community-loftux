@@ -51,6 +51,11 @@ public class PersonTest extends BaseSpringTest
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
+        
+        for(NodeRef nodeRef: personService.getAllPeople())
+        {
+            nodeService.deleteNode(nodeRef);
+        }
 
     }
 

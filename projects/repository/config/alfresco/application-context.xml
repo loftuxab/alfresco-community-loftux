@@ -651,6 +651,9 @@
               <property name="searchService">
                   <ref bean="searchService" />
               </property>
+              <property name="userNamesAreCaseSensitive">
+                 <value>false</value>
+              </property>           
            </bean>
         </property>
         <property name="transactionAttributes">
@@ -741,6 +744,9 @@
                  <value>workspace://SpacesStore</value>
               </property>
               <property name="createMissingPeople">
+                 <value>false</value>
+              </property>
+              <property name="userNamesAreCaseSensitive">
                  <value>false</value>
               </property>
            </bean>

@@ -62,6 +62,18 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     private PasswordEncoder passwordEncoder;
 
     private StoreRef userStoreRef;
+    
+    private boolean userNamesAreCaseSensitive;
+    
+    public boolean getUserNamesAreCaseSensitive()
+    {
+        return userNamesAreCaseSensitive;
+    }
+
+    public void setUserNamesAreCaseSensitive(boolean userNamesAreCaseSensitive)
+    {
+        this.userNamesAreCaseSensitive = userNamesAreCaseSensitive;
+    }
 
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -88,9 +100,10 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         this.searchService = searchService;
     }
 
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException, DataAccessException
+    public UserDetails loadUserByUsername(String caseSensitiveUserName) throws UsernameNotFoundException, DataAccessException
     {
-        NodeRef userRef = getUserOrNull(userName);
+        String userName = userNamesAreCaseSensitive ? caseSensitiveUserName: caseSensitiveUserName.toLowerCase();
+        NodeRef userRef = getUserOrNull(userNamesAreCaseSensitive ? userName: userName.toLowerCase());
         if (userRef == null)
         {
             throw new UsernameNotFoundException("Could not find user by userName: " + userName);
@@ -108,8 +121,9 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         return ud;
     }
 
-    /* package for testing */NodeRef getUserOrNull(String userName)
+    /* package for testing */NodeRef getUserOrNull(String caseSensitiveUserName)
     {
+        String userName = userNamesAreCaseSensitive ? caseSensitiveUserName: caseSensitiveUserName.toLowerCase();
         NodeRef rootNode = nodeService.getRootNode(getUserStoreRef());
         QueryParameterDefinition[] defs = new QueryParameterDefinition[1];
         DataTypeDefinition text = dictionaryService.getDataType(DataTypeDefinition.TEXT);
@@ -124,8 +138,9 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         return results.get(0);
     }
 
-    public void createUser(String userName, char[] rawPassword) throws AuthenticationException
+    public void createUser(String caseSensitiveUserName, char[] rawPassword) throws AuthenticationException
     {
+        String userName = userNamesAreCaseSensitive ? caseSensitiveUserName: caseSensitiveUserName.toLowerCase();
         NodeRef userRef = getUserOrNull(userName);
         if (userRef != null)
         {

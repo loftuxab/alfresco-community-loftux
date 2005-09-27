@@ -192,4 +192,12 @@ public interface MutableAuthenticationDao extends AuthenticationDao, SaltSource
      * @return
      */
     public String getMD4HashedPassword(String userName);
+    
+    /**
+     * Are user names case sensitive?
+     * 
+     * @return
+     */
+    public boolean getUserNamesAreCaseSensitive();
+    
 }
