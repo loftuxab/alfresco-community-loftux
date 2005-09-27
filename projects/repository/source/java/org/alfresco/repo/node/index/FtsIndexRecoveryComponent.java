@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
-import org.alfresco.repo.transaction.TransactionUtil;
-import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
@@ -96,21 +94,6 @@ public class FtsIndexRecoveryComponent implements IndexRecovery
             StoreRef storeRef = new StoreRef(storeRefStr);
             storeRefs.add(storeRef);
         }
-    }
-    
-    /**
-     * Initializes the component by kicking off a reindex within a transaction
-     */
-    public void init()
-    {
-        TransactionWork<List<String>> reindexWork = new TransactionWork<List<String>>()
-        {
-            public List<String> doWork()
-            {
-                return reindex();
-            }
-        };
-        TransactionUtil.executeInUserTransaction(transactionService, reindexWork);
     }
     
     /**

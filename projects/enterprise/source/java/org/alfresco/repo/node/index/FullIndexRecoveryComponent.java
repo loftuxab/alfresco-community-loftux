@@ -30,8 +30,6 @@ import org.alfresco.repo.domain.hibernate.NodeAssocImpl;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.search.Indexer;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
-import org.alfresco.repo.transaction.TransactionUtil;
-import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -133,21 +131,6 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             StoreRef storeRef = new StoreRef(storeRefStr);
             storeRefs.add(storeRef);
         }
-    }
-    
-    /**
-     * Initializes the component by kicking off a reindex within a transaction
-     */
-    public void init()
-    {
-        TransactionWork<List<String>> reindexWork = new TransactionWork<List<String>>()
-        {
-            public List<String> doWork()
-            {
-                return reindex();
-            }
-        };
-        TransactionUtil.executeInUserTransaction(transactionService, reindexWork);
     }
     
     /**

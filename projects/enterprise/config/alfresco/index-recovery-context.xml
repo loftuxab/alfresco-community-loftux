@@ -4,10 +4,7 @@
 <beans>
     
    <!-- full node index recovery -->
-   <bean id="indexRecoveryComponent"
-            class="org.alfresco.repo.node.index.FullIndexRecoveryComponent"
-            init-method="init"
-            depends-on="nodeDaoService" >
+   <bean id="indexRecoveryComponentImpl" class="org.alfresco.repo.node.index.FullIndexRecoveryComponent" >
       <property name="sessionFactory">
          <ref bean="sessionFactory" />
       </property>
@@ -35,4 +32,21 @@
       </property>
    </bean>
     
+   <bean id="indexRecoveryComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+      <property name="proxyInterfaces">
+         <value>org.alfresco.repo.node.index.IndexRecovery</value>
+      </property>
+      <property name="transactionManager">
+         <ref bean="transactionManager" />
+      </property>
+      <property name="target">
+         <ref bean="indexRecoveryComponentImpl" />
+      </property>
+      <property name="transactionAttributes">
+         <props>
+            <prop key="reindex">PROPAGATION_REQUIRED</prop>
+         </props>
+      </property>
+   </bean>
+
 </beans>
