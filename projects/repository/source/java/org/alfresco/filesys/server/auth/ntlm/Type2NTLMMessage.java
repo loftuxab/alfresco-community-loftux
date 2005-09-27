@@ -204,7 +204,11 @@ public class Type2NTLMMessage extends NTLMMessage
     /**
      * Build a type 2 message
      * 
-     * @param 
+     * @param flags int
+     * @param target String
+     * @param challenge byte[]
+     * @param ctx byte[]
+     * @param tList List<TargetInfo>
      */
     public final void buildType2(int flags, String target, byte[] challenge, int[] ctx, List<TargetInfo> tList)
     {

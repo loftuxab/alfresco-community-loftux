@@ -163,6 +163,18 @@ public class NTLMLogonDetails
     }
     
     /**
+     * Return the challenge key from the type2 message
+     * 
+     * @return byte[]
+     */
+    public final byte[] getChallengeKey()
+    {
+        if ( m_type2Msg != null)
+            return m_type2Msg.getChallenge();
+        return null;
+    }
+    
+    /**
      * Set the authentication date/time
      * 
      * @param authTime long
