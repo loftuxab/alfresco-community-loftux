@@ -42,6 +42,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.app.portlet.AlfrescoFacesPortlet;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
@@ -847,9 +848,16 @@ public class BrowseBean implements IContextListener
             Node node = new Node(ref, this.nodeService);
             
             // store the URL to for downloading the content
-            String name = node.getName();
             node.addPropertyResolver("url", this.resolverDownload);
             node.addPropertyResolver("fileType32", this.resolverFileType32);
+            
+            // get hold of the DocumentDetailsBean and reset it
+            DocumentDetailsBean docDetails = (DocumentDetailsBean)FacesContext.getCurrentInstance().
+               getExternalContext().getSessionMap().get("DocumentDetailsBean");
+            if (docDetails != null)
+            {
+               docDetails.reset();
+            }
             
             // remember the document
             setDocument(node);

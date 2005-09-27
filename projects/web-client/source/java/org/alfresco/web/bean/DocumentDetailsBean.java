@@ -51,6 +51,8 @@ import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.repo.component.template.TemplateNode;
 import org.apache.log4j.Logger;
 
+import sun.security.krb5.internal.crypto.t;
+
 /**
  * Backing bean providing access to the details of a document
  * 
@@ -70,6 +72,18 @@ public class DocumentDetailsBean
    
    private Map<String, Serializable> workflowProperties;
 
+   /**
+    * Resets any state that may be held by this bean
+    */
+   public void reset()
+   {
+      if (this.workflowProperties != null)
+      {
+         this.workflowProperties.clear();
+         this.workflowProperties = null;
+      }
+   }
+   
    /**
     * Returns the id of the current document
     * 
@@ -425,6 +439,19 @@ public class DocumentDetailsBean
       }
       
       return this.workflowProperties;
+   }
+   
+   /**
+    * 
+    * @return
+    */
+   public String cancelWorkflowEdit()
+   {
+      // resets the workflow properties map so any changes made
+      // don't appear to be persisted
+      this.workflowProperties.clear();
+      this.workflowProperties = null;
+      return "cancel";
    }
    
    /**

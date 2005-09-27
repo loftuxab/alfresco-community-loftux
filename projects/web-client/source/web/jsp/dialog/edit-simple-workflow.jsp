@@ -248,7 +248,8 @@
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel}" action="cancel" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="#{DocumentDetailsBean.cancelWorkflowEdit}" 
+                                                        styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
