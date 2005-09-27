@@ -60,6 +60,7 @@ import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchParameters;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -288,7 +289,8 @@ public class LuceneTest extends TestCase
         // check that we get the result
         SearchParameters sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", query);
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery(query);
         ResultSet results = searcher.query(sp);
         assertEquals("No results found from query", 1, results.length());
         
@@ -297,7 +299,8 @@ public class LuceneTest extends TestCase
         // repeat
         for (int i = 0; i < count; i++)
         {
-            sp.setQuery("lucene", query);
+            sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+            sp.setQuery(query);
             results = searcher.query(sp);
         }
         long end = System.nanoTime();
@@ -328,7 +331,8 @@ public class LuceneTest extends TestCase
 
         SearchParameters sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.addSort("ID", true);
         ResultSet results = searcher.query(sp);
 
@@ -350,7 +354,8 @@ public class LuceneTest extends TestCase
         
         SearchParameters sp2 = new SearchParameters();
         sp2.addStore(rootNodeRef.getStoreRef());
-        sp2.setQuery("lucene", "PATH:\"//.\"");
+        sp2.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp2.setQuery("PATH:\"//.\"");
         sp2.addSort("ID", false);
         results = searcher.query(sp2);
 
@@ -2054,7 +2059,8 @@ public class LuceneTest extends TestCase
 
         SearchParameters sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.excludeDataInTheCurrentTransaction(false);
         ResultSet results = serviceRegistry.getSearchService().query(sp);
         assertEquals(5, results.length());
@@ -2062,7 +2068,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.excludeDataInTheCurrentTransaction(true);
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(15, results.length());
@@ -2072,7 +2079,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.addSort("ID", true);
         sp.excludeDataInTheCurrentTransaction(false);
         results = serviceRegistry.getSearchService().query(sp);
@@ -2092,7 +2100,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.excludeDataInTheCurrentTransaction(false);
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(16, results.length());
@@ -2102,7 +2111,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.addSort("ID", true);
         sp.excludeDataInTheCurrentTransaction(false);
         results = serviceRegistry.getSearchService().query(sp);
@@ -2118,7 +2128,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "\\@\\{namespace\\}property\\-1:\"valueone\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
         sp.addSort("ID", true);
         sp.excludeDataInTheCurrentTransaction(false);
         results = serviceRegistry.getSearchService().query(sp);
@@ -2130,7 +2141,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "\\@\\{namespace\\}property\\-1:\"valueone\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
         sp.addSort("ID", true);
         sp.excludeDataInTheCurrentTransaction(false);
         results = serviceRegistry.getSearchService().query(sp);
@@ -2142,7 +2154,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "\\@\\{namespace\\}property\\-1:\"valueone\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
         sp.excludeDataInTheCurrentTransaction(false);
         sp.addSort("ID", true);
         results = serviceRegistry.getSearchService().query(sp);
@@ -2164,7 +2177,8 @@ public class LuceneTest extends TestCase
 
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.excludeDataInTheCurrentTransaction(false);
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(6, results.length());
@@ -2172,7 +2186,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.excludeDataInTheCurrentTransaction(true);
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(15, results.length());
@@ -2182,7 +2197,8 @@ public class LuceneTest extends TestCase
         
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"//.\"");
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
         sp.addSort("ID", true);
         sp.excludeDataInTheCurrentTransaction(false);
         results = serviceRegistry.getSearchService().query(sp);
@@ -2257,7 +2273,8 @@ public class LuceneTest extends TestCase
 
         SearchParameters sp = new SearchParameters();
         sp.addStore(test.rootNodeRef.getStoreRef());
-        sp.setQuery("lucene", "PATH:\"" + path + "//." + "\"");        
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"" + path + "//." + "\"");        
         ResultSet results = test.serviceRegistry.getSearchService().query(sp);
         
         results.close();

@@ -29,38 +29,72 @@ import org.jaxen.BaseXPath;
 import org.jaxen.Context;
 import org.jaxen.Function;
 import org.jaxen.FunctionCallException;
+import org.jaxen.FunctionContext;
 import org.jaxen.JaxenException;
 import org.jaxen.Navigator;
 import org.jaxen.SimpleFunctionContext;
 import org.jaxen.SimpleVariableContext;
 import org.jaxen.function.BooleanFunction;
+import org.jaxen.function.CeilingFunction;
+import org.jaxen.function.ConcatFunction;
+import org.jaxen.function.ContainsFunction;
+import org.jaxen.function.CountFunction;
+import org.jaxen.function.FalseFunction;
+import org.jaxen.function.FloorFunction;
+import org.jaxen.function.IdFunction;
+import org.jaxen.function.LangFunction;
+import org.jaxen.function.LastFunction;
+import org.jaxen.function.LocalNameFunction;
+import org.jaxen.function.NameFunction;
+import org.jaxen.function.NamespaceUriFunction;
+import org.jaxen.function.NormalizeSpaceFunction;
+import org.jaxen.function.NotFunction;
+import org.jaxen.function.NumberFunction;
+import org.jaxen.function.PositionFunction;
+import org.jaxen.function.RoundFunction;
+import org.jaxen.function.StartsWithFunction;
 import org.jaxen.function.StringFunction;
+import org.jaxen.function.StringLengthFunction;
+import org.jaxen.function.SubstringAfterFunction;
+import org.jaxen.function.SubstringBeforeFunction;
+import org.jaxen.function.SubstringFunction;
+import org.jaxen.function.SumFunction;
+import org.jaxen.function.TranslateFunction;
+import org.jaxen.function.TrueFunction;
+import org.jaxen.function.ext.EndsWithFunction;
+import org.jaxen.function.ext.EvaluateFunction;
+import org.jaxen.function.ext.LowerFunction;
+import org.jaxen.function.ext.MatrixConcatFunction;
+import org.jaxen.function.ext.UpperFunction;
+import org.jaxen.function.xslt.DocumentFunction;
 
 /**
- * Represents an xpath statement that resolves against a <code>NodeService</code>
+ * Represents an xpath statement that resolves against a
+ * <code>NodeService</code>
  * 
  * @author Andy Hind
  */
 public class NodeServiceXPath extends BaseXPath
 {
     private static final long serialVersionUID = 3834032441789592882L;
-    
+
     private boolean followAllParentLinks;
 
     /**
      * 
-     * @param xpath the xpath statement
-     * @param documentNavigator the navigator that will allow the xpath to be resolved
-     * @param paramDefs parameters to resolve variables required by xpath
+     * @param xpath
+     *            the xpath statement
+     * @param documentNavigator
+     *            the navigator that will allow the xpath to be resolved
+     * @param paramDefs
+     *            parameters to resolve variables required by xpath
      * @throws JaxenException
      */
-    public NodeServiceXPath(
-            String xpath,
-            DocumentNavigator documentNavigator,
-            QueryParameterDefinition[] paramDefs) throws JaxenException
+    public NodeServiceXPath(String xpath, DocumentNavigator documentNavigator, QueryParameterDefinition[] paramDefs)
+            throws JaxenException
     {
         super(xpath, documentNavigator);
-        
+
         // Add support for parameters
         if (paramDefs != null)
         {
@@ -96,25 +130,41 @@ public class NodeServiceXPath extends BaseXPath
                 {
                     value = paramDefs[i].getDefault();
                 }
-                svc.setVariableValue(paramDefs[i].getQName().getNamespaceURI(), paramDefs[i].getQName().getLocalName(), value);
+                svc.setVariableValue(paramDefs[i].getQName().getNamespaceURI(), paramDefs[i].getQName().getLocalName(),
+                        value);
             }
         }
-        SimpleFunctionContext sfc = (SimpleFunctionContext) this.getFunctionContext();
-        // Register extra functions here - both null and empty namespace
-        // TODO: Issue - Investigate why both null and empty string ns are required for the functions
-        sfc.registerFunction("", "subtypeOf", new SubTypeOf());
-        sfc.registerFunction("", "deref", new Deref());
-        sfc.registerFunction("", "like", new Like());
-        sfc.registerFunction("", "contains", new Contains());
         
-        sfc.registerFunction(null, "subtypeOf", new SubTypeOf());
-        sfc.registerFunction(null, "deref", new Deref());
-        sfc.registerFunction(null, "like", new Like());
-        sfc.registerFunction(null, "contains", new Contains());
+        for(String prefix : documentNavigator.getNamespacePrefixResolver().getPrefixes())
+        {
+            addNamespace(prefix, documentNavigator.getNamespacePrefixResolver().getNamespaceURI(prefix));
+        }
     }
 
+    
+    public static class FirstFunction implements Function
+    {
+
+        public Object call(Context context,
+                           List args) throws FunctionCallException
+        {
+            if (args.size() == 0)
+            {
+                return evaluate( context );
+            }
+          
+            throw new FunctionCallException( "first() requires no arguments." );
+        }
+
+        public static Double evaluate(Context context)
+        {
+            return new Double(1);
+        }
+    }
+    
     /**
-     * A boolean function to determine if a node type is a subtype of another type  
+     * A boolean function to determine if a node type is a subtype of another
+     * type
      */
     static class SubTypeOf implements Function
     {
@@ -129,29 +179,39 @@ public class NodeServiceXPath extends BaseXPath
 
         public Object evaluate(List nodes, Object qnameObj, Navigator nav)
         {
-            if(nodes.size() != 1)
+            if (nodes.size() != 1)
             {
                 return false;
             }
             // resolve the qname of the type we are checking for
             String qnameStr = StringFunction.evaluate(qnameObj, nav);
-            QName typeQName = QName.createQName(qnameStr);
+            QName typeQName;
+            if(qnameStr.indexOf("{") == 0)
+            {
+                typeQName = QName.createQName(qnameStr);
+            }
+            else
+            {
+               typeQName = QName.createQName(qnameStr, ((DocumentNavigator)nav).getNamespacePrefixResolver());
+            }
             // resolve the noderef
             NodeRef nodeRef = null;
-            if(nav.isElement(nodes.get(0)))
+            if (nav.isElement(nodes.get(0)))
             {
-                nodeRef = ((ChildAssociationRef)nodes.get(0)).getChildRef();
+                nodeRef = ((ChildAssociationRef) nodes.get(0)).getChildRef();
             }
-            else if(nav.isAttribute(nodes.get(0)))
-            {   
-                nodeRef = ((DocumentNavigator.Property)nodes.get(0)).parent;
+            else if (nav.isAttribute(nodes.get(0)))
+            {
+                nodeRef = ((DocumentNavigator.Property) nodes.get(0)).parent;
             }
-            
-            DocumentNavigator dNav = (DocumentNavigator)nav;
+
+            DocumentNavigator dNav = (DocumentNavigator) nav;
             boolean result = dNav.isSubtypeOf(nodeRef, typeQName);
             return result;
         }
     }
+    
+    
     
     static class Deref implements Function
     {
@@ -172,89 +232,84 @@ public class NodeServiceXPath extends BaseXPath
             String attributeValue = StringFunction.evaluate(attributeName, nav);
             String patternValue = StringFunction.evaluate(pattern, nav);
 
-            // TODO:  Ignore the pattern for now
+            // TODO: Ignore the pattern for now
             // Should do a type pattern test
-            if((attributeValue != null) && (attributeValue.length() > 0))
+            if ((attributeValue != null) && (attributeValue.length() > 0))
             {
-               NodeRef nodeRef = new NodeRef(attributeValue);
-               DocumentNavigator dNav = (DocumentNavigator)nav;
-               answer.add(dNav.getNode(nodeRef));
-               
+                NodeRef nodeRef = new NodeRef(attributeValue);
+                DocumentNavigator dNav = (DocumentNavigator) nav;
+                answer.add(dNav.getNode(nodeRef));
+
             }
             return answer;
-            
+
         }
     }
-    
+
     /**
-     * A boolean function to determine if a node property matches a pattern and/or the node
-     * text matches the pattern.
+     * A boolean function to determine if a node property matches a pattern
+     * and/or the node text matches the pattern.
      * <p>
-     * The default is JSR170 compliant.  The optional boolean allows searching only against
-     * the property value itself.
+     * The default is JSR170 compliant. The optional boolean allows searching
+     * only against the property value itself.
      * 
      * @author Derek Hulley
      */
     static class Like implements Function
     {
-   
+
         public Object call(Context context, List args) throws FunctionCallException
         {
             if (args.size() < 2 || args.size() > 3)
             {
-                throw new FunctionCallException(
-                        "like() usage: like(@attr, 'pattern' [, includeFTS]) \n" +
-                        " - includeFTS can be 'true' or 'false'");
+                throw new FunctionCallException("like() usage: like(@attr, 'pattern' [, includeFTS]) \n"
+                        + " - includeFTS can be 'true' or 'false'");
             }
             // default includeFTS to true
-            return evaluate(
-                    context.getNodeSet(),
-                    args.get(0),
-                    args.get(1),
-                    args.size() == 2 ? Boolean.toString(true) : args.get(2), 
-                    context.getNavigator());
+            return evaluate(context.getNodeSet(), args.get(0), args.get(1), args.size() == 2 ? Boolean.toString(true)
+                    : args.get(2), context.getNavigator());
         }
 
         public Object evaluate(List nodes, Object obj, Object patternObj, Object includeFtsObj, Navigator nav)
         {
             Object attribute = null;
-            if(obj instanceof List)
+            if (obj instanceof List)
             {
                 List list = (List) obj;
                 if (list.isEmpty())
                 {
-                   return false;
+                    return false;
                 }
                 // do not recurse: only first list should unwrap
                 attribute = list.get(0);
             }
-            if((attribute == null) || !nav.isAttribute(attribute))
+            if ((attribute == null) || !nav.isAttribute(attribute))
             {
                 return false;
             }
-            if(nodes.size() != 1)
+            if (nodes.size() != 1)
             {
                 return false;
             }
-            if(!nav.isElement(nodes.get(0)))
+            if (!nav.isElement(nodes.get(0)))
             {
                 return false;
             }
-            ChildAssociationRef car = (ChildAssociationRef)nodes.get(0);
+            ChildAssociationRef car = (ChildAssociationRef) nodes.get(0);
             String pattern = StringFunction.evaluate(patternObj, nav);
             boolean includeFts = BooleanFunction.evaluate(includeFtsObj, nav);
             QName qname = QName.createQName(nav.getAttributeNamespaceUri(attribute), nav.getAttributeName(attribute));
-            
-            DocumentNavigator dNav = (DocumentNavigator)nav;
+
+            DocumentNavigator dNav = (DocumentNavigator) nav;
             // JSR 170 inclues full text matches
-            return dNav.like(car.getChildRef(), qname, pattern, includeFts); 
-            
+            return dNav.like(car.getChildRef(), qname, pattern, includeFts);
+
         }
     }
-    
+
     static class Contains implements Function
     {
-   
+
         public Object call(Context context, List args) throws FunctionCallException
         {
             if (args.size() == 1)
@@ -267,27 +322,216 @@ public class NodeServiceXPath extends BaseXPath
 
         public Object evaluate(List nodes, Object pattern, Navigator nav)
         {
-            if(nodes.size() != 1)
+            if (nodes.size() != 1)
             {
                 return false;
             }
             QName qname = null;
             NodeRef nodeRef = null;
-            if(nav.isElement(nodes.get(0)))
+            if (nav.isElement(nodes.get(0)))
             {
                 qname = null; // should use all attributes and full text index
-                nodeRef = ((ChildAssociationRef)nodes.get(0)).getChildRef();
+                nodeRef = ((ChildAssociationRef) nodes.get(0)).getChildRef();
             }
-            else if(nav.isAttribute(nodes.get(0)))
-            {   
-                qname = QName.createQName(nav.getAttributeNamespaceUri(nodes.get(0)), nav.getAttributeName(nodes.get(0)));
-                nodeRef = ((DocumentNavigator.Property)nodes.get(0)).parent;
+            else if (nav.isAttribute(nodes.get(0)))
+            {
+                qname = QName.createQName(nav.getAttributeNamespaceUri(nodes.get(0)), nav
+                        .getAttributeName(nodes.get(0)));
+                nodeRef = ((DocumentNavigator.Property) nodes.get(0)).parent;
             }
-            
+
             String patternValue = StringFunction.evaluate(pattern, nav);
-            DocumentNavigator dNav = (DocumentNavigator)nav;
+            DocumentNavigator dNav = (DocumentNavigator) nav;
+
+            return dNav.contains(nodeRef, qname, patternValue);
+
+        }
+    }
+    
+    
+    protected FunctionContext createFunctionContext()
+    {
+        return XPathFunctionContext.getInstance();
+    }
+    
+    
+    
+    
+    
+    public static class XPathFunctionContext extends SimpleFunctionContext
+    {
+       /** Singleton implementation.
+        */
+        private static class Singleton
+        {
+            /** Singleton instance.
+             */
+            private static XPathFunctionContext instance = new XPathFunctionContext();
+        }
+
+        /** Retrieve the singleton instance.
+         *
+         *  @return the singleton instance
+         */
+        public static FunctionContext getInstance()
+        {
+            return Singleton.instance;
+        }
+
+        /** Construct.
+         *
+         *  <p>
+         *  Construct with all core XPath functions registered.
+         *  </p>
+         */
+        public XPathFunctionContext()
+        {
+            // XXX could this be a HotSpot????
+            registerFunction( "",  // namespace URI
+                              "boolean",
+                              new BooleanFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "ceiling",
+                              new CeilingFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "concat",
+                              new ConcatFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "contains",
+                              new ContainsFunction() );
             
-            return dNav.contains(nodeRef, qname, patternValue); 
+            registerFunction( "",  // namespace URI
+                              "count",
+                              new CountFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "document",
+                              new DocumentFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "false",
+                              new FalseFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "floor",
+                              new FloorFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "id",
+                              new IdFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "lang",
+                              new LangFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "last",
+                              new LastFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "local-name",
+                              new LocalNameFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "name",
+                              new NameFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "namespace-uri",
+                              new NamespaceUriFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "normalize-space",
+                              new NormalizeSpaceFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "not",
+                              new NotFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "number",
+                              new NumberFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "position",
+                              new PositionFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "round",
+                              new RoundFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "starts-with",
+                              new StartsWithFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "string",
+                              new StringFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "string-length",
+                              new StringLengthFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "substring-after",
+                              new SubstringAfterFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "substring-before",
+                              new SubstringBeforeFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "substring",
+                              new SubstringFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "sum",
+                              new SumFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "true",
+                              new TrueFunction() );
+            
+            registerFunction( "",  // namespace URI
+                              "translate",
+                              new TranslateFunction() );
+            
+
+            // register extension functions
+            // extension functions should go into a namespace, but which one?
+            // for now, keep them in default namespace to not break any code
+
+            registerFunction( "",  // namespace URI
+                              "matrix-concat",
+                              new MatrixConcatFunction() );
+
+            registerFunction( "",  // namespace URI
+                              "evaluate",
+                              new EvaluateFunction() );
+            
+            registerFunction( "",  // namespace URI
+                              "lower-case",
+                              new LowerFunction() );
+            
+            registerFunction( "",  // namespace URI
+                              "upper-case",
+                              new UpperFunction() );
+            
+            registerFunction( "",  // namespace URI
+                              "ends-with",
+                              new EndsWithFunction() );
+            
+            
+            
+            registerFunction("", "subtypeOf", new SubTypeOf());
+            registerFunction("", "deref", new Deref());
+            registerFunction("", "like", new Like());
+            registerFunction("", "contains", new Contains());
+            
+            registerFunction("", "first", new FirstFunction());
             
         }
     }

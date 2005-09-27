@@ -89,15 +89,15 @@ public class SearcherComponent extends AbstractSearcherComponent
         return searcher.like(nodeRef, propertyQName, sqlLikePattern, includeFTS);
     }
 
-    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks, String language) throws InvalidNodeRefException, XPathException
     {
         SearchService searcher = indexerAndSearcherFactory.getSearcher(contextNodeRef.getStoreRef(), true);
-        return searcher.selectNodes(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+        return searcher.selectNodes(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks, language);
     }
 
-    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks, String language) throws InvalidNodeRefException, XPathException
     {
         SearchService searcher = indexerAndSearcherFactory.getSearcher(contextNodeRef.getStoreRef(), true);
-        return searcher.selectProperties(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+        return searcher.selectProperties(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks, language);
     }
 }

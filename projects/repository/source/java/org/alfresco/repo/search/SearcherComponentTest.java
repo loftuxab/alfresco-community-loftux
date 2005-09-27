@@ -104,7 +104,7 @@ public class SearcherComponentTest extends TestCase
                 nodeService,
                 searcher,
                 namespacePrefixResolver,
-                false);
+                false, false);
         
         xpath = new NodeServiceXPath("//.[@test:animal='monkey']", documentNavigator, null);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
@@ -133,8 +133,8 @@ public class SearcherComponentTest extends TestCase
         
         xpath = new NodeServiceXPath("*//.", documentNavigator, null);
         list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-//        assertEquals(11, list.size());
-        assertEquals(13, list.size());   // 13 unique paths through the graph - duplicates not being removed
+        assertEquals(11, list.size());
+//        assertEquals(13, list.size());   // 13 unique paths through the graph - duplicates not being removed
         
         xpathStr = "test:root_p_n1";
         xpath = new NodeServiceXPath(xpathStr, documentNavigator, null);
@@ -213,7 +213,7 @@ public class SearcherComponentTest extends TestCase
                 QName.createQName("test:type", namespacePrefixResolver),
                 dictionaryService.getDataType(DataTypeDefinition.QNAME),
                 true,
-                BaseNodeServiceTest.TYPE_QNAME_TEST_CONTENT.toString());
+                BaseNodeServiceTest.TYPE_QNAME_TEST_CONTENT.toPrefixString(namespacePrefixResolver));
         xpathStr = "//.[subtypeOf($test:type)]";
         xpath = new NodeServiceXPath(xpathStr, documentNavigator, new QueryParameterDefinition[]{paramDef});
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
@@ -341,5 +341,41 @@ public class SearcherComponentTest extends TestCase
         assertEquals(1, answer.size());
         assertFalse("Incorrect result: search root node pulled back", answer.contains(n1Ref));
         assertTrue("Incorrect result: incorrect node retrieved", answer.contains(n3Ref));
+    }
+    
+    public void testJCRRoot() throws Exception
+    {
+        
+        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        // commit the node graph
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+        
+        NodeServiceXPath xpath;
+        List list;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
+        // create the document navigator
+        DocumentNavigator documentNavigator = new DocumentNavigator(
+                dictionaryService,
+                nodeService,
+                searcher,
+                namespacePrefixResolver,
+                false, true);
+        
+        xpath = new NodeServiceXPath("/jcr:root", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root/*", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(2, list.size());
+        
+        xpath = new NodeServiceXPath("/*/*", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(2, list.size());
     }
 }

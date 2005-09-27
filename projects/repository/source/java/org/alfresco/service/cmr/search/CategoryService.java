@@ -17,7 +17,6 @@
 package org.alfresco.service.cmr.search;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -27,16 +26,16 @@ import org.alfresco.service.namespace.QName;
 /**
  * Category Service
  *
- * The service for querying and creatikng categories.
+ * The service for querying and creating categories.
  * All other management can be carried out using the node service.
  * 
- * @author andyh
+ * @author Andy Hind
  *
  */
 public interface CategoryService
 {
     /**
-     * Enum for navigation control.
+     * Enumeration for navigation control.
      * MEMBERS - get only category members
      * SUB_CATEGORIES - get sub categories only
      * ALL - get both of the above
@@ -54,9 +53,9 @@ public interface CategoryService
      * Get the children of a given category node
      * 
      * @param categoryRef - the category node
-     * @param mode - the enum mode for what to recover
-     * @param depth - the enum depth for what level to recover
-     * @return a collection of all the nodes found identified by thier ChildAssocRef's
+     * @param mode - the enumeration mode for what to recover
+     * @param depth - the enumeration depth for what level to recover
+     * @return a collection of all the nodes found identified by their ChildAssocRef's
      */
     Collection<ChildAssociationRef> getChildren(NodeRef categoryRef, Mode mode, Depth depth );
 
@@ -64,8 +63,8 @@ public interface CategoryService
      * Get a list of all the categories appropriate for a given property
      * 
      * @param aspectQName
-     * @param depth - the enum depth for what level to recover
-     * @return a collection of all the nodes found identified by thier ChildAssocRef's
+     * @param depth - the enumeration depth for what level to recover
+     * @return a collection of all the nodes found identified by their ChildAssocRef's
      */
     Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName aspectQName, Depth depth );
 

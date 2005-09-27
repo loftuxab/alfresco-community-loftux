@@ -65,19 +65,30 @@ public class NodeSearcher
      */
     public synchronized List<NodeRef> selectNodes(
             NodeRef contextNodeRef,
-            String xpath,
+            String xpathIn,
             QueryParameterDefinition[] paramDefs,
             NamespacePrefixResolver namespacePrefixResolver,
-            boolean followAllParentLinks)
+            boolean followAllParentLinks, String language)
     {
         try
         {
+            String xpath  = xpathIn;
+            boolean useJCRXPath = language.equalsIgnoreCase(SearchService.LANGUAGE_JCR_XPATH);
+            
+            
+            // replace element
+            if(useJCRXPath)
+            {
+                xpath = xpath.replaceAll("element\\(\\s*(\\*|\\w*:\\w*)\\s*,\\s*(\\*|\\w*:\\w*)\\s*\\)", "$1[subtypeOf(\"$2\")]");
+                xpath = xpath.replaceAll("order\\s*by\\s*.*", "");
+            }
+            
             DocumentNavigator documentNavigator = new DocumentNavigator(
                     dictionaryService,
                     nodeService,
                     searchService,
                     namespacePrefixResolver,
-                    followAllParentLinks);
+                    followAllParentLinks, useJCRXPath);
             NodeServiceXPath nsXPath = new NodeServiceXPath(xpath, documentNavigator, paramDefs);
             for (String prefix : namespacePrefixResolver.getPrefixes())
             {
@@ -100,7 +111,7 @@ public class NodeSearcher
         }
         catch (JaxenException e)
         {
-            throw new XPathException("Error executing xpath: \n" + "   xpath: " + xpath, e);
+            throw new XPathException("Error executing xpath: \n" + "   xpath: " + xpathIn, e);
         }
     }
 
@@ -112,16 +123,18 @@ public class NodeSearcher
             String xpath,
             QueryParameterDefinition[] paramDefs,
             NamespacePrefixResolver namespacePrefixResolver,
-            boolean followAllParentLinks)
+            boolean followAllParentLinks, String language)
     {
         try
         {
+            boolean useJCRXPath = language.equalsIgnoreCase(SearchService.LANGUAGE_JCR_XPATH);
+            
             DocumentNavigator documentNavigator = new DocumentNavigator(
                     dictionaryService,
                     nodeService,
                     searchService,
                     namespacePrefixResolver,
-                    followAllParentLinks);
+                    followAllParentLinks, useJCRXPath);
             NodeServiceXPath nsXPath = new NodeServiceXPath(xpath, documentNavigator, paramDefs);
             for (String prefix : namespacePrefixResolver.getPrefixes())
             {

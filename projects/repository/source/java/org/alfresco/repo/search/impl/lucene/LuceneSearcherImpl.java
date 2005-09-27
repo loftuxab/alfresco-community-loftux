@@ -69,13 +69,6 @@ import com.werken.saxpath.XPathReader;
 public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
 {
     /**
-     * Lucence languages key = temporary implementation
-     */
-    private static final String LUCENE = "lucene";
-
-    private static final String XPATH = "xpath";
-
-    /**
      * Default field name
      */
     private static final String DEFAULT_FIELD = "FTS";
@@ -95,8 +88,8 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      */
 
     /**
-     * Get an intialised searcher for the store and transaction Normally we do
-     * not search againsta a store and delta. Currently only gets the searcher
+     * Get an initialised searcher for the store and transaction Normally we do
+     * not search against a a store and delta. Currently only gets the searcher
      * against the main index.
      * 
      * @param storeRef
@@ -161,7 +154,8 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
     {
         SearchParameters sp = new SearchParameters();
         sp.addStore(store);
-        sp.setQuery(language, queryString);
+        sp.setLanguage(language);
+        sp.setQuery(queryString);
         if (queryOptions != null)
         {
             for (Path path : queryOptions)
@@ -207,7 +201,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 parameterisedQueryString = searchParameters.getQuery();
             }
 
-            if (searchParameters.getLanguage().equalsIgnoreCase(LUCENE))
+            if (searchParameters.getLanguage().equalsIgnoreCase(SearchService.LANGUAGE_LUCENE))
             {
                 try
                 {
@@ -245,7 +239,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     throw new SearcherException("IO exception during search", e);
                 }
             }
-            else if (searchParameters.getLanguage().equalsIgnoreCase(XPATH))
+            else if (searchParameters.getLanguage().equalsIgnoreCase(SearchService.LANGUAGE_XPATH))
             {
                 try
                 {
@@ -458,19 +452,19 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
     /**
      * @see org.alfresco.repo.search.impl.NodeSearcher
      */
-    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks, String language) throws InvalidNodeRefException, XPathException
     {
         NodeSearcher nodeSearcher = new NodeSearcher(nodeService, dictionaryService, this);
-        return nodeSearcher.selectNodes(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+        return nodeSearcher.selectNodes(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks, language);
     }
 
     /**
      * @see org.alfresco.repo.search.impl.NodeSearcher
      */
-    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks, String language) throws InvalidNodeRefException, XPathException
     {
         NodeSearcher nodeSearcher = new NodeSearcher(nodeService, dictionaryService, this);
-        return nodeSearcher.selectProperties(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks);
+        return nodeSearcher.selectProperties(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks, language);
     }
 
     /**
@@ -579,5 +573,21 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 return propertyString.toLowerCase().matches(pattern);
             }
         }
+    }
+    
+    public List<NodeRef> selectNodes(NodeRef contextNodeRef, String xpath, QueryParameterDefinition[] parameters,
+            NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks)
+            throws InvalidNodeRefException, XPathException
+    {
+        return selectNodes(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks,
+                SearchService.LANGUAGE_XPATH);
+    }
+
+    public List<Serializable> selectProperties(NodeRef contextNodeRef, String xpath,
+            QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver,
+            boolean followAllParentLinks) throws InvalidNodeRefException, XPathException
+    {
+        return selectProperties(contextNodeRef, xpath, parameters, namespacePrefixResolver, followAllParentLinks,
+                SearchService.LANGUAGE_XPATH);
     }
 }

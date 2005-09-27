@@ -200,7 +200,8 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             String changeTxnId = iterator.next();
             // search for it
             String query = "TX:\"" + changeTxnId + "\"";
-            sp.setQuery("lucene", query);
+            sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+            sp.setQuery(query);
             ResultSet results = searcher.query(sp);
             // did the index have any of these changes?
             if (results.length() > 0)

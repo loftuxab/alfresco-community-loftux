@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -44,11 +45,15 @@ import org.jaxen.XPath;
  * 
  * This allows simple path navigation and much more.
  * 
- * @author andyh
+ * @author Andy Hind
  * 
  */
 public class DocumentNavigator extends DefaultNavigator
 {
+    private static QName JCR_ROOT = QName.createQName("http://www.jcp.org/jcr/1.0", "root");
+    
+    private static QName JCR_PRIMARY_TYPE = QName.createQName("http://www.jcp.org/jcr/1.0", "primaryType");
+    
     private static final long serialVersionUID = 3618984485740165427L;
 
     private DictionaryService dictionaryService;
@@ -77,6 +82,7 @@ public class DocumentNavigator extends DefaultNavigator
         }
     }
 
+   
     public class Namespace
     {
         public final String prefix;
@@ -89,8 +95,30 @@ public class DocumentNavigator extends DefaultNavigator
             this.uri = uri;
         }
     }
+    
+    public class JCRRootNodeChildAssociationRef extends ChildAssociationRef
+    {
+
+        /**
+         * Comment for <code>serialVersionUID</code>
+         */
+        private static final long serialVersionUID = -3890194577752476675L;
+
+        public JCRRootNodeChildAssociationRef(QName assocTypeQName, NodeRef parentRef, QName childQName, NodeRef childRef)
+        {
+            super(assocTypeQName, parentRef, childQName, childRef);
+        }
+        
+        public JCRRootNodeChildAssociationRef(QName assocTypeQName, NodeRef parentRef, QName childQName, NodeRef childRef, boolean isPrimary, int nthSibling)
+        {
+            super(assocTypeQName, parentRef, childQName, childRef, isPrimary, nthSibling);
+        }
+        
+    }
 
     private boolean followAllParentLinks;
+    
+    private boolean useJCRRootNode;
 
     /**
      * @param dictionaryService
@@ -109,7 +137,7 @@ public class DocumentNavigator extends DefaultNavigator
      *            parent-child association should be traversed
      */
     public DocumentNavigator(DictionaryService dictionaryService, NodeService nodeService, SearchService searchService,
-            NamespacePrefixResolver nspr, boolean followAllParentLinks)
+            NamespacePrefixResolver nspr, boolean followAllParentLinks, boolean useJCRRootNode)
     {
         super();
         this.dictionaryService = dictionaryService;
@@ -117,7 +145,17 @@ public class DocumentNavigator extends DefaultNavigator
         this.searchService = searchService;
         this.nspr = nspr;
         this.followAllParentLinks = followAllParentLinks;
+        this.useJCRRootNode = useJCRRootNode;
     }
+
+    
+    
+    public NamespacePrefixResolver getNamespacePrefixResolver()
+    {
+        return nspr;
+    }
+
+
 
     /**
      * Allow this to be set as it commonly changes from one search to the next
@@ -248,9 +286,12 @@ public class DocumentNavigator extends DefaultNavigator
         Map<QName, Serializable> map = nodeService.getProperties(nodeRef);
         for (QName qName : map.keySet())
         {
-            // Do not support multi value attributes - return the first
             Property property = new Property(qName, map.get(qName), nodeRef);
             properties.add(property);
+        }
+        if(useJCRRootNode)
+        {
+            properties.add(new Property(JCR_PRIMARY_TYPE, nodeService.getType(nodeRef), nodeRef));
         }
         return properties.iterator();
     }
@@ -260,7 +301,17 @@ public class DocumentNavigator extends DefaultNavigator
         // Iterator of ChildAxisRef
         ChildAssociationRef assocRef = (ChildAssociationRef) o;
         NodeRef childRef = assocRef.getChildRef();
-        List<ChildAssociationRef> list = nodeService.getChildAssocs(childRef);
+        List<ChildAssociationRef> list;
+        // Add compatability for JCR 170 by including the root node.
+        if(isDocument(o) && useJCRRootNode)
+        {
+            list = new ArrayList<ChildAssociationRef>(1);
+            list.add(new JCRRootNodeChildAssociationRef(ContentModel.ASSOC_CHILDREN, childRef, JCR_ROOT, childRef, true, 0));
+        }
+        else
+        {
+            list = nodeService.getChildAssocs(childRef);
+        }
         return list.iterator();
     }
 
@@ -299,10 +350,10 @@ public class DocumentNavigator extends DefaultNavigator
                 }
             }
         }
-        if(o instanceof Property)
+        if (o instanceof Property)
         {
-            Property p = (Property)o;
-            parents.add(nodeService.getPrimaryParent(p.parent));   
+            Property p = (Property) o;
+            parents.add(nodeService.getPrimaryParent(p.parent));
         }
         return parents.iterator();
     }

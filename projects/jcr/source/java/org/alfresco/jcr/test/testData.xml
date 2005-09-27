@@ -42,6 +42,21 @@
 			<cm:contentUrl>org/alfresco/jcr/test/testContent.txt</cm:contentUrl>
           </cm:content>
           
+          <!-- Query -->
+          
+          <jcrtest:testtype view:childName="query">
+             <jcrtest:children>
+                <jcrtest:testtype view:childName="one"/>
+                <jcrtest:testtype view:childName="two"/>
+                <jcrtest:testtype view:childName="three"/>
+                <jcrtest:testtype view:childName="four"/>
+                <jcrtest:testtype view:childName="node1"/>
+                <jcrtest:testtype view:childName="node1"/>
+                <jcrtest:testtype view:childName="node1"/>
+                <jcrtest:testtype view:childName="node1"/>
+             </jcrtest:children>
+          </jcrtest:testtype>
+          
        </jcrtest:children>
 	</jcrtest:testtype>
 

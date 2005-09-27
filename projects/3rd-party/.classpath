@@ -44,11 +44,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-2.5.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/acegi-security-0.8.2.jar"/>
+	<classpathentry exported="true" sourcepath="W:/acegi-security-0.8.2" kind="lib" path="lib/acegi-security-0.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cryptix-jce-provider.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.5H3.jar"/>
 	<classpathentry exported="true" sourcepath="src/axis_src.zip" kind="lib" path="lib/axis.jar"/>
@@ -77,5 +76,6 @@
 	<classpathentry exported="true" sourcepath="W:/freemarker-2.3.3/src" kind="lib" path="lib/freemarker.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-nodep-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.jar"/>
+	<classpathentry exported="true" sourcepath="/Jaxen" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

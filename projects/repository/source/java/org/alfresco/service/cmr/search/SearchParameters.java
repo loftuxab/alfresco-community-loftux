@@ -25,13 +25,11 @@ import org.alfresco.service.cmr.repository.StoreRef;
  * This class provides parameters to define a lucene search
  * 
  * 
- * @author andyh
+ * @author Andy Hind
  */
-public class SearchParameters
+public class SearchParameters extends SearchStatement
 {
     private ArrayList<StoreRef> stores = new ArrayList<StoreRef>(1);
-    private String language;
-    private String query;
     private ArrayList<Path> attributePaths = new ArrayList<Path>(1);
     private ArrayList<QueryParameterDefinition> queryParameterDefinitions = new ArrayList<QueryParameterDefinition>(1);
     private boolean excludeDataInTheCurrentTransaction = false;
@@ -43,7 +41,7 @@ public class SearchParameters
     }
 
     /**
-     * Set the stores to be suported - currently there can be only one 
+     * Set the stores to be supported - currently there can be only one 
      * 
      * @param store
      */
@@ -54,18 +52,6 @@ public class SearchParameters
             throw new IllegalStateException("At the moment, there can only be one store set for the search");
         }
         stores.add(store);
-    }
-    
-    /**
-     * Set the query language and query string
-     * 
-     * @param language
-     * @param query
-     */
-    public void setQuery(String language, String query)
-    {
-        this.language = language;
-        this.query = query;
     }
     
     /**
@@ -156,16 +142,6 @@ public class SearchParameters
     public boolean excludeDataInTheCurrentTransaction()
     {
         return excludeDataInTheCurrentTransaction;
-    }
-
-    public String getLanguage()
-    {
-        return language;
-    }
-
-    public String getQuery()
-    {
-        return query;
     }
 
     public ArrayList<QueryParameterDefinition> getQueryParameterDefinitions()
