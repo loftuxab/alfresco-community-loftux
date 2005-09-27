@@ -69,6 +69,10 @@
          <property-name>contentDiskDriver</property-name>
          <value>#{contentDiskDriver}</value>
       </managed-property>
+      <managed-property>
+         <property-name>configService</property-name>
+         <value>#{configService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

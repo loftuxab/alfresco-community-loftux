@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.CIFSServer;
 import org.alfresco.filesys.smb.server.repo.ContentDiskInterface;
@@ -42,10 +43,12 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.bean.wizard.NewSpaceWizard;
+import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
+import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.alfresco.web.ui.repo.component.shelf.UIShelf;
 import org.apache.log4j.Logger;
@@ -96,6 +99,14 @@ public class NavigationBean
    public void setContentDiskDriver(ContentDiskInterface contentDiskDriver)
    {
       this.contentDiskDriver = contentDiskDriver;
+   }
+   
+   /**
+    * @param configService The ConfigService to set.
+    */
+   public void setConfigService(ConfigService configService)
+   {
+      this.configService = configService;
    }
    
    /**
@@ -156,6 +167,26 @@ public class NavigationBean
    public void setToolbarLocation(String toolbarLocation)
    {
       this.toolbarLocation = toolbarLocation;
+   }
+   
+   /**
+    * @return Returns the helpUrl.
+    */
+   public String getHelpUrl()
+   {
+      if (this.clientConfig == null)
+      {
+         initFromClientConfig();
+      }
+      return this.helpUrl;
+   }
+
+   /**
+    * @param helpUrl The helpUrl to set.
+    */
+   public void setHelpUrl(String helpUrl)
+   {
+      this.helpUrl = helpUrl;
    }
    
    /**
@@ -394,6 +425,20 @@ public class NavigationBean
    // ------------------------------------------------------------------------------
    // Private helpers
    
+   /**
+    * Initialise default values from client configuration
+    */
+   private void initFromClientConfig()
+   {
+      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
+            ClientConfigElement.CONFIG_ELEMENT_ID);
+      
+      this.helpUrl = clientConfig.getHelpUrl();
+   }
+   
+   /**
+    * @return CIFS server path as network style string label
+    */
    private String getCIFSServerPath()
    {
       if (this.cifsServerPath == null)
@@ -501,6 +546,12 @@ public class NavigationBean
    /** CIFS content disk driver bean reference */
    private ContentDiskInterface contentDiskDriver;
    
+   /** ConfigService bean reference */
+   private ConfigService configService;
+   
+   /** Client configuration object */
+   private ClientConfigElement clientConfig = null;
+   
    /** Cached path to our CIFS server and top level node DIR */
    private String cifsServerPath;
    
@@ -527,4 +578,7 @@ public class NavigationBean
    
    /** list of the breadcrumb handler elements representing the location path of the UI */
    private List<IBreadcrumbHandler> location = null;
+   
+   /** The client Help file url */
+   private String helpUrl;
 }

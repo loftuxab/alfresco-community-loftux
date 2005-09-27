@@ -40,7 +40,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    private int iconsPageSize = 9;
    private String defaultView = "list";
    private int recentSpacesItems = 6;
-   private boolean unicodeFont = false;
+   private String helpUrl = null;
    private Map<String, String> localeMap = new HashMap<String, String>();
    private List<String> languages = new ArrayList<String>(8);
    private Map<String, String> processors = new HashMap<String, String>();
@@ -82,7 +82,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    /**
     * @param defaultView The defaultView to set.
     */
-   public void setDefaultView(String defaultView)
+   /*package*/ void setDefaultView(String defaultView)
    {
       this.defaultView = defaultView;
    }
@@ -98,7 +98,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    /**
     * @param detailsPageSize The detailsPageSize to set.
     */
-   public void setDetailsPageSize(int detailsPageSize)
+   /*package*/ void setDetailsPageSize(int detailsPageSize)
    {
       this.detailsPageSize = detailsPageSize;
    }
@@ -114,7 +114,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    /**
     * @param iconsPageSize The iconsPageSize to set.
     */
-   public void setIconsPageSize(int iconsPageSize)
+   /*package*/ void setIconsPageSize(int iconsPageSize)
    {
       this.iconsPageSize = iconsPageSize;
    }
@@ -130,7 +130,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    /**
     * @param listPageSize The listPageSize to set.
     */
-   public void setListPageSize(int listPageSize)
+   /*package*/ void setListPageSize(int listPageSize)
    {
       this.listPageSize = listPageSize;
    }
@@ -146,7 +146,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    /**
     * @param recentSpacesItems The recentSpacesItems to set.
     */
-   public void setRecentSpacesItems(int recentSpacesItems)
+   /*package*/ void setRecentSpacesItems(int recentSpacesItems)
    {
       this.recentSpacesItems = recentSpacesItems;
    }
@@ -202,5 +202,21 @@ public class ClientConfigElement extends ConfigElementAdapter
    public String getTemplateProcessor(String name)
    {
       return this.processors.get(name);
+   }
+
+   /**
+    * @return Returns the help Url.
+    */
+   public String getHelpUrl()
+   {
+      return this.helpUrl;
+   }
+
+   /**
+    * @param helpUrl The help Url to set.
+    */
+   /*package*/ void setHelpUrl(String helpUrl)
+   {
+      this.helpUrl = helpUrl;
    }
 }

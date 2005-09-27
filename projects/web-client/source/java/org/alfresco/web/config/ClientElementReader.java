@@ -43,6 +43,7 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_TEMPLATES = "templates";
    public static final String ELEMENT_ENGINE = "engine";
    public static final String ATTRIBUTE_NAME = "name";
+   public static final String ELEMENT_HELPURL = "help-url";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -141,6 +142,13 @@ public class ClientElementReader implements ConfigElementReader
          if (recentSpaces != null)
          {
             configElement.setRecentSpacesItems(Integer.parseInt(recentSpaces.getTextTrim()));
+         }
+         
+         // get the Help url
+         Element helpUrl = element.element(ELEMENT_HELPURL);
+         if (helpUrl != null)
+         {
+            configElement.setHelpUrl(helpUrl.getTextTrim());
          }
       }
       

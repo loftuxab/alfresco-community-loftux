@@ -36,7 +36,7 @@
          <initial-password>admin</initial-password>
       </admin>
       <client>
-         <!-- specifies the list of available language files -->
+         <!-- the list of available language files -->
          <languages>
             <language locale="en_US">English</language>
             <!-- <language locale="fr_FR">French</language> -->
@@ -44,19 +44,22 @@
             <!-- <language locale="ja_JP">Japanese</language> -->
          </languages>
          
-         <!-- specifies the maximum page size for each view mode in the browse screen -->
+         <!-- the maximum page size for each view mode in the browse screen -->
          <page-size>
             <list>10</list>
             <details>10</details>
             <icons>9</icons>
          </page-size>
          
-         <!-- specifies the default view mode in the browse screen -->
+         <!-- the default view mode in the browse screen -->
          <!-- can be: list|details|icons -->
          <default-view>list</default-view>
          
-         <!-- specified the maximum number of items to show in the recent spaces shelf component -->
+         <!-- the maximum number of items to show in the recent spaces shelf component -->
          <recent-spaces-items>6</recent-spaces-items>
+         
+         <!-- the URL to the client Help file -->
+         <help-url>http://www.alfresco.org/mediawiki/index.php/Client_Help</help-url>
          
          <!-- list of template engine implementations -->
          <templates>
