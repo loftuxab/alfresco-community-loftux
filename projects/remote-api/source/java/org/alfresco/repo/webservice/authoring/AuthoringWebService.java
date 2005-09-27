@@ -431,7 +431,7 @@ public class AuthoringWebService extends AbstractWebService implements
                             for (NodeRef node : nodes)
                             {
                                 LockType convertedLockType = convertToLockType(lockType);
-                                AuthoringWebService.this.lockService.lock(node, user, convertedLockType, lockChildren);
+                                AuthoringWebService.this.lockService.lock(node, user, convertedLockType, 0, lockChildren);
                                 result[iIndex] = Utils.convertToReference(node);
                                 iIndex++;
                             }                        
