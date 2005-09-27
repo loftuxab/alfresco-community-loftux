@@ -17,7 +17,9 @@
 package org.alfresco.repo.lock;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -141,13 +143,20 @@ public class LockServiceImpl implements LockService
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
                 ContentModel.ASPECT_LOCKABLE, new JavaBehaviour(this, "onCreateVersion"));
     }
-
+    
     /**
-     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef,
-     *      java.lang.String, LockType)
+     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.service.cmr.lock.LockType)
      */
     public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType)
-            throws UnableToAquireLockException
+    {
+        // Lock with no expiration
+        lock(nodeRef, userName, lockType, 0);
+    }
+
+    /**
+     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.service.cmr.lock.LockType, int)
+     */
+    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType, int timeToExpire)
     {
         // Check for lock aspect
         checkForLockApsect(nodeRef);
@@ -164,15 +173,19 @@ public class LockServiceImpl implements LockService
             // Error since we are trying to lock a locked node
             throw new UnableToAquireLockException(nodeRef);
         }
-        else if (LockStatus.NO_LOCK.equals(currentLockStatus) == true)
+        else if (LockStatus.NO_LOCK.equals(currentLockStatus) == true || 
+                 LockStatus.LOCK_EXPIRED.equals(currentLockStatus) == true ||
+                 LockStatus.LOCK_OWNER.equals(currentLockStatus) == true)
         {
             this.ignoreNodeRefs.add(nodeRef);
             try
             {
                 // Set the current user as the lock owner
                 this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_OWNER, userName);
-                this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_TYPE, lockType.toString());
-            } finally
+                this.nodeService.setProperty(nodeRef, ContentModel.PROP_LOCK_TYPE, lockType.toString());                
+                setExpiryDate(nodeRef, timeToExpire);
+            } 
+            finally
             {
                 this.ignoreNodeRefs.remove(nodeRef);
             }
@@ -180,37 +193,57 @@ public class LockServiceImpl implements LockService
     }
 
     /**
-     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef,
-     *      java.lang.String, LockType, boolean)
+     * Helper method to set the expiry date based on the time to expire provided
+     * 
+     * @param nodeRef       the node reference
+     * @param timeToExpire  the time to expire (in seconds)
      */
-    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType, boolean lockChildren)
+    private void setExpiryDate(NodeRef nodeRef, int timeToExpire)
+    {
+        // Set the expiry date
+        Date expiryDate = null;
+        if (timeToExpire > 0)
+        {
+            expiryDate = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(expiryDate);
+            calendar.add(Calendar.SECOND, timeToExpire);
+            expiryDate = calendar.getTime();
+        }
+        
+        this.nodeService.setProperty(nodeRef, ContentModel.PROP_EXPIRY_DATE, expiryDate);
+    }
+
+    /**
+     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.service.cmr.lock.LockType, int, boolean)
+     */
+    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType, int timeToExpire, boolean lockChildren)
             throws UnableToAquireLockException
     {
-        lock(nodeRef, userName, lockType);
+        lock(nodeRef, userName, lockType, timeToExpire);
 
         if (lockChildren == true)
         {
             Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
             for (ChildAssociationRef childAssocRef : childAssocRefs)
             {
-                lock(childAssocRef.getChildRef(), userName, lockType, lockChildren);
+                lock(childAssocRef.getChildRef(), userName, lockType, timeToExpire, lockChildren);
             }
         }
     }
 
     /**
-     * @see org.alfresco.service.cmr.lock.LockService#lock(java.util.Collection,
-     *      java.lang.String, LockType)
+     * @see org.alfresco.service.cmr.lock.LockService#lock(java.util.Collection, java.lang.String, org.alfresco.service.cmr.lock.LockType, int)
      */
-    public synchronized void lock(Collection<NodeRef> nodeRefs, String userName, LockType lockType)
+    public synchronized void lock(Collection<NodeRef> nodeRefs, String userName, LockType lockType, int timeToExpire)
             throws UnableToAquireLockException
     {
         // Lock each of the specifed nodes
         for (NodeRef nodeRef : nodeRefs)
         {
-            lock(nodeRef, userName, lockType);
+            lock(nodeRef, userName, lockType, timeToExpire);
         }
-    }
+    }    
 
     /**
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String)
@@ -297,19 +330,27 @@ public class LockServiceImpl implements LockService
             String currentUserRef = (String) this.nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_OWNER);
             String owner = ownableService.getOwner(nodeRef);
             if (currentUserRef != null)
-
             {
-                if (currentUserRef.equals(userName) == true)
+                Date expiryDate = (Date)this.nodeService.getProperty(nodeRef, ContentModel.PROP_EXPIRY_DATE);
+                if (expiryDate != null && expiryDate.before(new Date()) == true)
                 {
-                    result = LockStatus.LOCK_OWNER;
-                }
-                else if ((owner != null) && owner.equals(userName))
-                {
-                    result = LockStatus.LOCK_OWNER;
+                    // Indicate that the lock has expired
+                    result = LockStatus.LOCK_EXPIRED;
                 }
                 else
                 {
-                    result = LockStatus.LOCKED;
+                    if (currentUserRef.equals(userName) == true)
+                    {
+                        result = LockStatus.LOCK_OWNER;
+                    }
+                    else if ((owner != null) && owner.equals(userName))
+                    {
+                        result = LockStatus.LOCK_OWNER;
+                    }
+                    else
+                    {
+                        result = LockStatus.LOCKED;
+                    }
                 }
             }
 
@@ -373,20 +414,19 @@ public class LockServiceImpl implements LockService
             {
                 try
                 {
-                    LockType lockType = getLockType(nodeRef);
-                    if (LockType.WRITE_LOCK.equals(lockType) == true)
-                    {
-                        // Get the current lock status on the node ref
-                        LockStatus currentLockStatus = getLockStatus(nodeRef, userName);
+                    // Get the current lock status on the node ref
+                    LockStatus currentLockStatus = getLockStatus(nodeRef, userName);
 
-                        if (LockStatus.LOCKED.equals(currentLockStatus) == true)
-                        {
-                            // Error since we are trying to preform an operation
-                            // on a locked node
-                            throw new NodeLockedException(nodeRef);
-                        }
+                    LockType lockType = getLockType(nodeRef);
+                    if (LockType.WRITE_LOCK.equals(lockType) == true && 
+                        LockStatus.LOCKED.equals(currentLockStatus) == true)
+                    {
+                        // Error since we are trying to preform an operation
+                        // on a locked node
+                        throw new NodeLockedException(nodeRef);
                     }
-                    else if (LockType.READ_ONLY_LOCK.equals(lockType) == true)
+                    else if (LockType.READ_ONLY_LOCK.equals(lockType) == true &&
+                             (LockStatus.LOCKED.equals(currentLockStatus) == true || LockStatus.LOCK_OWNER.equals(currentLockStatus) == true))
                     {
                         // Error since there is a read only lock on this object
                         // and all

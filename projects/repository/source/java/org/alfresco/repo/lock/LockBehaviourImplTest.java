@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.lock.NodeLockedException;
@@ -56,11 +55,6 @@ public class LockBehaviourImplTest extends BaseSpringTest
      * The node service
      */
     private NodeService nodeService;
-    
-    /**
-     * Service registry
-     */
-    private ServiceRegistry serviceRegistry;
 
     /**
      * The authentication service
@@ -98,7 +92,6 @@ public class LockBehaviourImplTest extends BaseSpringTest
         this.lockService = (LockService)applicationContext.getBean("lockService");
 		this.versionService = (VersionService)applicationContext.getBean("versionService");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
-        this.serviceRegistry = (ServiceRegistry)applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
         
         // Create the node properties
         HashMap<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
@@ -241,6 +234,25 @@ public class LockBehaviourImplTest extends BaseSpringTest
             // Correct behaviour
         }
     }
+    
+    public void testCheckForLockWhenExpired()
+    {
+        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.READ_ONLY_LOCK, 1);        
+        try 
+        {
+            this.lockService.checkForLockWithUser(this.nodeRef, this.goodUserNodeRef);    
+            fail("Should be locked.");
+        }
+        catch (NodeLockedException e)
+        {
+            // Expected
+        }
+        
+        try {Thread.sleep(2*1000); } catch (Exception e) {};
+        
+        // Should now have expired so the node should no longer appear to be locked
+        this.lockService.checkForLockWithUser(this.nodeRef, this.goodUserNodeRef);
+    }
 	
     /**
      * Test version service lock checking
@@ -308,6 +320,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 	 * Test that the node service lock behaviour is as we expect
 	 *
 	 */
+    @SuppressWarnings("unused")
 	public void testNodeServiceLockBehaviour()
 	{
 		// Check that we can create a new node and set of it properties when no lock is present
@@ -316,7 +329,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 				ContentModel.ASSOC_CONTAINS,
 				QName.createQName("{test}nodeServiceLockTest"),
 				ContentModel.TYPE_CONTAINER);
-		NodeRef nodeRef = childAssocRef.getChildRef();
+		 NodeRef nodeRef = childAssocRef.getChildRef();
 		
 		// Lets lock the parent node and check that whether we can still create a new node
 		this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.WRITE_LOCK);

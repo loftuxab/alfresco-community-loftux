@@ -226,6 +226,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     /**
      * Test revert
      */
+    @SuppressWarnings("unused")
     public void testRevert()
     {
     	// Create a versionable node

@@ -38,6 +38,8 @@ public class NodeLockedException extends AlfrescoRuntimeException
      */
     private static final String ERROR_MESSAGE = "Can not perform operation since " +
             "the node (id:{0}) is locked by another user.";
+    private static final String ERROR_MESSAGE_2 = "Can not perform operation {0} since " +
+    "the node (id:{1}) is locked by another user.";
 
     /**
      * @param message
@@ -46,4 +48,9 @@ public class NodeLockedException extends AlfrescoRuntimeException
     {
         super(MessageFormat.format(ERROR_MESSAGE, new Object[]{nodeRef.getId()}));
     }   
+    
+    public NodeLockedException(NodeRef nodeRef, String operation)
+    {
+        super(MessageFormat.format(ERROR_MESSAGE_2, new Object[]{operation, nodeRef.getId()}));
+    }
 }

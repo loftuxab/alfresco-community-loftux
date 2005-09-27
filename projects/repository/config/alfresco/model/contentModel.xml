@@ -490,6 +490,11 @@
                <type>d:text</type>
                <protected>true</protected>
             </property>
+            <property name="cm:expiryDate">
+               <type>d:date</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+            </property>
             <property name="cm:lockIsDeep">
                <type>d:boolean</type>
                <protected>true</protected>

@@ -25,11 +25,9 @@ import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.lock.UnableToAquireLockException;
 import org.alfresco.service.cmr.lock.UnableToReleaseLockException;
-import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
@@ -61,8 +59,8 @@ public class LockServiceImplTest extends BaseSpringTest
     private static final String BAD_USER_NAME = "badUser";
     private static final String PWD = "password";
     
-    private String badUserNodeRef;
-    private String goodUserNodeRef;
+    private String badUserName;
+    private String goodUserName;
 
     /**
      * Called during the transaction setup
@@ -129,9 +127,9 @@ public class LockServiceImplTest extends BaseSpringTest
         
         // Stash the user node ref's for later use
         TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.badUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);
+        this.badUserName = TestWithUserUtils.getCurrentUser(this.authenticationService);
         TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.goodUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);  
+        this.goodUserName = TestWithUserUtils.getCurrentUser(this.authenticationService);  
     }
     
     /**
@@ -142,22 +140,22 @@ public class LockServiceImplTest extends BaseSpringTest
         // Check that the node is not currently locked
         assertEquals(
                 LockStatus.NO_LOCK, 
-                this.lockService.getLockStatus(this.parentNode, this.goodUserNodeRef));
+                this.lockService.getLockStatus(this.parentNode, this.goodUserName));
  
         
         // Test valid lock
-        this.lockService.lock(this.parentNode, this.goodUserNodeRef, LockType.WRITE_LOCK);
+        this.lockService.lock(this.parentNode, this.goodUserName, LockType.WRITE_LOCK);
         assertEquals(
                 LockStatus.LOCK_OWNER, 
-                this.lockService.getLockStatus(this.parentNode, this.goodUserNodeRef));
+                this.lockService.getLockStatus(this.parentNode, this.goodUserName));
         assertEquals(
                 LockStatus.LOCKED,
-                this.lockService.getLockStatus(this.parentNode, this.badUserNodeRef));
+                this.lockService.getLockStatus(this.parentNode, this.badUserName));
      
         // Test lock when already locked
         try
         {
-            this.lockService.lock(this.parentNode, this.badUserNodeRef, LockType.WRITE_LOCK);
+            this.lockService.lock(this.parentNode, this.badUserName, LockType.WRITE_LOCK);
             fail("The user should not be able to lock the node since it is already locked by another user.");
         }
         catch (UnableToAquireLockException exception)
@@ -167,7 +165,7 @@ public class LockServiceImplTest extends BaseSpringTest
         // Test already locked by this user
         try
         {
-            this.lockService.lock(this.parentNode, this.goodUserNodeRef, LockType.WRITE_LOCK);
+            this.lockService.lock(this.parentNode, this.goodUserName, LockType.WRITE_LOCK);
         }
         catch (Exception exception)
         {
@@ -175,7 +173,7 @@ public class LockServiceImplTest extends BaseSpringTest
         }
         
         // Test with no apect node
-        this.lockService.lock(this.noAspectNode, this.goodUserNodeRef, LockType.WRITE_LOCK);        
+        this.lockService.lock(this.noAspectNode, this.goodUserName, LockType.WRITE_LOCK);        
     }
 
     /**
@@ -205,7 +203,7 @@ public class LockServiceImplTest extends BaseSpringTest
         // Try and unlock a locked node
         try
         {
-            this.lockService.unlock(this.parentNode, this.badUserNodeRef);
+            this.lockService.unlock(this.parentNode, this.badUserName);
             fail("A user cannot unlock a node that is currently lock by another user.");
         }
         catch (UnableToReleaseLockException exception)
@@ -213,18 +211,18 @@ public class LockServiceImplTest extends BaseSpringTest
         }
         
         // Unlock the node
-        this.lockService.unlock(this.parentNode, this.goodUserNodeRef);
+        this.lockService.unlock(this.parentNode, this.goodUserName);
         assertEquals(
                 LockStatus.NO_LOCK,
-                this.lockService.getLockStatus(this.parentNode, this.goodUserNodeRef));
+                this.lockService.getLockStatus(this.parentNode, this.goodUserName));
         assertEquals(
                 LockStatus.NO_LOCK,
-                this.lockService.getLockStatus(this.parentNode, this.badUserNodeRef));
+                this.lockService.getLockStatus(this.parentNode, this.badUserName));
         
         // Try and unlock node with no lock
         try
         {
-            this.lockService.unlock(this.parentNode, this.goodUserNodeRef);
+            this.lockService.unlock(this.parentNode, this.goodUserName);
         }
         catch (Exception exception)
         {
@@ -232,7 +230,7 @@ public class LockServiceImplTest extends BaseSpringTest
         }
         
         // Test with no apect node
-        this.lockService.unlock(this.noAspectNode, this.goodUserNodeRef);
+        this.lockService.unlock(this.noAspectNode, this.goodUserName);
     }
     
     // TODO
@@ -251,22 +249,22 @@ public class LockServiceImplTest extends BaseSpringTest
     public void testGetLockStatus()
     {
         // Check an unlocked node
-        LockStatus lockStatus1 = this.lockService.getLockStatus(this.parentNode, this.goodUserNodeRef);
+        LockStatus lockStatus1 = this.lockService.getLockStatus(this.parentNode, this.goodUserName);
         assertEquals(LockStatus.NO_LOCK, lockStatus1);
         
         // Simulate the node being locked by user1
-        this.nodeService.setProperty(this.parentNode, ContentModel.PROP_LOCK_OWNER, this.goodUserNodeRef);
+        this.nodeService.setProperty(this.parentNode, ContentModel.PROP_LOCK_OWNER, this.goodUserName);
         
         // Check for locked status
-        LockStatus lockStatus2 = this.lockService.getLockStatus(this.parentNode, this.badUserNodeRef);
+        LockStatus lockStatus2 = this.lockService.getLockStatus(this.parentNode, this.badUserName);
         assertEquals(LockStatus.LOCKED, lockStatus2);
         
         // Check for lock owner status
-        LockStatus lockStatus3 = this.lockService.getLockStatus(this.parentNode, this.goodUserNodeRef);
+        LockStatus lockStatus3 = this.lockService.getLockStatus(this.parentNode, this.goodUserName);
         assertEquals(LockStatus.LOCK_OWNER, lockStatus3);
                 
         // Test with no apect node
-        this.lockService.getLockStatus(this.noAspectNode, this.goodUserNodeRef);
+        this.lockService.getLockStatus(this.noAspectNode, this.goodUserName);
         
         // Test method overload
         LockStatus lockStatus4 = this.lockService.getLockStatus(this.parentNode); 
@@ -283,23 +281,57 @@ public class LockServiceImplTest extends BaseSpringTest
         assertNull(lockType1);
         
         // Lock the object for writing
-        this.lockService.lock(this.parentNode, this.goodUserNodeRef, LockType.WRITE_LOCK);
+        this.lockService.lock(this.parentNode, this.goodUserName, LockType.WRITE_LOCK);
         LockType lockType2 = this.lockService.getLockType(this.parentNode);
         assertNotNull(lockType2);               
         assertEquals(LockType.WRITE_LOCK, lockType2);
         
         // Unlock the node
-        this.lockService.unlock(this.parentNode, this.goodUserNodeRef);
+        this.lockService.unlock(this.parentNode, this.goodUserName);
         LockType lockType3 = this.lockService.getLockType(this.parentNode);
         assertNull(lockType3);
         
         // Lock the object for read only
-        this.lockService.lock(this.parentNode, this.goodUserNodeRef, LockType.READ_ONLY_LOCK);
+        this.lockService.lock(this.parentNode, this.goodUserName, LockType.READ_ONLY_LOCK);
         LockType lockType4 = this.lockService.getLockType(this.parentNode);
         assertNotNull(lockType4);
         assertEquals(LockType.READ_ONLY_LOCK, lockType4);
         
         // Test with no apect node
         this.lockService.getLockType(this.noAspectNode);
+    }
+    
+    public void testTimeToExpire()
+    {
+        this.lockService.lock(this.parentNode, this.goodUserName, LockType.WRITE_LOCK, 1);
+        assertEquals(LockStatus.LOCK_OWNER, this.lockService.getLockStatus(this.parentNode, this.goodUserName));
+        assertEquals(LockStatus.LOCKED, this.lockService.getLockStatus(this.parentNode, this.badUserName));
+        
+        // Wait for 2 second before re-testing the status
+        try {Thread.sleep(2*1000);} catch (Exception exception){};
+        
+        assertEquals(LockStatus.LOCK_EXPIRED, this.lockService.getLockStatus(this.parentNode, this.goodUserName));
+        assertEquals(LockStatus.LOCK_EXPIRED, this.lockService.getLockStatus(this.parentNode, this.badUserName));
+        
+        // Re-lock and then update the time to expire before lock expires
+        this.lockService.lock(this.parentNode, this.goodUserName, LockType.WRITE_LOCK, 0);
+        try
+        {
+            this.lockService.lock(this.parentNode, this.badUserName, LockType.WRITE_LOCK, 1);
+            fail("Can not update lock info if not lock owner");
+        }
+        catch (UnableToAquireLockException exception)
+        {
+            // Expected
+        }
+        this.lockService.lock(this.parentNode, this.goodUserName, LockType.WRITE_LOCK, 1);
+        assertEquals(LockStatus.LOCK_OWNER, this.lockService.getLockStatus(this.parentNode, this.goodUserName));
+        assertEquals(LockStatus.LOCKED, this.lockService.getLockStatus(this.parentNode, this.badUserName));
+        
+        // Wait for 2 second before re-testing the status
+        try {Thread.sleep(2*1000);} catch (Exception exception){};
+        
+        assertEquals(LockStatus.LOCK_EXPIRED, this.lockService.getLockStatus(this.parentNode, this.goodUserName));
+        assertEquals(LockStatus.LOCK_EXPIRED, this.lockService.getLockStatus(this.parentNode, this.badUserName));
     }
 }
