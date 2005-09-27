@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
@@ -200,14 +201,23 @@ public class DefaultTypeConverter
             }
         });
         
-        INSTANCE.addConverter(String.class, NodeRef.class, new TypeConverter.Converter<String, NodeRef>()
+        INSTANCE.addConverter(String.class, ContentData.class, new TypeConverter.Converter<String, ContentData>()
         {
-            public NodeRef convert(String source)
+            public ContentData convert(String source)
             {
-                return new NodeRef(source);
+                return ContentData.createContentProperty(source);
             }
     
         });
+
+        INSTANCE.addConverter(String.class, NodeRef.class, new TypeConverter.Converter<String, NodeRef>()
+                {
+                    public NodeRef convert(String source)
+                    {
+                        return new NodeRef(source);
+                    }
+            
+                });
 
         INSTANCE.addConverter(String.class, InputStream.class, new TypeConverter.Converter<String, InputStream>()
         {
@@ -535,8 +545,22 @@ public class DefaultTypeConverter
                 return source.toString();
             }
         });
-
+        
         INSTANCE.addDynamicTwoStageConverter(NodeRef.class, String.class, InputStream.class);
+        
+        //
+        // ContentData
+        //
+
+        INSTANCE.addConverter(ContentData.class, String.class, new TypeConverter.Converter<ContentData, String>()
+        {
+            public String convert(ContentData source)
+            {
+                return source.toString();
+            }
+        });
+                
+        INSTANCE.addDynamicTwoStageConverter(ContentData.class, String.class, InputStream.class);
         
         //
         // Path

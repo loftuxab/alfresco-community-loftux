@@ -61,6 +61,13 @@ import org.alfresco.service.namespace.QName;
         }
     }
     
+    /**
+     * @see #getName()
+     */
+    public String toString()
+    {
+        return getName().toString();
+    }
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyTypeDefinition#getName()

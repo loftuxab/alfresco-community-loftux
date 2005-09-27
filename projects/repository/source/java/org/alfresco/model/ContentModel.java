@@ -68,9 +68,14 @@ public interface ContentModel
     
     // content type and aspect constants
     static final QName TYPE_CONTENT = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "content");
+    static final QName PROP_CONTENT = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "content");
+    @Deprecated
     static final QName PROP_CONTENT_URL = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "contentUrl");
+    @Deprecated
     static final QName PROP_MIME_TYPE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "mimetype");
+    @Deprecated
     static final QName PROP_ENCODING = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "encoding");
+    @Deprecated
     static final QName PROP_SIZE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "size");
     
     // title aspect

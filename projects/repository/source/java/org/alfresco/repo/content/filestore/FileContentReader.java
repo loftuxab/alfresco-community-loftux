@@ -86,7 +86,7 @@ public class FileContentReader extends AbstractContentReader implements RandomAc
     /**
      * @see File#length()
      */
-    public long getLength()
+    public long getSize()
     {
         if (!exists())
         {

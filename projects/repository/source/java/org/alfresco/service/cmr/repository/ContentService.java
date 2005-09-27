@@ -17,6 +17,7 @@
 package org.alfresco.service.cmr.repository;
 
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Provides methods for accessing and transforming content.
@@ -49,8 +50,25 @@ public interface ContentService
      *      or null if no content has been written for the node
      * @throws InvalidNodeRefException if the node doesn't exist
      * @throws InvalidTypeException if the node is not of type <b>content</b>
+     * 
+     * @deprecated
+     * @see #getReader(NodeRef, QName)
      */
+    @Deprecated
     public ContentReader getReader(NodeRef nodeRef)
+            throws InvalidNodeRefException, InvalidTypeException;
+    
+    /**
+     * Gets a reader for the content associated with the given node property.
+     * 
+     * @param nodeRef a reference to a node having a content property
+     * @param propertyQName the name of the property, which must be of type <b>content</b>
+     * @return Returns a reader for the content associated with the node property,
+     *      or null if no content has been written for the property
+     * @throws InvalidNodeRefException if the node doesn't exist
+     * @throws InvalidTypeException if the node is not of type <b>content</b>
+     */
+    public ContentReader getReader(NodeRef nodeRef, QName propertyQName)
             throws InvalidNodeRefException, InvalidTypeException;
 
 	/**
@@ -62,11 +80,36 @@ public interface ContentService
      * @param nodeRef a reference to a node.
      * @return Returns a writer for the content associated with the node.
      * @throws InvalidNodeRefException if the node doesn't exist
-     * @throws InvalidTypeException if the node is not of type <b>content</b>
+     * @throws InvalidTypeException if the node property is not of type <b>content</b>
+     * 
+     * @deprecated
+     * @see #getWriter(NodeRef, QName, boolean)
 	 */
-	public ContentWriter getWriter(NodeRef nodeRef)
-            throws InvalidNodeRefException, InvalidTypeException;
-	
+    @Deprecated
+    public ContentWriter getWriter(NodeRef nodeRef)
+    throws InvalidNodeRefException, InvalidTypeException;
+
+    /**
+     * Get a content writer for the given node property, choosing to optionally have
+     * the node property updated automatically when the content stream closes.
+     * <p>
+     * If the update flag is off, then the state of the node property will remain unchanged
+     * regardless of the state of the written binary data.  If the flag is on, then the node
+     * property will be updated on the same thread as the code that closed the write
+     * channel.
+     * 
+     * @param nodeRef a reference to a node having a content property
+     * @param propertyQName the name of the property, which must be of type <b>content</b>
+     * @param update true if the property must be updated atomically when the content write
+     *      stream is closed (attaches a listener to the stream); false if the client code
+     *      will perform the updates itself.
+     * @return Returns a writer for the content associated with the node property
+     * @throws InvalidNodeRefException if the node doesn't exist
+     * @throws InvalidTypeException if the node property is not of type <b>content</b>
+     */
+    public ContentWriter getWriter(NodeRef nodeRef, QName propertyQName, boolean update)
+                throws InvalidNodeRefException, InvalidTypeException;
+
     /**
      * Gets a writer for the content associated with the given node.
      * <p>
@@ -81,7 +124,11 @@ public interface ContentService
      * @return Returns a writer for the content associated with the node.
      * @throws InvalidNodeRefException if the node doesn't exist
      * @throws InvalidTypeException if the node is not of type <b>content</b>
+     * 
+     * @deprecated
+     * @see #getWriter(NodeRef, QName, boolean)
      */
+    @Deprecated
     public ContentWriter getUpdatingWriter(NodeRef nodeRef)
             throws InvalidNodeRefException, InvalidTypeException;
     
@@ -98,8 +145,8 @@ public interface ContentService
      * back out to the writer.
      * <p>
      * The mimetypes used for the transformation must be set both on
-     * the {@link Content#getMimetype() reader} and on the
-     * {@link Content#getMimetype() writer}.
+     * the {@link ContentAccessor#getMimetype() reader} and on the
+     * {@link ContentAccessor#getMimetype() writer}.
      * 
      * @param reader the source content location and mimetype
      * @param writer the target content location and mimetype
@@ -115,8 +162,8 @@ public interface ContentService
      * the reader and write the content back out to the writer.
      * <p>
      * The mimetypes used for the transformation must be set both on
-     * the {@link Content#getMimetype() reader} and on the
-     * {@link Content#getMimetype() writer}.
+     * the {@link ContentAccessor#getMimetype() reader} and on the
+     * {@link ContentAccessor#getMimetype() writer}.
      * 
      * @param reader the source content location and mimetype
      * @param writer the target content location and mimetype

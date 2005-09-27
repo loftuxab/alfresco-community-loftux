@@ -38,7 +38,7 @@ import java.nio.channels.ReadableByteChannel;
  * 
  * @author Derek Hulley
  */
-public interface ContentReader extends Content
+public interface ContentReader extends ContentAccessor
 {
     /**
      * Convenience method to get another reader onto the underlying content.
@@ -49,19 +49,11 @@ public interface ContentReader extends Content
     public ContentReader getReader() throws ContentIOException;
     
     /**
-     * Check if the {@link Content#getContentUrl() underlying content} is present.
+     * Check if the {@link ContentAccessor#getContentUrl() underlying content} is present.
      * 
      * @return Returns true if there is content at the URL refered to by this reader
      */
     public boolean exists();
-    
-    /**
-     * Gets the length of the content that this reader references.
-     * 
-     * @return Returns the document byte length, or <code>OL</code> if the
-     *      content doesn't {@link #exists() exist}.
-     */
-    public long getLength();
     
     /**
      * Gets the time of the last modification of the underlying content.
@@ -110,7 +102,7 @@ public interface ContentReader extends Content
      * All resources will be closed automatically.
      * <p>
      * Care must be taken that the bytes read from the stream are properly
-     * decoded according to the {@link Content#getEncoding() encoding}
+     * decoded according to the {@link ContentAccessor#getEncoding() encoding}
      * property.
      * 
      * @param os the stream to which to write the content
@@ -135,7 +127,7 @@ public interface ContentReader extends Content
     /**
      * Gets content from the repository direct to <code>String</code>.
      * <p>
-     * If the {@link Content#getEncoding() encoding } is known then it will be used
+     * If the {@link ContentAccessor#getEncoding() encoding } is known then it will be used
      * otherwise the default system <tt>byte[]</tt> to <tt>String</tt> conversion
      * will be used.
      * <p>
@@ -157,7 +149,7 @@ public interface ContentReader extends Content
      * Gets content from the repository direct to <code>String</code>, but limiting
      * the string size to a given number of characters.
      * <p>
-     * If the {@link Content#getEncoding() encoding } is known then it will be used
+     * If the {@link ContentAccessor#getEncoding() encoding } is known then it will be used
      * otherwise the default system <tt>byte[]</tt> to <tt>String</tt> conversion
      * will be used.
      * <p>

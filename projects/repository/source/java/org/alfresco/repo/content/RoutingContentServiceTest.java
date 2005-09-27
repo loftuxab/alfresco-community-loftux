@@ -18,12 +18,8 @@ package org.alfresco.repo.content;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.transaction.RollbackException;
-import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
@@ -31,6 +27,7 @@ import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -44,6 +41,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
+import org.alfresco.util.PropertyMap;
 
 /**
  * @see org.alfresco.repo.content.RoutingContentService
@@ -80,10 +78,12 @@ public class RoutingContentServiceTest extends BaseSpringTest
             storeRef = nodeService.createStore(storeRef.getProtocol(), storeRef.getIdentifier());
         }
         rootNodeRef = nodeService.getRootNode(storeRef);
-        // create a basic node and add the content aspect
-        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(7);
-        properties.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        properties.put(ContentModel.PROP_ENCODING, "UTF-16");
+        // create a content node
+        ContentData contentData = new ContentData(null, "text/plain", 0L, "UTF-16");
+        
+        PropertyMap properties = new PropertyMap();
+        properties.put(ContentModel.PROP_CONTENT, contentData);
+        
         ChildAssociationRef assocRef = nodeService.createNode(
                 rootNodeRef,
                 ContentModel.ASSOC_CHILDREN,
@@ -116,7 +116,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
     public void testAutoSettingOfProperties() throws Exception
     {
         // get a writer onto the node
-        ContentWriter writer = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         assertNotNull("Writer should not be null", writer);
         assertNotNull("Content URL should not be null", writer.getContentUrl());
         assertNotNull("Content mimetype should not be null", writer.getMimetype());
@@ -126,7 +126,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         writer.putContent(SOME_CONTENT);
         
         // get the reader
-        ContentReader reader = contentService.getReader(contentNodeRef);
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNotNull("Reader should not be null", reader);
         assertNotNull("Content URL should not be null", reader.getContentUrl());
         assertNotNull("Content mimetype should not be null", reader.getMimetype());
@@ -135,7 +135,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         // check that the content length is correct
         // - note encoding is important as we get the byte length
         long length = SOME_CONTENT.getBytes(reader.getEncoding()).length;  // ensures correct decoding
-        long checkLength = reader.getLength();
+        long checkLength = reader.getSize();
         assertEquals("Content length incorrect", length, checkLength);
 
         // check the content - the encoding will come into effect here
@@ -149,14 +149,14 @@ public class RoutingContentServiceTest extends BaseSpringTest
 	public void testSimpleWrite() throws Exception
 	{
 		// get a writer to an arbitrary node
-		ContentWriter writer = contentService.getWriter(contentNodeRef);   // no updating of URL
+		ContentWriter writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, false);   // no updating of URL
 		assertNotNull("Writer should not be null", writer);
 		
 		// put some content
 		writer.putContent(SOME_CONTENT);
 		
 		// get the reader for the node
-		ContentReader reader = contentService.getReader(contentNodeRef);
+		ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
 		assertNull("No reader should yet be available for the node", reader);
 	}
 	
@@ -168,24 +168,25 @@ public class RoutingContentServiceTest extends BaseSpringTest
 	public void testOnContentUpdatePolicy()
 	{
 		// Register interest in the content update event for a versionable node
-		this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onContentUpdate"),
+		this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onContentUpdate"),
 				ContentModel.ASPECT_VERSIONABLE,
 				new JavaBehaviour(this, "onContentUpdateBehaviourTest"));
 		
 		// First check that the policy is not fired when the versionable aspect is not present
-		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.contentNodeRef);
+		ContentWriter contentWriter = this.contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
 		contentWriter.putContent("content update one");
 		assertFalse(this.policyFired);
 		
 		// Now check that the policy is fired when the versionable aspect is present
 		this.nodeService.addAspect(this.contentNodeRef, ContentModel.ASPECT_VERSIONABLE, null);
-		ContentWriter contentWriter2 = this.contentService.getUpdatingWriter(this.contentNodeRef);
+		ContentWriter contentWriter2 = this.contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
 		contentWriter2.putContent("content update two");
 		assertTrue(this.policyFired);
 		this.policyFired = false;
 		
 		// Check that the policy is not fired when using a non updating content writer
-		ContentWriter contentWriter3 = this.contentService.getWriter(this.contentNodeRef);
+		ContentWriter contentWriter3 = this.contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, false);
 		contentWriter3.putContent("content update three");
 		assertFalse(this.policyFired);
 	}
@@ -215,15 +216,17 @@ public class RoutingContentServiceTest extends BaseSpringTest
     public void testUpdatingWrite() throws Exception
     {
         // check that the content URL property has not been set
-        String contentUrl = (String) nodeService.getProperty(contentNodeRef, ContentModel.PROP_CONTENT_URL); 
-        assertNull("Content URL should be null", contentUrl);
+        ContentData contentData = (ContentData) nodeService.getProperty(
+                contentNodeRef,
+                ContentModel.PROP_CONTENT); 
+        assertNull("Content URL should be null", contentData.getContentUrl());
         
         // before the content is written, there should not be any reader available
-        ContentReader reader = contentService.getReader(contentNodeRef);
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNull("No reader should be available for new node", reader);
         
         // get the writer
-        ContentWriter writer = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         assertNotNull("No writer received", writer);
         // write some content directly
         writer.putContent(SOME_CONTENT);
@@ -240,21 +243,27 @@ public class RoutingContentServiceTest extends BaseSpringTest
         }
         
         // check that there is a reader available
-        reader = contentService.getReader(contentNodeRef);
+        reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNotNull("No reader available for node", reader);
         String contentCheck = reader.getContentString();
         assertEquals("Content fetched doesn't match that written", SOME_CONTENT, contentCheck);
 
-        // check that the content URL was set
-        contentUrl = (String) nodeService.getProperty(contentNodeRef, ContentModel.PROP_CONTENT_URL);
-        assertNotNull("Content URL not set", contentUrl);
-        assertEquals("Mismatched URL between writer and node", writer.getContentUrl(), contentUrl);
+        // check that the content data was set
+        contentData = (ContentData) nodeService.getProperty(
+                contentNodeRef,
+                ContentModel.PROP_CONTENT);
+        assertNotNull("Content data not set", contentData);
+        assertEquals("Mismatched URL between writer and node",
+                writer.getContentUrl(), contentData.getContentUrl());
         
-        // check that the content length was set
-        Long contentLength = (Long) nodeService.getProperty(contentNodeRef, ContentModel.PROP_SIZE);
-        assertNotNull("Content size not set", contentLength);
+        // check that the content size was set
         assertEquals("Reader content length and node content length different",
-                reader.getLength(), contentLength.longValue());
+                reader.getSize(), contentData.getSize());
+        
+        // check that the mimetype was set
+        assertEquals("Mimetype not set on content data", "text/plain", contentData.getMimetype());
+        // check encoding
+        assertEquals("Encoding not set", "UTF-16", contentData.getEncoding());
     }
     
     /**
@@ -268,16 +277,16 @@ public class RoutingContentServiceTest extends BaseSpringTest
         setComplete();
         endTransaction();
         
-        ContentWriter writer1 = contentService.getUpdatingWriter(contentNodeRef);
-        ContentWriter writer2 = contentService.getUpdatingWriter(contentNodeRef);
-        ContentWriter writer3 = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer1 = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
+        ContentWriter writer2 = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
+        ContentWriter writer3 = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         
         writer1.putContent("writer1 wrote this");
         writer2.putContent("writer2 wrote this");
         writer3.putContent("writer3 wrote this");
 
         // get the content
-        ContentReader reader = contentService.getReader(contentNodeRef);
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         String contentCheck = reader.getContentString();
         assertEquals("Content check failed", "writer3 wrote this", contentCheck);
     }
@@ -292,16 +301,16 @@ public class RoutingContentServiceTest extends BaseSpringTest
         txn.begin();
         txn.setRollbackOnly();
 
-        ContentWriter writer1 = contentService.getUpdatingWriter(contentNodeRef);
-        ContentWriter writer2 = contentService.getUpdatingWriter(contentNodeRef);
-        ContentWriter writer3 = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer1 = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
+        ContentWriter writer2 = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
+        ContentWriter writer3 = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         
         writer1.putContent("writer1 wrote this");
         writer2.putContent("writer2 wrote this");
         writer3.putContent("writer3 wrote this");
 
         // get the content
-        ContentReader reader = contentService.getReader(contentNodeRef);
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         String contentCheck = reader.getContentString();
         assertEquals("Content check failed", "writer3 wrote this", contentCheck);
         
@@ -317,7 +326,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         
         // rollback and check that the content has 'disappeared'
         txn.rollback();
-        reader = contentService.getReader(contentNodeRef);
+        reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNull("Transaction was rolled back - no content should be visible", reader);
     }
     
@@ -331,10 +340,10 @@ public class RoutingContentServiceTest extends BaseSpringTest
         txn.begin();
         
         // ensure that there is no content to read on the node
-        ContentReader reader = contentService.getReader(contentNodeRef);
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNull("Reader should not be available", reader);
         
-        ContentWriter threadWriter = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter threadWriter = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         String threadContent = "Thread content";
         WriteThread thread = new WriteThread(threadWriter, threadContent);
         // kick off thread
@@ -344,8 +353,9 @@ public class RoutingContentServiceTest extends BaseSpringTest
         {
             wait(10);
         }
+        
         // write to the content
-        ContentWriter writer = contentService.getUpdatingWriter(contentNodeRef);
+        ContentWriter writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         writer.putContent(SOME_CONTENT);
         
         // fire thread up again
@@ -358,27 +368,18 @@ public class RoutingContentServiceTest extends BaseSpringTest
         {
             wait(10);
         }
+
         // the thread has finished and has committed its changes - check the visibility
-        reader = contentService.getReader(contentNodeRef);
+        reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNotNull("Reader should now be available", reader);
         String checkContent = reader.getContentString();
         assertEquals("Content check failed", SOME_CONTENT, checkContent);
         
-        // now commit this transaction
-        try
-        {
-            txn.commit();
-            fail("Multiple commits after inserts of same data should have been detected");
-        }
-        catch (RollbackException e)
-        {
-            // expected
-        }
-        // failed commit - rollback must be automatic
-        assertEquals("Expected transaction to have been rolled back", Status.STATUS_ROLLEDBACK, txn.getStatus());
+        // rollback the txn
+        txn.rollback();
         
         // check content has taken on thread's content
-        reader = contentService.getReader(contentNodeRef);
+        reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNotNull("Reader should now be available", reader);
         checkContent = reader.getContentString();
         assertEquals("Content check failed", threadContent, checkContent);

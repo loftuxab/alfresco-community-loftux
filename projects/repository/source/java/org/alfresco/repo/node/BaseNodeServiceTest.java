@@ -41,6 +41,7 @@ import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationExistsException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CyclicChildRelationshipException;
 import org.alfresco.service.cmr.repository.EntityRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -75,7 +76,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
     public static final QName ASPECT_QNAME_TEST_MARKER = QName.createQName(NAMESPACE, "marker");
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
-    public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
+    public static final QName PROP_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
     public static final QName ASSOC_TYPE_QNAME_TEST_CHILDREN = ContentModel.ASSOC_CHILDREN;
     public static final QName ASSOC_TYPE_QNAME_TEST_NEXT = QName.createQName(NAMESPACE, "next");
     public static final QName TYPE_QNAME_TEST_MANY_PROPERTIES = QName.createQName(NAMESPACE, "many-properties");
@@ -89,6 +90,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName PROP_QNAME_SERIALIZABLE_VALUE = QName.createQName(NAMESPACE, "serializableValue");
     public static final QName PROP_QNAME_NODEREF_VALUE = QName.createQName(NAMESPACE, "nodeRefValue");
     public static final QName PROP_QNAME_QNAME_VALUE = QName.createQName(NAMESPACE, "qnameValue");
+    public static final QName PROP_QNAME_CONTENT_VALUE = QName.createQName(NAMESPACE, "contentValue");
     public static final QName PROP_QNAME_PATH_VALUE = QName.createQName(NAMESPACE, "pathValue");
     public static final QName PROP_QNAME_CATEGORY_VALUE = QName.createQName(NAMESPACE, "categoryValue");
     public static final QName PROP_QNAME_NULL_VALUE = QName.createQName(NAMESPACE, "nullValue");
@@ -293,7 +295,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
 
         // LEVEL 4
         properties.clear();
-        properties.put(PROP_QNAME_TEST_MIMETYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        properties.put(PROP_QNAME_TEST_CONTENT, new ContentData(null, MimetypeMap.MIMETYPE_TEXT_PLAIN, 0L, null));
         properties.put(PROP_QNAME_TEST_TITLE, "node8");
         qname = QName.createQName(ns, "n6_p_n8");
         assoc = nodeService.createNode(n6, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, TYPE_QNAME_TEST_CONTENT, properties);
@@ -739,6 +741,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         properties.put(PROP_QNAME_NODEREF_VALUE, rootNodeRef);
         properties.put(PROP_QNAME_QNAME_VALUE, TYPE_QNAME_TEST_CONTENT);
         properties.put(PROP_QNAME_PATH_VALUE, pathProperty);
+        properties.put(PROP_QNAME_CONTENT_VALUE, new ContentData("url", "text/plain", 88L, "UTF-8"));
         properties.put(PROP_QNAME_CATEGORY_VALUE, rootNodeRef);
         properties.put(PROP_QNAME_NULL_VALUE, null);
         properties.put(PROP_QNAME_MULTI_VALUE, listProperty);

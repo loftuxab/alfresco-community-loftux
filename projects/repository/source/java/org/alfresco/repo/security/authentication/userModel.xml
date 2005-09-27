@@ -22,7 +22,7 @@
          <parent>sys:base</parent>
          <properties>
             <property name="usr:username">
-               <type>d:text</type> `
+               <type>d:text</type>
             </property>
             <property name="usr:password">
                <type>d:text</type>

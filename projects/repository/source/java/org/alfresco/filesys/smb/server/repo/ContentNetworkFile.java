@@ -29,7 +29,7 @@ import org.alfresco.filesys.server.filesys.FileOpenParams;
 import org.alfresco.filesys.server.filesys.NetworkFile;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.RandomAccessContent;
-import org.alfresco.service.cmr.repository.Content;
+import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -53,7 +53,7 @@ public class ContentNetworkFile extends NetworkFile
     /** keeps track of the read/write access */
     private FileChannel channel;
     /** the original content opened */
-    private Content content;
+    private ContentAccessor content;
     /** keeps track of any writes */
     private boolean modified;
     

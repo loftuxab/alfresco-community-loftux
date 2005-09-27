@@ -17,7 +17,7 @@
 package org.alfresco.repo.content.transform;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.cmr.repository.Content;
+import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -62,7 +62,7 @@ public abstract class AbstractContentTransformer implements ContentTransformer
      * @return Returns the mimetype for the content
      * @throws AlfrescoRuntimeException if the content doesn't have a mimetype
      */
-    protected String getMimetype(Content content)
+    protected String getMimetype(ContentAccessor content)
     {
         String mimetype = content.getMimetype();
         if (mimetype == null)

@@ -473,7 +473,7 @@ public class PropertyImpl extends ItemImpl implements Property
         // Handle streams
         if (value instanceof ContentReader)
         {
-            return ((ContentReader)value).getLength();
+            return ((ContentReader)value).getSize();
         }
         if (value instanceof InputStream)
         {

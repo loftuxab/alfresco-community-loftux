@@ -99,6 +99,19 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
     }
 
     /**
+     * @return Returns the size of the underlying file or 
+     */
+    public long getSize()
+    {
+        if (file == null)
+            return 0L;
+        else if (!file.exists())
+            return 0L;
+        else
+            return file.length();
+    }
+
+    /**
      * The URL of the write is known from the start and this method contract states
      * that no consideration needs to be taken w.r.t. the stream state.
      */
@@ -179,7 +192,7 @@ public class FileContentWriter extends AbstractContentWriter implements RandomAc
         if (existingContentReader != null)
         {
             ReadableByteChannel existingContentChannel = existingContentReader.getReadableChannel();
-            long existingContentLength = existingContentReader.getLength();
+            long existingContentLength = existingContentReader.getSize();
             // copy the existing content
             try
             {

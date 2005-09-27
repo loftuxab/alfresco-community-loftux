@@ -28,7 +28,8 @@ import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.transaction.TransactionUtil;
-import org.alfresco.service.cmr.repository.Content;
+import org.alfresco.service.cmr.repository.ContentAccessor;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentStreamListener;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
@@ -36,13 +37,13 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.AfterReturningAdvice;
 
 /**
- * Provides basic information for <tt>Content</tt>.
+ * Provides basic support for content accessors.
  * 
  * @author Derek Hulley
  */
-public abstract class AbstractContent implements Content
+public abstract class AbstractContentAccessor implements ContentAccessor
 {
-    private static Log logger = LogFactory.getLog(AbstractContent.class);
+    private static Log logger = LogFactory.getLog(AbstractContentAccessor.class);
     
     /** when set, ensures that listeners are executed within a transaction */
     private TransactionService transactionService;
@@ -54,13 +55,19 @@ public abstract class AbstractContent implements Content
     /**
      * @param contentUrl the content URL
      */
-    protected AbstractContent(String contentUrl)
+    protected AbstractContentAccessor(String contentUrl)
     {
         if (contentUrl == null || contentUrl.length() == 0)
         {
             throw new IllegalArgumentException("contentUrl must be a valid String");
         }
         this.contentUrl = contentUrl;
+    }
+    
+    public ContentData getContentProperty()
+    {
+        ContentData property = new ContentData(contentUrl, mimetype, getSize(), encoding);
+        return property;
     }
 
     /**
@@ -81,11 +88,7 @@ public abstract class AbstractContent implements Content
     public String toString()
     {
         StringBuilder sb = new StringBuilder(100);
-        sb.append("Content")
-          .append("[ url=").append(contentUrl)
-          .append(", mimetype=").append(mimetype)
-          .append(", encoding=").append(encoding)
-          .append("]");
+        sb.append("ContentAccessor[ content=").append(getContentProperty()).append("]");
         return sb.toString();
     }
     
@@ -106,7 +109,10 @@ public abstract class AbstractContent implements Content
     {
         this.mimetype = mimetype;
     }
-    
+
+    /**
+     * @return Returns the content encoding - null if unknown
+     */
     public String getEncoding()
     {
         return encoding;

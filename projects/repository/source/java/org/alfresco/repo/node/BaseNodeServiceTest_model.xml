@@ -19,12 +19,8 @@
          <title>Content</title>
          <parent>sys:base</parent>
          <properties>
-            <property name="test:contentUrl">
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
-            <property name="test:mimetype">
-               <type>d:text</type>
+            <property name="test:content">
+               <type>d:content</type>
                <mandatory>true</mandatory>
             </property>
          </properties>
@@ -88,6 +84,10 @@
             </property>
             <property name="test:qnameValue">
                <type>d:qname</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="test:contentValue">
+               <type>d:content</type>
                <mandatory>true</mandatory>
             </property>
             <property name="test:pathValue">

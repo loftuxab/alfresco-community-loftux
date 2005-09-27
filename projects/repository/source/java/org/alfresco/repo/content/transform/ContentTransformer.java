@@ -61,7 +61,7 @@ public interface ContentTransformer
      * to {@link #getReliability(String, String)}.
      * <p>
      * The source and target mimetypes <b>must</b> be available on the
-     * {@link org.alfresco.service.cmr.repository.Content#getMimetype()} methods of
+     * {@link org.alfresco.service.cmr.repository.ContentAccessor#getMimetype()} methods of
      * both the reader and the writer.
      * 
      * @param reader the source of the content

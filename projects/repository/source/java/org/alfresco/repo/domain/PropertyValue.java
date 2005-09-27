@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
@@ -133,6 +134,20 @@ public class PropertyValue implements Cloneable, Serializable
                 return value;
             }
         },
+        CONTENT
+        {
+            @Override
+            protected ValueType getPersistedType()
+            {
+                return ValueType.STRING;
+            }
+
+            @Override
+            Serializable convert(Serializable value)
+            {
+                return DefaultTypeConverter.INSTANCE.convert(ContentData.class, value);
+            }
+        },
         NODEREF
         {
             @Override
@@ -226,7 +241,7 @@ public class PropertyValue implements Cloneable, Serializable
         valueTypesByPropertyType.put(DataTypeDefinition.DATE, ValueType.DATE);
         valueTypesByPropertyType.put(DataTypeDefinition.DATETIME, ValueType.DATE);
         valueTypesByPropertyType.put(DataTypeDefinition.CATEGORY, ValueType.NODEREF);
-        valueTypesByPropertyType.put(DataTypeDefinition.CONTENT, ValueType.STRING);
+        valueTypesByPropertyType.put(DataTypeDefinition.CONTENT, ValueType.CONTENT);
         valueTypesByPropertyType.put(DataTypeDefinition.TEXT, ValueType.STRING);
         valueTypesByPropertyType.put(DataTypeDefinition.GUID, ValueType.STRING);
         valueTypesByPropertyType.put(DataTypeDefinition.NODE_REF, ValueType.NODEREF);

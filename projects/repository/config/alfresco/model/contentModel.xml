@@ -58,6 +58,17 @@
          <title>Content</title>
          <parent>cm:cmobject</parent>
          <properties>
+            <property name="cm:content">
+               <type>d:content</type>
+               <mandatory>false</mandatory>   <!-- TODO: Make this mandatory -->
+               <!--- Index content in the background -->
+               <index enabled="true">
+                  <atomic>true</atomic>
+                  <stored>false</stored>
+                  <tokenised>false</tokenised>
+               </index>
+            </property>
+            <!-- the individual url, mimetype, etc are replaced by the single d:content -->
             <property name="cm:contentUrl">
                <type>d:text</type>
                <mandatory>false</mandatory>
@@ -70,7 +81,7 @@
             </property>
             <property name="cm:mimetype">
                <type>d:text</type>
-               <mandatory>true</mandatory>
+               <mandatory>false</mandatory>
             </property>
             <property name="cm:encoding">
                <type>d:text</type>

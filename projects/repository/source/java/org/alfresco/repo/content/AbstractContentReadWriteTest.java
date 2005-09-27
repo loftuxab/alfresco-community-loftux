@@ -146,7 +146,7 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         
         // check that the length is correct
         int length = content.getBytes(writer.getEncoding()).length;
-        assertEquals("Reader content length is incorrect", length, readerFromWriter.getLength());
+        assertEquals("Reader content length is incorrect", length, readerFromWriter.getSize());
         
         // check that the last modified time is correct
         long modifiedTimeCheck = readerFromWriter.getLastModified();

@@ -60,7 +60,7 @@ public interface MetadataExtracter
      * {@link #getReliability(String)}.
      * <p>
      * The source mimetype <b>must</b> be available on the
-     * {@link org.alfresco.service.cmr.repository.Content#getMimetype()} method
+     * {@link org.alfresco.service.cmr.repository.ContentAccessor#getMimetype()} method
      * of the reader.
      * 
      * @param reader the source of the content

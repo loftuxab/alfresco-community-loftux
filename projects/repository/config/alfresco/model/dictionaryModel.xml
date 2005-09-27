@@ -30,8 +30,7 @@
 
       <data-type name="d:content">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
-         <!-- URL reference is a string -->
-         <java-class>java.lang.String</java-class>
+         <java-class>org.alfresco.service.cmr.repository.ContentData</java-class>
       </data-type>
 
       <data-type name="d:int">
@@ -81,8 +80,7 @@
 
       <data-type name="d:category">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
-         <!-- TODO: Check this is correct -->
-         <java-class>java.lang.String</java-class>
+         <java-class>org.alfresco.service.cmr.repository.NodeRef</java-class>
       </data-type>
 
       <data-type name="d:noderef">

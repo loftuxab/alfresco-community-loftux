@@ -30,8 +30,11 @@ import org.alfresco.repo.content.transform.ContentTransformerRegistry;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -46,6 +49,8 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.EqualsHelper;
 import org.alfresco.util.TempFileProvider;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -56,6 +61,8 @@ import org.alfresco.util.TempFileProvider;
  */
 public class RoutingContentService implements ContentService
 {
+    private static Log logger = LogFactory.getLog(RoutingContentService.class);
+    
     private TransactionService transactionService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
@@ -141,18 +148,54 @@ public class RoutingContentService implements ContentService
             Map<QName, Serializable> before,
             Map<QName, Serializable> after)
     {
-    	String beforeContentUrl = (String)before.get(ContentModel.PROP_CONTENT_URL);
-    	String afterContentUrl = (String)after.get(ContentModel.PROP_CONTENT_URL);
-    	if (EqualsHelper.nullSafeEquals(beforeContentUrl, afterContentUrl) == false)
-	    {
-    		// Fire the content update policy
-    		Set<QName> types = new HashSet<QName>(this.nodeService.getAspects(nodeRef));
-    		types.add(this.nodeService.getType(nodeRef));
-    		OnContentUpdatePolicy policy = this.onContentUpdateDelegate.get(types);
-    		policy.onContentUpdate(nodeRef);
-	    }
+        boolean fire = false;
+        // the code below is for the old-style properties
+        {
+        	String beforeContentUrl = (String)before.get(ContentModel.PROP_CONTENT_URL);
+        	String afterContentUrl = (String)after.get(ContentModel.PROP_CONTENT_URL);
+        	if (!EqualsHelper.nullSafeEquals(beforeContentUrl, afterContentUrl))
+    	    {
+                fire = true;
+    	    }
+        }
+        // check if any of the content properties have changed
+        for (QName propertyQName : before.keySet())
+        {
+            // is this a content property?
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
+            if (propertyDef == null)
+            {
+                // the property is not recognised
+                continue;
+            }
+            if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
+            {
+                // not a content type
+                continue;
+            }
+            
+            Serializable beforeValue = before.get(propertyQName);
+            Serializable afterValue = after.get(propertyQName);
+            if (!EqualsHelper.nullSafeEquals(beforeValue, afterValue))
+            {
+                // the content changed
+                // at the moment, we are only interested in this one change
+                fire = true;
+                break;
+            }
+        }
+        // fire?
+        if (fire)
+        {
+            // Fire the content update policy
+            Set<QName> types = new HashSet<QName>(this.nodeService.getAspects(nodeRef));
+            types.add(this.nodeService.getType(nodeRef));
+            OnContentUpdatePolicy policy = this.onContentUpdateDelegate.get(types);
+            policy.onContentUpdate(nodeRef);
+        }
     }
     
+    @Deprecated
     public ContentReader getReader(NodeRef nodeRef)
     {
         // ensure that the node exists and is of type content
@@ -191,6 +234,7 @@ public class RoutingContentService implements ContentService
         return reader;
     }
 
+    @Deprecated
     public ContentWriter getWriter(NodeRef nodeRef)
     {
         // ensure that the node exists and is of type content
@@ -227,6 +271,7 @@ public class RoutingContentService implements ContentService
     * 
     * @see #getWriter(NodeRef)
     */
+    @Deprecated
     public ContentWriter getUpdatingWriter(NodeRef nodeRef)
     {
         // ensure that the node exists and is of type content
@@ -239,9 +284,78 @@ public class RoutingContentService implements ContentService
         // get the plain writer
         ContentWriter writer = getWriter(nodeRef);
         // need a listener to update the node when the stream closes
-        WriteStreamListener listener = new WriteStreamListener(nodeService, nodeRef, writer);
+        OldWriteStreamListener listener = new OldWriteStreamListener(nodeService, nodeRef, writer);
         writer.addListener(listener);
         writer.setTransactionService(transactionService);
+        // give back to the client
+        return writer;
+    }
+
+    public ContentReader getReader(NodeRef nodeRef, QName propertyQName)
+    {
+        // ensure that the node property is of type content
+        QName nodeType = nodeService.getType(nodeRef);
+        PropertyDefinition contentPropDef = dictionaryService.getProperty(nodeType, propertyQName);
+        if (contentPropDef == null || !contentPropDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
+        {
+            throw new InvalidTypeException("The node property must be of type content: \n" +
+                    "   node: " + nodeRef + "\n" +
+                    "   node type: " + nodeType + "\n" +
+                    "   property name: " + propertyQName + "\n" +
+                    "   property type: " + contentPropDef.getDataType(),
+                    propertyQName);
+        }
+        
+        // get the content property
+        ContentData contentData = (ContentData) nodeService.getProperty(nodeRef, propertyQName);
+        // check that the URL is available
+        if (contentData == null || contentData.getContentUrl() == null)
+        {
+            // there is no URL - the interface specifies that this is not an error condition
+            return null;
+        }
+        String contentUrl = contentData.getContentUrl();
+        
+        // TODO: Choose the store to read from at runtime
+        ContentReader reader = store.getReader(contentUrl);
+        
+        // set extra data on the reader
+        reader.setMimetype(contentData.getMimetype());
+        reader.setEncoding(contentData.getEncoding());
+        
+        // we don't listen for anything
+        // result may be null - but interface contract says we may return null
+        return reader;
+    }
+
+    public ContentWriter getWriter(NodeRef nodeRef, QName propertyQName, boolean update)
+    {
+        // check for an existing URL - the get of the reader will perform type checking
+        ContentReader existingContentReader = getReader(nodeRef, propertyQName);
+        
+        // TODO: Choose the store to write to at runtime
+        
+        // get the content using the (potentially) existing content - the new content
+        // can be wherever the store decides.
+        ContentWriter writer = store.getWriter(existingContentReader, null);
+
+        // set extra data on the reader if the property is pre-existing
+        ContentData contentData = (ContentData) nodeService.getProperty(nodeRef, propertyQName);
+        if (contentData != null)
+        {
+            writer.setMimetype(contentData.getMimetype());
+            writer.setEncoding(contentData.getEncoding());
+        }
+        
+        // attach a listener if required
+        if (update)
+        {
+            // need a listener to update the node when the stream closes
+            WriteStreamListener listener = new WriteStreamListener(nodeService, nodeRef, propertyQName, writer);
+            writer.addListener(listener);
+            writer.setTransactionService(transactionService);
+        }
+        
         // give back to the client
         return writer;
     }
@@ -308,21 +422,17 @@ public class RoutingContentService implements ContentService
     }
 
     /**
-     * Ensures that, upon closure of the output stream, the node is updated with
-     * the latest URL of the content to which it refers.
-     * <p>
-     * The listener close operation does not need a transaction as the 
-     * <code>ContentWriter</code> takes care of that.
-     * 
-     * @author Derek Hulley
+     * Still uses the old properties
      */
-    private static class WriteStreamListener implements ContentStreamListener
+    @Deprecated
+    private static class OldWriteStreamListener implements ContentStreamListener
     {
         private NodeService nodeService;
         private NodeRef nodeRef;
         private ContentWriter writer;
         
-        public WriteStreamListener(
+        @Deprecated
+        public OldWriteStreamListener(
                 NodeService nodeService,
                 NodeRef nodeRef,
                 ContentWriter writer)
@@ -344,7 +454,7 @@ public class RoutingContentService implements ContentService
                         contentUrl);
                 // get the size of the document
                 ContentReader reader = writer.getReader();
-                long length = reader.getLength();
+                long length = reader.getSize();
                 nodeService.setProperty(
                         nodeRef,
                         ContentModel.PROP_SIZE,
@@ -353,6 +463,64 @@ public class RoutingContentService implements ContentService
             catch (Throwable e)
             {
                 throw new ContentIOException("Failed to set URL and size upon stream closure", e);
+            }
+        }
+    }
+
+    /**
+     * Ensures that, upon closure of the output stream, the node is updated with
+     * the latest URL of the content to which it refers.
+     * <p>
+     * The listener close operation does not need a transaction as the 
+     * <code>ContentWriter</code> takes care of that.
+     * 
+     * @author Derek Hulley
+     */
+    private static class WriteStreamListener implements ContentStreamListener
+    {
+        private NodeService nodeService;
+        private NodeRef nodeRef;
+        private QName propertyQName;
+        private ContentWriter writer;
+        
+        public WriteStreamListener(
+                NodeService nodeService,
+                NodeRef nodeRef,
+                QName propertyQName,
+                ContentWriter writer)
+        {
+            this.nodeService = nodeService;
+            this.nodeRef = nodeRef;
+            this.propertyQName = propertyQName;
+            this.writer = writer;
+        }
+        
+        public void contentStreamClosed() throws ContentIOException
+        {
+            try
+            {
+                // set the full content property
+                ContentData contentData = writer.getContentProperty();
+                nodeService.setProperty(
+                        nodeRef,
+                        propertyQName,
+                        contentData);
+                // done
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Stream listener updated node: \n" +
+                            "   node: " + nodeRef + "\n" +
+                            "   property: " + propertyQName + "\n" +
+                            "   value: " + contentData);
+                }
+            }
+            catch (Throwable e)
+            {
+                throw new ContentIOException("Failed to set content property on stream closure: \n" +
+                        "   node: " + nodeRef + "\n" +
+                        "   property: " + propertyQName + "\n" +
+                        "   writer: " + writer,
+                        e);
             }
         }
     }

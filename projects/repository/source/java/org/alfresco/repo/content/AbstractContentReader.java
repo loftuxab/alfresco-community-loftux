@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.cmr.repository.Content;
+import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentStreamListener;
@@ -48,7 +48,7 @@ import org.springframework.util.FileCopyUtils;
  * 
  * @author Derek Hulley
  */
-public abstract class AbstractContentReader extends AbstractContent implements ContentReader
+public abstract class AbstractContentReader extends AbstractContentAccessor implements ContentReader
 {
     private static final Log logger = LogFactory.getLog(AbstractContentReader.class);
     
@@ -303,7 +303,7 @@ public abstract class AbstractContentReader extends AbstractContent implements C
      * All the content is streamed into memory.  So, like the interface said,
      * be careful with this method.
      * 
-     * @see Content#getEncoding()
+     * @see ContentAccessor#getEncoding()
      */
     public final String getContentString() throws ContentIOException
     {

@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.cmr.repository.Content;
+import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentStreamListener;
@@ -47,7 +47,7 @@ import org.springframework.util.FileCopyUtils;
  * 
  * @author Derek Hulley
  */
-public abstract class AbstractContentWriter extends AbstractContent implements ContentWriter
+public abstract class AbstractContentWriter extends AbstractContentAccessor implements ContentWriter
 {
     private static final Log logger = LogFactory.getLog(AbstractContentWriter.class);
     
@@ -288,7 +288,7 @@ public abstract class AbstractContentWriter extends AbstractContent implements C
     /**
      * Makes use of the encoding, if available, to convert the string to bytes.
      * 
-     * @see Content#getEncoding()
+     * @see ContentAccessor#getEncoding()
      */
     public final void putContent(String content) throws ContentIOException
     {

@@ -39,7 +39,7 @@ import java.nio.channels.WritableByteChannel;
  * 
  * @author Derek Hulley
  */
-public interface ContentWriter extends Content
+public interface ContentWriter extends ContentAccessor
 {
     /**
      * Convenience method to get a reader onto newly written content.  This
@@ -126,7 +126,7 @@ public interface ContentWriter extends Content
     /**
      * Puts content to the repository direct from <code>String</code>.
      * <p>
-     * If the {@link Content#getEncoding() encoding } is known then it will be used
+     * If the {@link ContentAccessor#getEncoding() encoding } is known then it will be used
      * otherwise the default system <tt>String</tt> to <tt>byte[]</tt> conversion
      * will be used.
      * <p>
