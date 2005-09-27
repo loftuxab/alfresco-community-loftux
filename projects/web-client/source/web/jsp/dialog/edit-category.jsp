@@ -24,7 +24,7 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_edit_category">
+<r:page titleId="title_edit_categories">
 
 <f:view>
    
@@ -70,7 +70,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle"><h:outputText value="#{msg.modify_category_of}" /> '<h:outputText value="#{BrowseBean.document.name}" />'</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.modify_categories_of}" /> '<h:outputText value="#{BrowseBean.document.name}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.editcategory_description}" /></div>
                            </td>
                         </tr>
@@ -98,11 +98,13 @@
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td valign="top"><h:outputText value="#{msg.category}" />:</td>
+                                    <td><h:outputText value="#{msg.categories}" />:</td>
                                     <td width="90%">
-                                       <r:categorySelector label="#{msg.select_category_prompt}" 
-                                                        value="#{DocumentDetailsBean.category}" 
-                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                       <a:multiValueListEditor value="#{DocumentDetailsBean.categories}"
+                                                               lastItemAdded="#{DocumentDetailsBean.addedCategory}">
+                                          <r:categorySelector label="#{msg.select_category_prompt}" 
+                                                              value="#{DocumentDetailsBean.addedCategory}"/>
+                                       </a:multiValueListEditor>
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
@@ -115,8 +117,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.ok}" action="#{DocumentDetailsBean.saveCategory}" styleClass="wizardButton" 
-                                                        disabled="#{DocumentDetailsBean.category == null}"/>
+                                       <h:commandButton value="#{msg.ok}" action="#{DocumentDetailsBean.saveCategories}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>

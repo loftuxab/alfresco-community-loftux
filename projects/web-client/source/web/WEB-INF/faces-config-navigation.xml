@@ -254,7 +254,7 @@
          <to-view-id>/jsp/dialog/edit-simple-workflow.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
-         <from-outcome>editCategory</from-outcome>
+         <from-outcome>editCategories</from-outcome>
          <to-view-id>/jsp/dialog/edit-category.jsp</to-view-id>
       </navigation-case>
       <navigation-case>

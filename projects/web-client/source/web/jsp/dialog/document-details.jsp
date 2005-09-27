@@ -302,7 +302,7 @@
                               <br/>
                               <a:panel label="#{msg.category}" id="category-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       action="editCategory" actionListener="#{DocumentDetailsBean.setupCategoryForEdit}"
+                                       action="editCategories" actionListener="#{DocumentDetailsBean.setupCategoriesForEdit}"
                                        linkIcon="/images/icons/Change_details.gif" linkTooltip="#{msg.change_category}"
                                        rendered="#{DocumentDetailsBean.categorised}"
                                        expanded='#{DocumentDetailsBean.panels["category-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">

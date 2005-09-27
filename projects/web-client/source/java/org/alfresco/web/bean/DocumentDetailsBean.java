@@ -19,7 +19,9 @@ package org.alfresco.web.bean;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +54,6 @@ import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
 import org.alfresco.web.ui.repo.component.template.TemplateNode;
 import org.apache.log4j.Logger;
 
-import sun.security.krb5.internal.crypto.t;
-
 /**
  * Backing bean providing access to the details of a document
  * 
@@ -63,7 +63,6 @@ public class DocumentDetailsBean
 {
    private static Logger logger = Logger.getLogger(DocumentDetailsBean.class);
    
-   private NodeRef category;
    private BrowseBean browseBean;
    private NodeService nodeService;
    private LockService lockService;
@@ -74,7 +73,8 @@ public class DocumentDetailsBean
    private Map<String, Boolean> panels = new HashMap(5, 1.0f);
    
    private Map<String, Serializable> workflowProperties;
-
+   private NodeRef addedCategory;
+   private List categories;
 
    /**
     * Default constructor
@@ -92,11 +92,21 @@ public class DocumentDetailsBean
     */
    public void reset()
    {
+      // reset the workflow cache
       if (this.workflowProperties != null)
       {
          this.workflowProperties.clear();
          this.workflowProperties = null;
       }
+      
+      // reset the category caches
+      if (this.categories != null)
+      {
+         this.categories.clear();
+         this.categories = null;
+      }
+      
+      this.addedCategory = null;
    }
    
    /**
@@ -137,26 +147,6 @@ public class DocumentDetailsBean
    public String getBrowserUrl()
    {
       return DownloadContentServlet.generateBrowserURL(getDocument().getNodeRef(), getDocument().getName());
-   }
-   
-   /**
-    * Returns the current category for this document
-    * 
-    * @return The current category as an id
-    */
-   public NodeRef getCategory()
-   {
-      return this.category;
-   }
-   
-   /**
-    * Sets the category to be used by the current document
-    * 
-    * @param category The new category 
-    */
-   public void setCategory(NodeRef category)
-   {
-      this.category = category;
    }
    
    /**
@@ -236,17 +226,28 @@ public class DocumentDetailsBean
       {
          // we know for now that the general classifiable aspect only will be
          // applied so we can retrive the categories property direclty
-         NodeRef catNode = (NodeRef)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
+         Collection categories = (Collection)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
                ContentModel.PROP_CATEGORIES);
          
-          if (catNode == null)
+          if (categories == null || categories.size() == 0)
           {
-             html = "This document does not yet have a category applied.";
+             html = Application.getMessage(FacesContext.getCurrentInstance(), "no_categories_applied");
           }
           else
           {
-             html = "This document has the following category applied: " + 
-                   Repository.getNameForNode(this.nodeService, catNode);
+             StringBuilder builder = new StringBuilder(Application.getMessage(FacesContext.getCurrentInstance(), 
+                   "has_following_categories"));
+             
+             builder.append("<ul>");
+             for (Object obj : categories)
+             {
+                builder.append("<li>");
+                builder.append(Repository.getNameForNode(this.nodeService, (NodeRef)obj));
+                builder.append("</li>");
+             }
+             builder.append("</ul>");
+             
+             html = builder.toString();
           }
       }
       
@@ -254,25 +255,62 @@ public class DocumentDetailsBean
    }
 
    /**
-    * Event handler called to setup the category for editing
+    * Event handler called to setup the categories for editing
     * 
     * @param event The event
     */
-   public void setupCategoryForEdit(ActionEvent event)
+   public void setupCategoriesForEdit(ActionEvent event)
    {
-      NodeRef catNode = (NodeRef)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
+      this.categories = (List)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
                ContentModel.PROP_CATEGORIES);
-      
-      this.category = catNode;
    }
    
    /**
-    * Updates the category for the current document to the category stored
-    * by this.newCategory
+    * Returns a Map of the initial categories on the node keyed by the NodeRef
+    * 
+    * @return Map of initial categories
+    */
+   public List getCategories()
+   {
+      return this.categories;
+   }
+   
+   /**
+    * Sets the categories Map
+    * 
+    * @param categories
+    */
+   public void setCategories(List categories)
+   {
+      this.categories = categories;
+   }
+   
+   /**
+    * Returns the last category added from the multi value editor
+    * 
+    * @return The last category added
+    */
+   public NodeRef getAddedCategory()
+   {
+      return this.addedCategory;
+   }
+
+   /**
+    * Sets the category added from the multi value editor
+    * 
+    * @param addedCategory The added category
+    */
+   public void setAddedCategory(NodeRef addedCategory)
+   {
+      this.addedCategory = addedCategory;
+   }
+   
+   /**
+    * Updates the categories for the current document
     *  
     * @return The outcome
     */
-   public String saveCategory()
+   public String saveCategories()
    {
       String outcome = "cancel";
       
@@ -289,7 +327,7 @@ public class DocumentDetailsBean
                getDocument().getNodeRef());
          
          // create a node ref representation of the selected id and set the new properties
-         updateProps.put(ContentModel.PROP_CATEGORIES, this.category);
+         updateProps.put(ContentModel.PROP_CATEGORIES, (Serializable)this.categories);
          
          // set the properties on the node
          this.nodeService.setProperties(getDocument().getNodeRef(), updateProps);
@@ -360,38 +398,38 @@ public class DocumentDetailsBean
          }
          
          StringBuilder builder = new StringBuilder();
-         builder.append("The document will be ");
+         
+         // calculate the approve action string
+         String action = null;
          if (approveMove.booleanValue())
          {
-            builder.append("moved");
+            action = Application.getMessage(FacesContext.getCurrentInstance(), "moved");
          }
          else
          {
-            builder.append("copied");
+            action = Application.getMessage(FacesContext.getCurrentInstance(), "copied");
          }
-         builder.append(" to '");
-         builder.append(approveFolderName);
-         builder.append("' if the '");
-         builder.append(approveStepName);
-         builder.append("' action is taken.");
+         
+         String docActionPattern = Application.getMessage(FacesContext.getCurrentInstance(), "document_action");
+         Object[] params = new Object[] {action, approveFolderName, approveStepName};
+         builder.append(MessageFormat.format(docActionPattern, params));
          
          // add details of the reject step if there is one
          if (rejectStepName != null && rejectMove != null && rejectFolderName != null)
          {
-            builder.append("<p>Alternatively, the document will be ");
             if (rejectMove.booleanValue())
             {
-               builder.append("moved");
+               action = Application.getMessage(FacesContext.getCurrentInstance(), "moved");
             }
             else
             {
-               builder.append("copied");
+               action = Application.getMessage(FacesContext.getCurrentInstance(), "copied");
             }
-            builder.append(" to '");
-            builder.append(rejectFolderName);
-            builder.append("' if the '");
-            builder.append(rejectStepName);
-            builder.append("' action is taken.");
+            
+            builder.append("<p>");
+            params = new Object[] {action, rejectFolderName, rejectStepName};
+            builder.append(MessageFormat.format(docActionPattern, params));
+            builder.append("</p>");
          }
          
          html = builder.toString();
