@@ -82,6 +82,13 @@ public interface Exporter
     public void endAspect(NodeRef nodeRef, QName aspect);
     
     /**
+     * Start export of properties
+     * 
+     * @param nodeRef  the node reference
+     */
+    public void startProperties(NodeRef nodeRef);
+    
+    /**
      * Start export of property
      * 
      * @param nodeRef  the node reference
@@ -96,6 +103,13 @@ public interface Exporter
      * @param property  the property name
      */
     public void endProperty(NodeRef nodeRef, QName property);
+    
+    /**
+     * End export of properties
+     * 
+     * @param nodeRef  the node reference
+     */
+    public void endProperties(NodeRef nodeRef);
     
     /**
      * Export single valued property

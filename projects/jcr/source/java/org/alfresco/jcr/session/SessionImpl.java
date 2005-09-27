@@ -51,6 +51,7 @@ import javax.jcr.version.VersionException;
 import org.alfresco.jcr.dictionary.JCRNamespacePrefixResolver;
 import org.alfresco.jcr.dictionary.NamespaceRegistryImpl;
 import org.alfresco.jcr.dictionary.NodeTypeManagerImpl;
+import org.alfresco.jcr.export.JCRDocumentXMLExporter;
 import org.alfresco.jcr.export.JCRSystemXMLExporter;
 import org.alfresco.jcr.item.ItemImpl;
 import org.alfresco.jcr.item.ItemResolver;
@@ -399,8 +400,10 @@ public class SessionImpl implements Session
      */
     public void exportDocumentView(String absPath, ContentHandler contentHandler, boolean skipBinary, boolean noRecurse) throws PathNotFoundException, SAXException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        
+        JCRDocumentXMLExporter exporter = new JCRDocumentXMLExporter(this, contentHandler);
+        ExporterCrawlerParameters parameters = createExportParameters(absPath, skipBinary, noRecurse);
+        ExporterService exporterService = getRepositoryImpl().getServiceRegistry().getExporterService();
+        exporterService.exportView(exporter, parameters, null);
     }
 
     /* (non-Javadoc)
@@ -408,8 +411,10 @@ public class SessionImpl implements Session
      */
     public void exportDocumentView(String absPath, OutputStream out, boolean skipBinary, boolean noRecurse) throws IOException, PathNotFoundException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        
+        JCRDocumentXMLExporter exporter = new JCRDocumentXMLExporter(this, createExportContentHandler(out));
+        ExporterCrawlerParameters parameters = createExportParameters(absPath, skipBinary, noRecurse);
+        ExporterService exporterService = getRepositoryImpl().getServiceRegistry().getExporterService();
+        exporterService.exportView(exporter, parameters, null);
     }
 
     /* (non-Javadoc)

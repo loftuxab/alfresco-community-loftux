@@ -112,6 +112,22 @@ import org.alfresco.util.ParameterCheck;
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startProperties(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void startProperties(NodeRef nodeRef)
+    {
+        exporter.startProperties(nodeRef);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endProperties(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endProperties(NodeRef nodeRef)
+    {
+        exporter.endProperties(nodeRef);        
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#startProperty(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
      */
     public void startProperty(NodeRef nodeRef, QName property)

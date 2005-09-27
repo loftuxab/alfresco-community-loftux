@@ -226,7 +226,7 @@ public class ExporterComponent
             Collection<String> prefixes = namespaceService.getPrefixes();
             for (String prefix : prefixes)
             {
-                if (prefix != null && prefix.length() > 0)
+                if (prefix != null && prefix.length() > 0 && !prefix.startsWith("xml"))
                 {
                     String uri = namespaceService.getNamespaceURI(prefix);
                     if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), uri))
@@ -245,7 +245,7 @@ public class ExporterComponent
             Collection<String> prefixes = namespaceService.getPrefixes();
             for (String prefix : prefixes)
             {
-                if (prefix != null && prefix.length() > 0)
+                if (prefix != null && prefix.length() > 0 && !prefix.startsWith("xml"))
                 {
                     String uri = namespaceService.getNamespaceURI(prefix);
                     if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), uri))
@@ -283,6 +283,7 @@ public class ExporterComponent
             }
             
             // Export node properties
+            exporter.startProperties(nodeRef);
             Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
             for (QName property : properties.keySet())
             {
@@ -364,6 +365,7 @@ public class ExporterComponent
                 // end export of property
                 exporter.endProperty(nodeRef, property);
             }
+            exporter.endProperties(nodeRef);
             
             // Export node children
             if (parameters.isCrawlChildNodes())
