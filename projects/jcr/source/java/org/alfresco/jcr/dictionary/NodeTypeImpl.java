@@ -30,7 +30,6 @@ import javax.jcr.nodetype.PropertyDefinition;
 import org.alfresco.jcr.item.JCRMixinTypesProperty;
 import org.alfresco.jcr.item.JCRPrimaryTypeProperty;
 import org.alfresco.jcr.item.ValueImpl;
-import org.alfresco.jcr.repository.JCRNamespace;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;

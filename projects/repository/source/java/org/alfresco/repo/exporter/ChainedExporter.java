@@ -157,7 +157,7 @@ import org.alfresco.service.namespace.QName;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
-    public void value(NodeRef nodeRef, QName property, String value)
+    public void value(NodeRef nodeRef, QName property, Object value)
     {
         for (Exporter exporter : exporters)
         {
@@ -168,7 +168,7 @@ import org.alfresco.service.namespace.QName;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Collection)
      */
-    public void value(NodeRef nodeRef, QName property, Collection<String> values)
+    public void value(NodeRef nodeRef, QName property, Collection values)
     {
         for (Exporter exporter : exporters)
         {

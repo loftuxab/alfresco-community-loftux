@@ -33,10 +33,11 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ExportStreamHandler;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterCrawler;
+import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterException;
@@ -63,9 +64,6 @@ public class ExporterComponent
     private NodeService nodeService;
     private SearchService searchService;
     private ContentService contentService;
-
-    /** The list of namespace URIs to exclude from the export */
-    private String[] excludedURIs = new String[] { NamespaceService.SYSTEM_MODEL_1_0_URI, NamespaceService.REPOSITORY_VIEW_1_0_URI };
 
     /** Indent Size */
     private int indentSize = 2;
@@ -111,28 +109,25 @@ public class ExporterComponent
         this.namespaceService = namespaceService;
     }
 
-    /**
-     * @param excludedURIs  the URIs to exclude from the export
-     */
-    public void setExcludedURIs(String[] excludedURIs)
-    {
-        this.excludedURIs = excludedURIs;
-    }
-    
     
     /* (non-Javadoc)
-     * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.Location, boolean, org.alfresco.service.cmr.view.Exporter)
+     * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.ExporterCrawlerParameters, org.alfresco.service.cmr.view.Exporter)
      */
-    public void exportView(OutputStream viewWriter, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, ExporterCrawlerParameters parameters, Exporter progress)
     {
         ParameterCheck.mandatory("View Writer", viewWriter);
-        export(location, createXMLExporter(viewWriter), exportChildren, progress);
+        
+        // Construct a basic XML Exporter
+        Exporter xmlExporter = createXMLExporter(viewWriter);
+
+        // Export
+        exportView(xmlExporter, parameters, progress);
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.ExportStreamHandler, org.alfresco.service.cmr.view.Location, boolean, org.alfresco.service.cmr.view.Exporter)
+     * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.ExportStreamHandler, org.alfresco.service.cmr.view.ExporterCrawlerParameters, org.alfresco.service.cmr.view.Exporter)
      */
-    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, ExporterCrawlerParameters parameters, Exporter progress)
     {
         ParameterCheck.mandatory("View Writer", viewWriter);
         ParameterCheck.mandatory("Stream Handler", streamHandler);
@@ -140,11 +135,23 @@ public class ExporterComponent
         // Construct a URL Exporter (wrapped around an XML Exporter)
         Exporter xmlExporter = createXMLExporter(viewWriter);
         URLExporter urlExporter = new URLExporter(xmlExporter, streamHandler);
-        
-        // Export        
-        export(location, urlExporter, exportChildren, progress);        
-    }
 
+        // Export        
+        exportView(urlExporter, parameters, progress);        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.ExporterService#exportView(org.alfresco.service.cmr.view.Exporter, org.alfresco.service.cmr.view.ExporterCrawler, org.alfresco.service.cmr.view.Exporter)
+     */
+    public void exportView(Exporter exporter, ExporterCrawlerParameters parameters, Exporter progress)
+    {
+        ParameterCheck.mandatory("Exporter", exporter);
+        
+        ChainedExporter chainedExporter = new ChainedExporter(new Exporter[] {exporter, progress});
+        DefaultCrawler crawler = new DefaultCrawler();
+        crawler.export(parameters, chainedExporter);
+    }
+    
     /**
      * Create an XML Exporter that exports repository information to the specified
      * output stream in xml format.
@@ -164,7 +171,7 @@ public class ExporterComponent
         try
         {
             XMLWriter writer = new XMLWriter(viewWriter, format);
-            return new XMLExporter(namespaceService, nodeService, writer);
+            return new ViewXMLExporter(namespaceService, nodeService, writer);
         }
         catch (UnsupportedEncodingException e)        
         {
@@ -172,25 +179,6 @@ public class ExporterComponent
         }
     }
     
-    /**
-     * Perform the Export
-     * 
-     * @param location  the location within the Repository to export
-     * @param exporter  the exporter to perform the actual export
-     * @param exportChildren  export children as well?
-     * @param progress  exporter callback for tracking progress of export
-     */
-    private void export(Location location, Exporter exporter, boolean exportChildren, Exporter progress)
-    {
-        ParameterCheck.mandatory("Location", location);
-        ParameterCheck.mandatory("Exporter", exporter);
-        
-        NodeRef nodeRef = getNodeRef(location);
-
-        ChainedExporter chainedExporter = new ChainedExporter(new Exporter[] {exporter, progress});
-        ExportNavigator navigator = new ExportNavigator(nodeRef, chainedExporter, exportChildren);
-        navigator.walk();        
-    }
     
     /**
      * Responsible for navigating the Repository from specified location and invoking
@@ -198,57 +186,42 @@ public class ExporterComponent
      * 
      * @author David Caruana
      */
-    private class ExportNavigator
+    private class DefaultCrawler implements ExporterCrawler
     {
-        private NodeRef nodeRef;
-        private Exporter exporter;
-        private boolean children;
-
-        /**
-         * Construct.
-         * 
-         * @param nodeRef  the starting point node reference
-         * @param exporter  the export
-         * @param children  export children as well?
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ExporterCrawler#export(org.alfresco.service.cmr.view.Exporter)
          */
-        private ExportNavigator(NodeRef nodeRef, Exporter exporter, boolean children)
+        public void export(ExporterCrawlerParameters parameters, Exporter exporter)
         {
-            this.nodeRef = nodeRef;
-            this.exporter = exporter;
-            this.children = children;
-        }
-        
-        /**
-         * Start navigation
-         */
-        private void walk()
-        {
+            NodeRef nodeRef = getNodeRef(parameters.getExportFrom());
+                    
             exporter.start();
-            if (nodeService.getRootNode(nodeRef.getStoreRef()).equals(nodeRef))
+            
+            if (parameters.isCrawlSelf())
             {
-                // exporting complete store so cycle through the root entries
-                List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
-                for (ChildAssociationRef childAssoc : childAssocs)
-                {
-                    walkStartNamespaces();
-                    walkNode(childAssoc.getChildRef());
-                    walkEndNamespaces();
-                }
+                walkStartNamespaces(parameters, exporter);
+                walkNode(nodeRef, parameters, exporter);
+                walkEndNamespaces(parameters, exporter);
             }
             else
             {
-                // exporting specific node within store
-                walkStartNamespaces();
-                walkNode(nodeRef);
-                walkEndNamespaces();
+                // export child nodes only
+                List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
+                for (ChildAssociationRef childAssoc : childAssocs)
+                {
+                    walkStartNamespaces(parameters, exporter);
+                    walkNode(childAssoc.getChildRef(), parameters, exporter);
+                    walkEndNamespaces(parameters, exporter);
+                }
             }
+            
             exporter.end();
         }
         
         /**
          * Call-backs for start of Namespace scope
          */
-        private void walkStartNamespaces()
+        private void walkStartNamespaces(ExporterCrawlerParameters parameters, Exporter exporter)
         {
             Collection<String> prefixes = namespaceService.getPrefixes();
             for (String prefix : prefixes)
@@ -256,7 +229,7 @@ public class ExporterComponent
                 if (prefix != null && prefix.length() > 0)
                 {
                     String uri = namespaceService.getNamespaceURI(prefix);
-                    if (!excludedURI(uri))
+                    if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), uri))
                     {
                         exporter.startNamespace(prefix, uri);
                     }
@@ -267,7 +240,7 @@ public class ExporterComponent
         /**
          * Call-backs for end of Namespace scope
          */
-        private void walkEndNamespaces()
+        private void walkEndNamespaces(ExporterCrawlerParameters parameters, Exporter exporter)
         {
             Collection<String> prefixes = namespaceService.getPrefixes();
             for (String prefix : prefixes)
@@ -275,7 +248,7 @@ public class ExporterComponent
                 if (prefix != null && prefix.length() > 0)
                 {
                     String uri = namespaceService.getNamespaceURI(prefix);
-                    if (!excludedURI(uri))
+                    if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), uri))
                     {
                         exporter.endNamespace(prefix);
                     }
@@ -288,11 +261,11 @@ public class ExporterComponent
          * 
          * @param nodeRef  the node to navigate
          */
-        private void walkNode(NodeRef nodeRef)
+        private void walkNode(NodeRef nodeRef, ExporterCrawlerParameters parameters, Exporter exporter)
         {
             // Export node (but only if it's not excluded from export)
             QName type = nodeService.getType(nodeRef);
-            if (excludedURI(type.getNamespaceURI()))
+            if (isExcludedURI(parameters.getExcludeNamespaceURIs(), type.getNamespaceURI()))
             {
                 return;
             }
@@ -302,7 +275,7 @@ public class ExporterComponent
             Set<QName> aspects = nodeService.getAspects(nodeRef);
             for (QName aspect : aspects)
             {
-                if (!excludedURI(aspect.getNamespaceURI()))                
+                if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), aspect.getNamespaceURI()))                
                 {
                     exporter.startAspect(nodeRef, aspect);
                     exporter.endAspect(nodeRef, aspect);
@@ -313,16 +286,26 @@ public class ExporterComponent
             Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
             for (QName property : properties.keySet())
             {
-                if (excludedURI(property.getNamespaceURI()))
+                // filter out properties whose namespace is excluded
+                if (isExcludedURI(parameters.getExcludeNamespaceURIs(), property.getNamespaceURI()))
                 {
                     continue;
                 }
-                exporter.startProperty(nodeRef, property);
                 
+                // filter out properties whose value is null, if not required
+                Object value = properties.get(property);
+                if (!parameters.isCrawlNullProperties() && value == null)
+                {
+                    continue;
+                }
+                
+                // start export of property
+                exporter.startProperty(nodeRef, property);
+
                 // TODO: This should test for datatype.content
                 if (dictionaryService.isSubClass(type, ContentModel.TYPE_CMOBJECT) && property.equals(ContentModel.PROP_CONTENT_URL))
                 {
-                    // Export property of datatype CONTENT
+                    // export property of datatype CONTENT
                     ContentReader reader = contentService.getReader(nodeRef);
                     if (reader == null || reader.exists() == false)
                     {
@@ -330,21 +313,30 @@ public class ExporterComponent
                     }
                     else
                     {
-                        InputStream inputStream = reader.getContentInputStream();
-                        try
+                        // filter out content if not required
+                        if (parameters.isCrawlContent())
                         {
-                            exporter.content(nodeRef, property, inputStream);
-                        }
-                        finally
-                        {
+                            InputStream inputStream = reader.getContentInputStream();
                             try
                             {
-                                inputStream.close();
+                                exporter.content(nodeRef, property, inputStream);
                             }
-                            catch(IOException e)
+                            finally
                             {
-                                throw new ExporterException("Failed to export node content for node " + nodeRef, e);
+                                try
+                                {
+                                    inputStream.close();
+                                }
+                                catch(IOException e)
+                                {
+                                    throw new ExporterException("Failed to export node content for node " + nodeRef, e);
+                                }
                             }
+                        }
+                        else
+                        {
+                            // skip content values
+                            exporter.content(nodeRef, property, null);
                         }
                     }
                 }
@@ -353,16 +345,13 @@ public class ExporterComponent
                     // Export all other datatypes
                     try
                     {
-                        Object value = properties.get(property);
                         if (value instanceof Collection)
                         {
-                            Collection<String> strValues = DefaultTypeConverter.INSTANCE.convert(String.class, (Collection)value);
-                            exporter.value(nodeRef, property, strValues);
+                            exporter.value(nodeRef, property, (Collection)value);
                         }
                         else
                         {
-                            String strValue = DefaultTypeConverter.INSTANCE.convert(String.class, value);
-                            exporter.value(nodeRef, property, strValue);
+                            exporter.value(nodeRef, property, value);
                         }
                     }
                     catch(UnsupportedOperationException e)
@@ -371,19 +360,20 @@ public class ExporterComponent
                         exporter.value(nodeRef, property, properties.get(property).toString());
                     }
                 }
-                
+
+                // end export of property
                 exporter.endProperty(nodeRef, property);
             }
             
             // Export node children
-            if (children)
+            if (parameters.isCrawlChildNodes())
             {
                 List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
                 for (int i = 0; i < childAssocs.size(); i++)
                 {
                     ChildAssociationRef childAssoc = childAssocs.get(i);
                     QName childAssocType = childAssoc.getTypeQName();
-                    if (excludedURI(childAssocType.getNamespaceURI()))
+                    if (isExcludedURI(parameters.getExcludeNamespaceURIs(), childAssocType.getNamespaceURI()))
                     {
                         continue;
                     }
@@ -393,9 +383,9 @@ public class ExporterComponent
                         exporter.startAssoc(nodeRef, childAssocType);
                     }
                     
-                    if (!excludedURI(childAssoc.getQName().getNamespaceURI()))
+                    if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), childAssoc.getQName().getNamespaceURI()))
                     {
-                        walkNode(childAssoc.getChildRef());
+                        walkNode(childAssoc.getChildRef(), parameters, exporter);
                     }
                     
                     if (i == childAssocs.size() - 1 || childAssocs.get(i + 1).getTypeQName().equals(childAssocType) == false)
@@ -417,9 +407,9 @@ public class ExporterComponent
          * @param uri  the URI to test
          * @return  true => it's excluded from the export
          */
-        private boolean excludedURI(String uri)
+        private boolean isExcludedURI(String[] excludeNamespaceURIs, String uri)
         {
-            for (String excludedURI : excludedURIs)
+            for (String excludedURI : excludeNamespaceURIs)
             {
                 if (uri.equals(excludedURI))
                 {
@@ -428,47 +418,47 @@ public class ExporterComponent
             }
             return false;
         }
-
+        
+        /**
+         * Get the Node Ref from the specified Location
+         * 
+         * @param location  the location
+         * @return  the node reference
+         */
+        private NodeRef getNodeRef(Location location)
+        {
+            ParameterCheck.mandatory("Location", location);
+        
+            // Establish node to import within
+            NodeRef nodeRef = (location == null) ? null : location.getNodeRef();
+            if (nodeRef == null)
+            {
+                // If a specific node has not been provided, default to the root
+                nodeRef = nodeService.getRootNode(location.getStoreRef());
+            }
+        
+            // Resolve to path within node, if one specified
+            String path = (location == null) ? null : location.getPath();
+            if (path != null && path.length() >0)
+            {
+                // Create a valid path and search
+                List<NodeRef> nodeRefs = searchService.selectNodes(nodeRef, path, null, namespaceService, false);
+                if (nodeRefs.size() == 0)
+                {
+                    throw new ImporterException("Path " + path + " within node " + nodeRef + " does not exist - the path must resolve to a valid location");
+                }
+                if (nodeRefs.size() > 1)
+                {
+                    throw new ImporterException("Path " + path + " within node " + nodeRef + " found too many locations - the path must resolve to one location");
+                }
+                nodeRef = nodeRefs.get(0);
+            }
+        
+            // TODO: Check Node actually exists
+        
+            return nodeRef;
+        }
     }
 
-    /**
-     * Get the Node Ref from the specified Location
-     * 
-     * @param location  the location
-     * @return  the node reference
-     */
-    private NodeRef getNodeRef(Location location)
-    {
-        ParameterCheck.mandatory("Location", location);
-    
-        // Establish node to import within
-        NodeRef nodeRef = location.getNodeRef();
-        if (nodeRef == null)
-        {
-            // If a specific node has not been provided, default to the root
-            nodeRef = nodeService.getRootNode(location.getStoreRef());
-        }
-    
-        // Resolve to path within node, if one specified
-        String path = location.getPath();
-        if (path != null && path.length() >0)
-        {
-            // Create a valid path and search
-            List<NodeRef> nodeRefs = searchService.selectNodes(nodeRef, path, null, namespaceService, false);
-            if (nodeRefs.size() == 0)
-            {
-                throw new ImporterException("Path " + path + " within node " + nodeRef + " does not exist - the path must resolve to a valid location");
-            }
-            if (nodeRefs.size() > 1)
-            {
-                throw new ImporterException("Path " + path + " within node " + nodeRef + " found too many locations - the path must resolve to one location");
-            }
-            nodeRef = nodeRefs.get(0);
-        }
-    
-        // TODO: Check Node actually exists
-    
-        return nodeRef;
-    }
     
 }

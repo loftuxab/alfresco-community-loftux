@@ -27,31 +27,39 @@ import java.io.OutputStream;
 public interface ExporterService
 {
     /**
-     * Export a view of the Repository.
+     * Export a view of the Repository using the default xml view schema.
      * 
      * All repository information is exported to the single output stream.  This means that any
      * content properties are base64 encoded. 
      * 
      * @param viewWriter  the output stream to export to
-     * @param location  the location within the Repository to export
-     * @param exportChildren  export children as well
+     * @param parameters  export parameters
      * @param progress  exporter callback for tracking progress of export
      */
-    public void exportView(OutputStream viewWriter, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, ExporterCrawlerParameters parameters, Exporter progress)
         throws ExporterException;
 
     /**
-     * Export a view of the Repository.
+     * Export a view of the Repository using the default xml view schema.
      * 
      * This export supports the custom handling of content properties.
      * 
      * @param viewWriter the output stream to export to
      * @param streamHandler  the custom handler for content properties
-     * @param location  the location witihn the Repository to export
-     * @param exportChildren  export children as well
+     * @param parameters  export parameters
      * @param progress  exporter callback for tracking progress of export
      */
-    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, Location location, boolean exportChildren, Exporter progress)
+    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, ExporterCrawlerParameters parameters, Exporter progress)
         throws ExporterException;
 
+    
+    /**
+     * Export a view of the Repository using a custom crawler and exporter.
+     * 
+     * @param exporter  custom exporter
+     * @param parameters  export parameters
+     * @param progress  exporter callback for tracking progress of export
+     */
+    public void exportView(Exporter exporter, ExporterCrawlerParameters parameters, Exporter progress);
+    
 }

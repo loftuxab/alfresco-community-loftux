@@ -22,8 +22,8 @@ import java.util.Set;
 
 import javax.jcr.RepositoryException;
 
+import org.alfresco.jcr.dictionary.JCRNamespace;
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
-import org.alfresco.jcr.repository.JCRNamespace;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 

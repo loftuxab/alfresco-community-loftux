@@ -18,7 +18,7 @@ package org.alfresco.jcr.item;
 
 import javax.jcr.RepositoryException;
 
-import org.alfresco.jcr.repository.JCRNamespace;
+import org.alfresco.jcr.dictionary.JCRNamespace;
 import org.alfresco.service.namespace.QName;
 
 

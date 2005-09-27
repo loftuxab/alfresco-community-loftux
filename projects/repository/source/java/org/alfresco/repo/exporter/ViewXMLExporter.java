@@ -19,7 +19,6 @@ package org.alfresco.repo.exporter;
 import java.io.InputStream;
 import java.util.Collection;
 
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
@@ -38,7 +37,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * 
  * @author David Caruana
  */
-/*package*/ class XMLExporter
+/*package*/ class ViewXMLExporter
     implements Exporter
 {
     private final static String VIEW_LOCALNAME = "view";
@@ -61,7 +60,7 @@ import org.xml.sax.helpers.AttributesImpl;
      * @param nodeService  node service
      * @param contentHandler  content handler
      */
-    /*package*/ XMLExporter(NamespaceService namespaceService, NodeService nodeService, ContentHandler contentHandler)
+    ViewXMLExporter(NamespaceService namespaceService, NodeService nodeService, ContentHandler contentHandler)
     {
         this.namespaceService = namespaceService;
         this.nodeService = nodeService;
@@ -222,13 +221,14 @@ import org.xml.sax.helpers.AttributesImpl;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
-    public void value(NodeRef nodeRef, QName property, String value)
+    public void value(NodeRef nodeRef, QName property, Object value)
     {
         if (value != null)
         {
             try
             {
-                contentHandler.characters(value.toCharArray(), 0, value.length());
+                String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
+                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
             }
             catch (SAXException e)
             {
@@ -240,14 +240,15 @@ import org.xml.sax.helpers.AttributesImpl;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Collection)
      */
-    public void value(NodeRef nodeRef, QName property, Collection<String> values)
+    public void value(NodeRef nodeRef, QName property, Collection values)
     {
         try
         {
-            for (String value : values)
+            Collection<String> strValues = DefaultTypeConverter.INSTANCE.convert(String.class, values);
+            for (String strValue : strValues)
             {
                 contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
-                contentHandler.characters(value.toCharArray(), 0, value.length());
+                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
                 contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, toPrefixString(VALUE_QNAME));
             }
         }
@@ -326,17 +327,7 @@ import org.xml.sax.helpers.AttributesImpl;
      */
     private String toPrefixString(QName qname)
     {
-        Collection<String> prefixes = namespaceService.getPrefixes(qname.getNamespaceURI());
-        if (prefixes.isEmpty() == false)
-        {
-            String prefix = prefixes.iterator().next();
-            QName prefixedQName = QName.createQName(prefix, qname.getLocalName(), namespaceService);
-            return prefixedQName.toPrefixString();
-        }
-        else
-        {
-            return qname.toPrefixString();
-        }
+        return qname.toPrefixString(namespaceService);
     }
     
 }

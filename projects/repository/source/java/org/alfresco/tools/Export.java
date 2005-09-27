@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ExportStreamHandler;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
@@ -138,6 +139,10 @@ public final class Export extends Tool
                 }
                 context.setPassword(args[i]);
             }
+            else if (args[i].equals("-root"))
+            {
+                context.self = true;
+            }
             else if (args[i].equals("-nochildren"))
             {
                 context.children = false;
@@ -188,7 +193,8 @@ public final class Export extends Tool
         System.out.println(" -d[ir] the destination directory to export to (default: current directory)");
         System.out.println(" -pwd password for login");
         System.out.println(" -packagedir the directory to place extracted content (default: dir/<packagename>)");
-        System.out.println(" -nochildren do not extract children");
+        System.out.println(" -root extract the item located at export path");
+        System.out.println(" -nochildren do not extract children of the item at export path");
         System.out.println(" -overwrite force overwrite of existing export package if it already exists");
         System.out.println(" -quiet do not display any messages during export");
         System.out.println(" -verbose report export progress");
@@ -210,7 +216,11 @@ public final class Export extends Tool
         streamHandler.createPackage();
 
         // Export Repository content to export package
-        exporter.exportView(output, streamHandler, context.getLocation(), context.children, new ExportProgress());
+        ExporterCrawlerParameters parameters = new ExporterCrawlerParameters();
+        parameters.setExportFrom(context.getLocation());
+        parameters.setCrawlSelf(context.self);
+        parameters.setCrawlChildNodes(context.children);
+        exporter.exportView(output, streamHandler, parameters, new ExportProgress());
         
         // Close Export File
         try
@@ -293,7 +303,14 @@ public final class Export extends Tool
                 }
                 log("Warning: Overwriting existing package dir " + absPackageDir.getAbsolutePath());
             }
+        }
 
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ExportStreamHandler#exportStream(java.io.InputStream)
+         */
+        public String exportStream(InputStream exportStream)
+        {
+            // Lazily create package directory
             try
             {
                 absPackageDir.mkdirs();
@@ -302,13 +319,7 @@ public final class Export extends Tool
             {
                 throw new ToolException("Failed to create package dir " + absPackageDir.getAbsolutePath() + " due to " + e.getMessage());
             }
-        }
-
-        /* (non-Javadoc)
-         * @see org.alfresco.service.cmr.view.ExportStreamHandler#exportStream(java.io.InputStream)
-         */
-        public String exportStream(InputStream exportStream)
-        {
+            
             // Create file in package directory to hold exported content
             File outputFile = TempFileProvider.createTempFile("export", ".bin", absPackageDir);
             
@@ -358,6 +369,8 @@ public final class Export extends Tool
         private String packageName;
         /** Export children */
         private boolean children = true;
+        /** Export self */
+        private boolean self = false;
         /** Force overwrite of existing package */
         private boolean overwrite = false;
 
@@ -523,14 +536,14 @@ public final class Export extends Tool
         /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
          */
-        public void value(NodeRef nodeRef, QName property, String value)
+        public void value(NodeRef nodeRef, QName property, Object value)
         {
         }
 
         /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Collection)
          */
-        public void value(NodeRef nodeRef, QName property, Collection<String> values)
+        public void value(NodeRef nodeRef, QName property, Collection values)
         {
         }
 

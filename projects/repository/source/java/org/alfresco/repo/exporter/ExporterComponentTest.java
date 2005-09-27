@@ -27,6 +27,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
@@ -74,7 +75,9 @@ public class ExporterComponentTest extends BaseSpringTest
         location.setPath("/system");
         File tempFile = TempFileProvider.createTempFile("xmlexporttest", ".xml");
         OutputStream output = new FileOutputStream(tempFile);
-        exporterService.exportView(output, location, true, testProgress);
+        ExporterCrawlerParameters parameters = new ExporterCrawlerParameters();
+        parameters.setExportFrom(location);
+        exporterService.exportView(output, parameters, testProgress);
         output.close();
     }
 
@@ -128,7 +131,7 @@ public class ExporterComponentTest extends BaseSpringTest
 //            System.out.println("TestProgress: end property " + property);
         }
 
-        public void value(NodeRef nodeRef, QName property, String value)
+        public void value(NodeRef nodeRef, QName property, Object value)
         {
 //            System.out.println("TestProgress: single value " + value);
         }

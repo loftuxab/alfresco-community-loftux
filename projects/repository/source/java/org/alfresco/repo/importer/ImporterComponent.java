@@ -50,7 +50,6 @@ import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
-import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -146,9 +145,6 @@ public class ImporterComponent
         NodeRef nodeRef = getNodeRef(location, configuration);
         QName childAssocType = getChildAssocType(location, configuration);
         performImport(nodeRef, childAssocType, viewReader, streamHandler, configuration, progress);
-
-        // TODO: Remove
-        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, nodeRef.getStoreRef()));
     }
     
     /**

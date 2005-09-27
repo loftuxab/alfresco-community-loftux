@@ -19,6 +19,7 @@ package org.alfresco.jcr.session;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessControlException;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +51,7 @@ import javax.jcr.version.VersionException;
 import org.alfresco.jcr.dictionary.JCRNamespacePrefixResolver;
 import org.alfresco.jcr.dictionary.NamespaceRegistryImpl;
 import org.alfresco.jcr.dictionary.NodeTypeManagerImpl;
+import org.alfresco.jcr.export.JCRSystemXMLExporter;
 import org.alfresco.jcr.item.ItemImpl;
 import org.alfresco.jcr.item.ItemResolver;
 import org.alfresco.jcr.item.JCRTypeConverter;
@@ -60,7 +62,12 @@ import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
+import org.alfresco.service.cmr.view.ExporterService;
+import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -370,8 +377,10 @@ public class SessionImpl implements Session
      */
     public void exportSystemView(String absPath, ContentHandler contentHandler, boolean skipBinary, boolean noRecurse) throws PathNotFoundException, SAXException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        
+        JCRSystemXMLExporter exporter = new JCRSystemXMLExporter(this, contentHandler);
+        ExporterCrawlerParameters parameters = createExportParameters(absPath, skipBinary, noRecurse);
+        ExporterService exporterService = getRepositoryImpl().getServiceRegistry().getExporterService();
+        exporterService.exportView(exporter, parameters, null);
     }
 
     /* (non-Javadoc)
@@ -379,8 +388,10 @@ public class SessionImpl implements Session
      */
     public void exportSystemView(String absPath, OutputStream out, boolean skipBinary, boolean noRecurse) throws IOException, PathNotFoundException, RepositoryException
     {
-        // TODO Auto-generated method stub
-        
+        JCRSystemXMLExporter exporter = new JCRSystemXMLExporter(this, createExportContentHandler(out));
+        ExporterCrawlerParameters parameters = createExportParameters(absPath, skipBinary, noRecurse);
+        ExporterService exporterService = getRepositoryImpl().getServiceRegistry().getExporterService();
+        exporterService.exportView(exporter, parameters, null);
     }
 
     /* (non-Javadoc)
@@ -502,6 +513,56 @@ public class SessionImpl implements Session
             throw new NoSuchWorkspaceException("Workspace " + workspaceName + " does not exist.");
         }
         return workspace;
+    }
+
+    
+    /**
+     * Create a Content Handler that outputs to the specified output stream.
+     * 
+     * @param output stream the output stream to write to
+     * @return  the content handler
+     */
+    private ContentHandler createExportContentHandler(OutputStream output)
+        throws RepositoryException
+    {
+        // Define output format
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        format.setNewLineAfterDeclaration(false);
+        format.setIndentSize(2);
+        format.setEncoding("UTF-8");
+
+        // Construct an XML Writer
+        try
+        {
+            return new XMLWriter(output, format);
+        }
+        catch (UnsupportedEncodingException e)        
+        {
+            throw new RepositoryException("Failed to create content handler for export", e);            
+        }
+    }
+
+    
+    /**
+     * Create Export Parameters
+     * 
+     * @param exportPath  path to export from
+     * @param skipBinary  skip binary content in export
+     * @param noRecurse  do not recurse to children
+     * @return  export parameters
+     */
+    private ExporterCrawlerParameters createExportParameters(String exportPath, boolean skipBinary, boolean noRecurse)
+    {
+        // construct exporter parameters
+        ExporterCrawlerParameters parameters = new ExporterCrawlerParameters();
+        Location exportFrom = new Location(getWorkspaceStore());
+        exportFrom.setPath(exportPath);
+        parameters.setExportFrom(exportFrom);
+        parameters.setCrawlSelf(true);
+        parameters.setCrawlContent(!skipBinary);
+        parameters.setCrawlChildNodes(!noRecurse);
+        parameters.setCrawlNullProperties(false);
+        return parameters;
     }
 
 }

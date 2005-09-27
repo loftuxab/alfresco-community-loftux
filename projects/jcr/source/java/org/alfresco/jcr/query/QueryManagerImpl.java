@@ -26,7 +26,7 @@ import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 
-import org.alfresco.jcr.repository.JCRNamespace;
+import org.alfresco.jcr.dictionary.JCRNamespace;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.namespace.QName;
 

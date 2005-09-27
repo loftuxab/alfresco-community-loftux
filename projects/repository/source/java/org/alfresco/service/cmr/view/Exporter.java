@@ -104,7 +104,7 @@ public interface Exporter
      * @param property  the property name
      * @param value  the value
      */
-    public void value(NodeRef nodeRef, QName property, String value);
+    public void value(NodeRef nodeRef, QName property, Object value);
 
     /**
      * Export multi valued property
@@ -113,7 +113,7 @@ public interface Exporter
      * @param property  the property name
      * @param value  the value
      */
-    public void value(NodeRef nodeRef, QName property, Collection<String> values);
+    public void value(NodeRef nodeRef, QName property, Collection values);
     
     /**
      * Export content stream

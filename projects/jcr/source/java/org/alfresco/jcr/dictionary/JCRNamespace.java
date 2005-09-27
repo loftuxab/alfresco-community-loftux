@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.repository;
+package org.alfresco.jcr.dictionary;
 
 
 /**
@@ -34,4 +34,7 @@ public class JCRNamespace
     
     public static String MIX_URI = "http://www.jcp.org/jcr/mix/1.0";
     public static String MIX_PREFIX = "mix";
+
+    public static String SV_URI = "http://www.jcp.org/jcr/sv/1.0";
+    public static String SV_PREFIX = "sv";
 }
