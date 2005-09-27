@@ -409,7 +409,7 @@ public class PasswordEncryptor
      * @return byte[]
      * @exception NoSuchAlgorithmException
      */
-    protected final byte[] doNTLM1Encryption(byte[] p21, byte[] c8)
+    public final byte[] doNTLM1Encryption(byte[] p21, byte[] c8)
         throws NoSuchAlgorithmException
     {
         return P24(p21, c8);
