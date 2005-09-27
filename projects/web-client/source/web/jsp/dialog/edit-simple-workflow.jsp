@@ -38,8 +38,8 @@
    
    function checkButtonState()
    {
-      /*if (document.getElementById("edit-simple-workflow:approve-step-name").value.length == 0 ||
-          document.getElementById("edit-simple-workflow:client-approve-folder").value.length == 0 ||
+      if (document.getElementById("edit-simple-workflow:approve-step-name").value.length == 0 ||
+          document.getElementById("edit-simple-workflow:client-approve-folder_selected").value.length == 0 ||
           rejectValid() == false)
       {
          document.getElementById("edit-simple-workflow:ok-button").disabled = true;
@@ -47,19 +47,19 @@
       else
       {
          document.getElementById("edit-simple-workflow:ok-button").disabled = false;
-      }*/
+      }
    }
    
    function rejectValid()
    {
       var result = true;
       
-      /*if (document.forms['edit-simple-workflow']['edit-simple-workflow:reject-step-present'][0].checked && 
+      if (document.forms['edit-simple-workflow']['edit-simple-workflow:reject-step-present'][0].checked && 
           (document.getElementById("edit-simple-workflow:reject-step-name").value.length == 0 ||
-           document.getElementById("edit-simple-workflow:client-reject-folder").value.length == 0))
+           document.getElementById("edit-simple-workflow:client-reject-folder_selected").value.length == 0))
       {
          result = false;
-      }*/
+      }
       
       return result;
    }
@@ -71,12 +71,6 @@
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <h:form acceptCharset="UTF-8" id="edit-simple-workflow">
-   
-   <%-- add the approve and reject folder ids as hidden fields --%>
-   <%--
-   <h:inputHidden id="client-approve-folder" value="#{DocumentDetailsBean.workflowProperties.approveFolder.id}" />
-   <h:inputHidden id="client-reject-folder" value="#{DocumentDetailsBean.workflowProperties.rejectFolder.id}" /<
-   --%>
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -167,7 +161,7 @@
                                              <td valign="top" style="padding-top:10px;"><h:outputText value="#{msg.to}" />:</td>
                                              <td style="padding-left:6px;"></td>
                                              <td style="padding-top:6px;">
-                                                <r:spaceSelector label="#{msg.select_destination_prompt}"
+                                                <r:spaceSelector id="client-approve-folder" label="#{msg.select_destination_prompt}"
                                                         value="#{DocumentDetailsBean.workflowProperties.approveFolder}"
                                                         initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
@@ -222,7 +216,8 @@
                                                                <td valign="top" style="padding-top:10px;"><h:outputText value="#{msg.to}" />:</td>
                                                                <td style="padding-left:6px;"></td>
                                                                <td style="padding-top:6px;">
-                                                                  <r:spaceSelector label="#{msg.select_destination_prompt}" 
+                                                                  <r:spaceSelector id="client-reject-folder" 
+                                                                          label="#{msg.select_destination_prompt}" 
                                                                           value="#{DocumentDetailsBean.workflowProperties.rejectFolder}" 
                                                                           initialSelection="#{NavigationBean.currentNodeId}"
                                                                           style="border: 1px dashed #cccccc; padding: 6px;"/>

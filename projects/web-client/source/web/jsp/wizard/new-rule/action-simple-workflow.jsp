@@ -39,7 +39,7 @@
    function checkButtonState()
    {
       if (document.getElementById("new-rule-simple-workflow:approve-step-name").value.length == 0 ||
-          document.getElementById("new-rule-simple-workflow:client-approve-folder").value.length == 0 ||
+          document.getElementById("new-rule-simple-workflow:client-approve-folder_selected").value.length == 0 ||
           rejectValid() == false)
       {
          document.getElementById("new-rule-simple-workflow:ok-button").disabled = true;
@@ -56,7 +56,7 @@
       
       if (document.forms['new-rule-simple-workflow']['new-rule-simple-workflow:reject-step-present'][0].checked && 
           (document.getElementById("new-rule-simple-workflow:reject-step-name").value.length == 0 ||
-           document.getElementById("new-rule-simple-workflow:client-reject-folder").value.length == 0))
+           document.getElementById("new-rule-simple-workflow:client-reject-folder_selected").value.length == 0))
       {
          result = false;
       }
@@ -71,10 +71,6 @@
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
    <h:form acceptCharset="UTF-8" id="new-rule-simple-workflow">
-   
-   <%-- add the approve and reject folder ids as hidden fields --%>
-   <h:inputHidden id="client-approve-folder" value="#{NewRuleWizard.actionProperties.approveFolder}" />
-   <h:inputHidden id="client-reject-folder" value="#{NewRuleWizard.actionProperties.rejectFolder}" />
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -172,7 +168,8 @@
                                              <td valign="top" style="padding-top:10px;">To:</td>
                                              <td style="padding-left:6px;"></td>
                                              <td style="padding-top:6px;">
-                                                <r:spaceSelector label="#{msg.select_destination_prompt}" 
+                                                <r:spaceSelector id="client-approve-folder"
+                                                        label="#{msg.select_destination_prompt}" 
                                                         value="#{NewRuleWizard.actionProperties.approveFolder}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
@@ -227,7 +224,8 @@
                                                                <td valign="top" style="padding-top:10px;"><h:outputText value="#{msg.to}"/>:</td>
                                                                <td style="padding-left:6px;"></td>
                                                                <td style="padding-top:6px;">
-                                                                  <r:spaceSelector label="#{msg.select_destination_prompt}" 
+                                                                  <r:spaceSelector id="client-reject-folder"
+                                                                          label="#{msg.select_destination_prompt}" 
                                                                           value="#{NewRuleWizard.actionProperties.rejectFolder}"
                                                                           initialSelection="#{NavigationBean.currentNodeId}" 
                                                                           style="border: 1px dashed #cccccc; padding: 6px;"/>

@@ -230,6 +230,8 @@ public abstract class AbstractItemSelector extends UIInput
       
       StringBuilder buf = new StringBuilder(512);
       Map attrs = this.getAttributes();
+      boolean showValueInHiddenField = false;
+      NodeRef value = null;
       
       switch (this.mode)
       {
@@ -242,7 +244,7 @@ public abstract class AbstractItemSelector extends UIInput
                tx = Repository.getUserTransaction(context);
                tx.begin();
                
-               NodeRef value = null;
+               
                NodeRef submittedValue = (NodeRef)getSubmittedValue();
                if (submittedValue != null)
                {
@@ -276,6 +278,7 @@ public abstract class AbstractItemSelector extends UIInput
                else
                {
                   label = Repository.getNameForNode(getNodeService(context), value);
+                  showValueInHiddenField = true;
                }
                
                // output surrounding span for style purposes
@@ -466,6 +469,19 @@ public abstract class AbstractItemSelector extends UIInput
             break;
          }
       }
+      
+      // output a hidden field containing the currently selected NodeRef so that JavaScript
+      // can be used to check the state of the component
+      buf.append("<input type='hidden' name='");
+      buf.append(clientId);
+      buf.append("_selected' id='");
+      buf.append(clientId);
+      buf.append("_selected' value='");
+      if (showValueInHiddenField)
+      {
+         buf.append(value);
+      }
+      buf.append("'/>");
       
       context.getResponseWriter().write(buf.toString());
    }
