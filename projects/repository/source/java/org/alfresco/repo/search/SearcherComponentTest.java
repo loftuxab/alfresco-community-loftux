@@ -202,11 +202,24 @@ public class SearcherComponentTest extends TestCase
         // stop following parent links
         documentNavigator.setFollowAllParentLinks(false);
         
-        xpathStr = "deref(/test:root_p_n1/test:n1_p_n3/@test:reference, '')";
+        xpathStr = "deref(/test:root_p_n1/test:n1_p_n3/@test:reference, '*')";
         xpath = new NodeServiceXPath(xpathStr, documentNavigator, null);
         xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         list = xpath.selectNodes(assocRefs.get(qname));
         assertEquals(1, list.size());
+        
+        xpathStr = "deref(/test:root_p_n1/test:n1_p_n3/@test:reference, 'test:root_p_n1')";
+        xpath = new NodeServiceXPath(xpathStr, documentNavigator, null);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        list = xpath.selectNodes(assocRefs.get(qname));
+        assertEquals(0, list.size());
+        
+        xpathStr = "deref(/test:root_p_n1/test:n1_p_n3/@test:reference, 'test:root_p_n2')";
+        xpath = new NodeServiceXPath(xpathStr, documentNavigator, null);
+        xpath.addNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        list = xpath.selectNodes(assocRefs.get(qname));
+        assertEquals(1, list.size());
+        
         
         // test 'subtypeOf' function
         paramDef = new QueryParameterDefImpl(
@@ -377,5 +390,701 @@ public class SearcherComponentTest extends TestCase
         xpath = new NodeServiceXPath("/*/*", documentNavigator, null);
         list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(2, list.size());
+    }
+    
+    public void testBooleanFunctions() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        // commit the node graph
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+        
+        NodeServiceXPath xpath;
+        List list;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
+        // create the document navigator
+        DocumentNavigator documentNavigator = new DocumentNavigator(
+                dictionaryService,
+                nodeService,
+                searcher,
+                namespacePrefixResolver,
+                false, true);
+        
+        xpath = new NodeServiceXPath("/jcr:root[true()]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root[false()]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root[not(true())]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root[not(false())]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+    }
+    
+    public void testMutiValueProperties() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        // commit the node graph
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+        
+        NodeServiceXPath xpath;
+        List list;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
+        namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        // create the document navigator
+        DocumentNavigator documentNavigator = new DocumentNavigator(
+                dictionaryService,
+                nodeService,
+                searcher,
+                namespacePrefixResolver,
+                false, true);
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp = 'first']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp = 'second']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp = 'third']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp != 'third']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp < 'e']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp > 'e']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp < 'first']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp <= 'first']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp > 'third']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvp >= 'third']", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvi < 1]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvi <= 1]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvi > 3]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(0, list.size());
+        
+        xpath = new NodeServiceXPath("/jcr:root//*[@test:mvi >= 3]", documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());    
+    }
+    
+    public void testElementNodeTest() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        // commit the node graph
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+        
+        NodeServiceXPath xpath;
+        List list;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
+        namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        // create the document navigator
+        DocumentNavigator documentNavigator = new DocumentNavigator(
+                dictionaryService,
+                nodeService,
+                searcher,
+                namespacePrefixResolver,
+                false, true);
+        
+        xpath = new NodeServiceXPath("//element(*, *)".replaceAll("element\\(\\s*(\\*|\\$?\\w*:\\w*)\\s*,\\s*(\\*|\\$?\\w*:\\w*)\\s*\\)", "$1[subtypeOf(\"$2\")]"), documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(12, list.size());
+        
+        xpath = new NodeServiceXPath("//element(jcr:root, *)".replaceAll("element\\(\\s*(\\*|\\$?\\w*:\\w*)\\s*,\\s*(\\*|\\$?\\w*:\\w*)\\s*\\)", "$1[subtypeOf(\"$2\")]"), documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        QueryParameterDefImpl paramDef;
+        
+        paramDef = new QueryParameterDefImpl(
+                QName.createQName("test:type", namespacePrefixResolver),
+                dictionaryService.getDataType(DataTypeDefinition.QNAME),
+                true,
+                BaseNodeServiceTest.TYPE_QNAME_TEST_CONTENT.toPrefixString(namespacePrefixResolver));
+        xpath = new NodeServiceXPath("//element(*, test:content)".replaceAll("element\\(\\s*(\\*|\\$?\\w*:\\w*)\\s*,\\s*(\\*|\\$?\\w*:\\w*)\\s*\\)", "$1[subtypeOf(\"$2\")]"), documentNavigator,  new QueryParameterDefinition[]{paramDef});
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(2, list.size());
+        
+        paramDef = new QueryParameterDefImpl(
+                QName.createQName("test:type", namespacePrefixResolver),
+                dictionaryService.getDataType(DataTypeDefinition.QNAME),
+                true,
+                BaseNodeServiceTest.TYPE_QNAME_TEST_CONTENT.toPrefixString(namespacePrefixResolver));
+        xpath = new NodeServiceXPath("//element(test:n6_p_n8, test:content)".replaceAll("element\\(\\s*(\\*|\\$?\\w*:\\w*)\\s*,\\s*(\\*|\\$?\\w*:\\w*)\\s*\\)", "$1[subtypeOf(\"$2\")]"), documentNavigator,  new QueryParameterDefinition[]{paramDef});
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+    }
+    
+    public void testJCRLike() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        // commit the node graph
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+        
+        NodeServiceXPath xpath;
+        List list;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
+        namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        // create the document navigator
+        DocumentNavigator documentNavigator = new DocumentNavigator(
+                dictionaryService,
+                nodeService,
+                searcher,
+                namespacePrefixResolver,
+                false, true);
+        
+        
+        List<NodeRef> answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:like(@test:animal, 'm__k%')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+    }
+    
+    public void testJCRScore() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        // commit the node graph
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+        
+        NodeServiceXPath xpath;
+        List list;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
+        namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        // create the document navigator
+        DocumentNavigator documentNavigator = new DocumentNavigator(
+                dictionaryService,
+                nodeService,
+                searcher,
+                namespacePrefixResolver,
+                false, true);
+        
+        List<NodeRef> answer;
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//.",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(9, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//.[jcr:score() = 1.0]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(9, answer.size());
+    }
+    
+    public void testJCRContains() throws Exception
+    {
+        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        // commit the node graph
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+        
+        NodeServiceXPath xpath;
+        List list;
+        
+        DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
+        namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
+        namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
+        // create the document navigator
+        DocumentNavigator documentNavigator = new DocumentNavigator(
+                dictionaryService,
+                nodeService,
+                searcher,
+                namespacePrefixResolver,
+                false, true);
+        
+        List<NodeRef> answer;
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text1, 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text1, 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text1, 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text1, 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text1, 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text1, 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text1, 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        
+        
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text3, 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text3, 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text3, 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text3, 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text3, 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text2, 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        
+        
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text12, 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text12, 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text12, 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text12, 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text12, 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text12, 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text12, 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        
+        
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text13, 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text13, 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text13, 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text13, 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text13, 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text13, 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text13, 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text23, 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text23, 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text23, 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text23, 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text23, 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text23, 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text23, 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(0, answer.size());
+        
+        
+        
+        
+        
+        
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text123, 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text123, 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text123, 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text123, 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text123, 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text123, 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(@test:text123, 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(., 'bun')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(., 'cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+       
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(., 'biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(., 'bun cake')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(., 'cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(., 'bun biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[jcr:contains(., 'bun  cake biscuit')]",
+                null,
+                namespacePrefixResolver, false);
+        assertEquals(1, answer.size());
+        
     }
 }

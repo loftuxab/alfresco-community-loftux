@@ -18,13 +18,18 @@ package org.alfresco.repo.search;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.search.impl.JCR170Searcher;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.SearchParameters;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.QNamePattern;
 import org.jaxen.BaseXPath;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -76,6 +81,8 @@ import org.jaxen.function.xslt.DocumentFunction;
  */
 public class NodeServiceXPath extends BaseXPath
 {
+    private static String JCR_URI = "http://www.jcp.org/jcr/1.0";
+
     private static final long serialVersionUID = 3834032441789592882L;
 
     private boolean followAllParentLinks;
@@ -134,26 +141,24 @@ public class NodeServiceXPath extends BaseXPath
                         value);
             }
         }
-        
-        for(String prefix : documentNavigator.getNamespacePrefixResolver().getPrefixes())
+
+        for (String prefix : documentNavigator.getNamespacePrefixResolver().getPrefixes())
         {
             addNamespace(prefix, documentNavigator.getNamespacePrefixResolver().getNamespaceURI(prefix));
         }
     }
 
-    
     public static class FirstFunction implements Function
     {
 
-        public Object call(Context context,
-                           List args) throws FunctionCallException
+        public Object call(Context context, List args) throws FunctionCallException
         {
             if (args.size() == 0)
             {
-                return evaluate( context );
+                return evaluate(context);
             }
-          
-            throw new FunctionCallException( "first() requires no arguments." );
+
+            throw new FunctionCallException("first() requires no arguments.");
         }
 
         public static Double evaluate(Context context)
@@ -161,7 +166,7 @@ public class NodeServiceXPath extends BaseXPath
             return new Double(1);
         }
     }
-    
+
     /**
      * A boolean function to determine if a node type is a subtype of another
      * type
@@ -185,14 +190,19 @@ public class NodeServiceXPath extends BaseXPath
             }
             // resolve the qname of the type we are checking for
             String qnameStr = StringFunction.evaluate(qnameObj, nav);
+            if (qnameStr.equals("*"))
+            {
+                return true;
+            }
             QName typeQName;
-            if(qnameStr.indexOf("{") == 0)
+
+            if (qnameStr.startsWith("{"))
             {
                 typeQName = QName.createQName(qnameStr);
             }
             else
             {
-               typeQName = QName.createQName(qnameStr, ((DocumentNavigator)nav).getNamespacePrefixResolver());
+                typeQName = QName.createQName(qnameStr, ((DocumentNavigator) nav).getNamespacePrefixResolver());
             }
             // resolve the noderef
             NodeRef nodeRef = null;
@@ -210,9 +220,7 @@ public class NodeServiceXPath extends BaseXPath
             return result;
         }
     }
-    
-    
-    
+
     static class Deref implements Function
     {
 
@@ -236,9 +244,17 @@ public class NodeServiceXPath extends BaseXPath
             // Should do a type pattern test
             if ((attributeValue != null) && (attributeValue.length() > 0))
             {
-                NodeRef nodeRef = new NodeRef(attributeValue);
                 DocumentNavigator dNav = (DocumentNavigator) nav;
-                answer.add(dNav.getNode(nodeRef));
+                NodeRef nodeRef = new NodeRef(attributeValue);
+                if (patternValue.equals("*"))
+                {
+                    answer.add(dNav.getNode(nodeRef));
+                }
+                else
+                {
+                    QNamePattern qNamePattern = new JCRPatternMatch(patternValue, dNav.getNamespacePrefixResolver());
+                    answer.addAll(dNav.getNode(nodeRef, qNamePattern));
+                }
 
             }
             return answer;
@@ -343,196 +359,296 @@ public class NodeServiceXPath extends BaseXPath
             String patternValue = StringFunction.evaluate(pattern, nav);
             DocumentNavigator dNav = (DocumentNavigator) nav;
 
-            return dNav.contains(nodeRef, qname, patternValue);
+            return dNav.contains(nodeRef, qname, patternValue, SearchParameters.OR);
 
         }
     }
     
     
+    static class JCRContains implements Function
+    {
+
+        public Object call(Context context, List args) throws FunctionCallException
+        {
+            if (args.size() == 2)
+            {
+                if (context.getNavigator().isAttribute(context.getNodeSet().get(0)))
+                {
+                    throw new FunctionCallException("jcr:contains() does not apply to an attribute context.");
+                }
+                return evaluate(context.getNodeSet(), args.get(0), args.get(1), context.getNavigator());
+            }
+
+            throw new FunctionCallException("contains() requires two argument.");
+        }
+
+        public Object evaluate(List nodes, Object identifier, Object pattern, Navigator nav)
+        {
+            if (nodes.size() != 1)
+            {
+                return false;
+            }
+            
+            QName qname = null;
+            NodeRef nodeRef = null;
+            
+            Object target = identifier;
+            
+            if (identifier instanceof List)
+            {
+                List list = (List) identifier;
+                if (list.isEmpty())
+                {
+                    return false;
+                }
+                // do not recurse: only first list should unwrap
+                target = list.get(0);
+            }
+            
+            if (nav.isElement(target))
+            {
+                qname = null; // should use all attributes and full text index
+                nodeRef = ((ChildAssociationRef) target).getChildRef();
+            }
+            else if (nav.isAttribute(target))
+            {
+                qname = QName.createQName(nav.getAttributeNamespaceUri(target), nav
+                        .getAttributeName(target));
+                nodeRef = ((DocumentNavigator.Property) target).parent;
+            }
+
+            String patternValue = StringFunction.evaluate(pattern, nav);
+            DocumentNavigator dNav = (DocumentNavigator) nav;
+
+            return dNav.contains(nodeRef, qname, patternValue, SearchParameters.AND);
+
+        }
+    }
+
+    static class Score implements Function
+    {
+        private Double one = new Double(1);
+
+        public Object call(Context context, List args) throws FunctionCallException
+        {
+            return evaluate(context.getNodeSet(), context.getNavigator());
+        }
+
+        public Object evaluate(List nodes, Navigator nav)
+        {
+            return one;
+
+        }
+    }
+
     protected FunctionContext createFunctionContext()
     {
         return XPathFunctionContext.getInstance();
     }
-    
-    
-    
-    
-    
+
     public static class XPathFunctionContext extends SimpleFunctionContext
     {
-       /** Singleton implementation.
-        */
+        /**
+         * Singleton implementation.
+         */
         private static class Singleton
         {
-            /** Singleton instance.
+            /**
+             * Singleton instance.
              */
             private static XPathFunctionContext instance = new XPathFunctionContext();
         }
 
-        /** Retrieve the singleton instance.
-         *
-         *  @return the singleton instance
+        /**
+         * Retrieve the singleton instance.
+         * 
+         * @return the singleton instance
          */
         public static FunctionContext getInstance()
         {
             return Singleton.instance;
         }
 
-        /** Construct.
-         *
-         *  <p>
-         *  Construct with all core XPath functions registered.
-         *  </p>
+        /**
+         * Construct.
+         * 
+         * <p>
+         * Construct with all core XPath functions registered.
+         * </p>
          */
         public XPathFunctionContext()
         {
             // XXX could this be a HotSpot????
-            registerFunction( "",  // namespace URI
-                              "boolean",
-                              new BooleanFunction() );
+            registerFunction("", // namespace URI
+                    "boolean", new BooleanFunction());
 
-            registerFunction( "",  // namespace URI
-                              "ceiling",
-                              new CeilingFunction() );
+            registerFunction("", // namespace URI
+                    "ceiling", new CeilingFunction());
 
-            registerFunction( "",  // namespace URI
-                              "concat",
-                              new ConcatFunction() );
+            registerFunction("", // namespace URI
+                    "concat", new ConcatFunction());
 
-            registerFunction( "",  // namespace URI
-                              "contains",
-                              new ContainsFunction() );
-            
-            registerFunction( "",  // namespace URI
-                              "count",
-                              new CountFunction() );
+            registerFunction("", // namespace URI
+                    "contains", new ContainsFunction());
 
-            registerFunction( "",  // namespace URI
-                              "document",
-                              new DocumentFunction() );
+            registerFunction("", // namespace URI
+                    "count", new CountFunction());
 
-            registerFunction( "",  // namespace URI
-                              "false",
-                              new FalseFunction() );
+            registerFunction("", // namespace URI
+                    "document", new DocumentFunction());
 
-            registerFunction( "",  // namespace URI
-                              "floor",
-                              new FloorFunction() );
+            registerFunction("", // namespace URI
+                    "false", new FalseFunction());
 
-            registerFunction( "",  // namespace URI
-                              "id",
-                              new IdFunction() );
+            registerFunction("", // namespace URI
+                    "floor", new FloorFunction());
 
-            registerFunction( "",  // namespace URI
-                              "lang",
-                              new LangFunction() );
+            registerFunction("", // namespace URI
+                    "id", new IdFunction());
 
-            registerFunction( "",  // namespace URI
-                              "last",
-                              new LastFunction() );
+            registerFunction("", // namespace URI
+                    "lang", new LangFunction());
 
-            registerFunction( "",  // namespace URI
-                              "local-name",
-                              new LocalNameFunction() );
+            registerFunction("", // namespace URI
+                    "last", new LastFunction());
 
-            registerFunction( "",  // namespace URI
-                              "name",
-                              new NameFunction() );
+            registerFunction("", // namespace URI
+                    "local-name", new LocalNameFunction());
 
-            registerFunction( "",  // namespace URI
-                              "namespace-uri",
-                              new NamespaceUriFunction() );
+            registerFunction("", // namespace URI
+                    "name", new NameFunction());
 
-            registerFunction( "",  // namespace URI
-                              "normalize-space",
-                              new NormalizeSpaceFunction() );
+            registerFunction("", // namespace URI
+                    "namespace-uri", new NamespaceUriFunction());
 
-            registerFunction( "",  // namespace URI
-                              "not",
-                              new NotFunction() );
+            registerFunction("", // namespace URI
+                    "normalize-space", new NormalizeSpaceFunction());
 
-            registerFunction( "",  // namespace URI
-                              "number",
-                              new NumberFunction() );
+            registerFunction("", // namespace URI
+                    "not", new NotFunction());
 
-            registerFunction( "",  // namespace URI
-                              "position",
-                              new PositionFunction() );
+            registerFunction("", // namespace URI
+                    "number", new NumberFunction());
 
-            registerFunction( "",  // namespace URI
-                              "round",
-                              new RoundFunction() );
+            registerFunction("", // namespace URI
+                    "position", new PositionFunction());
 
-            registerFunction( "",  // namespace URI
-                              "starts-with",
-                              new StartsWithFunction() );
+            registerFunction("", // namespace URI
+                    "round", new RoundFunction());
 
-            registerFunction( "",  // namespace URI
-                              "string",
-                              new StringFunction() );
+            registerFunction("", // namespace URI
+                    "starts-with", new StartsWithFunction());
 
-            registerFunction( "",  // namespace URI
-                              "string-length",
-                              new StringLengthFunction() );
+            registerFunction("", // namespace URI
+                    "string", new StringFunction());
 
-            registerFunction( "",  // namespace URI
-                              "substring-after",
-                              new SubstringAfterFunction() );
+            registerFunction("", // namespace URI
+                    "string-length", new StringLengthFunction());
 
-            registerFunction( "",  // namespace URI
-                              "substring-before",
-                              new SubstringBeforeFunction() );
+            registerFunction("", // namespace URI
+                    "substring-after", new SubstringAfterFunction());
 
-            registerFunction( "",  // namespace URI
-                              "substring",
-                              new SubstringFunction() );
+            registerFunction("", // namespace URI
+                    "substring-before", new SubstringBeforeFunction());
 
-            registerFunction( "",  // namespace URI
-                              "sum",
-                              new SumFunction() );
+            registerFunction("", // namespace URI
+                    "substring", new SubstringFunction());
 
-            registerFunction( "",  // namespace URI
-                              "true",
-                              new TrueFunction() );
-            
-            registerFunction( "",  // namespace URI
-                              "translate",
-                              new TranslateFunction() );
-            
+            registerFunction("", // namespace URI
+                    "sum", new SumFunction());
+
+            registerFunction("", // namespace URI
+                    "true", new TrueFunction());
+
+            registerFunction("", // namespace URI
+                    "translate", new TranslateFunction());
 
             // register extension functions
             // extension functions should go into a namespace, but which one?
             // for now, keep them in default namespace to not break any code
 
-            registerFunction( "",  // namespace URI
-                              "matrix-concat",
-                              new MatrixConcatFunction() );
+            registerFunction("", // namespace URI
+                    "matrix-concat", new MatrixConcatFunction());
 
-            registerFunction( "",  // namespace URI
-                              "evaluate",
-                              new EvaluateFunction() );
-            
-            registerFunction( "",  // namespace URI
-                              "lower-case",
-                              new LowerFunction() );
-            
-            registerFunction( "",  // namespace URI
-                              "upper-case",
-                              new UpperFunction() );
-            
-            registerFunction( "",  // namespace URI
-                              "ends-with",
-                              new EndsWithFunction() );
-            
-            
-            
+            registerFunction("", // namespace URI
+                    "evaluate", new EvaluateFunction());
+
+            registerFunction("", // namespace URI
+                    "lower-case", new LowerFunction());
+
+            registerFunction("", // namespace URI
+                    "upper-case", new UpperFunction());
+
+            registerFunction("", // namespace URI
+                    "ends-with", new EndsWithFunction());
+
             registerFunction("", "subtypeOf", new SubTypeOf());
             registerFunction("", "deref", new Deref());
             registerFunction("", "like", new Like());
             registerFunction("", "contains", new Contains());
-            
+
             registerFunction("", "first", new FirstFunction());
-            
+
+            // 170 functions
+
+            registerFunction(JCR_URI, "like", new Like());
+            registerFunction(JCR_URI, "score", new Score());
+            registerFunction(JCR_URI, "contains", new JCRContains());
+            registerFunction(JCR_URI, "deref", new Deref());
+
         }
     }
+
+    public static class JCRPatternMatch implements QNamePattern
+    {
+        private List<String> searches = new ArrayList<String>();
+
+        private NamespacePrefixResolver resolver;
+
+        /**
+         * Construct
+         * 
+         * @param pattern
+         *            JCR Pattern
+         * @param resolver
+         *            Namespace Prefix Resolver
+         */
+        public JCRPatternMatch(String pattern, NamespacePrefixResolver resolver)
+        {
+            // TODO: Check for valid pattern
+
+            // Convert to regular expression
+            String regexPattern = pattern.replaceAll("\\*", ".*");
+
+            // Split into independent search strings
+            StringTokenizer tokenizer = new StringTokenizer(regexPattern, "|", false);
+            while (tokenizer.hasMoreTokens())
+            {
+                String disjunct = tokenizer.nextToken().trim();
+                this.searches.add(disjunct);
+            }
+
+            this.resolver = resolver;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.alfresco.service.namespace.QNamePattern#isMatch(org.alfresco.service.namespace.QName)
+         */
+        public boolean isMatch(QName qname)
+        {
+            String prefixedName = qname.toPrefixString(resolver);
+            for (String search : searches)
+            {
+                if (prefixedName.matches(search))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    }
+
 }

@@ -41,19 +41,69 @@
 			<cm:mimetype>text/plain</cm:mimetype>
 			<cm:contentUrl>org/alfresco/jcr/test/testContent.txt</cm:contentUrl>
           </cm:content>
-          
+        
           <!-- Query -->
           
           <jcrtest:testtype view:childName="query">
              <jcrtest:children>
-                <jcrtest:testtype view:childName="one"/>
-                <jcrtest:testtype view:childName="two"/>
-                <jcrtest:testtype view:childName="three"/>
-                <jcrtest:testtype view:childName="four"/>
-                <jcrtest:testtype view:childName="node1"/>
-                <jcrtest:testtype view:childName="node1"/>
-                <jcrtest:testtype view:childName="node1"/>
-                <jcrtest:testtype view:childName="node1"/>
+                <jcrtest:testtype view:childName="one">
+                    <prop1>a</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testtype view:childName="two">
+                    <prop1>c</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testtype view:childName="three">
+                    <prop1>e</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testtype view:childName="four">
+                    <prop1>g</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testtype view:childName="node1">
+                    <prop1>b</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testtype view:childName="node1">
+                    <prop1>d</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testtype view:childName="node1">
+                    <prop1>f</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testtype view:childName="node1">
+                    <prop1>h</prop1>
+                </jcrtest:testtype>
+                <jcrtest:testdoc view:childName="document">
+                    <jcrtest:title>Doc 1</jcrtest:title>
+                    <jcrtest:children>
+                        <jcrtest:testpara view:childName="para-1-1">
+                            <jcrtest:subtitle>P 1 1</jcrtest:subtitle>
+                            <jcrtest:content>A bit of wiffle</jcrtest:content>
+                        </jcrtest:testpara>
+                        <jcrtest:testpara view:childName="para-1-2">
+                            <jcrtest:subtitle>P 1 2</jcrtest:subtitle>
+                            <jcrtest:content>More whitterings</jcrtest:content>
+                        </jcrtest:testpara>
+                        <jcrtest:testpara view:childName="para-1-3">
+                            <jcrtest:subtitle>P 1 3</jcrtest:subtitle>
+                            <jcrtest:content>Carrot, spud, turnip and leek.</jcrtest:content>
+                        </jcrtest:testpara>
+                    </jcrtest:children>
+                </jcrtest:testdoc>
+                <jcrtest:testdoc view:childName="document-2">
+                    <jcrtest:title>Doc 2</jcrtest:title>
+                    <jcrtest:children>
+                        <jcrtest:testpara view:childName="para-2-1">
+                            <jcrtest:subtitle>P 2 1</jcrtest:subtitle>
+                            <jcrtest:content>tiger, lion</jcrtest:content>
+                        </jcrtest:testpara>
+                        <jcrtest:testpara view:childName="para-2-2">
+                            <jcrtest:subtitle>P 2 2</jcrtest:subtitle>
+                            <jcrtest:content>biscuit, bun, cake</jcrtest:content>
+                        </jcrtest:testpara>
+                        <jcrtest:testpara view:childName="para-2-3">
+                            <jcrtest:subtitle>P 2 3</jcrtest:subtitle>
+                            <jcrtest:content>penguin, hawk, dove</jcrtest:content>
+                        </jcrtest:testpara>
+                    </jcrtest:children>
+                </jcrtest:testdoc>
              </jcrtest:children>
           </jcrtest:testtype>
           

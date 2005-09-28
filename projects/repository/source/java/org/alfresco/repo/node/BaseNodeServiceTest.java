@@ -255,6 +255,26 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         properties.put(QName.createQName(ns, "animal"), "monkey");
         properties.put(QName.createQName(ns, "UPPERANIMAL"), "MONKEY");
         properties.put(QName.createQName(ns, "reference"), n2.toString());
+        properties.put(QName.createQName(ns, "text1"), "bun");
+        properties.put(QName.createQName(ns, "text2"), "cake");
+        properties.put(QName.createQName(ns, "text3"), "biscuit");
+        properties.put(QName.createQName(ns, "text12"), "bun, cake");
+        properties.put(QName.createQName(ns, "text13"), "bun, biscuit");
+        properties.put(QName.createQName(ns, "text23"), "cake, biscuit");
+        properties.put(QName.createQName(ns, "text123"), "bun, cake, biscuit");
+        ArrayList<String> slist = new ArrayList<String>();
+        slist.add("first");
+        slist.add("second");
+        slist.add("third");
+       
+        properties.put(QName.createQName(ns, "mvp"), slist);
+        
+        ArrayList<Integer> ilist = new ArrayList<Integer>();
+        ilist.add(new Integer(1));
+        ilist.add(new Integer(2));
+        ilist.add(new Integer(3));
+        
+        properties.put(QName.createQName(ns, "mvi"), ilist);
         
         qname = QName.createQName(ns, "n1_p_n3");
         assoc = nodeService.createNode(n1, ASSOC_TYPE_QNAME_TEST_CHILDREN, qname, ContentModel.TYPE_CONTAINER, properties);

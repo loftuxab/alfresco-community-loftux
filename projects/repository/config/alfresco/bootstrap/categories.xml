@@ -7,6 +7,9 @@
 
 			<!-- Software Document Classification -->
 			<cm:category view:childName="cm:generalclassifiable">
+                <cm:name>General</cm:name>
+				<cm:subcategories>
+                <cm:category>
 				<cm:name>Software Document Classification</cm:name>
 				<cm:subcategories>
 					<cm:category>
@@ -192,11 +195,11 @@
 						</cm:subcategories>
 					</cm:category>
 				</cm:subcategories>
-			</cm:category>
+			    </cm:category>
 
 
-			<!-- Languages -->
-			<cm:category view:childName="cm:generalclassifiable">
+			    <!-- Languages -->
+			    <cm:category>
 				<cm:name>Languages</cm:name>
 				<cm:subcategories>
 					<cm:category>
@@ -259,11 +262,11 @@
 						</cm:subcategories>
 					</cm:category>
 				</cm:subcategories>
-			</cm:category>
+			    </cm:category>
 
 
-			<!-- Regions -->
-			<cm:category view:childName="cm:generalclassifiable">
+			    <!-- Regions -->
+			    <cm:category>
 				<cm:name>Regions</cm:name>
 				<cm:subcategories>
 					<cm:category>
@@ -1087,8 +1090,9 @@
 						</cm:subcategories>
 					</cm:category>
 				</cm:subcategories>
-			</cm:category>
-
+			    </cm:category>
+                </cm:subcategories>
+             </cm:category>
 		</cm:categories>
 	</cm:category_root>
 

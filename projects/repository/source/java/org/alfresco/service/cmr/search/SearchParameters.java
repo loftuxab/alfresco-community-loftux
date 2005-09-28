@@ -29,11 +29,20 @@ import org.alfresco.service.cmr.repository.StoreRef;
  */
 public class SearchParameters extends SearchStatement
 {
+    public enum Operator
+    {
+        OR, AND
+    }
+    
+    public static final Operator OR = Operator.OR;
+    public static final Operator AND = Operator.AND;
+    
     private ArrayList<StoreRef> stores = new ArrayList<StoreRef>(1);
     private ArrayList<Path> attributePaths = new ArrayList<Path>(1);
     private ArrayList<QueryParameterDefinition> queryParameterDefinitions = new ArrayList<QueryParameterDefinition>(1);
     private boolean excludeDataInTheCurrentTransaction = false;
     private ArrayList<SortDefinition> sortDefinitions = new ArrayList<SortDefinition>(1);
+    private Operator defaultOperator = Operator.OR;
     
     public SearchParameters()
     {
@@ -132,8 +141,6 @@ public class SearchParameters extends SearchStatement
         
     }
 
-
-
     public ArrayList<Path> getAttributePaths()
     {
         return attributePaths;
@@ -157,5 +164,15 @@ public class SearchParameters extends SearchStatement
     public ArrayList<StoreRef> getStores()
     {
         return stores;
+    }
+    
+    public void setDefaultOperator(Operator defaultOperator)
+    {
+        this.defaultOperator = defaultOperator;
+    }
+    
+    public Operator getDefaultOperator()
+    {
+        return defaultOperator;
     }
 }

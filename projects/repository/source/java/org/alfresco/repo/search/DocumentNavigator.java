@@ -18,6 +18,7 @@ package org.alfresco.repo.search;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +30,11 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.QNamePattern;
 import org.jaxen.DefaultNavigator;
 import org.jaxen.JaxenException;
 import org.jaxen.UnsupportedAxisException;
@@ -53,6 +56,8 @@ public class DocumentNavigator extends DefaultNavigator
     private static QName JCR_ROOT = QName.createQName("http://www.jcp.org/jcr/1.0", "root");
     
     private static QName JCR_PRIMARY_TYPE = QName.createQName("http://www.jcp.org/jcr/1.0", "primaryType");
+    
+    private static QName JCR_MIXIN_TYPES = QName.createQName("http://www.jcp.org/jcr/1.0", "mixinTypes");
     
     private static final long serialVersionUID = 3618984485740165427L;
 
@@ -286,13 +291,29 @@ public class DocumentNavigator extends DefaultNavigator
         Map<QName, Serializable> map = nodeService.getProperties(nodeRef);
         for (QName qName : map.keySet())
         {
-            Property property = new Property(qName, map.get(qName), nodeRef);
-            properties.add(property);
+            if(map.get(qName) instanceof Collection)
+            {
+                for(Serializable ob : (Collection<Serializable>) map.get(qName))
+                {
+                    Property property = new Property(qName, ob, nodeRef);
+                    properties.add(property);
+                }
+            }
+            else
+            {
+                Property property = new Property(qName, map.get(qName), nodeRef);
+                properties.add(property);
+            }        
         }
         if(useJCRRootNode)
         {
             properties.add(new Property(JCR_PRIMARY_TYPE, nodeService.getType(nodeRef), nodeRef));
+            for(QName mixin : nodeService.getAspects(nodeRef))
+            {
+                properties.add(new Property(JCR_MIXIN_TYPES, mixin, nodeRef));
+            }
         }
+        
         return properties.iterator();
     }
 
@@ -369,15 +390,20 @@ public class DocumentNavigator extends DefaultNavigator
     {
         return nodeService.getPrimaryParent(nodeRef);
     }
+    
+    public List<ChildAssociationRef> getNode(NodeRef nodeRef, QNamePattern qNamePattern)
+    {
+        return nodeService.getParentAssocs(nodeRef, qNamePattern);
+    }
 
     public Boolean like(NodeRef childRef, QName qname, String sqlLikePattern, boolean includeFTS)
     {
         return searchService.like(childRef, qname, sqlLikePattern, includeFTS);
     }
 
-    public Boolean contains(NodeRef childRef, QName qname, String sqlLikePattern)
+    public Boolean contains(NodeRef childRef, QName qname, String sqlLikePattern, SearchParameters.Operator defaultOperator)
     {
-        return searchService.contains(childRef, qname, sqlLikePattern);
+        return searchService.contains(childRef, qname, sqlLikePattern, defaultOperator);
     }
 
     public Boolean isSubtypeOf(NodeRef nodeRef, QName typeQName)

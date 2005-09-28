@@ -79,6 +79,11 @@ public class SearcherComponent extends AbstractSearcherComponent
 
     public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern) throws InvalidNodeRefException
     {
+        return contains(nodeRef, propertyQName, googleLikePattern, SearchParameters.Operator.OR);
+    }
+    
+    public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern, SearchParameters.Operator defaultOperator) throws InvalidNodeRefException
+    {
         SearchService searcher = indexerAndSearcherFactory.getSearcher(nodeRef.getStoreRef(), true);
         return searcher.contains(nodeRef, propertyQName, googleLikePattern);
     }

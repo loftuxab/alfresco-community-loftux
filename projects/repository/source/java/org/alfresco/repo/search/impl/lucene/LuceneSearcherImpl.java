@@ -206,8 +206,18 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                 try
                 {
 
+                    int defaultOperator;
+                    if(searchParameters.getDefaultOperator() == SearchParameters.AND)
+                    {
+                        defaultOperator = LuceneQueryParser.DEFAULT_OPERATOR_AND;
+                    }
+                    else
+                    {
+                        defaultOperator = LuceneQueryParser.DEFAULT_OPERATOR_OR;
+                    }
+                    
                     Query query = LuceneQueryParser.parse(parameterisedQueryString, DEFAULT_FIELD, new LuceneAnalyser(dictionaryService), namespacePrefixResolver,
-                            dictionaryService);
+                            dictionaryService, defaultOperator);
                     Searcher searcher = getSearcher(indexer);
 
                     Hits hits;
@@ -472,6 +482,14 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
      */
     public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern)
     {
+        return contains(nodeRef, propertyQName, googleLikePattern, SearchParameters.Operator.OR);
+    }
+    
+    /**
+     * @return Returns true if the pattern is present, otherwise false.
+     */
+    public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern, SearchParameters.Operator defaultOperator)
+    {
         ResultSet resultSet = null;
         try
         {
@@ -480,20 +498,26 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             sb.append("+ID:\"").append(nodeRef.toString()).append("\" +(TEXT:(").append(googleLikePattern.toLowerCase()).append(") ");
             if (propertyQName != null)
             {
-                sb.append("@").append(LuceneQueryParser.escape(propertyQName.toString()));
+                sb.append(" OR @").append(LuceneQueryParser.escape(propertyQName.toString()));
                 sb.append(":(").append(googleLikePattern.toLowerCase()).append(")");
             }
             else
             {
                 for (QName key : nodeService.getProperties(nodeRef).keySet())
                 {
-                    sb.append("@").append(LuceneQueryParser.escape(key.toString()));
+                    sb.append(" OR @").append(LuceneQueryParser.escape(key.toString()));
                     sb.append(":(").append(googleLikePattern.toLowerCase()).append(")");
                 }
             }
             sb.append(")");
 
-            resultSet = this.query(nodeRef.getStoreRef(), "lucene", sb.toString());
+            SearchParameters sp = new SearchParameters();
+            sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+            sp.setQuery(sb.toString());
+            sp.setDefaultOperator(defaultOperator);
+            sp.addStore(nodeRef.getStoreRef());
+            
+            resultSet = this.query(sp);
             boolean answer = resultSet.length() > 0;
             return answer;
         }

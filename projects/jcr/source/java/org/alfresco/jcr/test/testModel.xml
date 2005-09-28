@@ -6,6 +6,7 @@
    <imports>
       <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
       <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+      <import uri="" prefix=""/>
    </imports>
    
    <namespaces>
@@ -13,10 +14,21 @@
    </namespaces>
 
    <types>
+      <type name="jcrtest:basetesttype">
+         <title>Base Test Type</title>
+         <parent>sys:base</parent>
+         <associations>
+            <child-association name="jcrtest:children">
+               <target>
+                  <class>sys:base</class>
+               </target>
+            </child-association>
+         </associations>
+      </type>
    
       <type name="jcrtest:testtype">
          <title>Test Type</title>
-         <parent>sys:base</parent>
+         <parent>jcrtest:basetesttype</parent>
          <properties>
             <property name="jcrtest:booleanProp">
                <type>d:boolean</type>
@@ -40,14 +52,33 @@
                <type>d:text</type>
                <multiple>true</multiple>
             </property>
+             <property name="prop1">
+               <type>d:text</type>
+            </property>
          </properties>
-         <associations>
-            <child-association name="jcrtest:children">
-               <target>
-                  <class>sys:base</class>
-               </target>
-            </child-association>
-         </associations>
+      </type>
+      
+      <type name="jcrtest:testdoc">
+         <title>Test Doc Type</title>
+         <parent>jcrtest:basetesttype</parent>
+         <properties>
+            <property name="jcrtest:title">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+      
+      <type name="jcrtest:testpara">
+         <title>Test Doc Type</title>
+         <parent>sys:base</parent>
+         <properties>
+            <property name="jcrtest:subtitle">
+               <type>d:text</type>
+            </property>
+            <property name="jcrtest:content">
+               <type>d:text</type>
+            </property>
+         </properties>
       </type>
       
    </types>

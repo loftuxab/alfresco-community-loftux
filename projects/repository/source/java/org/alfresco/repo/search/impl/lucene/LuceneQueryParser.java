@@ -52,9 +52,10 @@ public class LuceneQueryParser extends QueryParser
      * @throws ParseException
      *             if the parsing fails
      */
-    static public Query parse(String query, String field, Analyzer analyzer, NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService) throws ParseException
+    static public Query parse(String query, String field, Analyzer analyzer, NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService, int defaultOperator) throws ParseException
     {
         LuceneQueryParser parser = new LuceneQueryParser(field, analyzer);
+        parser.setOperator(defaultOperator);
         parser.setNamespacePrefixResolver(namespacePrefixResolver);
         parser.setDictionaryService(dictionaryService);
         return parser.parse(query);

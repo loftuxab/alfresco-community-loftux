@@ -79,8 +79,10 @@ public class NodeSearcher
             // replace element
             if(useJCRXPath)
             {
+                // We do not allow variable substitution with this pattern
                 xpath = xpath.replaceAll("element\\(\\s*(\\*|\\w*:\\w*)\\s*,\\s*(\\*|\\w*:\\w*)\\s*\\)", "$1[subtypeOf(\"$2\")]");
-                xpath = xpath.replaceAll("order\\s*by\\s*.*", "");
+                String split[] = xpath.split("order\\s*by\\s*.*", 2);
+                xpath = split[0];
             }
             
             DocumentNavigator documentNavigator = new DocumentNavigator(
@@ -151,7 +153,7 @@ public class NodeSearcher
                 answer.add(((DocumentNavigator.Property) o).value);
             }
             return answer;
-        }
+        } 
         catch (JaxenException e)
         {
             throw new XPathException("Error executing xpath", e);

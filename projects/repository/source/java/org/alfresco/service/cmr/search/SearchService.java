@@ -225,9 +225,24 @@ public interface SearchService
      *            the name of the property
      * @param googleLikePattern
      *            a Google-like pattern to search for in the property value
-     * @return Returns true if the pattern could be found
+     * @return Returns true if the pattern could be found - uses the default OR operator
      */
     public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern)
+            throws InvalidNodeRefException;
+    
+    /**
+     * Search for string pattern in both the node text (if present) and node
+     * properties
+     * 
+     * @param nodeRef
+     *            the node to get
+     * @param propertyQName
+     *            the name of the property
+     * @param googleLikePattern
+     *            a Google-like pattern to search for in the property value
+     * @return Returns true if the pattern could be found
+     */
+    public boolean contains(NodeRef nodeRef, QName propertyQName, String googleLikePattern, SearchParameters.Operator defaultOperator)
             throws InvalidNodeRefException;
 
     /**
