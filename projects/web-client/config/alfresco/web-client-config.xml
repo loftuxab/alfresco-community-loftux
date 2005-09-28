@@ -71,82 +71,82 @@
    
    <config evaluator="node-type" condition="content">
       <property-sheet>
-         <show-property name="name" displayLabel="File Name" />
-         <show-property name="mimetype" displayLabel="Content Type" converter="org.alfresco.faces.MimeTypeConverter" />
-         <show-property name="title" displayLabel="Title" />
-         <show-property name="description" displayLabel="Description" />
-         <show-property name="size" displayLabel="Size" converter="org.alfresco.faces.ByteSizeConverter" />
-         <show-property name="creator" displayLabel="Author" />
+         <show-property name="name"/>
+         <show-property name="mimetype" converter="org.alfresco.faces.MimeTypeConverter"/>
+         <show-property name="title"/>
+         <show-property name="description"/>
+         <show-property name="size" converter="org.alfresco.faces.ByteSizeConverter"/>
+         <show-property name="creator"/>
       </property-sheet>
    </config>
    
    <config evaluator="node-type" condition="folder">
       <property-sheet>
-         <show-property name="name" displayLabel="Name" />
-         <show-property name="description" displayLabel="Description" />
+         <show-property name="name"/>
+         <show-property name="description"/>
       </property-sheet>
    </config>
    
    <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
-         <show-property name="removeAfter" displayLabel="Remove After" />
+         <show-property name="removeAfter"/>
       </property-sheet>
    </config>
 
    <config evaluator="aspect-name" condition="dublincore">
       <property-sheet>
-         <show-property name="publisher" displayLabel="Publisher" />
-         <show-property name="contributor" displayLabel="Contributor" />
-         <show-property name="type" displayLabel="Type" />
-         <show-property name="identifier" displayLabel="Identifier" />
-         <show-property name="dcsource" displayLabel="Source" />
-         <show-property name="coverage" displayLabel="Coverage" />
-         <show-property name="rights" displayLabel="Rights" />
-         <show-property name="subject" displayLabel="Subject" />
+         <show-property name="publisher"/>
+         <show-property name="contributor"/>
+         <show-property name="type"/>
+         <show-property name="identifier"/>
+         <show-property name="dcsource"/>
+         <show-property name="coverage"/>
+         <show-property name="rights"/>
+         <show-property name="subject"/>
       </property-sheet>
    </config>
    
    <config evaluator="aspect-name" condition="effectivity">
       <property-sheet>
-         <show-property name="from" displayLabel="Effective From" />
-         <show-property name="to" displayLabel="Effective To" />
+         <show-property name="from"/>
+         <show-property name="to"/>
       </property-sheet>
    </config>
    
    <config evaluator="aspect-name" condition="summarizable">
       <property-sheet>
-         <show-property name="summary" displayLabel="Summary" />
+         <show-property name="summary"/>
       </property-sheet>
    </config>
    
    <config evaluator="aspect-name" condition="versionable">
       <property-sheet>
-         <show-property name="versionLabel" displayLabel="Version Label" />
+         <show-property name="versionLabel"/>
       </property-sheet>
    </config>
    
    <config evaluator="aspect-name" condition="translatable">
       <property-sheet>
-         <show-association name="translations" displayLabel="Translations" />
+         <show-association name="translations"/>
       </property-sheet>
    </config>
 
    <config evaluator="aspect-name" condition="localizable">
       <property-sheet>
-         <show-property name="locale" displayLabel="Locale" converter="org.alfresco.faces.CategoryConverter"/>
+         <show-property name="locale" converter="org.alfresco.faces.CategoryConverter"/>
       </property-sheet>
    </config>
    
    <config evaluator="aspect-name" condition="auditable">
       <property-sheet>
-         <show-property name="created" displayLabel="Created" readOnly="true" />
-         <show-property name="modified" displayLabel="Modified" readOnly="true" />
+         <show-property name="created" readOnly="true"/>
+         <show-property name="modified" readOnly="true"/>
       </property-sheet>
    </config>
    
    <config evaluator="aspect-name" condition="app:inlineeditable">
       <property-sheet>
-         <show-property name="app:editInline" displayLabel="Edit Inline" converter="org.alfresco.faces.BooleanLabelConverter" />
+         <show-property name="app:editInline" converter="org.alfresco.faces.BooleanLabelConverter" />
       </property-sheet>
    </config>
    

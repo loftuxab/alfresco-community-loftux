@@ -97,13 +97,11 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
-                                          value="6" disabled="true">
+                                          value="4" disabled="true">
                                  <a:listItem value="1" label="1. #{msg.details}" />
-                                 <a:listItem value="2" label="2. #{msg.condition}" />
-                                 <a:listItem value="3" label="3. #{msg.condition_settings}" />
-                                 <a:listItem value="4" label="4. #{msg.action}" />
-                                 <a:listItem value="5" label="5. #{msg.action_settings}" />
-                                 <a:listItem value="6" label="6. #{msg.summary}" />
+                                 <a:listItem value="2" label="2. #{msg.conditions}" />
+                                 <a:listItem value="3" label="3. #{msg.actions}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>

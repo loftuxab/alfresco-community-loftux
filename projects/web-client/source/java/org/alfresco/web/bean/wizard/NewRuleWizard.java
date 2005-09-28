@@ -43,10 +43,7 @@ import org.alfresco.repo.action.evaluator.IsSubTypeEvaluator;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
-import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
@@ -116,10 +113,10 @@ public class NewRuleWizard extends BaseActionWizard
    private List<SelectItem> conditions;
    private List<SelectItem> typesAndAspects;
    private Map<String, String> conditionDescriptions;
-   private Map<String, String> currentConditionProperties;
+   private Map<String, Serializable> currentConditionProperties;
    
    private List<Map<String, Serializable>> allActionsProperties;
-   private List<Map<String, String>> allConditionsProperties;
+   private List<Map<String, Serializable>> allConditionsProperties;
    
    private DataModel allActionsDataModel;
    private DataModel allConditionsDataModel;
@@ -167,13 +164,13 @@ public class NewRuleWizard extends BaseActionWizard
          rule.setExecuteAsynchronously(this.runInBackground);
          
          // add all the conditions to the rule
-         for (Map<String, String> condParams : this.allConditionsProperties)
+         for (Map<String, Serializable> condParams : this.allConditionsProperties)
          {
             Map<String, Serializable> repoCondParams = buildConditionParams(condParams);
             
             // add the condition to the rule
             ActionCondition condition = this.actionService.createActionCondition(
-                  condParams.get(PROP_CONDITION_NAME));
+                  (String)condParams.get(PROP_CONDITION_NAME));
             condition.setParameterValues(repoCondParams);
             
             // specify whether the condition result should be inverted (JSF is storing
@@ -258,7 +255,7 @@ public class NewRuleWizard extends BaseActionWizard
 
       if ("no-condition".equals(this.condition))
       {
-         HashMap<String, String> condProps = new HashMap<String, String>(3);
+         HashMap<String, Serializable> condProps = new HashMap<String, Serializable>(3);
          condProps.put(PROP_CONDITION_NAME, this.condition);
          condProps.put(PROP_CONDITION_SUMMARY, Application.getMessage(
                FacesContext.getCurrentInstance(), "condition_no_condition"));
@@ -273,7 +270,7 @@ public class NewRuleWizard extends BaseActionWizard
       }
       else if (this.condition != null)
       {
-         HashMap<String, String> condProps = new HashMap<String, String>(3);
+         HashMap<String, Serializable> condProps = new HashMap<String, Serializable>(3);
          condProps.put(PROP_CONDITION_NAME, this.condition);
          this.currentConditionProperties = condProps;
          outcome = this.condition;
@@ -576,7 +573,7 @@ public class NewRuleWizard extends BaseActionWizard
       this.conditions = null;
       this.conditionDescriptions = null;
       
-      this.allConditionsProperties = new ArrayList<Map<String, String>>();
+      this.allConditionsProperties = new ArrayList<Map<String, Serializable>>();
       this.allActionsProperties = new ArrayList<Map<String, Serializable>>();
    }
    
@@ -621,7 +618,7 @@ public class NewRuleWizard extends BaseActionWizard
       List<ActionCondition> conditions = rule.getActionConditions();
       for (ActionCondition condition : conditions)
       {
-         Map<String, String> params = populateCondition(condition);
+         Map<String, Serializable> params = populateCondition(condition);
          this.allConditionsProperties.add(params);
       }
       
@@ -653,7 +650,7 @@ public class NewRuleWizard extends BaseActionWizard
    {
       // create the summary using all the conditions
       StringBuilder conditionsSummary = new StringBuilder();
-      for (Map<String,String> props : this.allConditionsProperties)
+      for (Map<String, Serializable> props : this.allConditionsProperties)
       {
          conditionsSummary.append(props.get(PROP_CONDITION_SUMMARY));
          conditionsSummary.append("<br/>");
@@ -921,7 +918,7 @@ public class NewRuleWizard extends BaseActionWizard
    /**
     * @return Gets the condition settings 
     */
-   public Map<String, String> getConditionProperties()
+   public Map<String, Serializable> getConditionProperties()
    {
       return this.currentConditionProperties;
    }
@@ -970,11 +967,11 @@ public class NewRuleWizard extends BaseActionWizard
     * @param params The Map of properties built from the UI
     * @return The Map the repo is expecting
     */
-   protected Map<String, Serializable> buildConditionParams(Map<String, String> params)
+   protected Map<String, Serializable> buildConditionParams(Map<String, Serializable> params)
    {
       Map<String, Serializable> repoParams = new HashMap<String, Serializable>(params.size());
       
-      String condName = params.get(PROP_CONDITION_NAME);
+      String condName = (String)params.get(PROP_CONDITION_NAME);
       if (condName.equals(ComparePropertyValueEvaluator.NAME))
       {
          repoParams.put(ComparePropertyValueEvaluator.PARAM_VALUE, params.get(PROP_CONTAINS_TEXT));
@@ -982,8 +979,7 @@ public class NewRuleWizard extends BaseActionWizard
       else if (condName.equals(InCategoryEvaluator.NAME))
       {
          // put the selected category in the condition params
-         NodeRef catNodeRef = new NodeRef(Repository.getStoreRef(), params.get(PROP_CATEGORY));
-         repoParams.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, catNodeRef);
+         repoParams.put(InCategoryEvaluator.PARAM_CATEGORY_VALUE, params.get(PROP_CATEGORY));
          
          // add the classifiable aspect
          repoParams.put(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_GEN_CLASSIFIABLE);
@@ -991,12 +987,12 @@ public class NewRuleWizard extends BaseActionWizard
       else if (condName.equals(IsSubTypeEvaluator.NAME))
       {
          // add the model type
-         repoParams.put(IsSubTypeEvaluator.PARAM_TYPE, QName.createQName(params.get(PROP_MODEL_TYPE)));
+         repoParams.put(IsSubTypeEvaluator.PARAM_TYPE, QName.createQName((String)params.get(PROP_MODEL_TYPE)));
       }
       else if (condName.equals(HasAspectEvaluator.NAME))
       {
          // add the aspect
-         repoParams.put(HasAspectEvaluator.PARAM_ASPECT, QName.createQName(params.get(PROP_ASPECT)));
+         repoParams.put(HasAspectEvaluator.PARAM_ASPECT, QName.createQName((String)params.get(PROP_ASPECT)));
       }
       
       return repoParams;
@@ -1007,10 +1003,10 @@ public class NewRuleWizard extends BaseActionWizard
     * 
     * @param condition The condition to build the map for
     */
-   protected Map<String, String> populateCondition(ActionCondition condition)
+   protected Map<String, Serializable> populateCondition(ActionCondition condition)
    {
       // find out what the condition is called
-      Map<String, String> condProps = new HashMap<String, String>(3);
+      Map<String, Serializable> condProps = new HashMap<String, Serializable>(3);
       String name = condition.getActionConditionDefinitionName();
       condProps.put(PROP_CONDITION_NAME, name);
       
@@ -1023,7 +1019,7 @@ public class NewRuleWizard extends BaseActionWizard
       else if (name.equals(InCategoryEvaluator.NAME))
       {
          NodeRef catNodeRef = (NodeRef)repoCondProps.get(InCategoryEvaluator.PARAM_CATEGORY_VALUE);
-         condProps.put(PROP_CATEGORY, catNodeRef.getId());
+         condProps.put(PROP_CATEGORY, catNodeRef);
       }
       else if (name.equals(IsSubTypeEvaluator.NAME))
       {
@@ -1048,11 +1044,11 @@ public class NewRuleWizard extends BaseActionWizard
     * 
     * @return The summary or null if a summary could not be built
     */
-   protected String buildConditionSummary(Map<String, String> props)
+   protected String buildConditionSummary(Map<String, Serializable> props)
    {
       String summaryResult = null;
       
-      String condName = props.get(PROP_CONDITION_NAME);
+      String condName = (String)props.get(PROP_CONDITION_NAME);
       if (condName != null)
       {
          StringBuilder summary = new StringBuilder();
@@ -1077,8 +1073,7 @@ public class NewRuleWizard extends BaseActionWizard
          // define a summary to be added for each condition
          if ("in-category".equals(condName))
          {
-            NodeRef cat = new NodeRef(Repository.getStoreRef(), props.get(PROP_CATEGORY));
-            String name = Repository.getNameForNode(this.nodeService, cat);
+            String name = Repository.getNameForNode(this.nodeService, (NodeRef)props.get(PROP_CATEGORY));
             summary.append("'").append(name).append("'");
          }
          else if ("compare-property-value".equals(condName))
@@ -1090,7 +1085,7 @@ public class NewRuleWizard extends BaseActionWizard
          else if ("is-subtype".equals(condName))
          {
             // find the label used by looking through the SelectItem list
-            String typeName = props.get(PROP_MODEL_TYPE);
+            String typeName = (String)props.get(PROP_MODEL_TYPE);
             for (SelectItem item : this.getModelTypes())
             {
                if (item.getValue().equals(typeName))
@@ -1103,7 +1098,7 @@ public class NewRuleWizard extends BaseActionWizard
          else if ("has-aspect".equals(condName))
          {
             // find the label used by looking through the SelectItem list
-            String aspectName = props.get(PROP_ASPECT);
+            String aspectName = (String)props.get(PROP_ASPECT);
             for (SelectItem item : this.getAspects())
             {
                if (item.getValue().equals(aspectName))

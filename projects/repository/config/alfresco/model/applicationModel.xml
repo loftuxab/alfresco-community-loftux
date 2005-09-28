@@ -123,6 +123,7 @@
          <title>Inline Editable</title>
          <properties>
             <property name="app:editInline">
+               <title>Edit Inline</title>
                <type>d:boolean</type>
             </property>
          </properties>
