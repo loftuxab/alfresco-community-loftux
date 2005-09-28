@@ -882,7 +882,7 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the new node has been checked out
         List<ChildAssociationRef> children = this.nodeService.getChildAssocs(this.nodeRef);
         assertNotNull(children);
-        assertEquals(4, children.size()); // includes the action and the rule folder
+        assertEquals(3, children.size()); // includes rule folder
         for (ChildAssociationRef child : children)
         {
             NodeRef childNodeRef = child.getChildRef();

@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueOperation;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
-import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.evaluator.NoConditionEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.action.executer.CheckInActionExecuter;
@@ -470,7 +470,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		
 		// Modify the conditions of the action
 		ActionCondition actionCondition3 = this.actionService.createActionCondition(InCategoryEvaluator.NAME);
-		actionCondition3.setParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_ACTIONABLE);
+		actionCondition3.setParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT, ContentModel.ASPECT_OWNABLE);
 		action.addActionCondition(actionCondition3);
 		action.removeActionCondition(actionCondition);
 		actionCondition2.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "*.exe");
@@ -487,7 +487,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 			if (savedCondition.getActionConditionDefinitionName().equals(InCategoryEvaluator.NAME) == true)
 			{
 				assertEquals(1, savedCondition.getParameterValues().size());
-				assertEquals(ContentModel.ASPECT_ACTIONABLE, savedCondition.getParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT));
+				assertEquals(ContentModel.ASPECT_OWNABLE, savedCondition.getParameterValue(InCategoryEvaluator.PARAM_CATEGORY_ASPECT));
 			}
 			else if (savedCondition.getActionConditionDefinitionName().equals(ComparePropertyValueEvaluator.NAME) == true)
 			{
@@ -763,7 +763,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		List<ActionExecutionDetails> empty = this.actionService.getActionExecutionHistory(this.nodeRef);
 		assertNotNull(empty);
 		assertTrue(empty.isEmpty());
-		assertFalse(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY));
+		assertFalse(this.nodeService.hasAspect(this.nodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY));
 		
 		// Execute an action that will not be placed in the execution history
 		// TODO
@@ -779,7 +779,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE));
 		
 		// Check the action execution history
-		assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY));
+		assertTrue(this.nodeService.hasAspect(this.nodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY));
 		List<ActionExecutionDetails> details = this.actionService.getActionExecutionHistory(this.nodeRef);
 		assertNotNull(details);
 		assertEquals(1, details.size());
@@ -875,7 +875,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 						List<ActionExecutionDetails> empty = ActionServiceImplTest.this.actionService.getActionExecutionHistory(ActionServiceImplTest.this.nodeRef);
 						assertNotNull(empty);
 						assertTrue(empty.isEmpty());
-						assertFalse(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY));
+						assertFalse(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY));
 						
 						// Create an action that will succeed
 						Action goodAction = ActionServiceImplTest.this.actionService.createAction(AddFeaturesActionExecuter.NAME);
@@ -897,7 +897,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 				{
 					public Object doWork()
 					{
-						assertTrue(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY));
+						assertTrue(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY));
 						List<ActionExecutionDetails> details = ActionServiceImplTest.this.actionService.getActionExecutionHistory(ActionServiceImplTest.this.nodeRef);
 						assertNotNull(details);
 						assertEquals(1, details.size());

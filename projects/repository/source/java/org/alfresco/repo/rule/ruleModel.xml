@@ -8,6 +8,7 @@
    <imports>
       <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
       <import uri="http://www.alfresco.org/model/action/1.0" prefix="act"/>
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
    </imports>
    
    <namespaces>
@@ -33,5 +34,22 @@
 	  </type>
 
 	</types>
+	
+	<aspects>
+	
+      <aspect name="rule:rules">
+         <title>Rules</title>           
+         <associations>
+            <child-association name="rule:ruleFolder">
+               <target>
+                  <class>cm:systemfolder</class>
+                  <mandatory>false</mandatory>
+                  <many>false</many>
+               </target>
+            </child-association>
+         </associations>  
+      </aspect>
+         
+	</aspects>
 
 </model>

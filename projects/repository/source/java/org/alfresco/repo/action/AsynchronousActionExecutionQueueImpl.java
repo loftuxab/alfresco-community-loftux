@@ -200,7 +200,8 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
-		public void run()
+		@SuppressWarnings("unchecked")
+        public void run()
 		{	
 			try
 			{

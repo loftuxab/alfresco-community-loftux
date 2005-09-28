@@ -26,9 +26,9 @@
     	</property>
     </bean>
 
-   <!-- Actionable Aspect -->
+   <!-- Actions Aspect -->
    
-   <bean id="actionableAspect" class="org.alfresco.repo.action.ActionableAspect" init-method="init">
+   <bean id="actionsAspect" class="org.alfresco.repo.action.ActionsAspect" init-method="init">
       <property name="nodeService">
 	     <ref bean="nodeService"/>
 	  </property>	   

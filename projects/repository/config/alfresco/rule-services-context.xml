@@ -20,6 +20,20 @@
 	    </property>
    </bean>
    
+   <!-- Rules Aspect -->
+   
+   <bean id="rulesAspect" class="org.alfresco.repo.rule.RulesAspect" init-method="init">
+      <property name="nodeService">
+	     <ref bean="nodeService"/>
+	  </property>	   
+	  <property name="policyComponent">
+	     <ref bean="policyComponent"/>
+	  </property>	  	   
+	  <property name="ruleService">
+	     <ref bean="ruleService"/>
+	  </property>
+   </bean> 
+   
    <!-- I18N -->
    
    <bean id="ruleResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">

@@ -33,6 +33,7 @@ import org.alfresco.repo.dictionary.M2ChildAssociation;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.repo.dictionary.M2Type;
+import org.alfresco.repo.rule.RuleModel;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
@@ -384,7 +385,7 @@ public class CopyServiceImplTest extends BaseSpringTest
         //assertNotNull(this.configurableService.getConfigurationFolder(copy));
         //assertFalse(this.configurableService.getConfigurationFolder(this.sourceNodeRef) == this.configurableService.getConfigurationFolder(copy));
         
-        assertTrue(this.nodeService.hasAspect(copy, ContentModel.ASPECT_ACTIONABLE));
+        assertTrue(this.nodeService.hasAspect(copy, RuleModel.ASPECT_RULES));
         assertTrue(this.ruleService.hasRules(copy));
         assertTrue(this.ruleService.rulesEnabled(copy));
         List<Rule> copiedRules = this.ruleService.getRules(copy);
@@ -410,7 +411,7 @@ public class CopyServiceImplTest extends BaseSpringTest
         //assertNotNull(this.configurableService.getConfigurationFolder(copy2));
         //assertFalse(this.configurableService.getConfigurationFolder(this.sourceNodeRef) == this.configurableService.getConfigurationFolder(copy2));
         
-        assertTrue(this.nodeService.hasAspect(copy2, ContentModel.ASPECT_ACTIONABLE));
+        assertTrue(this.nodeService.hasAspect(copy2, RuleModel.ASPECT_RULES));
         assertTrue(this.ruleService.hasRules(copy2));
         assertTrue(this.ruleService.rulesEnabled(copy2));
         List<Rule> copiedRules2 = this.ruleService.getRules(copy2);
@@ -524,7 +525,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		
 		List<ChildAssociationRef> nodeOneCopyChildren = this.nodeService.getChildAssocs(nodeOneCopy);
 		assertNotNull(nodeOneCopyChildren);
-		assertEquals(4, nodeOneCopyChildren.size());
+		assertEquals(3, nodeOneCopyChildren.size());
 		for (ChildAssociationRef nodeOneCopyChild : nodeOneCopyChildren)
 		{
 			if (nodeOneCopyChild.getQName().equals(nodeTwoAssocName) == true)
@@ -647,9 +648,9 @@ public class CopyServiceImplTest extends BaseSpringTest
 		List<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(destinationNodeRef);
 		assertNotNull(childAssocRefs);
 		int expectedSize = 2;
-		if (this.nodeService.hasAspect(destinationNodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+		if (this.nodeService.hasAspect(destinationNodeRef, RuleModel.ASPECT_RULES) == true)
 		{
-			expectedSize = expectedSize + 2;
+			expectedSize = expectedSize + 1;
 		}
 		
 		assertEquals(expectedSize, childAssocRefs.size());
@@ -665,7 +666,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 			{
 				if (copyChildren == false)
 				{
-					if (ref.getTypeQName().equals(ContentModel.ASSOC_SAVED_ACTION_FOLDERS) == true)
+					if (ref.getTypeQName().equals(RuleModel.ASSOC_RULE_FOLDER) == true)
 					{
 						assertTrue(ref.isPrimary());
 						assertTrue(this.childNodeRef.equals(ref.getChildRef()) == false);

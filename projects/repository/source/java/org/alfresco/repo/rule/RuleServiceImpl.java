@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.action.ActionableAspect;
+import org.alfresco.repo.action.ActionModel;
 import org.alfresco.repo.action.RuntimeActionService;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.TransactionListener;
@@ -61,6 +61,9 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     
     /** key against which to store executed rules on the current transaction */
     private static final String KEY_RULES_EXECUTED = "RuleServiceImpl.ExecutedRules";
+    
+    /** qname of assoc to rules */
+    private QName ASSOC_NAME_RULES = QName.createQName(RuleModel.RULE_MODEL_URI, "rules");
     
     /**
      * The node service
@@ -161,7 +164,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	 */
 	private NodeRef getSavedRuleFolderRef(NodeRef nodeRef)
 	{
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, RuleModel.ASSOC_RULE_FOLDER);
 		if (assocs.size() != 1)
 		{
 			throw new ActionServiceException("Unable to retrieve the saved rule folder reference.");
@@ -217,7 +220,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
      */
     public boolean hasRules(NodeRef nodeRef)
     {
-    	return (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true && getRules(nodeRef).size() != 0);
+    	return (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true && getRules(nodeRef).size() != 0);
     } 
 
     /**
@@ -258,8 +261,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 				}
     		}
     		
-    		// If the node is actionable then get any rules that it might have set against it
-    		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+    		if (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
     		{
     			List<Rule> allRules = this.ruleCache.getRules(nodeRef);
     			if (allRules == null)
@@ -268,7 +270,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     				
 		    		// Get the rules for this node
 		    		List<ChildAssociationRef> ruleChildAssocRefs = 
-		    			this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER);
+		    			this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), ASSOC_NAME_RULES);
 		    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
 					{
 		    			// Create the rule and add to the list
@@ -398,7 +400,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	private NodeRef getRuleNodeRefFromId(NodeRef nodeRef, String ruleId)
 	{
 		NodeRef result = null;
-		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+		if (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
 		{
 			DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
 			namespacePrefixResolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
@@ -430,11 +432,11 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 		Map<QName, Serializable> props = this.nodeService.getProperties(ruleNodeRef);
 		
     	// Create the rule
-    	String ruleTypeName = (String)props.get(ContentModel.PROP_RULE_TYPE);    	
+    	String ruleTypeName = (String)props.get(RuleModel.PROP_RULE_TYPE);    	
 		Rule rule = new RuleImpl(ruleNodeRef.getId(), ruleTypeName, owningNodeRef);
 		
 		// Set the other rule properties
-		boolean isAppliedToChildren = ((Boolean)props.get(ContentModel.PROP_APPLY_TO_CHILDREN)).booleanValue();
+		boolean isAppliedToChildren = ((Boolean)props.get(RuleModel.PROP_APPLY_TO_CHILDREN)).booleanValue();
 		rule.applyToChildren(isAppliedToChildren);
 		
 		// Populate the composite action details
@@ -466,24 +468,24 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
     	if (ruleNodeRef == null)
     	{
-    		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == false)
+    		if (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == false)
     		{
     			// Add the actionable aspect
-    			this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
+    			this.nodeService.addAspect(nodeRef, RuleModel.ASPECT_RULES, null);
     		}
     		
     		Map<QName, Serializable> props = new HashMap<QName, Serializable>(3);
-    		props.put(ContentModel.PROP_RULE_TYPE, rule.getRuleTypeName());
-			props.put(ContentModel.PROP_DEFINITION_NAME, rule.getActionDefinitionName());
+    		props.put(RuleModel.PROP_RULE_TYPE, rule.getRuleTypeName());
+			props.put(ActionModel.PROP_DEFINITION_NAME, rule.getActionDefinitionName());
 			props.put(ContentModel.PROP_NODE_UUID, rule.getId());
-			props.put(ContentModel.PROP_APPLY_TO_CHILDREN, rule.isAppliedToChildren());
+			props.put(RuleModel.PROP_APPLY_TO_CHILDREN, rule.isAppliedToChildren());
 			
 			// Create the action node
 			ruleNodeRef = this.nodeService.createNode(
 					getSavedRuleFolderRef(nodeRef),
-					ContentModel.ASSOC_SAVED_ACTIONS,
-					ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER,
-					ContentModel.TYPE_RULE,
+					ContentModel.ASSOC_CONTAINS,
+					ASSOC_NAME_RULES,
+					RuleModel.TYPE_RULE,
 					props).getChildRef();
 			
 			// Update the created details
@@ -501,7 +503,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     public void removeRule(NodeRef nodeRef, Rule rule)
     {
     	if (this.nodeService.exists(nodeRef) == true &&
-    		this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+    		this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
     	{
     		NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
     		if (ruleNodeRef != null)
@@ -517,9 +519,11 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     public void removeAllRules(NodeRef nodeRef)
     {
     	if (this.nodeService.exists(nodeRef) == true && 
-        	this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+        	this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
     	{
-    		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), ActionableAspect.ASSOC_NAME_SAVEDRULESFOLDER);
+    		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(
+                                                                        getSavedRuleFolderRef(nodeRef), 
+                                                                        ASSOC_NAME_RULES);
     		for (ChildAssociationRef ruleChildAssoc : ruleChildAssocs)
 			{
 				this.nodeService.removeChild(getSavedRuleFolderRef(nodeRef), ruleChildAssoc.getChildRef());

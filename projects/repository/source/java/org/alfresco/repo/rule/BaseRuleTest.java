@@ -127,11 +127,11 @@ public class BaseRuleTest extends BaseSpringTest
                 ContentModel.TYPE_CONTAINER).getChildRef();
     }
 
-    protected void makeTestNodeActionable()
+    protected void addRulesAspect()
     {
     	// Make the node actionable
     	this.configService.makeConfigurable(this.nodeRef);
-    	this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_ACTIONABLE, null); 
+    	this.nodeService.addAspect(this.nodeRef, RuleModel.ASPECT_RULES, null); 
     }
 
     protected Rule createTestRule()

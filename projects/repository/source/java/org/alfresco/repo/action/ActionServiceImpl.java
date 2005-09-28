@@ -69,6 +69,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 * Error message
 	 */
 	private static final String ERR_FAIL = "The action failed to execute due to an error.";
+
+    /** Action assoc name */
+    private static final QName ASSOC_NAME_ACTIONS = QName.createQName(ActionModel.ACTION_MODEL_URI, "actions");
 	
 	/**
      * The logger
@@ -184,7 +187,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	private NodeRef getSavedActionFolderRef(NodeRef nodeRef)
 	{
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionableAspect.ASSOC_NAME_SAVEDACTIONFOLDER);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionModel.ASSOC_ACTION_FOLDER);
 		if (assocs.size() != 1)
 		{
 			throw new ActionServiceException("Unable to retrieve the saved action folder reference.");
@@ -443,7 +446,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		NodeRef result = null;
 		
-		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+		if (this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTIONS) == true)
 		{
 			DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
 			namespacePrefixResolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
@@ -471,27 +474,27 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, action.getId());
 		if (actionNodeRef == null)
 		{		
-			if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == false)
+			if (this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTIONS) == false)
 			{
 				// Apply the actionable aspect
-				this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE, null);
+				this.nodeService.addAspect(nodeRef, ActionModel.ASPECT_ACTIONS, null);
 			}
 				
 			Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
-			props.put(ContentModel.PROP_DEFINITION_NAME, action.getActionDefinitionName());
+			props.put(ActionModel.PROP_DEFINITION_NAME, action.getActionDefinitionName());
 			props.put(ContentModel.PROP_NODE_UUID, action.getId());
 			
-			QName actionType = ContentModel.TYPE_ACTION;
+			QName actionType = ActionModel.TYPE_ACTION;
 			if(action instanceof CompositeAction)
 			{
-				actionType = ContentModel.TYPE_COMPOSITE_ACTION;
+				actionType = ActionModel.TYPE_COMPOSITE_ACTION;
 			}
 			
 			// Create the action node
 			actionNodeRef = this.nodeService.createNode(
 					getSavedActionFolderRef(nodeRef),
-					ContentModel.ASSOC_SAVED_ACTIONS,
-					ContentModel.ASSOC_SAVED_ACTIONS,
+					ContentModel.ASSOC_CONTAINS,
+					ASSOC_NAME_ACTIONS,
 					actionType,
 					props).getChildRef();
 			
@@ -541,27 +544,27 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		// Update the action property values
 		Map<QName, Serializable> props = this.nodeService.getProperties(actionNodeRef);
-		props.put(ContentModel.PROP_ACTION_TITLE, action.getTitle());
-		props.put(ContentModel.PROP_ACTION_DESCRIPTION, action.getDescription());
-		props.put(ContentModel.PROP_EXECUTE_ASYNCHRONOUSLY, action.getExecuteAsychronously());
+		props.put(ActionModel.PROP_ACTION_TITLE, action.getTitle());
+		props.put(ActionModel.PROP_ACTION_DESCRIPTION, action.getDescription());
+		props.put(ActionModel.PROP_EXECUTE_ASYNCHRONOUSLY, action.getExecuteAsychronously());
 		this.nodeService.setProperties(actionNodeRef, props);
 		
 		// Update the compensating action (model should enforce the singularity of this association)
 		Action compensatingAction = action.getCompensatingAction();
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ContentModel.ASSOC_COMPENSATING_ACTION);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_COMPENSATING_ACTION);
 		if (assocs.size() == 0)
 		{
 			if (compensatingAction != null)
 			{
 				Map<QName, Serializable> props2 = new HashMap<QName, Serializable>(2);
-				props2.put(ContentModel.PROP_DEFINITION_NAME, compensatingAction.getActionDefinitionName());
+				props2.put(ActionModel.PROP_DEFINITION_NAME, compensatingAction.getActionDefinitionName());
 				props2.put(ContentModel.PROP_NODE_UUID, compensatingAction.getId());
 				
 				NodeRef compensatingActionNodeRef = this.nodeService.createNode(
 						actionNodeRef,
-	                    ContentModel.ASSOC_COMPENSATING_ACTION,
-	                    ContentModel.ASSOC_COMPENSATING_ACTION,
-	                    ContentModel.TYPE_ACTION,
+	                    ActionModel.ASSOC_COMPENSATING_ACTION,
+	                    ActionModel.ASSOC_COMPENSATING_ACTION,
+	                    ActionModel.TYPE_ACTION,
 	                    props2).getChildRef();
 				
 				saveActionImpl(compensatingAction.getOwningNodeRef(), compensatingActionNodeRef, compensatingAction);
@@ -597,7 +600,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			idToAction.put(action.getId(), action);
 		}
 		
-		List<ChildAssociationRef> actionRefs = this.nodeService.getChildAssocs(compositeActionNodeRef, ContentModel.ASSOC_ACTIONS);
+		List<ChildAssociationRef> actionRefs = this.nodeService.getChildAssocs(compositeActionNodeRef, ActionModel.ASSOC_ACTIONS);
 		for (ChildAssociationRef actionRef : actionRefs)
 		{
 			NodeRef actionNodeRef = actionRef.getChildRef();
@@ -620,14 +623,14 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		for (Map.Entry<String, Action> entry : idToAction.entrySet())
 		{
 			Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
-			props.put(ContentModel.PROP_DEFINITION_NAME, entry.getValue().getActionDefinitionName());
+			props.put(ActionModel.PROP_DEFINITION_NAME, entry.getValue().getActionDefinitionName());
 			props.put(ContentModel.PROP_NODE_UUID, entry.getValue().getId());
 			
 			NodeRef actionNodeRef = this.nodeService.createNode(
 					compositeActionNodeRef,
-                    ContentModel.ASSOC_ACTIONS,
-                    ContentModel.ASSOC_ACTIONS,
-                    ContentModel.TYPE_ACTION,
+                    ActionModel.ASSOC_ACTIONS,
+                    ActionModel.ASSOC_ACTIONS,
+                    ActionModel.TYPE_ACTION,
 					props).getChildRef();
 			
             Action action = entry.getValue();
@@ -651,7 +654,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			idToCondition.put(actionCondition.getId(), actionCondition);
 		}
 		
-		List<ChildAssociationRef> conditionRefs = this.nodeService.getChildAssocs(actionNodeRef, ContentModel.ASSOC_CONDITIONS);
+		List<ChildAssociationRef> conditionRefs = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_CONDITIONS);
 		for (ChildAssociationRef conditionRef : conditionRefs)
 		{
 			NodeRef conditionNodeRef = conditionRef.getChildRef();
@@ -675,14 +678,14 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		for (Map.Entry<String, ActionCondition> entry : idToCondition.entrySet())
 		{
 			Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
-			props.put(ContentModel.PROP_DEFINITION_NAME, entry.getValue().getActionConditionDefinitionName());
+			props.put(ActionModel.PROP_DEFINITION_NAME, entry.getValue().getActionConditionDefinitionName());
 			props.put(ContentModel.PROP_NODE_UUID, entry.getValue().getId());
 			
 			NodeRef conditionNodeRef = this.nodeService.createNode(
 					actionNodeRef,
-                    ContentModel.ASSOC_CONDITIONS,
-                    ContentModel.ASSOC_CONDITIONS,
-                    ContentModel.TYPE_ACTION_CONDITION,
+                    ActionModel.ASSOC_CONDITIONS,
+                    ActionModel.ASSOC_CONDITIONS,
+                    ActionModel.TYPE_ACTION_CONDITION,
 					props).getChildRef();
             
             saveConditionProperties(conditionNodeRef, entry.getValue());
@@ -698,7 +701,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
      */
 	private void saveConditionProperties(NodeRef conditionNodeRef, ActionCondition condition)
     {
-        this.nodeService.setProperty(conditionNodeRef, ContentModel.PROP_CONDITION_INVERT, condition.getInvertCondition());
+        this.nodeService.setProperty(conditionNodeRef, ActionModel.PROP_CONDITION_INVERT, condition.getInvertCondition());
         
     }
 
@@ -713,12 +716,12 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		Map<String, Serializable> parameterMap = new HashMap<String, Serializable>();
 		parameterMap.putAll(item.getParameterValues());
 		
-		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedNodeRef, ContentModel.ASSOC_PARAMETERS);
+		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedNodeRef, ActionModel.ASSOC_PARAMETERS);
 		for (ChildAssociationRef ref : parameters)
 		{
 			NodeRef paramNodeRef = ref.getChildRef();
 			Map<QName, Serializable> nodeRefParameterMap = this.nodeService.getProperties(paramNodeRef);
-			String paramName = (String)nodeRefParameterMap.get(ContentModel.PROP_PARAMETER_NAME);
+			String paramName = (String)nodeRefParameterMap.get(ActionModel.PROP_PARAMETER_NAME);
 			if (parameterMap.containsKey(paramName) == false)
 			{
 				// Delete parameter from node ref
@@ -727,7 +730,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			else
 			{
 				// Update the parameter value
-				nodeRefParameterMap.put(ContentModel.PROP_PARAMETER_VALUE, parameterMap.get(paramName));
+				nodeRefParameterMap.put(ActionModel.PROP_PARAMETER_VALUE, parameterMap.get(paramName));
 				this.nodeService.setProperties(paramNodeRef, nodeRefParameterMap);
 				parameterMap.remove(paramName);
 			}
@@ -737,14 +740,14 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		for (Map.Entry<String, Serializable> entry : parameterMap.entrySet())
 		{
 			Map<QName, Serializable> nodeRefProperties = new HashMap<QName, Serializable>(2);
-			nodeRefProperties.put(ContentModel.PROP_PARAMETER_NAME, entry.getKey());
-			nodeRefProperties.put(ContentModel.PROP_PARAMETER_VALUE, entry.getValue());
+			nodeRefProperties.put(ActionModel.PROP_PARAMETER_NAME, entry.getKey());
+			nodeRefProperties.put(ActionModel.PROP_PARAMETER_VALUE, entry.getValue());
 			
 			this.nodeService.createNode(
 					parameterizedNodeRef,
-                    ContentModel.ASSOC_PARAMETERS,
-                    ContentModel.ASSOC_PARAMETERS,
-                    ContentModel.TYPE_ACTION_PARAMETER,
+                    ActionModel.ASSOC_PARAMETERS,
+                    ActionModel.ASSOC_PARAMETERS,
+                    ActionModel.TYPE_ACTION_PARAMETER,
 					nodeRefProperties);
 		}
 	}
@@ -757,9 +760,11 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		List<Action> result = new ArrayList<Action>();
 		
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+			this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTIONS) == true)
 		{
-			List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(getSavedActionFolderRef(nodeRef), ContentModel.ASSOC_SAVED_ACTIONS);
+			List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(
+                                                    getSavedActionFolderRef(nodeRef), 
+                                                    ASSOC_NAME_ACTIONS);
 			for (ChildAssociationRef action : actions)
 			{
 				NodeRef actionNodeRef = action.getChildRef();
@@ -783,7 +788,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		Map<QName, Serializable> properties = this.nodeService.getProperties(actionNodeRef);
 		
 		QName actionType = this.nodeService.getType(actionNodeRef);
-		if (ContentModel.TYPE_COMPOSITE_ACTION.equals(actionType) == true)
+		if (ActionModel.TYPE_COMPOSITE_ACTION.equals(actionType) == true)
 		{
 			// Create a composite action
 			result = new CompositeActionImpl(actionNodeRef.getId(), owningNodeRef);
@@ -792,7 +797,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		else
 		{
 			// Create an action
-			result = new ActionImpl(actionNodeRef.getId(), (String)properties.get(ContentModel.PROP_DEFINITION_NAME), owningNodeRef);
+			result = new ActionImpl(actionNodeRef.getId(), (String)properties.get(ActionModel.PROP_DEFINITION_NAME), owningNodeRef);
 			populateAction(actionNodeRef, result);
 		}
 		
@@ -814,7 +819,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		populateParameters(actionNodeRef, action);
 		
 		// Set the conditions
-		List<ChildAssociationRef> conditions = this.nodeService.getChildAssocs(actionNodeRef, ContentModel.ASSOC_CONDITIONS);
+		List<ChildAssociationRef> conditions = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_CONDITIONS);
 		for (ChildAssociationRef condition : conditions)
 		{
 			NodeRef conditionNodeRef = condition.getChildRef();
@@ -832,9 +837,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		Map<QName, Serializable> props = this.nodeService.getProperties(actionNodeRef);
 		
-		action.setTitle((String)props.get(ContentModel.PROP_ACTION_TITLE));
-		action.setDescription((String)props.get(ContentModel.PROP_ACTION_DESCRIPTION));
-		action.setExecuteAsynchronously(((Boolean)props.get(ContentModel.PROP_EXECUTE_ASYNCHRONOUSLY)).booleanValue());	
+		action.setTitle((String)props.get(ActionModel.PROP_ACTION_TITLE));
+		action.setDescription((String)props.get(ActionModel.PROP_ACTION_DESCRIPTION));
+		action.setExecuteAsynchronously(((Boolean)props.get(ActionModel.PROP_EXECUTE_ASYNCHRONOUSLY)).booleanValue());	
 		
 		((ActionImpl)action).setCreator((String)props.get(ContentModel.PROP_CREATOR));
 		((ActionImpl)action).setCreatedDate((Date)props.get(ContentModel.PROP_CREATED));
@@ -842,7 +847,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		((ActionImpl)action).setModifiedDate((Date)props.get(ContentModel.PROP_MODIFIED));
 		
 		// Get the compensating action
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ContentModel.ASSOC_COMPENSATING_ACTION);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_COMPENSATING_ACTION);
 		if (assocs.size() != 0)
 		{
 			Action compensatingAction = createAction(action.getOwningNodeRef(), assocs.get(0).getChildRef());
@@ -858,14 +863,14 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	private void populateParameters(NodeRef parameterizedItemNodeRef, ParameterizedItem parameterizedItem)
 	{
-		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedItemNodeRef, ContentModel.ASSOC_PARAMETERS);
+		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedItemNodeRef, ActionModel.ASSOC_PARAMETERS);
 		for (ChildAssociationRef parameter : parameters)
 		{
 			NodeRef parameterNodeRef = parameter.getChildRef();
 			Map<QName, Serializable> properties = this.nodeService.getProperties(parameterNodeRef);
 			parameterizedItem.setParameterValue(
-					(String)properties.get(ContentModel.PROP_PARAMETER_NAME),
-					properties.get(ContentModel.PROP_PARAMETER_VALUE));
+					(String)properties.get(ActionModel.PROP_PARAMETER_NAME),
+					properties.get(ActionModel.PROP_PARAMETER_VALUE));
 		}
 	}
 	
@@ -878,9 +883,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	private ActionCondition createActionCondition(NodeRef conditionNodeRef)
 	{
 		Map<QName, Serializable> properties = this.nodeService.getProperties(conditionNodeRef);
-		ActionCondition condition = new ActionConditionImpl(conditionNodeRef.getId(), (String)properties.get(ContentModel.PROP_DEFINITION_NAME));
+		ActionCondition condition = new ActionConditionImpl(conditionNodeRef.getId(), (String)properties.get(ActionModel.PROP_DEFINITION_NAME));
         
-        Boolean invert = (Boolean)this.nodeService.getProperty(conditionNodeRef, ContentModel.PROP_CONDITION_INVERT);
+        Boolean invert = (Boolean)this.nodeService.getProperty(conditionNodeRef, ActionModel.PROP_CONDITION_INVERT);
         condition.setInvertCondition(invert.booleanValue());
         
 		populateParameters(conditionNodeRef, condition);
@@ -897,7 +902,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		populateAction(compositeNodeRef, compositeAction);
 		
-		List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(compositeNodeRef, ContentModel.ASSOC_ACTIONS);
+		List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(compositeNodeRef, ActionModel.ASSOC_ACTIONS);
 		for (ChildAssociationRef action : actions)
 		{
 			NodeRef actionNodeRef = action.getChildRef();
@@ -913,7 +918,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		Action result = null;
 		
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+			this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTIONS) == true)
 		{
 			NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, actionId);
 			if (actionNodeRef != null)
@@ -931,7 +936,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	public void removeAction(NodeRef nodeRef, Action action)
 	{
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+			this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTIONS) == true)
 		{
 			NodeRef actionNodeRef = getActionNodeRefFromId(nodeRef, action.getId());
 			if (actionNodeRef != null)
@@ -947,9 +952,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	public void removeAllActions(NodeRef nodeRef)
 	{
 		if (this.nodeService.exists(nodeRef) == true &&
-			this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTIONABLE) == true)
+			this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTIONS) == true)
 		{
-			List<ChildAssociationRef> actions = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(getSavedActionFolderRef(nodeRef), ContentModel.ASSOC_SAVED_ACTIONS));
+			List<ChildAssociationRef> actions = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(getSavedActionFolderRef(nodeRef), ASSOC_NAME_ACTIONS));
 			for (ChildAssociationRef action : actions)
 			{
 				this.nodeService.removeChild(getSavedActionFolderRef(nodeRef), action.getChildRef());
@@ -964,9 +969,9 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		List<ActionExecutionDetails> result = new ArrayList<ActionExecutionDetails>();
 		
-		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY) == true)
+		if (this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY) == true)
 		{
-			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_ACTION_EXECUTION_DETAILS);
+			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionModel.ASSOC_ACTION_EXECUTION_DETAILS);
 			for (ChildAssociationRef assoc : assocs)
 			{
 				NodeRef actionExecutionDetailsNodeRef = assoc.getChildRef();
@@ -990,16 +995,16 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		ActionExecutionDetailsImpl executionDetails = new ActionExecutionDetailsImpl();
 		
 		// Set the basic properties
-		executionDetails.setTitle((String)props.get(ContentModel.PROP_ACTION_EXECUTION_TITLE));
-		executionDetails.setExecutionStatus(ActionExecutionStatus.valueOf((String)props.get(ContentModel.PROP_EXECUTION_STATUS)));
+		executionDetails.setTitle((String)props.get(ActionModel.PROP_ACTION_EXECUTION_TITLE));
+		executionDetails.setExecutionStatus(ActionExecutionStatus.valueOf((String)props.get(ActionModel.PROP_EXECUTION_STATUS)));
 		
 		// Set the error details if present
-		String errorMessage = (String)props.get(ContentModel.PROP_ERROR_MESSAGE);
+		String errorMessage = (String)props.get(ActionModel.PROP_ERROR_MESSAGE);
 		if (errorMessage != null)
 		{
 			executionDetails.setErrorMessage(errorMessage);
 		}
-		String errorDetails = (String)props.get(ContentModel.PROP_ERROR_DETAILS);
+		String errorDetails = (String)props.get(ActionModel.PROP_ERROR_DETAILS);
 		if (errorDetails != null)
 		{
 			executionDetails.setErrorDetails(errorDetails);
@@ -1027,20 +1032,20 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 				
 				if (ActionServiceImpl.this.nodeService.exists(actionedUponNodeRef) == true)
 				{				
-					if (ActionServiceImpl.this.nodeService.hasAspect(actionedUponNodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY) == false)
+					if (ActionServiceImpl.this.nodeService.hasAspect(actionedUponNodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY) == false)
 					{
-						ActionServiceImpl.this.nodeService.addAspect(actionedUponNodeRef, ContentModel.ASPECT_ACTION_EXECUTION_HISTORY, null);
+						ActionServiceImpl.this.nodeService.addAspect(actionedUponNodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY, null);
 					}
 					
 					Map<QName, Serializable> props = new HashMap<QName, Serializable>();
-					props.put(ContentModel.PROP_ACTION_EXECUTION_TITLE, action.getTitle());
-					props.put(ContentModel.PROP_EXECUTION_STATUS, ActionExecutionStatus.PENDING.toString());
+					props.put(ActionModel.PROP_ACTION_EXECUTION_TITLE, action.getTitle());
+					props.put(ActionModel.PROP_EXECUTION_STATUS, ActionExecutionStatus.PENDING.toString());
 							
 					actionExecutionDetailsNodeRef = ActionServiceImpl.this.nodeService.createNode(
 							actionedUponNodeRef, 
-							ContentModel.ASSOC_ACTION_EXECUTION_DETAILS, 
-							ContentModel.ASSOC_ACTION_EXECUTION_DETAILS,
-							ContentModel.TYPE_ACTION_EXECUTION_DETAILS,
+							ActionModel.ASSOC_ACTION_EXECUTION_DETAILS, 
+							ActionModel.ASSOC_ACTION_EXECUTION_DETAILS,
+							ActionModel.TYPE_ACTION_EXECUTION_DETAILS,
 							props).getChildRef();
 				}
 				
@@ -1080,7 +1085,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 					{
 						ActionServiceImpl.this.nodeService.setProperty(
 								actionExecutionDetailsNodeRef, 
-								ContentModel.PROP_EXECUTION_STATUS, 
+								ActionModel.PROP_EXECUTION_STATUS, 
 								executionStatus.toString());
 						result = true;
 					}
@@ -1112,15 +1117,15 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 					if (ActionServiceImpl.this.nodeService.exists(actionExecutionDetailsNodeRef) == true)
 					{
 						Map<QName, Serializable> props = ActionServiceImpl.this.nodeService.getProperties(actionExecutionDetailsNodeRef);
-						props.put(ContentModel.PROP_EXECUTION_STATUS, ActionExecutionStatus.FAILED.toString());
-						props.put(ContentModel.PROP_ERROR_MESSAGE, exception.getMessage());
+						props.put(ActionModel.PROP_EXECUTION_STATUS, ActionExecutionStatus.FAILED.toString());
+						props.put(ActionModel.PROP_ERROR_MESSAGE, exception.getMessage());
 					
 						StringBuilder builder = new StringBuilder(); 
 						for (StackTraceElement stackTraceElement : exception.getStackTrace())
 						{
 							builder.append(stackTraceElement.toString()).append("\n");
 						} 
-						props.put(ContentModel.PROP_ERROR_DETAILS, builder.toString());
+						props.put(ActionModel.PROP_ERROR_DETAILS, builder.toString());
 						
 						ActionServiceImpl.this.nodeService.setProperties(actionExecutionDetailsNodeRef, props);
 						result = true;
