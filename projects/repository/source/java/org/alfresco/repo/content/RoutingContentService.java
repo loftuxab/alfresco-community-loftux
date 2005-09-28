@@ -500,7 +500,7 @@ public class RoutingContentService implements ContentService
             try
             {
                 // set the full content property
-                ContentData contentData = writer.getContentProperty();
+                ContentData contentData = writer.getContentData();
                 nodeService.setProperty(
                         nodeRef,
                         propertyQName,

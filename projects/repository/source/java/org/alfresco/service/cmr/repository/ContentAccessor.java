@@ -59,11 +59,11 @@ public interface ContentAccessor
     public long getSize();
     
     /**
-     * Get the property representation of the content being accessed
+     * Get the data representation of the content being accessed
      * 
-     * @return Returns the content property
+     * @return Returns the content data
      */
-    public ContentData getContentProperty();
+    public ContentData getContentData();
     
     /**
      * Retrieve the URL that this accessor references

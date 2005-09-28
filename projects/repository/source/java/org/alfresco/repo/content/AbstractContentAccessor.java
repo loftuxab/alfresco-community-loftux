@@ -64,7 +64,7 @@ public abstract class AbstractContentAccessor implements ContentAccessor
         this.contentUrl = contentUrl;
     }
     
-    public ContentData getContentProperty()
+    public ContentData getContentData()
     {
         ContentData property = new ContentData(contentUrl, mimetype, getSize(), encoding);
         return property;
@@ -88,7 +88,7 @@ public abstract class AbstractContentAccessor implements ContentAccessor
     public String toString()
     {
         StringBuilder sb = new StringBuilder(100);
-        sb.append("ContentAccessor[ content=").append(getContentProperty()).append("]");
+        sb.append("ContentAccessor[ content=").append(getContentData()).append("]");
         return sb.toString();
     }
     

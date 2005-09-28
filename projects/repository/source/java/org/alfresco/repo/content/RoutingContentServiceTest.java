@@ -142,6 +142,33 @@ public class RoutingContentServiceTest extends BaseSpringTest
         String contentCheck = reader.getContentString();
         assertEquals("Content incorrect", SOME_CONTENT, contentCheck);
     }
+    
+    public void testWriteToNodeWithoutAnyContentProperties() throws Exception
+    {
+        // previously, the node was populated with the mimetype, etc
+        // check that the write has these
+        ContentWriter writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
+        assertNotNull(writer.getMimetype());
+        assertNotNull(writer.getEncoding());
+        
+        // now remove the content property from the node
+        nodeService.setProperty(contentNodeRef, ContentModel.PROP_CONTENT, null);
+        
+        writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
+        assertNull(writer.getMimetype());
+        assertNull(writer.getEncoding());
+        
+        // now set it on the writer
+        writer.setMimetype("text/plain");
+        writer.setEncoding("UTF-8");
+        
+        String content = "The quick brown fox ...";
+        writer.putContent(content);
+        
+        // the properties should have found their way onto the node
+        ContentData contentData = (ContentData) nodeService.getProperty(contentNodeRef, ContentModel.PROP_CONTENT);
+        assertEquals("metadata didn't get onto node", writer.getContentData(), contentData);
+    }
 	
 	/**
 	 * Tests simple writes that don't automatically update the node content URL
