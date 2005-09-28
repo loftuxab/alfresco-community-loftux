@@ -307,7 +307,8 @@ public class AuthoringWebService extends AbstractWebService implements
                                     AuthoringWebService.this.namespaceService);
                             
                             // Write the content to the server
-                            ContentWriter contentWriter = AuthoringWebService.this.contentService.getWriter(nodeRef);
+                            // TODO: Need to get the property QName into this method
+                            ContentWriter contentWriter = AuthoringWebService.this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, false);
                             if (contentWriter == null)
                             {
                                 throw new RuntimeException("Unable to write external content before checkin.");

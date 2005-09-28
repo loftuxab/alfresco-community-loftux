@@ -66,7 +66,6 @@ public interface ContentStore
      *      the {@link RandomAccessContent random access interface}
      * @throws ContentIOException
      *
-     * @see #getWriter(NodeRef)
      * @see ContentWriter#addListener(ContentStreamListener)
      * @see ContentWriter#getContentUrl()
      */

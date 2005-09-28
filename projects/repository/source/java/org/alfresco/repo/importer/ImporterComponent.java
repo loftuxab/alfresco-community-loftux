@@ -30,12 +30,13 @@ import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
-import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -371,38 +372,39 @@ public class ImporterComponent
             }
             
             // Build initial map of properties
-            Map<QName, Serializable> initialProperties = new HashMap<QName, Serializable>();
-            initialProperties.putAll(context.getProperties(nodeType.getName()));
-            List<AspectDefinition> defaultAspects = nodeType.getDefaultAspects();
-            for (AspectDefinition aspect: defaultAspects)
-            {
-                initialProperties.putAll(context.getProperties(aspect.getName()));
-            }
-            Map<QName, Serializable> boundInitialProperties = bindProperties(initialProperties);
+            Map<QName, Serializable> properties = context.getProperties();
+            Map<QName, Serializable> initialProperties = bindProperties(properties);
             
             // Create initial node
-            ChildAssociationRef assocRef = nodeService.createNode(parentRef, assocType, childQName, nodeType.getName(), boundInitialProperties);
+            ChildAssociationRef assocRef = nodeService.createNode(parentRef, assocType, childQName, nodeType.getName(), initialProperties);
             NodeRef nodeRef = assocRef.getChildRef();
             reportNodeCreated(assocRef);
-            reportPropertySet(nodeRef, boundInitialProperties);
+            reportPropertySet(nodeRef, initialProperties);
             
             // Apply aspects
             for (QName aspect : context.getNodeAspects())
             {
                 if (nodeService.hasAspect(nodeRef, aspect) == false)
                 {
-                    Map<QName, Serializable> aspectProperties = context.getProperties(aspect);
-                    Map<QName, Serializable> boundAspectProperties = bindProperties(aspectProperties);
-                    nodeService.addAspect(nodeRef, aspect, boundAspectProperties);
+                    nodeService.addAspect(nodeRef, aspect, null);   // all properties previously added
                     reportAspectAdded(nodeRef, aspect);
-                    reportPropertySet(nodeRef, boundAspectProperties);
                 }
             }
 
-            // Import Content, if applicable
-            if (dictionaryService.isSubClass(nodeType.getName(), ContentModel.TYPE_CONTENT))
+            // import content, if applicable
+            for (QName propertyQName : properties.keySet())
             {
-                importContent(nodeRef);
+                PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
+                if (propertyDef == null)
+                {
+                    // not defined in the dictionary
+                    continue;
+                }
+                QName propertyTypeQName = propertyDef.getDataType().getName();
+                if (propertyTypeQName.equals(DataTypeDefinition.CONTENT))
+                {
+                    importContent(nodeRef, propertyQName);
+                }
             }
             
             // Do we need to flush?
@@ -417,24 +419,32 @@ public class ImporterComponent
         }
         
         /**
-         * Import Node Content
+         * Import Node Content.
+         * <p>
+         * The content URL, if present, will be a local URL.  This import copies the content
+         * from the local URL to a server-assigned location.
          * 
          * @param context
+         * @param propertyQName the name of the content-type property
          */
-        private void importContent(NodeRef nodeRef)
+        private void importContent(NodeRef nodeRef, QName propertyQName)
         {
             // Extract the source location of the content
-            String contentUrl = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT_URL);
+            ContentData contentData = (ContentData)nodeService.getProperty(nodeRef, propertyQName);
+            String contentUrl = contentData.getContentUrl();
             if (contentUrl != null && contentUrl.length() > 0)
             {
-                // since there really isn't any content associated with the node (yet), we should
-                // remove the URL from the node.  It will be set after the content has been
-                // uploaded
-                nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT_URL, null);
-        
+                // remove the 'fake' content URL - it causes failures
+                contentData = new ContentData(
+                        null,
+                        contentData.getMimetype(),
+                        0L,
+                        contentData.getEncoding());
+                nodeService.setProperty(nodeRef, propertyQName, contentData);
+                
                 // import the content from the url
                 InputStream contentStream = streamHandler.importStream(contentUrl);
-                ContentWriter writer = contentService.getUpdatingWriter(nodeRef);
+                ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
                 writer.putContent(contentStream);
                 reportContentCreated(nodeRef, contentUrl);
             }

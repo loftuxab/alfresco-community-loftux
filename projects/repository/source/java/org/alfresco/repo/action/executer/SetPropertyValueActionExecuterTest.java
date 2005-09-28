@@ -18,7 +18,6 @@ package org.alfresco.repo.action.executer;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ActionImpl;
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -60,7 +59,6 @@ public class SetPropertyValueActionExecuterTest extends BaseSpringTest
                 ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTENT).getChildRef();
-        this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         
         // Get the executer instance 
         this.executer = (SetPropertyValueActionExecuter)this.applicationContext.getBean(SetPropertyValueActionExecuter.NAME);

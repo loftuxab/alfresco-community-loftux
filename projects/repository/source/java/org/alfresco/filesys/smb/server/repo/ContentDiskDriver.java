@@ -41,6 +41,7 @@ import org.alfresco.filesys.server.filesys.TreeConnection;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -547,7 +548,26 @@ public class ContentDiskDriver implements ContentDiskInterface
         if (!cifsHelper.isDirectory(nodeToMoveRef))
         {
             // reguess the mimetype in case the extension has changed
-            properties.put(ContentModel.PROP_MIME_TYPE, mimetypeService.guessMimetype(splitPaths[1]));
+            String mimetype = mimetypeService.guessMimetype(splitPaths[1]);
+            // get the current content properties
+            ContentData contentData = (ContentData) properties.get(ContentModel.PROP_CONTENT);
+            if (contentData == null)
+            {
+                contentData = new ContentData(
+                        null,
+                        mimetype,
+                        0L,
+                        "UTF-8");
+            }
+            else
+            {
+                contentData = new ContentData(
+                        contentData.getContentUrl(),
+                        mimetype,
+                        contentData.getSize(),
+                        contentData.getEncoding());
+            }
+            properties.put(ContentModel.PROP_CONTENT, contentData);
         }
         nodeService.setProperties(nodeToMoveRef, properties);
         

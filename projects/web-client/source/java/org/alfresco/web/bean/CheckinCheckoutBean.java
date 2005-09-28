@@ -521,11 +521,9 @@ public class CheckinCheckoutBean
              node.getProperties().get(ContentModel.PROP_EDITINLINE) != null &&
              ((Boolean)node.getProperties().get(ContentModel.PROP_EDITINLINE)).booleanValue() == true)
          {
-            // found a document that can be edited in-line
-            String mimetype = (String)node.getProperties().get(ContentModel.PROP_MIME_TYPE);
-            
             // retrieve the content reader for this node
-            ContentReader reader = getContentService().getReader(node.getNodeRef());
+            ContentReader reader = getContentService().getReader(node.getNodeRef(), ContentModel.PROP_CONTENT);
+            String mimetype = reader.getMimetype();
             
             // calculate which editor screen to display
             if (MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(mimetype) ||
@@ -594,7 +592,7 @@ public class CheckinCheckoutBean
                logger.debug("Trying to update content node Id: " + node.getId());
             
             // get an updating writer that we can use to modify the content on the current node
-            ContentWriter writer = this.contentService.getUpdatingWriter(node.getNodeRef());
+            ContentWriter writer = this.contentService.getWriter(node.getNodeRef(), ContentModel.PROP_CONTENT, true);
             writer.putContent(this.editorOutput);
             
             // commit the transaction
@@ -730,6 +728,7 @@ public class CheckinCheckoutBean
             // we can either checkin the content from the current working copy node
             // which would have been previously updated by the user
             String contentUrl;
+            String mimetype;
             if (getCopyLocation().equals(COPYLOCATION_CURRENT))
             {
                contentUrl = (String)node.getProperties().get("contentUrl");
@@ -737,9 +736,10 @@ public class CheckinCheckoutBean
             // or specify a specific file as the content instead
             else
             {
-               // add the content to a repo temp writer location
+               // add the content to an anonymous but permanent writer location
                // we can then retrieve the URL to the content to to be set on the node during checkin
-               ContentWriter writer = this.contentService.getWriter(node.getNodeRef());
+               ContentWriter writer = this.contentService.getWriter(node.getNodeRef(), ContentModel.PROP_CONTENT, false);
+               // TODO: Adjust the mimetype
                writer.putContent(this.file);
                contentUrl = writer.getContentUrl();
             }
@@ -805,7 +805,7 @@ public class CheckinCheckoutBean
                logger.debug("Trying to update content node Id: " + node.getId());
             
             // get an updating writer that we can use to modify the content on the current node
-            ContentWriter writer = this.contentService.getUpdatingWriter(node.getNodeRef());
+            ContentWriter writer = this.contentService.getWriter(node.getNodeRef(), ContentModel.PROP_CONTENT, true);
             writer.putContent(this.file);
             
             // commit the transaction

@@ -30,6 +30,7 @@ import org.alfresco.filesys.server.filesys.NetworkFile;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentAccessor;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -37,8 +38,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * First-pass implementation of the <tt>NetworkFile</tt> for direct interaction
+ * Implementation of the <tt>NetworkFile</tt> for direct interaction
  * with the channel repository.
+ * <p>
+ * This provides the interaction with the Alfresco Content Model file/folder structure.
  * 
  * @author Derek Hulley
  */
@@ -214,11 +217,11 @@ public class ContentNetworkFile extends NetworkFile
         content = null;
         if (write)
         {
-            content = contentService.getWriter(nodeRef);
+            content = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, false);
         }
         else
         {
-            content = contentService.getReader(nodeRef);
+            content = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
             if (content == null)  // no content on node
             {
                 // give it an empty file
@@ -251,8 +254,8 @@ public class ContentNetworkFile extends NetworkFile
         else if (modified)              // file was modified
         {
             // write properties
-            nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT_URL, content.getContentUrl());
-            nodeService.setProperty(nodeRef, ContentModel.PROP_SIZE, channel.size());
+            ContentData contentData = content.getContentData();
+            nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT, contentData);
             // close it
             channel.close();
             channel = null;

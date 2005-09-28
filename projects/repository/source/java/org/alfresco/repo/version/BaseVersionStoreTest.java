@@ -26,6 +26,7 @@ import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -129,8 +130,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.nodeProperties.put(PROP_1, VALUE_1);
         this.nodeProperties.put(PROP_2, VALUE_2);
         this.nodeProperties.put(PROP_3, VALUE_3);
-        this.nodeProperties.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        this.nodeProperties.put(ContentModel.PROP_ENCODING, "UTF-8");
+        this.nodeProperties.put(ContentModel.PROP_CONTENT, new ContentData(null, "text/plain", 0L, "UTF-8"));
         
         // Create a workspace that contains the 'live' nodes
         this.testStoreRef = this.dbNodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
@@ -176,7 +176,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.versionableNodes.put(nodeRef.getId(), nodeRef);
         
         // Add the content to the node
-        ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
+        ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
         contentWriter.putContent(TEST_CONTENT);
         
         // Add some children to the node

@@ -43,22 +43,6 @@ import org.alfresco.service.namespace.QName;
 public interface ContentService
 {
     /**
-     * Gets a reader for the content associated with the given node.
-     * 
-     * @param nodeRef a reference to a node with the <b>content</b> aspect
-     * @return Returns a reader for the content associated with the node,
-     *      or null if no content has been written for the node
-     * @throws InvalidNodeRefException if the node doesn't exist
-     * @throws InvalidTypeException if the node is not of type <b>content</b>
-     * 
-     * @deprecated
-     * @see #getReader(NodeRef, QName)
-     */
-    @Deprecated
-    public ContentReader getReader(NodeRef nodeRef)
-            throws InvalidNodeRefException, InvalidTypeException;
-    
-    /**
      * Gets a reader for the content associated with the given node property.
      * 
      * @param nodeRef a reference to a node having a content property
@@ -70,24 +54,6 @@ public interface ContentService
      */
     public ContentReader getReader(NodeRef nodeRef, QName propertyQName)
             throws InvalidNodeRefException, InvalidTypeException;
-
-	/**
-	 * Gets a writer for the content associated with the given node.
-	 * <p>
-	 * There is no work performed to update the node to point to the
-	 * new {@link ContentWriter#getContentUrl() content URL}.
-	 * 
-     * @param nodeRef a reference to a node.
-     * @return Returns a writer for the content associated with the node.
-     * @throws InvalidNodeRefException if the node doesn't exist
-     * @throws InvalidTypeException if the node property is not of type <b>content</b>
-     * 
-     * @deprecated
-     * @see #getWriter(NodeRef, QName, boolean)
-	 */
-    @Deprecated
-    public ContentWriter getWriter(NodeRef nodeRef)
-    throws InvalidNodeRefException, InvalidTypeException;
 
     /**
      * Get a content writer for the given node property, choosing to optionally have
@@ -110,28 +76,6 @@ public interface ContentService
     public ContentWriter getWriter(NodeRef nodeRef, QName propertyQName, boolean update)
                 throws InvalidNodeRefException, InvalidTypeException;
 
-    /**
-     * Gets a writer for the content associated with the given node.
-     * <p>
-     * When the writer output channel is closed the node will automatically
-     * be updated to point to the new
-     * {@link ContentWriter#getContentUrl() content URL}.  The <b>size</b>
-     * property will also be set.  The callback operation occurs within
-     * a transaction that will propogate from any transaction present on
-     * the thread responsible for closing the channel.
-     * 
-     * @param nodeRef a reference to a node with the <b>content</b> aspect.
-     * @return Returns a writer for the content associated with the node.
-     * @throws InvalidNodeRefException if the node doesn't exist
-     * @throws InvalidTypeException if the node is not of type <b>content</b>
-     * 
-     * @deprecated
-     * @see #getWriter(NodeRef, QName, boolean)
-     */
-    @Deprecated
-    public ContentWriter getUpdatingWriter(NodeRef nodeRef)
-            throws InvalidNodeRefException, InvalidTypeException;
-    
     /**
      * Gets a writer to a temporary location.  The longevity of the stored
      * temporary content is determined by the system.

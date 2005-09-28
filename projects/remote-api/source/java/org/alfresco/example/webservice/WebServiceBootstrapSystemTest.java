@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -20,17 +19,15 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class WebServiceBootstrapSystemTest extends TestCase
@@ -103,8 +100,6 @@ public class WebServiceBootstrapSystemTest extends TestCase
                                             folderProps).getChildRef();
             
             Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(3);
-            contentProps.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
-            contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
             contentProps.put(ContentModel.PROP_NAME, CONTENT_NAME);
             
             // Create some test content        
@@ -114,7 +109,10 @@ public class WebServiceBootstrapSystemTest extends TestCase
                     ContentModel.ASSOC_CHILDREN,
                     ContentModel.TYPE_CONTENT,
                     contentProps).getChildRef();
-            contentService.getUpdatingWriter(testContent).putContent(TEST_CONTENT);
+            ContentWriter writer = contentService.getWriter(testContent, ContentModel.PROP_CONTENT, true);
+            writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            writer.setEncoding("UTF-8");
+            writer.putContent(TEST_CONTENT);
         
             userTransaction.commit();
         }

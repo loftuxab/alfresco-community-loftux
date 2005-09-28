@@ -150,7 +150,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         ContentWriter writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         assertNotNull(writer.getMimetype());
         assertNotNull(writer.getEncoding());
-        
+
         // now remove the content property from the node
         nodeService.setProperty(contentNodeRef, ContentModel.PROP_CONTENT, null);
         
@@ -168,6 +168,21 @@ public class RoutingContentServiceTest extends BaseSpringTest
         // the properties should have found their way onto the node
         ContentData contentData = (ContentData) nodeService.getProperty(contentNodeRef, ContentModel.PROP_CONTENT);
         assertEquals("metadata didn't get onto node", writer.getContentData(), contentData);
+        
+        // check that the reader's metadata is set
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
+        assertEquals("Metadata didn't get set on reader", writer.getContentData(), reader.getContentData());
+    }
+    
+    public void testNullReaderForNullUrl() throws Exception
+    {
+        // set the property, but with a null URL
+        ContentData contentData = new ContentData(null, null, 0L, null);
+        nodeService.setProperty(contentNodeRef, ContentModel.PROP_CONTENT, null);
+
+        // get the reader
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
+        assertNull("Reader must be null if the content URL is null", reader);
     }
 	
 	/**

@@ -48,6 +48,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -230,14 +231,15 @@ public class LuceneTest extends TestCase
        
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-        properties.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        // properties.put(DictionaryBootstrap.PROP_QNAME_MIME_TYPE,
-        // "application/msword");
-        properties.put(ContentModel.PROP_ENCODING, "UTF-16");
-        n14 = nodeService.createNode(n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}fourteen"), ContentModel.TYPE_CONTENT, properties).getChildRef();
+        properties.put(ContentModel.PROP_CONTENT, new ContentData(null, "text/plain", 0L, "UTF-16"));
+        n14 = nodeService.createNode(
+                n13,
+                ASSOC_TYPE_QNAME,
+                QName.createQName("{namespace}fourteen"), ContentModel.TYPE_CONTENT,
+                properties).getChildRef();
         //nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
 
-        ContentWriter writer = contentService.getUpdatingWriter(n14);
+        ContentWriter writer = contentService.getWriter(n14, ContentModel.PROP_CONTENT, true);
         // InputStream is =
         // this.getClass().getClassLoader().getResourceAsStream("test.doc");
         // writer.putContent(is);

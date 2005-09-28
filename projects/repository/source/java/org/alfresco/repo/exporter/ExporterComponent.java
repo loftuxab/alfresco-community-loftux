@@ -27,7 +27,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -303,11 +305,15 @@ public class ExporterComponent
                 // start export of property
                 exporter.startProperty(nodeRef, property);
 
+                // get the property type
+                PropertyDefinition propertyDef = dictionaryService.getProperty(property);
+                boolean isContentProperty = propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT);
+                
                 // TODO: This should test for datatype.content
-                if (dictionaryService.isSubClass(type, ContentModel.TYPE_CMOBJECT) && property.equals(ContentModel.PROP_CONTENT_URL))
+                if (dictionaryService.isSubClass(type, ContentModel.TYPE_CMOBJECT) && isContentProperty)
                 {
                     // export property of datatype CONTENT
-                    ContentReader reader = contentService.getReader(nodeRef);
+                    ContentReader reader = contentService.getReader(nodeRef, property);
                     if (reader == null || reader.exists() == false)
                     {
                         exporter.warning("Failed to read content for property " + property + " on node " + nodeRef);

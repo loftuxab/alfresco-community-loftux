@@ -62,6 +62,13 @@ public interface ImportNode
     public Map<QName,Serializable> getProperties(QName className);
 
     /**
+     * Gets all properties for the node
+     * 
+     * @return the properties
+     */
+    public Map<QName,Serializable> getProperties();
+
+    /**
      * @return  the aspects of this node
      */
     public Set<QName> getNodeAspects();

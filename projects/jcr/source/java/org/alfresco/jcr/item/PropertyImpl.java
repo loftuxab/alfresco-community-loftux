@@ -306,7 +306,7 @@ public class PropertyImpl extends ItemImpl implements Property
     {
         // TODO: The type should be based on the property value (in the case of undefined required type)
         // TODO: Switch on data type
-        if (name.equals(ContentModel.PROP_CONTENT_URL))
+        if (name.equals(ContentModel.PROP_CONTENT))
         {
             return DataTypeMap.convertDataTypeToPropertyType(DataTypeDefinition.CONTENT);
         }
@@ -427,11 +427,11 @@ public class PropertyImpl extends ItemImpl implements Property
         Object value = null; 
 
         // TODO: Switch on data type
-        if (name.equals(ContentModel.PROP_CONTENT_URL))
+        if (name.equals(ContentModel.PROP_CONTENT))
         {
             // Retrieve content reader as value
             ContentService contentService = node.session.getRepositoryImpl().getServiceRegistry().getContentService();
-            value = contentService.getReader(node.getNodeRef());
+            value = contentService.getReader(node.getNodeRef(), name);
             if (value == null)
             {
                 // TODO: Check - If value is now null, then effectively the property has been removed

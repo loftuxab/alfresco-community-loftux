@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.version;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -63,19 +64,19 @@ public class ContentServiceImplTest extends BaseVersionStoreTest
         NodeRef versionNodeRef = version.getFrozenStateNodeRef();
 		
         // Get the content reader for the frozen node
-        ContentReader contentReader = this.contentService.getReader(versionNodeRef);
+        ContentReader contentReader = this.contentService.getReader(versionNodeRef, ContentModel.PROP_CONTENT);
         assertNotNull(contentReader);
         assertEquals(TEST_CONTENT, contentReader.getContentString());
         
         // Now update the content and verison again
-        ContentWriter contentWriter = this.contentService.getUpdatingWriter(versionableNode);
+        ContentWriter contentWriter = this.contentService.getWriter(versionableNode, ContentModel.PROP_CONTENT, true);
         assertNotNull(contentWriter);
         contentWriter.putContent(UPDATED_CONTENT);        
         Version version2 = createVersion(versionableNode, this.versionProperties);
         NodeRef version2NodeRef = version2.getFrozenStateNodeRef();
 		
         // Get the content reader for the new verisoned content
-        ContentReader contentReader2 = this.contentService.getReader(version2NodeRef);
+        ContentReader contentReader2 = this.contentService.getReader(version2NodeRef, ContentModel.PROP_CONTENT);
         assertNotNull(contentReader2);
         assertEquals(UPDATED_CONTENT, contentReader2.getContentString());
     }
@@ -94,7 +95,10 @@ public class ContentServiceImplTest extends BaseVersionStoreTest
         // Get writer is not supported by the version content service
         try
         {
-            ContentWriter contentWriter = this.contentService.getUpdatingWriter(version.getFrozenStateNodeRef());
+            ContentWriter contentWriter = this.contentService.getWriter(
+                    version.getFrozenStateNodeRef(),
+                    ContentModel.PROP_CONTENT,
+                    true);
             contentWriter.putContent("bobbins");
             fail("This operation is not supported.");
         }

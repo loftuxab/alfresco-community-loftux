@@ -18,7 +18,6 @@ package org.alfresco.repo.action.evaluator;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ActionConditionImpl;
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -59,7 +58,6 @@ public class HasAspectEvaluatorTest extends BaseSpringTest
                 ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTENT).getChildRef();
-        this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
         
         this.evaluator = (HasAspectEvaluator)this.applicationContext.getBean(HasAspectEvaluator.NAME);
     }

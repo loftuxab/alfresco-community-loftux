@@ -38,6 +38,7 @@ import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -52,6 +53,9 @@ import org.alfresco.util.PropertyMap;
  */
 public class CMLUtilTest extends BaseSpringTest
 {
+    private static final ContentData CONTENT_DATA_TEXT_UTF8 = new ContentData(null, MimetypeMap.MIMETYPE_TEXT_PLAIN, 0L, "UTF-8");
+    private static final ContentData CONTENT_DATA_HTML_UTF16 = new ContentData(null, MimetypeMap.MIMETYPE_HTML, 0L, "UTF-16");
+    
     private CMLUtil cmlUtil;
     private NodeService nodeService;
     private StoreRef testStoreRef;
@@ -83,8 +87,7 @@ public class CMLUtilTest extends BaseSpringTest
         
         // Create the node used for tests
         PropertyMap contentProps = new PropertyMap();
-        contentProps.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
+        contentProps.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT_UTF8);
         this.nodeRef = this.nodeService.createNode(
                 this.rootNodeRef,
                 ContentModel.ASSOC_CHILDREN,
@@ -158,8 +161,7 @@ public class CMLUtilTest extends BaseSpringTest
         update.setProperty(new NamedValue[]
         {
                 new NamedValue(ContentModel.PROP_NAME.toString(), "updatedName"),
-                new NamedValue(ContentModel.PROP_MIME_TYPE.toString(), MimetypeMap.MIMETYPE_HTML),
-                new NamedValue(ContentModel.PROP_ENCODING.toString(), "UTF-16")
+                new NamedValue(ContentModel.PROP_CONTENT.toString(), CONTENT_DATA_HTML_UTF16.toString())
         });
         
         CML cml = new CML();
@@ -175,8 +177,7 @@ public class CMLUtilTest extends BaseSpringTest
         assertNotNull(updateResult.getDestination());
         
         assertEquals("updatedName", this.nodeService.getProperty(this.nodeRef, ContentModel.PROP_NAME));
-        assertEquals(MimetypeMap.MIMETYPE_HTML, this.nodeService.getProperty(this.nodeRef, ContentModel.PROP_MIME_TYPE));
-        assertEquals("UTF-16", this.nodeService.getProperty(this.nodeRef, ContentModel.PROP_ENCODING));        
+        assertEquals(CONTENT_DATA_HTML_UTF16, this.nodeService.getProperty(this.nodeRef, ContentModel.PROP_CONTENT));
     }
     
     public void testDelete()
@@ -409,8 +410,7 @@ public class CMLUtilTest extends BaseSpringTest
         return new NamedValue[]
           {
                 new NamedValue(ContentModel.PROP_NAME.toString(), "name"),
-                new NamedValue(ContentModel.PROP_MIME_TYPE.toString(), MimetypeMap.MIMETYPE_TEXT_PLAIN),
-                new NamedValue(ContentModel.PROP_ENCODING.toString(), "UTF-8")
+                new NamedValue(ContentModel.PROP_CONTENT.toString(), CONTENT_DATA_TEXT_UTF8.toString())
           };
     }
 }

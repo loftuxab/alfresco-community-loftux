@@ -23,8 +23,10 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -134,29 +136,29 @@ public class SimpleExampleWithContent
                 nodeProperties);
         NodeRef fileRef = assocRef.getChildRef();
         
+        ContentWriter writer = contentService.getWriter(fileRef, ContentModel.PROP_CONTENT, true);
         // the file is of type content, with mandatory property 'mimetype'
         // this need only be set before the end of the transaction to satisfy the node,
         // but the content services require the mimetype set before content can be
         // written or read
-        nodeService.setProperty(fileRef, ContentModel.PROP_MIME_TYPE, "text/plain");
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         // store string content as UTF-8
-        nodeService.setProperty(fileRef, ContentModel.PROP_ENCODING, "UTF-8");
+        writer.setEncoding("UTF-8");
         
         // write some content - this API allows streaming and direct loading,
         // but for now we'll just upload a string
         // The writer, being updating, will take care of updating the node once the stream
         // closes.
         // just to demonstrate the node structure, dump it to the file
-        ContentWriter writer = contentService.getUpdatingWriter(fileRef);
         String dump = NodeStoreInspector.dumpNodeStore(nodeService, storeRef);
         writer.putContent(dump);
         
         // get the URL.  It is also available directly from the writer
-        String contentUrl = (String) nodeService.getProperty(fileRef, ContentModel.PROP_CONTENT_URL);
-        System.out.println("Node store dumped to: " + contentUrl);
+        ContentData contentData = (ContentData) nodeService.getProperty(fileRef, ContentModel.PROP_CONTENT);
+        System.out.println("Node store dumped to: " + contentData);
         
         // get a reader
-        ContentReader reader = contentService.getReader(fileRef);
+        ContentReader reader = contentService.getReader(fileRef, ContentModel.PROP_CONTENT);
         if (reader.exists())
         {
             System.out.println("Node Store: \n" + reader.getContentString());

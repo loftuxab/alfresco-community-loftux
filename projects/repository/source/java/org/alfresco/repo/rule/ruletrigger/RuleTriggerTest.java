@@ -223,7 +223,7 @@ public class RuleTriggerTest extends BaseSpringTest
 		assertFalse(ruleType.rulesTriggered);
 		
 		// Try and trigger the type
-		ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
+		ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
 		contentWriter.putContent("some content");
 		
 		// Check to see if the rule type has been triggered

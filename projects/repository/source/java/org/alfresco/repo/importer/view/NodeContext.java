@@ -201,6 +201,14 @@ import org.alfresco.service.namespace.QName;
     }
 
     /**
+     * @return Return all properties
+     */
+    public Map<QName, Serializable> getProperties()
+    {
+        return nodeProperties;
+    }
+
+    /**
      * Adds an aspect to the node
      * 
      * @param aspect  the aspect

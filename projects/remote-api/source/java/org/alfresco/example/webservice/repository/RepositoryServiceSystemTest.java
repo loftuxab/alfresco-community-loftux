@@ -41,6 +41,7 @@ import org.alfresco.example.webservice.types.ResultSetRowNode;
 import org.alfresco.example.webservice.types.Store;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.commons.logging.Log;
@@ -511,12 +512,13 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 
         create.setParent(parentReference);
         create.setProperty(new NamedValue[] {
-                        new NamedValue(ContentModel.PROP_NAME.toString(),
+                        new NamedValue(
+                                ContentModel.PROP_NAME.toString(),
                                 "name"),
-                        new NamedValue(ContentModel.PROP_MIME_TYPE.toString(),
-                                MimetypeMap.MIMETYPE_TEXT_PLAIN),
-                        new NamedValue(ContentModel.PROP_ENCODING.toString(),
-                                "UTF-8") });
+                        new NamedValue(
+                                ContentModel.PROP_CONTENT.toString(),
+                                new ContentData(null, MimetypeMap.MIMETYPE_TEXT_PLAIN, 0L, "UTF-8").toString())
+                        });
         
         CMLAddAspect aspect = new CMLAddAspect();
         aspect.setAspect(ContentModel.ASPECT_VERSIONABLE.toString());

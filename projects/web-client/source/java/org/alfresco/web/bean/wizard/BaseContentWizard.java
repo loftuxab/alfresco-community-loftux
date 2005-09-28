@@ -34,6 +34,7 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.MimetypeService;
@@ -98,13 +99,29 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             Node currentDocument = this.browseBean.getDocument();
             NodeRef nodeRef = currentDocument.getNodeRef();
             
+            // set up the content data
             // update the modified timestamp and other content props
             Map<QName, Serializable> contentProps = this.nodeService.getProperties(nodeRef);
             contentProps.put(ContentModel.PROP_NAME, this.fileName);
             contentProps.put(ContentModel.PROP_TITLE, this.title);
             contentProps.put(ContentModel.PROP_DESCRIPTION, this.description);
-            contentProps.put(ContentModel.PROP_MIME_TYPE, this.contentType);
             contentProps.put(ContentModel.PROP_CREATOR, this.author);
+            
+            // set up content properties - copy or create the compound property
+            ContentData contentData = (ContentData) contentProps.get(ContentModel.PROP_CONTENT);
+            if (contentData == null)
+            {
+                contentData = new ContentData(null, this.contentType, 0L, "UTF-8");
+            }
+            else
+            {
+                contentData = new ContentData(
+                        contentData.getContentUrl(),
+                        this.contentType,
+                        contentData.getSize(),
+                        contentData.getEncoding());
+            }
+            contentProps.put(ContentModel.PROP_CONTENT, contentData);
             
             if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_INLINEEDITABLE) == false)
             {
@@ -135,8 +152,6 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             // create properties for content type
             Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(5, 1.0f);
             contentProps.put(ContentModel.PROP_NAME, this.fileName);
-            contentProps.put(ContentModel.PROP_ENCODING, "UTF-8");
-            contentProps.put(ContentModel.PROP_MIME_TYPE, this.contentType);
             contentProps.put(ContentModel.PROP_CREATOR, this.author);
             
             // create the node to represent the content
@@ -174,7 +189,10 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             }
             
             // get a writer for the content and put the file
-            ContentWriter writer = contentService.getUpdatingWriter(fileNodeRef);
+            ContentWriter writer = contentService.getWriter(fileNodeRef, ContentModel.PROP_CONTENT, true);
+            // set the mimetype and encoding
+            writer.setMimetype(this.contentType);
+            writer.setEncoding("UTF-8");
             if (fileContent != null)
             {
                writer.putContent(fileContent);

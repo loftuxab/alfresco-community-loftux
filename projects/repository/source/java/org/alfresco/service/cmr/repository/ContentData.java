@@ -95,9 +95,28 @@ public class ContentData implements Serializable
         return property;
     }
     
+    /**
+     * Constructs a new instance using the existing one as a template, but replacing the
+     * mimetype
+     * 
+     * @param existing and existing set of content data
+     * @param mimetype the mimetype to set
+     * @return Returns a new, immutable instance of the data
+     */
+    public static ContentData setMimetype(ContentData existing, String mimetype)
+    {
+        ContentData ret = new ContentData(
+                existing.contentUrl,
+                mimetype,
+                existing.size,
+                existing.encoding);
+        // done
+        return ret;
+    }
+    
     public ContentData(String contentUrl, String mimetype, long size, String encoding)
     {
-        checkContentUrl(contentUrl);
+        checkContentUrl(contentUrl, mimetype);
         
         this.contentUrl = contentUrl;
         this.mimetype = mimetype;
@@ -145,9 +164,13 @@ public class ContentData implements Serializable
     }
     
     /**
+     * Checks that the content URL is correct, and also that the mimetype is
+     * non-null if the URL is present.
+     * 
      * @param contentUrl the content URL to check
+     * @param mimetype
      */
-    private void checkContentUrl(String contentUrl)
+    private void checkContentUrl(String contentUrl, String mimetype)
     {
         // check the URL
         if (contentUrl != null && contentUrl.length() > 0)
@@ -165,6 +188,14 @@ public class ContentData implements Serializable
                                 "   position: " + j);
                     }
                 }
+            }
+            // check that mimetype is present if URL is present
+            if (mimetype == null)
+            {
+                throw new IllegalArgumentException(
+                        "The content mimetype must be set whenever the URL is set: \n" +
+                        "   content URL: " + contentUrl + "\n" +
+                        "   mimetype: " + mimetype);
             }
         }
     }

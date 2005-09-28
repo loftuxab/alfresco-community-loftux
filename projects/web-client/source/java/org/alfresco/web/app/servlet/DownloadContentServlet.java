@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
@@ -135,7 +136,8 @@ public class DownloadContentServlet extends HttpServlet
          // get the content mimetype from the node properties
          ServiceRegistry serviceRegistry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
          NodeService nodeService = serviceRegistry.getNodeService();
-         String mimetype = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_MIME_TYPE);
+         ContentData contentData = (ContentData) nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
+         String mimetype = contentData.getMimetype();
          
          // fall back if unable to resolve mimetype property
          if (mimetype == null || mimetype.length() == 0)
@@ -159,7 +161,7 @@ public class DownloadContentServlet extends HttpServlet
          // assuming the repo is capable of streaming in chunks, this should allow large files
          // to be streamed directly to the browser response stream.
          ContentService contentService = serviceRegistry.getContentService();
-         ContentReader reader = contentService.getReader(nodeRef);
+         ContentReader reader = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
          reader.getContent( res.getOutputStream() );
       }
       catch (Throwable err)

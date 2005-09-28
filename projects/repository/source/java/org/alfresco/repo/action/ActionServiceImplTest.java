@@ -41,6 +41,7 @@ import org.alfresco.service.cmr.action.ActionExecutionDetails;
 import org.alfresco.service.cmr.action.ActionExecutionStatus;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.action.CompositeAction;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -85,7 +86,10 @@ public class ActionServiceImplTest extends BaseSpringTest
                 ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTENT).getChildRef();
-        this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        this.nodeService.setProperty(
+                this.nodeRef,
+                ContentModel.PROP_CONTENT,
+                new ContentData(null, MimetypeMap.MIMETYPE_TEXT_PLAIN, 0L, null));
 	}
 	
 	/**

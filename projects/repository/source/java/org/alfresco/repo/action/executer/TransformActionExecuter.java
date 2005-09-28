@@ -23,8 +23,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -162,11 +162,17 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
                 destinationAssocQName,
                 false);
 		
-		// Set the mime type on the copy
-		this.nodeService.setProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE, mimeType);
-		
+        
+        // Get the content reader and writer
+        ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef, ContentModel.PROP_CONTENT);
+        ContentWriter contentWriter = this.contentService.getWriter(copyNodeRef, ContentModel.PROP_CONTENT, true);
+        // set up the writer
+        contentWriter.setMimetype(mimeType);                        // new mimetype
+        contentWriter.setEncoding(contentReader.getEncoding());     // original encoding
+
+        String originalMimetype = contentReader.getMimetype();
+        
         // Adjust the name of the copy
-        String originalMimetype = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_MIME_TYPE);
         String originalName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
         String newName = transformName(originalName, originalMimetype, mimeType);
         nodeService.setProperty(copyNodeRef, ContentModel.PROP_NAME, newName);
@@ -176,10 +182,6 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
             String newTitle = transformName(originalTitle, originalMimetype, mimeType);
             nodeService.setProperty(copyNodeRef, ContentModel.PROP_TITLE, newTitle);
         }
-        
-		// Get the content reader and writer
-		ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef);
-		ContentWriter contentWriter = this.contentService.getUpdatingWriter(copyNodeRef);
 		
         if (contentReader == null)
         {

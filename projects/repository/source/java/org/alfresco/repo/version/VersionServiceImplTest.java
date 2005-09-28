@@ -241,7 +241,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	// Change the property and content values
     	this.dbNodeService.setProperty(versionableNode, PROP_1, UPDATED_VALUE_1);
     	this.dbNodeService.setProperty(versionableNode, PROP_2, null);
-    	ContentWriter contentWriter = this.contentService.getUpdatingWriter(versionableNode);
+    	ContentWriter contentWriter = this.contentService.getWriter(versionableNode, ContentModel.PROP_CONTENT, true);
     	assertNotNull(contentWriter);
     	contentWriter.putContent(UPDATED_CONTENT_1);
     	
@@ -258,7 +258,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	this.dbNodeService.setProperty(versionableNode, PROP_1, UPDATED_VALUE_2);
     	this.dbNodeService.setProperty(versionableNode, PROP_2, UPDATED_VALUE_3);
     	this.dbNodeService.setProperty(versionableNode, PROP_3, null);
-    	ContentWriter contentWriter2 = this.contentService.getUpdatingWriter(versionableNode);
+    	ContentWriter contentWriter2 = this.contentService.getWriter(versionableNode, ContentModel.PROP_CONTENT, true);
     	assertNotNull(contentWriter2);
     	contentWriter2.putContent(UPDATED_CONTENT_2);
     	
@@ -273,7 +273,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	assertEquals(VALUE_3, this.dbNodeService.getProperty(versionableNode, PROP_3));
     	
     	// Check that the content has been reverted
-    	ContentReader contentReader1 = this.contentService.getReader(versionableNode);
+    	ContentReader contentReader1 = this.contentService.getReader(versionableNode, ContentModel.PROP_CONTENT);
     	assertNotNull(contentReader1);
     	assertEquals(UPDATED_CONTENT_1, contentReader1.getContentString());
     	
@@ -292,7 +292,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	assertEquals(VALUE_3, this.dbNodeService.getProperty(versionableNode, PROP_3));
     	
     	// Check that the content is correct
-    	ContentReader contentReader2 = this.contentService.getReader(versionableNode);
+    	ContentReader contentReader2 = this.contentService.getReader(versionableNode, ContentModel.PROP_CONTENT);
     	assertNotNull(contentReader2);
     	assertEquals(TEST_CONTENT, contentReader2.getContentString());
     	
@@ -367,7 +367,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
         assertEquals(VALUE_3, this.dbNodeService.getProperty(restoredNode, PROP_3));
         
         // Check that the content is correct
-        ContentReader contentReader2 = this.contentService.getReader(restoredNode);
+        ContentReader contentReader2 = this.contentService.getReader(restoredNode, ContentModel.PROP_CONTENT);
         assertNotNull(contentReader2);
         assertEquals(TEST_CONTENT, contentReader2.getContentString());
         

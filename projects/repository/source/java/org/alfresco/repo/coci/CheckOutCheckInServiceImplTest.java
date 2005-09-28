@@ -21,9 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -70,7 +72,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private static final String TEST_VALUE_2 = "UTF8";
 	private static final String TEST_VALUE_3 = "UTF16";
 	private static final QName PROP_NAME_QNAME = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "name");
-	private static final QName PROP2_QNAME = ContentModel.PROP_ENCODING;
+	private static final QName PROP2_QNAME = ContentModel.PROP_DESCRIPTION;
 	private static final String CONTENT_1 = "This is some content";
 	private static final String CONTENT_2 = "This is the cotent modified.";
     
@@ -99,21 +101,18 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.rootNodeRef = this.nodeService.getRootNode(storeRef);
 		
 		// Create the node used for tests
-        Map<QName, Serializable> bagOfProps = createTypePropertyBag();
-        bagOfProps.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        bagOfProps.put(ContentModel.PROP_ENCODING, TEST_VALUE_2);
-        
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				rootNodeRef,
 				ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}test"),
-				ContentModel.TYPE_CONTENT,
-				bagOfProps);
+				ContentModel.TYPE_CONTENT);
 		this.nodeRef = childAssocRef.getChildRef();
 		
 		// Add the initial content to the node
-		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.nodeRef);
-		contentWriter.putContent(CONTENT_1);	
+		ContentWriter contentWriter = this.contentService.getWriter(this.nodeRef, ContentModel.PROP_CONTENT, true);
+        contentWriter.setMimetype("text/plain");
+        contentWriter.setEncoding(TEST_VALUE_2);
+		contentWriter.putContent(CONTENT_1);
 		
 		// Add the lock and version aspects to the created node
 		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
@@ -182,12 +181,12 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		}
 		
 		// Ensure that the content has been copied correctly
-		ContentReader contentReader = this.contentService.getReader(this.nodeRef);
+		ContentReader contentReader = this.contentService.getReader(this.nodeRef, ContentModel.PROP_CONTENT);
 		assertNotNull(contentReader);
-		ContentReader contentReader2 = this.contentService.getReader(workingCopy);
+		ContentReader contentReader2 = this.contentService.getReader(workingCopy, ContentModel.PROP_CONTENT);
 		assertNotNull(contentReader2);
 		assertEquals(
-				"The content string of the working copy should match the origional immediatly after checkout.", 
+				"The content string of the working copy should match the original immediatly after checkout.", 
 				contentReader.getContentString(), 
 				contentReader2.getContentString());
 		
@@ -210,7 +209,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
         NodeRef workingCopy3 = checkout();
 		this.nodeService.setProperty(workingCopy3, PROP_NAME_QNAME, TEST_VALUE_2);
 		this.nodeService.setProperty(workingCopy3, PROP2_QNAME, TEST_VALUE_3);
-        ContentWriter tempWriter = this.contentService.getWriter(workingCopy3);
+        ContentWriter tempWriter = this.contentService.getWriter(workingCopy3, ContentModel.PROP_CONTENT, false);
 		assertNotNull(tempWriter);
 		tempWriter.putContent(CONTENT_2);
 		String contentUrl = tempWriter.getContentUrl();
@@ -221,7 +220,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		assertNotNull(origNodeRef);
 		
 		// Check the checked in content
-		ContentReader contentReader = this.contentService.getReader(origNodeRef);
+		ContentReader contentReader = this.contentService.getReader(origNodeRef, ContentModel.PROP_CONTENT);
 		assertNotNull(contentReader);
 		assertEquals(CONTENT_2, contentReader.getContentString());
 		
@@ -234,7 +233,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		assertNotNull(versionNodeRef);
 		
 		// Check the verioned content
-		ContentReader versionContentReader = this.contentService.getReader(versionNodeRef);
+		ContentReader versionContentReader = this.contentService.getReader(versionNodeRef, ContentModel.PROP_CONTENT);
 		assertNotNull(versionContentReader);
 		assertEquals(CONTENT_1, versionContentReader.getContentString());		
 		
@@ -264,8 +263,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	{
 		// Create a bag of props
         Map<QName, Serializable> bagOfProps = createTypePropertyBag();
-        bagOfProps.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        bagOfProps.put(ContentModel.PROP_ENCODING, "UTF-8");
+        bagOfProps.put(ContentModel.PROP_CONTENT, new ContentData(null, MimetypeMap.MIMETYPE_TEXT_PLAIN, 0L, "UTF-8"));
 
 		// Create a new node 
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(

@@ -61,6 +61,7 @@ import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -84,6 +85,8 @@ import org.springframework.util.StopWatch;
  */
 public class RuleServiceCoverageTest extends TestCase
 {
+    private static final ContentData CONTENT_DATA_TEXT = new ContentData(null, MimetypeMap.MIMETYPE_TEXT_PLAIN, 0L, "UTF-8");
+    
 	/**
 	 * Application context used during the test
 	 */
@@ -368,7 +371,7 @@ public class RuleServiceCoverageTest extends TestCase
 	private Map<QName, Serializable> getContentProperties()
     {
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
-        properties.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        properties.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
         return properties;
     }
 
@@ -662,7 +665,6 @@ public class RuleServiceCoverageTest extends TestCase
     			
     			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
     	        props.put(ContentModel.PROP_NAME, "test.xls");
-    			props.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_EXCEL);
     			
     			// Create the node at the root
     	        NodeRef newNodeRef = this.nodeService.createNode(
@@ -673,7 +675,8 @@ public class RuleServiceCoverageTest extends TestCase
     	                props).getChildRef(); 
     			
     			// Set some content on the origional
-    			ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
+    			ContentWriter contentWriter = this.contentService.getWriter(newNodeRef, ContentModel.PROP_CONTENT, true);
+                contentWriter.setMimetype(MimetypeMap.MIMETYPE_EXCEL);
     			File testFile = AbstractContentTransformerTest.loadQuickTestFile("xls");
     			contentWriter.putContent(testFile);
     			
@@ -702,7 +705,8 @@ public class RuleServiceCoverageTest extends TestCase
     	        assertEquals(newNodeRef, source);
     	        
     	        // Check the transformed content
-    			assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, this.nodeService.getProperty(copyNodeRef, ContentModel.PROP_MIME_TYPE));
+                ContentData contentData = (ContentData) nodeService.getProperty(copyNodeRef, ContentModel.PROP_CONTENT);
+    			assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, contentData.getMimetype());
     			
     		}
     		catch (Exception exception)
@@ -743,7 +747,6 @@ public class RuleServiceCoverageTest extends TestCase
     			
     			Map<QName, Serializable> props =new HashMap<QName, Serializable>(1);
     	        props.put(ContentModel.PROP_NAME, "test.gif");
-    			props.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_GIF);
     			
     			// Create the node at the root
     	        NodeRef newNodeRef = this.nodeService.createNode(
@@ -754,7 +757,8 @@ public class RuleServiceCoverageTest extends TestCase
     	                props).getChildRef(); 
     			
     			// Set some content on the origional
-    			ContentWriter contentWriter = this.contentService.getUpdatingWriter(newNodeRef);
+    			ContentWriter contentWriter = this.contentService.getWriter(newNodeRef, ContentModel.PROP_CONTENT, true);
+                contentWriter.setMimetype(MimetypeMap.MIMETYPE_IMAGE_GIF);
     			File testFile = AbstractContentTransformerTest.loadQuickTestFile("gif");
     			contentWriter.putContent(testFile);
     			
@@ -1011,7 +1015,7 @@ public class RuleServiceCoverageTest extends TestCase
      */
     private void addContentToNode(NodeRef nodeRef)
     {
-    	ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
+    	ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
     	assertNotNull(contentWriter);
     	contentWriter.putContent(STANDARD_TEXT_CONTENT + System.currentTimeMillis());
     }
@@ -1086,7 +1090,7 @@ public class RuleServiceCoverageTest extends TestCase
 		// Test condition failure
 		Map<QName, Serializable> props1 = new HashMap<QName, Serializable>();
 		props1.put(ContentModel.PROP_NAME, "bobbins.txt");
-        props1.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        props1.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
 		NodeRef newNodeRef = this.nodeService.createNode(
                 this.nodeRef,
                 ContentModel.ASSOC_CHILDREN,                
@@ -1103,7 +1107,7 @@ public class RuleServiceCoverageTest extends TestCase
 		// Test condition success
 		Map<QName, Serializable> props2 = new HashMap<QName, Serializable>();
 		props2.put(ContentModel.PROP_NAME, "bobbins.doc");
-        props2.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        props2.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
 		NodeRef newNodeRef2 = this.nodeService.createNode(
                 this.nodeRef,
                 ContentModel.ASSOC_CHILDREN,                
@@ -1140,7 +1144,7 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.saveRule(this.nodeRef, rule);
         Map<QName, Serializable> propsx = new HashMap<QName, Serializable>();
         propsx.put(ContentModel.PROP_NAME, "mybobbins.doc");
-        propsx.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        propsx.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
         NodeRef newNodeRefx = this.nodeService.createNode(
                 this.nodeRef,
                 ContentModel.ASSOC_CHILDREN,                
@@ -1151,7 +1155,7 @@ public class RuleServiceCoverageTest extends TestCase
         assertFalse(this.nodeService.hasAspect(newNodeRefx, ContentModel.ASPECT_VERSIONABLE));  
         Map<QName, Serializable> propsy = new HashMap<QName, Serializable>();
         propsy.put(ContentModel.PROP_NAME, "bobbins.doc");
-        propsy.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        propsy.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
         NodeRef newNodeRefy = this.nodeService.createNode(
                 this.nodeRef,
                 ContentModel.ASSOC_CHILDREN,                
@@ -1172,7 +1176,7 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService.saveRule(this.nodeRef, rule);
         Map<QName, Serializable> propsa = new HashMap<QName, Serializable>();
         propsa.put(ContentModel.PROP_NAME, "bobbins.document");
-        propsa.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        propsa.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
         NodeRef newNodeRefa = this.nodeService.createNode(
                 this.nodeRef,
                 ContentModel.ASSOC_CHILDREN,                
@@ -1183,7 +1187,7 @@ public class RuleServiceCoverageTest extends TestCase
         assertFalse(this.nodeService.hasAspect(newNodeRefa, ContentModel.ASPECT_VERSIONABLE));  
         Map<QName, Serializable> propsb = new HashMap<QName, Serializable>();
         propsb.put(ContentModel.PROP_NAME, "bobbins.doc");
-        propsb.put(ContentModel.PROP_MIME_TYPE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        propsb.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
         NodeRef newNodeRefb = this.nodeService.createNode(
                 this.nodeRef,
                 ContentModel.ASSOC_CHILDREN,                

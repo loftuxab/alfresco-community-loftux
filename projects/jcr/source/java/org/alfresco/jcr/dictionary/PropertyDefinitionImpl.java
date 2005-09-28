@@ -59,7 +59,7 @@ public class PropertyDefinitionImpl implements PropertyDefinition
     public int getRequiredType()
     {
         // TODO: Switch on data type
-        if (propDef.getName().equals(ContentModel.PROP_CONTENT_URL))
+        if (propDef.getName().equals(ContentModel.PROP_CONTENT))
         {
             return DataTypeMap.convertDataTypeToPropertyType(DataTypeDefinition.CONTENT);
         }

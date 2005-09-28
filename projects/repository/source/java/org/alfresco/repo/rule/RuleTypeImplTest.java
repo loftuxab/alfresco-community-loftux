@@ -99,7 +99,7 @@ public class RuleTypeImplTest extends BaseSpringTest
     	assertFalse(ruleType.rulesTriggered);
     	
     	// Update some content in order to trigger the rule type
-    	ContentWriter contentWriter = this.contentService.getUpdatingWriter(nodeRef);
+    	ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
     	contentWriter.putContent("any old content");
     	assertTrue(ruleType.rulesTriggered);
     	

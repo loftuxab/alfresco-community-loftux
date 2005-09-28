@@ -25,6 +25,7 @@ import java.net.URLConnection;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -178,7 +179,7 @@ public class ClassPathRepoTemplateLoader implements TemplateLoader
       RepoTemplateSource(NodeRef ref) throws IOException
       {
          this.nodeRef = ref;
-         this.conn = getServiceRegistry().getContentService().getReader(nodeRef);
+         this.conn = getServiceRegistry().getContentService().getReader(nodeRef, ContentModel.PROP_CONTENT);
       }
 
       public boolean equals(Object o)

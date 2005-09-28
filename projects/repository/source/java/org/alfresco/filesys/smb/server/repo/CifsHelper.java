@@ -39,6 +39,7 @@ import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -201,11 +202,11 @@ public class CifsHelper
         else
         {
             // get the file size
-            Object propSize = nodeProperties.get(ContentModel.PROP_SIZE);
+            ContentData contentData = (ContentData) nodeProperties.get(ContentModel.PROP_CONTENT);
             long size = 0L;
-            if (propSize != null)       // it can be null if no content has been uploaded yet
+            if (contentData != null)
             {
-                size = DefaultTypeConverter.INSTANCE.longValue(propSize);
+                size = contentData.getSize();
             }
             fileInfo.setSize(size);
             
@@ -316,7 +317,7 @@ public class CifsHelper
                 if (fileToken)
                 {
                     String mimetype = mimetypeService.guessMimetype(pathElement);
-                    properties.put(ContentModel.PROP_MIME_TYPE, mimetype);
+                    properties.put(ContentModel.PROP_CONTENT, new ContentData(null, mimetype, 0L, "UTF-8"));
                 }
                 // create node
                 ChildAssociationRef assocRef = nodeService.createNode(

@@ -18,10 +18,8 @@ package org.alfresco.web.ui.repo.component.template;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.faces.context.FacesContext;
 
@@ -217,7 +215,7 @@ public class TemplateNode extends Node
    public String getContent()
    {
       ContentService contentService = getServiceRegistry().getContentService();
-      ContentReader reader = contentService.getReader(this.nodeRef);
+      ContentReader reader = contentService.getReader(this.nodeRef, ContentModel.PROP_CONTENT);
       return reader != null ? reader.getContentString() : "";
    }
    

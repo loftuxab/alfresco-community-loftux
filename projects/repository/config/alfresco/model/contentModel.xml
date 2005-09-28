@@ -61,40 +61,13 @@
          <properties>
             <property name="cm:content">
                <type>d:content</type>
-               <mandatory>false</mandatory>   <!-- TODO: Make this mandatory -->
+               <mandatory>false</mandatory>
                <!--- Index content in the background -->
                <index enabled="true">
                   <atomic>true</atomic>
                   <stored>false</stored>
                   <tokenised>false</tokenised>
                </index>
-            </property>
-            <!-- the individual url, mimetype, etc are replaced by the single d:content -->
-            <property name="cm:contentUrl">
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-               <!--- Index content in the background -->
-               <index enabled="true">
-                  <atomic>true</atomic>
-                  <stored>false</stored>
-                  <tokenised>true</tokenised>
-               </index>
-            </property>
-            <property name="cm:mimetype">
-               <title>Content Type</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
-            <property name="cm:encoding">
-               <title>Encoding</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
-            <property name="cm:size">
-               <!-- This property should be system maintained -->
-               <title>Size</title>
-               <type>d:long</type>
-               <mandatory>false</mandatory>
             </property>
          </properties>
       </type>

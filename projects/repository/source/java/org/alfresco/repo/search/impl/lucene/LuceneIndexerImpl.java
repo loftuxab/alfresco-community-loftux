@@ -148,12 +148,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     private ArrayList<Helper> toFTSIndex = new ArrayList<Helper>();
 
     /**
-     * Ref to the QName for content
-     * TODO: This should be based on type.
-     */
-    private QName contentPropertyQName = ContentModel.PROP_CONTENT_URL;
-
-    /**
      * Default construction
      *
      */
@@ -1319,6 +1313,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         boolean index = true;
         boolean tokenise = true;
         boolean atomic = true;
+        boolean isContent = false;
 
         PropertyDefinition propertyDef = getDictionaryService().getProperty(propertyName);
         if (propertyDef != null)
@@ -1327,6 +1322,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             store = propertyDef.isStoredInIndex();
             tokenise = propertyDef.isTokenisedInIndex();
             atomic = propertyDef.isIndexedAtomically();
+            isContent = propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT);
         }
         isAtomic &= atomic;
 
@@ -1343,9 +1339,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     // analyser
                     if (index && atomic)
                     {
-                        if (propertyName.equals(contentPropertyQName))
+                        if (isContent)
                         {
-                            ContentReader reader = contentService.getReader(nodeRef);
+                            ContentReader reader = contentService.getReader(nodeRef, propertyName);
                             if (reader != null)
                             {
                                 ContentWriter writer = contentService.getTempWriter();
@@ -1584,6 +1580,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         boolean index = true;
                         boolean tokenise = true;
                         boolean atomic = true;
+                        boolean isContent = false;
 
                         PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
                         if (propertyDefinition != null)
@@ -1592,6 +1589,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             store = propertyDefinition.isStoredInIndex();
                             tokenise = propertyDefinition.isTokenisedInIndex();
                             atomic = propertyDefinition.isIndexedAtomically();
+                            isContent = propertyDefinition.getDataType().getName().equals(DataTypeDefinition.CONTENT);
                         }
 
                         Serializable value = properties.get(propertyQName);
@@ -1613,9 +1611,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                 if (index && !atomic)
                                 {
                                     document.removeFields(propertyQName.toString());
-                                    if (propertyQName.equals(contentPropertyQName))
+                                    if (isContent)
                                     {
-                                        ContentReader reader = contentService.getReader(ref);
+                                        ContentReader reader = contentService.getReader(ref, propertyQName);
                                         if (reader != null)
                                         {
                                             ContentWriter cwriter = contentService.getTempWriter();

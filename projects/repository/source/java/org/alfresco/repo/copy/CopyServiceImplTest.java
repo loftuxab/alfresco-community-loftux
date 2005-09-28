@@ -40,6 +40,7 @@ import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -109,6 +110,8 @@ public class CopyServiceImplTest extends BaseSpringTest
     private static final QName TEST_CHILD_ASSOC_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName");
 	private static final QName TEST_ASSOC_TYPE_QNAME = QName.createQName(TEST_TYPE_NAMESPACE, "testAssocName");
 	private static final QName TEST_CHILD_ASSOC_QNAME2 = QName.createQName(TEST_TYPE_NAMESPACE, "testChildAssocName2");
+    
+    private static final ContentData CONTENT_DATA_TEXT = new ContentData(null, "text/plain", 0L, "UTF-8");
 	
 	/**
 	 * Test content
@@ -206,8 +209,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		Map<QName, Serializable> destinationProps = new HashMap<QName, Serializable>();
 		destinationProps.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);			
         destinationProps.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3); 
-        destinationProps.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        destinationProps.put(ContentModel.PROP_ENCODING, "UTF-8");
+        destinationProps.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
 		ChildAssociationRef temp5 = this.nodeService.createNode(
 				this.rootNodeRef,
                 ContentModel.ASSOC_CHILDREN,
@@ -228,8 +230,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		result.put(PROP1_QNAME_MANDATORY, TEST_VALUE_1);
 		result.put(PROP2_QNAME_OPTIONAL, TEST_VALUE_2);
         result.put(PROP5_QNAME_MANDATORY, TEST_VALUE_3);
-        result.put(ContentModel.PROP_MIME_TYPE, "text/plain");
-        result.put(ContentModel.PROP_ENCODING, "UTF-8");
+        result.put(ContentModel.PROP_CONTENT, CONTENT_DATA_TEXT);
 		return result;
 	}
 	
@@ -331,7 +332,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 		// TODO check copying from a lockable copy
 		
 		// Check copying from a node with content	
-		ContentWriter contentWriter = this.contentService.getUpdatingWriter(this.sourceNodeRef);
+		ContentWriter contentWriter = this.contentService.getWriter(this.sourceNodeRef, ContentModel.PROP_CONTENT, true);
 		contentWriter.putContent(SOME_CONTENT);		
 		NodeRef copyWithContent = this.copyService.copy(
 				this.sourceNodeRef,
@@ -339,7 +340,7 @@ public class CopyServiceImplTest extends BaseSpringTest
                 ContentModel.ASSOC_CHILDREN,
 				QName.createQName("{test}copyWithContent"));
 		checkCopiedNode(this.sourceNodeRef, copyWithContent, true, true, false);
-		ContentReader contentReader = this.contentService.getReader(copyWithContent);
+		ContentReader contentReader = this.contentService.getReader(copyWithContent, ContentModel.PROP_CONTENT);
 		assertNotNull(contentReader);
 		assertEquals(SOME_CONTENT, contentReader.getContentString());
 		

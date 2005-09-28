@@ -36,6 +36,7 @@ import org.alfresco.repo.webservice.types.ParentReference;
 import org.alfresco.repo.webservice.types.Predicate;
 import org.alfresco.repo.webservice.types.Reference;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -174,7 +175,7 @@ public class ContentWebService extends AbstractWebService implements ContentServ
          // create a NodeRef from the parent reference
          NodeRef nodeRef = Utils.convertToNodeRef(node, this.nodeService, this.searchService, this.namespaceService);
          
-         ContentWriter writer = this.contentService.getUpdatingWriter(nodeRef);
+         ContentWriter writer = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
          writer.putContent(new String(content));
          
          if (logger.isDebugEnabled())
@@ -212,11 +213,10 @@ public class ContentWebService extends AbstractWebService implements ContentServ
          // create a NodeRef from the parent reference
          NodeRef parentNodeRef = Utils.convertToNodeRef(parent, this.nodeService, this.searchService, this.namespaceService);
          
+         ContentData contentData = new ContentData(null, format.getMimetype(), 0L, format.getEncoding());
          Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(5, 1.0f);
          contentProps.put(ContentModel.PROP_NAME, name);
-         contentProps.put(ContentModel.PROP_ENCODING, format.getEncoding());
-         contentProps.put(ContentModel.PROP_MIME_TYPE, format.getMimetype());
-         contentProps.put(ContentModel.PROP_NAME, name);
+         contentProps.put(ContentModel.PROP_CONTENT, contentData);
          
          // TODO what do we do if the parent assoc type or name is not set ???
          // TODO need to fix this you cos the old tests arn't going to work
@@ -235,7 +235,7 @@ public class ContentWebService extends AbstractWebService implements ContentServ
             logger.debug("Created content node (name=" + name + " id=" + contentNodeRef.getId() + ")");
          
          // get a writer for the content and put the file
-         ContentWriter writer = contentService.getUpdatingWriter(contentNodeRef);
+         ContentWriter writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
          writer.putContent(new String(content));
          
          // create the return object
@@ -330,11 +330,8 @@ public class ContentWebService extends AbstractWebService implements ContentServ
             long length = -1;
             if (exists)
             {
-               Long size = (Long)this.nodeService.getProperty(nodeRef, ContentModel.PROP_SIZE);
-               if (size != null && size instanceof Long)
-               {
-                  length = ((Long)size).longValue();
-               }
+               ContentData contentData = (ContentData) this.nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
+               length = contentData.getSize();
             }
             
             ExistsResult result = new ExistsResult(Utils.convertToReference(nodeRef), exists, length);
@@ -368,19 +365,11 @@ public class ContentWebService extends AbstractWebService implements ContentServ
    private Content setupContentObject(NodeRef node)
    {
       // get metadata for the given node
-      Map<QName, Serializable> props = this.nodeService.getProperties(node);
-      String encoding = (String)props.get(ContentModel.PROP_ENCODING);
-      String mimetype = (String)props.get(ContentModel.PROP_MIME_TYPE);
-      Object size = props.get(ContentModel.PROP_SIZE);
-      long length = -1;
-      if (size != null && size instanceof Long)
-      {
-         length = ((Long)size).longValue();
-      }
-         
+      ContentData contentData = (ContentData) this.nodeService.getProperty(node, ContentModel.PROP_CONTENT);
+      
       // setup the return objects
-      ContentFormat format = new ContentFormat(mimetype, encoding);
-      Content content = new Content(format, length);
+      ContentFormat format = new ContentFormat(contentData.getMimetype(), contentData.getEncoding());
+      Content content = new Content(format, contentData.getSize());
       content.setReference(Utils.convertToReference(node));
       content.setType(this.nodeService.getType(node).toString());
       

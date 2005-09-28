@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -31,6 +32,7 @@ import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.lock.UnableToReleaseLockException;
 import org.alfresco.service.cmr.repository.AspectMissingException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -324,8 +326,9 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		// Check that the working node still has the copy aspect applied
 		if (this.nodeService.hasAspect(workingCopyNodeRef, ContentModel.ASPECT_COPIEDFROM) == true)
 		{
+            Map<QName, Serializable> workingCopyProperties = nodeService.getProperties(workingCopyNodeRef);
 			// Try and get the origional node reference
-			nodeRef = (NodeRef)this.nodeService.getProperty(workingCopyNodeRef, ContentModel.PROP_COPY_REFERENCE);
+			nodeRef = (NodeRef) workingCopyProperties.get(ContentModel.PROP_COPY_REFERENCE);
 			if(nodeRef == null)
 			{
 				// Error since the origional node can not be found
@@ -350,11 +353,24 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			
 			if (contentUrl != null)
 			{
+                ContentData contentData = (ContentData) workingCopyProperties.get(ContentModel.PROP_CONTENT);
+                if (contentData == null)
+                {
+                    throw new AlfrescoRuntimeException("Working copy node has no mimetype: " + workingCopyNodeRef);
+                }
+                else
+                {
+                    contentData = new ContentData(
+                            contentUrl,
+                            contentData.getMimetype(),
+                            contentData.getSize(),
+                            contentData.getEncoding());
+                }
 				// Set the content url value onto the working copy
 				this.nodeService.setProperty(
 						workingCopyNodeRef, 
-						ContentModel.PROP_CONTENT_URL, 
-						contentUrl);
+						ContentModel.PROP_CONTENT, 
+						contentData);
 			}
 			
 			// Copy the contents of the working copy onto the origional

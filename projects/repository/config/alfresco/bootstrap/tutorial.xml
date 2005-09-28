@@ -12,8 +12,7 @@
 				<cm:title>Alfresco Tutorial</cm:title>
 				<cm:name>Alfresco Tutorial.pdf</cm:name>
 				<cm:description>Getting started guide</cm:description>
-				<cm:mimetype>application/pdf</cm:mimetype>
-				<cm:contentUrl>classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf</cm:contentUrl>
+				<cm:content>contentUrl=classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf|mimetype=application/pdf|size=|encoding=</cm:content>
 			</cm:content>
 		</cm:contains>
 	</cm:folder>

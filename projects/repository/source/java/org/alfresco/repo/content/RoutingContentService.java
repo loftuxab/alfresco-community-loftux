@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy;
 import org.alfresco.repo.content.filestore.FileContentStore;
 import org.alfresco.repo.content.transform.ContentTransformer;
@@ -43,7 +42,6 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -149,15 +147,6 @@ public class RoutingContentService implements ContentService
             Map<QName, Serializable> after)
     {
         boolean fire = false;
-        // the code below is for the old-style properties
-        {
-        	String beforeContentUrl = (String)before.get(ContentModel.PROP_CONTENT_URL);
-        	String afterContentUrl = (String)after.get(ContentModel.PROP_CONTENT_URL);
-        	if (!EqualsHelper.nullSafeEquals(beforeContentUrl, afterContentUrl))
-    	    {
-                fire = true;
-    	    }
-        }
         // check if any of the content properties have changed
         for (QName propertyQName : before.keySet())
         {
@@ -195,102 +184,6 @@ public class RoutingContentService implements ContentService
         }
     }
     
-    @Deprecated
-    public ContentReader getReader(NodeRef nodeRef)
-    {
-        // ensure that the node exists and is of type content
-        QName nodeType = nodeService.getType(nodeRef);
-        if (!dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
-        {
-            throw new InvalidTypeException("The node must be an instance of type content", nodeType);
-        }
-        
-        // get the content URL
-        Object contentUrlProperty = nodeService.getProperty(
-                nodeRef,
-                ContentModel.PROP_CONTENT_URL);
-        String contentUrl = DefaultTypeConverter.INSTANCE.convert(String.class, contentUrlProperty);
-        // check that the URL is available
-        if (contentUrl == null)
-        {
-            // there is no URL - the interface specifies that this is not an error condition
-            return null;
-        }
-        
-        // TODO: Choose the store to read from at runtime
-        ContentReader reader = store.getReader(contentUrl);
-        
-        // get node properties
-        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-        // get the content mimetype
-        String mimetype = (String) properties.get(ContentModel.PROP_MIME_TYPE);
-        reader.setMimetype(mimetype);
-        // get the content encoding
-        String encoding = (String) properties.get(ContentModel.PROP_ENCODING);
-        reader.setEncoding(encoding);
-        
-        // we don't listen for anything
-        // result may be null - but interface contract says we may return null
-        return reader;
-    }
-
-    @Deprecated
-    public ContentWriter getWriter(NodeRef nodeRef)
-    {
-        // ensure that the node exists and is of type content
-        QName nodeType = nodeService.getType(nodeRef);
-        if (!dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
-        {
-            throw new InvalidTypeException("The node must be an instance of type content", nodeType);
-        }
-        
-        // check for an existing URL
-        ContentReader existingContentReader = getReader(nodeRef);
-        
-        // TODO: Choose the store to write to at runtime
-        
-        // get the content using the (potentially) existing content - the new content
-        // can be wherever the store decides.
-        ContentWriter writer = store.getWriter(existingContentReader, null);
-
-        // get node properties
-        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-        // get the content mimetype
-        String mimetype = (String) properties.get(ContentModel.PROP_MIME_TYPE);
-        writer.setMimetype(mimetype);
-        // get the content encoding
-        String encoding = (String) properties.get(ContentModel.PROP_ENCODING);
-        writer.setEncoding(encoding);
-        
-        // give back to the client
-        return writer;
-    }
-
-   /**
-    * Add a listener to the plain writer 
-    * 
-    * @see #getWriter(NodeRef)
-    */
-    @Deprecated
-    public ContentWriter getUpdatingWriter(NodeRef nodeRef)
-    {
-        // ensure that the node exists and is of type content
-        QName nodeType = nodeService.getType(nodeRef);
-        if (!dictionaryService.isSubClass(nodeType, ContentModel.TYPE_CONTENT))
-        {
-            throw new InvalidTypeException("The node must be an instance of type content", nodeType);
-        }
-        
-        // get the plain writer
-        ContentWriter writer = getWriter(nodeRef);
-        // need a listener to update the node when the stream closes
-        OldWriteStreamListener listener = new OldWriteStreamListener(nodeService, nodeRef, writer);
-        writer.addListener(listener);
-        writer.setTransactionService(transactionService);
-        // give back to the client
-        return writer;
-    }
-
     public ContentReader getReader(NodeRef nodeRef, QName propertyQName)
     {
         // ensure that the node property is of type content
@@ -419,52 +312,6 @@ public class RoutingContentService implements ContentService
         // look for a transformer
         ContentTransformer transformer = transformerRegistry.getTransformer(sourceMimetype, targetMimetype);
         return (transformer != null);
-    }
-
-    /**
-     * Still uses the old properties
-     */
-    @Deprecated
-    private static class OldWriteStreamListener implements ContentStreamListener
-    {
-        private NodeService nodeService;
-        private NodeRef nodeRef;
-        private ContentWriter writer;
-        
-        @Deprecated
-        public OldWriteStreamListener(
-                NodeService nodeService,
-                NodeRef nodeRef,
-                ContentWriter writer)
-        {
-            this.nodeService = nodeService;
-            this.nodeRef = nodeRef;
-            this.writer = writer;
-        }
-        
-        public void contentStreamClosed() throws ContentIOException
-        {
-            try
-            {
-                // change the content URL property of the node we are listening for
-                String contentUrl = writer.getContentUrl();
-                nodeService.setProperty(
-                        nodeRef,
-                        ContentModel.PROP_CONTENT_URL,
-                        contentUrl);
-                // get the size of the document
-                ContentReader reader = writer.getReader();
-                long length = reader.getSize();
-                nodeService.setProperty(
-                        nodeRef,
-                        ContentModel.PROP_SIZE,
-                        new Long(length));
-            }
-            catch (Throwable e)
-            {
-                throw new ContentIOException("Failed to set URL and size upon stream closure", e);
-            }
-        }
     }
 
     /**

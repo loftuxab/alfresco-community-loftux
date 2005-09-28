@@ -224,7 +224,14 @@ public class ImporterBootstrap
                     }
         
                     // Now import...
-                    importerService.importView(viewReader, importLocation, configuration, new BootstrapProgress());
+                    try
+                    {
+                        importerService.importView(viewReader, importLocation, configuration, new BootstrapProgress());
+                    }
+                    catch (Throwable e)
+                    {
+                        throw new AlfrescoRuntimeException("Import failed for view: " + view, e);
+                    }
                 }
                 
                 userTransaction.commit();
