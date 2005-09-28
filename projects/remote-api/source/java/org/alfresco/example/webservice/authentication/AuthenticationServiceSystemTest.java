@@ -68,7 +68,7 @@ public class AuthenticationServiceSystemTest extends BaseTest
    {
       try 
       {
-         AuthenticationResult value = this.binding.authenticate("admin", "admin");
+         AuthenticationResult value = this.binding.startSession("admin", "admin");
          assertNotNull("result must not be null", value);
          System.out.println("ticket = " + value.getTicket());
       }
@@ -87,12 +87,18 @@ public class AuthenticationServiceSystemTest extends BaseTest
    {
       try
       {
-         AuthenticationResult result = this.binding.authenticate("wrong", "credentials");
+         AuthenticationResult result = this.binding.startSession("wrong", "credentials");
          fail("The credentials are incorrect so an AuthenticationFault should have been thrown");
       }
       catch (AuthenticationFault error) 
       {
          // we expected this
       }
+   }
+   
+   public void testEndSession() throws Exception
+   {
+       this.binding.startSession("admin", "admin");
+       this.binding.endSession();
    }
 }

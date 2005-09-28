@@ -334,7 +334,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         assertNull("There should not be any associations", typeDef
                 .getAssociations());
         assertNotNull("Properties should not be null", typeDef.getProperties());
-        assertEquals("There should be 5 properties", 5,
+        assertEquals("There should be 6 properties", 6,
                 typeDef.getProperties().length);
 
         // check the name and type of each of the properties
@@ -346,32 +346,39 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
                         .getProperties(0).getDataType());
 
         assertEquals("Property2 name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}size", typeDef
+                "{http://www.alfresco.org/model/content/1.0}content", typeDef
                         .getProperties(1).getName());
         assertEquals("Property2 type name is incorrect",
-                "{http://www.alfresco.org/model/dictionary/1.0}long", typeDef
+                "{http://www.alfresco.org/model/dictionary/1.0}content", typeDef
                         .getProperties(1).getDataType());
-
+        
         assertEquals("Property3 name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}contentUrl",
-                typeDef.getProperties(2).getName());
+                "{http://www.alfresco.org/model/content/1.0}size", typeDef
+                        .getProperties(2).getName());
         assertEquals("Property3 type name is incorrect",
-                "{http://www.alfresco.org/model/dictionary/1.0}text", typeDef
+                "{http://www.alfresco.org/model/dictionary/1.0}long", typeDef
                         .getProperties(2).getDataType());
 
         assertEquals("Property4 name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}name", typeDef
-                        .getProperties(3).getName());
+                "{http://www.alfresco.org/model/content/1.0}contentUrl",
+                typeDef.getProperties(3).getName());
         assertEquals("Property4 type name is incorrect",
                 "{http://www.alfresco.org/model/dictionary/1.0}text", typeDef
                         .getProperties(3).getDataType());
 
         assertEquals("Property5 name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}mimetype", typeDef
+                "{http://www.alfresco.org/model/content/1.0}name", typeDef
                         .getProperties(4).getName());
         assertEquals("Property5 type name is incorrect",
                 "{http://www.alfresco.org/model/dictionary/1.0}text", typeDef
                         .getProperties(4).getDataType());
+
+        assertEquals("Property6 name is incorrect",
+                "{http://www.alfresco.org/model/content/1.0}mimetype", typeDef
+                        .getProperties(5).getName());
+        assertEquals("Property6 type name is incorrect",
+                "{http://www.alfresco.org/model/dictionary/1.0}text", typeDef
+                        .getProperties(5).getDataType());
 
         // check the aspects
         ClassDefinition[] aspects = nodeDef.getAspects();

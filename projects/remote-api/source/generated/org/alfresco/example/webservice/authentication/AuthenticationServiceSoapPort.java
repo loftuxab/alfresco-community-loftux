@@ -8,5 +8,6 @@
 package org.alfresco.example.webservice.authentication;
 
 public interface AuthenticationServiceSoapPort extends java.rmi.Remote {
-    public org.alfresco.example.webservice.authentication.AuthenticationResult authenticate(java.lang.String username, java.lang.String password) throws java.rmi.RemoteException, org.alfresco.example.webservice.authentication.AuthenticationFault;
+    public org.alfresco.example.webservice.authentication.AuthenticationResult startSession(java.lang.String username, java.lang.String password) throws java.rmi.RemoteException, org.alfresco.example.webservice.authentication.AuthenticationFault;
+    public void endSession() throws java.rmi.RemoteException, org.alfresco.example.webservice.authentication.AuthenticationFault;
 }

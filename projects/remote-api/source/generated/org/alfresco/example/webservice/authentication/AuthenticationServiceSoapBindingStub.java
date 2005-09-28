@@ -16,7 +16,7 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
     static org.apache.axis.description.OperationDesc [] _operations;
 
     static {
-        _operations = new org.apache.axis.description.OperationDesc[1];
+        _operations = new org.apache.axis.description.OperationDesc[2];
         _initOperationDesc1();
     }
 
@@ -24,14 +24,14 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
-        oper.setName("authenticate");
+        oper.setName("startSession");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "username"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "password"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationResult"));
         oper.setReturnClass(org.alfresco.example.webservice.authentication.AuthenticationResult.class);
-        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "authenticateReturn"));
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "startSessionReturn"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         oper.addFault(new org.apache.axis.description.FaultDesc(
@@ -41,6 +41,19 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
                       true
                      ));
         _operations[0] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("endSession");
+        oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationFault"),
+                      "org.alfresco.example.webservice.authentication.AuthenticationFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "AuthenticationFault"), 
+                      true
+                     ));
+        _operations[1] = oper;
 
     }
 
@@ -153,19 +166,19 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
         }
     }
 
-    public org.alfresco.example.webservice.authentication.AuthenticationResult authenticate(java.lang.String username, java.lang.String password) throws java.rmi.RemoteException, org.alfresco.example.webservice.authentication.AuthenticationFault {
+    public org.alfresco.example.webservice.authentication.AuthenticationResult startSession(java.lang.String username, java.lang.String password) throws java.rmi.RemoteException, org.alfresco.example.webservice.authentication.AuthenticationFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
         org.apache.axis.client.Call _call = createCall();
         _call.setOperation(_operations[0]);
         _call.setUseSOAPAction(true);
-        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/authentication/1.0/authenticate");
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/authentication/1.0/startSession");
         _call.setEncodingStyle(null);
         _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "authenticate"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "startSession"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
@@ -182,6 +195,41 @@ public class AuthenticationServiceSoapBindingStub extends org.apache.axis.client
                 return (org.alfresco.example.webservice.authentication.AuthenticationResult) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.example.webservice.authentication.AuthenticationResult.class);
             }
         }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.example.webservice.authentication.AuthenticationFault) {
+              throw (org.alfresco.example.webservice.authentication.AuthenticationFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public void endSession() throws java.rmi.RemoteException, org.alfresco.example.webservice.authentication.AuthenticationFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[1]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/authentication/1.0/endSession");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authentication/1.0", "endSession"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        extractAttachments(_call);
   } catch (org.apache.axis.AxisFault axisFaultException) {
     if (axisFaultException.detail != null) {
         if (axisFaultException.detail instanceof java.rmi.RemoteException) {

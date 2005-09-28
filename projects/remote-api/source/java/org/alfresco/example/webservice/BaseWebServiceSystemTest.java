@@ -115,7 +115,7 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
         authSvc.setTimeout(60000);
 
         // call the authenticate method and retrieve the ticket
-        AuthenticationResult result = authSvc.authenticate(USERNAME, PASSWORD);
+        AuthenticationResult result = authSvc.startSession(USERNAME, PASSWORD);
         assertNotNull("result is null", result);
 
         String ticket = result.getTicket();
