@@ -154,6 +154,14 @@
                                     </td>
                                  </tr>
                                  <tr>
+                                    <td><h:outputText value="#{msg.type}"/>:</td>
+                                    <td>
+                                       <h:selectOneMenu value="#{AddContentWizard.objectType}">
+                                          <f:selectItems value="#{AddContentWizard.objectTypes}" />
+                                       </h:selectOneMenu>&nbsp;*
+                                    </td>
+                                 </tr>
+                                 <tr>
                                     <td><h:outputText value="#{msg.content_type}"/>:</td>
                                     <td>
                                        <h:selectOneMenu value="#{AddContentWizard.contentType}">

@@ -152,7 +152,7 @@
    
    <config evaluator="string-compare" condition="Action Wizards">
       <types>
-         <type id="folder" description="Folder"/>
+         <type id="folder" description="Space"/>
          <type id="content" description="Content"/>
       </types>
       <aspects>
@@ -180,6 +180,12 @@
          <transformer id="image/jpeg" description="JPG" />
          <transformer id="image/png" description="PNG" />
       </image-transformers>
+   </config>
+   
+   <config evaluator="string-compare" condition="Custom Content Types">
+      <content-types>
+         <!-- <type id="my:content-type" descriptionMsgId="my_content_type"/> -->
+      </content-types>
    </config>
    
 </alfresco-config>

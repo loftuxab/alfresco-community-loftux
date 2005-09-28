@@ -573,18 +573,8 @@ public class NewRuleWizard extends BaseActionWizard
       this.action = null;
       this.applyToSubSpaces = false;
       this.runInBackground = false;
-      
-      if (this.conditions != null)
-      {
-         this.conditions.clear();
-         this.conditions = null;
-      }
-
-      if (this.conditionDescriptions != null)
-      {
-         this.conditionDescriptions.clear();
-         this.conditionDescriptions = null;
-      }
+      this.conditions = null;
+      this.conditionDescriptions = null;
       
       this.allConditionsProperties = new ArrayList<Map<String, String>>();
       this.allActionsProperties = new ArrayList<Map<String, Serializable>>();

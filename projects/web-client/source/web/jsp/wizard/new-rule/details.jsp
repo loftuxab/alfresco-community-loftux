@@ -147,7 +147,7 @@
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
-                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.other_properties}" /></td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.other_options}" /></td>
                                  </tr>
                                  <tr>
                                     <td colspan="2">

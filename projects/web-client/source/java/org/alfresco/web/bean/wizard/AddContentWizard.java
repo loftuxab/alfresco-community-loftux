@@ -274,10 +274,12 @@ public class AddContentWizard extends BaseContentWizard
       ResourceBundle bundle = Application.getBundle(FacesContext.getCurrentInstance());
       
       return buildSummary(
-            new String[] {bundle.getString("file_name"), bundle.getString("content_type"), 
-                          bundle.getString("title"), bundle.getString("description"), 
-                          bundle.getString("author"), bundle.getString("inline_editable")},
-            new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author, Boolean.toString(this.inlineEdit)});
+            new String[] {bundle.getString("file_name"), bundle.getString("type"), 
+                          bundle.getString("content_type"), bundle.getString("title"), 
+                          bundle.getString("description"), bundle.getString("author"), 
+                          bundle.getString("inline_editable")},
+            new String[] {this.fileName, getSummaryObjectType(), getSummaryContentType(), this.title, 
+                          this.description, this.author, Boolean.toString(this.inlineEdit)});
    }
    
    /**

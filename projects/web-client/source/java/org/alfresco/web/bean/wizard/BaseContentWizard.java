@@ -28,6 +28,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -45,6 +48,7 @@ import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Base Handler class used by the Content Wizards 
@@ -63,8 +67,10 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    protected String title;
    protected String description;
    protected String contentType;
+   protected String objectType;
    protected boolean inlineEdit;
    protected List<SelectItem> contentTypes;
+   protected List<SelectItem> objectTypes;
    protected ContentService contentService;
    
    
@@ -139,7 +145,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
                   containerNodeRef,
                   ContentModel.ASSOC_CONTAINS,
                   QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, assocName),
-                  ContentModel.TYPE_CONTENT,
+                  Repository.resolveToQName(this.objectType),
                   contentProps);
             
             NodeRef fileNodeRef = assocRef.getChildRef();
@@ -230,12 +236,10 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       this.description = null;
       this.contentType = null;
       this.inlineEdit = false;
+      this.contentTypes = null;
+      this.objectTypes = null;
       
-      if (this.contentTypes != null)
-      {
-         this.contentTypes.clear();
-         this.contentTypes = null;
-      }
+      this.objectType = ContentModel.TYPE_CONTENT.toString();
    }
    
    /**
@@ -319,6 +323,22 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    {
       this.contentType = contentType;
    }
+   
+   /**
+    * @return Returns the object type currenty selected
+    */
+   public String getObjectType()
+   {
+      return this.objectType;
+   }
+
+   /**
+    * @param objectType Sets the currently selected object type
+    */
+   public void setObjectType(String objectType)
+   {
+      this.objectType = objectType;
+   }
 
    /**
     * @return Returns the description
@@ -395,6 +415,65 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    }
    
    /**
+    * @return Returns a list of object types to allow the user to select from
+    */
+   public List<SelectItem> getObjectTypes()
+   {
+      if (this.objectTypes == null)
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         
+         // add the well known object type to start with
+         this.objectTypes = new ArrayList<SelectItem>(5);
+         this.objectTypes.add(new SelectItem(ContentModel.TYPE_CONTENT.toString(), 
+               Application.getMessage(context, "content")));
+         
+         // add any configured content sub-types to the list
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("Custom Content Types");
+         if (wizardCfg != null)
+         {
+            ConfigElement typesCfg = wizardCfg.getConfigElement("content-types");
+            if (typesCfg != null)
+            {               
+               for (ConfigElement child : typesCfg.getChildren())
+               {
+                  QName idQName = Repository.resolveToQName(child.getAttribute("id"));
+                  
+                  String label = child.getAttribute("descriptionMsgId");
+                  if (label != null)
+                  {
+                     label = Application.getMessage(context, label);
+                  }
+                  else
+                  {
+                     label = child.getAttribute("description");
+                  }
+                  
+                  this.objectTypes.add(new SelectItem(idQName.toString(), label));
+               }
+               
+               // make sure the list is sorted by the label
+               QuickSort sorter = new QuickSort(this.objectTypes, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+               sorter.sort();
+            }
+            else
+            {
+               logger.warn("Could not find types configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find Action Wizards configuration section");
+         }
+         
+      }
+      
+      return this.objectTypes;
+   }
+   
+   /**
     * @return Determines whether the next and finish button should be enabled 
     */
    public boolean getNextFinishDisabled()
@@ -424,5 +503,26 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       // get the mime type display name
       Map<String, String> mimeTypes = mimetypeService.getDisplaysByMimetype();
       return mimeTypes.get(this.contentType);
+   }
+   
+   /**
+    * Returns the display label for the currently selected object type
+    * 
+    * @return The objevt type label
+    */
+   protected String getSummaryObjectType()
+   {
+      String objType = null;
+      
+      for (SelectItem item : this.getObjectTypes())
+      {
+         if (item.getValue().equals(this.objectType))
+         {
+            objType = item.getLabel();
+            break;
+         }
+      }
+      
+      return objType;
    }
 }

@@ -104,7 +104,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><nobr><h:outputText value="#{msg.required_format}"/>:</nobr>:</td>
+                                    <td><nobr><h:outputText value="#{msg.required_format}"/>:</nobr></td>
                                     <td width="90%">
                                        <h:selectOneMenu value="#{NewRuleWizard.actionProperties.imageTransformer}">
                                           <f:selectItems value="#{NewRuleWizard.imageTransformers}" />

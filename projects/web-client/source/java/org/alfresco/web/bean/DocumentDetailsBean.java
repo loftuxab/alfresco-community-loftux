@@ -93,19 +93,10 @@ public class DocumentDetailsBean
    public void reset()
    {
       // reset the workflow cache
-      if (this.workflowProperties != null)
-      {
-         this.workflowProperties.clear();
-         this.workflowProperties = null;
-      }
+      this.workflowProperties = null;
       
       // reset the category caches
-      if (this.categories != null)
-      {
-         this.categories.clear();
-         this.categories = null;
-      }
-      
+      this.categories = null;
       this.addedCategory = null;
    }
    

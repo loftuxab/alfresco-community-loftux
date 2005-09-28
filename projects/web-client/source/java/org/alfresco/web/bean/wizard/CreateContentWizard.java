@@ -180,10 +180,11 @@ public class CreateContentWizard extends BaseContentWizard
       
       // TODO: show first few lines of content here?
       return buildSummary(
-            new String[] {bundle.getString("file_name"), bundle.getString("content_type"), 
-                          bundle.getString("title"), bundle.getString("description"), 
-                          bundle.getString("author")},
-            new String[] {this.fileName, getSummaryContentType(), this.title, this.description, this.author});
+            new String[] {bundle.getString("file_name"), bundle.getString("type"), 
+                          bundle.getString("content_type"), bundle.getString("title"), 
+                          bundle.getString("description"), bundle.getString("author")},
+            new String[] {this.fileName, getSummaryObjectType(), getSummaryContentType(), 
+                          this.title, this.description, this.author});
    }
    
    /**
