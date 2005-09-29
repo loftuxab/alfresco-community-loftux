@@ -27,7 +27,6 @@
    <td bgcolor="#8EB6E6">
       <%-- Breadcrumb component --%>
       <div style="padding-left:8px" class="headbarTitle">
-         <%--<h:outputText value="#{msg.location}"/>:&nbsp;--%>
          <a:breadcrumb value="#{NavigationBean.location}" styleClass="headbarLink" />
       </div>
    </td>

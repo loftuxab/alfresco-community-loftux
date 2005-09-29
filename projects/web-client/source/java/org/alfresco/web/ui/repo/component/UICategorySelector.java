@@ -17,7 +17,6 @@
 package org.alfresco.web.ui.repo.component;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.faces.context.FacesContext;
 
@@ -26,7 +25,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.CategoryService;
-import org.alfresco.service.namespace.QName;
+import org.alfresco.service.cmr.search.CategoryService.Depth;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
@@ -108,11 +107,8 @@ public class UICategorySelector extends AbstractItemSelector
    {
       NodeRef nodeRef = new NodeRef(Repository.getStoreRef(), this.navigationId);
       
-      // TODO: replace this code with the proper call to the category service but 
-      //       this seems to work for now until we get proper categories to test with
-      List<ChildAssociationRef> childRefs = getNodeService(context).getChildAssocs(nodeRef);
-//      Collection<ChildAssocRef> childRefs = getCategoryService(context).getChildren(nodeRef, 
-//            CategoryService.Mode.ALL, CategoryService.Depth.IMMEDIATE);
+      Collection<ChildAssociationRef> childRefs = getCategoryService(context).getChildren(nodeRef, 
+            CategoryService.Mode.SUB_CATEGORIES, CategoryService.Depth.IMMEDIATE);
       
       return childRefs;
    }
@@ -124,6 +120,6 @@ public class UICategorySelector extends AbstractItemSelector
     */
    public Collection<ChildAssociationRef> getRootChildren(FacesContext context)
    {
-      return getCategoryService(context).getRootCategories(Repository.getStoreRef());
+      return getCategoryService(context).getCategories(Repository.getStoreRef(), ContentModel.ASPECT_GEN_CLASSIFIABLE, Depth.IMMEDIATE);
    }
 }

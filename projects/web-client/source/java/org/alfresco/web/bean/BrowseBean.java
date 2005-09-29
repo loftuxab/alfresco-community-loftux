@@ -425,7 +425,7 @@ public class BrowseBean implements IContextListener
       catch (InvalidNodeRefException refErr)
       {
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {parentNodeId}) );
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {refErr.getNodeRef()}) );
          this.containerNodes = Collections.<Node>emptyList();
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
@@ -518,6 +518,14 @@ public class BrowseBean implements IContextListener
          
          // commit the transaction
          tx.commit();
+      }
+      catch (InvalidNodeRefException refErr)
+      {
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] {refErr.getNodeRef()}) );
+         this.containerNodes = Collections.<Node>emptyList();
+         this.contentNodes = Collections.<Node>emptyList();
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
       catch (Exception err)
       {

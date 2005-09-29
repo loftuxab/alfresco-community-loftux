@@ -224,7 +224,8 @@ public class NavigationBean
     */
    public void setCurrentNodeId(String currentNodeId)
    {
-      s_logger.debug("Setting current node id to: " + currentNodeId);
+      if (s_logger.isDebugEnabled())
+         s_logger.debug("Setting current node id to: " + currentNodeId);
       
       if (currentNodeId == null)
       {

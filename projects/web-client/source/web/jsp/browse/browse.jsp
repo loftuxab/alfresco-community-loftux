@@ -127,6 +127,7 @@
                                     <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}" id="eval8">
                                        <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
                                        <a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" id="link12" />
+                                       <a:actionLink value="#{msg.category_management}" image="/images/icons/categories.gif" action="manageCategories" id="link13" />
                                     </a:booleanEvaluator>
                                  </a:menu>
                               </td>

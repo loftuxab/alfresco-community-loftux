@@ -405,9 +405,16 @@ public class Node implements Serializable
    {
       if (this.nodeService != null)
       {
-         return "Node Type: " + getType() + 
-                "\nNode Properties: " + this.getProperties().toString() + 
-                "\nNode Aspects: " + this.getAspects().toString();
+         if (this.nodeService.exists(nodeRef))
+         {
+            return "Node Type: " + getType() + 
+                   "\nNode Properties: " + this.getProperties().toString() + 
+                   "\nNode Aspects: " + this.getAspects().toString();
+         }
+         else
+         {
+            return "Node no longer exists: " + nodeRef;
+         }
       }
       else
       {

@@ -36,9 +36,12 @@ import org.alfresco.web.bean.ErrorBean;
  */
 public class SystemErrorTag extends TagSupport
 {
+   private static final String MSG_RETURN_TO_APP = "return_to_application";
+   
    private String styleClass;
    private String detailsStyleClass;
    private boolean showDetails = false;
+   
    
    /**
     * @return Returns the showDetails.
@@ -219,7 +222,9 @@ public class SystemErrorTag extends TagSupport
             }
          }
          
-         out.write("'>Return to application</a></div>");
+         out.write("'>");
+         out.write(Application.getMessage(pageContext.getSession(), MSG_RETURN_TO_APP));
+         out.write("</a></div>");
       }
       catch (IOException ioe)
       {

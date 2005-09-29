@@ -211,6 +211,23 @@
    
    <managed-bean>
       <description>
+         The bean that holds state for the Category Management screens.
+      </description>
+      <managed-bean-name>CategoriesBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.CategoriesBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{NodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>categoryService</property-name>
+         <value>#{CategoryService}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
          The bean that backs up the New Space Wizard
       </description>
       <managed-bean-name>NewSpaceWizard</managed-bean-name>
