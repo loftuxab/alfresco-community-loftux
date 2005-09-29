@@ -31,6 +31,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -572,6 +573,7 @@ public class BrowseBean implements IContextListener
       node.addPropertyResolver("fileType16", this.resolverFileType16);
       node.addPropertyResolver("fileType32", this.resolverFileType32);
       node.addPropertyResolver("templatable", this.resolverTemplatable);
+      node.addPropertyResolver("size", this.resolverSize);
    }
    
    private NodePropertyResolver resolverlocked = new NodePropertyResolver() {
@@ -640,6 +642,20 @@ public class BrowseBean implements IContextListener
    private NodePropertyResolver resolverTemplatable = new NodePropertyResolver() {
       public Object get(Node node) {
          return Boolean.valueOf(node.hasAspect(ContentModel.ASPECT_TEMPLATABLE));
+      }
+   };
+   
+   private NodePropertyResolver resolverMimetype = new NodePropertyResolver() {
+      public Object get(Node node) {
+         ContentData content = (ContentData)node.getProperties().get(ContentModel.PROP_CONTENT);
+         return (content != null ? content.getMimetype() : null);
+      }
+   };
+   
+   private NodePropertyResolver resolverSize = new NodePropertyResolver() {
+      public Object get(Node node) {
+         ContentData content = (ContentData)node.getProperties().get(ContentModel.PROP_CONTENT);
+         return (content != null ? new Long(content.getSize()) : null);
       }
    };
    
@@ -858,6 +874,8 @@ public class BrowseBean implements IContextListener
             // store the URL to for downloading the content
             node.addPropertyResolver("url", this.resolverDownload);
             node.addPropertyResolver("fileType32", this.resolverFileType32);
+            node.addPropertyResolver("mimetype", this.resolverMimetype);
+            node.addPropertyResolver("size", this.resolverSize);
             
             // get hold of the DocumentDetailsBean and reset it
             DocumentDetailsBean docDetails = (DocumentDetailsBean)FacesContext.getCurrentInstance().

@@ -83,7 +83,8 @@ public final class QNameMap<K,V> implements Map, Cloneable
     */
    public boolean containsKey(Object key)
    {
-      return this.contents.containsKey(Repository.resolveToQNameString((String)key));
+      return (this.contents.containsKey(Repository.resolveToQNameString((String)key)) ||
+              this.resolvers.containsKey(key));
    }
 
    /**

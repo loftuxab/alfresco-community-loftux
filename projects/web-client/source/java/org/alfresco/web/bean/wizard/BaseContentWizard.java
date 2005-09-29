@@ -111,18 +111,18 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             contentProps.put(ContentModel.PROP_CREATOR, this.author);
             
             // set up content properties - copy or create the compound property
-            ContentData contentData = (ContentData) contentProps.get(ContentModel.PROP_CONTENT);
+            ContentData contentData = (ContentData)contentProps.get(ContentModel.PROP_CONTENT);
             if (contentData == null)
             {
-                contentData = new ContentData(null, this.contentType, 0L, "UTF-8");
+               contentData = new ContentData(null, this.contentType, 0L, "UTF-8");
             }
             else
             {
-                contentData = new ContentData(
-                        contentData.getContentUrl(),
-                        this.contentType,
-                        contentData.getSize(),
-                        contentData.getEncoding());
+               contentData = new ContentData(
+                     contentData.getContentUrl(),
+                     this.contentType,
+                     contentData.getSize(),
+                     contentData.getEncoding());
             }
             contentProps.put(ContentModel.PROP_CONTENT, contentData);
             
@@ -275,7 +275,12 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       Boolean inline = (Boolean)props.get("editInline");
       this.inlineEdit = inline != null ? inline.booleanValue() : false;
       this.author = (String)props.get("creator");
-      this.contentType = (String)props.get("mimetype");
+      this.contentType = null;
+      ContentData contentData = (ContentData)props.get(ContentModel.PROP_CONTENT);
+      if (contentData != null)
+      {
+         this.contentType = contentData.getMimetype();
+      }
       this.description = (String)props.get("description");
       this.fileName = currentDocument.getName();
       this.title = (String)props.get("title");

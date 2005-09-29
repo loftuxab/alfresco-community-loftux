@@ -63,10 +63,10 @@
    <config evaluator="node-type" condition="content">
       <property-sheet>
          <show-property name="name"/>
-         <show-property name="mimetype" converter="org.alfresco.faces.MimeTypeConverter"/>
+         <show-property name="mimetype" displayLabelId="mimetype" converter="org.alfresco.faces.MimeTypeConverter"/>
          <show-property name="title"/>
          <show-property name="description"/>
-         <show-property name="size" converter="org.alfresco.faces.ByteSizeConverter"/>
+         <show-property name="size" displayLabelId="size" converter="org.alfresco.faces.ByteSizeConverter"/>
          <show-property name="creator"/>
       </property-sheet>
    </config>

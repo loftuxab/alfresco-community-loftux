@@ -236,23 +236,26 @@ public class UserMembersBean implements IContextListener
          User user = Application.getCurrentUser(context);
          Map<String, List<String>> permissionMap = new HashMap<String, List<String>>(13, 1.0f);
          Set<AccessPermission> permissions = permissionService.getAllSetPermissions(navigator.getCurrentNode().getNodeRef());
-         for (AccessPermission permission : permissions)
+         if (permissions != null)
          {
-            // we are only interested in Allow and not groups/owner etc.
-            if (permission.getAccessStatus() == AccessStatus.ALLOWED &&
-                permission.getAuthorityType() == AuthorityType.USER)
+            for (AccessPermission permission : permissions)
             {
-               String authority = permission.getAuthority();
-               
-               List<String> userPermissions = permissionMap.get(authority);
-               if (userPermissions == null)
+               // we are only interested in Allow and not groups/owner etc.
+               if (permission.getAccessStatus() == AccessStatus.ALLOWED &&
+                   permission.getAuthorityType() == AuthorityType.USER)
                {
-                  // create for first time
-                  userPermissions = new ArrayList<String>(4);
-                  permissionMap.put(authority, userPermissions);
+                  String authority = permission.getAuthority();
+                  
+                  List<String> userPermissions = permissionMap.get(authority);
+                  if (userPermissions == null)
+                  {
+                     // create for first time
+                     userPermissions = new ArrayList<String>(4);
+                     permissionMap.put(authority, userPermissions);
+                  }
+                  // add the display label for the permission name
+                  userPermissions.add(Application.getMessage(context, permission.getPermission()));
                }
-               // add the display label for the permission name
-               userPermissions.add(Application.getMessage(context, permission.getPermission()));
             }
          }
          
@@ -358,19 +361,22 @@ public class UserMembersBean implements IContextListener
             // setup roles for this person
             List<PermissionWrapper> userPermissions = new ArrayList<PermissionWrapper>(4);
             Set<AccessPermission> permissions = permissionService.getAllSetPermissions(navigator.getCurrentNode().getNodeRef());
-            for (AccessPermission permission : permissions)
+            if (permissions != null)
             {
-               // we are only interested in Allow and not groups/owner etc.
-               if (permission.getAccessStatus() == AccessStatus.ALLOWED &&
-                   permission.getAuthorityType() == AuthorityType.USER)
+               for (AccessPermission permission : permissions)
                {
-                  if (userName.equals(permission.getAuthority()))
+                  // we are only interested in Allow and not groups/owner etc.
+                  if (permission.getAccessStatus() == AccessStatus.ALLOWED &&
+                      permission.getAuthorityType() == AuthorityType.USER)
                   {
-                     // found a permission for this user authentiaction
-                     PermissionWrapper wrapper = new PermissionWrapper(
-                           permission.getPermission(),
-                           Application.getMessage(context, permission.getPermission()));
-                     userPermissions.add(wrapper);
+                     if (userName.equals(permission.getAuthority()))
+                     {
+                        // found a permission for this user authentiaction
+                        PermissionWrapper wrapper = new PermissionWrapper(
+                              permission.getPermission(),
+                              Application.getMessage(context, permission.getPermission()));
+                        userPermissions.add(wrapper);
+                     }
                   }
                }
             }

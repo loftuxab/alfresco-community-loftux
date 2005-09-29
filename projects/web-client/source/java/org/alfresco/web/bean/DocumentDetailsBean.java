@@ -33,6 +33,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -876,15 +877,22 @@ public class DocumentDetailsBean
          
          // add the inlineeditable aspect to the node
          Map<QName, Serializable> props = new HashMap<QName, Serializable>(1, 1.0f);
-         String contentType = (String)getDocument().getProperties().get("mimetype");
-         
-         // set the property to true by default if the filetype is text/HTML content
-         if (MimetypeMap.MIMETYPE_HTML.equals(contentType) ||
-             MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(contentType) ||
-             MimetypeMap.MIMETYPE_XML.equals(contentType) ||
-             MimetypeMap.MIMETYPE_TEXT_CSS.equals(contentType))
+         String contentType = null;
+         ContentData contentData = (ContentData)getDocument().getProperties().get(ContentModel.PROP_CONTENT);
+         if (contentData != null)
          {
-            props.put(ContentModel.PROP_EDITINLINE, true);
+            contentType = contentData.getMimetype();
+         }
+         if (contentType != null)
+         {
+            // set the property to true by default if the filetype is text/HTML content
+            if (MimetypeMap.MIMETYPE_HTML.equals(contentType) ||
+                MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(contentType) ||
+                MimetypeMap.MIMETYPE_XML.equals(contentType) ||
+                MimetypeMap.MIMETYPE_TEXT_CSS.equals(contentType))
+            {
+               props.put(ContentModel.PROP_EDITINLINE, true);
+            }
          }
          this.nodeService.addAspect(getDocument().getNodeRef(), ContentModel.ASPECT_INLINEEDITABLE, props);
          

@@ -103,8 +103,6 @@ public class UIProperty extends UIPanel implements NamingContainer
          
          if (propDef == null)
          {
-            logger.warn("Failed to find property definition for property '" + propertyName + "'");
-            
             // there is no definition for the node, so it may have been added to
             // the node as an additional property, so look for it in the node itself
             if (node.hasProperty(propertyName))
@@ -121,6 +119,9 @@ public class UIProperty extends UIPanel implements NamingContainer
             }
             else
             {
+               if (logger.isDebugEnabled())
+                  logger.debug("Failed to find property definition for property '" + propertyName + "'");
+               
                // add an error message as the property is not defined in the data dictionary and 
                // not in the node's set of properties
                String msg = MessageFormat.format(Application.getMessage(context, MSG_ERROR_PROPERTY), new Object[] {propertyName});

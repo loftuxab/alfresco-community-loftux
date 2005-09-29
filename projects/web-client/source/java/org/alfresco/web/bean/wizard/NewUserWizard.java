@@ -748,21 +748,20 @@ public class NewUserWizard extends AbstractWizardBean
    {
       if (this.companyHomeSpaceRef == null)
       {
-         String companySpaceName = Application.getRootPath(FacesContext.getCurrentInstance());
-         String companyXPath = NamespaceService.APP_MODEL_PREFIX + ":" + QName.createValidLocalName(companySpaceName);
-
+         String companyXPath =  Application.getRootPath(FacesContext.getCurrentInstance());
+         
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
          List<NodeRef> nodes = this.searchService.selectNodes(rootNodeRef, companyXPath, null, this.namespaceService,
                false);
-
+         
          if (nodes.size() == 0)
          {
-            throw new IllegalStateException("Unable to find company home space path: " + companySpaceName);
+            throw new IllegalStateException("Unable to find company home space path: " + companyXPath);
          }
-
+         
          this.companyHomeSpaceRef = nodes.get(0);
       }
-
+      
       return this.companyHomeSpaceRef;
    }
 

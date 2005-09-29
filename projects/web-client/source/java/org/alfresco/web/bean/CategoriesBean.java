@@ -206,6 +206,9 @@ public class CategoriesBean implements IContextListener
       }
    }
    
+   /**
+    * @return The currently displayed category as a Node or null if at the root.
+    */
    public Node getCurrentCategory()
    {
       if (this.category == null)
@@ -219,6 +222,9 @@ public class CategoriesBean implements IContextListener
       return this.category;
    }
    
+   /**
+    * @return The ID of the currently displayed category or null if at the root.
+    */
    public String getCurrentCategoryId()
    {
       if (this.categoryRef != null)
@@ -253,6 +259,9 @@ public class CategoriesBean implements IContextListener
       contextUpdated();
    }
    
+   /**
+    * @return Breadcrumb location list
+    */
    public List<IBreadcrumbHandler> getLocation()
    {
       if (this.location == null)
@@ -266,11 +275,18 @@ public class CategoriesBean implements IContextListener
       return this.location;
    }
    
+   /**
+    * @param location Breadcrumb location list
+    */
    public void setLocation(List<IBreadcrumbHandler> location)
    {
       this.location = location;
    }
    
+   /**
+    * @return The list of categories Nodes to display. Returns the list root categories or the
+    *         list of sub-categories for the current category if set.
+    */
    public List<Node> getCategories()
    {
       List<Node> categories;
@@ -362,6 +378,9 @@ public class CategoriesBean implements IContextListener
    public void clearCategoryAction(ActionEvent event)
    {
       setActionCategory(null);
+      
+      // clear datalist cache ready from return from action dialog
+      contextUpdated();
    }
    
    /**
@@ -404,7 +423,20 @@ public class CategoriesBean implements IContextListener
          tx = Repository.getUserTransaction(context);
          tx.begin();
          
-         // TODO: create category using categoryservice?
+         // create category using categoryservice
+         NodeRef ref;
+         if (categoryRef == null)
+         {
+            ref = this.categoryService.createRootCategory(Repository.getStoreRef(), ContentModel.ASPECT_GEN_CLASSIFIABLE, this.name);
+         }
+         else
+         {
+            ref = this.categoryService.createCategory(categoryRef, this.name);
+         }
+         if (this.description != null)
+         {
+            this.nodeService.setProperty(ref, ContentModel.PROP_DESCRIPTION, this.description);
+         }
          
          // commit the transaction
          tx.commit();
@@ -413,8 +445,8 @@ public class CategoriesBean implements IContextListener
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-         Utils.addErrorMessage(Application.getMessage(
-               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC) + err.getMessage());
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
          outcome = null;
       }
       
@@ -460,8 +492,8 @@ public class CategoriesBean implements IContextListener
       {
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-         Utils.addErrorMessage(Application.getMessage(
-               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC) + err.getMessage());
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
          outcome = null;
       }
       
@@ -486,7 +518,7 @@ public class CategoriesBean implements IContextListener
             
             // delete the category node using the nodeservice
             NodeRef nodeRef = getActionCategory().getNodeRef();
-            this.nodeService.deleteNode(nodeRef);
+            this.categoryService.deleteCategory(nodeRef);
             
             // commit the transaction
             tx.commit();
@@ -496,7 +528,7 @@ public class CategoriesBean implements IContextListener
             IBreadcrumbHandler handler = location.get(location.size() - 1);
             
             // see if the current breadcrumb location is our node 
-            if ( ((IRepoBreadcrumbHandler)handler).getNodeRef().equals(nodeRef) == true )
+            if ( nodeRef.equals(((IRepoBreadcrumbHandler)handler).getNodeRef()) )
             {
                location.remove(location.size() - 1);
                
@@ -515,8 +547,8 @@ public class CategoriesBean implements IContextListener
          {
             // rollback the transaction
             try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
-            Utils.addErrorMessage(Application.getMessage(
-                  FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC) + err.getMessage());
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
             outcome = null;
          }
       }
