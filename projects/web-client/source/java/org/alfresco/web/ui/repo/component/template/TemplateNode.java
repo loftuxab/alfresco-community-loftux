@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -67,6 +68,8 @@ public class TemplateNode extends Node
    private Boolean isDocument = null;
    private Boolean isContainer = null;
    private String displayPath = null;
+   private String mimetype = null;
+   private Long size = null;
    private TemplateNode parent = null;
    
    
@@ -313,6 +316,40 @@ public class TemplateNode extends Node
       }
       
       return parent;
+   }
+   
+   /**
+    * @return The mimetype encoding for content attached to the node.
+    */
+   public String getMimetype()
+   {
+      if (mimetype == null)
+      {
+         ContentData content = (ContentData)this.getProperties().get(ContentModel.PROP_CONTENT);
+         if (content != null)
+         {
+            mimetype = content.getMimetype();
+         }
+      }
+      
+      return mimetype;
+   }
+   
+   /**
+    * @return The size in bytes of the content attached to the node.
+    */
+   public long getSize()
+   {
+      if (size == null)
+      {
+         ContentData content = (ContentData)this.getProperties().get(ContentModel.PROP_CONTENT);
+         if (content != null)
+         {
+            size = content.getSize();
+         }
+      }
+      
+      return size != null ? size.longValue() : 0L;
    }
    
    
