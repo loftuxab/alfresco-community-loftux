@@ -41,34 +41,34 @@
 			<cm:mimetype>text/plain</cm:mimetype>
 			<cm:contentUrl>org/alfresco/jcr/test/testContent.txt</cm:contentUrl>
           </cm:content>
-        
+          
           <!-- Query -->
           
           <jcrtest:testtype view:childName="query">
              <jcrtest:children>
                 <jcrtest:testtype view:childName="one">
-                    <prop1>a</prop1>
+                    <jcrtest:prop1>a</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testtype view:childName="two">
-                    <prop1>c</prop1>
+                    <jcrtest:prop1>c</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testtype view:childName="three">
-                    <prop1>e</prop1>
+                    <jcrtest:prop1>e</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testtype view:childName="four">
-                    <prop1>g</prop1>
+                    <jcrtest:prop1>g</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testtype view:childName="node1">
-                    <prop1>b</prop1>
+                    <jcrtest:prop1>b</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testtype view:childName="node1">
-                    <prop1>d</prop1>
+                    <jcrtest:prop1>d</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testtype view:childName="node1">
-                    <prop1>f</prop1>
+                    <jcrtest:prop1>f</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testtype view:childName="node1">
-                    <prop1>h</prop1>
+                    <jcrtest:prop1>h</jcrtest:prop1>
                 </jcrtest:testtype>
                 <jcrtest:testdoc view:childName="document">
                     <jcrtest:title>Doc 1</jcrtest:title>

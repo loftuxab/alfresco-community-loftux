@@ -52,7 +52,7 @@
                <type>d:text</type>
                <multiple>true</multiple>
             </property>
-             <property name="prop1">
+             <property name="jcrtest:prop1">
                <type>d:text</type>
             </property>
          </properties>

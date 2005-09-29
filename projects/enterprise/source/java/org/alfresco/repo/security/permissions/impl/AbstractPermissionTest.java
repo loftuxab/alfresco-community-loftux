@@ -71,7 +71,7 @@ public class AbstractPermissionTest extends BaseSpringTest
 
     protected void onSetUpInTransaction() throws Exception
     {
-        nodeService = (NodeService) applicationContext.getBean("dbNodeService");
+        nodeService = (NodeService) applicationContext.getBean("nodeService");
         dictionaryService = (DictionaryService) applicationContext.getBean(ServiceRegistry.DICTIONARY_SERVICE
                 .getLocalName());
         permissionService = (PermissionServiceSPI) applicationContext.getBean("permissionService");
@@ -81,6 +81,8 @@ public class AbstractPermissionTest extends BaseSpringTest
         authenticationComponent = (AuthenticationComponent) applicationContext.getBean("authenticationComponent");
         serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
         permissionModelDAO = (ModelDAO) applicationContext.getBean("permissionsModelDAO");
+        
+        authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
@@ -103,6 +105,8 @@ public class AbstractPermissionTest extends BaseSpringTest
         authenticationService.createAuthentication("lemur", "lemur".toCharArray());
         
         authenticationService.createAuthentication("admin", "admin".toCharArray());
+        
+        authenticationComponent.clearCurrentSecurityContext();
     }
 
     protected void onTearDownInTransaction()

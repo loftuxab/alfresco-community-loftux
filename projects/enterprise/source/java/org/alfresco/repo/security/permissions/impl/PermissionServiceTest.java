@@ -57,6 +57,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testSetInheritFalse()
     {
+        runAs("andy");
         permissionService.setInheritParentPermissions(rootNodeRef, false);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertFalse(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -66,6 +67,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testSetInheritTrue()
     {
+        runAs("andy");
         permissionService.setInheritParentPermissions(rootNodeRef, true);
         assertNotNull(permissionService.getSetPermissions(rootNodeRef));
         assertTrue(permissionService.getSetPermissions(rootNodeRef).inheritPermissions());
@@ -77,6 +79,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testAlterInherit()
     {
+        runAs("andy");
         testSetInheritFalse();
         testSetInheritTrue();
         testSetInheritFalse();
@@ -88,6 +91,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testSetNodePermissionEntry()
     {
+        runAs("andy");
         Set<SimplePermissionEntry> entries = new HashSet<SimplePermissionEntry>();
         entries.add(new SimplePermissionEntry(rootNodeRef, new SimplePermissionReference(QName.createQName("A", "B"),
                 "C"), "user-one", AccessStatus.ALLOWED));
@@ -415,13 +419,13 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testGlobalPermissionsForAdmin()
     {
+        runAs("admin");
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
 
         NodeRef n2 = nodeService.createNode(n1, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}two"),
                 ContentModel.TYPE_CONTENT).getChildRef();
 
-        runAs("admin");
         assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
         assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_PROPERTIES)) == AccessStatus.ALLOWED);
         assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CHILDREN)) == AccessStatus.ALLOWED);
@@ -1017,9 +1021,9 @@ public class PermissionServiceTest extends AbstractPermissionTest
         assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ_CONTENT)) == AccessStatus.ALLOWED);
     }
 
-    public void doNotTest() throws Exception
+    public void testPerf() throws Exception
     {
-        runAs("andy");
+        runAs("admin");
 
         TransactionService transactionService = serviceRegistry.getTransactionService();
         UserTransaction tx = transactionService.getUserTransaction();
@@ -1060,13 +1064,14 @@ public class PermissionServiceTest extends AbstractPermissionTest
         long time = 0;
         for (int i = 0; i < 1000; i++)
         {
-            // getSession().flush();
-            // getSession().clear();
+            getSession().flush();
+            getSession().clear();
             start = System.nanoTime();
             assertTrue(permissionService.hasPermission(n10, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
             end = System.nanoTime();
             time += (end - start);
         }
+        System.out.println("Time is " + (time / 1000000000.0));
         assertTrue((time / 1000000000.0) < 60.0);
 
         time = 0;
