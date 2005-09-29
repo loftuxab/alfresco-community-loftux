@@ -197,7 +197,6 @@
          <value>
 				org.alfresco.service.cmr.repository.ContentService.getReader=ACL_NODE.0.cm:content.ReadContent
                 org.alfresco.service.cmr.repository.ContentService.getWriter=ACL_NODE.0.cm:content.WriteContent
-                org.alfresco.service.cmr.repository.ContentService.getUpdatingWriter=ACL_NODE.0.cm:content.WriteContent
          </value>
       </property>
    </bean>
