@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Properties;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -66,9 +65,7 @@ public class ExporterComponentTest extends BaseSpringTest
         // import
         InputStream test = getClass().getClassLoader().getResourceAsStream("org/alfresco/repo/importer/importercomponent_test.xml");
         InputStreamReader testReader = new InputStreamReader(test, "UTF-8");
-        Properties configuration = new Properties();
-        configuration.put("username", "fredb");
-        importerService.importView(testReader, location, configuration, null);        
+        importerService.importView(testReader, location, null, null);        
         System.out.println(NodeStoreInspector.dumpNodeStore((NodeService)applicationContext.getBean("NodeService"), storeRef));
         
         // now export

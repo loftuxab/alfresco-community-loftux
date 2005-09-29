@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
@@ -44,6 +43,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImportStreamHandler;
+import org.alfresco.service.cmr.view.ImporterBinding;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.cmr.view.ImporterService;
@@ -65,17 +65,21 @@ import org.springframework.util.StringUtils;
 public class ImporterComponent
     implements ImporterService
 {
-    // Default importer
+    // default importer
     // TODO: Allow registration of plug-in parsers (by namespace)
     private Parser viewParser;
 
-    // Supporting services
+    // supporting services
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
     private SearchService searchService;
     private ContentService contentService;
 
+    // binding markers    
+    private static final String START_BINDING_MARKER = "${";
+    private static final String END_BINDING_MARKER = "}"; 
+    
     
     /**
      * @param viewParser  the default parser
@@ -131,31 +135,31 @@ public class ImporterComponent
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStreamReader, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
      */
-    public void importView(Reader viewReader, Location location, Properties configuration, ImporterProgress progress)
+    public void importView(Reader viewReader, Location location, ImporterBinding binding, ImporterProgress progress)
     {
-        NodeRef nodeRef = getNodeRef(location, configuration);
-        QName childAssocType = getChildAssocType(location, configuration);
-        performImport(nodeRef, childAssocType, viewReader, new DefaultStreamHandler(), configuration, progress);       
+        NodeRef nodeRef = getNodeRef(location, binding);
+        QName childAssocType = getChildAssocType(location, binding);
+        performImport(nodeRef, childAssocType, viewReader, new DefaultStreamHandler(), binding, progress);       
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStreamReader, org.alfresco.service.cmr.view.ImportStreamHandler, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
      */
-    public void importView(Reader viewReader, ImportStreamHandler streamHandler, Location location, Properties configuration, ImporterProgress progress) throws ImporterException
+    public void importView(Reader viewReader, ImportStreamHandler streamHandler, Location location, ImporterBinding binding, ImporterProgress progress) throws ImporterException
     {
-        NodeRef nodeRef = getNodeRef(location, configuration);
-        QName childAssocType = getChildAssocType(location, configuration);
-        performImport(nodeRef, childAssocType, viewReader, streamHandler, configuration, progress);
+        NodeRef nodeRef = getNodeRef(location, binding);
+        QName childAssocType = getChildAssocType(location, binding);
+        performImport(nodeRef, childAssocType, viewReader, streamHandler, binding, progress);
     }
     
     /**
      * Get Node Reference from Location
      *  
      * @param location the location to extract node reference from
-     * @param configuration import configuration
+     * @param binding import configuration
      * @return node reference
      */
-    private NodeRef getNodeRef(Location location, Properties configuration)
+    private NodeRef getNodeRef(Location location, ImporterBinding binding)
     {
         ParameterCheck.mandatory("Location", location);
     
@@ -172,7 +176,7 @@ public class ImporterComponent
         if (path != null && path.length() >0)
         {
             // Create a valid path and search
-            path = bindPlaceHolder(path, configuration);
+            path = bindPlaceHolder(path, binding);
             path = createValidPath(path);
             List<NodeRef> nodeRefs = searchService.selectNodes(nodeRef, path, null, namespaceService, false);
             if (nodeRefs.size() == 0)
@@ -195,13 +199,13 @@ public class ImporterComponent
      * Get the child association type from location
      * 
      * @param location the location to extract child association type from
-     * @param configuration import configuration
+     * @param binding import configuration
      * @return the child association type
      */
-    private QName getChildAssocType(Location location, Properties configuration)
+    private QName getChildAssocType(Location location, ImporterBinding binding)
     {
         // Establish child association type to import under
-        NodeRef nodeRef = getNodeRef(location, configuration);
+        NodeRef nodeRef = getNodeRef(location, binding);
         QName childAssocType = location.getChildAssocType();
         if (childAssocType == null)
         {
@@ -226,16 +230,16 @@ public class ImporterComponent
      * @param childAssocType the child association type to import under
      * @param inputStream the input stream to import from
      * @param streamHandler the content property import stream handler
-     * @param configuration import configuration
+     * @param binding import configuration
      * @param progress import progress
      */
-    private void performImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportStreamHandler streamHandler, Properties configuration, ImporterProgress progress)
+    private void performImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportStreamHandler streamHandler, ImporterBinding binding, ImporterProgress progress)
     {
         ParameterCheck.mandatory("Node Reference", nodeRef);
         ParameterCheck.mandatory("Child Assoc Type", childAssocType);
         ParameterCheck.mandatory("View Reader", viewReader);
         ParameterCheck.mandatory("Stream Handler", streamHandler);
-        Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, configuration, streamHandler, progress);
+        Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, binding, streamHandler, progress);
         viewParser.parse(viewReader, defaultImporter);
     }
     
@@ -243,22 +247,29 @@ public class ImporterComponent
      * Bind the specified value to the passed configuration values if it is a place holder
      * 
      * @param value  the value to bind
-     * @param configuration  the configuration properties to bind to
+     * @param binding  the configuration properties to bind to
      * @return  the bound value
      */
-    private String bindPlaceHolder(String value, Properties configuration)
+    private String bindPlaceHolder(String value, ImporterBinding binding)
     {
-        // TODO: replace with more efficient approach
-        String boundValue = value;
-        if (configuration != null)
+        if (binding != null)
         {
-            for (Object key : configuration.keySet())
+            int iStartBinding = value.indexOf(START_BINDING_MARKER);
+            while (iStartBinding != -1)
             {
-                String stringKey = (String)key;
-                boundValue = StringUtils.replace(boundValue, "${" + stringKey + "}", configuration.getProperty(stringKey));
+                int iEndBinding = value.indexOf(END_BINDING_MARKER, iStartBinding + START_BINDING_MARKER.length());
+                if (iEndBinding == -1)
+                {
+                    throw new ImporterException("Cannot find end marker " + END_BINDING_MARKER + " within value " + value);
+                }
+                
+                String key = value.substring(iStartBinding + START_BINDING_MARKER.length(), iEndBinding);
+                String keyValue = binding.getValue(key);
+                value = StringUtils.replace(value, START_BINDING_MARKER + key + END_BINDING_MARKER, keyValue == null ? "" : keyValue);
+                iStartBinding = value.indexOf(START_BINDING_MARKER);
             }
         }
-        return boundValue;
+        return value;
     }
     
     /**
@@ -297,7 +308,7 @@ public class ImporterComponent
     {
         private NodeRef rootRef;
         private QName rootAssocType;
-        private Properties configuration;
+        private ImporterBinding binding;
         private ImporterProgress progress;
         private ImportStreamHandler streamHandler;
 
@@ -311,14 +322,14 @@ public class ImporterComponent
          * 
          * @param rootRef
          * @param rootAssocType
-         * @param configuration
+         * @param binding
          * @param progress
          */
-        private DefaultImporter(NodeRef rootRef, QName rootAssocType, Properties configuration, ImportStreamHandler streamHandler, ImporterProgress progress)
+        private DefaultImporter(NodeRef rootRef, QName rootAssocType, ImporterBinding binding, ImportStreamHandler streamHandler, ImporterProgress progress)
         {
             this.rootRef = rootRef;
             this.rootAssocType = rootAssocType;
-            this.configuration = configuration;
+            this.binding = binding;
             this.progress = progress;
             this.streamHandler = streamHandler;
         }
@@ -353,7 +364,7 @@ public class ImporterComponent
             String childName = context.getChildName();
             if (childName != null)
             {
-                childName = bindPlaceHolder(childName, configuration);
+                childName = bindPlaceHolder(childName, binding);
                 String[] qnameComponents = QName.splitPrefixedQName(childName);
                 childQName = QName.createQName(qnameComponents[0], QName.createValidLocalName(qnameComponents[1]), namespaceService); 
             }
@@ -366,7 +377,7 @@ public class ImporterComponent
                     throw new ImporterException("Cannot import node of type " + nodeType.getName() + " - it does not have a name");
                 }
                 
-                name = bindPlaceHolder(name, configuration);
+                name = bindPlaceHolder(name, binding);
                 String localName = QName.createValidLocalName(name);
                 childQName = QName.createQName(assocType.getNamespaceURI(), localName);
             }
@@ -475,14 +486,14 @@ public class ImporterComponent
                     List<Serializable> boundCollection = new ArrayList<Serializable>();
                     for (String collectionValue : (Collection<String>)value)
                     {
-                        String strValue = bindPlaceHolder(collectionValue, configuration);
+                        String strValue = bindPlaceHolder(collectionValue, binding);
                         boundCollection.add(strValue);
                     }
                     value = (Serializable)DefaultTypeConverter.INSTANCE.convert(propDef.getDataType(), boundCollection);
                 }
                 else
                 {
-                    value = bindPlaceHolder((String)value, configuration);
+                    value = bindPlaceHolder((String)value, binding);
                     value = (Serializable)DefaultTypeConverter.INSTANCE.convert(propDef.getDataType(), value);
                 }
                 boundProperties.put(property, value);

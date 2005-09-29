@@ -91,13 +91,6 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
       AuthenticationComponent authenticationComponent = (AuthenticationComponent) ctx
             .getBean("authenticationComponent");
 
-      String repoStoreUrl = Application.getRepositoryStoreUrl(servletContext);
-      if (repoStoreUrl == null)
-      {
-         throw new AlfrescoRuntimeException(
-               "Repository store URL has not been configured, is 'store-url' element missing?");
-      }
-
       // repo bootstrap code for our client
       UserTransaction tx = null;
       NodeRef companySpaceNodeRef = null;
@@ -123,11 +116,10 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          String rootPath = Application.getRootPath(servletContext);
          if (rootPath == null)
          {
-            throw new AlfrescoRuntimeException("Root path has not been configured, is 'root-path' element missing?");
+            throw new AlfrescoRuntimeException("Root path has not been configured");
          }
 
-         String companyXPath = NamespaceService.APP_MODEL_PREFIX + ":" + QName.createValidLocalName(rootPath);
-         List<NodeRef> nodes = searchService.selectNodes(rootNodeRef, companyXPath, null, namespaceService, false);
+         List<NodeRef> nodes = searchService.selectNodes(rootNodeRef, rootPath, null, namespaceService, false);
          if (nodes.size() == 0)
          {
             throw new AlfrescoRuntimeException("Root path not created prior to application startup: " + rootPath);

@@ -19,15 +19,14 @@ package org.alfresco.repo.importer;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.Properties;
 
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
-import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
@@ -46,6 +45,7 @@ public class ImporterComponentTest extends BaseSpringTest
     {
         nodeService = (NodeService)applicationContext.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
         importerService = (ImporterService)applicationContext.getBean(ServiceRegistry.IMPORTER_SERVICE.getLocalName());
+        
         importerBootstrap = (ImporterBootstrap)applicationContext.getBean("importerBootstrap");
         
         // Create the store
@@ -60,26 +60,15 @@ public class ImporterComponentTest extends BaseSpringTest
         InputStreamReader testReader = new InputStreamReader(test, "UTF-8");
         TestProgress testProgress = new TestProgress();
         Location location = new Location(storeRef);
-        Properties configuration = new Properties();
-        configuration.put("username", "fredb");
-        
-        importerService.importView(testReader, location, configuration, testProgress);
+        importerService.importView(testReader, location, null, testProgress);
         System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
     }
     
     
-    public void testBootstrap()
+    public void xtestBootstrap()
     {
-        Properties configuration = new Properties();
-        configuration.put("companySpaceName", "test company name");
-        configuration.put("companySpaceDescription", "test company description");
-        configuration.put("glossaryName", "glossary name");
-        configuration.put("spaceTemplatesName", "space templates name");
-        configuration.put("contentTemplatesName", "content templates name");
-
         StoreRef bootstrapStoreRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         importerBootstrap.setStoreUrl(bootstrapStoreRef.toString());
-        importerBootstrap.setConfiguration(configuration);
         importerBootstrap.bootstrap();
         System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, bootstrapStoreRef));
     }
@@ -109,6 +98,7 @@ public class ImporterComponentTest extends BaseSpringTest
             System.out.println("TestProgress: added aspect " + aspect + " to node ");
         }
     }
+    
     
 }
 

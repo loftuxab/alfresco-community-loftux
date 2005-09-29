@@ -120,7 +120,7 @@ public final class Repository
     */
    public static StoreRef getStoreRef(ServletContext context)
    {
-      storeRef = new StoreRef(Application.getRepositoryStoreUrl(context));
+      storeRef = Application.getRepositoryStoreRef(context);
       
       return storeRef;
    }

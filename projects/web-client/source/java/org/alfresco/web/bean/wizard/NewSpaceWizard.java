@@ -208,13 +208,9 @@ public class NewSpaceWizard extends AbstractWizardBean
                DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
                namespacePrefixResolver.registerNamespace(NamespaceService.APP_MODEL_PREFIX, NamespaceService.APP_MODEL_1_0_URI);
                
-               String actNs = NamespaceService.APP_MODEL_PREFIX;
-               String xpath = actNs + ":" + 
-                     QName.createValidLocalName(Application.getRootPath(FacesContext.getCurrentInstance())) + 
-                     "/" + actNs + ":" + 
-                     QName.createValidLocalName(Application.getGlossaryFolderName(FacesContext.getCurrentInstance())) +
-                     "/" + actNs + ":" + 
-                     QName.createValidLocalName(Application.getSpaceTemplatesFolderName(FacesContext.getCurrentInstance()));
+               String xpath = Application.getRootPath(FacesContext.getCurrentInstance()) + "/" +
+                     Application.getGlossaryFolderName(FacesContext.getCurrentInstance()) + "/" +
+                     Application.getSpaceTemplatesFolderName(FacesContext.getCurrentInstance());
                
                NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
                List<NodeRef> templateNodeList = this.searchService.selectNodes(
@@ -451,15 +447,8 @@ public class NewSpaceWizard extends AbstractWizardBean
          this.templates = new ArrayList<SelectItem>();
          
          FacesContext context = FacesContext.getCurrentInstance();
-         String actNs = NamespaceService.APP_MODEL_PREFIX;
-         String xpath = actNs + ":" + 
-               QName.createValidLocalName(Application.getRootPath(context)) + 
-               "/" + actNs + ":" + 
-               QName.createValidLocalName(Application.getGlossaryFolderName(context)) +
-               "/" + actNs + ":" + 
-               QName.createValidLocalName(Application.getSpaceTemplatesFolderName(context)) +
-               "/*";
-         
+         String xpath = Application.getRootPath(context) + "/" + Application.getGlossaryFolderName(context) +
+               "/" + Application.getSpaceTemplatesFolderName(context) + "/*";
          NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
          NamespaceService resolver = Repository.getServiceRegistry(context).getNamespaceService();
          List<NodeRef> results = this.searchService.selectNodes(rootNodeRef, xpath, null, resolver, false);

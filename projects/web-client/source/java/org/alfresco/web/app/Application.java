@@ -19,6 +19,7 @@ package org.alfresco.web.app;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 
@@ -31,10 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.web.app.servlet.AuthenticationFilter;
+import org.alfresco.repo.importer.ImporterBootstrap;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.app.servlet.AuthenticationHelper;
 import org.alfresco.web.bean.ErrorBean;
 import org.alfresco.web.bean.repository.User;
@@ -55,11 +56,12 @@ public class Application
    
    public static final String BEAN_CONFIG_SERVICE = "configService";
    public static final String BEAN_DATA_DICTIONARY = "dataDictionary";
+   public static final String BEAN_IMPORTER_BOOTSTRAP = "importerBootstrap";
    
    public static final String MESSAGE_BUNDLE = "alfresco.messages";
    
    private static boolean inPortalServer = true;
-   private static String repoStoreUrl;
+   private static StoreRef repoStoreRef;
    private static String rootPath;
    private static String companyRootId;
    private static String companyRootDescription;
@@ -227,17 +229,17 @@ public class Application
    /**
     * @return Returns the repository store URL (retrieved from config service)
     */
-   public static String getRepositoryStoreUrl(ServletContext context)
+   public static StoreRef getRepositoryStoreRef(ServletContext context)
    {
-      return getRepositoryStoreUrl(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
+      return getRepositoryStoreRef(WebApplicationContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
     * @return Returns the repository store URL (retrieved from config service)
     */
-   public static String getRepositoryStoreUrl(FacesContext context)
+   public static StoreRef getRepositoryStoreRef(FacesContext context)
    {
-      return getRepositoryStoreUrl(FacesContextUtils.getRequiredWebApplicationContext(context));
+      return getRepositoryStoreRef(FacesContextUtils.getRequiredWebApplicationContext(context));
    }
    
    /**
@@ -496,20 +498,15 @@ public class Application
     * @param context The spring context
     * @return The repository store URL to use
     */
-   private static String getRepositoryStoreUrl(WebApplicationContext context)
+   private static StoreRef getRepositoryStoreRef(WebApplicationContext context)
    {
-      if (repoStoreUrl == null)
+      if (repoStoreRef == null)
       {
-         ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
-         ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         ConfigElement storeUrlConfig = repoConfig.getChild("store-url");
-         if (storeUrlConfig != null)
-         {
-             repoStoreUrl = storeUrlConfig.getValue();
-         }
+         ImporterBootstrap bootstrap = (ImporterBootstrap)context.getBean(BEAN_IMPORTER_BOOTSTRAP);
+         repoStoreRef = bootstrap.getStoreRef();
       }
       
-      return repoStoreUrl;
+      return repoStoreRef;
    }
    
    /**
@@ -522,13 +519,9 @@ public class Application
    {
       if (rootPath == null)
       {
-         ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
-         ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         ConfigElement rootPathConfig = repoConfig.getChild("root-path");
-         if (rootPathConfig != null)
-         {
-             rootPath = rootPathConfig.getValue();
-         }
+         ImporterBootstrap bootstrap = (ImporterBootstrap)context.getBean(BEAN_IMPORTER_BOOTSTRAP);
+         Properties configuration = bootstrap.getConfiguration();
+         rootPath = configuration.getProperty("spaces.company_home.childname");
       }
       
       return rootPath;
@@ -544,15 +537,9 @@ public class Application
    {
       if (glossaryFolderName == null)
       {
-         ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
-         ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         for (ConfigElement child : repoConfig.getChildren())
-         {
-            if (child.getName().equals("glossary-folder-name"))
-            {
-               glossaryFolderName = child.getValue();
-            }
-         }
+         ImporterBootstrap bootstrap = (ImporterBootstrap)context.getBean(BEAN_IMPORTER_BOOTSTRAP);
+         Properties configuration = bootstrap.getConfiguration();
+         glossaryFolderName = configuration.getProperty("spaces.dictionary.childname");
       }
       
       return glossaryFolderName;
@@ -568,15 +555,9 @@ public class Application
    {
       if (spaceTemplatesFolderName == null)
       {
-         ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
-         ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         for (ConfigElement child : repoConfig.getChildren())
-         {
-            if (child.getName().equals("space-templates-folder-name"))
-            {
-               spaceTemplatesFolderName = child.getValue();
-            }
-         }
+         ImporterBootstrap bootstrap = (ImporterBootstrap)context.getBean(BEAN_IMPORTER_BOOTSTRAP);
+         Properties configuration = bootstrap.getConfiguration();
+         spaceTemplatesFolderName = configuration.getProperty("spaces.templates.childname");
       }
       
       return spaceTemplatesFolderName;
@@ -592,15 +573,9 @@ public class Application
    {
       if (contentTemplatesFolderName == null)
       {
-         ConfigService configService = (ConfigService)context.getBean(BEAN_CONFIG_SERVICE);
-         ConfigElement repoConfig = configService.getGlobalConfig().getConfigElement("repository");
-         for (ConfigElement child : repoConfig.getChildren())
-         {
-            if (child.getName().equals("content-templates-folder-name"))
-            {
-               contentTemplatesFolderName = child.getValue();
-            }
-         }
+         ImporterBootstrap bootstrap = (ImporterBootstrap)context.getBean(BEAN_IMPORTER_BOOTSTRAP);
+         Properties configuration = bootstrap.getConfiguration();
+         contentTemplatesFolderName = configuration.getProperty("spaces.templates.content.childname");
       }
       
       return contentTemplatesFolderName;

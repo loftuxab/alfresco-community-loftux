@@ -13,6 +13,7 @@
     <import resource="classpath:alfresco/hibernate-context.xml" />
     <import resource="classpath:alfresco/ownable-services-context.xml" />
     <import resource="classpath:alfresco/index-recovery-context.xml" />
+    
 
     <!--                    -->
     <!--  PERSISTENCE       -->
@@ -816,40 +817,45 @@
         <property name="namespaceService">
             <ref bean="namespaceService"/>
         </property>
-        <property name="storeUrl">
-            <value>workspace://SpacesStore</value>
-        </property>
         <property name="authenticationComponent">
             <ref bean="authenticationComponent" />
         </property>
+        <property name="storeUrl">
+            <value>${spaces.store}</value>
+        </property>
         <property name="configuration">
             <props>
-                <!-- NOTE: see web-client/config/alfresco/web-client-config.xml -->
-                <!--       values changed here must match those in web-client-config.xml -->
-                <prop key="companySpaceName">Company Home</prop>
-                <prop key="companySpaceDescription">The company root space</prop>
-                <prop key="glossaryName">Glossary</prop>
-                <prop key="spaceTemplatesName">Space Templates</prop>
-                <prop key="contentTemplatesName">Content Templates</prop>
+                <prop key="spaces.company_home.childname">${spaces.company_home.childname}</prop>
+                <prop key="spaces.dictionary.childname">${spaces.dictionary.childname}</prop>
+                <prop key="spaces.templates.childname">${spaces.templates.childname}</prop>
+                <prop key="spaces.templates.content.childname">${spaces.templates.content.childname}</prop>
             </props>
         </property>
+        <!-- To specify a locale other than the system default, uncomment the following
+        <property name="locale">
+            <value>en_GB</value>
+        </property>
+        -->
         <property name="bootstrapViews">
             <list>
-                <props>
-                    <prop key="path">/</prop>
-                    <prop key="location">alfresco/bootstrap/systemImport.xml</prop>
-                </props>
                 <props>
                     <prop key="path">/</prop>
                     <prop key="location">alfresco/bootstrap/categories.xml</prop>
                 </props>
                 <props>
-                    <prop key="path">/app:${companySpaceName}</prop>
-                    <prop key="location">alfresco/bootstrap/tutorial.xml</prop>
+                    <prop key="path">/</prop>
+                    <prop key="location">alfresco/bootstrap/spaces.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
                 </props>
                 <props>
-                    <prop key="path">/app:${companySpaceName}/app:${glossaryName}/app:${spaceTemplatesName}</prop>
+                    <prop key="path">/${spaces.company_home.childname}</prop>
+                    <prop key="location">alfresco/bootstrap/tutorial.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-tutorial</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.childname}</prop>
                     <prop key="location">alfresco/templates/software_engineering_project.xml</prop>
+                    <prop key="messages">alfresco/messages/bootstrap-templates</prop>
                 </props>
             </list>
         </property>

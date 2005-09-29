@@ -18,7 +18,6 @@ package org.alfresco.web.bean;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,10 +34,8 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
-import org.alfresco.web.app.servlet.AuthenticationFilter;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
@@ -48,7 +45,6 @@ import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
-import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.alfresco.web.ui.repo.component.shelf.UIShelf;
 import org.apache.log4j.Logger;
@@ -337,7 +333,7 @@ public class NavigationBean
          setCurrentNodeId(user.getHomeSpaceId());
          
          // setup the breadcrumb with the same location
-         List<IBreadcrumbHandler> elements = new ArrayList(1);
+         List<IBreadcrumbHandler> elements = new ArrayList<IBreadcrumbHandler>(1);
          elements.add(new NavigationBreadcrumbHandler(homeSpaceRef, homeSpaceName));
          setLocation(elements);
       }
@@ -390,15 +386,16 @@ public class NavigationBean
          
          if (LOCATION_COMPANY.equals(location))
          {
-            List<IBreadcrumbHandler> elements = new ArrayList(1);
+            List<IBreadcrumbHandler> elements = new ArrayList<IBreadcrumbHandler>(1);
             NodeRef companyRootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
-            elements.add(new NavigationBreadcrumbHandler(companyRootRef, Application.getRootPath(context)));
+            String companySpaceName = Repository.getNameForNode(this.nodeService, companyRootRef);
+            elements.add(new NavigationBreadcrumbHandler(companyRootRef, companySpaceName));
             setLocation(elements);
             setCurrentNodeId(companyRootRef.getId());
          }
          else if (LOCATION_HOME.equals(location))
          {
-            List<IBreadcrumbHandler> elements = new ArrayList(1);
+            List<IBreadcrumbHandler> elements = new ArrayList<IBreadcrumbHandler>(1);
             String homeSpaceId = Application.getCurrentUser(context).getHomeSpaceId();
             NodeRef homeSpaceRef = new NodeRef(Repository.getStoreRef(), homeSpaceId);
             String homeSpaceName = Repository.getNameForNode(this.nodeService, homeSpaceRef);
@@ -561,9 +558,6 @@ public class NavigationBean
    
    /** Node we are using for UI context operations */
    private Node currentNode = null;
-   
-   /** Cached version of company root Id */
-   private NodeRef companyRootRef = null;
    
    /** Current toolbar location */
    private String toolbarLocation = LOCATION_HOME;

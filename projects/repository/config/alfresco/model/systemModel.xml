@@ -2,8 +2,8 @@
 
 	<description>Alfresco Repository System Definitions</description>
 	<author>Alfresco</author>
-	<published>2005-08-16</published>
-	<version>0.1</version>
+	<published>2005-09-29</published>
+	<version>1.0</version>
 
 	<imports>
 		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d" />

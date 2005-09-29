@@ -121,20 +121,14 @@ public class DocumentPreviewBean
       
       // get the template from the special Content Templates folder
       FacesContext context = FacesContext.getCurrentInstance();
-      String actNs = NamespaceService.APP_MODEL_PREFIX;
-      String xpath = actNs + ":" + 
-            QName.createValidLocalName(Application.getRootPath(context)) + 
-            "/" + actNs + ":" + 
-            QName.createValidLocalName(Application.getGlossaryFolderName(context)) +
-            "/" + actNs + ":" + 
-            QName.createValidLocalName(Application.getContentTemplatesFolderName(context)) +
-            "/*";
-      
+      String xpath = Application.getRootPath(context) + "/" + 
+            Application.getGlossaryFolderName(context) + "/" +
+            Application.getContentTemplatesFolderName(context) + "/*";
       NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
       NamespaceService resolver = Repository.getServiceRegistry(context).getNamespaceService();
       List<NodeRef> results = this.searchService.selectNodes(rootNodeRef, xpath, null, resolver, false);
       
-      List<SelectItem> templates = new ArrayList(results.size());
+      List<SelectItem> templates = new ArrayList<SelectItem>(results.size());
       if (results.size() != 0)
       {
          for (NodeRef assocRef : results)

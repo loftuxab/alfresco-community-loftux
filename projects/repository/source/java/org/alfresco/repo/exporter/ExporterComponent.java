@@ -228,13 +228,10 @@ public class ExporterComponent
             Collection<String> prefixes = namespaceService.getPrefixes();
             for (String prefix : prefixes)
             {
-                if (prefix != null && prefix.length() > 0 && !prefix.startsWith("xml"))
+                if (!prefix.equals("xml"))
                 {
                     String uri = namespaceService.getNamespaceURI(prefix);
-                    if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), uri))
-                    {
-                        exporter.startNamespace(prefix, uri);
-                    }
+                    exporter.startNamespace(prefix, uri);
                 }
             }
         }
@@ -247,13 +244,9 @@ public class ExporterComponent
             Collection<String> prefixes = namespaceService.getPrefixes();
             for (String prefix : prefixes)
             {
-                if (prefix != null && prefix.length() > 0 && !prefix.startsWith("xml"))
+                if (!prefix.equals("xml"))
                 {
-                    String uri = namespaceService.getNamespaceURI(prefix);
-                    if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), uri))
-                    {
-                        exporter.endNamespace(prefix);
-                    }
+                    exporter.endNamespace(prefix);
                 }
             }
         }

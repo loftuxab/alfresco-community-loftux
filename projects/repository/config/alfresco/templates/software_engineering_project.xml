@@ -4,39 +4,39 @@
 
    <cm:folder>
       <app:uifacets/>
-      <cm:name>Software Engineering Project</cm:name>
+      <cm:name>${templates.space.project}</cm:name>
       <app:icon>space-icon-default</app:icon>
       <cm:contains>
          <cm:folder>
          	<app:uifacets/>
-			<cm:name>Documentation</cm:name>
+			<cm:name>${templates.space.documentation}</cm:name>
 		    <app:icon>space-icon-default</app:icon>
       		<cm:contains>
 				<cm:folder>
 	         		<app:uifacets/>
-					<cm:name>Drafts</cm:name>
+					<cm:name>${templates.space.drafts}</cm:name>
 				    <app:icon>space-icon-default</app:icon>
 				</cm:folder>
 				<cm:folder>
 	         		<app:uifacets/>
-					<cm:name>Pending Approval</cm:name>
+					<cm:name>${templates.space.pending_approval}</cm:name>
 				    <app:icon>space-icon-default</app:icon>
 				</cm:folder>
 				<cm:folder>
 	         		<app:uifacets/>
-					<cm:name>Published</cm:name>
+					<cm:name>${templates.space.published}</cm:name>
 				    <app:icon>space-icon-default</app:icon>
 				</cm:folder>
 				<cm:folder>
 	         		<app:uifacets/>
-					<cm:name>Samples</cm:name>
+					<cm:name>${templates.space.samples}</cm:name>
 				    <app:icon>space-icon-doc</app:icon>
 				    <cm:contains>
 						<cm:content>
 	         				<app:uifacets/>
-				    		   <cm:title>System Overview</cm:title>
-            				<cm:name>system-overview.html</cm:name>
-            				<cm:content>contentUrl=classpath:alfresco/templates/system-overview.html|mimetype=text/html|size=|encoding=</cm:content>
+				    		<cm:title>${templates.document.system_overview.title}</cm:title>
+            				<cm:name>${templates.document.system_overview.name}</cm:name>
+            				<cm:content>contentUrl=classpath:alfresco/templates/${templates.document.system_overview.name}|mimetype=text/html|size=|encoding=</cm:content>
             	        </cm:content>
          			</cm:contains>
 				</cm:folder>
@@ -44,22 +44,22 @@
 		</cm:folder>
 		<cm:folder>
      		<app:uifacets/>
-			<cm:name>Discussions</cm:name>
+			<cm:name>${templates.space.discussions}</cm:name>
 		    <app:icon>space-icon-default</app:icon>
 		</cm:folder>
 		<cm:folder>
      		<app:uifacets/>
-			<cm:name>UI Design</cm:name>
+			<cm:name>${templates.space.ui_design}</cm:name>
 		    <app:icon>space-icon-default</app:icon>
 		</cm:folder>
 		<cm:folder>
      		<app:uifacets/>
-			<cm:name>Presentations</cm:name>
+			<cm:name>${templates.space.presentations}</cm:name>
 		    <app:icon>space-icon-default</app:icon>
 		</cm:folder>
 		<cm:folder>
      		<app:uifacets/>
-			<cm:name>Quality Assurance</cm:name>
+			<cm:name>${templates.space.quality_assurance}</cm:name>
 		    <app:icon>space-icon-default</app:icon>
 		</cm:folder>
       </cm:contains>

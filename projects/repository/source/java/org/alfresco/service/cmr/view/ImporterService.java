@@ -17,7 +17,6 @@
 package org.alfresco.service.cmr.view;
 
 import java.io.Reader;
-import java.util.Properties;
 
 
 /**
@@ -34,10 +33,10 @@ public interface ImporterService
      * 
      * @param viewReader  input stream containing the xml view to parse
      * @param location  the location to import under
-     * @param configuration  property values used for binding property place holders in import stream
+     * @param binding  property values used for binding property place holders in import stream
      * @param progress  progress monitor (optional)
      */
-    public void importView(Reader viewReader, Location location, Properties configuration, ImporterProgress progress)
+    public void importView(Reader viewReader, Location location, ImporterBinding binding, ImporterProgress progress)
         throws ImporterException;
 
     
@@ -49,10 +48,10 @@ public interface ImporterService
      * @param viewReader  input stream containing the xml view to parse
      * @param streamHandler  custom content importer
      * @param location  the location to import under
-     * @param configuration  property values used for binding property place holders in import stream
+     * @param binding  property values used for binding property place holders in import stream
      * @param progress  progress monitor (optional)
      */
-    public void importView(Reader viewReader, ImportStreamHandler streamHandler, Location location, Properties configuration, ImporterProgress progress)
+    public void importView(Reader viewReader, ImportStreamHandler streamHandler, Location location, ImporterBinding binding, ImporterProgress progress)
         throws ImporterException;
     
 }

@@ -4,15 +4,16 @@
 
 	<cm:folder>
 		<app:uifacets />
-		<cm:name>Alfresco Tutorial</cm:name>
+		<cm:name>${tutorial.space.name}</cm:name>
+		<cm:description>${tutorial.space.description}</cm:description>
 		<app:icon>space-icon-doc</app:icon>
 		<cm:contains>
 			<cm:content>
 				<app:uifacets />
-				<cm:title>Alfresco Tutorial</cm:title>
-				<cm:name>Alfresco Tutorial.pdf</cm:name>
-				<cm:description>Getting started guide</cm:description>
-				<cm:content>contentUrl=classpath:alfresco/bootstrap/Alfresco-Tutorial.pdf|mimetype=application/pdf|size=|encoding=</cm:content>
+				<cm:name>${tutorial.document.name}</cm:name>
+				<cm:title>${tutorial.document.title}</cm:title>
+				<cm:description>${tutorial.document.description}</cm:description>
+				<cm:content>contentUrl=classpath:alfresco/bootstrap/${tutorial.document.name}|mimetype=application/pdf|size=|encoding=</cm:content>
 			</cm:content>
 		</cm:contains>
 	</cm:folder>

@@ -84,11 +84,11 @@ public class JCRSystemXMLExporter implements Exporter
         this.session = session;
         this.contentHandler = contentHandler;
         
-        NODE_QNAME = QName.createQName(JCRNamespace.SV_PREFIX, NODE_LOCALNAME, session.getNamespaceResolver());
-        NAME_QNAME = QName.createQName(JCRNamespace.SV_PREFIX, NAME_LOCALNAME, session.getNamespaceResolver());
-        PROPERTY_QNAME = QName.createQName(JCRNamespace.SV_PREFIX, PROPERTY_LOCALNAME, session.getNamespaceResolver());
-        TYPE_QNAME = QName.createQName(JCRNamespace.SV_PREFIX, TYPE_LOCALNAME, session.getNamespaceResolver());
-        VALUE_QNAME = QName.createQName(JCRNamespace.SV_PREFIX, VALUE_LOCALNAME, session.getNamespaceResolver());
+        NODE_QNAME = QName.createQName(JCRNamespace.SV_URI, NODE_LOCALNAME);
+        NAME_QNAME = QName.createQName(JCRNamespace.SV_URI, NAME_LOCALNAME);
+        PROPERTY_QNAME = QName.createQName(JCRNamespace.SV_URI, PROPERTY_LOCALNAME);
+        TYPE_QNAME = QName.createQName(JCRNamespace.SV_URI, TYPE_LOCALNAME);
+        VALUE_QNAME = QName.createQName(JCRNamespace.SV_URI, VALUE_LOCALNAME);
     }
     
     
@@ -161,10 +161,10 @@ public class JCRSystemXMLExporter implements Exporter
 
             // create jcr node attributes
             AttributesImpl attrs = new AttributesImpl(); 
-            attrs.addAttribute(NAME_QNAME.getNamespaceURI(), NAME_LOCALNAME, NAME_QNAME.toPrefixString(), null, toPrefixString(childQName));
+            attrs.addAttribute(NAME_QNAME.getNamespaceURI(), NAME_LOCALNAME, toPrefixString(NAME_QNAME), null, toPrefixString(childQName));
             
             // emit node element
-            contentHandler.startElement(NODE_QNAME.getNamespaceURI(), NODE_LOCALNAME, NODE_QNAME.toPrefixString(), attrs);
+            contentHandler.startElement(NODE_QNAME.getNamespaceURI(), NODE_LOCALNAME, toPrefixString(NODE_QNAME), attrs);
 
             //
             // emit jcr specifics
@@ -210,7 +210,7 @@ public class JCRSystemXMLExporter implements Exporter
     {
         try
         {
-            contentHandler.endElement(NODE_QNAME.getNamespaceURI(), NODE_LOCALNAME, NODE_QNAME.toPrefixString());
+            contentHandler.endElement(NODE_QNAME.getNamespaceURI(), NODE_LOCALNAME, toPrefixString(NODE_QNAME));
         }
         catch (SAXException e)
         {
@@ -259,11 +259,11 @@ public class JCRSystemXMLExporter implements Exporter
             PropertyDefinitionImpl propDefImpl = new PropertyDefinitionImpl(session.getTypeManager(), propDef);
             String datatype = PropertyType.nameFromValue(propDefImpl.getRequiredType());
             AttributesImpl attrs = new AttributesImpl(); 
-            attrs.addAttribute(NAME_QNAME.getNamespaceURI(), NAME_LOCALNAME, NAME_QNAME.toPrefixString(), null, toPrefixString(property));
-            attrs.addAttribute(TYPE_QNAME.getNamespaceURI(), TYPE_LOCALNAME, TYPE_QNAME.toPrefixString(), null, datatype);
+            attrs.addAttribute(NAME_QNAME.getNamespaceURI(), NAME_LOCALNAME, toPrefixString(NAME_QNAME), null, toPrefixString(property));
+            attrs.addAttribute(TYPE_QNAME.getNamespaceURI(), TYPE_LOCALNAME, toPrefixString(TYPE_QNAME), null, datatype);
             
             // emit property element
-            contentHandler.startElement(PROPERTY_QNAME.getNamespaceURI(), PROPERTY_LOCALNAME, PROPERTY_QNAME.toPrefixString(), attrs);
+            contentHandler.startElement(PROPERTY_QNAME.getNamespaceURI(), PROPERTY_LOCALNAME, toPrefixString(PROPERTY_QNAME), attrs);
         }
         catch (SAXException e)
         {
@@ -279,7 +279,7 @@ public class JCRSystemXMLExporter implements Exporter
         try
         {
             // emit property element
-            contentHandler.endElement(PROPERTY_QNAME.getNamespaceURI(), PROPERTY_LOCALNAME, PROPERTY_QNAME.toPrefixString());
+            contentHandler.endElement(PROPERTY_QNAME.getNamespaceURI(), PROPERTY_LOCALNAME, toPrefixString(PROPERTY_QNAME));
         }
         catch (SAXException e)
         {
@@ -295,10 +295,10 @@ public class JCRSystemXMLExporter implements Exporter
         try
         {
             // emit value element
-            contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, VALUE_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+            contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
             String strValue = session.getTypeConverter().getConverter().convert(String.class, value);
             contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
-            contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, VALUE_QNAME.toPrefixString());
+            contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
         }
         catch (SAXException e)
         {
@@ -319,9 +319,9 @@ public class JCRSystemXMLExporter implements Exporter
             for (String strValue : strValues)
             {
                 // emit value element
-                contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, VALUE_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+                contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
                 contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
-                contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, VALUE_QNAME.toPrefixString());
+                contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
             }
         }
         catch (SAXException e)
@@ -337,7 +337,7 @@ public class JCRSystemXMLExporter implements Exporter
     {
         try
         {
-            contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, VALUE_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+            contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
             
             if (content != null)
             {
@@ -352,7 +352,7 @@ public class JCRSystemXMLExporter implements Exporter
                 }
             }
             
-            contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, VALUE_QNAME.toPrefixString());
+            contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
         }
         catch (SAXException e)
         {
