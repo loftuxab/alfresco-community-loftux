@@ -30,6 +30,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -731,7 +732,8 @@ public class CheckinCheckoutBean
             String mimetype;
             if (getCopyLocation().equals(COPYLOCATION_CURRENT))
             {
-               contentUrl = (String)node.getProperties().get("contentUrl");
+               ContentData contentData = (ContentData) node.getProperties().get(ContentModel.PROP_CONTENT);
+               contentUrl = (contentData == null ? null : contentData.getContentUrl());
             }
             // or specify a specific file as the content instead
             else
