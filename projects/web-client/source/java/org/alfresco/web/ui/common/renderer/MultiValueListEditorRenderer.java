@@ -46,8 +46,9 @@ public class MultiValueListEditorRenderer extends BaseRenderer
    
    /** I18N message strings */
    private final static String MSG_REMOVE = "remove";
-   private final static String MSG_ADD_NEW = "add_new";
-   private final static String MSG_ADD = "add";
+   private final static String MSG_SELECT_BUTTON = "select_button";
+   private final static String MSG_SELECT = "select_an_item";
+   private final static String MSG_ADD_TO_LIST_BUTTON = "add_to_list_button";
    
    // ------------------------------------------------------------------------------
    // Renderer implemenation
@@ -101,38 +102,37 @@ public class MultiValueListEditorRenderer extends BaseRenderer
       if (component instanceof UIMultiValueEditor)
       {
          ResponseWriter out = context.getResponseWriter();
+         Map attrs = component.getAttributes();
          String clientId = component.getClientId(context);
          UIMultiValueEditor editor = (UIMultiValueEditor)component;
-      
-         // get hold of the node service
-         NodeService nodeService = Repository.getServiceRegistry(context).getNodeService();
          
          // start outer table
-         out.write("<table border='0' cellspacing='4' cellpadding='0' style='border: 1px dashed #cccccc; padding: 6px;'>");
+         out.write("<table border='0' cellspacing='4' cellpadding='0'");
+         this.outputAttribute(out, attrs.get("style"), "style");
+         this.outputAttribute(out, attrs.get("styleClass"), "styleClass");
+         out.write(">");
          
-         // show the current items
-         List currentItems = (List)editor.getValue();
-         if (currentItems != null)
-         {
-            for (int x = 0; x < currentItems.size(); x++)
-            {  
-               renderExistingItem(context, component, out, nodeService, x, currentItems.get(x));
-            }
-         }
+         // show the select an item message
+         out.write("<tr><td>");
          
+         // TODO: make this generic
+         out.write(Application.getMessage(context, "select_category"));
+         out.write("</td></tr>");
+            
          // output a padding row
          out.write("<tr><td height='10'></td></tr>");
-         
+            
          if (editor.getAddingNewItem())
          {
-            out.write("<tr><td colspan='2'>");
+            // TODO: remove the hard coded style - need to change the space selector to use div and not span
+            out.write("<tr><td colspan='2' style='background-color: #eeeeee; border: 1px dashed #cccccc; padding: 6px;'>");
          }
          else
          {
             out.write("<tr><td colspan='2'><input type='submit' value='");
-            out.write(Application.getMessage(context, MSG_ADD_NEW));
+            out.write(Application.getMessage(context, MSG_SELECT_BUTTON));
             out.write("' onclick=\"");
-            out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_ADD_NEW)));
+            out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_SELECT)));
             out.write("\"/></td></tr>");
          
             // output a padding row
@@ -151,6 +151,9 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          ResponseWriter out = context.getResponseWriter();
          UIMultiValueEditor editor = (UIMultiValueEditor)component;
          
+         // get hold of the node service
+         NodeService nodeService = Repository.getServiceRegistry(context).getNodeService();
+         
          if (editor.getAddingNewItem())
          {
             out.write("</td></tr>");
@@ -158,13 +161,44 @@ public class MultiValueListEditorRenderer extends BaseRenderer
             // output a padding row
             out.write("<tr><td height='10'></td></tr>");
             
-            out.write("<tr><td colspan='2'><input type='submit' value='");
-            out.write(Application.getMessage(context, MSG_ADD));
-            out.write("' onclick=\"");
-            out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_ADD)));
-            out.write("\"/></td></tr>");
+            // show the add to list button but only if something has been selected
+            if (editor.getLastItemAdded() != null)
+            {
+               out.write("<tr><td colspan='2'><input type='submit' value='");
+               out.write(Application.getMessage(context, MSG_ADD_TO_LIST_BUTTON));
+               out.write("' onclick=\"");
+               out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_ADD)));
+               out.write("\"/></td></tr>");
+            
+               // output a padding row
+               out.write("<tr><td height='10'></td></tr>");
+            }
          }
          
+         // output a padding row
+         out.write("<tr><td>");
+            
+         // TODO: make this generic
+         out.write(Application.getMessage(context, "selected_categories"));
+         out.write(":</td></tr>");
+         
+         // show the current items
+         List currentItems = (List)editor.getValue();
+         if (currentItems != null && currentItems.size() > 0)
+         {
+            for (int x = 0; x < currentItems.size(); x++)
+            {  
+               renderExistingItem(context, component, out, nodeService, x, currentItems.get(x));
+            }
+         }
+         else
+         {
+            // output a padding row
+            out.write("<tr><td>&lt;");
+            out.write(Application.getMessage(context, "none"));
+            out.write("&gt;</td></tr>");
+         }
+            
          // close table
          out.write("</table>");
       }

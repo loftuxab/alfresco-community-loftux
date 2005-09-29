@@ -428,6 +428,14 @@
          <value>#{ActionService}</value>
       </managed-property>
       <managed-property>
+         <property-name>dictionaryService</property-name>
+         <value>#{DictionaryService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>mimetypeService</property-name>
+         <value>#{MimetypeService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>rulesBean</property-name>
          <value>#{RulesBean}</value>
       </managed-property>
@@ -459,6 +467,14 @@
       <managed-property>
          <property-name>actionService</property-name>
          <value>#{ActionService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>dictionaryService</property-name>
+         <value>#{DictionaryService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>mimetypeService</property-name>
+         <value>#{MimetypeService}</value>
       </managed-property>
    </managed-bean>
    

@@ -33,6 +33,9 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -73,7 +76,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    protected List<SelectItem> contentTypes;
    protected List<SelectItem> objectTypes;
    protected ContentService contentService;
-   
+   protected DictionaryService dictionaryService;
    
    /**
     * Save the specified content using the currently set wizard attributes
@@ -293,6 +296,16 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    {
       this.contentService = contentService;
    }
+   
+   /**
+    * Sets the dictionary service
+    * 
+    * @param dictionaryService  the dictionary service
+    */
+   public void setDictionaryService(DictionaryService dictionaryService)
+   {
+      this.dictionaryService = dictionaryService;
+   }
 
    /**
     * @return Returns the name of the file
@@ -459,14 +472,28 @@ public abstract class BaseContentWizard extends AbstractWizardBean
                {
                   QName idQName = Repository.resolveToQName(child.getAttribute("id"));
                   
-                  String label = child.getAttribute("descriptionMsgId");
-                  if (label != null)
+                  // look for a client localized string
+                  String label = null;
+                  String msgId = child.getAttribute("descriptionMsgId");
+                  if (msgId != null)
                   {
-                     label = Application.getMessage(context, label);
+                     label = Application.getMessage(context, msgId);
                   }
-                  else
+                  
+                  // if there wasn't an externalized string look for one in the config
+                  if (label == null)
                   {
                      label = child.getAttribute("description");
+                  }
+
+                  // if there wasn't a client based label try and get it from the dictionary
+                  if (label == null)
+                  {
+                     TypeDefinition typeDef = this.dictionaryService.getType(idQName);
+                     if (typeDef != null)
+                     {
+                        label = typeDef.getTitle();
+                     }
                   }
                   
                   this.objectTypes.add(new SelectItem(idQName.toString(), label));

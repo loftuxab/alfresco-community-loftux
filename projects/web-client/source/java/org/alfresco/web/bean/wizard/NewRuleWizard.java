@@ -43,7 +43,8 @@ import org.alfresco.repo.action.evaluator.IsSubTypeEvaluator;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
@@ -104,7 +105,6 @@ public class NewRuleWizard extends BaseActionWizard
    private boolean runInBackground;
    private boolean applyToSubSpaces;
 
-   private DictionaryService dictionaryService;
    private RuleService ruleService;
    private RulesBean rulesBean;
    
@@ -641,6 +641,9 @@ public class NewRuleWizard extends BaseActionWizard
          // add the populated currentActionProperties to the list
          this.allActionsProperties.add(this.currentActionProperties);
       }
+      
+      // reset the current action
+      this.action = null;
    }
 
    /**
@@ -824,12 +827,38 @@ public class NewRuleWizard extends BaseActionWizard
          {
             ConfigElement typesCfg = wizardCfg.getConfigElement("types");
             if (typesCfg != null)
-            {               
+            {
+               FacesContext context = FacesContext.getCurrentInstance();
                this.modelTypes = new ArrayList<SelectItem>();
                for (ConfigElement child : typesCfg.getChildren())
                {
                   QName idQName = Repository.resolveToQName(child.getAttribute("id"));
-                  this.modelTypes.add(new SelectItem(idQName.toString(), child.getAttribute("description")));
+
+                  // look for a client localized string
+                  String label = null;
+                  String msgId = child.getAttribute("descriptionMsgId");
+                  if (msgId != null)
+                  {
+                     label = Application.getMessage(context, msgId);
+                  }
+                  
+                  // if there wasn't an externalized string look for one in the config
+                  if (label == null)
+                  {
+                     label = child.getAttribute("description");
+                  }
+
+                  // if there wasn't a client based label try and get it from the dictionary
+                  if (label == null)
+                  {
+                     TypeDefinition typeDef = this.dictionaryService.getType(idQName);
+                     if (typeDef != null)
+                     {
+                        label = typeDef.getTitle();
+                     }
+                  }
+                  
+                  this.modelTypes.add(new SelectItem(idQName.toString(), label));
                }
                
                // make sure the list is sorted by the label

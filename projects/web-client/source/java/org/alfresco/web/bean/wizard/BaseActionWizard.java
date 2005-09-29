@@ -39,8 +39,12 @@ import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.action.executer.MoveActionExecuter;
 import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
 import org.alfresco.repo.action.executer.TransformActionExecuter;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.ActionDefinition;
 import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -85,6 +89,8 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    protected boolean multiActionMode = false;
    protected String action;
    protected ActionService actionService;
+   protected DictionaryService dictionaryService;
+   protected MimetypeService mimetypeService;
    protected List<SelectItem> actions;
    protected List<SelectItem> transformers;
    protected List<SelectItem> imageTransformers;
@@ -448,6 +454,26 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    {
 	  this.actionService = actionService;
    }
+   
+   /**
+    * Sets the dictionary service
+    * 
+    * @param dictionaryService  the dictionary service
+    */
+   public void setDictionaryService(DictionaryService dictionaryService)
+   {
+      this.dictionaryService = dictionaryService;
+   }
+   
+   /**
+    * Sets the mimetype service
+    * 
+    * @param mimetypeService  The mimetype service
+    */
+   public void setMimetypeService(MimetypeService mimetypeService)
+   {
+      this.mimetypeService = mimetypeService;
+   }
 
    /**
     * @return Returns the list of selectable actions
@@ -513,12 +539,35 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          {
             ConfigElement transformersCfg = wizardCfg.getConfigElement("transformers");
             if (transformersCfg != null)
-            {               
+            {
+               FacesContext context = FacesContext.getCurrentInstance();
+               Map<String, String> mimeTypes = this.mimetypeService.getDisplaysByMimetype();
                this.transformers = new ArrayList<SelectItem>();
                for (ConfigElement child : transformersCfg.getChildren())
                {
-                  this.transformers.add(new SelectItem(child.getAttribute("id"), 
-                        child.getAttribute("description")));
+                  String id = child.getAttribute("id");
+                  
+                  // look for a client localized string
+                  String label = null;
+                  String msgId = child.getAttribute("descriptionMsgId");
+                  if (msgId != null)
+                  {
+                     label = Application.getMessage(context, msgId);
+                  }
+                  
+                  // if there wasn't an externalized string look for one in the config
+                  if (label == null)
+                  {
+                     label = child.getAttribute("description");
+                  }
+
+                  // if there wasn't a client based label get it from the mime type service
+                  if (label == null)
+                  {
+                     label = mimeTypes.get(id);
+                  }
+                  
+                  this.transformers.add(new SelectItem(id, label));
                }
                
                // make sure the list is sorted by the label
@@ -555,12 +604,35 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          {
             ConfigElement transformersCfg = wizardCfg.getConfigElement("image-transformers");
             if (transformersCfg != null)
-            {               
+            {
+               FacesContext context = FacesContext.getCurrentInstance();
+               Map<String, String> mimeTypes = this.mimetypeService.getDisplaysByMimetype();
                this.imageTransformers = new ArrayList<SelectItem>();
                for (ConfigElement child : transformersCfg.getChildren())
                {
-                  this.imageTransformers.add(new SelectItem(child.getAttribute("id"), 
-                        child.getAttribute("description")));
+                  String id = child.getAttribute("id");
+                  
+                  // look for a client localized string
+                  String label = null;
+                  String msgId = child.getAttribute("descriptionMsgId");
+                  if (msgId != null)
+                  {
+                     label = Application.getMessage(context, msgId);
+                  }
+                  
+                  // if there wasn't an externalized string look for one in the config
+                  if (label == null)
+                  {
+                     label = child.getAttribute("description");
+                  }
+
+                  // if there wasn't a client based label get it from the mime type service
+                  if (label == null)
+                  {
+                     label = mimeTypes.get(id);
+                  }
+
+                  this.imageTransformers.add(new SelectItem(id, label));
                }
                
                // make sure the list is sorted by the label
@@ -597,12 +669,38 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          {
             ConfigElement aspectsCfg = wizardCfg.getConfigElement("aspects");
             if (aspectsCfg != null)
-            {               
+            {
+               FacesContext context = FacesContext.getCurrentInstance();
                this.aspects = new ArrayList<SelectItem>();
                for (ConfigElement child : aspectsCfg.getChildren())
                {
                   QName idQName = Repository.resolveToQName(child.getAttribute("id"));
-                  this.aspects.add(new SelectItem(idQName.toString(), child.getAttribute("description")));
+
+                  // look for a client localized string
+                  String label = null;
+                  String msgId = child.getAttribute("descriptionMsgId");
+                  if (msgId != null)
+                  {
+                     label = Application.getMessage(context, msgId);
+                  }
+                  
+                  // if there wasn't an externalized string look for one in the config
+                  if (label == null)
+                  {
+                     label = child.getAttribute("description");
+                  }
+
+                  // if there wasn't a client based label try and get it from the dictionary
+                  if (label == null)
+                  {
+                     AspectDefinition aspectDef = this.dictionaryService.getAspect(idQName);
+                     if (aspectDef != null)
+                     {
+                        label = aspectDef.getTitle();
+                     }
+                  }
+                  
+                  this.aspects.add(new SelectItem(idQName.toString(), label));
                }
                
                // make sure the list is sorted by the label

@@ -143,39 +143,39 @@
    
    <config evaluator="string-compare" condition="Action Wizards">
       <types>
-         <type id="folder" description="Space"/>
-         <type id="content" description="Content"/>
+         <type id="folder" descriptionMsgId="space"/>
+         <type id="content"/>
       </types>
       <aspects>
-         <aspect id="generalclassifiable" description="Classifiable"/>
-         <aspect id="complianceable" description="Complianceable"/>
-         <aspect id="dublincore" description="Dublin Core"/>
-         <aspect id="effectivity" description="Effectivity"/>
-         <aspect id="summarizable" description="Summarizable"/>
-         <aspect id="versionable" description="Versionable"/>
-         <aspect id="templatable" description="Templatable"/>
-         <aspect id="translatable" description="Translatable"/>
-         <aspect id="localizable" description="Localizable"/>
+         <aspect id="generalclassifiable" descriptionMsgId="classifiable"/>
+         <aspect id="complianceable"/>
+         <aspect id="dublincore"/>
+         <aspect id="effectivity"/>
+         <aspect id="summarizable"/>
+         <aspect id="versionable"/>
+         <aspect id="templatable"/>
+         <aspect id="translatable"/>
+         <aspect id="localizable"/>
       </aspects>
       <transformers>
-         <transformer id="text/html" description="HTML" />
-         <transformer id="application/pdf" description="PDF" />
-         <transformer id="text/plain" description="Text" />
-         <transformer id="text/xml" description="XML" />
-         <transformer id="application/x-shockwave-flash" description="Flash" />
-         <transformer id="image/gif" description="GIF" />
-         <transformer id="image/jpeg" description="JPEG" />
+         <transformer id="text/html"/>
+         <transformer id="application/pdf"/>
+         <transformer id="text/plain"/>
+         <transformer id="text/xml"/>
+         <transformer id="application/x-shockwave-flash"/>
+         <transformer id="image/gif"/>
+         <transformer id="image/jpeg"/>
       </transformers>
       <image-transformers>
-         <transformer id="image/gif" description="GIF" />
-         <transformer id="image/jpeg" description="JPG" />
-         <transformer id="image/png" description="PNG" />
+         <transformer id="image/gif"/>
+         <transformer id="image/jpeg"/>
+         <transformer id="image/png"/>
       </image-transformers>
    </config>
    
    <config evaluator="string-compare" condition="Custom Content Types">
       <content-types>
-         <!-- <type id="my:content-type" descriptionMsgId="my_content_type"/> -->
+         <!-- <type id="my:content-type"/> -->
       </content-types>
    </config>
    

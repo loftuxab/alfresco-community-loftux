@@ -48,12 +48,14 @@ public class UIMultiValueEditor extends UIInput
    public final static String ACTION_SEPARATOR = ";";
    public final static int ACTION_NONE   = -1;
    public final static int ACTION_REMOVE = 0;
-   public final static int ACTION_ADD_NEW = 1;
+   public final static int ACTION_SELECT = 1;
    public final static int ACTION_ADD = 2;
    
    private Boolean addingNewItem = Boolean.FALSE;
    private Boolean readOnly;
    private Object lastItemAdded;
+   private String selectItemMsg;
+   private String selectedItemsMsg;
    
    // ------------------------------------------------------------------------------
    // Component implementation
@@ -85,6 +87,8 @@ public class UIMultiValueEditor extends UIInput
       this.lastItemAdded = values[1];
       this.readOnly = (Boolean)values[2];
       this.addingNewItem = (Boolean)values[3];
+      this.selectItemMsg = (String)values[4];
+      this.selectedItemsMsg = (String)values[5];
    }
    
    /**
@@ -98,6 +102,8 @@ public class UIMultiValueEditor extends UIInput
       values[1] = this.lastItemAdded;
       values[2] = this.readOnly;
       values[3] = this.addingNewItem;
+      values[4] = this.selectItemMsg;
+      values[5] = this.selectedItemsMsg;
       return (values);
    }
 
@@ -180,7 +186,7 @@ public class UIMultiValueEditor extends UIInput
          
          switch (assocEvent.Action)
          {
-            case ACTION_ADD_NEW:
+            case ACTION_SELECT:
             {
                this.addingNewItem = Boolean.TRUE;
                break;
