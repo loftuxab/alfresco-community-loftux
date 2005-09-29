@@ -31,7 +31,7 @@ public interface ContentModel
     
     // base type constants
     static final QName TYPE_BASE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "base");
-    static final QName ASPECT_REFERENCABLE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "referencable");
+    static final QName ASPECT_REFERENCEABLE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "referenceable");
     static final QName PROP_STORE_PROTOCOL = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "store-protocol");
     static final QName PROP_STORE_IDENTIFIER = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "store-identifier");
     static final QName PROP_NODE_UUID = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-uuid");

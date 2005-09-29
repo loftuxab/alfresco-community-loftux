@@ -50,7 +50,7 @@ import org.alfresco.service.namespace.QName;
             throw new DictionaryException("Java class of data type " + name.toPrefixString() + " must be specified");
         }
         
-        // Ensure java class is valid and referencable
+        // Ensure java class is valid and referenceable
         try
         {
             Class.forName(javaClass);

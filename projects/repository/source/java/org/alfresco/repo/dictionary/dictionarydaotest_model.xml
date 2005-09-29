@@ -46,7 +46,7 @@
                   <many>true</many>
                </source>
                <target>
-                  <class>test:referencable</class>
+                  <class>test:referenceable</class>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
@@ -57,7 +57,7 @@
                   <many>true</many>
                </source>
                <target>
-                  <class>test:referencable</class>
+                  <class>test:referenceable</class>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>
@@ -67,7 +67,7 @@
          </associations>
          
          <mandatory-aspects>
-            <aspect>test:referencable</aspect>
+            <aspect>test:referenceable</aspect>
          </mandatory-aspects>
       </type>
    
@@ -86,7 +86,7 @@
          <associations>
             <child-association name="test:childassoc2">
                <target>
-                  <class>test:referencable</class>
+                  <class>test:referenceable</class>
                </target>
                <child-name>fred</child-name>
                <duplicate>true</duplicate>
@@ -117,9 +117,9 @@
    </types>
    
    <aspects>
-      <aspect name="test:referencable">
-         <title>Referencable</title>
-         <description>The referencable aspect</description>
+      <aspect name="test:referenceable">
+         <title>Referenceable</title>
+         <description>The referenceable aspect</description>
          <parent></parent>
          
          <properties>

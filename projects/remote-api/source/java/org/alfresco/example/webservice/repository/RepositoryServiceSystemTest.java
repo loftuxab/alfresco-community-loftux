@@ -389,7 +389,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         // check the first aspect
         ClassDefinition aspect1 = aspects[0];
         assertEquals("Aspect1 name is incorrect",
-                "{http://www.alfresco.org/model/system/1.0}referencable",
+                "{http://www.alfresco.org/model/system/1.0}referenceable",
                 aspect1.getName());
         assertTrue("Aspect1 should be an aspect", aspect1.isIsAspect());
         assertNotNull("Aspect1 should have properties", aspect1.getProperties());

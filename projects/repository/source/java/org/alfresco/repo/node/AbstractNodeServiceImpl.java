@@ -463,7 +463,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     
     /**
      * Remove all properties used by the
-     * {@link ContentModel#ASPECT_REFERENCABLE referencable aspect}.
+     * {@link ContentModel#ASPECT_REFERENCEABLE referencable aspect}.
      * <p>
      * This method can be used to ensure that the information already stored
      * by the node key is not duplicated by the properties.
@@ -479,7 +479,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     
     /**
      * Adds all properties used by the
-     * {@link ContentModel#ASPECT_REFERENCABLE referencable aspect}.
+     * {@link ContentModel#ASPECT_REFERENCEABLE referencable aspect}.
      * <p>
      * This method can be used to ensure that the values used by the aspect
      * are present as node properties.

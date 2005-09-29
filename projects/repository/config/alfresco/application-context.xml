@@ -894,8 +894,8 @@
         </property>
     </bean>
 
-    <!-- Referencable -->
-    <bean id="referencableAspect" class="org.alfresco.repo.node.ReferencableAspect" init-method="init">
+    <!-- Referenceable -->
+    <bean id="referenceableAspect" class="org.alfresco.repo.node.ReferenceableAspect" init-method="init">
         <property name="policyComponent">
             <ref bean="policyComponent" />
         </property>

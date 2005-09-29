@@ -18,7 +18,7 @@
 		<type name="sys:base">
 			<title>Base</title>
 			<mandatory-aspects>
-				<aspect>sys:referencable</aspect>
+				<aspect>sys:referenceable</aspect>
 			</mandatory-aspects>
 		</type>
 
@@ -63,8 +63,8 @@
 		</aspect>
 
 		<!-- aspect to store the fundamental node identifiers -->
-		<aspect name="sys:referencable">
-			<title>Referencable</title>
+		<aspect name="sys:referenceable">
+			<title>Referenceable</title>
 			<properties>
 				<property name="sys:store-protocol">
 					<type>d:text</type>

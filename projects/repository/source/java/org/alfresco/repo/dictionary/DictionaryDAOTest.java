@@ -84,25 +84,25 @@ public class DictionaryDAOTest extends TestCase
         QName base = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "base");
         QName file = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "file");
         QName folder = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "folder");
-        QName referencable = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "referencable");
+        QName referenceable = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "referenceable");
 
         // Test invalid args
         try
         {
-            service.isSubClass(invalid, referencable);
+            service.isSubClass(invalid, referenceable);
             fail("Failed to catch invalid class parameter");
         }
         catch(InvalidTypeException e) {}
 
         try
         {
-            service.isSubClass(referencable, invalid);
+            service.isSubClass(referenceable, invalid);
             fail("Failed to catch invalid class parameter");
         }
         catch(InvalidTypeException e) {}
 
         // Test various flavours of subclassof
-        boolean test1 = service.isSubClass(file, referencable);  // type vs aspect
+        boolean test1 = service.isSubClass(file, referenceable);  // type vs aspect
         assertFalse(test1);
         boolean test2 = service.isSubClass(file, folder);   // seperate hierarchies
         assertFalse(test2);

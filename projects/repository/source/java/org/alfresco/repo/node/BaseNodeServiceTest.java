@@ -795,7 +795,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     }
     
     /**
-     * Checks that the {@link ContentModel#ASPECT_REFERENCABLE referencable} properties
+     * Checks that the {@link ContentModel#ASPECT_REFERENCEABLE referencable} properties
      * are present
      */
     public void testGetReferencableProperties() throws Exception
