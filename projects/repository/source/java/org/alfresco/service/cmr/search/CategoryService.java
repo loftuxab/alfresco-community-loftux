@@ -29,6 +29,10 @@ import org.alfresco.service.namespace.QName;
  * The service for querying and creating categories.
  * All other management can be carried out using the node service.
  * 
+ * Classification - the groupings of categories. There is a one-to-one mapping with aspects. For example, Region. 
+ * Root Category - the top level categories in a classification. For example, Northern Europe
+ * Category - any other category below a root category
+ * 
  * @author Andy Hind
  *
  */
@@ -36,14 +40,16 @@ public interface CategoryService
 {
     /**
      * Enumeration for navigation control.
-     * MEMBERS - get only category members
-     * SUB_CATEGORIES - get sub categories only
+     * 
+     * MEMBERS - get only category members (the things that have been classified in a category, not the sub categories)
+     * SUB_CATEGORIES - get sub categories only, not the things that hyave been classified.
      * ALL - get both of the above
      */
     public enum Mode {MEMBERS, SUB_CATEGORIES, ALL};
     
     /**
-     * Depth from which to get nodes
+     * Depth from which to get nodes.
+     * 
      * IMMEDIATE - only immediate sub categories or members
      * ANY - find subcategories or members at any level 
      */
@@ -57,38 +63,83 @@ public interface CategoryService
      * @param depth - the enumeration depth for what level to recover
      * @return a collection of all the nodes found identified by their ChildAssocRef's
      */
-    Collection<ChildAssociationRef> getChildren(NodeRef categoryRef, Mode mode, Depth depth );
+    public Collection<ChildAssociationRef> getChildren(NodeRef categoryRef, Mode mode, Depth depth );
 
     /**
-     * Get a list of all the categories appropriate for a given property
+     * Get a list of all the categories appropriate for a given property.
+     * The full list of categories that may be assigned for this aspect.
      * 
      * @param aspectQName
      * @param depth - the enumeration depth for what level to recover
      * @return a collection of all the nodes found identified by their ChildAssocRef's
      */
-    Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName aspectQName, Depth depth );
+    public Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName aspectQName, Depth depth );
 
     /**
-     * Get all the root categories
+     * Get all the classification entries
      * 
      * @return
      */
-    Collection<ChildAssociationRef> getRootCategories(StoreRef storeRef);
+    public Collection<ChildAssociationRef> getClassifications(StoreRef storeRef);
 
+    /**
+     * Get the root categories for an aspect/classification
+     * 
+     * @param storeRef
+     * @param aspectName
+     * @return
+     */
+    public Collection<ChildAssociationRef> getRootCategories(StoreRef storeRef, QName aspectName);
+    
     /**
      * Get all the types that represent categories
      * 
      * @return
      */
-    Collection<QName> getCategoryAspects();
+    public Collection<QName> getClassificationAspects();
 
     /**
-     * Create a new category
-     * This will extend the category types in the data dictionary
-     * All it needs is the type name and the attribute to use for categorisation
+     * Create a new category.
      * 
-     * @param typeName
+     * This will extend the category types in the data dictionary
+     * All it needs is the type name and the attribute in which to store noderefs to categories.
+     * 
+     * @param aspectName
      * @param attributeName
      */
-    NodeRef newCategory(QName typeName, String attributeName);
+    public NodeRef createClassifiction(StoreRef storeRef, QName aspectName, String attributeName);
+    
+    /**
+     * Create a new root category in the given classification
+     * 
+     * @param storeRef
+     * @param aspectName
+     * @param name
+     * @return
+     */
+    public NodeRef createRootCategory(StoreRef storeRef, QName aspectName, String name);
+    
+    /**
+     *  Create a new category.
+     * 
+     * @param parent
+     * @param name
+     * @return
+     */
+    public NodeRef createCategory(NodeRef parent, String name);
+    
+    /**
+     * Delete a classification
+     * 
+     * @param storeRef
+     * @param aspectName
+     */
+    public void deleteClassification(StoreRef storeRef, QName aspectName);
+    
+    /**
+     * Delete a category
+     * 
+     * @param nodeRef
+     */
+    public void deleteCategory(NodeRef nodeRef);
 }

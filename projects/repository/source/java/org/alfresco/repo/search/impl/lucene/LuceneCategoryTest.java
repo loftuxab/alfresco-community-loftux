@@ -582,7 +582,7 @@ public class LuceneCategoryTest extends TestCase
         assertEquals(3, result.size());
         
         
-        result = impl.getRootCategories(rootNodeRef.getStoreRef());
+        result = impl.getClassifications(rootNodeRef.getStoreRef());
         assertEquals(4, result.size());
         
         
@@ -590,7 +590,7 @@ public class LuceneCategoryTest extends TestCase
         assertEquals(2, result.size());
       
         
-        Collection<QName> aspects = impl.getCategoryAspects();
+        Collection<QName> aspects = impl.getClassificationAspects();
         assertEquals(6, aspects.size());    
        
         tx.rollback();
@@ -613,9 +613,45 @@ public class LuceneCategoryTest extends TestCase
         tx.begin();
         buildBaseIndex();
         assertEquals(1, categoryService.getChildren(catACBase , CategoryService.Mode.MEMBERS, CategoryService.Depth.IMMEDIATE).size());
-        assertEquals(4, categoryService.getRootCategories(rootNodeRef.getStoreRef()).size());
+        assertEquals(4, categoryService.getClassifications(rootNodeRef.getStoreRef()).size());
         assertEquals(2, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.IMMEDIATE).size());
-        assertEquals(6, categoryService.getCategoryAspects().size());
+        assertEquals(3, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.ANY).size());
+        assertEquals(6, categoryService.getClassificationAspects().size());
+        assertEquals(2, categoryService.getRootCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass")).size());
+
+        NodeRef newRoot = categoryService.createRootCategory(rootNodeRef.getStoreRef(),QName.createQName(TEST_NAMESPACE, "AssetClass"), "Fruit");
+        tx.commit();
+        tx = transactionService.getUserTransaction();
+        tx.begin();
+        assertEquals(3, categoryService.getRootCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass")).size());
+        assertEquals(3, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.IMMEDIATE).size());
+        assertEquals(4, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.ANY).size());
+     
+        NodeRef newCat = categoryService.createCategory(newRoot, "Banana");
+        tx.commit();
+        tx = transactionService.getUserTransaction();
+        tx.begin();
+        assertEquals(3, categoryService.getRootCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass")).size());
+        assertEquals(3, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.IMMEDIATE).size());
+        assertEquals(5, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.ANY).size());
+     
+        categoryService.deleteCategory(newCat);
+        tx.commit();
+        tx = transactionService.getUserTransaction();
+        tx.begin();
+        assertEquals(3, categoryService.getRootCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass")).size());
+        assertEquals(3, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.IMMEDIATE).size());
+        assertEquals(4, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.ANY).size());
+     
+        categoryService.deleteCategory(newRoot);
+        tx.commit();
+        tx = transactionService.getUserTransaction();
+        tx.begin();
+        assertEquals(2, categoryService.getRootCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass")).size());
+        assertEquals(2, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.IMMEDIATE).size());
+        assertEquals(3, categoryService.getCategories(rootNodeRef.getStoreRef(), QName.createQName(TEST_NAMESPACE, "AssetClass"), CategoryService.Depth.ANY).size());
+     
+        
         tx.rollback();
     }
     

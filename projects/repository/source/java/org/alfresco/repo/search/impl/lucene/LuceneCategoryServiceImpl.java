@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -188,7 +189,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
     public Collection<ChildAssociationRef> getCategories(StoreRef storeRef, QName aspectQName, Depth depth)
     {
         Collection<ChildAssociationRef> assocs = new ArrayList<ChildAssociationRef>();
-        Set<NodeRef> nodeRefs = getCategoryRootNode(storeRef, aspectQName);
+        Set<NodeRef> nodeRefs = getClassificationNodes(storeRef, aspectQName);
         for (NodeRef nodeRef : nodeRefs)
         {
             assocs.addAll(getChildren(nodeRef, Mode.SUB_CATEGORIES, depth));
@@ -196,7 +197,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         return assocs;
     }
 
-    private Set<NodeRef> getCategoryRootNode(StoreRef storeRef, QName qname)
+    private Set<NodeRef> getClassificationNodes(StoreRef storeRef, QName qname)
     {
         ResultSet resultSet = null;
         try
@@ -221,7 +222,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         }
     }
 
-    public Collection<ChildAssociationRef> getRootCategories(StoreRef storeRef)
+    public Collection<ChildAssociationRef> getClassifications(StoreRef storeRef)
     {
         ResultSet resultSet = null;
         try
@@ -238,7 +239,7 @@ public class LuceneCategoryServiceImpl implements CategoryService
         }
     }
 
-    public Collection<QName> getCategoryAspects()
+    public Collection<QName> getClassificationAspects()
     {
         List<QName> list = new ArrayList<QName>();
         for (QName aspect : dictionaryService.getAllAspects())
@@ -251,10 +252,58 @@ public class LuceneCategoryServiceImpl implements CategoryService
         return list;
     }
 
-    public NodeRef newCategory(QName typeName, String attributeName)
+    public NodeRef createClassifiction(StoreRef storeRef, QName typeName, String attributeName)
     {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }
 
+    public Collection<ChildAssociationRef> getRootCategories(StoreRef storeRef, QName aspectName)
+    {
+        Collection<ChildAssociationRef> assocs = new ArrayList<ChildAssociationRef>();
+        Set<NodeRef> nodeRefs = getClassificationNodes(storeRef, aspectName);
+        for (NodeRef nodeRef : nodeRefs)
+        {
+            assocs.addAll(getChildren(nodeRef, Mode.SUB_CATEGORIES, Depth.IMMEDIATE));
+        }
+        return assocs;
+    }
+
+    public NodeRef createCategory(NodeRef parent, String name)
+    {
+        if(!nodeService.exists(parent))
+        {
+            throw new AlfrescoRuntimeException("Missing category?");
+        }
+        String uri = nodeService.getPrimaryParent(parent).getQName().getNamespaceURI();
+        NodeRef newCategory = nodeService.createNode(parent, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(uri, name), ContentModel.TYPE_CATEGORY).getChildRef();
+        nodeService.setProperty(newCategory, ContentModel.PROP_NAME, name);
+        return newCategory;
+    }
+
+    public NodeRef createRootCategory(StoreRef storeRef, QName aspectName, String name)
+    {
+        Set<NodeRef> nodeRefs = getClassificationNodes(storeRef, aspectName);
+        if(nodeRefs.size() == 0)
+        {
+            throw new AlfrescoRuntimeException("Missing classification: "+aspectName);
+        }
+        NodeRef parent = nodeRefs.iterator().next();
+        return createCategory(parent, name);
+       
+    }
+
+    public void deleteCategory(NodeRef nodeRef)
+    {
+        nodeService.deleteNode(nodeRef);
+    }
+
+    public void deleteClassification(StoreRef storeRef, QName aspectName)
+    {
+        throw new UnsupportedOperationException();
+    }
+    
+    
+
+    
+    
 }

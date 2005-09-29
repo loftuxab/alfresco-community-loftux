@@ -118,7 +118,7 @@ public class ClassificationWebService extends AbstractWebService implements
                         {
                             List<Classification> classifications = new ArrayList<Classification>();
                             
-                            Collection<QName> categoryAspects = ClassificationWebService.this.categoryService.getCategoryAspects();
+                            Collection<QName> categoryAspects = ClassificationWebService.this.categoryService.getClassificationAspects();
                             for (QName aspect : categoryAspects)
                             {
                                 // Get the title of the cateogry
