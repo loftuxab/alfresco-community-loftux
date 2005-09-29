@@ -24,6 +24,7 @@ import java.nio.channels.WritableByteChannel;
 
 import org.alfresco.repo.content.AbstractContentReadWriteTest;
 import org.alfresco.repo.content.ContentStore;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -92,6 +93,37 @@ public class FileContentReadWriteTest extends AbstractContentReadWriteTest
         ContentReader reader = writer.getReader();
         ReadableByteChannel readChannel = reader.getReadableChannel();
         assertTrue("Channel not of correct callback type", readChannel instanceof FileChannel);
+    }
+    
+    public void testGetSafeContentReader() throws Exception
+    {
+        String template = "ABC {0}{1}";
+        String arg0 = "DEF";
+        String arg1 = "123";
+        String fakeContent = "ABC DEF123";
+        
+        // get a good reader
+        ContentReader reader = getReader();
+        
+        // remove the underlying content
+        file.delete();
+        assertFalse("File not missing", file.exists());
+        assertFalse("Reader doesn't show missing content", reader.exists());
+        
+        // make a safe reader
+        ContentReader safeReader = FileContentReader.getSafeContentReader(reader, template, arg0, arg1);
+        // check it
+        assertTrue("Fake content doesn't exist", safeReader.exists());
+        assertEquals("Fake content incorrect", fakeContent, safeReader.getContentString());
+        assertEquals("Fake mimetype incorrect", MimetypeMap.MIMETYPE_TEXT_PLAIN, safeReader.getMimetype());
+        assertEquals("Fake encoding incorrect", "UTF-8", safeReader.getEncoding());
+        
+        // now repeat with a null reader
+        reader = null;
+        safeReader = FileContentReader.getSafeContentReader(reader, template, arg0, arg1);
+        // check it
+        assertTrue("Fake content doesn't exist", safeReader.exists());
+        assertEquals("Fake content incorrect", fakeContent, safeReader.getContentString());
     }
     
     /**

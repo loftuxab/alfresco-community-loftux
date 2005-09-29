@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.content;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -23,6 +24,7 @@ import javax.transaction.RollbackException;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.filestore.FileContentWriter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.ServiceRegistry;
@@ -42,6 +44,7 @@ import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 import org.alfresco.util.PropertyMap;
+import org.alfresco.util.TempFileProvider;
 
 /**
  * @see org.alfresco.repo.content.RoutingContentService
@@ -183,6 +186,37 @@ public class RoutingContentServiceTest extends BaseSpringTest
         // get the reader
         ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
         assertNull("Reader must be null if the content URL is null", reader);
+    }
+    
+    /**
+     * Checks what happens when the physical content disappears
+     */
+    public void testMissingContent() throws Exception
+    {
+        File tempFile = TempFileProvider.createTempFile(getName(), ".txt");
+        
+        ContentWriter writer = new FileContentWriter(tempFile);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("What about the others?  Buckwheats!");
+        // check
+        assertTrue("File does not exist", tempFile.exists());
+        assertTrue("File not written to", tempFile.length() > 0);
+        
+        // update the node with this new info 
+        ContentData contentData = writer.getContentData();
+        nodeService.setProperty(contentNodeRef, ContentModel.PROP_CONTENT, contentData);
+        
+        // delete the content
+        tempFile.delete();
+        assertFalse("File not deleted", tempFile.exists());
+        
+        // check the indexing doesn't spank everthing
+        setComplete();
+        endTransaction();
+        
+        // now attempt to get the reader for the node
+        ContentReader reader = contentService.getReader(contentNodeRef, ContentModel.PROP_CONTENT);
     }
 	
 	/**

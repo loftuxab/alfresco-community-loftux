@@ -27,10 +27,13 @@ import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
 import org.alfresco.filesys.server.filesys.NetworkFile;
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.RandomAccessContent;
+import org.alfresco.repo.content.filestore.FileContentReader;
 import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -222,11 +225,11 @@ public class ContentNetworkFile extends NetworkFile
         else
         {
             content = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
-            if (content == null)  // no content on node
-            {
-                // give it an empty file
-                content = contentService.getTempWriter();
-            }
+            // ensure that the content we are going to read is valid
+            content = FileContentReader.getSafeContentReader(
+                    (ContentReader) content,
+                    I18NUtil.getMessage("content.content_missing"),
+                    nodeRef, content);
         }
         // wrap the channel accessor, if required
         if (!(content instanceof RandomAccessContent))

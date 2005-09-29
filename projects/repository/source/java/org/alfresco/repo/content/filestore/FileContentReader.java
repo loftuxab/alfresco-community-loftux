@@ -21,14 +21,18 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentReader;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.RandomAccessContent;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentStreamListener;
+import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,6 +48,49 @@ public class FileContentReader extends AbstractContentReader implements RandomAc
     private static final Log logger = LogFactory.getLog(FileContentReader.class);
     
     private File file;
+    
+    /**
+     * Checks the existing reader provided and replaces it with a reader onto some
+     * fake content if required.  If the existing reader is invalid, an error message
+     * will be logged as well.
+     * <p>
+     * It is a convenience method that clients can use to cheaply get a reader that
+     * is valid, regardless of whether the initial reader is valid.
+     * 
+     * @param existingReader a potentially valid reader
+     * @param msgTemplate the template message that will used to format the final <i>fake</i> content
+     * @param args arguments to put into the <i>fake</i> content
+     * @return Returns a the existing reader or a new reader onto some generated text content
+     */
+    public static ContentReader getSafeContentReader(ContentReader existingReader, String msgTemplate, Object ... args)
+    {
+        ContentReader reader = existingReader;
+        if (existingReader == null || !existingReader.exists())
+        {
+            // the content was never written to the node or the underlying content is missing
+            String fakeContent = MessageFormat.format(msgTemplate, args);
+            
+            // log it
+            logger.error(fakeContent);
+            
+            // fake the content
+            File tempFile = TempFileProvider.createTempFile("getSafeContentReader_", ".txt");
+            ContentWriter writer = new FileContentWriter(tempFile);
+            writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            writer.setEncoding("UTF-8");
+            writer.putContent(fakeContent);
+            // grab the reader from the temp writer
+            reader = writer.getReader();
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Created safe content reader: \n" +
+                    "   existing reader: " + existingReader + "\n" +
+                    "   safe reader: " + reader);
+        }
+        return reader;
+    }
     
     /**
      * Constructor that builds a URL based on the absolute path of the file.

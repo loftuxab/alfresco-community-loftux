@@ -44,6 +44,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -78,6 +79,10 @@ import org.apache.lucene.search.TermQuery;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
+    private static final String NOT_INDEXED_NO_TRANSFORMATION = "nint";
+    private static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nift";
+    private static final String NOT_INDEXED_CONTENT_MISSING = "nicm";
+    
     private static Logger s_logger = Logger.getLogger(LuceneIndexerImpl.class);
 
     /**
@@ -1342,27 +1347,39 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         if (isContent)
                         {
                             ContentReader reader = contentService.getReader(nodeRef, propertyName);
-                            if (reader != null)
+                            if (reader != null && reader.exists())
                             {
                                 ContentWriter writer = contentService.getTempWriter();
                                 writer.setMimetype("text/plain");
-                                if (contentService.isTransformable(reader, writer))
+                                try
                                 {
-                                   try
-                                   {
-                                       contentService.transform(reader, writer);
-                                       doc.add(Field.Text("TEXT", new InputStreamReader(writer.getReader().getContentInputStream())));
-                                   }
-                                   catch (NoTransformerException e)
-                                   {
-                                       // if it does not convert we did not write
-                                       doc.add(Field.Text("TEXT", ""));
-                                   }
+                                    contentService.transform(reader, writer);
+                                    doc.add(Field.Text("TEXT", new InputStreamReader(writer.getReader().getContentInputStream())));
                                 }
-                                else
+                                catch (NoTransformerException e)
                                 {
-                                    doc.add(Field.Text("TEXT", ""));
+                                    // not indexed: no transformation
+                                    doc.add(Field.Text("TEXT", NOT_INDEXED_NO_TRANSFORMATION));
                                 }
+                                catch (ContentIOException e)
+                                {
+                                    // log it
+                                    s_logger.error("Not indexed: Transformation failed", e);
+                                    // not indexed: transformation failed
+                                    doc.add(Field.Text("TEXT", NOT_INDEXED_TRANSFORMATION_FAILED));
+                                }
+                            }
+                            else        // URL not present (null reader) or no content at the URL (file missing)
+                            {
+                                // log it
+                                s_logger.error(
+                                        "Not indexed: Content Missing \n" +
+                                        "   node: " + nodeRef + "\n" +
+                                        "   reader: " + reader + "\n" +
+                                        "   content exists: " + (reader == null ? " --- " : Boolean.toString(reader.exists()))
+                                        );
+                                // not indexed: content missing
+                                doc.add(Field.Text("TEXT", NOT_INDEXED_CONTENT_MISSING));
                             }
                         }
                         doc.add(new Field("@" + propertyName, strValue, store, index, tokenise));

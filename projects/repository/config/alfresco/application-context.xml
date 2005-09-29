@@ -78,6 +78,7 @@
     		<list>
     			<value>alfresco.messages.version-service</value>
     			<value>alfresco.messages.permissions-service</value>
+    			<value>alfresco.messages.content-service</value>
     		</list>
     	</property>
     </bean>

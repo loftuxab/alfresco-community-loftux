@@ -31,14 +31,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.filestore.FileContentReader;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.web.app.Application;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -136,9 +137,17 @@ public class DownloadContentServlet extends HttpServlet
          // get the content mimetype from the node properties
          ServiceRegistry serviceRegistry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
          NodeService nodeService = serviceRegistry.getNodeService();
-         ContentData contentData = (ContentData) nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
-         String mimetype = contentData.getMimetype();
+         ContentService contentService = serviceRegistry.getContentService();
+
+         // get the content reader
+         ContentReader reader = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
+         // ensure that it is safe to use
+         reader = FileContentReader.getSafeContentReader(
+                 reader,
+                 Application.getMessage(req.getSession(), "error_content_missing"),
+                 nodeRef, reader);
          
+         String mimetype = reader.getMimetype();
          // fall back if unable to resolve mimetype property
          if (mimetype == null || mimetype.length() == 0)
          {
@@ -160,8 +169,6 @@ public class DownloadContentServlet extends HttpServlet
          // get the content and stream directly to the response output stream
          // assuming the repo is capable of streaming in chunks, this should allow large files
          // to be streamed directly to the browser response stream.
-         ContentService contentService = serviceRegistry.getContentService();
-         ContentReader reader = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
          reader.getContent( res.getOutputStream() );
       }
       catch (Throwable err)
