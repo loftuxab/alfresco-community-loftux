@@ -44,8 +44,7 @@
          
          <cm:content>
             <cm:name>Real content</cm:name>
-            <cm:mimetype>text</cm:mimetype>
-            <cm:contentUrl>org/alfresco/repo/importer/importercomponent_testfile.txt</cm:contentUrl>
+            <cm:content>contentUrl=classpath:org/alfresco/repo/importer/importercomponent_testfile.txt|mimetype=text|size=|encoding=</cm:content>
          </cm:content>
 
       </cm:contains>
