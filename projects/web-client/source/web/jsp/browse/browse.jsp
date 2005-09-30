@@ -123,11 +123,9 @@
                                           <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                        </a:actionLink>
                                     </r:permissionEvaluator>
-                                    <%-- admin user only actions --%>
+                                    <%-- admin only actions --%>
                                     <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}" id="eval8">
-                                       <a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" actionListener="#{NewUserWizard.setupUsers}" id="link11" />
-                                       <a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" id="link12" />
-                                       <a:actionLink value="#{msg.category_management}" image="/images/icons/categories.gif" action="manageCategories" id="link13" />
+                                       <a:actionLink value="#{msg.admin_console}" image="/images/icons/admin_console.gif" action="adminConsole" id="link11" />
                                     </a:booleanEvaluator>
                                  </a:menu>
                               </td>
