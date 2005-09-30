@@ -102,7 +102,7 @@
                                     <td width="90%">
                                        <a:multiValueListEditor value="#{DocumentDetailsBean.categories}"
                                                                lastItemAdded="#{DocumentDetailsBean.addedCategory}"
-                                                               style="border: 1px dashed #cccccc; padding: 6px;">
+                                                               style="border: 1px dashed #cccccc; padding: 4px;">
                                           <r:categorySelector label="#{msg.select_category_prompt}" 
                                                               value="#{DocumentDetailsBean.addedCategory}"/>
                                        </a:multiValueListEditor>

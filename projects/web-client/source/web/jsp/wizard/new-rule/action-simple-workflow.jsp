@@ -172,7 +172,7 @@
                                                         label="#{msg.select_destination_prompt}" 
                                                         value="#{NewRuleWizard.actionProperties.approveFolder}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
-                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                                        style="border: 1px dashed #cccccc; padding: 4px;"/>
                                              </td>
                                           </tr>
                                        </table>
@@ -228,7 +228,7 @@
                                                                           label="#{msg.select_destination_prompt}" 
                                                                           value="#{NewRuleWizard.actionProperties.rejectFolder}"
                                                                           initialSelection="#{NavigationBean.currentNodeId}" 
-                                                                          style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                                                          style="border: 1px dashed #cccccc; padding: 4px;"/>
                                                                </td>
                                                             </tr>
                                                          </table>

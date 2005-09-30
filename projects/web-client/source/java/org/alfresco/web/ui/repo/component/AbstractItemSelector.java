@@ -49,13 +49,16 @@ public abstract class AbstractItemSelector extends UIInput
 {
    private static final String MSG_GO_UP = "go_up";
    private static final String MSG_OK = "ok";
+   private static final String MSG_CANCEL = "cancel";
 
+   private final static String OK_BUTTON = "_ok";
    protected final static String OPTION = "_option";
    
    protected final static int MODE_BEFORE_SELECTION = 0;
-   protected final static int MODE_PERFORM_SELECTION = 1;
-   protected final static int MODE_AFTER_SELECTION = 2;
-   protected final static int MODE_INITIAL_SELECTION = 3;
+   protected final static int MODE_INITIAL_SELECTION = 1;
+   protected final static int MODE_DRILLDOWN_SELECTION = 2;
+   protected final static int MODE_CONFIRM_SELECTION = 3;
+   protected final static int MODE_CANCEL_SELECTION = 4;
    
    /** label to be displayed before a space is selected */
    protected String label = null;
@@ -71,6 +74,7 @@ public abstract class AbstractItemSelector extends UIInput
    
    /** id of the initially selected item, if value is not set */
    protected String initialSelectionId = null;
+   
    
    // ------------------------------------------------------------------------------
    // Component Impl 
@@ -187,9 +191,9 @@ public abstract class AbstractItemSelector extends UIInput
          this.queueEvent(event);
       }
       
-      if (mode == MODE_AFTER_SELECTION)
+      if (mode == MODE_CONFIRM_SELECTION)
       {
-         // only bother to check the selection if the mode is set to END_SELECTION
+         // only bother to check the selection if the mode is set to MODE_AFTER_SELECTION
          // see if a selection has been submitted
          String selection = (String)requestMap.get(getClientId(context) + OPTION);
          if (selection != null && selection.length() != 0)
@@ -236,14 +240,14 @@ public abstract class AbstractItemSelector extends UIInput
       switch (this.mode)
       {
          case MODE_BEFORE_SELECTION:
-         case MODE_AFTER_SELECTION:
+         case MODE_CONFIRM_SELECTION:
+         case MODE_CANCEL_SELECTION:
          {
             UserTransaction tx = null;
             try
             {
                tx = Repository.getUserTransaction(context);
                tx.begin();
-               
                
                NodeRef submittedValue = (NodeRef)getSubmittedValue();
                if (submittedValue != null)
@@ -296,12 +300,14 @@ public abstract class AbstractItemSelector extends UIInput
                }
                buf.append(">");
                
-               int theMode = MODE_PERFORM_SELECTION;
+               // rendering as initial selection mode means the sibilings of the selected
+               // item are shown instead of the children on first click in.
+               int theMode = MODE_INITIAL_SELECTION;
+               
                // if we have an initial selection and no value set the initial one up
                if (value == null && this.getInitialSelection() != null)
                {
                   value = new NodeRef(Repository.getStoreRef(), this.getInitialSelection());
-                  theMode = MODE_INITIAL_SELECTION;
                }
                
                // field value is whether we are picking and the current or parent Id value
@@ -343,7 +349,7 @@ public abstract class AbstractItemSelector extends UIInput
             break;
          }
          
-         case MODE_PERFORM_SELECTION:
+         case MODE_DRILLDOWN_SELECTION:
          case MODE_INITIAL_SELECTION:
          {
             // show the picker list
@@ -391,6 +397,9 @@ public abstract class AbstractItemSelector extends UIInput
                   buf.append("</td></tr>");
                }
                
+               String okButtonId = clientId + OK_BUTTON;
+               boolean okButtonEnabled = false;
+               
                // display the children of the specified navigation node ID
                if (this.navigationId != null)
                {
@@ -407,9 +416,15 @@ public abstract class AbstractItemSelector extends UIInput
                      {
                         buf.append(" checked");
                         
+                        // if any radio buttons are checked, the OK button must start enabled
+                        okButtonEnabled = true;
+                        
                         // now remove the initial selection as we only need it the first time
                         this.initialSelectionId = null;
                      }
+                     buf.append(" onchange=\"javascript:document.getElementById('")
+                        .append(okButtonId)
+                        .append("').disabled=false;\"");
                      buf.append("/></td><td>");
                      
                      // get the name for the child (rather than association name)
@@ -434,6 +449,9 @@ public abstract class AbstractItemSelector extends UIInput
                      {
                         buf.append(" checked");
                         
+                        // if any radio buttons are checked, the OK button must start enabled
+                        okButtonEnabled = true;
+                        
                         // now remove the initial selection as we only need it the first time
                         this.initialSelectionId = null;
                      }
@@ -448,12 +466,24 @@ public abstract class AbstractItemSelector extends UIInput
                }
                
                // render OK button
-               String fieldValue = encodeFieldValues(MODE_AFTER_SELECTION, null);
+               String fieldValue = encodeFieldValues(MODE_CONFIRM_SELECTION, null);
                buf.append("<tr><td></td><td align=center>")
-                  .append("<input type='button' onclick=\"")
+                  .append("<input type='button' ")
+                  .append(okButtonEnabled == false ? "disabled" : "") 
+                  .append(" onclick=\"")
                   .append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue))
                   .append("\" value='")
                   .append(Application.getMessage(context, MSG_OK))
+                  .append("' id='")
+                  .append(okButtonId)
+                  .append("'>&nbsp;");
+               
+               // render Cancel button
+               fieldValue = encodeFieldValues(MODE_CANCEL_SELECTION, null);
+               buf.append("<input type='button' onclick=\"")
+                  .append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue))
+                  .append("\" value='")
+                  .append(Application.getMessage(context, MSG_CANCEL))
                   .append("'></td></tr>");
                
                buf.append("</table>");
@@ -603,7 +633,7 @@ public abstract class AbstractItemSelector extends UIInput
    protected String renderNodeLink(FacesContext context, String id, String name, StringBuilder buf)
    {
       buf.append("<a href='#' onclick=\"");
-      String fieldValue = encodeFieldValues(MODE_PERFORM_SELECTION, id);
+      String fieldValue = encodeFieldValues(MODE_DRILLDOWN_SELECTION, id);
       buf.append(Utils.generateFormSubmit(context, this, getHiddenFieldName(), fieldValue));
       buf.append('"');
       Map attrs = this.getAttributes();

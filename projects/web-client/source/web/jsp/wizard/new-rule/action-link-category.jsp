@@ -108,7 +108,7 @@
                                     <td width="90%">
                                        <r:categorySelector label="#{msg.select_category_prompt}" 
                                                         value="#{NewRuleWizard.actionProperties.category}" 
-                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
+                                                        style="border: 1px dashed #cccccc; padding: 4px;"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
