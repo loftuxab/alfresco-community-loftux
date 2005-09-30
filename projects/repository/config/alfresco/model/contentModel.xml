@@ -147,7 +147,7 @@
          <associations>
             <child-association name="cm:subcategories">
                <target>
-                  <class>sys:base</class>
+                  <class>cm:category</class>
                </target>
             </child-association>
          </associations>

@@ -229,9 +229,14 @@
          <value>
 				org.alfresco.service.cmr.search.CategoryService.getChildren=AFTER_ACL_NODE.sys:base.Read
                 org.alfresco.service.cmr.search.CategoryService.getCategories=AFTER_ACL_NODE.sys:base.Read
+                org.alfresco.service.cmr.search.CategoryService.getClassifications=AFTER_ACL_NODE.sys:base.Read
                 org.alfresco.service.cmr.search.CategoryService.getRootCategories=AFTER_ACL_NODE.sys:base.Read
-                org.alfresco.service.cmr.search.CategoryService.getCategoryAspects=ACL_ALLOW
-                org.alfresco.service.cmr.search.CategoryService.newCategory=ACL_ALLOW
+                org.alfresco.service.cmr.search.CategoryService.getClassificationAspects=ACL_ALLOW
+                org.alfresco.service.cmr.search.CategoryService.createClassifiction=ACL_ALLOW
+                org.alfresco.service.cmr.search.CategoryService.createRootCategory=ACL_ALLOW
+                org.alfresco.service.cmr.search.CategoryService.createCategory=ACL_ALLOW
+                org.alfresco.service.cmr.search.CategoryService.deleteClassification=ACL_ALLOW
+                org.alfresco.service.cmr.search.CategoryService.deleteCategory=ACL_ALLOW
          </value>
       </property>
    </bean>
