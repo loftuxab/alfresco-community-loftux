@@ -88,7 +88,12 @@ public abstract class AbstractContentAccessor implements ContentAccessor
     public String toString()
     {
         StringBuilder sb = new StringBuilder(100);
-        sb.append("ContentAccessor[ content=").append(getContentData()).append("]");
+        sb.append("ContentAccessor")
+          .append("[ contentUrl=").append(getContentUrl())
+          .append(", mimetype=").append(getMimetype())
+          .append(", size=").append(getSize())
+          .append(", encoding=").append(getEncoding())
+          .append("]");
         return sb.toString();
     }
     
