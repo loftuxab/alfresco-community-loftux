@@ -26,6 +26,11 @@ import org.alfresco.service.namespace.QName;
 public interface PropertyDefinition
 {
     /**
+     * @return defining model 
+     */
+    public ModelDefinition getModel();
+    
+    /**
      * @return the qualified name of the property
      */
     public QName getName();

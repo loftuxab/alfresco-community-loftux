@@ -24,6 +24,7 @@ import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -36,6 +37,7 @@ import org.alfresco.service.namespace.QName;
  */
 /*package*/ class M2ClassDefinition implements ClassDefinition
 {
+    protected ModelDefinition model;
     protected M2Class m2Class;
     protected QName name;
     protected QName parentName = null;
@@ -56,8 +58,9 @@ import org.alfresco.service.namespace.QName;
      * @param modelProperties  global list of model properties
      * @param modelAssociations  global list of model associations
      */
-    /*package*/ M2ClassDefinition(M2Class m2Class, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
+    /*package*/ M2ClassDefinition(ModelDefinition model, M2Class m2Class, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
+        this.model = model;
         this.m2Class = m2Class;
         
         // Resolve Names
@@ -216,7 +219,14 @@ import org.alfresco.service.namespace.QName;
         }
     }
     
-    
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.ClassDefinition#getModel()
+     */
+    public ModelDefinition getModel()
+    {
+        return model;
+    }
+
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.ClassDefinition#getName()
      */
@@ -230,7 +240,12 @@ import org.alfresco.service.namespace.QName;
      */
     public String getTitle()
     {
-        return m2Class.getTitle();
+        String value = M2Label.getLabel(model, "class", name, "title"); 
+        if (value == null)
+        {
+            value = m2Class.getTitle();
+        }
+        return value;
     }
 
     /* (non-Javadoc)
@@ -238,7 +253,12 @@ import org.alfresco.service.namespace.QName;
      */
     public String getDescription()
     {
-        return m2Class.getDescription();
+        String value = M2Label.getLabel(model, "class", name, "description"); 
+        if (value == null)
+        {
+            value = m2Class.getDescription();
+        }
+        return value;
     }
     
     /* (non-Javadoc)

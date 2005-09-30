@@ -63,7 +63,7 @@ public class PolicyComponentTest extends TestCase
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
         bootstrapModels.add("org/alfresco/repo/policy/policycomponenttest_model.xml");
         bootstrapModels.add(TEST_MODEL);
-        bootstrap.setBootstrapModels(bootstrapModels);
+        bootstrap.setModels(bootstrapModels);
         bootstrap.setDictionaryDAO(dictionaryDAO);
         bootstrap.bootstrap();
 

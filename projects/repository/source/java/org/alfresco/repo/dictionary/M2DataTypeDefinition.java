@@ -16,8 +16,12 @@
  */
 package org.alfresco.repo.dictionary;
 
+import java.util.Locale;
+
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
@@ -30,12 +34,14 @@ import org.alfresco.service.namespace.QName;
  */
 /*package*/ class M2DataTypeDefinition implements DataTypeDefinition
 {
+    private ModelDefinition model;
     private QName name;
     private M2DataType dataType;
     
     
-    /*package*/ M2DataTypeDefinition(M2DataType propertyType, NamespacePrefixResolver resolver)
+    /*package*/ M2DataTypeDefinition(ModelDefinition model, M2DataType propertyType, NamespacePrefixResolver resolver)
     {
+        this.model = model;
         this.name = QName.createQName(propertyType.getName(), resolver);
         this.dataType = propertyType;
     }
@@ -70,6 +76,14 @@ import org.alfresco.service.namespace.QName;
     }
     
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.DataTypeDefinition#getModel()
+     */
+    public ModelDefinition getModel()
+    {
+        return model;
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyTypeDefinition#getName()
      */
     public QName getName()
@@ -83,7 +97,12 @@ import org.alfresco.service.namespace.QName;
      */
     public String getTitle()
     {
-        return dataType.getTitle();
+        String value = M2Label.getLabel(model, "datatype", name, "title"); 
+        if (value == null)
+        {
+            value = dataType.getTitle();
+        }
+        return value;
     }
     
 
@@ -92,18 +111,34 @@ import org.alfresco.service.namespace.QName;
      */
     public String getDescription()
     {
-        return dataType.getDescription();
+        String value = M2Label.getLabel(model, "datatype", name, "description"); 
+        if (value == null)
+        {
+            value = dataType.getDescription();
+        }
+        return value;
     }
     
-
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyTypeDefinition#getAnalyserClassName()
      */
     public String getAnalyserClassName()
     {
-       return dataType.getAnalyserClassName();
+        return getAnalyserClassName(I18NUtil.getLocale());
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.DataTypeDefinition#getAnalyserClassName(java.util.Locale)
+     */
+    public String getAnalyserClassName(Locale locale)
+    {
+        String value = M2Label.getLabel(locale, model, "datatype", name, "analyser");
+        if (value == null)
+        {
+            value = dataType.getAnalyserClassName();
+        }
+        return value;
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.dictionary.PropertyTypeDefinition#getJavaClassName()

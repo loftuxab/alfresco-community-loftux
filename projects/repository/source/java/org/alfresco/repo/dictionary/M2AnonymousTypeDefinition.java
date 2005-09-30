@@ -25,6 +25,7 @@ import java.util.Map;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespaceService;
@@ -66,8 +67,15 @@ import org.alfresco.service.namespace.QName;
             childassociations.putAll(aspect.getChildAssociations());
         }
     }
-    
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.ClassDefinition#getModel()
+     */
+    public ModelDefinition getModel()
+    {
+        return type.getModel();
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.TypeDefinition#getDefaultAspects()
      */

@@ -27,6 +27,12 @@ import org.alfresco.service.namespace.QName;
  */
 public interface AssociationDefinition
 {
+    
+    /**
+     * @return  defining model
+     */
+    public ModelDefinition getModel();
+    
     /**
      * @return  the qualified name
      */

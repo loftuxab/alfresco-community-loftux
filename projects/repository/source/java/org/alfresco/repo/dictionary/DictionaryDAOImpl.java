@@ -80,7 +80,7 @@ public class DictionaryDAOImpl implements DictionaryDAO
         CompiledModel previousVersion = compiledModels.get(modelName);
         if (previousVersion != null)
         {
-            for (M2Namespace namespace : previousVersion.getModel().getNamespaces())
+            for (M2Namespace namespace : previousVersion.getM2Model().getNamespaces())
             {
                 namespaceDAO.removePrefix(namespace.getPrefix());
                 namespaceDAO.removeURI(namespace.getUri());

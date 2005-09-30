@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 
 
@@ -31,9 +32,11 @@ import org.alfresco.service.cmr.dictionary.DictionaryException;
  */
 public class DictionaryBootstrap
 {
-
     // The list of models to bootstrap with
-    private List<String> bootstrapModels = new ArrayList<String>();
+    private List<String> models = new ArrayList<String>();
+
+    // The list of model resource bundles to bootstrap with
+    private List<String> resourceBundles = new ArrayList<String>();
 
     // Dictionary DAO
     private DictionaryDAO dictionaryDAO = null;
@@ -53,18 +56,28 @@ public class DictionaryBootstrap
      * 
      * @param modelResources the model names
      */
-    public void setBootstrapModels(List<String> modelResources)
+    public void setModels(List<String> modelResources)
     {
-        this.bootstrapModels = modelResources;
+        this.models = modelResources;
     }
     
+    /**
+     * Sets the initial list of models to bootstrap with
+     * 
+     * @param modelResources the model names
+     */
+    public void setLabels(List<String> labels)
+    {
+        this.resourceBundles = labels;
+    }
     
     /**
      * Bootstrap the Dictionary
      */
     public void bootstrap()
     {
-        for (String bootstrapModel : bootstrapModels)
+        // register models
+        for (String bootstrapModel : models)
         {
             InputStream modelStream = getClass().getClassLoader().getResourceAsStream(bootstrapModel);
             if (modelStream == null)
@@ -80,6 +93,12 @@ public class DictionaryBootstrap
             {
                 throw new DictionaryException("Could not import bootstrap model " + bootstrapModel, e);
             }
+        }
+        
+        // register models
+        for (String resourceBundle : resourceBundles)
+        {
+            I18NUtil.registerResourceBundle(resourceBundle);
         }
     }
 

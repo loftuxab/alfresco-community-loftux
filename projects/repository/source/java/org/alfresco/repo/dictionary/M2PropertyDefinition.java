@@ -18,6 +18,7 @@ package org.alfresco.repo.dictionary;
 
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -122,6 +123,14 @@ import org.alfresco.service.namespace.QName;
     }
     
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.PropertyDefinition#getModel()
+     */
+    public ModelDefinition getModel()
+    {
+        return classDef.getModel();
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.PropertyDefinition#getName()
      */
     public QName getName()
@@ -135,7 +144,12 @@ import org.alfresco.service.namespace.QName;
      */
     public String getTitle()
     {
-        return property.getTitle();
+        String value = M2Label.getLabel(classDef.getModel(), "property", name, "title"); 
+        if (value == null)
+        {
+            value = property.getTitle();
+        }
+        return value;
     }
     
 
@@ -144,7 +158,12 @@ import org.alfresco.service.namespace.QName;
      */
     public String getDescription()
     {
-        return property.getDescription();
+        String value = M2Label.getLabel(classDef.getModel(), "property", name, "description"); 
+        if (value == null)
+        {
+            value = property.getDescription();
+        }
+        return value;
     }
     
 

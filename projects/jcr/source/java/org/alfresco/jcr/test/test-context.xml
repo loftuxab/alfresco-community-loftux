@@ -7,7 +7,7 @@
 
     <bean id="testDictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap" depends-on="JCR.DictionaryBootstrap">
         <property name="dictionaryDAO"><ref bean="dictionaryDAO"/></property>
-        <property name="bootstrapModels">
+        <property name="models">
             <list>
                 <value>org/alfresco/jcr/test/testModel.xml</value>
             </list>

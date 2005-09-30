@@ -16,6 +16,8 @@
  */
 package org.alfresco.service.cmr.dictionary;
 
+import java.util.Locale;
+
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -48,6 +50,11 @@ public interface DataTypeDefinition
     
     
     /**
+     * @return defining model
+     */
+    public ModelDefinition getModel();
+    
+    /**
      * @return the qualified name of the data type
      */
     public QName getName();
@@ -66,6 +73,11 @@ public interface DataTypeDefinition
      * @return the indexing analyser class
      */
     public String getAnalyserClassName();
+    
+    /**
+     * @return the indexing analyser class for the specified locale
+     */
+    public String getAnalyserClassName(Locale locale);
     
     /**
      * @return the equivalent java class name (or null, if not mapped) 

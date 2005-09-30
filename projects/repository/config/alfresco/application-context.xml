@@ -372,7 +372,7 @@
 
     <bean id="dictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap">
         <property name="dictionaryDAO"><ref local="dictionaryDAO"/></property>
-        <property name="bootstrapModels">
+        <property name="models">
             <list>
                 <value>alfresco/model/dictionaryModel.xml</value>
                 <value>alfresco/model/systemModel.xml</value>
@@ -384,6 +384,12 @@
                 <value>org/alfresco/repo/action/actionModel.xml</value>
                 <value>org/alfresco/repo/rule/ruleModel.xml</value>
                 <value>org/alfresco/repo/version/version_model.xml</value>
+            </list>
+        </property>
+        <property name="labels">
+            <list>
+                <value>alfresco/messages/dictionary-model</value>
+                <value>alfresco/messages/content-model</value>
             </list>
         </property>
     </bean>

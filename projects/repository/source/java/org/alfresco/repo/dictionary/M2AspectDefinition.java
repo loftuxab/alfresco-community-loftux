@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -34,9 +35,9 @@ import org.alfresco.service.namespace.QName;
     implements AspectDefinition
 {
 
-    /*package*/ M2AspectDefinition(M2Aspect m2Aspect, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
+    /*package*/ M2AspectDefinition(ModelDefinition model, M2Aspect m2Aspect, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
-        super(m2Aspect, resolver, modelProperties, modelAssociations);
+        super(model, m2Aspect, resolver, modelProperties, modelAssociations);
     }
     
 }

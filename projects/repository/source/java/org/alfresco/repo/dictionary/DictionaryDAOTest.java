@@ -21,8 +21,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 
 
@@ -30,6 +35,7 @@ public class DictionaryDAOTest extends TestCase
 {
     
     private static final String TEST_MODEL = "org/alfresco/repo/dictionary/dictionarydaotest_model.xml";
+    private static final String TEST_BUNDLE = "org/alfresco/repo/dictionary/dictionarydaotest_model";
     private DictionaryService service; 
     
     
@@ -45,7 +51,10 @@ public class DictionaryDAOTest extends TestCase
         List<String> bootstrapModels = new ArrayList<String>();
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
         bootstrapModels.add(TEST_MODEL);
-        bootstrap.setBootstrapModels(bootstrapModels);
+        List<String> labels = new ArrayList<String>();
+        labels.add(TEST_BUNDLE);
+        bootstrap.setModels(bootstrapModels);
+        bootstrap.setLabels(labels);
         bootstrap.setDictionaryDAO(dictionaryDAO);
         bootstrap.bootstrap();
         
@@ -72,11 +81,34 @@ public class DictionaryDAOTest extends TestCase
         bootstrapModels.add("org/alfresco/repo/rule/ruleModel.xml");
         bootstrapModels.add("org/alfresco/repo/version/version_model.xml");
         
-        bootstrap.setBootstrapModels(bootstrapModels);
+        bootstrap.setModels(bootstrapModels);
         bootstrap.setDictionaryDAO(dictionaryDAO);
         bootstrap.bootstrap();        
     }
 
+
+    public void testLabels()
+    {
+        QName model = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "dictionarydaotest");
+        ModelDefinition modelDef = service.getModel(model);
+        assertEquals("Model Description", modelDef.getDescription());
+        QName type = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "base");
+        TypeDefinition typeDef = service.getType(type);
+        assertEquals("Base Title", typeDef.getTitle());
+        assertEquals("Base Description", typeDef.getDescription());
+        QName prop = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "prop1");
+        PropertyDefinition propDef = service.getProperty(prop);
+        assertEquals("Prop1 Title", propDef.getTitle());
+        assertEquals("Prop1 Description", propDef.getDescription());
+        QName assoc = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "assoc1");
+        AssociationDefinition assocDef = service.getAssociation(assoc);
+        assertEquals("Assoc1 Title", assocDef.getTitle());
+        assertEquals("Assoc1 Description", assocDef.getDescription());
+        QName datatype = QName.createQName("http://www.alfresco.org/test/dictionarydaotest/1.0", "datatype");
+        DataTypeDefinition datatypeDef = service.getDataType(datatype);
+        assertEquals("Datatype Analyser", datatypeDef.getAnalyserClassName());
+    }
+    
     
     public void testSubClassOf()
     {

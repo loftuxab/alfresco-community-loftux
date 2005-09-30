@@ -13,6 +13,15 @@
       <namespace uri="http://www.alfresco.org/test/dictionarydaotest/1.0" prefix="test"/>
    </namespaces>
 
+   <data-types>
+
+      <data-type name="test:datatype">
+         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+         <java-class>java.lang.Object</java-class>
+      </data-type>
+
+   </data-types>
+
    <types>
       
       <type name="test:base">
@@ -21,7 +30,7 @@
          <parent></parent>
          
          <properties>
-            <property name="test:type">
+            <property name="test:prop1">
                <type>d:text</type>
                <protected>true</protected>
                <default></default>
@@ -94,7 +103,7 @@
          </associations>
 
          <overrides>
-            <property name="test:type">
+            <property name="test:prop">
                <default>an overriden default value</default>
             </property>
          </overrides>

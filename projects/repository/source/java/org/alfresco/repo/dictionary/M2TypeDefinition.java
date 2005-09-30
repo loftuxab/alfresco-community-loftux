@@ -23,6 +23,7 @@ import java.util.Map;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -42,9 +43,9 @@ import org.alfresco.service.namespace.QName;
     private List<AspectDefinition> inheritedDefaultAspects = new ArrayList<AspectDefinition>();
 
 
-    /*package*/ M2TypeDefinition(M2Type m2Type, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
+    /*package*/ M2TypeDefinition(ModelDefinition model, M2Type m2Type, NamespacePrefixResolver resolver, Map<QName, PropertyDefinition> modelProperties, Map<QName, AssociationDefinition> modelAssociations)
     {
-        super(m2Type, resolver, modelProperties, modelAssociations);
+        super(model, m2Type, resolver, modelProperties, modelAssociations);
 
         // Resolve qualified names
         for (String aspectName : m2Type.getMandatoryAspects())

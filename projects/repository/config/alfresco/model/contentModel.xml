@@ -1,6 +1,6 @@
 <model name="cm:contentmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
-   <description>Alfresco Content Model</description>
+   <description>Alfresco Content Domain Model</description>
    <author>Alfresco</author>
    <published>2005-09-29</published>
    <version>1.0</version>

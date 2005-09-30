@@ -101,7 +101,7 @@ import org.apache.commons.logging.LogFactory;
     /**
      * @return the model definition
      */
-    /*package*/ M2Model getModel()
+    /*package*/ M2Model getM2Model()
     {
         return model;
     }
@@ -124,7 +124,7 @@ import org.apache.commons.logging.LogFactory;
         // Construct Property Types
         for (M2DataType propType : model.getPropertyTypes())
         {
-            M2DataTypeDefinition def = new M2DataTypeDefinition(propType, localPrefixes);
+            M2DataTypeDefinition def = new M2DataTypeDefinition(modelDefinition, propType, localPrefixes);
             if (dataTypes.containsKey(def.getName()))
             {
                 throw new DictionaryException("Found duplicate property type definition " + propType.getName());
@@ -135,7 +135,7 @@ import org.apache.commons.logging.LogFactory;
         // Construct Type Definitions
         for (M2Type type : model.getTypes())
         {
-            M2TypeDefinition def = new M2TypeDefinition(type, localPrefixes, properties, associations);
+            M2TypeDefinition def = new M2TypeDefinition(modelDefinition, type, localPrefixes, properties, associations);
             if (classes.containsKey(def.getName()))
             {
                 throw new DictionaryException("Found duplicate class definition " + type.getName() + " (a type)");
@@ -147,7 +147,7 @@ import org.apache.commons.logging.LogFactory;
         // Construct Aspect Definitions
         for (M2Aspect aspect : model.getAspects())
         {
-            M2AspectDefinition def = new M2AspectDefinition(aspect, localPrefixes, properties, associations);
+            M2AspectDefinition def = new M2AspectDefinition(modelDefinition, aspect, localPrefixes, properties, associations);
             if (classes.containsKey(def.getName()))
             {
                 throw new DictionaryException("Found duplicate class definition " + aspect.getName() + " (an aspect)");

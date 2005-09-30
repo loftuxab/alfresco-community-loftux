@@ -16,7 +16,7 @@
 
     <bean id="dictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap">
         <property name="dictionaryDAO"><ref local="dictionaryDAO"/></property>
-        <property name="bootstrapModels">
+        <property name="models">
             <list>
                 <value>alfresco/model/dictionaryModel.xml</value>
             </list>

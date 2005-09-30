@@ -55,7 +55,12 @@ public class M2ModelDefinition implements ModelDefinition
      */
     public String getDescription()
     {
-        return model.getDescription();
+        String value = M2Label.getLabel(this, null, null, "description"); 
+        if (value == null)
+        {
+            value = model.getDescription();
+        }
+        return value;
     }
 
 
