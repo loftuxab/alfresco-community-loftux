@@ -18,40 +18,42 @@ package org.alfresco.repo.importer;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.alfresco.service.cmr.view.ImportPackageHandler;
 import org.alfresco.service.cmr.view.ImporterException;
 
 
 /**
- * Handler for importing Repository content streams from file system
+ * Handler for importing Repository content from zip package file
  * 
  * @author David Caruana
  */
-public class FileImportPackageHandler
+public class ZipImportPackageHandler
     implements ImportPackageHandler
 {
-    protected File sourceDir;
-    protected File dataFile;
+    
+    protected File file;
+    protected ZipFile zipFile;
     protected String dataFileEncoding;
+    
 
     /**
-     * Construct
+     * Constuct Handler
      * 
-     * @param sourceDir
-     * @param dataFile
-     * @param dataFileEncoding
+     * @param sourceDir  source directory
+     * @param packageDir  relative directory within source to place exported content  
      */
-    public FileImportPackageHandler(File sourceDir, File dataFile, String dataFileEncoding)
+    public ZipImportPackageHandler(File zipFile, String dataFileEncoding)
     {
-        this.sourceDir = sourceDir;
-        this.dataFile = new File(sourceDir, dataFile.getPath());
+        this.file = zipFile;
         this.dataFileEncoding = dataFileEncoding;
     }
 
@@ -60,7 +62,15 @@ public class FileImportPackageHandler
      */
     public void startImport()
     {
-        log("Importing from package " + dataFile.getAbsolutePath());
+        log("Importing from zip file " + file.getAbsolutePath());
+        try
+        {
+            zipFile = new ZipFile(file);
+        }
+        catch(IOException e)
+        {
+            throw new ImporterException("Failed to read zip file due to " + e.getMessage(), e);
+        }
     }
     
     /* (non-Javadoc)
@@ -70,8 +80,28 @@ public class FileImportPackageHandler
     {
         try
         {
-            InputStream inputStream = new FileInputStream(dataFile);
-            Reader inputReader = (dataFileEncoding == null) ? new InputStreamReader(inputStream) : new InputStreamReader(inputStream, dataFileEncoding);
+            // find data file
+            InputStream dataStream = null;
+            Enumeration entries = zipFile.entries();
+            while(entries.hasMoreElements())
+            {
+                ZipEntry entry = (ZipEntry)entries.nextElement();
+                if (!entry.isDirectory())
+                {
+                    if (entry.getName().endsWith(".xml"))
+                    {
+                        dataStream = zipFile.getInputStream(entry);
+                    }
+                }
+            }
+
+            // oh dear, there's no data file
+            if (dataStream == null)
+            {
+                throw new ImporterException("Failed to find data file within zip package");
+            }
+            
+            Reader inputReader = (dataFileEncoding == null) ? new InputStreamReader(dataStream) : new InputStreamReader(dataStream, dataFileEncoding);
             return new BufferedReader(inputReader);
         }
         catch(UnsupportedEncodingException e)
@@ -80,7 +110,7 @@ public class FileImportPackageHandler
         }
         catch(IOException e)
         {
-            throw new ImporterException("Failed to read package " + dataFile.getAbsolutePath() + " due to " + e.getMessage());
+            throw new ImporterException("Failed to open data file within zip package due to " + e.getMessage());
         }
     }
     
@@ -89,22 +119,22 @@ public class FileImportPackageHandler
      */
     public InputStream importStream(String content)
     {
-        File fileURL = new File(content);
-        if (fileURL.isAbsolute() == false)
+        ZipEntry zipEntry = zipFile.getEntry(content);
+        if (zipEntry == null)
         {
-            fileURL = new File(sourceDir, content);
+            throw new ImporterException("Failed to find content " + content + " within zip package");
         }
         
         try
         {
-            return new FileInputStream(fileURL);
+            return zipFile.getInputStream(zipEntry);
         }
-        catch(IOException e)
+        catch (IOException e)
         {
-            throw new ImporterException("Failed to read content url " + content + " from file " + fileURL.getAbsolutePath());
+            throw new ImporterException("Failed to open content " + content + " within zip package due to " + e.getMessage(), e);
         }
     }
-
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ImportPackageHandler#endImport()
      */

@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 
 import org.alfresco.repo.exporter.FileExportPackageHandler;
 import org.alfresco.repo.importer.FileImportPackageHandler;
+import org.alfresco.repo.importer.ZipImportPackageHandler;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ImportPackageHandler;
@@ -187,7 +188,17 @@ public class Import extends Tool
     /*package*/ void execute() throws ToolException
     {
         ImporterService importer = getServiceRegistry().getImporterService();
-        ImportPackageHandler importHandler = new FileHandler(context.getSourceDir(), context.getPackageFile(), context.encoding);
+        
+        // determine type of import (from zip or file system)
+        ImportPackageHandler importHandler;
+        if (context.zipFile)
+        {
+            importHandler = new ZipHandler(context.getSourceDir(), context.getPackageFile(), context.encoding);
+        }
+        else
+        {
+            importHandler = new FileHandler(context.getSourceDir(), context.getPackageFile(), context.encoding);
+        }
         
         try
         {
@@ -198,9 +209,39 @@ public class Import extends Tool
             throw new ToolException("Failed to import package due to " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Handler for importing Repository content from zip package
+     * 
+     * @author David Caruana
+     */
+    private class ZipHandler extends ZipImportPackageHandler
+    {
+        /**
+         * Construct
+         * 
+         * @param sourceDir
+         * @param dataFile
+         * @param dataFileEncoding
+         */
+        public ZipHandler(File sourceDir, File dataFile, String dataFileEncoding)
+        {
+            super(new File(sourceDir, dataFile.getPath()), dataFileEncoding);
+        }
+
+        /**
+         * Log Export Message
+         * 
+         * @param message  message to log
+         */
+        protected void log(String message)
+        {
+            Import.this.log(message);
+        }
+    }
     
     /**
-     * Handler for exporting Repository content streams to file system files
+     * Handler for importing Repository content from file system files
      * 
      * @author David Caruana
      */
@@ -284,7 +325,8 @@ public class Import extends Tool
         private String packageName;
         /** The package encoding */
         private String encoding = null;
-        
+        /** Zip Package? */
+        private boolean zipFile = false;
 
         /* (non-Javadoc)
          * @see org.alfresco.tools.ToolContext#validate()
@@ -310,10 +352,22 @@ public class Import extends Tool
                     throw new ToolException("Source directory " + fileSourceDir.getAbsolutePath() + " does not exist.");
                 }
             }
-            File packageFile = new File(getSourceDir(), getPackageFile().getPath());
-            if (packageFile.exists() == false)
+            if (packageName.endsWith(".acp"))
             {
-                throw new ToolException("Package file " + packageFile.getAbsolutePath() + " does not exist.");
+                File packageFile = new File(getSourceDir(), packageName);
+                if (!packageFile.exists())
+                {
+                    throw new ToolException("Package zip file " + packageFile.getAbsolutePath() + " does not exist.");
+                }
+                zipFile = true;
+            }
+            else
+            {
+                File packageFile = new File(getSourceDir(), getDataFile().getPath());
+                if (!packageFile.exists())
+                {
+                    throw new ToolException("Package file " + packageFile.getAbsolutePath() + " does not exist.");
+                }
             }
         }
 
@@ -345,12 +399,22 @@ public class Import extends Tool
          * 
          * @return the package file
          */
-        private File getPackageFile()
+        private File getDataFile()
         {
-            String packageFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
-            File file = new File(packageFile); 
+            String dataFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
+            File file = new File(dataFile); 
             return file;
         }
+        
+        /**
+         * Get the zip import file (.acp - alfresco content package)
+         * 
+         * @return the zip package file
+         */
+        private File getPackageFile()
+        {
+            return (zipFile) ? new File(packageName) : getDataFile();
+        }        
     }
     
 }
