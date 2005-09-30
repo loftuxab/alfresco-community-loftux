@@ -17,23 +17,20 @@
 package org.alfresco.tools;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
 
 import org.alfresco.repo.exporter.FileExportPackageHandler;
+import org.alfresco.repo.exporter.ZipExportPackageHandler;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
+import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.TempFileProvider;
 
 
 /**
@@ -148,6 +145,10 @@ public final class Export extends Tool
             {
                 context.children = false;
             }
+            else if (args[i].equals("-zip"))
+            {
+                context.zipped = true;
+            }
             else if (args[i].equals("-overwrite"))
             {
                 context.overwrite = true;
@@ -199,6 +200,7 @@ public final class Export extends Tool
         System.out.println(" -overwrite force overwrite of existing export package if it already exists");
         System.out.println(" -quiet do not display any messages during export");
         System.out.println(" -verbose report export progress");
+        System.out.println(" -zip export in zip format");
     }
         
     /* (non-Javadoc)
@@ -210,14 +212,30 @@ public final class Export extends Tool
         ExporterService exporter = getServiceRegistry().getExporterService();
 
         // create export package handler
-        ExportPackageHandler exportHandler = new ToolExportPackageHandler(context.getDestDir(), context.getPackageFile(), context.getPackageDir(), context.overwrite);
+        ExportPackageHandler exportHandler = null;
+        if (context.zipped)
+        {
+            exportHandler = new ZipHandler(context.getDestDir(), context.getZipFile(), context.getPackageFile(), context.getPackageDir(), context.overwrite);
+        }
+        else
+        {
+            exportHandler = new FileHandler(context.getDestDir(), context.getPackageFile(), context.getPackageDir(), context.overwrite);
+        }
 
         // export Repository content to export package
         ExporterCrawlerParameters parameters = new ExporterCrawlerParameters();
         parameters.setExportFrom(context.getLocation());
         parameters.setCrawlSelf(context.self);
         parameters.setCrawlChildNodes(context.children);
-        exporter.exportView(exportHandler, parameters, new ExportProgress());
+        
+        try
+        {
+            exporter.exportView(exportHandler, parameters, new ExportProgress());
+        }
+        catch(ExporterException e)
+        {
+            throw new ToolException("Failed to export", e);
+        }
     }
 
     /**
@@ -225,7 +243,7 @@ public final class Export extends Tool
      * 
      * @author David Caruana
      */
-    private class ToolExportPackageHandler extends FileExportPackageHandler
+    private class FileHandler extends FileExportPackageHandler
     {
         /**
          * Construct
@@ -235,7 +253,7 @@ public final class Export extends Tool
          * @param contentDir
          * @param overwrite
          */
-        public ToolExportPackageHandler(File destDir, File dataFile, File contentDir, boolean overwrite)
+        public FileHandler(File destDir, File dataFile, File contentDir, boolean overwrite)
         {
             super(destDir, dataFile, contentDir, overwrite);
         }
@@ -251,6 +269,37 @@ public final class Export extends Tool
         }
     }
     
+    /**
+     * Handler for exporting Repository content streams to zip file
+     * 
+     * @author David Caruana
+     */
+    private class ZipHandler extends ZipExportPackageHandler
+    {
+        /**
+         * Construct
+         * 
+         * @param destDir
+         * @param zipFile
+         * @param dataFile
+         * @param contentDir
+         */
+        public ZipHandler(File destDir, File zipFile, File dataFile, File contentDir, boolean overwrite)
+        {
+            super(destDir, zipFile, dataFile, contentDir, overwrite);
+        }
+
+        /**
+         * Log Export Message
+         * 
+         * @param message  message to log
+         */
+        protected void log(String message)
+        {
+            Export.this.log(message);
+        }
+    }
+
     /**
      * Export Tool Context
      * 
@@ -274,6 +323,8 @@ public final class Export extends Tool
         private boolean self = false;
         /** Force overwrite of existing package */
         private boolean overwrite = false;
+        /** Zipped? */
+        private boolean zipped = false;
 
         /* (non-Javadoc)
          * @see org.alfresco.tools.ToolContext#validate()
@@ -357,6 +408,18 @@ public final class Export extends Tool
             String packageFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
             File file = new File(packageFile); 
             return file;
+        }
+
+        /**
+         * Get the zip file
+         * 
+         * @return the zip file
+         */
+        private File getZipFile()
+        {
+            int iExt = packageName.indexOf('.');
+            String zipFile = ((iExt != -1) ? packageName.substring(0, iExt) : packageName) + ".acp";
+            return new File(zipFile);
         }
     }
 
