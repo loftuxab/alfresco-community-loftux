@@ -43,7 +43,6 @@ import org.alfresco.repo.action.evaluator.IsSubTypeEvaluator;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
-import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
@@ -1244,6 +1243,12 @@ public class NewRuleWizard extends BaseActionWizard
          {
             String comment = (String)this.currentActionProperties.get(PROP_CHECKIN_DESC);
             summary.append("'").append(comment).append("'");
+         }
+         else if ("import".equals(actionName))
+         {
+            NodeRef space = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
+            String spaceName = Repository.getNameForNode(this.nodeService, space);
+            summary.append("'").append(spaceName).append("'");
          }
 
          summaryResult = summary.toString();

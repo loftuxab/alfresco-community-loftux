@@ -640,6 +640,10 @@
          <to-view-id>/jsp/wizard/new-rule/action-check-out.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>import</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-import.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>summary</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/summary.jsp</to-view-id>
       </navigation-case>
@@ -715,6 +719,10 @@
       <navigation-case>
          <from-outcome>check-out</from-outcome>
          <to-view-id>/jsp/wizard/create-action/action-check-out.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>import</from-outcome>
+         <to-view-id>/jsp/wizard/create-action/action-import.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>summary</from-outcome>

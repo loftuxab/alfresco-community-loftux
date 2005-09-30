@@ -31,6 +31,12 @@ import org.alfresco.service.cmr.view.ExporterService;
 public class ExporterActionExecuter extends ActionExecuterAbstractBase
 {
     public static final String NAME = "export";
+    public static final String PARAM_STORE = "store";
+    public static final String PARAM_PACKAGE_NAME = "package-name";
+    public static final String PARAM_DESTINATION_FOLDER = "destination";
+    public static final String PARAM_INCLUDE_CHILDREN = "include-children";
+    public static final String PARAM_INCLUDE_SELF = "include-self";
+    public static final String PARAM_ENCODING = "encoding";
     
     /**
      * The exporter service

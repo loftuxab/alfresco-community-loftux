@@ -171,6 +171,11 @@
          <transformer id="image/jpeg"/>
          <transformer id="image/png"/>
       </image-transformers>
+      <encodings>
+         <encoding id="windows-1252" descriptionMsgId="encoding_windows1252"/>
+         <encoding id="utf8" descriptionMsgId="encoding_utf8"/>
+         <encoding id="utf16" descriptionMsgId="encoding_utf16"/>
+      </encodings>
    </config>
    
    <config evaluator="string-compare" condition="Custom Content Types">

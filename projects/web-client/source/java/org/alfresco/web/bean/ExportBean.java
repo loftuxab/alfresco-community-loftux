@@ -29,6 +29,7 @@ import org.alfresco.repo.action.executer.ExporterActionExecuter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -46,22 +47,26 @@ public class ExportBean
    
    private static final String ALL_SPACES = "all";
    private static final String CURRENT_SPACE = "current";
-   
+
    private static final String DEFAULT_OUTCOME = "adminConsole";
    
    private static final String MSG_ERROR = "error_export";
    
    private BrowseBean browseBean;
-   private NavigationBean navigator;
+   private NodeService nodeService;
    private ActionService actionService;
    
    private String packageName;
+   private String encoding;
    private String mode = CURRENT_SPACE;
    private NodeRef destination;
    private boolean includeChildren = true;
+   private boolean includeSelf;
    
    /**
     * Performs the export operation using the current state of the bean
+    * 
+    * @return The outcome
     */
    public String export()
    {
@@ -78,14 +83,31 @@ public class ExportBean
          tx.begin();
          
          // build the action params map based on the bean's current state
-         Map<String, Serializable> params = new HashMap<String, Serializable>(4);
+         Map<String, Serializable> params = new HashMap<String, Serializable>(5);
+         params.put(ExporterActionExecuter.PARAM_STORE, Repository.getStoreRef());
+         params.put(ExporterActionExecuter.PARAM_PACKAGE_NAME, this.packageName);
+         params.put(ExporterActionExecuter.PARAM_ENCODING, this.encoding);
+         params.put(ExporterActionExecuter.PARAM_DESTINATION_FOLDER, this.destination);
+         params.put(ExporterActionExecuter.PARAM_INCLUDE_CHILDREN, new Boolean(includeChildren));
+         params.put(ExporterActionExecuter.PARAM_INCLUDE_SELF, new Boolean(includeSelf));
           
          // build the action to execute
          Action action = this.actionService.createAction(ExporterActionExecuter.NAME, params);
          action.setExecuteAsynchronously(true);
          
-         // execute the action on the current document node
-         this.actionService.executeAction(action, this.browseBean.getActionSpace().getNodeRef());
+         // get the appropriate node
+         NodeRef startNode = null;
+         if (this.mode.equals(ALL_SPACES))
+         {
+            startNode = this.nodeService.getRootNode(Repository.getStoreRef());
+         }
+         else
+         {
+            startNode = this.browseBean.getActionSpace().getNodeRef();
+         }
+         
+         // execute the action on the relevant node
+         this.actionService.executeAction(action, startNode);
          
          if (logger.isDebugEnabled())
          {
@@ -110,6 +132,11 @@ public class ExportBean
       return outcome;
    }
    
+   /**
+    * Action called when the dialog is cancelled, just resets the bean's state
+    * 
+    * @return The outcome
+    */
    public String cancel()
    {
       reset();
@@ -123,9 +150,11 @@ public class ExportBean
    public void reset()
    {
       this.packageName = null;
+      this.encoding = null;
       this.mode = CURRENT_SPACE;
       this.destination = null;
       this.includeChildren = true;
+      this.includeSelf = false;
    }
    
    /**
@@ -189,6 +218,26 @@ public class ExportBean
    }
    
    /**
+    * Determines whether the export will include the space itself 
+    * 
+    * @return true includes the space being exported from
+    */
+   public boolean getIncludeSelf()
+   {
+      return this.includeSelf;
+   }
+   
+   /**
+    * Sets whether the space itself is included in the export 
+    * 
+    * @param includeSelf true to include the space itself
+    */
+   public void setIncludeSelf(boolean includeSelf)
+   {
+      this.includeSelf = includeSelf;
+   }
+   
+   /**
     * Determines whether to export only the current space or all spaces
     * 
     * @return "all" to export all space and "current" to export the current space
@@ -209,6 +258,26 @@ public class ExportBean
    }
    
    /**
+    * Returns the encoding to use for the export
+    *  
+    * @return The encoding
+    */
+   public String getEncoding()
+   {
+      return this.encoding;
+   }
+
+   /**
+    * Sets the encoding to use for the export package
+    * 
+    * @param encoding The encoding
+    */
+   public void setEncoding(String encoding)
+   {
+      this.encoding = encoding;
+   }
+
+   /**
     * Sets the BrowseBean instance to use to retrieve the current document
     * 
     * @param browseBean BrowseBean instance
@@ -219,22 +288,22 @@ public class ExportBean
    }
    
    /**
-    * Sets the NavigationBean to use
-    * 
-    * @param navigator The NavigationBean to set.
-    */
-   public void setNavigator(NavigationBean navigator)
-   {
-      this.navigator = navigator;
-   }
-   
-   /**
     * Sets the action service
     * 
-    * @param actionRegistration  the action service
+    * @param actionService  the action service
     */
    public void setActionService(ActionService actionService)
    {
       this.actionService = actionService;
+   }
+   
+   /**
+    * Sets the node service
+    * 
+    * @param nodeService  the node service
+    */
+   public void setNodeService(NodeService nodeService)
+   {
+      this.nodeService = nodeService;
    }
 }

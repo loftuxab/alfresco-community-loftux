@@ -34,12 +34,12 @@ import org.alfresco.repo.action.executer.CheckInActionExecuter;
 import org.alfresco.repo.action.executer.CheckOutActionExecuter;
 import org.alfresco.repo.action.executer.CopyActionExecuter;
 import org.alfresco.repo.action.executer.ImageTransformActionExecuter;
+import org.alfresco.repo.action.executer.ImporterActionExecuter;
 import org.alfresco.repo.action.executer.LinkCategoryActionExecuter;
 import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.action.executer.MoveActionExecuter;
 import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
 import org.alfresco.repo.action.executer.TransformActionExecuter;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.ActionDefinition;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -79,6 +79,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    public static final String PROP_TRANSFORMER = "transformer";
    public static final String PROP_IMAGE_TRANSFORMER = "imageTransformer";
    public static final String PROP_TRANSFORM_OPTIONS = "transformOptions";
+   public static final String PROP_ENCODING = "encoding";
    public static final String PROP_MESSAGE = "message";
    public static final String PROP_SUBJECT = "subject";
    public static final String PROP_TO = "to";
@@ -96,6 +97,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    protected List<SelectItem> imageTransformers;
    protected List<SelectItem> aspects;
    protected List<SelectItem> users;
+   protected List<SelectItem> encodings;
    protected Map<String, String> actionDescriptions;
    protected Map<String, Serializable> currentActionProperties;
    
@@ -107,24 +109,9 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       super.init();
       
       this.action = "add-features";
-      
-      if (this.users != null)
-      {
-         this.users.clear();
-         this.users = null;
-      }
-      
-      if (this.actions != null)
-      {
-         this.actions.clear();
-         this.actions = null;
-      }
-      
-      if (this.actionDescriptions != null)
-      {
-         this.actionDescriptions.clear();
-         this.actionDescriptions = null;
-      }
+      this.users = null;
+      this.actions = null;
+      this.actionDescriptions = null;
       
       this.currentActionProperties = new HashMap<String, Serializable>(3);
       
@@ -327,6 +314,16 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          actionParams.put(MailActionExecuter.PARAM_SUBJECT,
                this.currentActionProperties.get(PROP_SUBJECT));
       }
+      else if (this.action.equals(ImporterActionExecuter.NAME))
+      {
+         // add the encoding
+         actionParams.put(ImporterActionExecuter.PARAM_ENCODING, 
+               this.currentActionProperties.get(PROP_ENCODING));
+         
+         // add the destination for the import
+         NodeRef destNodeRef = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
+         actionParams.put(ImporterActionExecuter.NAME, destNodeRef);
+      }
       
       return actionParams;
    }
@@ -427,6 +424,14 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          String to = (String)actionProps.get(MailActionExecuter.PARAM_TO);
          this.currentActionProperties.put(PROP_TO, to);
       }
+      else if (this.action.equals(ImporterActionExecuter.NAME))
+      {
+         String encoding = (String)actionProps.get(ImporterActionExecuter.PARAM_ENCODING);
+         this.currentActionProperties.put(PROP_ENCODING, encoding);
+         
+         NodeRef destNodeRef = (NodeRef)actionProps.get(ImporterActionExecuter.PARAM_DESTINATION_FOLDER);
+         this.currentActionProperties.put(PROP_DESTINATION, destNodeRef);
+      }
    }
 
    /**
@@ -521,6 +526,64 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    public Map<String, Serializable> getActionProperties()
    {
       return this.currentActionProperties;
+   }
+   
+   /**
+    * Returns a list of encodings the import and export actions can use
+    * 
+    * @return List of SelectItem objects representing the available encodings
+    */
+   public List<SelectItem> getEncodings()
+   {
+      if (this.encodings == null)
+      {
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("Action Wizards");
+         if (wizardCfg != null)
+         {
+            ConfigElement encodingsCfg = wizardCfg.getConfigElement("encodings");
+            if (encodingsCfg != null)
+            {
+               FacesContext context = FacesContext.getCurrentInstance();
+               this.encodings = new ArrayList<SelectItem>();
+               for (ConfigElement child : encodingsCfg.getChildren())
+               {
+                  String id = child.getAttribute("id");
+                  
+                  // look for a client localized string
+                  String label = null;
+                  String msgId = child.getAttribute("descriptionMsgId");
+                  if (msgId != null)
+                  {
+                     label = Application.getMessage(context, msgId);
+                  }
+                  
+                  // if there wasn't an externalized string look for one in the config
+                  if (label == null)
+                  {
+                     label = child.getAttribute("description");
+                  }
+                  
+                  this.encodings.add(new SelectItem(id, label));
+               }
+               
+               // make sure the list is sorted by the label
+               QuickSort sorter = new QuickSort(this.encodings, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+               sorter.sort();
+            }
+            else
+            {
+               logger.warn("Could not find encodings configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find Action Wizards configuration section");
+         }
+      }
+      
+      return this.encodings;
    }
    
    /**

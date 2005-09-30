@@ -24,31 +24,14 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_export">
-
-<script language="JavaScript1.2">
-   function checkButtonState()
-   {
-      if (document.getElementById("export-form:package-name").value.length == 0 ||
-          document.getElementById("export-form:destination_selected").value.length == 0)
-      {
-         document.getElementById("export-form:ok-button").disabled = true;
-      }
-      else
-      {
-         document.getElementById("export-form:ok-button").disabled = false;
-      }
-   }
-   
-   checkButtonState();
-</script>
+<r:page titleId="title_create_action_import">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="export-form">
+   <h:form acceptCharset="UTF-8" id="action-import">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -56,7 +39,7 @@
       <%-- Title bar --%>
       <tr>
          <td colspan="2">
-            <%@ include file="../parts/titlebar.jsp" %>
+            <%@ include file="../../parts/titlebar.jsp" %>
          </td>
       </tr>
       
@@ -64,14 +47,14 @@
       <tr valign="top">
          <%-- Shelf --%>
          <td>
-            <%@ include file="../parts/shelf.jsp" %>
+            <%@ include file="../../parts/shelf.jsp" %>
          </td>
          
          <%-- Work Area --%>
          <td width="100%">
             <table cellspacing="0" cellpadding="0" width="100%">
                <%-- Breadcrumb --%>
-               <%@ include file="../parts/breadcrumb.jsp" %>
+               <%@ include file="../../parts/breadcrumb.jsp" %>
                
                <%-- Status and Actions --%>
                <tr>
@@ -82,17 +65,17 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                        	<td width="32">
+                           <td width="32">
                               <h:graphicImage id="wizard-logo" url="/images/icons/new_rule_large.gif" />
                            </td>
                            <td>
-                              <div class="mainTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainSubTitle"><h:outputText value="#{msg.export}"/></div>
-                              <div class="mainSubText"><h:outputText value="#{msg.export_info}"/></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainTitle"><h:outputText value="#{NewActionWizard.wizardTitle}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{NewActionWizard.wizardDescription}" /> '<h:outputText value="#{DocumentDetailsBean.name}" />'</div>
                            </td>
                         </tr>
                      </table>
-
+                     
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_6.gif)" width="4"></td>
                </tr>
@@ -110,57 +93,49 @@
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
+                           <td width="20%" valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
+                              <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
+                              <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight" 
+                                          value="2" disabled="true">
+                                 <a:listItem value="1" label="1. #{msg.action}" />
+                                 <a:listItem value="2" label="2. #{msg.action_settings}" />
+                                 <a:listItem value="3" label="3. #{msg.summary}" />
+                              </a:modeList>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                           </td>
+                           
                            <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td><nobr><h:outputText value="#{msg.package_name}"/>:</nobr></td>
-                                    <td width="90%">
-                                       <h:inputText id="package-name" value="#{ExportDialog.packageName}" size="35" maxlength="1024" 
-                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td><nobr><h:outputText value="#{msg.export_from}"/>:</nobr></td>
-                                    <td>
-                                       <h:selectOneRadio value="#{ExportDialog.mode}" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="#{msg.current_space}" />
-                                          <f:selectItem itemValue="all" itemLabel="#{msg.all_spaces}" />
-                                       </h:selectOneRadio>
-                                    </td>
+                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewActionWizard.stepTitle}" /></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><nobr><h:outputText value="#{msg.destination}"/>:</nobr></td>
-                                    <td>
-                                       <r:spaceSelector id="destination" label="#{msg.select_destination_prompt}" 
-                                                        value="#{ExportDialog.destination}" 
+                                    <td><h:outputText value="#{msg.destination}"/>:</td>
+                                    <td width="90%">
+                                       <r:spaceSelector label="#{msg.select_destination_prompt}" 
+                                                        value="#{NewActionWizard.actionProperties.destinationLocation}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
-                                                        style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                        style="border: 1px dashed #cccccc; padding: 6px;"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><nobr><h:outputText value="#{msg.encoding}"/>:</nobr></td>
                                     <td>
-                                       <h:selectOneMenu value="#{ExportDialog.encoding}">
-                                          <f:selectItems value="#{NewRuleWizard.encodings}" />
+                                       <h:selectOneMenu value="#{NewActionWizard.actionProperties.encoding}">
+                                          <f:selectItems value="#{NewActionWizard.encodings}" />
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                       <h:selectBooleanCheckbox value="#{ExportDialog.includeChildren}"/>&nbsp;
-                                       <span style="vertical-align:20%"><h:outputText value="#{msg.include_children}"/></span>
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                       <h:selectBooleanCheckbox value="#{ExportDialog.includeSelf}"/>&nbsp;
-                                       <span style="vertical-align:20%"><h:outputText value="#{msg.include_self}"/></span>
-                                    </td>
+                                    <td colspan="2"><h:outputText value="#{NewActionWizard.stepInstructions}" /></td>
                                  </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
@@ -171,14 +146,25 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{ExportDialog.export}" 
-                                                        disabled="true" styleClass="wizardButton"/>
+                                       <h:commandButton value="#{msg.next_button}" action="#{NewActionWizard.next}" styleClass="wizardButton" 
+                                                        disabled="#{NewActionWizard.actionProperties.destinationLocation == null}" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel}" action="#{ExportDialog.cancel}" 
-                                                        styleClass="wizardButton"/>
+                                       <h:commandButton value="#{msg.back_button}" action="#{NewActionWizard.back}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="#{msg.finish_button}" action="#{NewActionWizard.finish}" styleClass="wizardButton" 
+                                                        disabled="#{NewActionWizard.actionProperties.destinationLocation == null}" />
+                                    </td>
+                                 </tr>
+                                 <tr><td class="wizardButtonSpacing"></td></tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewActionWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -189,17 +175,7 @@
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
+                              
                <%-- separator row with bottom panel graphics --%>
                <tr>
                   <td><img src="<%=request.getContextPath()%>/images/parts/whitepanel_7.gif" width="4" height="4"></td>
@@ -215,9 +191,5 @@
     </h:form>
     
 </f:view>
-
-<script language="JavaScript1.2">
-   checkButtonState();
-</script>
 
 </r:page>

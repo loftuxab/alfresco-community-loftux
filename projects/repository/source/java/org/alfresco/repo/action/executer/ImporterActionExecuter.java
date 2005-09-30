@@ -31,6 +31,8 @@ import org.alfresco.service.cmr.view.ImporterService;
 public class ImporterActionExecuter extends ActionExecuterAbstractBase
 {
     public static final String NAME = "import";
+    public static final String PARAM_ENCODING = "encoding";
+    public static final String PARAM_DESTINATION_FOLDER = "destination";
     
     /**
      * The importer service
