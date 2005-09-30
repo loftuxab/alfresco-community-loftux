@@ -59,9 +59,15 @@ public interface ContentAccessor
     public long getSize();
     
     /**
-     * Get the data representation of the content being accessed
+     * Get the data representation of the content being accessed.
+     * <p>
+     * The content {@link #setMimetype(String) mimetype } must be set before this
+     * method is called as the content data requires a mimetype whenever the
+     * content URL is specified.
      * 
      * @return Returns the content data
+     * 
+     * @see ContentData#ContentData(String, String, long, String)
      */
     public ContentData getContentData();
     

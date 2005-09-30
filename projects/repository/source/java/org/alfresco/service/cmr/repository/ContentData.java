@@ -114,6 +114,18 @@ public class ContentData implements Serializable
         return ret;
     }
     
+    /**
+     * Create a compound set of data representing a single instance of <i>content</i>.
+     * <p>
+     * In order to ensure data integrity, the {@link #getMimetype() mimetype}
+     * must be set if the {@link #getContentUrl() content URL} is set.
+     * 
+     * @param contentUrl the content URL.  If this value is non-null, then the
+     *      <b>mimetype</b> must be supplied.
+     * @param mimetype the content mimetype.  This is mandatory if the <b>contentUrl</b> is specified.
+     * @param size the content size.
+     * @param encoding the content encoding.
+     */
     public ContentData(String contentUrl, String mimetype, long size, String encoding)
     {
         checkContentUrl(contentUrl, mimetype);
