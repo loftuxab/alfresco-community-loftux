@@ -42,7 +42,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.view.ImportStreamHandler;
+import org.alfresco.service.cmr.view.ImportPackageHandler;
 import org.alfresco.service.cmr.view.ImporterBinding;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.cmr.view.ImporterProgress;
@@ -143,13 +143,17 @@ public class ImporterComponent
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStreamReader, org.alfresco.service.cmr.view.ImportStreamHandler, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
+     * @see org.alfresco.service.cmr.view.ImporterService#importView(org.alfresco.service.cmr.view.ImportPackageHandler, org.alfresco.service.cmr.view.Location, org.alfresco.service.cmr.view.ImporterBinding, org.alfresco.service.cmr.view.ImporterProgress)
      */
-    public void importView(Reader viewReader, ImportStreamHandler streamHandler, Location location, ImporterBinding binding, ImporterProgress progress) throws ImporterException
+    public void importView(ImportPackageHandler importHandler, Location location, ImporterBinding binding, ImporterProgress progress) throws ImporterException
     {
         NodeRef nodeRef = getNodeRef(location, binding);
         QName childAssocType = getChildAssocType(location, binding);
-        performImport(nodeRef, childAssocType, viewReader, streamHandler, binding, progress);
+        
+        importHandler.startImport();
+        Reader dataFileReader = importHandler.getDataStream(); 
+        performImport(nodeRef, childAssocType, dataFileReader, importHandler, binding, progress);
+        importHandler.endImport();
     }
     
     /**
@@ -233,7 +237,7 @@ public class ImporterComponent
      * @param binding import configuration
      * @param progress import progress
      */
-    private void performImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportStreamHandler streamHandler, ImporterBinding binding, ImporterProgress progress)
+    private void performImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportPackageHandler streamHandler, ImporterBinding binding, ImporterProgress progress)
     {
         ParameterCheck.mandatory("Node Reference", nodeRef);
         ParameterCheck.mandatory("Child Assoc Type", childAssocType);
@@ -310,7 +314,7 @@ public class ImporterComponent
         private QName rootAssocType;
         private ImporterBinding binding;
         private ImporterProgress progress;
-        private ImportStreamHandler streamHandler;
+        private ImportPackageHandler streamHandler;
 
         // Flush threshold
         private int flushThreshold = 500;
@@ -325,7 +329,7 @@ public class ImporterComponent
          * @param binding
          * @param progress
          */
-        private DefaultImporter(NodeRef rootRef, QName rootAssocType, ImporterBinding binding, ImportStreamHandler streamHandler, ImporterProgress progress)
+        private DefaultImporter(NodeRef rootRef, QName rootAssocType, ImporterBinding binding, ImportPackageHandler streamHandler, ImporterProgress progress)
         {
             this.rootRef = rootRef;
             this.rootAssocType = rootAssocType;
@@ -446,11 +450,7 @@ public class ImporterComponent
             if (contentUrl != null && contentUrl.length() > 0)
             {
                 // remove the 'fake' content URL - it causes failures
-                contentData = new ContentData(
-                        null,
-                        contentData.getMimetype(),
-                        0L,
-                        contentData.getEncoding());
+                contentData = new ContentData(null, contentData.getMimetype(), 0L, contentData.getEncoding());
                 nodeService.setProperty(nodeRef, propertyQName, contentData);
                 
                 // import the content from the url
@@ -572,18 +572,25 @@ public class ImporterComponent
      * @author David Caruana
      */
     private static class DefaultStreamHandler
-        implements ImportStreamHandler
+        implements ImportPackageHandler
     {
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportPackageHandler#startImport()
+         */
+        public void startImport()
+        {
+        }
+
         /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.ImportStreamHandler#importStream(java.lang.String)
          */
-        public InputStream importStream(String url)
+        public InputStream importStream(String content)
         {
             ResourceLoader loader = new DefaultResourceLoader();
-            Resource resource = loader.getResource(url);
+            Resource resource = loader.getResource(content);
             if (resource.exists() == false)
             {
-                throw new ImporterException("Content URL " + url + " does not exist.");
+                throw new ImporterException("Content URL " + content + " does not exist.");
             }
             
             try
@@ -592,10 +599,24 @@ public class ImporterComponent
             }
             catch(IOException e)
             {
-                throw new ImporterException("Failed to retrieve input stream for content URL " + url);
+                throw new ImporterException("Failed to retrieve input stream for content URL " + content);
             }
         }
-    }
 
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportPackageHandler#getDataStream()
+         */
+        public Reader getDataStream()
+        {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportPackageHandler#endImport()
+         */
+        public void endImport()
+        {
+        }
+    }
 
 }

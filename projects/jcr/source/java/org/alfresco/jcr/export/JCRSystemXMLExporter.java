@@ -35,6 +35,7 @@ import org.alfresco.jcr.item.PropertyImpl;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
@@ -333,7 +334,7 @@ public class JCRSystemXMLExporter implements Exporter
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
      */
-    public void content(NodeRef nodeRef, QName property, InputStream content)
+    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData)
     {
         try
         {

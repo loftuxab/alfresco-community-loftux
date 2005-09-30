@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.importer.ImportNode;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
@@ -148,6 +149,12 @@ import org.alfresco.service.namespace.QName;
                     break;
                 }
             }
+        }
+        
+        // Do not import properties of sys:referenceable
+        if (owningClass.getName().equals(ContentModel.ASPECT_REFERENCEABLE))
+        {
+            return;
         }
         
         // Store property value

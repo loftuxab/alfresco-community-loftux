@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import org.alfresco.repo.exporter.FileExportPackageHandler;
 import org.alfresco.repo.exporter.ZipExportPackageHandler;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
@@ -528,7 +529,7 @@ public final class Export extends Tool
         /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
          */
-        public void content(NodeRef nodeRef, QName property, InputStream content)
+        public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData)
         {
         }
 

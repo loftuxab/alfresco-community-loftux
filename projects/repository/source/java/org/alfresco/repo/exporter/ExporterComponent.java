@@ -323,7 +323,7 @@ public class ExporterComponent
                             InputStream inputStream = reader.getContentInputStream();
                             try
                             {
-                                exporter.content(nodeRef, property, inputStream);
+                                exporter.content(nodeRef, property, inputStream, reader.getContentData());
                             }
                             finally
                             {
@@ -340,7 +340,7 @@ public class ExporterComponent
                         else
                         {
                             // skip content values
-                            exporter.content(nodeRef, property, null);
+                            exporter.content(nodeRef, property, null, null);
                         }
                     }
                 }

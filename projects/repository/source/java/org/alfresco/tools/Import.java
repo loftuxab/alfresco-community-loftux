@@ -16,20 +16,16 @@
  */
 package org.alfresco.tools;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
+import org.alfresco.repo.exporter.FileExportPackageHandler;
+import org.alfresco.repo.importer.FileImportPackageHandler;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.view.ImportStreamHandler;
+import org.alfresco.service.cmr.view.ImportPackageHandler;
+import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.cmr.view.ImporterProgress;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
@@ -191,81 +187,45 @@ public class Import extends Tool
     /*package*/ void execute() throws ToolException
     {
         ImporterService importer = getServiceRegistry().getImporterService();
+        ImportPackageHandler importHandler = new FileHandler(context.getSourceDir(), context.getPackageFile(), context.encoding);
         
-        // Create Import package
-        File packageFile = context.getPackageFile();
-        log("Importing from package " + packageFile.getAbsolutePath());
-        Reader viewReader = getPackageReader(packageFile, context.encoding);
-        PackageStreamHandler streamHandler = new PackageStreamHandler(context.getSourceDir());
-
-        // Export Repository content to export package
-        importer.importView(viewReader, streamHandler, context.getLocation(), null, new ImportProgress());
-    }
-    
-    /**
-     * Get XML Export File
-     * 
-     * @param packageFile  the name of the file
-     * @return the input stream to the file
-     */
-    private Reader getPackageReader(File packageFile, String encoding)
-    {
         try
         {
-            InputStream inputStream = new FileInputStream(packageFile);
-            Reader inputReader = (encoding == null) ? new InputStreamReader(inputStream) : new InputStreamReader(inputStream, encoding);
-            return new BufferedReader(inputReader);
+            importer.importView(importHandler, context.getLocation(), null, new ImportProgress());
         }
-        catch(UnsupportedEncodingException e)
+        catch(ImporterException e)
         {
-            throw new ToolException("Encoding " + encoding + " is not supported");
-        }
-        catch(IOException e)
-        {
-            throw new ToolException("Failed to read package " + packageFile.getAbsolutePath() + " due to " + e.getMessage());
+            throw new ToolException("Failed to import package due to " + e.getMessage(), e);
         }
     }
     
     /**
-     * Handler for importing Repository content streams from file system
+     * Handler for exporting Repository content streams to file system files
      * 
      * @author David Caruana
      */
-    private class PackageStreamHandler
-        implements ImportStreamHandler
+    private class FileHandler extends FileImportPackageHandler
     {
-        private File sourceDir;
-
         /**
-         * Constuct Handler
+         * Construct
          * 
-         * @param sourceDir  source directory
-         * @param packageDir  relative directory within source to place exported content  
+         * @param sourceDir
+         * @param dataFile
+         * @param dataFileEncoding
          */
-        private PackageStreamHandler(File sourceDir)
+        public FileHandler(File sourceDir, File dataFile, String dataFileEncoding)
         {
-            this.sourceDir = sourceDir;
+            super(sourceDir, dataFile, dataFileEncoding);
         }
 
-        /* (non-Javadoc)
-         * @see org.alfresco.service.cmr.view.ImportStreamHandler#importStream(java.lang.String)
+        /**
+         * Log Export Message
+         * 
+         * @param message  message to log
          */
-        public InputStream importStream(String url)
+        protected void log(String message)
         {
-            File fileURL = new File(url);
-            if (fileURL.isAbsolute() == false)
-            {
-                fileURL = new File(sourceDir, url);
-            }
-            
-            try
-            {
-                return new FileInputStream(fileURL);
-            }
-            catch(IOException e)
-            {
-                throw new ToolException("Failed to read content url " + url + " from file " + fileURL.getAbsolutePath());
-            }
+            Import.this.log(message);
         }
     }
     
@@ -344,13 +304,13 @@ public class Import extends Tool
             }
             if (sourceDir != null)
             {
-                File fileSourceDir = new File(sourceDir);
+                File fileSourceDir = getSourceDir();
                 if (fileSourceDir.exists() == false)
                 {
                     throw new ToolException("Source directory " + fileSourceDir.getAbsolutePath() + " does not exist.");
                 }
             }
-            File packageFile = getPackageFile();
+            File packageFile = new File(getSourceDir(), getPackageFile().getPath());
             if (packageFile.exists() == false)
             {
                 throw new ToolException("Package file " + packageFile.getAbsolutePath() + " does not exist.");
@@ -388,7 +348,7 @@ public class Import extends Tool
         private File getPackageFile()
         {
             String packageFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
-            File file = new File(getSourceDir(), packageFile); 
+            File file = new File(packageFile); 
             return file;
         }
     }

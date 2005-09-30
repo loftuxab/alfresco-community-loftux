@@ -45,13 +45,12 @@ public interface ImporterService
      * 
      * This import allows for a custom content importer.
      * 
-     * @param viewReader  input stream containing the xml view to parse
-     * @param streamHandler  custom content importer
+     * @param importHandler  custom content importer
      * @param location  the location to import under
      * @param binding  property values used for binding property place holders in import stream
      * @param progress  progress monitor (optional)
      */
-    public void importView(Reader viewReader, ImportStreamHandler streamHandler, Location location, ImporterBinding binding, ImporterProgress progress)
+    public void importView(ImportPackageHandler importHandler, Location location, ImporterBinding binding, ImporterProgress progress)
         throws ImporterException;
     
 }

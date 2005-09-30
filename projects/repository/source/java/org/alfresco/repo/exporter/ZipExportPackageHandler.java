@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.util.TempFileProvider;
@@ -124,7 +125,7 @@ public class ZipExportPackageHandler
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ExportStreamHandler#exportStream(java.io.InputStream)
      */
-    public String exportStream(InputStream exportStream)
+    public ContentData exportContent(InputStream content, ContentData contentData)
     {
         // create zip entry for stream to export
         File file = new File(contentDir.getPath(), "content" + iFileCnt++ + ".bin");
@@ -135,14 +136,14 @@ public class ZipExportPackageHandler
             zipStream.putNextEntry(zipEntry);
             
             // copy export stream to zip
-            copyStream(zipStream, exportStream);
+            copyStream(zipStream, content);
         }
         catch (IOException e)
         {
             throw new ExporterException("Failed to zip export stream", e);
         }
         
-        return file.getPath();
+        return new ContentData(file.getPath(), contentData.getMimetype(), contentData.getSize(), contentData.getEncoding());
     }
 
     /* (non-Javadoc)

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.namespace.QName;
@@ -201,11 +202,11 @@ import org.alfresco.service.namespace.QName;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
      */
-    public void content(NodeRef nodeRef, QName property, InputStream content)
+    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData)
     {
         for (Exporter exporter : exporters)
         {
-            exporter.content(nodeRef, property, content);
+            exporter.content(nodeRef, property, content, contentData);
         }
     }
     

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.util.TempFileProvider;
@@ -105,7 +106,7 @@ public class FileExportPackageHandler
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ExportStreamHandler#exportStream(java.io.InputStream)
      */
-    public String exportStream(InputStream exportStream)
+    public ContentData exportContent(InputStream content, ContentData contentData)
     {
         // Lazily create package directory
         try
@@ -125,11 +126,11 @@ public class FileExportPackageHandler
             // Copy exported content from repository to exported file
             FileOutputStream outputStream = new FileOutputStream(outputFile);
             byte[] buffer = new byte[2048 * 10];
-            int read = exportStream.read(buffer, 0, 2048 *10);
+            int read = content.read(buffer, 0, 2048 *10);
             while (read != -1)
             {
                 outputStream.write(buffer, 0, read);
-                read = exportStream.read(buffer, 0, 2048 *10);
+                read = content.read(buffer, 0, 2048 *10);
             }
             outputStream.close();
         }
@@ -142,8 +143,9 @@ public class FileExportPackageHandler
             throw new ExporterException("Failed to export content due to " + e.getMessage());
         }
         
-        // return relative path to exported content file (relative to xml export file) 
-        return new File(contentDir, outputFile.getName()).getPath();
+        // return relative path to exported content file (relative to xml export file)
+        File url = new File(contentDir, outputFile.getName());
+        return new ContentData(url.getPath(), contentData.getMimetype(), contentData.getSize(), contentData.getEncoding());
     }
 
     /* (non-Javadoc)

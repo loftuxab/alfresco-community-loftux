@@ -19,6 +19,8 @@ package org.alfresco.service.cmr.view;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.alfresco.service.cmr.repository.ContentData;
+
 
 /**
  * Contract for a custom content property exporter.
@@ -44,10 +46,11 @@ public interface ExportPackageHandler
     /**
      * Call-back for handling the export of content stream.
      * 
-     * @param exportStream stream to export
+     * @param content content to export
+     * @param contentData content descriptor
      * @return the URL to the location of the exported content
      */
-    public String exportStream(InputStream exportStream);
+    public ContentData exportContent(InputStream content, ContentData contentData);
     
     /**
      * End the Export

@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -138,7 +139,7 @@ public class ExporterComponentTest extends BaseSpringTest
 //          System.out.println("TestProgress: multi value " + value);
         }
 
-        public void content(NodeRef nodeRef, QName property, InputStream content)
+        public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData)
         {
 //            System.out.println("TestProgress: content stream ");
         }

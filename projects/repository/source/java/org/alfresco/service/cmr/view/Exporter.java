@@ -19,6 +19,7 @@ package org.alfresco.service.cmr.view;
 import java.io.InputStream;
 import java.util.Collection;
 
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
@@ -135,8 +136,9 @@ public interface Exporter
      * @param nodeRef  the node reference
      * @param property  the property name
      * @param content  the content stream
+     * @param contentData  content descriptor
      */
-    public void content(NodeRef nodeRef, QName property, InputStream content);
+    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData);
     
     /**
      * Start export of association

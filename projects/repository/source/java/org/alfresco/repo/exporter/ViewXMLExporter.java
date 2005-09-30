@@ -19,6 +19,7 @@ package org.alfresco.repo.exporter;
 import java.io.InputStream;
 import java.util.Collection;
 
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
@@ -275,7 +276,7 @@ import org.xml.sax.helpers.AttributesImpl;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
      */
-    public void content(NodeRef nodeRef, QName property, InputStream content)
+    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData)
     {
         // TODO: Base64 encode content and send out via Content Handler
     }
