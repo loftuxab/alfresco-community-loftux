@@ -212,5 +212,20 @@
             <ref bean="nodeService"></ref>
         </property>
     </bean>
+    
+    <bean id="import" class="org.alfresco.repo.action.executer.ImporterActionExecuter" parent="action-executer">
+        <property name="importerService">
+            <ref bean="ImporterService"/>
+        </property>
+    </bean>
+    
+    <bean id="export" class="org.alfresco.repo.action.executer.ExporterActionExecuter" parent="action-executer">
+        <property name="publicAction">
+            <value>false</value>
+        </property>
+        <property name="exporterService">
+            <ref bean="ExporterService"/>
+        </property>
+    </bean>
 
 </beans>
