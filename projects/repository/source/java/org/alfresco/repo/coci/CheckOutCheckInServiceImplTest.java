@@ -40,6 +40,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.TestWithUserUtils;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Version operations service implementation unit tests
@@ -68,9 +69,9 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	/**
 	 * Types and properties used by the tests
 	 */
-	private static final String TEST_VALUE_1 = "myDocument.doc";
-	private static final String TEST_VALUE_2 = "UTF8";
-	private static final String TEST_VALUE_3 = "UTF16";
+	private static final String TEST_VALUE_NAME = "myDocument.doc";
+	private static final String TEST_VALUE_2 = "testValue2";
+	private static final String TEST_VALUE_3 = "testValue3";
 	private static final QName PROP_NAME_QNAME = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "name");
 	private static final QName PROP2_QNAME = ContentModel.PROP_DESCRIPTION;
 	private static final String CONTENT_1 = "This is some content";
@@ -107,11 +108,14 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 				QName.createQName("{test}test"),
 				ContentModel.TYPE_CONTENT);
 		this.nodeRef = childAssocRef.getChildRef();
-		
+        this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_TITLED, null);
+        this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_NAME, TEST_VALUE_NAME);
+        this.nodeService.setProperty(this.nodeRef, PROP2_QNAME, TEST_VALUE_2);
+        
 		// Add the initial content to the node
 		ContentWriter contentWriter = this.contentService.getWriter(this.nodeRef, ContentModel.PROP_CONTENT, true);
         contentWriter.setMimetype("text/plain");
-        contentWriter.setEncoding(TEST_VALUE_2);
+        contentWriter.setEncoding("UTF-8");
 		contentWriter.putContent(CONTENT_1);
 		
 		// Add the lock and version aspects to the created node
@@ -133,7 +137,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private Map<QName, Serializable> createTypePropertyBag()
 	{
 		Map<QName, Serializable> result = new HashMap<QName, Serializable>();
-		result.put(PROP_NAME_QNAME, TEST_VALUE_1);
+		result.put(PROP_NAME_QNAME, TEST_VALUE_NAME);
 		return result;
 	}
 	
@@ -159,6 +163,8 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 				QName.createQName("{test}workingCopy"));
 		assertNotNull(workingCopy);
 		
+        System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        
 		// Ensure that the working copy and copy aspect has been applied
 		assertTrue(this.nodeService.hasAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY));	
 		assertTrue(this.nodeService.hasAspect(workingCopy, ContentModel.ASPECT_COPIEDFROM));
@@ -189,7 +195,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 				"The content string of the working copy should match the original immediatly after checkout.", 
 				contentReader.getContentString(), 
 				contentReader2.getContentString());
-		
+        
 		return workingCopy;
 	}
 	
@@ -238,8 +244,8 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		assertEquals(CONTENT_1, versionContentReader.getContentString());		
 		
 		// Check that the name is not updated during the check-in
-		assertEquals(TEST_VALUE_1, this.nodeService.getProperty(versionNodeRef, PROP_NAME_QNAME));
-		assertEquals(TEST_VALUE_1, this.nodeService.getProperty(origNodeRef, PROP_NAME_QNAME));
+		assertEquals(TEST_VALUE_NAME, this.nodeService.getProperty(versionNodeRef, PROP_NAME_QNAME));
+		assertEquals(TEST_VALUE_NAME, this.nodeService.getProperty(origNodeRef, PROP_NAME_QNAME));
 		
 		// Check that the other properties are updated during the check-in
 		assertEquals(TEST_VALUE_2, this.nodeService.getProperty(versionNodeRef, PROP2_QNAME));
