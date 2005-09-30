@@ -36,7 +36,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.view.ExportStreamHandler;
+import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterCrawler;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
@@ -125,21 +125,25 @@ public class ExporterComponent
         // Export
         exportView(xmlExporter, parameters, progress);
     }
-
+    
     /* (non-Javadoc)
-     * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.ExportStreamHandler, org.alfresco.service.cmr.view.ExporterCrawlerParameters, org.alfresco.service.cmr.view.Exporter)
+     * @see org.alfresco.service.cmr.view.ExporterService#exportView(org.alfresco.service.cmr.view.ExportPackageHandler, org.alfresco.service.cmr.view.ExporterCrawlerParameters, org.alfresco.service.cmr.view.Exporter)
      */
-    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, ExporterCrawlerParameters parameters, Exporter progress)
+    public void exportView(ExportPackageHandler exportHandler, ExporterCrawlerParameters parameters, Exporter progress)
     {
-        ParameterCheck.mandatory("View Writer", viewWriter);
-        ParameterCheck.mandatory("Stream Handler", streamHandler);
+        ParameterCheck.mandatory("Stream Handler", exportHandler);
 
-        // Construct a URL Exporter (wrapped around an XML Exporter)
-        Exporter xmlExporter = createXMLExporter(viewWriter);
-        URLExporter urlExporter = new URLExporter(xmlExporter, streamHandler);
+        // create exporter around export handler
+        exportHandler.startExport();
+        OutputStream dataFile = exportHandler.createDataStream();
+        Exporter xmlExporter = createXMLExporter(dataFile);
+        URLExporter urlExporter = new URLExporter(xmlExporter, exportHandler);
 
-        // Export        
-        exportView(urlExporter, parameters, progress);        
+        // export        
+        exportView(urlExporter, parameters, progress);
+        
+        // end export
+        exportHandler.endExport();
     }
     
     /* (non-Javadoc)

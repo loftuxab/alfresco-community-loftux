@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.util.Collection;
 
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.view.ExportStreamHandler;
+import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
@@ -37,7 +37,7 @@ import org.alfresco.util.ParameterCheck;
     implements Exporter
 {
     private Exporter exporter;
-    private ExportStreamHandler streamHandler;
+    private ExportPackageHandler streamHandler;
 
     
     /**
@@ -45,7 +45,7 @@ import org.alfresco.util.ParameterCheck;
      * @param exporter  exporter to delegate to
      * @param streamHandler  the handler for transforming content streams to URLs
      */
-    public URLExporter(Exporter exporter, ExportStreamHandler streamHandler)
+    public URLExporter(Exporter exporter, ExportPackageHandler streamHandler)
     {
         ParameterCheck.mandatory("Exporter", exporter);
         ParameterCheck.mandatory("Stream Handler", streamHandler);

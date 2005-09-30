@@ -17,6 +17,7 @@
 package org.alfresco.service.cmr.view;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /**
@@ -25,9 +26,21 @@ import java.io.InputStream;
  * @author David Caruana
  *
  */
-public interface ExportStreamHandler
+public interface ExportPackageHandler
 {
-
+    /**
+     * Start the Export
+     */
+    public void startExport();
+    
+    /**
+     * Create a stream for accepting the package data
+     * 
+     * @return  the output stream
+     */
+    public OutputStream createDataStream();
+    
+    
     /**
      * Call-back for handling the export of content stream.
      * 
@@ -35,5 +48,10 @@ public interface ExportStreamHandler
      * @return the URL to the location of the exported content
      */
     public String exportStream(InputStream exportStream);
+    
+    /**
+     * End the Export
+     */
+    public void endExport();
     
 }

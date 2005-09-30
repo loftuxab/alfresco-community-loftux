@@ -24,9 +24,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.alfresco.repo.exporter.FileExportPackageHandler;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.view.ExportStreamHandler;
+import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
@@ -207,146 +208,46 @@ public final class Export extends Tool
     void execute() throws ToolException
     {
         ExporterService exporter = getServiceRegistry().getExporterService();
-        
-        // Create Export package
-        File packageFile = context.getPackageFile();
-        log("Exporting to package " + packageFile.getAbsolutePath());
-        OutputStream output = createPackageFile(packageFile, context.overwrite);
-        PackageStreamHandler streamHandler = new PackageStreamHandler(context.getDestDir(), context.getPackageDir(), context.overwrite);
-        streamHandler.createPackage();
 
-        // Export Repository content to export package
+        // create export package handler
+        ExportPackageHandler exportHandler = new ToolExportPackageHandler(context.getDestDir(), context.getPackageFile(), context.getPackageDir(), context.overwrite);
+
+        // export Repository content to export package
         ExporterCrawlerParameters parameters = new ExporterCrawlerParameters();
         parameters.setExportFrom(context.getLocation());
         parameters.setCrawlSelf(context.self);
         parameters.setCrawlChildNodes(context.children);
-        exporter.exportView(output, streamHandler, parameters, new ExportProgress());
-        
-        // Close Export File
-        try
-        {
-            output.close();
-        }
-        catch(IOException e)
-        {
-            throw new ToolException("Failed to create package file " + packageFile.getAbsolutePath() + " due to" + e.getMessage());
-        }
+        exporter.exportView(exportHandler, parameters, new ExportProgress());
     }
 
-    /**
-     * Create XML Export File
-     * 
-     * @param packageFile  the name of the file
-     * @param overwrite  force overwrite of existing xml export file
-     * @return the output stream to the file
-     */
-    private OutputStream createPackageFile(File packageFile, boolean overwrite)
-    {
-        if (packageFile.exists())
-        {
-            if (overwrite == false)
-            {
-                throw new ToolException("Package file " + packageFile.getAbsolutePath() + " already exists.");
-            }
-            log("Warning: Overwriting existing package file " + packageFile.getAbsolutePath());
-            packageFile.delete();
-        }
-
-        try
-        {
-            packageFile.createNewFile();
-            OutputStream outputStream = new FileOutputStream(packageFile);
-            return outputStream;
-        }
-        catch(IOException e)
-        {
-            throw new ToolException("Failed to create package file " + packageFile.getAbsolutePath() + " due to " + e.getMessage());
-        }
-    }
-    
     /**
      * Handler for exporting Repository content streams to file system files
      * 
      * @author David Caruana
      */
-    private class PackageStreamHandler
-        implements ExportStreamHandler
+    private class ToolExportPackageHandler extends FileExportPackageHandler
     {
-        private File packageDir;
-        private File absPackageDir;
-        private boolean overwrite;
-
         /**
-         * Constuct Handler
+         * Construct
          * 
-         * @param destDir  destination directory
-         * @param packageDir  relative directory within destination to place exported content  
-         * @param overwrite  force overwrite of existing package directory
+         * @param destDir
+         * @param dataFile
+         * @param contentDir
+         * @param overwrite
          */
-        /*package*/ PackageStreamHandler(File destDir, File packageDir, boolean overwrite)
+        public ToolExportPackageHandler(File destDir, File dataFile, File contentDir, boolean overwrite)
         {
-            this.packageDir = packageDir;
-            this.absPackageDir = new File(destDir, packageDir.getPath());
-            this.overwrite = overwrite;
-        }
-        
-        /**
-         * Create the Package Directory
-         */
-        /*package*/ void createPackage()
-        {
-            if (absPackageDir.exists())
-            {
-                if (overwrite == false)
-                {
-                    throw new ToolException("Package dir " + absPackageDir.getAbsolutePath() + " already exists.");
-                }
-                log("Warning: Overwriting existing package dir " + absPackageDir.getAbsolutePath());
-            }
+            super(destDir, dataFile, contentDir, overwrite);
         }
 
-        /* (non-Javadoc)
-         * @see org.alfresco.service.cmr.view.ExportStreamHandler#exportStream(java.io.InputStream)
+        /**
+         * Log Export Message
+         * 
+         * @param message  message to log
          */
-        public String exportStream(InputStream exportStream)
+        protected void log(String message)
         {
-            // Lazily create package directory
-            try
-            {
-                absPackageDir.mkdirs();
-            }
-            catch(SecurityException e)
-            {
-                throw new ToolException("Failed to create package dir " + absPackageDir.getAbsolutePath() + " due to " + e.getMessage());
-            }
-            
-            // Create file in package directory to hold exported content
-            File outputFile = TempFileProvider.createTempFile("export", ".bin", absPackageDir);
-            
-            try
-            {
-                // Copy exported content from repository to exported file
-                FileOutputStream outputStream = new FileOutputStream(outputFile);
-                byte[] buffer = new byte[2048 * 10];
-                int read = exportStream.read(buffer, 0, 2048 *10);
-                while (read != -1)
-                {
-                    outputStream.write(buffer, 0, read);
-                    read = exportStream.read(buffer, 0, 2048 *10);
-                }
-                outputStream.close();
-            }
-            catch(FileNotFoundException e)
-            {
-                throw new ToolException("Failed to create export package file due to " + e.getMessage());
-            }
-            catch(IOException e)
-            {
-                throw new ToolException("Failed to export content due to " + e.getMessage());
-            }
-            
-            // return relative path to exported content file (relative to xml export file) 
-            return new File(packageDir, outputFile.getName()).getPath();
+            Export.this.log(message);
         }
     }
     
@@ -454,7 +355,7 @@ public final class Export extends Tool
         private File getPackageFile()
         {
             String packageFile = (packageName.indexOf('.') != -1) ? packageName : packageName + ".xml";
-            File file = new File(getDestDir(), packageFile); 
+            File file = new File(packageFile); 
             return file;
         }
     }

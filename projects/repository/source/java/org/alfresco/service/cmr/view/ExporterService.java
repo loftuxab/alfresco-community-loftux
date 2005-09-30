@@ -44,12 +44,11 @@ public interface ExporterService
      * 
      * This export supports the custom handling of content properties.
      * 
-     * @param viewWriter the output stream to export to
-     * @param streamHandler  the custom handler for content properties
+     * @param exportHandler  the custom export handler for content properties
      * @param parameters  export parameters
      * @param progress  exporter callback for tracking progress of export
      */
-    public void exportView(OutputStream viewWriter, ExportStreamHandler streamHandler, ExporterCrawlerParameters parameters, Exporter progress)
+    public void exportView(ExportPackageHandler exportHandler, ExporterCrawlerParameters parameters, Exporter progress)
         throws ExporterException;
 
     
