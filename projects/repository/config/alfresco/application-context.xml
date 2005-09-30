@@ -811,7 +811,7 @@
         </property>
     </bean>
 
-    <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap" init-method="bootstrap" depends-on="nodeIndexer">
+    <bean id="importerBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap" init-method="bootstrap" depends-on="nodeIndexer, auditableAspect">
         <property name="transactionService">
             <ref bean="transactionComponent"/>
         </property>
