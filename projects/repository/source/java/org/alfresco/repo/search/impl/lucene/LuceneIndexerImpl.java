@@ -1364,7 +1364,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                 catch (ContentIOException e)
                                 {
                                     // log it
-                                    s_logger.error("Not indexed: Transformation failed", e);
+                                    if (s_logger.isDebugEnabled())
+                                    {
+                                        s_logger.debug("Not indexed: Transformation failed", e);
+                                        s_logger.debug("");
+                                    }
                                     // not indexed: transformation failed
                                     doc.add(Field.Text("TEXT", NOT_INDEXED_TRANSFORMATION_FAILED));
                                 }
@@ -1372,12 +1376,15 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             else        // URL not present (null reader) or no content at the URL (file missing)
                             {
                                 // log it
-                                s_logger.error(
-                                        "Not indexed: Content Missing \n" +
-                                        "   node: " + nodeRef + "\n" +
-                                        "   reader: " + reader + "\n" +
-                                        "   content exists: " + (reader == null ? " --- " : Boolean.toString(reader.exists()))
-                                        );
+                                if (s_logger.isDebugEnabled())
+                                {
+                                    s_logger.debug(
+                                            "Not indexed: Content Missing \n" +
+                                            "   node: " + nodeRef + "\n" +
+                                            "   reader: " + reader + "\n" +
+                                            "   content exists: " + (reader == null ? " --- " : Boolean.toString(reader.exists()))
+                                            );
+                                }
                                 // not indexed: content missing
                                 doc.add(Field.Text("TEXT", NOT_INDEXED_CONTENT_MISSING));
                             }
