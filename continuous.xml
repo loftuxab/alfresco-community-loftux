@@ -36,7 +36,7 @@
 
    <target name="distribute" 
            depends="package-jboss-binary-distribution,package-tomcat-binary-distribution,
-                    package-source-distribution" 
+                    package-source-distribution, generate-checksums" 
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="package-jboss-binary-distribution" description="Creates the distibution files for JBoss">
@@ -46,11 +46,13 @@
       <antcall target="package-jboss-binary-distribution-linux"/>
    </target>
 
-   <target name="package-tomcat-binary-distribution" description="Creates the distibution files for Tomcat">
+   <target name="package-tomcat-binary-distribution" depends="init" description="Creates the distibution files for Tomcat">
       <ant target="clean-war"/>
       <ant target="incremental-tomcat"/>
       <antcall target="package-tomcat-binary-distribution-windows"/>
       <antcall target="package-tomcat-binary-distribution-linux"/>
+      <!-- copy the WAR file to the distribution area too -->
+      <copy tofile="${dir.dist}/alfresco-${version.number}.war" file="${dir.deploy.tomcat}/${file.name.war.alfresco}"/>
    </target>
 
    <target name="package-jboss-binary-distribution-windows" depends="init">
@@ -154,4 +156,13 @@
       <delete file="${dir.dist}/${file.name.dist.src}.tar" />
    </target>
 
+   <target name="generate-checksums" depends="init" 
+           description="Generates checksum files for the distibution files">
+      <delete>
+         <fileset dir="${dir.dist}" includes="*.MD5"/>
+      </delete>
+      <checksum>
+         <fileset dir="${dir.dist}"/>
+      </checksum>
+   </target>
 </project>
