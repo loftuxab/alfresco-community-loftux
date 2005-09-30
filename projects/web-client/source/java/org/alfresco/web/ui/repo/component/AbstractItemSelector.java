@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.repo.WebResources;
 
 /**
  * Abstract component to allow the selection of a hierarchical item
@@ -123,6 +124,11 @@ public abstract class AbstractItemSelector extends UIInput
     * @return The root options
     */
    public abstract Collection<ChildAssociationRef> getRootChildren(FacesContext context);
+   
+   /**
+    * @return The icon image to display next to the item links, or null for no icon 
+    */
+   public abstract String getItemIcon();
    
    /**
     * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
@@ -236,6 +242,12 @@ public abstract class AbstractItemSelector extends UIInput
       Map attrs = this.getAttributes();
       boolean showValueInHiddenField = false;
       NodeRef value = null;
+      
+      String image = null;
+      if (getItemIcon() != null)
+      {
+         image = "<span style='padding-right:4px'>" + Utils.buildImageTag(context, getItemIcon(), null, "absmiddle") + "</span>";
+      }
       
       switch (this.mode)
       {
@@ -385,15 +397,17 @@ public abstract class AbstractItemSelector extends UIInput
                
                // render "Go Up" link
                if (this.navigationId != null)
-               {                  
-                  buf.append("<tr><td></td><td>");
-                  
+               {
                   // get the id of the parent node of the current navigation node,
-                  // null means we are at the root level
+                  // null indicates we are at the root level
                   String id = getParentNodeId(context);
                   
+                  buf.append("<tr><td></td><td>");
+                  
+                  String upImage = Utils.buildImageTag(context, WebResources.IMAGE_GO_UP, null, "absmiddle");
+                  
                   // render a link to the parent node
-                  renderNodeLink(context, id, Application.getMessage(context, MSG_GO_UP), buf);
+                  renderNodeLink(context, id, Application.getMessage(context, MSG_GO_UP), upImage, buf);
                   buf.append("</td></tr>");
                }
                
@@ -427,10 +441,10 @@ public abstract class AbstractItemSelector extends UIInput
                         .append("').disabled=false;\"");
                      buf.append("/></td><td>");
                      
-                     // get the name for the child (rather than association name)
+                     // get the name for the child and output as link
                      NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(), childId);
                      String name = Repository.getNameForNode(service, childNodeRef);
-                     renderNodeLink(context, childId, name, buf);
+                     renderNodeLink(context, childId, name, image, buf);
                      buf.append("</td></tr>");
                   }
                }
@@ -455,19 +469,22 @@ public abstract class AbstractItemSelector extends UIInput
                         // now remove the initial selection as we only need it the first time
                         this.initialSelectionId = null;
                      }
+                     buf.append(" onchange=\"javascript:document.getElementById('")
+                        .append(okButtonId)
+                        .append("').disabled=false;\"");
                      buf.append("/></td><td>");
                      
                      // get the name for the child (rather than association name)
                      NodeRef childNodeRef = new NodeRef(Repository.getStoreRef(), childId);
                      String name = Repository.getNameForNode(service, childNodeRef);
-                     renderNodeLink(context, childId, name, buf);
+                     renderNodeLink(context, childId, name, image, buf);
                      buf.append("</td></tr>");
                   }
                }
                
                // render OK button
                String fieldValue = encodeFieldValues(MODE_CONFIRM_SELECTION, null);
-               buf.append("<tr><td></td><td align=center>")
+               buf.append("<tr style='padding-top:4px'><td></td><td align=center>")
                   .append("<input type='button' ")
                   .append(okButtonEnabled == false ? "disabled" : "") 
                   .append(" onclick=\"")
@@ -630,7 +647,7 @@ public abstract class AbstractItemSelector extends UIInput
     *  
     * @return HTML for a descendant link
     */
-   protected String renderNodeLink(FacesContext context, String id, String name, StringBuilder buf)
+   protected String renderNodeLink(FacesContext context, String id, String name, String prefix, StringBuilder buf)
    {
       buf.append("<a href='#' onclick=\"");
       String fieldValue = encodeFieldValues(MODE_DRILLDOWN_SELECTION, id);
@@ -649,7 +666,11 @@ public abstract class AbstractItemSelector extends UIInput
             .append(attrs.get("nodeStyleClass"));
       }
       buf.append('>');
-
+      
+      if (prefix != null)
+      {
+         buf.append(prefix);
+      }
       buf.append(Utils.encode(name));
       
       buf.append("</a>");

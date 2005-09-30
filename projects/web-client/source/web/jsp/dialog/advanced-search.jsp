@@ -137,7 +137,7 @@
                                           </tr>
                                           <tr>
                                              <td style="padding-left:26px">
-                                                <r:spaceSelector label="#{msg.select_space_prompt}" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                <r:spaceSelector label="#{msg.select_space_prompt}" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" styleClass="selector"/>
                                              </td>
                                           </tr>
                                           <tr>
@@ -168,7 +168,7 @@
                                           </tr>
                                           <tr>
                                              <td style="padding-left:8px;padding-top:8px">
-                                                <r:categorySelector label="#{msg.select_category_prompt}" value="#{AdvancedSearchBean.category}" style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                <r:categorySelector label="#{msg.select_category_prompt}" value="#{AdvancedSearchBean.category}" styleClass="selector"/>
                                              </td>
                                           </tr>
                                           <tr>

@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.search.CategoryService.Depth;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.ui.repo.WebResources;
 
 /**
  * Component to allow the selection of a category
@@ -84,15 +85,18 @@ public class UICategorySelector extends AbstractItemSelector
    {
       String id = null;
       
-      ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
-            new NodeRef(Repository.getStoreRef(), this.navigationId));
-      Node parentNode = new Node(parentRef.getParentRef(), getNodeService(context));
-      
-      DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
-      
-      if (dd.isSubClass(parentNode.getType(), ContentModel.TYPE_CATEGORYROOT) == false)
+      if (this.navigationId != null)
       {
-         id = parentRef.getParentRef().getId();
+         ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
+               new NodeRef(Repository.getStoreRef(), this.navigationId));
+         Node parentNode = new Node(parentRef.getParentRef(), getNodeService(context));
+         
+         DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
+         
+         if (dd.isSubClass(parentNode.getType(), ContentModel.TYPE_CATEGORYROOT) == false)
+         {
+            id = parentRef.getParentRef().getId();
+         }
       }
       
       return id;
@@ -121,5 +125,13 @@ public class UICategorySelector extends AbstractItemSelector
    public Collection<ChildAssociationRef> getRootChildren(FacesContext context)
    {
       return getCategoryService(context).getCategories(Repository.getStoreRef(), ContentModel.ASPECT_GEN_CLASSIFIABLE, Depth.IMMEDIATE);
+   }
+   
+   /**
+    * @see org.alfresco.web.ui.repo.component.AbstractItemSelector#getItemIcon()
+    */
+   public String getItemIcon()
+   {
+      return WebResources.IMAGE_CATEGORY;
    }
 }

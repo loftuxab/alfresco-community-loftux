@@ -118,7 +118,7 @@
                                        <r:spaceSelector label="#{msg.select_destination_prompt}" 
                                                         value="#{NewRuleWizard.actionProperties.destinationLocation}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
-                                                        style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                        styleClass="selector"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

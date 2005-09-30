@@ -66,7 +66,7 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <h:graphicImage id="logo" url="/images/icons/category_large.gif" />
+                              <h:graphicImage id="logo" url="/images/icons/category.gif" />
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
@@ -152,7 +152,7 @@
                                     <f:facet name="header">
                                        <h:outputText value="#{msg.actions}"/>
                                     </f:facet>
-                                    <a:actionLink value="#{msg.modify}" image="/images/icons/edit_category.gif" showLink="false" action="editCategory" actionListener="#{CategoriesBean.setupCategoryAction}">
+                                    <a:actionLink value="#{msg.modify}" image="/images/icons/edit_category.gif" showLink="false" action="editCategory" style="padding-right:2px" actionListener="#{CategoriesBean.setupCategoryAction}">
                                        <f:param name="id" value="#{r.id}" />
                                     </a:actionLink>
                                     <a:actionLink value="#{msg.delete}" image="/images/icons/delete_category.gif" showLink="false" action="deleteCategory" actionListener="#{CategoriesBean.setupCategoryAction}">

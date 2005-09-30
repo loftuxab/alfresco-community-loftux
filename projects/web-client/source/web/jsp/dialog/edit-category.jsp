@@ -101,9 +101,8 @@
                                     <td><h:outputText value="#{msg.categories}" />:</td>
                                     <td width="90%">
                                        <a:multiValueListEditor value="#{DocumentDetailsBean.categories}"
-                                                               lastItemAdded="#{DocumentDetailsBean.addedCategory}"
-                                                               style="border: 1px dashed #cccccc; padding: 4px;">
-                                          <r:categorySelector label="#{msg.select_category_prompt}" 
+                                                               lastItemAdded="#{DocumentDetailsBean.addedCategory}" styleClass="selector">
+                                          <r:categorySelector label="#{msg.select_category_prompt}"
                                                               value="#{DocumentDetailsBean.addedCategory}"/>
                                        </a:multiValueListEditor>
                                     </td>

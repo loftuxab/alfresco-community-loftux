@@ -164,7 +164,7 @@
                                                 <r:spaceSelector id="client-approve-folder" label="#{msg.select_destination_prompt}"
                                                         value="#{DocumentDetailsBean.workflowProperties.approveFolder}"
                                                         initialSelection="#{NavigationBean.currentNodeId}"
-                                                        style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                        styleClass="selector"/>
                                              </td>
                                           </tr>
                                        </table>
@@ -220,7 +220,7 @@
                                                                           label="#{msg.select_destination_prompt}" 
                                                                           value="#{DocumentDetailsBean.workflowProperties.rejectFolder}" 
                                                                           initialSelection="#{NavigationBean.currentNodeId}"
-                                                                          style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                                          styleClass="selector"/>
                                                                </td>
                                                             </tr>
                                                          </table>

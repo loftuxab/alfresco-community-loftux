@@ -151,7 +151,7 @@
                                        <r:spaceSelector label="#{msg.select_space_prompt}"
                                                 value="#{CheckinCheckoutBean.selectedSpaceId}"
                                                 initialSelection="#{NavigationBean.currentNodeId}"
-                                                style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                styleClass="selector"/>
                                     </td>
                                  </tr>
                               </table>

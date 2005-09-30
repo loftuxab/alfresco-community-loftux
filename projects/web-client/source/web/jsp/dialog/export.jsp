@@ -27,6 +27,14 @@
 <r:page titleId="title_export">
 
 <script language="JavaScript1.2">
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("export-form:package-name").focus();
+      checkButtonState();
+   }
+   
    function checkButtonState()
    {
       if (document.getElementById("export-form:package-name").value.length == 0 ||
@@ -39,8 +47,6 @@
          document.getElementById("export-form:ok-button").disabled = false;
       }
    }
-   
-   checkButtonState();
 </script>
 
 <f:view>
@@ -136,7 +142,7 @@
                                        <r:spaceSelector id="destination" label="#{msg.select_destination_prompt}" 
                                                         value="#{ExportDialog.destination}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
-                                                        style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                        styleClass="selector"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

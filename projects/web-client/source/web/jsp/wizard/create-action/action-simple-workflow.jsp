@@ -186,7 +186,7 @@
                                                         label="#{msg.select_destination_prompt}" 
                                                         value="#{NewActionWizard.actionProperties.approveFolder}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
-                                                        style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                        styleClass="selector"/>
                                              </td>
                                           </tr>
                                        </table>
@@ -242,7 +242,7 @@
                                                                           label="#{msg.select_destination_prompt}" 
                                                                           value="#{NewActionWizard.actionProperties.rejectFolder}" 
                                                                           initialSelection="#{NavigationBean.currentNodeId}"
-                                                                          style="border: 1px dashed #cccccc; padding: 4px;"/>
+                                                                          styleClass="selector"/>
                                                                </td>
                                                             </tr>
                                                          </table>

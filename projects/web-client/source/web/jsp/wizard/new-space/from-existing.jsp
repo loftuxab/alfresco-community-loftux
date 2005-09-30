@@ -125,7 +125,7 @@
                                        <r:spaceSelector label="#{msg.select_existing_space_prompt}" 
                                                         value="#{NewSpaceWizard.existingSpaceId}" 
                                                         initialSelection="#{NavigationBean.currentNodeId}"
-                                                        style="border: 1px dashed #cccccc; padding: 4px;" />
+                                                        styleClass="selector" />
                                     </td>
                                  </tr>
                                  <%-- TBD

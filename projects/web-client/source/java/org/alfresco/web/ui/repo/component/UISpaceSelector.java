@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.ui.repo.WebResources;
 
 /**
  * @author Kevin Roast
@@ -118,5 +119,13 @@ public class UISpaceSelector extends AbstractItemSelector
       roots.add(childRefFromRealRoot);
                   
       return roots;
+   }
+
+   /**
+    * @see org.alfresco.web.ui.repo.component.AbstractItemSelector#getItemIcon()
+    */
+   public String getItemIcon()
+   {
+      return WebResources.IMAGE_SPACE;
    }
 }
