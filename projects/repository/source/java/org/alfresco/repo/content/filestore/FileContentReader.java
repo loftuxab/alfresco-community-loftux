@@ -51,8 +51,8 @@ public class FileContentReader extends AbstractContentReader implements RandomAc
     
     /**
      * Checks the existing reader provided and replaces it with a reader onto some
-     * fake content if required.  If the existing reader is invalid, an error message
-     * will be logged as well.
+     * fake content if required.  If the existing reader is invalid, an debug message
+     * will be logged under this classname category.
      * <p>
      * It is a convenience method that clients can use to cheaply get a reader that
      * is valid, regardless of whether the initial reader is valid.
@@ -71,7 +71,10 @@ public class FileContentReader extends AbstractContentReader implements RandomAc
             String fakeContent = MessageFormat.format(msgTemplate, args);
             
             // log it
-            logger.error(fakeContent);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(fakeContent);
+            }
             
             // fake the content
             File tempFile = TempFileProvider.createTempFile("getSafeContentReader_", ".txt");
