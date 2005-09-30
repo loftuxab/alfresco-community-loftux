@@ -480,7 +480,7 @@ public class CategoriesBean implements IContextListener
          IBreadcrumbHandler handler = location.get(location.size() - 1);
          
          // see if the current breadcrumb location is our node 
-         if ( ((IRepoBreadcrumbHandler)handler).getNodeRef().equals(nodeRef) == true )
+         if ( nodeRef.equals(((IRepoBreadcrumbHandler)handler).getNodeRef()) )
          {
             // and update with the modified node details
             IBreadcrumbHandler newHandler = new CategoryBreadcrumbHandler(
