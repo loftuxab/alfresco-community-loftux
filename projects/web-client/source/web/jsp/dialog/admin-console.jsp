@@ -106,6 +106,13 @@
                            <tr>
                               <td><a:actionLink value="#{msg.category_management}" image="/images/icons/categories.gif" action="manageCategories" styleClass="title" /></td>
                            </tr>
+                           <tr>
+                              <td>
+                                 <a:actionLink value="#{msg.export}" image="/images/icons/action.gif" action="export" actionListener="#{BrowseBean.setupSpaceAction}" styleClass="title">
+                                    <f:param name="id" value="#{NavigationBean.currentNodeId}" />
+                                 </a:actionLink>
+                              </td>
+                           </tr>
                         </table>
                         <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "ballongrey"); %>
                      

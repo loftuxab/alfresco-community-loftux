@@ -123,9 +123,6 @@
                                           <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param5" />
                                        </a:actionLink>
                                     </r:permissionEvaluator>
-                                    <a:actionLink value="#{msg.export}" image="/images/icons/action.gif" action="export" actionListener="#{BrowseBean.setupSpaceAction}" id="link11">
-                                       <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param7" />
-                                    </a:actionLink>
                                     <%-- admin user only actions --%>
                                     <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}" id="eval8">
                                        <a:actionLink value="#{msg.admin_console}" image="/images/icons/admin_console.gif" action="adminConsole" id="link11" />

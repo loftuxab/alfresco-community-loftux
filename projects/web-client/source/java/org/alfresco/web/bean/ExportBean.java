@@ -43,8 +43,12 @@ import org.apache.commons.logging.LogFactory;
 public class ExportBean
 {
    private static final Log logger = LogFactory.getLog(ExportBean.class);
+   
    private static final String ALL_SPACES = "all";
    private static final String CURRENT_SPACE = "current";
+   
+   private static final String DEFAULT_OUTCOME = "adminConsole";
+   
    private static final String MSG_ERROR = "error_export";
    
    private BrowseBean browseBean;
@@ -64,7 +68,7 @@ public class ExportBean
       if (logger.isDebugEnabled())
          logger.debug("Called export for " + this.mode + " with package name: " + this.packageName);
       
-      String outcome = "browse";
+      String outcome = DEFAULT_OUTCOME;
       
       UserTransaction tx = null;
       
@@ -110,7 +114,7 @@ public class ExportBean
    {
       reset();
       
-      return "browse";
+      return DEFAULT_OUTCOME;
    }
    
    /**
