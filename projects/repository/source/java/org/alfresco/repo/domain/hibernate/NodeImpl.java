@@ -16,6 +16,8 @@
  */
 package org.alfresco.repo.domain.hibernate;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,6 +32,7 @@ import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
+import org.hibernate.mapping.Bag;
 
 /**
  * Bean containing all the persistence data representing a <b>node</b>.
@@ -46,20 +49,20 @@ public class NodeImpl implements Node
     private QName typeQName;
     private NodeStatus status;
     private Set<QName> aspects;
-    private Set<NodeAssoc> sourceNodeAssocs;
-    private Set<NodeAssoc> targetNodeAssocs;
-    private Set<ChildAssoc> parentAssocs;
-    private Set<ChildAssoc> childAssocs;
+    private Collection<NodeAssoc> sourceNodeAssocs;
+    private Collection<NodeAssoc> targetNodeAssocs;
+    private Collection<ChildAssoc> parentAssocs;
+    private Collection<ChildAssoc> childAssocs;
     private Map<QName, PropertyValue> properties;
     private transient NodeRef nodeRef;
 
     public NodeImpl()
     {
         aspects = new HashSet<QName>(5);
-        sourceNodeAssocs = new HashSet<NodeAssoc>(3);
-        targetNodeAssocs = new HashSet<NodeAssoc>(3);
-        parentAssocs = new HashSet<ChildAssoc>(3);
-        childAssocs = new HashSet<ChildAssoc>(3, 0.75F);
+        sourceNodeAssocs = new ArrayList<NodeAssoc>(3);
+        targetNodeAssocs = new ArrayList<NodeAssoc>(3);
+        parentAssocs = new ArrayList<ChildAssoc>(3);
+        childAssocs = new ArrayList<ChildAssoc>(3);
         properties = new HashMap<QName, PropertyValue>(5);
     }
     
@@ -138,7 +141,7 @@ public class NodeImpl implements Node
         this.aspects = aspects;
     }
 
-    public Set<NodeAssoc> getSourceNodeAssocs()
+    public Collection<NodeAssoc> getSourceNodeAssocs()
     {
         return sourceNodeAssocs;
     }
@@ -146,12 +149,12 @@ public class NodeImpl implements Node
     /**
      * For Hibernate use
      */
-    private void setSourceNodeAssocs(Set<NodeAssoc> sourceNodeAssocs)
+    private void setSourceNodeAssocs(Collection<NodeAssoc> sourceNodeAssocs)
     {
         this.sourceNodeAssocs = sourceNodeAssocs;
     }
 
-    public Set<NodeAssoc> getTargetNodeAssocs()
+    public Collection<NodeAssoc> getTargetNodeAssocs()
     {
         return targetNodeAssocs;
     }
@@ -159,12 +162,12 @@ public class NodeImpl implements Node
     /**
      * For Hibernate use
      */
-    private void setTargetNodeAssocs(Set<NodeAssoc> targetNodeAssocs)
+    private void setTargetNodeAssocs(Collection<NodeAssoc> targetNodeAssocs)
     {
         this.targetNodeAssocs = targetNodeAssocs;
     }
     
-    public Set<ChildAssoc> getParentAssocs()
+    public Collection<ChildAssoc> getParentAssocs()
     {
         return parentAssocs;
     }
@@ -172,12 +175,12 @@ public class NodeImpl implements Node
     /**
      * For Hibernate use
      */
-    private void setParentAssocs(Set<ChildAssoc> parentAssocs)
+    private void setParentAssocs(Collection<ChildAssoc> parentAssocs)
     {
         this.parentAssocs = parentAssocs;
     }
 
-    public Set<ChildAssoc> getChildAssocs()
+    public Collection<ChildAssoc> getChildAssocs()
     {
         return childAssocs;
     }
@@ -185,7 +188,7 @@ public class NodeImpl implements Node
     /**
      * For Hibernate use
      */
-    private void setChildAssocs(Set<ChildAssoc> childAssocs)
+    private void setChildAssocs(Collection<ChildAssoc> childAssocs)
     {
         this.childAssocs = childAssocs;
     }

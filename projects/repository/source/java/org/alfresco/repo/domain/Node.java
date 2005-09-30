@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.domain;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,16 +70,16 @@ public interface Node
     /**
      * @return Returns all the regular associations for which this node is a target 
      */
-    public Set<NodeAssoc> getSourceNodeAssocs();
+    public Collection<NodeAssoc> getSourceNodeAssocs();
 
     /**
      * @return Returns all the regular associations for which this node is a source 
      */
-    public Set<NodeAssoc> getTargetNodeAssocs();
+    public Collection<NodeAssoc> getTargetNodeAssocs();
 
-    public Set<ChildAssoc> getChildAssocs();
+    public Collection<ChildAssoc> getChildAssocs();
 
-    public Set<ChildAssoc> getParentAssocs();
+    public Collection<ChildAssoc> getParentAssocs();
 
     public Map<QName, PropertyValue> getProperties();
 

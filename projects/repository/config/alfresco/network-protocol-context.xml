@@ -96,6 +96,7 @@
       <property name="dictionaryService"><ref bean="dictionaryService" /></property>
       <property name="namespaceService"><ref bean="namespaceService" /></property>
       <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
+      <!--
       <property name="filePathCache">
          <bean class="org.alfresco.filesys.server.filesys.cache.FilePathCache" >
             <property name="policyComponent">
@@ -109,6 +110,7 @@
             </property>
          </bean>
       </property>
+      -->
    </bean>
 
    <bean name="fileStatesCache" class="org.alfresco.repo.cache.TransactionalCache">

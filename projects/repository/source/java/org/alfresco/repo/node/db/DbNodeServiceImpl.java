@@ -560,7 +560,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // get all the child assocs
         ChildAssociationRef primaryAssocRef = null;
-        Set<ChildAssoc> assocs = parentNode.getChildAssocs();
+        Collection<ChildAssoc> assocs = parentNode.getChildAssocs();
         assocs = new HashSet<ChildAssoc>(assocs);   // copy set as we will be modifying it
         for (ChildAssoc assoc : assocs)
         {
@@ -751,7 +751,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node node = getNodeNotNull(nodeRef);
         // get the assocs pointing to it
-        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        Collection<ChildAssoc> parentAssocs = node.getParentAssocs();
         // list of results
         Collection<NodeRef> results = new ArrayList<NodeRef>(parentAssocs.size());
         for (ChildAssoc assoc : parentAssocs)
@@ -771,7 +771,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node node = getNodeNotNull(nodeRef);
         // get the assocs pointing to it
-        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        Collection<ChildAssoc> parentAssocs = node.getParentAssocs();
         // shortcut if there are no assocs
         if (parentAssocs.size() == 0)
         {
@@ -800,7 +800,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node node = getNodeNotNull(nodeRef);
         // get the assocs pointing from it
-        Set<ChildAssoc> childAssocs = node.getChildAssocs();
+        Collection<ChildAssoc> childAssocs = node.getChildAssocs();
         // shortcut if there are no assocs
         if (childAssocs.size() == 0)
         {
@@ -901,7 +901,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node sourceNode = getNodeNotNull(sourceRef);
         // get all assocs to target
-        Set<NodeAssoc> assocs = sourceNode.getTargetNodeAssocs();
+        Collection<NodeAssoc> assocs = sourceNode.getTargetNodeAssocs();
         List<AssociationRef> nodeAssocRefs = new ArrayList<AssociationRef>(assocs.size());
         for (NodeAssoc assoc : assocs)
         {
@@ -921,7 +921,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node sourceNode = getNodeNotNull(targetRef);
         // get all assocs to source
-        Set<NodeAssoc> assocs = sourceNode.getSourceNodeAssocs();
+        Collection<NodeAssoc> assocs = sourceNode.getSourceNodeAssocs();
         List<AssociationRef> nodeAssocRefs = new ArrayList<AssociationRef>(assocs.size());
         for (NodeAssoc assoc : assocs)
         {
@@ -961,7 +961,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         NodeRef currentNodeRef = currentNode.getNodeRef();
         // get the parent associations of the given node
-        Set<ChildAssoc> parentAssocs = currentNode.getParentAssocs();
+        Collection<ChildAssoc> parentAssocs = currentNode.getParentAssocs();
         // does the node have parents
         boolean hasParents = parentAssocs.size() > 0;
         // does the current node have a root aspect?

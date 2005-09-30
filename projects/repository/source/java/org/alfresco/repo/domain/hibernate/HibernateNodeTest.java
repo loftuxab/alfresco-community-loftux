@@ -17,6 +17,7 @@
 package org.alfresco.repo.domain.hibernate;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -375,7 +376,7 @@ public class HibernateNodeTest extends BaseHibernateTest
         }
 
         // check that we can traverse the association from the child
-        Set<ChildAssoc> parentAssocs = contentNode.getParentAssocs();
+        Collection<ChildAssoc> parentAssocs = contentNode.getParentAssocs();
         assertEquals("Expected exactly 2 parent assocs", 2, parentAssocs.size());
         parentAssocs = new HashSet<ChildAssoc>(parentAssocs);
         for (ChildAssoc assoc : parentAssocs)

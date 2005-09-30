@@ -148,7 +148,7 @@ public class CifsHelper
             throws FileNotFoundException
     {
         // check the cache for its state
-        FileState fileState = filePathCache.getExistingFileState(pathRootNodeRef, path);
+        FileState fileState = (filePathCache == null) ? null : filePathCache.getExistingFileState(pathRootNodeRef, path);
         if (fileState != null)
         {
             // it was cached, and we know it exists
@@ -163,7 +163,10 @@ public class CifsHelper
                 
         // put the results back into the cache
         fileState = new FileState(nodeRef, fileInfo);
-        filePathCache.setFileState(pathRootNodeRef, path, fileState);
+        if(filePathCache != null)
+        {
+           filePathCache.setFileState(pathRootNodeRef, path, fileState);
+        }
         
         return fileInfo;
     }
@@ -387,7 +390,7 @@ public class CifsHelper
     private List<NodeRef> getDirectDescendents(NodeRef pathRootNodeRef, String pathElement)
     {
         // first check the cache to see if there are any results for this path query
-        List<NodeRef> cachedResults = filePathCache.getPathResults(pathRootNodeRef, pathElement);
+        List<NodeRef> cachedResults = (filePathCache == null) ? null : filePathCache.getPathResults(pathRootNodeRef, pathElement);
         if (cachedResults != null)
         {
             // the cache had results for good or bad
@@ -468,7 +471,7 @@ public class CifsHelper
     public List<NodeRef> getNodeRefs(NodeRef pathRootNodeRef, String path)
     {
         // first check the cache to see if there are any results for this path query
-        List<NodeRef> cachedResults = filePathCache.getPathResults(pathRootNodeRef, path);
+        List<NodeRef> cachedResults = (filePathCache == null) ? null : filePathCache.getPathResults(pathRootNodeRef, path);
         if (cachedResults != null)
         {
             // the cache had results for good or bad
@@ -503,7 +506,10 @@ public class CifsHelper
         addDescendents(pathRootNodeRefs, pathElements, results); 
         
         // cache the search results
-        filePathCache.setPathResults(pathRootNodeRef, path, results);
+        if(filePathCache != null)
+        {
+            filePathCache.setPathResults(pathRootNodeRef, path, results);
+        }
         
         // done
         if (logger.isDebugEnabled())

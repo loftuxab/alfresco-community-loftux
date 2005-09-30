@@ -340,7 +340,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
                 qname,
                 childNode.getNodeRef());
         // get all the parent's child associations
-        Set<ChildAssoc> assocs = parentNode.getChildAssocs();
+        Collection<ChildAssoc> assocs = parentNode.getChildAssocs();
         // hunt down the desired assoc
         for (ChildAssoc assoc : assocs)
         {
@@ -385,7 +385,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public ChildAssoc getPrimaryParentAssoc(Node node)
     {
         // get the assocs pointing to the node
-        Set<ChildAssoc> parentAssocs = node.getParentAssocs();
+        Collection<ChildAssoc> parentAssocs = node.getParentAssocs();
         ChildAssoc primaryAssoc = null;
         for (ChildAssoc assoc : parentAssocs)
         {
