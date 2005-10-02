@@ -56,6 +56,14 @@
                <type>d:boolean</type>
                <mandatory>true</mandatory>
             </property>
+            <property name="act:runAsUser">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="act:runAsPassword">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
          </properties>	     
          <associations>
             <child-association name="act:conditions">
