@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.rule.ruletrigger.RuleTrigger;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -100,7 +101,8 @@ public class RuleTypeImplTest extends BaseSpringTest
     	
     	// Update some content in order to trigger the rule type
     	ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
-    	contentWriter.putContent("any old content");
+        contentWriter.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+    	contentWriter.putContent("any old content");        
     	assertTrue(ruleType.rulesTriggered);
     	
     	// Reset

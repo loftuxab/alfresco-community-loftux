@@ -17,6 +17,7 @@
 package org.alfresco.repo.rule.ruletrigger;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -224,6 +225,8 @@ public class RuleTriggerTest extends BaseSpringTest
 		
 		// Try and trigger the type
 		ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
+        contentWriter.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        contentWriter.setEncoding("UTF-8");
 		contentWriter.putContent("some content");
 		
 		// Check to see if the rule type has been triggered

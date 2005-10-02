@@ -148,7 +148,7 @@ public class RoutingContentService implements ContentService
     {
         boolean fire = false;
         // check if any of the content properties have changed
-        for (QName propertyQName : before.keySet())
+        for (QName propertyQName : after.keySet())
         {
             // is this a content property?
             PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
