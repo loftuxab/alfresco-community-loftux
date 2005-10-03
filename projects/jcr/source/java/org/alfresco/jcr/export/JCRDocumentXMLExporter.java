@@ -142,6 +142,20 @@ public class JCRDocumentXMLExporter implements Exporter
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startAspects(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void startAspects(NodeRef nodeRef)
+    {
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endAspects(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endAspects(NodeRef nodeRef)
+    {
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#startAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
      */
     public void startAspect(NodeRef nodeRef, QName aspect)
@@ -296,6 +310,20 @@ public class JCRDocumentXMLExporter implements Exporter
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startAssocs(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void startAssocs(NodeRef nodeRef)
+    {
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endAssocs(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endAssocs(NodeRef nodeRef)
+    {
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)
      */

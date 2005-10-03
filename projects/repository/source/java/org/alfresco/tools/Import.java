@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
 
 import org.alfresco.repo.exporter.FileExportPackageHandler;
 import org.alfresco.repo.importer.FileImportPackageHandler;
-import org.alfresco.repo.importer.ZipImportPackageHandler;
+import org.alfresco.repo.importer.ACPImportPackageHandler;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ImportPackageHandler;
@@ -215,7 +215,7 @@ public class Import extends Tool
      * 
      * @author David Caruana
      */
-    private class ZipHandler extends ZipImportPackageHandler
+    private class ZipHandler extends ACPImportPackageHandler
     {
         /**
          * Construct

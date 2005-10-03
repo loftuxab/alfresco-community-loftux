@@ -271,6 +271,7 @@ public class ExporterComponent
             exporter.startNode(nodeRef);
 
             // Export node aspects
+            exporter.startAspects(nodeRef);
             Set<QName> aspects = nodeService.getAspects(nodeRef);
             for (QName aspect : aspects)
             {
@@ -280,6 +281,7 @@ public class ExporterComponent
                     exporter.endAspect(nodeRef, aspect);
                 }
             }
+            exporter.endAspects(nodeRef);
             
             // Export node properties
             exporter.startProperties(nodeRef);
@@ -373,6 +375,7 @@ public class ExporterComponent
             // Export node children
             if (parameters.isCrawlChildNodes())
             {
+                exporter.startAssocs(nodeRef);
                 List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef);
                 for (int i = 0; i < childAssocs.size(); i++)
                 {
@@ -398,6 +401,7 @@ public class ExporterComponent
                         exporter.endAssoc(nodeRef, childAssocType);
                     }
                 }
+                exporter.endAssocs(nodeRef);
             }
             
             // TODO: Export node associations

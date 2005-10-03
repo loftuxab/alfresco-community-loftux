@@ -42,10 +42,16 @@ import org.xml.sax.helpers.AttributesImpl;
     implements Exporter
 {
     private final static String VIEW_LOCALNAME = "view";
-    private final static String VIEW_VALUE = "value";
+    private final static String VALUE_LOCALNAME = "value";
     private final static String CHILDNAME_LOCALNAME = "childName";
+    private final static String ASPECTS_LOCALNAME = "aspects";
+    private final static String PROPERTIES_LOCALNAME = "properties";
+    private final static String ASSOCIATIONS_LOCALNAME = "associations";
     private static QName VIEW_QNAME; 
-    private static QName VALUE_QNAME; 
+    private static QName VALUE_QNAME;
+    private static QName PROPERTIES_QNAME;
+    private static QName ASPECTS_QNAME;
+    private static QName ASSOCIATIONS_QNAME; 
     private static QName CHILDNAME_QNAME; 
     
     private NamespaceService namespaceService;
@@ -68,8 +74,11 @@ import org.xml.sax.helpers.AttributesImpl;
         this.contentHandler = contentHandler;
         
         VIEW_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, namespaceService);
-        VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, namespaceService);
+        VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, namespaceService);
         CHILDNAME_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, CHILDNAME_LOCALNAME, namespaceService);
+        ASPECTS_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ASPECTS_LOCALNAME, namespaceService);
+        PROPERTIES_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, PROPERTIES_LOCALNAME, namespaceService);
+        ASSOCIATIONS_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ASSOCIATIONS_LOCALNAME, namespaceService);
     }
     
     
@@ -160,6 +169,36 @@ import org.xml.sax.helpers.AttributesImpl;
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startAspects(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void startAspects(NodeRef nodeRef)
+    {
+        try
+        {
+            contentHandler.startElement(ASPECTS_QNAME.getNamespaceURI(), ASPECTS_LOCALNAME, toPrefixString(ASPECTS_QNAME), EMPTY_ATTRIBUTES);
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process start aspects", e);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endAspects(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endAspects(NodeRef nodeRef)
+    {
+        try
+        {
+            contentHandler.endElement(ASPECTS_QNAME.getNamespaceURI(), ASPECTS_LOCALNAME, toPrefixString(ASPECTS_QNAME));
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process end aspects", e);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#startAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
      */
     public void startAspect(NodeRef nodeRef, QName aspect)
@@ -194,6 +233,14 @@ import org.xml.sax.helpers.AttributesImpl;
      */
     public void startProperties(NodeRef nodeRef)
     {
+        try
+        {
+            contentHandler.startElement(PROPERTIES_QNAME.getNamespaceURI(), PROPERTIES_LOCALNAME, toPrefixString(PROPERTIES_QNAME), EMPTY_ATTRIBUTES);
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process start properties", e);
+        }
     }
 
     /* (non-Javadoc)
@@ -201,6 +248,14 @@ import org.xml.sax.helpers.AttributesImpl;
      */
     public void endProperties(NodeRef nodeRef)
     {
+        try
+        {
+            contentHandler.endElement(PROPERTIES_QNAME.getNamespaceURI(), PROPERTIES_LOCALNAME, toPrefixString(PROPERTIES_QNAME));
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process start properties", e);
+        }
     }
 
     /* (non-Javadoc)
@@ -262,9 +317,9 @@ import org.xml.sax.helpers.AttributesImpl;
             Collection<String> strValues = DefaultTypeConverter.INSTANCE.convert(String.class, values);
             for (String strValue : strValues)
             {
-                contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
+                contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
                 contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
-                contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_VALUE, toPrefixString(VALUE_QNAME));
+                contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
             }
         }
         catch (SAXException e)
@@ -280,7 +335,7 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         // TODO: Base64 encode content and send out via Content Handler
     }
-
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#startAssoc(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
      */
@@ -311,6 +366,36 @@ import org.xml.sax.helpers.AttributesImpl;
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startAssocs(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void startAssocs(NodeRef nodeRef)
+    {
+        try
+        {
+            contentHandler.startElement(ASSOCIATIONS_QNAME.getNamespaceURI(), ASSOCIATIONS_LOCALNAME, toPrefixString(ASSOCIATIONS_QNAME), EMPTY_ATTRIBUTES);
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process start associations", e);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endAssocs(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endAssocs(NodeRef nodeRef)
+    {
+        try
+        {
+            contentHandler.endElement(ASSOCIATIONS_QNAME.getNamespaceURI(), ASSOCIATIONS_LOCALNAME, toPrefixString(ASSOCIATIONS_QNAME));
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process end associations", e);
+        }
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)
      */

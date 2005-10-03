@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -50,7 +51,10 @@ public class ViewParser implements Parser
     
     // View schema elements and attributes
     private static final String VIEW_CHILD_NAME_ATTR = "childName";    
-    private static final QName VIEW_VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "value");    
+    private static final QName VIEW_VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "value");
+    private static final QName VIEW_ASPECTS = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "aspects");
+    private static final QName VIEW_PROPERTIES = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "properties");
+    private static final QName VIEW_ASSOCIATIONS = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "associations");
     
     // XML Pull Parser Factory
     private XmlPullParserFactory factory;
@@ -58,6 +62,7 @@ public class ViewParser implements Parser
     // Supporting services
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
+    private RuleService ruleService;
     
     
     /**
@@ -91,6 +96,11 @@ public class ViewParser implements Parser
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
+    }
+    
+    public void setRuleService(RuleService ruleService)
+    {
+        this.ruleService = ruleService;
     }
 
     /* (non-Javadoc)
@@ -154,52 +164,92 @@ public class ViewParser implements Parser
     {
         // Extract qualified name
         QName defName = getName(xpp);
-    
+
         // Process the element
         Object context = contextStack.peek();
-        if (context instanceof ParentContext)
+
+        // Handle special view directives
+        if (defName.equals(VIEW_ASPECTS) || defName.equals(VIEW_PROPERTIES) || defName.equals(VIEW_ASSOCIATIONS))
         {
-            // Process type definition 
-            TypeDefinition typeDef = dictionaryService.getType(defName);
-            if (typeDef == null)
+            if (context instanceof NodeItemContext)
             {
-                throw new ImporterException("Type " + defName + " has not been defined in the Repository dictionary");
+                throw new ImporterException("Cannot nest element " + defName + " within " + ((NodeItemContext)context).getElementName());
             }
-            processStartType(xpp, typeDef, contextStack);
-            return;
+            if (!(context instanceof NodeContext))
+            {
+                throw new ImporterException("Element " + defName + " can only be declared within a node");
+            }
+            NodeContext nodeContext = (NodeContext)context;
+            contextStack.push(new NodeItemContext(defName, nodeContext));
         }
-        else if (context instanceof NodeContext)
+        else
         {
-            // Process children of node
-            // Note: Process in the following order: aspects, properties and associations
-            Object def = ((NodeContext)context).determineDefinition(defName);
-            if (def == null)
+            if (context instanceof ParentContext)
             {
-                throw new ImporterException("Definition " + defName + " is not valid; cannot find in Repository dictionary");
-            }
-            
-            if (def instanceof AspectDefinition)
-            {
-                processAspect(xpp, (AspectDefinition)def, contextStack);
+                // Process type definition 
+                TypeDefinition typeDef = dictionaryService.getType(defName);
+                if (typeDef == null)
+                {
+                    throw new ImporterException("Type " + defName + " has not been defined in the Repository dictionary");
+                }
+                processStartType(xpp, typeDef, contextStack);
                 return;
             }
-            else if (def instanceof PropertyDefinition)
+            else if (context instanceof NodeContext)
             {
-                processProperty(xpp, (PropertyDefinition)def, contextStack);
-                return;
+                // Process children of node
+                // Note: Process in the following order: aspects, properties and associations
+                Object def = ((NodeContext)context).determineDefinition(defName);
+                if (def == null)
+                {
+                    throw new ImporterException("Definition " + defName + " is not valid; cannot find in Repository dictionary");
+                }
+                
+                if (def instanceof AspectDefinition)
+                {
+                    processAspect(xpp, (AspectDefinition)def, contextStack);
+                    return;
+                }
+                else if (def instanceof PropertyDefinition)
+                {
+                    processProperty(xpp, (PropertyDefinition)def, contextStack);
+                    return;
+                }
+                else if (def instanceof ChildAssociationDefinition)
+                {
+                    processStartChildAssoc(xpp, (ChildAssociationDefinition)def, contextStack);
+                    return;
+                }
+                else
+                {
+                    // TODO: general association
+                }
             }
-            else if (def instanceof ChildAssociationDefinition)
+            else if (context instanceof NodeItemContext)
             {
-                processStartChildAssoc(xpp, (ChildAssociationDefinition)def, contextStack);
-                return;
-            }
-            else
-            {
-                // TODO: general association
+                NodeItemContext nodeItemContext = (NodeItemContext)context;
+                NodeContext nodeContext = nodeItemContext.getNodeContext();
+                QName itemName = nodeItemContext.getElementName();
+                if (itemName.equals(VIEW_ASPECTS))
+                {
+                    AspectDefinition def = nodeContext.determineAspect(defName);
+                    processAspect(xpp, def, contextStack);
+                }
+                else if (itemName.equals(VIEW_PROPERTIES))
+                {
+                    PropertyDefinition def = nodeContext.determineProperty(defName);
+                    processProperty(xpp, def, contextStack);
+                }
+                else if (itemName.equals(VIEW_ASSOCIATIONS))
+                {
+                    // TODO: Handle general associations...  
+                    
+                    ChildAssociationDefinition def = (ChildAssociationDefinition)nodeContext.determineAssociation(defName);
+                    processStartChildAssoc(xpp, def, contextStack);
+                }
             }
         }
     }
-
 
     /**
      * Process Root
@@ -263,7 +313,7 @@ public class ViewParser implements Parser
     private void processAspect(XmlPullParser xpp, AspectDefinition aspectDef, Stack<ElementContext> contextStack)
         throws XmlPullParserException, IOException
     {
-        NodeContext context = (NodeContext)contextStack.peek();
+        NodeContext context = peekNodeContext(contextStack);
         context.addAspect(aspectDef);
         
         int eventType = xpp.next();
@@ -276,6 +326,7 @@ public class ViewParser implements Parser
             logger.debug(indentLog("Processed aspect " + aspectDef.getName(), contextStack.size()));
     }
 
+    
     /**
      * Process property definition
      * 
@@ -288,7 +339,7 @@ public class ViewParser implements Parser
     private void processProperty(XmlPullParser xpp, PropertyDefinition propDef, Stack<ElementContext> contextStack)
         throws XmlPullParserException, IOException
     {
-        NodeContext context = (NodeContext)contextStack.peek();
+        NodeContext context = peekNodeContext(contextStack);
         
         int eventType = xpp.next();
         if (eventType == XmlPullParser.TEXT)
@@ -350,11 +401,14 @@ public class ViewParser implements Parser
     private void processStartChildAssoc(XmlPullParser xpp, ChildAssociationDefinition childAssocDef, Stack<ElementContext> contextStack)
         throws XmlPullParserException, IOException
     {
-        NodeContext context = (NodeContext)contextStack.peek();
+        NodeContext context = peekNodeContext(contextStack);
     
-        // Create Node
         if (context.getNodeRef() == null)
         {
+            // TODO: Replace this with appropriate rule/action import handling
+            ruleService.disableRules(context.getParentContext().getParentRef());
+
+            // Create Node
             NodeRef nodeRef = context.getImporter().importNode(context);
             context.setNodeRef(nodeRef);
         }
@@ -407,6 +461,11 @@ public class ViewParser implements Parser
             NodeRef nodeRef = context.getImporter().importNode(context);
             context.setNodeRef(nodeRef);
         }
+        else
+        {
+            // TODO: Replace this with appropriate rule/action import handling
+            ruleService.enableRules(context.getParentContext().getParentRef());
+        }
     }
 
     /**
@@ -418,6 +477,26 @@ public class ViewParser implements Parser
     {
     }
 
+    /**
+     * Get parent Node Context
+     * 
+     * @param contextStack  context stack
+     * @return  node context
+     */
+    private NodeContext peekNodeContext(Stack<ElementContext> contextStack)
+    {
+        ElementContext context = contextStack.peek();
+        if (context instanceof NodeContext)
+        {
+            return (NodeContext)context;
+        }
+        else if (context instanceof NodeItemContext)
+        {
+            return ((NodeItemContext)context).getNodeContext();
+        }
+        throw new ImporterException("Internal error: Failed to retrieve node context");
+    }
+    
     /**
      * Helper to create Qualified name from current xml element
      * 

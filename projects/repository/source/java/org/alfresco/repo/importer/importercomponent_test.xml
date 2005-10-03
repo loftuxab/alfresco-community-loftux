@@ -12,17 +12,26 @@
       <cm:contains>
          
          <cm:systemfolder view:childName="cm:people">
+            <view:aspects>
             <cm:auditable/>
+            </view:aspects>
+            <view:properties>
             <cm:name>People</cm:name>
             <cm:creator>administrator</cm:creator>
+            </view:properties>
+            <view:associations>
             <cm:contains>
                <cm:person view:childName="cm:fredb">
+                  <view:aspects/>
+                  <view:properties>
                   <cm:userName>${username}</cm:userName>
                   <cm:firstName>Fred</cm:firstName>
                   <cm:lastName>Bloggs</cm:lastName>
                   <cm:homeFolder>workspace://SpacesStore/ID</cm:homeFolder>
+                  </view:properties>
                </cm:person>
             </cm:contains>
+            </view:associations>
          </cm:systemfolder>
          
          <!-- note: if no explicit view:childName, take from name if one exists -->

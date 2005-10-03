@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
-import org.alfresco.repo.importer.ZipImportPackageHandler;
+import org.alfresco.repo.importer.ACPImportPackageHandler;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
@@ -115,7 +115,7 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
                        zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
                        reader.getContent(zipFile);
                       
-                       ZipImportPackageHandler importHandler = new ZipImportPackageHandler(zipFile, ENCODING);
+                       ACPImportPackageHandler importHandler = new ACPImportPackageHandler(zipFile, ENCODING);
                        NodeRef importDest = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
                       
                        this.importerService.importView(importHandler, new Location(importDest), null, null);

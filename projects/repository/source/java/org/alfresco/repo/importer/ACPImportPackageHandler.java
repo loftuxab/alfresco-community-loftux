@@ -36,7 +36,7 @@ import org.alfresco.service.cmr.view.ImporterException;
  * 
  * @author David Caruana
  */
-public class ZipImportPackageHandler
+public class ACPImportPackageHandler
     implements ImportPackageHandler
 {
     
@@ -51,7 +51,7 @@ public class ZipImportPackageHandler
      * @param sourceDir  source directory
      * @param packageDir  relative directory within source to place exported content  
      */
-    public ZipImportPackageHandler(File zipFile, String dataFileEncoding)
+    public ACPImportPackageHandler(File zipFile, String dataFileEncoding)
     {
         this.file = zipFile;
         this.dataFileEncoding = dataFileEncoding;

@@ -174,6 +174,26 @@ public class ExporterComponentTest extends BaseSpringTest
 //            System.out.println("TestProgress: endProperties: " + nodeRef);
         }
 
+        public void startAspects(NodeRef nodeRef)
+        {
+//          System.out.println("TestProgress: startAspects: " + nodeRef);
+        }
+
+        public void endAspects(NodeRef nodeRef)
+        {
+//          System.out.println("TestProgress: endAspects: " + nodeRef);
+        }
+
+        public void startAssocs(NodeRef nodeRef)
+        {
+//          System.out.println("TestProgress: startAssocs: " + nodeRef);
+        }
+
+        public void endAssocs(NodeRef nodeRef)
+        {
+//          System.out.println("TestProgress: endAssocs: " + nodeRef);
+        }
+
     }
     
 }

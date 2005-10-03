@@ -28,8 +28,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.ActionsAspect;
+import org.alfresco.repo.rule.RulesAspect;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -75,6 +78,8 @@ public class ImporterComponent
     private NodeService nodeService;
     private SearchService searchService;
     private ContentService contentService;
+    private ActionsAspect actionAspect;
+    private RulesAspect ruleAspect;
 
     // binding markers    
     private static final String START_BINDING_MARKER = "${";
@@ -131,6 +136,16 @@ public class ImporterComponent
     {
         this.namespaceService = namespaceService;
     }
+    
+    public void setActionAspect(ActionsAspect actionAspect)
+    {
+        this.actionAspect = actionAspect;
+    }
+
+    public void setRuleAspect(RulesAspect ruleAspect)
+    {
+        this.ruleAspect = ruleAspect;
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ImporterService#importView(java.io.InputStreamReader, org.alfresco.service.cmr.view.Location, java.util.Properties, org.alfresco.service.cmr.view.ImporterProgress)
@@ -138,8 +153,7 @@ public class ImporterComponent
     public void importView(Reader viewReader, Location location, ImporterBinding binding, ImporterProgress progress)
     {
         NodeRef nodeRef = getNodeRef(location, binding);
-        QName childAssocType = getChildAssocType(location, binding);
-        performImport(nodeRef, childAssocType, viewReader, new DefaultStreamHandler(), binding, progress);       
+        performImport(nodeRef, location.getChildAssocType(), viewReader, new DefaultStreamHandler(), binding, progress);       
     }
 
     /* (non-Javadoc)
@@ -147,12 +161,10 @@ public class ImporterComponent
      */
     public void importView(ImportPackageHandler importHandler, Location location, ImporterBinding binding, ImporterProgress progress) throws ImporterException
     {
-        NodeRef nodeRef = getNodeRef(location, binding);
-        QName childAssocType = getChildAssocType(location, binding);
-        
         importHandler.startImport();
         Reader dataFileReader = importHandler.getDataStream(); 
-        performImport(nodeRef, childAssocType, dataFileReader, importHandler, binding, progress);
+        NodeRef nodeRef = getNodeRef(location, binding);
+        performImport(nodeRef, location.getChildAssocType(), dataFileReader, importHandler, binding, progress);
         importHandler.endImport();
     }
     
@@ -200,34 +212,6 @@ public class ImporterComponent
     }
     
     /**
-     * Get the child association type from location
-     * 
-     * @param location the location to extract child association type from
-     * @param binding import configuration
-     * @return the child association type
-     */
-    private QName getChildAssocType(Location location, ImporterBinding binding)
-    {
-        // Establish child association type to import under
-        NodeRef nodeRef = getNodeRef(location, binding);
-        QName childAssocType = location.getChildAssocType();
-        if (childAssocType == null)
-        {
-            // Determine if only one child association type exists
-            QName nodeType = nodeService.getType(nodeRef);
-            Set<QName> nodeAspects = nodeService.getAspects(nodeRef);
-            TypeDefinition anonymousType = dictionaryService.getAnonymousType(nodeType, nodeAspects);
-            Map<QName, ChildAssociationDefinition> childAssocDefs = anonymousType.getChildAssociations();
-            if (childAssocDefs.size() > 1)
-            {
-                throw new ImporterException("Can not determine child association type to use - location " + nodeRef + " supports multiple child association types: " + childAssocDefs.toString());
-            }
-            childAssocType = childAssocDefs.keySet().iterator().next();
-        }
-        return childAssocType;
-    }
-
-    /**
      * Perform the actual import
      * 
      * @param nodeRef node reference to import under
@@ -240,7 +224,6 @@ public class ImporterComponent
     private void performImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportPackageHandler streamHandler, ImporterBinding binding, ImporterProgress progress)
     {
         ParameterCheck.mandatory("Node Reference", nodeRef);
-        ParameterCheck.mandatory("Child Assoc Type", childAssocType);
         ParameterCheck.mandatory("View Reader", viewReader);
         ParameterCheck.mandatory("Stream Handler", streamHandler);
         Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, binding, streamHandler, progress);
@@ -361,7 +344,7 @@ public class ImporterComponent
         {
             TypeDefinition nodeType = context.getTypeDefinition();
             NodeRef parentRef = context.getParentContext().getParentRef();
-            QName assocType = context.getParentContext().getAssocType();
+            QName assocType = getAssocType(context);
             QName childQName = null;
 
             // Determine child name
@@ -397,6 +380,9 @@ public class ImporterComponent
             reportPropertySet(nodeRef, initialProperties);
             
             // Apply aspects
+            // TODO: Replace these disable calls with appropriate handling of rule/action import
+            actionAspect.disbleOnAddAspect();
+            ruleAspect.disbleOnAddAspect();
             for (QName aspect : context.getNodeAspects())
             {
                 if (nodeService.hasAspect(nodeRef, aspect) == false)
@@ -405,6 +391,8 @@ public class ImporterComponent
                     reportAspectAdded(nodeRef, aspect);
                 }
             }
+            actionAspect.enableOnAddAspect();
+            ruleAspect.enableOnAddAspect();
 
             // import content, if applicable
             for (QName propertyQName : properties.keySet())
@@ -431,6 +419,80 @@ public class ImporterComponent
             }
             
             return nodeRef;
+        }
+        
+        /**
+         * Get appropriate child association type for node to import under
+         * 
+         * @param context  node to import
+         * @return  child association type name
+         */
+        private QName getAssocType(ImportNode context)
+        {
+            QName assocType = context.getParentContext().getAssocType();
+            if (assocType != null)
+            {
+                // return explicitly set association type
+                return assocType;
+            }
+            
+            //
+            // Derive association type
+            //
+            
+            // build type and aspect list for node
+            List<QName> nodeTypes = new ArrayList<QName>();
+            nodeTypes.add(context.getTypeDefinition().getName());
+            for (QName aspect : context.getNodeAspects())
+            {
+                nodeTypes.add(aspect);
+            }
+            
+            // build target class types for parent
+            Map<QName, QName> targetTypes = new HashMap<QName, QName>();
+            QName parentType = nodeService.getType(context.getParentContext().getParentRef());
+            ClassDefinition classDef = dictionaryService.getClass(parentType);
+            Map<QName, ChildAssociationDefinition> childAssocDefs = classDef.getChildAssociations();
+            for (ChildAssociationDefinition childAssocDef : childAssocDefs.values())
+            {
+                targetTypes.put(childAssocDef.getTargetClass().getName(), childAssocDef.getName());
+            }
+            Set<QName> parentAspects = nodeService.getAspects(context.getParentContext().getParentRef());
+            for (QName parentAspect : parentAspects)
+            {
+                classDef = dictionaryService.getClass(parentAspect);
+                childAssocDefs = classDef.getChildAssociations();
+                for (ChildAssociationDefinition childAssocDef : childAssocDefs.values())
+                {
+                    targetTypes.put(childAssocDef.getTargetClass().getName(), childAssocDef.getName());
+                }
+            }
+            
+            // find target class that is closest to node type or aspects
+            QName closestAssocType = null;
+            int closestHit = 1;
+            for (QName nodeType : nodeTypes)
+            {
+                for (QName targetType : targetTypes.keySet())
+                {
+                    QName testType = nodeType;
+                    int howClose = 1;
+                    while (testType != null)
+                    {
+                        howClose--;
+                        if (targetType.equals(testType) && howClose < closestHit)
+                        {
+                            closestAssocType = targetTypes.get(targetType);
+                            closestHit = howClose;
+                            break;
+                        }
+                        ClassDefinition testTypeDef = dictionaryService.getClass(testType);
+                        testType = (testTypeDef == null) ? null : testTypeDef.getParentName();
+                    }
+                }
+            }
+            
+            return closestAssocType;
         }
         
         /**

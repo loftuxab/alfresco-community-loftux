@@ -67,6 +67,13 @@ public interface Exporter
     public void endNode(NodeRef nodeRef);
     
     /**
+     * Start export of aspects
+     * 
+     * @param nodeRef
+     */
+    public void startAspects(NodeRef nodeRef);
+    
+    /**
      * Start export of aspect
      * 
      * @param nodeRef  the node reference
@@ -81,6 +88,13 @@ public interface Exporter
      * @param aspect  the aspect
      */
     public void endAspect(NodeRef nodeRef, QName aspect);
+    
+    /**
+     * End export of aspects
+     * 
+     * @param nodeRef
+     */
+    public void endAspects(NodeRef nodeRef);
     
     /**
      * Start export of properties
@@ -141,6 +155,13 @@ public interface Exporter
     public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData);
     
     /**
+     * Start export of associations
+     * 
+     * @param nodeRef
+     */
+    public void startAssocs(NodeRef nodeRef);
+    
+    /**
      * Start export of association
      * 
      * @param nodeRef  the node reference
@@ -156,6 +177,13 @@ public interface Exporter
      */
     public void endAssoc(NodeRef nodeRef, QName assoc);
 
+    /**
+     * End export of associations
+     * 
+     * @param nodeRef
+     */
+    public void endAssocs(NodeRef nodeRef);
+    
     /**
      * Export warning
      * 

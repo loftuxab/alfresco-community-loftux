@@ -112,6 +112,28 @@ import org.alfresco.service.namespace.QName;
     }
     
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startAspects(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void startAspects(NodeRef nodeRef)
+    {
+        for (Exporter exporter : exporters)
+        {
+            exporter.startAspects(nodeRef);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endAspects(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endAspects(NodeRef nodeRef)
+    {
+        for (Exporter exporter : exporters)
+        {
+            exporter.endAspects(nodeRef);
+        }
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#startAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
      */
     public void startAspect(NodeRef nodeRef, QName aspect)
@@ -231,7 +253,29 @@ import org.alfresco.service.namespace.QName;
             exporter.endAssoc(nodeRef, assoc);
         }
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startAssocs(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void startAssocs(NodeRef nodeRef)
+    {
+        for (Exporter exporter : exporters)
+        {
+            exporter.startAssocs(nodeRef);
+        }
+    }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endAssocs(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endAssocs(NodeRef nodeRef)
+    {
+        for (Exporter exporter : exporters)
+        {
+            exporter.endAssocs(nodeRef);
+        }
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)
      */

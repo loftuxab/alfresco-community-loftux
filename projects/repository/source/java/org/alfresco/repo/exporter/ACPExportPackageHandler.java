@@ -33,13 +33,16 @@ import org.alfresco.util.TempFileProvider;
 
 
 /**
- * Handler for exporting Repository to zip file
+ * Handler for exporting Repository to ACP (Alfresco Content Package) file
  * 
  * @author David Caruana
  */
-public class ZipExportPackageHandler
+public class ACPExportPackageHandler
     implements ExportPackageHandler
 {
+    /** ACP File Extension */
+    public final static String ACP_EXTENSION = "acp";
+    
     protected OutputStream outputStream;
     protected File dataFile;
     protected File contentDir;
@@ -57,11 +60,18 @@ public class ZipExportPackageHandler
      * @param dataFile
      * @param contentDir
      */
-    public ZipExportPackageHandler(File destDir, File zipFile, File dataFile, File contentDir, boolean overwrite)
+    public ACPExportPackageHandler(File destDir, File zipFile, File dataFile, File contentDir, boolean overwrite)
     {
         try
         {
-            File absZipFile = new File(destDir, zipFile.getPath());
+            // Ensure ACP file has appropriate ACP extension
+            String zipFilePath = zipFile.getPath();
+            if (!zipFilePath.endsWith("." + ACP_EXTENSION))
+            {
+                zipFilePath += "." + ACP_EXTENSION;
+            }
+
+            File absZipFile = new File(destDir, zipFilePath);
             log("Exporting to package zip file " + absZipFile.getAbsolutePath());
 
             if (absZipFile.exists())
@@ -90,7 +100,7 @@ public class ZipExportPackageHandler
      * @param dataFile
      * @param contentDir
      */
-    public ZipExportPackageHandler(OutputStream outputStream, File dataFile, File contentDir)
+    public ACPExportPackageHandler(OutputStream outputStream, File dataFile, File contentDir)
     {
         this.outputStream = outputStream;
         this.dataFile = dataFile;
@@ -128,7 +138,12 @@ public class ZipExportPackageHandler
     public ContentData exportContent(InputStream content, ContentData contentData)
     {
         // create zip entry for stream to export
-        File file = new File(contentDir.getPath(), "content" + iFileCnt++ + ".bin");
+        String contentDirPath = contentDir.getPath();
+        if (contentDirPath.indexOf(".") != -1)
+        {
+            contentDirPath = contentDirPath.substring(0, contentDirPath.indexOf("."));
+        }
+        File file = new File(contentDirPath, "content" + iFileCnt++ + ".bin");
         
         try
         {
@@ -151,8 +166,15 @@ public class ZipExportPackageHandler
      */
     public void endExport()
     {
+        // ensure data file has .xml extension
+        String dataFilePath = dataFile.getPath();
+        if (!dataFilePath.endsWith(".xml"))
+        {
+            dataFilePath += ".xml";
+        }
+        
         // add data file to zip stream
-        ZipEntry zipEntry = new ZipEntry(dataFile.getPath());
+        ZipEntry zipEntry = new ZipEntry(dataFilePath);
         
         try
         {

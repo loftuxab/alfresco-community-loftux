@@ -151,8 +151,10 @@ import org.alfresco.service.namespace.QName;
             }
         }
         
-        // Do not import properties of sys:referenceable
-        if (owningClass.getName().equals(ContentModel.ASPECT_REFERENCEABLE))
+        // Do not import properties of sys:referenceable or cm:versionable
+        // TODO: Make this configurable...
+        if (owningClass.getName().equals(ContentModel.ASPECT_REFERENCEABLE) ||
+            owningClass.getName().equals(ContentModel.ASPECT_VERSIONABLE))
         {
             return;
         }
@@ -260,7 +262,7 @@ import org.alfresco.service.namespace.QName;
      * @param defName
      * @return
      */
-    private AspectDefinition determineAspect(QName defName)
+    /*package*/ AspectDefinition determineAspect(QName defName)
     {
         AspectDefinition def = null;
         if (nodeAspects.containsKey(defName) == false)
@@ -276,7 +278,7 @@ import org.alfresco.service.namespace.QName;
      * @param defName
      * @return
      */
-    private PropertyDefinition determineProperty(QName defName)
+    /*package*/ PropertyDefinition determineProperty(QName defName)
     {
         PropertyDefinition def = null;
         if (nodeProperties.containsKey(defName) == false)
@@ -306,7 +308,7 @@ import org.alfresco.service.namespace.QName;
      * @param defName
      * @return
      */
-    private AssociationDefinition determineAssociation(QName defName)
+    /*package*/ AssociationDefinition determineAssociation(QName defName)
     {
         AssociationDefinition def = null;
         if (nodeChildAssocs.containsKey(defName) == false)

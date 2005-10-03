@@ -787,6 +787,9 @@
         <property name="dictionaryService">
             <ref bean="dictionaryService" />
         </property>
+        <property name="ruleService">
+            <ref bean="ruleService" />
+        </property>
     </bean>
 
     <bean id="importerComponent" class="org.alfresco.repo.importer.ImporterComponent">
@@ -808,6 +811,12 @@
         </property>
         <property name="contentService">
             <ref bean="ContentService" />
+        </property>
+        <property name="actionAspect">
+            <ref bean="actionsAspect"/>
+        </property>
+        <property name="ruleAspect">
+            <ref bean="rulesAspect"/>
         </property>
     </bean>
 

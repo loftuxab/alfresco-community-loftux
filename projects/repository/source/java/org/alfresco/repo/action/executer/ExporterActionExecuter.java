@@ -28,7 +28,8 @@ import java.util.Map;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
-import org.alfresco.repo.exporter.ZipExportPackageHandler;
+import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.exporter.ACPExportPackageHandler;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -61,10 +62,6 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
     public static final String PARAM_ENCODING = "encoding";
     
     private static final String ENCODING = "UTF-8";
-    private static final String MIMETYPE = "application/acp";
-    private static final String PACKAGE_DIR = "content";
-    private static final String ACP_EXTENSION = ".acp";
-    private static final String XML_EXTENSION = ".xml";
     private static final String TEMP_FILE_PREFIX = "alf";
     
     /**
@@ -121,17 +118,12 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
         try
         {
             String packageName = (String)ruleAction.getParameterValue(PARAM_PACKAGE_NAME);
-            // add XML extenstion if it is not present
-            if (packageName.indexOf(".") == -1)
-            {
-                packageName = packageName + XML_EXTENSION;
-            }
             File dataFile = new File(packageName);
-            File contentDir = new File(PACKAGE_DIR);
+            File contentDir = new File(packageName);
            
             // create a temporary file to hold the zip
-            zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, ACP_EXTENSION);
-            ZipExportPackageHandler zipHandler = new ZipExportPackageHandler(new FileOutputStream(zipFile), 
+            zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, ACPExportPackageHandler.ACP_EXTENSION);
+            ACPExportPackageHandler zipHandler = new ACPExportPackageHandler(new FileOutputStream(zipFile), 
                  dataFile, contentDir);
            
             ExporterCrawlerParameters params = new ExporterCrawlerParameters();
@@ -162,7 +154,7 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
             ContentWriter writer = this.contentService.getWriter(zip, ContentModel.PROP_CONTENT, true);
             // TODO: use the encoding passed as a parameter, currently the underlying exporter service only uses UTF-8
             writer.setEncoding(ENCODING);
-            writer.setMimetype(MIMETYPE);
+            writer.setMimetype(MimetypeMap.MIMETYPE_ACP);
             writer.putContent(zipFile);
         }
         catch (FileNotFoundException fnfe)
@@ -211,7 +203,7 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
         // add the default Alfresco content package extension if an extension hasn't been given
         if (packageName.indexOf(".") == -1)
         {
-            packageName = packageName + ACP_EXTENSION;
+            packageName = packageName + "." + ACPExportPackageHandler.ACP_EXTENSION;
         }
         
         // set the name for the new node

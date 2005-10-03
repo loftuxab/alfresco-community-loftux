@@ -56,14 +56,13 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_OPENDOCUMENT_TEXT = "application/vnd.oasis.opendocument.text";
     public static final String MIMETYPE_OPENOFFICE_WRITER = "application/vnd.sun.xml.writer";
     public static final String MIMETYPE_MP3 = "audio/x-mpeg";
+    public static final String MIMETYPE_ACP = "application/acp";
     
     private static final String CONFIG_AREA = "mimetype-map";
     private static final String CONFIG_CONDITION = "Mimetype Map";
     private static final String ELEMENT_MIMETYPES = "mimetypes";
-    private static final String ELEMENT_MIMETYPE = "mimetype";
     private static final String ATTR_MIMETYPE = "mimetype";
     private static final String ATTR_DISPLAY = "display";
-    private static final String ELEMENT_EXTENSION = "extension";
     private static final String ATTR_DEFAULT = "default";
     
     private static final Log logger = LogFactory.getLog(MimetypeMap.class);

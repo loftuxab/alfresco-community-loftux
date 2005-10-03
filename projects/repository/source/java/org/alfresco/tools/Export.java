@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.util.Collection;
 
 import org.alfresco.repo.exporter.FileExportPackageHandler;
-import org.alfresco.repo.exporter.ZipExportPackageHandler;
+import org.alfresco.repo.exporter.ACPExportPackageHandler;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -275,7 +275,7 @@ public final class Export extends Tool
      * 
      * @author David Caruana
      */
-    private class ZipHandler extends ZipExportPackageHandler
+    private class ZipHandler extends ACPExportPackageHandler
     {
         /**
          * Construct
@@ -471,6 +471,20 @@ public final class Export extends Tool
         }
 
         /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#startAspects(org.alfresco.service.cmr.repository.NodeRef)
+         */
+        public void startAspects(NodeRef nodeRef)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#endAspects(org.alfresco.service.cmr.repository.NodeRef)
+         */
+        public void endAspects(NodeRef nodeRef)
+        {
+        }
+        
+        /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.Exporter#startAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
          */
         public void startAspect(NodeRef nodeRef, QName aspect)
@@ -548,6 +562,20 @@ public final class Export extends Tool
         }
 
         /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#startAssocs(org.alfresco.service.cmr.repository.NodeRef)
+         */
+        public void startAssocs(NodeRef nodeRef)
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.Exporter#endAssocs(org.alfresco.service.cmr.repository.NodeRef)
+         */
+        public void endAssocs(NodeRef nodeRef)
+        {
+        }
+
+        /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)
          */
         public void warning(String warning)
@@ -561,7 +589,6 @@ public final class Export extends Tool
         public void end()
         {
         }
-
     }
 
 }
