@@ -79,6 +79,32 @@ public class ActionsAspect
 				this, 
 				onAddAspectBehaviour);
 	}
+    
+
+    
+    /**
+     * Helper to diable the on add aspect policy behaviour.  Helpful when importing, 
+     * copying and other bulk respstorative operations.
+     * 
+     * TODO will eventually be redundant when policies can be enabled/diabled in the 
+     *      policy componenet
+     */
+    public void disbleOnAddAspect()
+    {
+        this.onAddAspectBehaviour.disable();
+    }
+    
+    /**
+     * Helper to enable the on add aspect policy behaviour.  Helpful when importing, 
+     * copying and other bulk respstorative operations.
+     * 
+     * TODO will eventually be redundant when policies can be enabled/diabled in the 
+     *      policy componenet
+     */
+    public void enableOnAddAspect()
+    {
+        this.onAddAspectBehaviour.enable();
+    }
 	
 	/**
 	 * On add aspect policy behaviour
