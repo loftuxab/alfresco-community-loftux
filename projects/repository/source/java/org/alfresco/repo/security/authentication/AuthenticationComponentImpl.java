@@ -16,6 +16,8 @@
  */
 package org.alfresco.repo.security.authentication;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationManager;
 import net.sf.acegisecurity.GrantedAuthority;
@@ -60,6 +62,13 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
         {
             throw new AuthenticationException(ae.getMessage(), ae);
         }
+    }
+
+    public Authentication authenticate(Authentication token) throws AuthenticationException
+    {
+        // Authentication via a token not supported in this implementation
+        
+        throw new AlfrescoRuntimeException("Authentication via token not supported");
     }
 
     public Authentication setCurrentUser(String userName)

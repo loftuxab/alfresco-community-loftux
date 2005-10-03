@@ -335,4 +335,36 @@ public abstract class SrvAuthenticator
     {
         return m_encryptor;
     }
+    
+    /**
+     * Return the authentication status as a string
+     * 
+     * @param sts int
+     * @return String
+     */
+    protected final String getStatusAsString(int sts)
+    {
+        String str = null;
+        
+        switch ( sts)
+        {
+        case AUTH_ALLOW:
+            str = "Allow";
+            break;
+        case AUTH_DISALLOW:
+            str = "Disallow";
+            break;
+        case AUTH_GUEST:
+            str = "Guest";
+            break;
+        case AUTH_BADPASSWORD:
+            str = "BadPassword";
+            break;
+        case AUTH_BADUSER:
+            str = "BadUser";
+            break;
+        }
+        
+        return str;
+    }
 }

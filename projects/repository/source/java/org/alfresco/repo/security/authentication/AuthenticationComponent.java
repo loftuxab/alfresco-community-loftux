@@ -31,6 +31,15 @@ public interface AuthenticationComponent
     public void authenticate(String userName, char[] password) throws AuthenticationException;
 
     /**
+     * Authenticate using a token
+     * 
+     * @param token Authentication
+     * @return Authentication
+     * @throws AuthenticationException
+     */
+    public Authentication authenticate(Authentication token) throws AuthenticationException;
+    
+    /**
      * Explicitly set the current user to be authenticated.
      */
     

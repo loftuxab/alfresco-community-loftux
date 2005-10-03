@@ -16,12 +16,17 @@
  */
 package org.alfresco.filesys.server.auth;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 import net.sf.acegisecurity.Authentication;
 
 /**
- * <p>
- * The client information class holds the details of a remote user from a session setup or tree
+ * Client Information Class
+ * 
+ * <p>The client information class holds the details of a remote user from a session setup or tree
  * connect request.
+ * 
+ * @author GKSpencer
  */
 public class ClientInfo
 {
@@ -65,6 +70,10 @@ public class ClientInfo
     // Authentication token
     
     private Authentication m_authToken;
+    
+    // Home folder node
+    
+    private NodeRef m_homeNode;
     
     /**
      * Class constructor
@@ -253,6 +262,26 @@ public class ClientInfo
     }
     
     /**
+     * Check if the client has a home folder node
+     * 
+     * @return boolean
+     */
+    public final boolean hasHomeFolder()
+    {
+        return m_homeNode != null ? true : false;
+    }
+    
+    /**
+     * Return the home folder node
+     * 
+     * @return NodeRef
+     */
+    public final NodeRef getHomeFolder()
+    {
+        return m_homeNode;
+    }
+    
+    /**
      * Set the remote users domain
      * 
      * @param domain Remote users domain
@@ -353,6 +382,16 @@ public class ClientInfo
     public final void setAuthenticationToken(Authentication token)
     {
         m_authToken = token;
+    }
+    
+    /**
+     * Set the home folder node
+     * 
+     * @param homeNode NodeRef
+     */
+    public final void setHomeFolder(NodeRef homeNode)
+    {
+        m_homeNode = homeNode;
     }
     
     /**
