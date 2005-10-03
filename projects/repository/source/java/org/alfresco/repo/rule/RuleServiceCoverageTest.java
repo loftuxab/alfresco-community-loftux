@@ -342,7 +342,7 @@ public class RuleServiceCoverageTest extends TestCase
         // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));        
     }   
     
-    public void xtestAddFeaturesToAFolder()
+    public void testAddFeaturesToAFolder()
     {
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put("aspect-name", ContentModel.ASPECT_TEMPLATABLE);        
@@ -360,8 +360,7 @@ public class RuleServiceCoverageTest extends TestCase
                 this.nodeRef,
                 ContentModel.ASSOC_CHILDREN,                
                 QName.createQName(TEST_NAMESPACE, "children"),
-                ContentModel.TYPE_FOLDER,
-                getContentProperties()).getChildRef();           
+                ContentModel.TYPE_FOLDER).getChildRef();           
         
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_TEMPLATABLE));
         

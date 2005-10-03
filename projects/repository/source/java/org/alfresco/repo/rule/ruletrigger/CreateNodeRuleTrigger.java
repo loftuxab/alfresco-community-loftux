@@ -16,8 +16,10 @@
  */
 package org.alfresco.repo.rule.ruletrigger;
 
-import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.namespace.QName;
 
@@ -39,8 +41,24 @@ public class CreateNodeRuleTrigger extends SingleChildAssocRefPolicyRuleTrigger
     
     public void policyBehaviour(ChildAssociationRef childAssocRef)
     {
+        // Only fire the rule if the node is question has no potential to contain content
+        // TODO we need to find a better way to do this .. how can this be resolved in CIFS??
+        boolean triggerRule = false;
         QName type = this.nodeService.getType(childAssocRef.getChildRef());
-        if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT) == false)
+        ClassDefinition classDefinition = this.dictionaryService.getClass(type);
+        if (classDefinition != null)
+        {
+            for (PropertyDefinition propertyDefinition : classDefinition.getProperties().values())
+            {
+                if (propertyDefinition.getDataType().getName().equals(DataTypeDefinition.CONTENT) == true)
+                {
+                    triggerRule = true;
+                    break;
+                }
+            }
+        }
+        
+        if (triggerRule == false)
         {
             triggerRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
         }
