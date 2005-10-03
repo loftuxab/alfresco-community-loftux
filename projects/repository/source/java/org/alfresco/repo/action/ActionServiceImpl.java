@@ -839,7 +839,14 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		
 		action.setTitle((String)props.get(ActionModel.PROP_ACTION_TITLE));
 		action.setDescription((String)props.get(ActionModel.PROP_ACTION_DESCRIPTION));
-		action.setExecuteAsynchronously(((Boolean)props.get(ActionModel.PROP_EXECUTE_ASYNCHRONOUSLY)).booleanValue());	
+        
+        boolean value = false;
+        Boolean executeAsynchronously = (Boolean)props.get(ActionModel.PROP_EXECUTE_ASYNCHRONOUSLY);
+        if (executeAsynchronously != null)            
+        {
+            value = executeAsynchronously.booleanValue();
+        }
+		action.setExecuteAsynchronously(value);	
 		
 		((ActionImpl)action).setCreator((String)props.get(ContentModel.PROP_CREATOR));
 		((ActionImpl)action).setCreatedDate((Date)props.get(ContentModel.PROP_CREATED));
@@ -885,8 +892,13 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		Map<QName, Serializable> properties = this.nodeService.getProperties(conditionNodeRef);
 		ActionCondition condition = new ActionConditionImpl(conditionNodeRef.getId(), (String)properties.get(ActionModel.PROP_DEFINITION_NAME));
         
+        boolean value = false;
         Boolean invert = (Boolean)this.nodeService.getProperty(conditionNodeRef, ActionModel.PROP_CONDITION_INVERT);
-        condition.setInvertCondition(invert.booleanValue());
+        if (invert != null)
+        {
+            value = invert.booleanValue();
+        }
+        condition.setInvertCondition(value);
         
 		populateParameters(conditionNodeRef, condition);
 		return condition;

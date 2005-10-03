@@ -65,25 +65,10 @@ public class WebServiceSample3
         WebServiceSample1.currentTicket = result.getTicket();
         
         // Get the content service
-        ContentServiceSoapBindingStub contentService = getContentWebService();
+        ContentServiceSoapBindingStub contentService = getContentWebService();        
         
-        // First we'll use the previous sample to get hold of a reference to a space that we can create the content within
-        Reference reference = WebServiceSample2.executeSearch();                
-        
-        // Create a parent reference, this contains information about the association we are createing to the new content and the
-        // parent of the new content (the space retrived from the search)
-        ParentReference parentReference = new ParentReference(ASSOC_CONTAINS, ASSOC_CONTAINS);
-        parentReference.setStore(reference.getStore());
-        parentReference.setUuid(reference.getUuid());
-        
-        // Define the content format for the content we are adding
-        ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
-        
-        // Add the content to the repository
-        Content newContent = contentService.create(parentReference, "myDocument.txt", contentFormat, INITIAL_CONTENT.getBytes());
-        
-        // Get a reference to the newly created content
-        Reference newContentReference = newContent.getReference();
+        // Create new content in the respository
+        Reference newContentReference = createNewContent(contentService, INITIAL_CONTENT);
         
         // Read the newly added content from the respository
         ReadResult readResult = contentService.read(newContentReference);
@@ -117,6 +102,36 @@ public class WebServiceSample3
         ContentServiceLocator contentServiceLocator = new ContentServiceLocator(config);        
         ContentServiceSoapBindingStub contentService = (ContentServiceSoapBindingStub)contentServiceLocator.getContentService();
         return contentService;
+    }
+    
+    /**
+     * Helper method to create new content.
+     *  
+     * @param contentService    the content web service
+     * @param content           the content itself
+     * @return                  a reference to the created content node
+     * @throws Exception        
+     */
+    public static Reference createNewContent(ContentServiceSoapBindingStub contentService, String content) 
+        throws Exception
+    {
+        // First we'll use the previous sample to get hold of a reference to a space that we can create the content within
+        Reference reference = WebServiceSample2.executeSearch();                
+        
+        // Create a parent reference, this contains information about the association we are createing to the new content and the
+        // parent of the new content (the space retrived from the search)
+        ParentReference parentReference = new ParentReference(ASSOC_CONTAINS, ASSOC_CONTAINS);
+        parentReference.setStore(reference.getStore());
+        parentReference.setUuid(reference.getUuid());
+        
+        // Define the content format for the content we are adding
+        ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
+        
+        // Add the content to the repository
+        Content newContent = contentService.create(parentReference, "myDocument.txt", contentFormat, content.getBytes());
+        
+        // Get a reference to the newly created content
+        return newContent.getReference();
     }
     
     /**
