@@ -20,11 +20,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.transaction.TransactionService;
 
+/**
+ * The asynchronous action execution queue implementation
+ * 
+ * @author Roy Wetherall
+ */
 public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 													implements AsynchronousActionExecutionQueue
 {
@@ -37,7 +43,15 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 	private static final int MAX_QUEUE_SIZE = 500;
 	
+    /**
+     * The transaction service
+     */
 	private TransactionService transactionService;
+    
+    /**
+     * The authentication component
+     */
+    private AuthenticationComponent authenticationComponent;
 	
 	/**
 	 * Default constructor
@@ -52,10 +66,25 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 				new ArrayBlockingQueue<Runnable>(MAX_QUEUE_SIZE, true));
 	}
 	
+    /**
+     * Set the transaction service
+     * 
+     * @param transactionService    the transaction service
+     */
 	public void setTransactionService(TransactionService transactionService)
 	{
 		this.transactionService = transactionService;
 	}
+    
+    /**
+     * Set the authentication component
+     * 
+     * @param authenticationComponent     the authentication component
+     */
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+    {
+        this.authenticationComponent = authenticationComponent;
+    }
 	
 	/**
 	 * @see org.alfresco.repo.action.AsynchronousActionExecutionQueue#executeAction(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.action.Action, boolean)
@@ -74,6 +103,7 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 				new ActionExecutionWrapper(
 							actionService, 
 							transactionService,
+                            authenticationComponent,
 							action, 
 							actionedUponNodeRef, 
 							checkConditions, 
@@ -108,7 +138,15 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 		 */
 		private RuntimeActionService actionService;
 		
+        /**
+         * The transaction service
+         */
 		private TransactionService transactionService;
+        
+        /**
+         * The authentication component
+         */
+        private AuthenticationComponent authenticationComponent;
 		
 		/**
 		 * The action
@@ -131,17 +169,20 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 		private NodeRef actionExecutionHistoryNodeRef;
 		
 		/**
-		 * Constructor
-		 * 
-		 * @param actionService
-		 * @param action
-		 * @param actionedUponNodeRef
-		 * @param checkConditions
-		 * @param actionExecutionHistoryNodeRef
+         * Constructor 
+         * 
+         * @param actionService
+         * @param transactionService
+         * @param authenticationComponent
+         * @param action
+         * @param actionedUponNodeRef
+         * @param checkConditions
+         * @param actionExecutionHistoryNodeRef
 		 */
 		public ActionExecutionWrapper(
 				RuntimeActionService actionService, 
 				TransactionService transactionService,
+                AuthenticationComponent authenticationComponent,
 				Action action, 
 				NodeRef actionedUponNodeRef, 
 				boolean checkConditions,
@@ -149,6 +190,7 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 		{
 			this.actionService = actionService;
 			this.transactionService = transactionService;
+            this.authenticationComponent = authenticationComponent;
 			this.actionedUponNodeRef = actionedUponNodeRef;
 			this.action = action;
 			this.checkConditions = checkConditions;
@@ -211,12 +253,21 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 						{
 							public Object doWork()
 							{
-								ActionExecutionWrapper.this.actionService.executeActionImpl(
-										ActionExecutionWrapper.this.action, 
-										ActionExecutionWrapper.this.actionedUponNodeRef, 
-										ActionExecutionWrapper.this.checkConditions, 
-										ActionExecutionWrapper.this.actionExecutionHistoryNodeRef,
-										true);	
+                                // For now run all actions in the background as the system user
+                                ActionExecutionWrapper.this.authenticationComponent.setCurrentUser(ActionExecutionWrapper.this.authenticationComponent.getSystemUserName());
+                                try
+                                {
+    								ActionExecutionWrapper.this.actionService.executeActionImpl(
+    										ActionExecutionWrapper.this.action, 
+    										ActionExecutionWrapper.this.actionedUponNodeRef, 
+    										ActionExecutionWrapper.this.checkConditions, 
+    										ActionExecutionWrapper.this.actionExecutionHistoryNodeRef,
+    										true);
+                                }
+                                finally
+                                {
+                                    ActionExecutionWrapper.this.authenticationComponent.clearCurrentSecurityContext();
+                                }
 								
 								return null;
 							}

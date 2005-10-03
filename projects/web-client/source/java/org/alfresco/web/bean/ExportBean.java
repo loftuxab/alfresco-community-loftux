@@ -93,7 +93,7 @@ public class ExportBean
           
          // build the action to execute
          Action action = this.actionService.createAction(ExporterActionExecuter.NAME, params);
-//         action.setExecuteAsynchronously(true);
+         action.setExecuteAsynchronously(true);
          
          // get the appropriate node
          NodeRef startNode = null;
