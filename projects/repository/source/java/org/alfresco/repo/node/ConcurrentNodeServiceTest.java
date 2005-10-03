@@ -105,8 +105,8 @@ public class ConcurrentNodeServiceTest extends TestCase
     public void testConcurrent() throws Exception
     {
         IndexWriter.COMMIT_LOCK_TIMEOUT = 100000;
-        int count = 10;
-        int repeats = 200000;
+        int count = 4;
+        int repeats = 4;
 
         Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
         Thread runner = null;
