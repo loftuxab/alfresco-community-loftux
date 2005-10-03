@@ -1,9 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem Start script for the OpenOffice transform service
+rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
-echo Stopping OpenOffice service...
-
-c:\windows\system32\taskkill /f /im soffice.exe
-
+call alfresco.bat start
