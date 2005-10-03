@@ -57,42 +57,25 @@ public class NewUserWizard extends AbstractWizardBean
 {
    private static Logger logger = Logger.getLogger(NewUserWizard.class);
 
-   // TODO: retrieve these from the config service
    private static final String WIZARD_TITLE_NEW_ID = "new_user_title";
-
    private static final String WIZARD_DESC_NEW_ID = "new_user_desc";
-
    private static final String WIZARD_TITLE_EDIT_ID = "new_user_title_edit";
-
    private static final String WIZARD_DESC_EDIT_ID = "new_user_desc_edit";
-
    private static final String STEP1_TITLE_ID = "new_user_step1_title";
-
    private static final String STEP1_DESCRIPTION_ID = "new_user_step1_desc";
-
    private static final String STEP2_TITLE_ID = "new_user_step2_title";
-
    private static final String STEP2_DESCRIPTION_ID = "new_user_step2_desc";
-
    private static final String FINISH_INSTRUCTION_ID = "new_user_finish_instruction";
-
    private static final String ERROR = "error_person";
 
    /** form variables */
    private String firstName = null;
-
    private String lastName = null;
-
    private String userName = null;
-
    private String password = null;
-
    private String email = null;
-
    private String companyId = null;
-
    private String homeSpaceName = null;
-
    private NodeRef homeSpaceLocation = null;
 
    /** AuthenticationService bean reference */
@@ -118,7 +101,8 @@ public class NewUserWizard extends AbstractWizardBean
 
    /** ref to the company home space folder */
    private NodeRef companyHomeSpaceRef = null;
-
+   
+   
    /**
     * @param authenticationService  The AuthenticationService to set.
     */
@@ -735,7 +719,8 @@ public class NewUserWizard extends AbstractWizardBean
          }
       }
    }
-
+   
+   
    // ------------------------------------------------------------------------------
    // Helper methods
 
@@ -833,8 +818,7 @@ public class NewUserWizard extends AbstractWizardBean
          // give full permissions to the new user
          this.permissionService.setPermission(nodeRef, this.userName, permissionService.getAllPermission(), true);
 
-         // by default other users (except Admin) will NOT have access to the
-         // space at all
+         // by default other users (except Admin) will NOT have access to the space at all
          // the new user is the OWNER of their own space
          this.ownableService.setOwner(nodeRef, this.userName);
          // give the OWNER full permissions

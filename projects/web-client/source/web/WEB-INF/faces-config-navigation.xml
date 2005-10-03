@@ -153,7 +153,7 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>manageUsers</from-outcome>
-         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+         <to-view-id>/jsp/users/users.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>showSystemInfo</from-outcome>
@@ -361,6 +361,7 @@
       </navigation-case>
    </navigation-rule>
    
+   <!-- Manage Invited Users navigation -->
    <navigation-rule>
       <from-view-id>/jsp/dialog/manage-invited-users.jsp</from-view-id>
       <navigation-case>
@@ -401,8 +402,42 @@
       </navigation-case>
    </navigation-rule>
    
+   <!-- navigation rules for the Invite Users wizard -->
    <navigation-rule>
-      <from-view-id>/jsp/dialog/users.jsp</from-view-id>
+      <from-view-id>/jsp/wizard/invite-users/*</from-view-id>
+      <navigation-case>
+         <from-outcome>invite</from-outcome>
+         <to-view-id>/jsp/wizard/invite-users/invite.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>notify</from-outcome>
+         <to-view-id>/jsp/wizard/invite-users/notify.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <!-- System User Management navigation -->
+   <navigation-rule>
+      <from-view-id>/jsp/users/*</from-view-id>
+      <navigation-case>
+         <from-outcome>manageUsers</from-outcome>
+         <to-view-id>/jsp/users/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/users/users.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/users/users.jsp</from-view-id>
       <navigation-case>
          <from-outcome>createUser</from-outcome>
          <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
@@ -413,15 +448,36 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>deleteUser</from-outcome>
-         <to-view-id>/jsp/dialog/delete-user.jsp</to-view-id>
+         <to-view-id>/jsp/users/delete-user.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>changePassword</from-outcome>
+         <to-view-id>/jsp/users/change-password.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
+   <!-- navigation rules for the New User wizard -->
    <navigation-rule>
-      <from-view-id>/jsp/dialog/delete-user.jsp</from-view-id>
+      <from-view-id>/jsp/wizard/new-user/*</from-view-id>
       <navigation-case>
-         <from-outcome>manageUsers</from-outcome>
-         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/users/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/users/users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>person-properties</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>user-properties</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/user-properties.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>summary</from-outcome>
+         <to-view-id>/jsp/wizard/new-user/summary.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -536,27 +592,6 @@
       <navigation-case>
          <from-outcome>summary</from-outcome>
          <to-view-id>/jsp/wizard/add-content/summary.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <!-- navigation rules for the Invite Users wizard -->
-   <navigation-rule>
-      <from-view-id>/jsp/wizard/invite-users/*</from-view-id>
-      <navigation-case>
-         <from-outcome>invite</from-outcome>
-         <to-view-id>/jsp/wizard/invite-users/invite.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>notify</from-outcome>
-         <to-view-id>/jsp/wizard/invite-users/notify.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>cancel</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>finish</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -727,31 +762,6 @@
       <navigation-case>
          <from-outcome>summary</from-outcome>
          <to-view-id>/jsp/wizard/create-action/summary.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <!-- navigation rules for the New User wizard -->
-   <navigation-rule>
-      <from-view-id>/jsp/wizard/new-user/*</from-view-id>
-      <navigation-case>
-         <from-outcome>cancel</from-outcome>
-         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>finish</from-outcome>
-         <to-view-id>/jsp/dialog/users.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>person-properties</from-outcome>
-         <to-view-id>/jsp/wizard/new-user/person-properties.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>user-properties</from-outcome>
-         <to-view-id>/jsp/wizard/new-user/user-properties.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>summary</from-outcome>
-         <to-view-id>/jsp/wizard/new-user/summary.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
 

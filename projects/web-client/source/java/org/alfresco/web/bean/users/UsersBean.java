@@ -24,6 +24,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -44,11 +45,12 @@ import org.apache.log4j.Logger;
  */
 public class UsersBean implements IContextListener
 {
-   private static final String DEFAULT_OUTCOME = "manageUsers";
-
    private static Logger logger = Logger.getLogger(UsersBean.class);
 
+   private static final String ERROR_PASSWORD_MATCH = "error_password_match";
    private static final String ERROR_DELETE = "error_delete_user";
+   
+   private static final String DEFAULT_OUTCOME = "manageUsers";
 
    /** NodeService bean reference */
    private NodeService nodeService;
@@ -64,6 +66,9 @@ public class UsersBean implements IContextListener
 
    /** action context */
    private Node person = null;
+   
+   private String password = null;
+   private String confirm = null;
 
    
    // ------------------------------------------------------------------------------
@@ -128,6 +133,38 @@ public class UsersBean implements IContextListener
    {
       return Repository.getUsers(FacesContext.getCurrentInstance(), this.nodeService,
             this.searchService);
+   }
+   
+   /**
+    * @return Returns the confirm password.
+    */
+   public String getConfirm()
+   {
+      return this.confirm;
+   }
+
+   /**
+    * @param confirm The confirm password to set.
+    */
+   public void setConfirm(String confirm)
+   {
+      this.confirm = confirm;
+   }
+
+   /**
+    * @return Returns the password.
+    */
+   public String getPassword()
+   {
+      return this.password;
+   }
+
+   /**
+    * @param password The password to set.
+    */
+   public void setPassword(String password)
+   {
+      this.password = password;
    }
 
    /**
@@ -219,6 +256,34 @@ public class UsersBean implements IContextListener
       }
       
       return DEFAULT_OUTCOME;
+   }
+   
+   public String changePasswordOK()
+   {
+      String outcome = DEFAULT_OUTCOME;
+      
+      if (this.password != null && this.confirm != null && this.password.equals(this.confirm))
+      {
+         try
+         {
+            String userName = (String)this.person.getProperties().get(ContentModel.PROP_USERNAME);
+            this.authenticationService.setAuthentication(userName, this.password.toCharArray());
+         }
+         catch (Exception e)
+         {
+            outcome = null;
+            Utils.addErrorMessage(MessageFormat.format(Application.getMessage(FacesContext
+                  .getCurrentInstance(), Repository.ERROR_GENERIC), e.getMessage()), e);
+         }
+      }
+      else
+      {
+         outcome = null;
+         Utils.addErrorMessage(Application.getMessage(FacesContext.getCurrentInstance(),
+               ERROR_PASSWORD_MATCH));
+      }
+      
+      return outcome;
    }
 
    
