@@ -112,6 +112,7 @@
                                                         style="border: 1px dashed #cccccc; padding: 6px;"/>
                                     </td>
                                  </tr>
+                                 <%--
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><nobr><h:outputText value="#{msg.encoding}"/>:</nobr></td>
@@ -121,6 +122,7 @@
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
+                                 --%>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>

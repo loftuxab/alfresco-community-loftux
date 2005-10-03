@@ -84,7 +84,7 @@ public class ExportBean
          
          // build the action params map based on the bean's current state
          Map<String, Serializable> params = new HashMap<String, Serializable>(5);
-         params.put(ExporterActionExecuter.PARAM_STORE, Repository.getStoreRef());
+         params.put(ExporterActionExecuter.PARAM_STORE, Repository.getStoreRef().toString());
          params.put(ExporterActionExecuter.PARAM_PACKAGE_NAME, this.packageName);
          params.put(ExporterActionExecuter.PARAM_ENCODING, this.encoding);
          params.put(ExporterActionExecuter.PARAM_DESTINATION_FOLDER, this.destination);
@@ -93,7 +93,7 @@ public class ExportBean
           
          // build the action to execute
          Action action = this.actionService.createAction(ExporterActionExecuter.NAME, params);
-         action.setExecuteAsynchronously(true);
+//         action.setExecuteAsynchronously(true);
          
          // get the appropriate node
          NodeRef startNode = null;

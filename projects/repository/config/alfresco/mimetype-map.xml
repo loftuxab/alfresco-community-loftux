@@ -28,6 +28,9 @@
             <extension>aif</extension>
             <extension>aifc</extension>
          </mimetype>
+         <mimetype mimetype="application/acp" display="Alfresco Content Package">
+            <extension>acp</extension>
+         </mimetype>
          <mimetype mimetype="audio/basic" display="Basic Audio">
             <extension>au</extension>
             <extension>snd</extension>

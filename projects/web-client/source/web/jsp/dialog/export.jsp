@@ -123,7 +123,7 @@
                                     <td><nobr><h:outputText value="#{msg.package_name}"/>:</nobr></td>
                                     <td width="90%">
                                        <h:inputText id="package-name" value="#{ExportDialog.packageName}" size="35" maxlength="1024" 
-                                                    onkeyup="javascript:checkButtonState();" />&nbsp;*
+                                                    onkeyup="javascript:checkButtonState();" />
                                     </td>
                                  </tr>
                                  <tr>
@@ -146,6 +146,7 @@
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
+                                 <%--
                                  <tr>
                                     <td><nobr><h:outputText value="#{msg.encoding}"/>:</nobr></td>
                                     <td>
@@ -154,6 +155,7 @@
                                        </h:selectOneMenu>
                                     </td>
                                  </tr>
+                                 --%>
                                  <tr>
                                     <td>&nbsp;</td>
                                     <td>
@@ -221,9 +223,5 @@
     </h:form>
     
 </f:view>
-
-<script language="JavaScript1.2">
-   checkButtonState();
-</script>
 
 </r:page>

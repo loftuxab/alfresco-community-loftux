@@ -16,17 +16,27 @@
  */
 package org.alfresco.repo.action.executer;
 
+import java.io.File;
 import java.util.List;
 
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.ParameterDefinitionImpl;
+import org.alfresco.repo.importer.ZipImportPackageHandler;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.cmr.view.Location;
+import org.alfresco.util.TempFileProvider;
 
 /**
  * Importer action executor
  * 
- * @author Roy Wetherall
+ * @author gavinc
  */
 public class ImporterActionExecuter extends ActionExecuterAbstractBase
 {
@@ -34,11 +44,26 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
     public static final String PARAM_ENCODING = "encoding";
     public static final String PARAM_DESTINATION_FOLDER = "destination";
     
+    private static final String ENCODING = "UTF-8";
+    private static final String MIMETYPE = "application/acp";
+    private static final String TEMP_FILE_PREFIX = "acp-";
+    private static final String TEMP_FILE_SUFFIX = "zip";
+    
     /**
      * The importer service
      */
     private ImporterService importerService;
 	
+    /**
+     * The node service
+     */
+    private NodeService nodeService;
+    
+    /**
+     * The content service
+     */
+    private ContentService contentService;
+    
     /**
      * Sets the ImporterService to use
      * 
@@ -48,19 +73,60 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
 	{
 		this.importerService = importerService;
 	}
+    
+    /**
+     * Sets the NodeService to use
+     * 
+     * @param nodeService The NodeService
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+       this.nodeService = nodeService;
+    }
+    
+    /**
+     * Sets the ContentService to use
+     * 
+     * @param contentService The ContentService
+     */
+    public void setContentService(ContentService contentService)
+    {
+       this.contentService = contentService;
+    }
 
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
     public void executeImpl(Action ruleAction, NodeRef actionedUponNodeRef)
     {
-        // TODO: execute the Importer 
+        if (this.nodeService.exists(actionedUponNodeRef) == true)
+        {
+           // The node being passed in should be an Alfresco content package
+           ContentReader reader = this.contentService.getReader(actionedUponNodeRef, ContentModel.PROP_CONTENT);
+           if (reader != null)
+           {
+               if (MIMETYPE.equals(reader.getMimetype()))
+               {
+                   // unfortunately a ZIP file can not be read directly from an input stream so we have to create
+                   // a temporary file first
+                   File zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+                   reader.getContent(zipFile);
+                   
+                   ZipImportPackageHandler importHandler = new ZipImportPackageHandler(zipFile, ENCODING);
+                   NodeRef importDest = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+                   
+                   this.importerService.importView(importHandler, new Location(importDest), null, null);
+               }
+           }
+        }
     }
 
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		//paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_DESCRIPTION)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, DataTypeDefinition.NODE_REF, 
+              true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_ENCODING, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_ENCODING)));
 	}
 
 }

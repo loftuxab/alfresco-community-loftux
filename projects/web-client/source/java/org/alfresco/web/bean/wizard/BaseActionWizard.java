@@ -317,12 +317,12 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       else if (this.action.equals(ImporterActionExecuter.NAME))
       {
          // add the encoding
-         actionParams.put(ImporterActionExecuter.PARAM_ENCODING, 
-               this.currentActionProperties.get(PROP_ENCODING));
+//         actionParams.put(ImporterActionExecuter.PARAM_ENCODING, 
+//               this.currentActionProperties.get(PROP_ENCODING));
          
          // add the destination for the import
          NodeRef destNodeRef = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
-         actionParams.put(ImporterActionExecuter.NAME, destNodeRef);
+         actionParams.put(ImporterActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
       }
       
       return actionParams;
@@ -426,8 +426,8 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       }
       else if (this.action.equals(ImporterActionExecuter.NAME))
       {
-         String encoding = (String)actionProps.get(ImporterActionExecuter.PARAM_ENCODING);
-         this.currentActionProperties.put(PROP_ENCODING, encoding);
+//         String encoding = (String)actionProps.get(ImporterActionExecuter.PARAM_ENCODING);
+//         this.currentActionProperties.put(PROP_ENCODING, encoding);
          
          NodeRef destNodeRef = (NodeRef)actionProps.get(ImporterActionExecuter.PARAM_DESTINATION_FOLDER);
          this.currentActionProperties.put(PROP_DESTINATION, destNodeRef);

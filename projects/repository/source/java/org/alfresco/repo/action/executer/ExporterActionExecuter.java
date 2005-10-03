@@ -16,17 +16,33 @@
  */
 package org.alfresco.repo.action.executer;
 
+import java.io.File;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.ParameterDefinitionImpl;
+import org.alfresco.repo.exporter.ZipExportPackageHandler;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
+import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Exporter action executor
  * 
- * @author Roy Wetherall
+ * @author gavinc
  */
 public class ExporterActionExecuter extends ActionExecuterAbstractBase
 {
@@ -38,10 +54,26 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
     public static final String PARAM_INCLUDE_SELF = "include-self";
     public static final String PARAM_ENCODING = "encoding";
     
+    private static final String ENCODING = "UTF-8";
+    private static final String MIMETYPE = "application/acp";
+    private static final String PACKAGE_DIR = "content";
+    private static final String ACP_EXTENSION = ".acp";
+    private static final String XML_EXTENSION = ".xml";
+    
     /**
      * The exporter service
      */
     private ExporterService exporterService;
+    
+    /**
+     * The node service
+     */
+    private NodeService nodeService;
+    
+    /**
+     * The content service
+     */
+    private ContentService contentService;
 	
     /**
      * Sets the ExporterService to use
@@ -52,19 +84,129 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
 	{
 		this.exporterService = exporterService;
 	}
+    
+    /**
+     * Sets the NodeService to use
+     * 
+     * @param nodeService The NodeService
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+       this.nodeService = nodeService;
+    }
+    
+    /**
+     * Sets the ContentService to use
+     * 
+     * @param contentService The ContentService
+     */
+    public void setContentService(ContentService contentService)
+    {
+       this.contentService = contentService;
+    }
 
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuter#execute(org.alfresco.repo.ref.NodeRef, org.alfresco.repo.ref.NodeRef)
      */
     public void executeImpl(Action ruleAction, NodeRef actionedUponNodeRef)
     {
-        // TODO: execute the Exporter 
+        // create the node to hold the zip export package
+        NodeRef zip = createExportZip(ruleAction);
+        ContentWriter writer = this.contentService.getWriter(zip, ContentModel.PROP_CONTENT, true);
+        // TODO: use the encoding passed as a parameter, the underlying exporter service only uses UTF-8
+        //       at the moment so there's no need to set it currently
+        writer.setEncoding(ENCODING);
+        writer.setMimetype(MIMETYPE);
+        
+        String packageName = (String)ruleAction.getParameterValue(PARAM_PACKAGE_NAME);
+        // add XML extenstion if it is not present
+        if (packageName.indexOf(".") == -1)
+        {
+            packageName = packageName + XML_EXTENSION;
+        }
+        File dataFile = new File(packageName);
+        File contentDir = new File(PACKAGE_DIR);
+        
+        ZipExportPackageHandler zipHandler = new ZipExportPackageHandler(writer.getContentOutputStream(), dataFile, contentDir);
+        
+        ExporterCrawlerParameters params = new ExporterCrawlerParameters();
+        boolean includeChildren = true;
+        Boolean withKids = (Boolean)ruleAction.getParameterValue(PARAM_INCLUDE_CHILDREN);
+        if (withKids != null)
+        {
+            includeChildren = withKids.booleanValue();
+        }
+        params.setCrawlChildNodes(includeChildren);
+        
+        boolean includeSelf = false;
+        Boolean andMe = (Boolean)ruleAction.getParameterValue(PARAM_INCLUDE_SELF);
+        if (andMe != null)
+        {
+            includeSelf = andMe.booleanValue();
+        }
+        params.setCrawlSelf(includeSelf);
+        
+        
+        params.setExportFrom(new Location(actionedUponNodeRef));
+        
+        // perform the actual export
+        this.exporterService.exportView(zipHandler, params, null);
     }
 
 	@Override
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		//paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_DESCRIPTION)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_STORE, DataTypeDefinition.TEXT, false, 
+              getParamDisplayLabel(PARAM_STORE)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_PACKAGE_NAME, DataTypeDefinition.TEXT, true, 
+              getParamDisplayLabel(PARAM_PACKAGE_NAME)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, DataTypeDefinition.NODE_REF, true, 
+              getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_INCLUDE_CHILDREN, DataTypeDefinition.BOOLEAN, false, 
+              getParamDisplayLabel(PARAM_INCLUDE_CHILDREN)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_INCLUDE_SELF, DataTypeDefinition.BOOLEAN, false, 
+              getParamDisplayLabel(PARAM_INCLUDE_SELF)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_ENCODING, DataTypeDefinition.TEXT, false, 
+              getParamDisplayLabel(PARAM_ENCODING)));
 	}
 
+    /**
+     * Creates the ZIP file node in the repository for the export
+     * 
+     * @param ruleAction The rule being executed
+     * @return The NodeRef of the newly created ZIP file
+     */
+    private NodeRef createExportZip(Action ruleAction)
+    {
+        // create a node in the repository to represent the export package
+        NodeRef exportDest = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+        String packageName = (String)ruleAction.getParameterValue(PARAM_PACKAGE_NAME);
+
+        // add the default Alfresco content package extension if an extension hasn't been given
+        if (packageName.indexOf(".") == -1)
+        {
+            packageName = packageName + ACP_EXTENSION;
+        }
+        
+        // set the name for the new node
+        Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(1);
+        contentProps.put(ContentModel.PROP_NAME, packageName);
+            
+        // create the node to represent the zip file
+        String assocName = QName.createValidLocalName(packageName);
+        ChildAssociationRef assocRef = this.nodeService.createNode(
+              exportDest, ContentModel.ASSOC_CONTAINS,
+              QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, assocName),
+              ContentModel.TYPE_CONTENT, contentProps);
+         
+        NodeRef zipNodeRef = assocRef.getChildRef();
+         
+        // apply the titled aspect to behave in the web client
+        Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(3, 1.0f);
+        titledProps.put(ContentModel.PROP_TITLE, "");
+        titledProps.put(ContentModel.PROP_DESCRIPTION, "");
+        this.nodeService.addAspect(zipNodeRef, ContentModel.ASPECT_TITLED, titledProps);
+        
+        return zipNodeRef;
+    }
 }
