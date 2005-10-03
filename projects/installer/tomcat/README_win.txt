@@ -57,6 +57,11 @@ Install MySQL
   - for demo, choose default selected options
   - for non-English or non-West European languages, choose UTF8 Character set
   - install as a Windows service
+  - include MySQL in path
+- Test MySQL is installed and running by opening a command prompt and entering:
+  'mysql -u root -p'
+- When prompted, give the password you set during installation.  If no errors
+  are reported, then it is installed and running.  Enter 'quit' to exit.
 
 
 Install Alfresco Tomcat Bundle
@@ -71,21 +76,22 @@ Install Alfresco Tomcat Bundle
 Set Paths
 ---------
 
-Edit 'paths_tc.bat' and set the variables to the locations where MySQL, Java and Tomcat
-are installed:
+Edit 'alfresco.bat' and check the variables are to the locations where Tomcat and
+Java are installed:
 - For the Tomcat bundle, this will be 'C:\alfresco\tomcat
-- For MySQL, the default is 'C:\Program Files\MySQL\MySQL Server 4.1'
 - For Java, the default is 'C:\Program Files\Java\jdk1.5.0_04'
 
 
 Create Database
 ---------------
 
-Navigate to the 'C:\alfresco' folder and run 'db_setup.bat' if you did a new
-install of MySQL above.
+Navigate to the 'C:\alfresco' folder and run 'db_setup.bat'.  
 
-This creates a MySQL database named 'alfresco' with a user 
-account and password of 'alfresco'.
+This creates a MySQL database named 'alfresco' with a user account and password
+of 'alfresco'.  If db_setup fails, this may be because the MySQL service is not
+running or that the mysql command cannot be found.  Either correct this or setup 
+the Alfresco database and user manually by loading the 'db_setup.sql' file into
+MySQL, for example, 'mysql -u root -p <db_setup.sql'.
 
 
 You have now installed all the components needed to run the Alfresco server.
@@ -95,11 +101,11 @@ Optional Install of OpenOffice
 ------------------------------
 
 If you would like to have a range of document transformations available from within
-Alfresco, you need to install OpenOffice 1.1.4.  This is entirely optional and can be
+Alfresco, you need to install OpenOffice 1.1.5.  This is entirely optional and can be
 done at any point after Alfresco has been installed.  OpenOffice should be installed
-in C:\Program Files\OpenOffice.org1.1.4
+in C:\Program Files\OpenOffice.org1.1.5
 
-- Browse to http://download.openoffice.org/1.1.4/index.html
+- Browse to http://download.openoffice.org/1.1.5/index.html
 - Download the Windows version
 - Install OpenOffice with defaults (except file associations, unless you wish to)
 - Start one of the OpenOffice programs to go through initial registration, then close it
@@ -111,8 +117,8 @@ in C:\Program Files\OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'alf_start_tc.bat'
-- two minimized windows will be started for MySQL and OpenOffice
+Navigate to the 'C:\alfresco' folder and run 'alf_start.bat'
+- a minimized window will be started for OpenOffice
 - a console window will open for Tomcat
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
 - you can now try Alfresco by visiting:
@@ -131,7 +137,7 @@ http://www.alfresco.org/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'alf_stop_tc.bat'
+Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 
 
 =====================
@@ -140,7 +146,7 @@ Using the CIFS Server
 
 The Preview release with CIFS is configured for ease of deployment.  To enable the CIFS
 server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' needs to be copied
-into a folder on the system path, such as \windows\system32.  The Alfresco server will 
+into a folder on the system path, such as 'c:\windows\system32'.  The Alfresco server will 
 need to be re-started once the dll has been copied.
 
 Once the Alfresco server is running, it should be possible to connect to it by mapping a
@@ -170,25 +176,12 @@ so that it is something like:
 You will need to restart the Alfresco server for this to take effect.
 
 
-====================
-Manual Installations
-====================
+==================
+Image Manipulation
+==================
 
-For other operating systems or where MySQL or Tomcat are already installed,
-you may need to adjust the instructions above as appropriate, such as changing
-the Tomcat port settings.
-
-The Alfresco server is packaged as a war file and can be found in:
-c:\alfresco\tomcat\webapps\alfresco.war
-
-The Alfresco 'db_setup.bat' performs the following MySQL commands:
-
-c:\mysql\bin\mqslqadmin -u root -p create alfresco
-c:\mysql\bin\mysql -u root -e "grant all on alfresco.* to 'alfresco'@'localhost'
-                   identified by 'alfresco' with grant option;"
-
-The Alfresco 'alf_start_tc.bat' starts the database and runs Tomcat's 'run.bat'.
-The 'alf_stop_tc.bat' runs Tomcat's 'shutdown.bat' and shutsdown the database.
+To enable image manipulation on a Windows platform, the 'imconvert.exe' in
+'C:\alfresco\bin' needs to be copied into a folder on the system path, such as 'C:\windows\system32'. 
 
 
 ================
@@ -198,38 +191,47 @@ Trouble-Shooting
 If you have problems with your installation, please look for help on the Installation
 forum at http://www.alfresco.org/forums and ask for any additional help you may need.
 
-. The JAVA_HOME variable must be set correctly to your Java5 installation.
+- The JAVA_HOME variable must be set correctly to your Java5 installation.
 
-. Most installation issues can be resolved by following advice in this forum article:
- - http://www.alfresco.org/forums/viewtopic.php?t=7
+- Most installation issues can be resolved by following advice in this forum article:
+  http://www.alfresco.org/forums/viewtopic.php?t=7
   and in this forum generally:
- - http://www.alfresco.org/forums/viewforum.php?f=8
+  http://www.alfresco.org/forums/viewforum.php?f=8
 
-. WAR file name is now called alfresco.war
-NOTE: If you deployed the war previously from source (rather than use a standard Alfresco installation package) then you must clear out the web-client stuff from your appservers before deploying the new WAR file:
+- WAR file name is now called alfresco.war
+  NOTE: If you deployed the war previously then you must clear out the web-client files 
+  before deploying the new WAR file, having first copied any configurations made:
 
-Tomcat:
-- Delete <tomcat-home>/webapps/web-client.war
-- Delete <tomcat-home>/webapps/web-client
-- Delete <tomcat-home>/work
+  Previous release was PR6 or later:
+  Delete <tomcat-home>/webapps/alfresco.war
+  Delete <tomcat-home>/webapps/alfresco
+  Delete <tomcat-home>/work/alfresco
+  Previous release was PR5 or earlier:
+  Delete <tomcat-home>/webapps/web-client.war
+  Delete <tomcat-home>/webapps/web-client
+  Delete <tomcat-home>/work/web-client
 
-JBoss:
-- Delete <jboss-home>/server/default/deploy/web-client.war
+- If the following errors are reported on the console:
+  ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
+  ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available:
+  Failed to execute command: imconvert ...
 
-. If the following errors are reported on the console:
-ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
-ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available: Failed to execute command: imconvert ...
-  These are not issues which will cause the server to fail, Alfresco is reporting the fact that various external document transformation engines are not available for use by the server. Either follow the instructions at the bottom of the Release Notes Wiki page:
- - http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
+  These are not issues which will cause the server to fail. Alfresco is reporting that 
+  various external document transformation engines are not available for use by the server.   
+  Either follow the instructions at the bottom of the Release Notes Wiki page:
+  http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
   or remove the transformer references completely if you don't require them:
- - http://www.alfresco.org/forums/viewtopic.php?t=90
+  http://www.alfresco.org/forums/viewtopic.php?t=90
 
-. If you see this error on server startup:
- ERROR [protocol] FTP Socket error
+- If you see this error on server startup:
+  ERROR [protocol] FTP Socket error
     java.net.BindException: Address already in use: JVM_Bind
          at java.net.PlainSocketImpl.socketBind(Native Method)
- Check to see if you have any services running against port 8080 for the Alfresco server and port 21 for the Alfresco FTP integration.
+  Check to see if you have any services running against port 8080 for the Alfresco server and
+  port 21 for the Alfresco FTP integration.
 
-. To access the CIFS repository directly from the FireFox browser, you need to install the Alfresco FireFox Extension from here:
- - http://sourceforge.net/projects/alfresco
- Internet Explorer does not require the extension to see display CIFS folders directly.
+- To access the CIFS repository directly from the FireFox browser, you need to install the
+  Alfresco FireFox Extension from here:
+  http://sourceforge.net/projects/alfresco
+  
+  Internet Explorer does not require the extension to see display CIFS folders directly.
