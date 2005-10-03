@@ -74,15 +74,6 @@
                               <div class="mainSubTitle"><h:outputText value="#{msg.current_user}" />: <h:outputText value="#{NavigationBean.currentUser.userName}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.version}" />: <h:outputText value="#{version.major}.#{version.minor}.#{version.revision}" /></div>
                            </td>
-                           <!--
-                           <td bgcolor="#465F7D" width=1></td>
-                           <td width="125" style="padding-left:2px">
-                              <%-- Current object actions --%>
-                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" /><br>
-                              <a:actionLink value="#{msg.reset_config}" actionListener="#{AdminBean.resetConfigService}" 
-                                            image="/images/icons/View_details.gif" padding="4" />
-                           </td>
-                           -->
                         </tr>
                      </table>
                      

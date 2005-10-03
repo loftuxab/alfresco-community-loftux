@@ -24,14 +24,15 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_admin_console">
+<r:page titleId="title_about">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages" var="msg"/>
+   <f:loadBundle basename="alfresco.version" var="version"/>
    
-   <h:form acceptCharset="UTF-8" id="admin-console">
+   <h:form acceptCharset="UTF-8" id="about">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -66,12 +67,12 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width=32>
-                              <h:graphicImage id="logo" url="/images/icons/admin_console_large.gif" width="32" height="32" />
+                              <h:graphicImage id="logo" url="/images/logo/AlfrescoLogo32.gif" width="32" height="32" />
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainTitle"><h:outputText value="#{msg.admin_console}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{msg.admin_description}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.title_about}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.version}" />: <h:outputText value="#{version.major}.#{version.minor}.#{version.revision}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -94,31 +95,67 @@
                      
                      <table cellspacing=0 cellpadding=0 border=0 width=100%>
                      <tr>
-                     <td width=100%>
+                     <td width=100% align=center>
                      
-                        <div style="padding:16px">
+                        <div style="padding:8px">
+                           <img src="<%=request.getContextPath()%>/images/logo/alfresco3d.jpg" width=520 height=168>
+                        </div>
+                        <div style="padding:4px">
+                           <a href="http://www.alfresco.org/" class="title" target="new">http://www.alfresco.org</a>
+                           <p>
+                           Alfresco Software Inc. (C) 2005 All rights reserved. <a href="http://www.alfresco.org/legalandlicense.html" target="new">Legal and License</a>
+                        </div>
                         
-                           <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "ballongrey", "#EEEEEE"); %>
-                           <table cellpadding="6" cellspacing="6" border="0" width="100%">
-                              <tr>
-                                 <td><a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" styleClass="title" actionListener="#{NewUserWizard.setupUsers}" /></td>
-                              </tr>
-                              <tr>
-                                 <td><a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" styleClass="title" /></td>
-                              </tr>
-                              <tr>
-                                 <td><a:actionLink value="#{msg.category_management}" image="/images/icons/categories.gif" action="manageCategories" styleClass="title" /></td>
-                              </tr>
-                              <tr>
-                                 <td>
-                                    <a:actionLink value="#{msg.export}" image="/images/icons/action.gif" action="export" actionListener="#{BrowseBean.setupSpaceAction}" styleClass="title">
-                                       <f:param name="id" value="#{NavigationBean.currentNodeId}" />
-                                    </a:actionLink>
-                                 </td>
-                              </tr>
-                           </table>
-                           <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "ballongrey"); %>
+                        <div style="padding:4px" class="mainSubTitle">
+                           Alfresco Software utilises components or libraries from the following software vendors and companies
+                        </div>
                         
+                        <p>
+                        
+                        <div style="padding:4px">
+                           <span align=center>
+                              <a href="http://www.springframework.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/spring_logo.jpg" border=0></a>
+                           </span>
+                           <span align=center>
+                              <a href="http://www.hibernate.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/hibernate_logo.gif" border=0></a>
+                           </span>
+                        </div>
+                        <div style="padding:4px">
+                           <span align=center>
+                              <a href="http://www.apache.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/asf_logo_wide.gif" border=0></a>
+                           </span>
+                        </div>
+                        <div style="padding:4px">
+                           <span align=center>
+                              <a href="http://jakarta.apache.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/jakarta-logo.gif" border=0></a>
+                           </span>
+                        </div>
+                        <div style="padding:4px">
+                           <span align=center>
+                              <a href="http://www.java.com/" target="new"><img src="<%=request.getContextPath()%>/images/logo/java.gif" border=0></a>
+                           </span>
+                           <span align=center>
+                              <a href="http://www.jboss.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/jbosslogo.gif" border=0></a>
+                           </span>
+                           <span align=center>
+                              <a href="http://myfaces.apache.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/myfaces.png" border=0></a>
+                           </span>
+                        </div>
+                        <div style="padding:4px">
+                           <span align=center>
+                              <a href="http://lucene.apache.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/lucene.gif" border=0></a>
+                           </span>
+                           <span align=center>
+                              <a href="http://cglib.sourceforge.net/" target="new"><img src="<%=request.getContextPath()%>/images/logo/cglib.png" border=0></a>
+                           </span>
+                        </div>
+                        <div style="padding:4px">
+                           <span align=center>
+                              <a href="http://www.pdfbox.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/pdfbox.gif" border=0></a>
+                           </span>
+                           <span align=center>
+                              <a href="http://tinymce.moxiecode.com/" target="new"><img src="<%=request.getContextPath()%>/images/logo/tinymce.png" border=0></a>
+                           </span>
                         </div>
                      
                      </td>
