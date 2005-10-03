@@ -17,15 +17,20 @@
 package org.alfresco.repo.action.executer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.exporter.ZipExportPackageHandler;
 import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -38,6 +43,7 @@ import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.TempFileProvider;
 
 /**
  * Exporter action executor
@@ -59,6 +65,7 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
     private static final String PACKAGE_DIR = "content";
     private static final String ACP_EXTENSION = ".acp";
     private static final String XML_EXTENSION = ".xml";
+    private static final String TEMP_FILE_PREFIX = "alf";
     
     /**
      * The exporter service
@@ -110,47 +117,66 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
      */
     public void executeImpl(Action ruleAction, NodeRef actionedUponNodeRef)
     {
-        // create the node to hold the zip export package
-        NodeRef zip = createExportZip(ruleAction);
-        ContentWriter writer = this.contentService.getWriter(zip, ContentModel.PROP_CONTENT, true);
-        // TODO: use the encoding passed as a parameter, the underlying exporter service only uses UTF-8
-        //       at the moment so there's no need to set it currently
-        writer.setEncoding(ENCODING);
-        writer.setMimetype(MIMETYPE);
-        
-        String packageName = (String)ruleAction.getParameterValue(PARAM_PACKAGE_NAME);
-        // add XML extenstion if it is not present
-        if (packageName.indexOf(".") == -1)
+        File zipFile = null;
+        try
         {
-            packageName = packageName + XML_EXTENSION;
+            String packageName = (String)ruleAction.getParameterValue(PARAM_PACKAGE_NAME);
+            // add XML extenstion if it is not present
+            if (packageName.indexOf(".") == -1)
+            {
+                packageName = packageName + XML_EXTENSION;
+            }
+            File dataFile = new File(packageName);
+            File contentDir = new File(PACKAGE_DIR);
+           
+            // create a temporary file to hold the zip
+            zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, ACP_EXTENSION);
+            ZipExportPackageHandler zipHandler = new ZipExportPackageHandler(new FileOutputStream(zipFile), 
+                 dataFile, contentDir);
+           
+            ExporterCrawlerParameters params = new ExporterCrawlerParameters();
+            boolean includeChildren = true;
+            Boolean withKids = (Boolean)ruleAction.getParameterValue(PARAM_INCLUDE_CHILDREN);
+            if (withKids != null)
+            {
+                includeChildren = withKids.booleanValue();
+            }
+            params.setCrawlChildNodes(includeChildren);
+           
+            boolean includeSelf = false;
+            Boolean andMe = (Boolean)ruleAction.getParameterValue(PARAM_INCLUDE_SELF);
+            if (andMe != null)
+            {
+                includeSelf = andMe.booleanValue();
+            }
+            params.setCrawlSelf(includeSelf);
+   
+            params.setExportFrom(new Location(actionedUponNodeRef));
+           
+            // perform the actual export
+            this.exporterService.exportView(zipHandler, params, null);
+           
+            // now the export is done we need to create a node in the repository
+            // to hold the exported package
+            NodeRef zip = createExportZip(ruleAction, actionedUponNodeRef);
+            ContentWriter writer = this.contentService.getWriter(zip, ContentModel.PROP_CONTENT, true);
+            // TODO: use the encoding passed as a parameter, currently the underlying exporter service only uses UTF-8
+            writer.setEncoding(ENCODING);
+            writer.setMimetype(MIMETYPE);
+            writer.putContent(zipFile);
         }
-        File dataFile = new File(packageName);
-        File contentDir = new File(PACKAGE_DIR);
-        
-        ZipExportPackageHandler zipHandler = new ZipExportPackageHandler(writer.getContentOutputStream(), dataFile, contentDir);
-        
-        ExporterCrawlerParameters params = new ExporterCrawlerParameters();
-        boolean includeChildren = true;
-        Boolean withKids = (Boolean)ruleAction.getParameterValue(PARAM_INCLUDE_CHILDREN);
-        if (withKids != null)
+        catch (FileNotFoundException fnfe)
         {
-            includeChildren = withKids.booleanValue();
+            throw new ActionServiceException("export.package.error", fnfe);
         }
-        params.setCrawlChildNodes(includeChildren);
-        
-        boolean includeSelf = false;
-        Boolean andMe = (Boolean)ruleAction.getParameterValue(PARAM_INCLUDE_SELF);
-        if (andMe != null)
+        finally
         {
-            includeSelf = andMe.booleanValue();
+           // try and delete the temporary file
+           if (zipFile != null)
+           {
+              zipFile.delete();
+           }
         }
-        params.setCrawlSelf(includeSelf);
-        
-        
-        params.setExportFrom(new Location(actionedUponNodeRef));
-        
-        // perform the actual export
-        this.exporterService.exportView(zipHandler, params, null);
     }
 
 	@Override
@@ -176,7 +202,7 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
      * @param ruleAction The rule being executed
      * @return The NodeRef of the newly created ZIP file
      */
-    private NodeRef createExportZip(Action ruleAction)
+    private NodeRef createExportZip(Action ruleAction, NodeRef actionedUponNodeRef)
     {
         // create a node in the repository to represent the export package
         NodeRef exportDest = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
@@ -200,11 +226,20 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
               ContentModel.TYPE_CONTENT, contentProps);
          
         NodeRef zipNodeRef = assocRef.getChildRef();
-         
+        
+        // build a description string to be set on the node representing the content package
+        String desc = "";
+        String spaceName = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
+        String pattern = I18NUtil.getMessage("export.package.description");
+        if (pattern != null && spaceName != null)
+        {
+           desc = MessageFormat.format(pattern, spaceName);
+        }
+        
         // apply the titled aspect to behave in the web client
         Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(3, 1.0f);
-        titledProps.put(ContentModel.PROP_TITLE, "");
-        titledProps.put(ContentModel.PROP_DESCRIPTION, "");
+        titledProps.put(ContentModel.PROP_TITLE, packageName);
+        titledProps.put(ContentModel.PROP_DESCRIPTION, desc);
         this.nodeService.addAspect(zipNodeRef, ContentModel.ASPECT_TITLED, titledProps);
         
         return zipNodeRef;

@@ -46,8 +46,8 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
     
     private static final String ENCODING = "UTF-8";
     private static final String MIMETYPE = "application/acp";
-    private static final String TEMP_FILE_PREFIX = "acp-";
-    private static final String TEMP_FILE_SUFFIX = "zip";
+    private static final String TEMP_FILE_PREFIX = "alf";
+    private static final String TEMP_FILE_SUFFIX = ".acp";
     
     /**
      * The importer service
@@ -107,15 +107,27 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
            {
                if (MIMETYPE.equals(reader.getMimetype()))
                {
-                   // unfortunately a ZIP file can not be read directly from an input stream so we have to create
-                   // a temporary file first
-                   File zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
-                   reader.getContent(zipFile);
-                   
-                   ZipImportPackageHandler importHandler = new ZipImportPackageHandler(zipFile, ENCODING);
-                   NodeRef importDest = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
-                   
-                   this.importerService.importView(importHandler, new Location(importDest), null, null);
+                   File zipFile = null;
+                   try
+                   {
+                       // unfortunately a ZIP file can not be read directly from an input stream so we have to create
+                       // a temporary file first
+                       zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
+                       reader.getContent(zipFile);
+                      
+                       ZipImportPackageHandler importHandler = new ZipImportPackageHandler(zipFile, ENCODING);
+                       NodeRef importDest = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
+                      
+                       this.importerService.importView(importHandler, new Location(importDest), null, null);
+                   }
+                   finally
+                   {
+                      // now the import is done, delete the temporary file
+                      if (zipFile != null)
+                      {
+                         zipFile.delete();
+                      }
+                   }
                }
            }
         }

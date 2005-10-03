@@ -126,15 +126,6 @@
                                                     onkeyup="javascript:checkButtonState();" />
                                     </td>
                                  </tr>
-                                 <tr>
-                                    <td><nobr><h:outputText value="#{msg.export_from}"/>:</nobr></td>
-                                    <td>
-                                       <h:selectOneRadio value="#{ExportDialog.mode}" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="#{msg.current_space}" />
-                                          <f:selectItem itemValue="all" itemLabel="#{msg.all_spaces}" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><nobr><h:outputText value="#{msg.destination}"/>:</nobr></td>
@@ -146,6 +137,15 @@
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td><nobr><h:outputText value="#{msg.export_from}"/>:</nobr></td>
+                                    <td>
+                                       <h:selectOneRadio value="#{ExportDialog.mode}" layout="pageDirection">
+                                          <f:selectItem itemValue="current" itemLabel="#{msg.current_space}" />
+                                          <f:selectItem itemValue="all" itemLabel="#{msg.all_spaces}" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
                                  <%--
                                  <tr>
                                     <td><nobr><h:outputText value="#{msg.encoding}"/>:</nobr></td>
