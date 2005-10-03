@@ -199,7 +199,6 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
     {
         // Add the ticket to the url
         strUrl += "?ticket=" + TicketHolder.ticket;
-        System.out.println(strUrl);
         
         StringBuilder readContent = new StringBuilder();
         URL url = new URL(strUrl);
