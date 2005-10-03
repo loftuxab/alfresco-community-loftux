@@ -87,7 +87,7 @@ public class NodeSearcher
                 String split[] = xpath.split("order\\s*by\\s*", 2);
                 xpath = split[0];
 
-                if (split[1].length() > 0)
+                if (split.length > 1 && split[1].length() > 0)
                 {
                     String clauses[] = split[1].split("\\s,\\s");
 

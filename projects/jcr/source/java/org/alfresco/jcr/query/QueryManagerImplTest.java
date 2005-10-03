@@ -24,7 +24,7 @@ public class QueryManagerImplTest extends BaseJCRTest
     {
         super.onSetUpInTransaction();
         
-        SimpleCredentials superuser = new SimpleCredentials("superuser", "".toCharArray());
+        SimpleCredentials superuser = new SimpleCredentials("admin", "admin".toCharArray());
         superuserSession = repository.login(superuser, getWorkspace());
     }
     

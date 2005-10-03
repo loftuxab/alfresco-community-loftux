@@ -37,9 +37,7 @@
           <!-- Some Content -->
           <cm:content view:childName="contentValue">
 			<cm:name>Test Content</cm:name>
-			<cm:encoding>UTF-8</cm:encoding>
-			<cm:mimetype>text/plain</cm:mimetype>
-			<cm:contentUrl>org/alfresco/jcr/test/testContent.txt</cm:contentUrl>
+			<cm:content>contentUrl=org/alfresco/jcr/test/testContent.txt|mimetype=text|size=|encoding=UTF-8</cm:content>
           </cm:content>
           
           <!-- Query -->
