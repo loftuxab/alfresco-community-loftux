@@ -47,4 +47,10 @@
       </war>
    </target>
 
+   <!-- override the drop-database target to also delete the enterprise index files -->
+   <target name="drop-database" depends="alfresco.drop-database">
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.name.projects}/${dir.name.enterprise}/alf_data" />
+   </target>
+   
+   
 </project>

@@ -202,9 +202,11 @@
           userid="${db.username}" password="${db.password}">
          drop database ${db.name};
       </sql>
-    
+      
       <!-- cleanup indexes, they could be in several locations so try all of them -->
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.root}" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.repository}/alf_data" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.remote-api}/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.jcr}/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${home.tomcat}/bin/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${home.jboss}/bin/alf_data" />
