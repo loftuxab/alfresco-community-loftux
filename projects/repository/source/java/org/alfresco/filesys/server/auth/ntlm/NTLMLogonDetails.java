@@ -19,6 +19,8 @@ package org.alfresco.filesys.server.auth.ntlm;
 
 import java.util.Date;
 
+import net.sf.acegisecurity.Authentication;
+
 /**
  * NTLM Logon Details Class
  * 
@@ -50,6 +52,10 @@ public class NTLMLogonDetails
     
     private Type2NTLMMessage m_type2Msg;
     private byte[] m_ntlmHash;
+    
+    // Authentication token, used for passthru mode
+    
+    private Authentication m_authToken;
     
     /**
      * Default constructor
@@ -175,6 +181,26 @@ public class NTLMLogonDetails
     }
     
     /**
+     * Determine if the passthru authentication token is valid
+     * 
+     * @return boolean
+     */
+    public final boolean hasAuthenticationToken()
+    {
+        return m_authToken != null ? true : false;
+    }
+    
+    /**
+     * Return the authentication token
+     * 
+     * @return Authentication
+     */
+    public final Authentication getAuthenticationToken()
+    {
+        return m_authToken;
+    }
+    
+    /**
      * Set the authentication date/time
      * 
      * @param authTime long
@@ -227,6 +253,16 @@ public class NTLMLogonDetails
     }
     
     /**
+     * Set the passthru authentication token
+     * 
+     * @param token Authentication
+     */
+    public final void setAuthenticationToken(Authentication token)
+    {
+        m_authToken = token;
+    }
+    
+    /**
      * Return the NTLM logon details as a string
      * 
      * @return String
@@ -245,6 +281,13 @@ public class NTLMLogonDetails
         str.append(getAuthenticationServer());
         str.append(",");
         str.append(new Date(authenticatedAt()));
+        
+        if ( hasAuthenticationToken())
+        {
+            str.append(",token=");
+            str.append(getAuthenticationToken());
+        }
+        
         str.append("]");
         
         return str.toString();
