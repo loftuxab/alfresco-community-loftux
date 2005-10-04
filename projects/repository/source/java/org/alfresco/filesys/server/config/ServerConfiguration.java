@@ -68,7 +68,10 @@ import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
 import org.alfresco.filesys.util.IPAddress;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -289,13 +292,27 @@ public class ServerConfiguration
     
     private AuthenticationComponent m_authComponent;
     
+    // Various services
+    
+    private NodeService m_nodeService;
+    private PersonService m_personService;
+    private TransactionService m_transactionService;
+    
     /**
      * Class constructor
      * 
-     * @param config ConfigService
+     * @param authMgr AuthenticationManager
+     * @param authenticationService AuthenticationService
+     * @param authenticationComponent AuthenticationComponent
+     * @param nodeService NodeService
+     * @param personServce PersonService
+     * @param transactionService TransactionService
+     * @param configPath String
+     * @param diskInterface DiskInterface 
      */
     public ServerConfiguration(AuthenticationManager authMgr, AuthenticationService authenticationService,
-            AuthenticationComponent authComponent, String configPath, DiskInterface diskInterface)
+            AuthenticationComponent authComponent, NodeService nodeService, PersonService personService,
+            TransactionService transactionService, String configPath, DiskInterface diskInterface)
     {
         // Save details
 
@@ -305,6 +322,10 @@ public class ServerConfiguration
         this.configLocation = configPath;
 
         m_authComponent = authComponent;
+        
+        m_nodeService = nodeService;
+        m_personService = personService;
+        m_transactionService = transactionService;
         
         // Allocate the shared device list
 
@@ -1723,6 +1744,36 @@ public class ServerConfiguration
     public final AuthenticationComponent getAuthenticationComponent()
     {
         return m_authComponent;
+    }
+    
+    /**
+     * Return the node service
+     * 
+     * @return NodeService
+     */
+    public final NodeService getNodeService()
+    {
+        return m_nodeService;
+    }
+    
+    /**
+     * Return the person service
+     * 
+     * @return PersonService
+     */
+    public final PersonService getPersonService()
+    {
+        return m_personService;
+    }
+    
+    /**
+     * Return the transaction service
+     * 
+     * @return TransactionService
+     */
+    public final TransactionService getTransactionService()
+    {
+        return m_transactionService;
     }
     
     /**

@@ -19,6 +19,8 @@ package org.alfresco.filesys.server.auth;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+import javax.transaction.UserTransaction;
+
 import org.alfresco.config.ConfigElement;
 import org.alfresco.filesys.server.SrvSession;
 import org.alfresco.filesys.server.config.InvalidConfigurationException;
@@ -35,6 +37,7 @@ import org.alfresco.repo.security.authentication.ntlm.NTLMPassthruToken;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -75,6 +78,7 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
     
     private NodeService m_nodeService;
     private PersonService m_personService;
+    private TransactionService m_transactionService;
     
     /**
      * Default Constructor
@@ -267,6 +271,12 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
         if ( m_authComponent.getNTLMMode() != NTLMMode.MD4_PROVIDER &&
                 m_authComponent.getNTLMMode() != NTLMMode.PASS_THROUGH)
             throw new InvalidConfigurationException("Required authentication mode not available");
+        
+        // Get hold of various services
+        
+        m_nodeService = config.getNodeService();
+        m_personService = config.getPersonService();
+        m_transactionService = config.getTransactionService();
     }
     
     /**
@@ -321,9 +331,7 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
                 
                 // Get the users home folder node, if available
                 
-                NodeRef homeSpaceRef = (NodeRef) m_nodeService.getProperty(m_personService.getPerson(client.getUserName()),
-                        ContentModel.PROP_HOMEFOLDER);
-                client.setHomeFolder( homeSpaceRef);
+                getHomeFolderForUser( client);
                 
                 // Passwords match, grant access
                 
@@ -424,10 +432,7 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
             
             // Get the users home folder node, if available
             
-            NodeRef homeSpaceRef = (NodeRef) m_nodeService.getProperty(m_personService.getPerson(client.getUserName()),
-                    ContentModel.PROP_HOMEFOLDER);
-            client.setHomeFolder( homeSpaceRef);
-            
+            getHomeFolderForUser( client);
         }
         catch ( Exception ex)
         {
@@ -440,5 +445,38 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
         // Return the authentication status
         
         return authSts;
+    }
+    
+    /**
+     * Get the home folder for the user
+     * 
+     * @param client ClientInfo
+     */
+    private final void getHomeFolderForUser(ClientInfo client)
+    {
+        // Get the home folder for the user
+        
+        UserTransaction tx = m_transactionService.getUserTransaction();
+        NodeRef homeSpaceRef = null;
+        
+        try
+        {
+            tx.begin();
+            homeSpaceRef = (NodeRef) m_nodeService.getProperty(m_personService.getPerson(client.getUserName()),
+                    ContentModel.PROP_HOMEFOLDER);
+            client.setHomeFolder( homeSpaceRef);
+            tx.commit();
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                tx.rollback();
+            }
+            catch (Exception ex2)
+            {
+                logger.error("Failed to rollback transaction", ex);
+            }
+        }
     }
 }

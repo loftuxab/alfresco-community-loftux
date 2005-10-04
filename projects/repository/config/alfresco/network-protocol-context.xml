@@ -18,6 +18,15 @@
          <ref bean="authenticationComponent"/>
       </constructor-arg>
       <constructor-arg>
+         <ref bean="nodeService"/>
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="personService"/>
+      </constructor-arg>
+      <constructor-arg>
+         <ref bean="transactionComponent"/>
+      </constructor-arg>
+      <constructor-arg>
          <value>alfresco/file-servers.xml</value>
       </constructor-arg>
       <constructor-arg>
