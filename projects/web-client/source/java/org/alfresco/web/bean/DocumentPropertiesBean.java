@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -61,6 +62,8 @@ import org.springframework.web.jsf.FacesContextUtils;
  */
 public class DocumentPropertiesBean
 {
+   private static final String TEMP_PROP_MIMETYPE = "mimetype";
+   
    private NodeService nodeService;
    private DictionaryService dictionaryService;
    private BrowseBean browseBean;
@@ -85,8 +88,17 @@ public class DocumentPropertiesBean
     */
    public void setupDocumentForAction(ActionEvent event)
    {
-      this.editableNode = new Node(this.browseBean.getDocument().getNodeRef(),
-            this.nodeService);
+      this.editableNode = new Node(this.browseBean.getDocument().getNodeRef(), this.nodeService);
+      
+      // special case for Mimetype - since this is a sub-property of the ContentData object
+      // we must extract it so it can be edited in the client, then we check for it later
+      // and create a new ContentData object to wrap it and it's associated URL
+      ContentData content = (ContentData)this.editableNode.getProperties().get(ContentModel.PROP_CONTENT);
+      if (content != null)
+      {
+         this.editableNode.getProperties().put(TEMP_PROP_MIMETYPE, content.getMimetype());
+      }
+      
       this.hasOtherProperties = null;
    }
    
@@ -111,14 +123,31 @@ public class DocumentPropertiesBean
          
          // we need to put all the properties from the editable bag back into 
          // the format expected by the repository
-         Iterator<String> iterProps = this.editableNode.getProperties().keySet().iterator();
+         
+         // but first extract and deal with the special mimetype property for ContentData
+         Map<String, Object> props = this.editableNode.getProperties();
+         String mimetype = (String)props.get(TEMP_PROP_MIMETYPE);
+         if (mimetype != null)
+         {
+            // remove temporary prop from list so it isn't saved with the others
+            props.remove(TEMP_PROP_MIMETYPE);
+            ContentData contentData = (ContentData)props.get(ContentModel.PROP_CONTENT);
+            if (contentData != null)
+            {
+               contentData = contentData.setMimetype(contentData, mimetype);
+               props.put(ContentModel.PROP_CONTENT.toString(), contentData);
+            }
+         }
+         
+         // add the remaining properties
+         Iterator<String> iterProps = props.keySet().iterator();
          while (iterProps.hasNext())
          {
             String propName = iterProps.next();
             QName qname = QName.createQName(propName);
             
             // make sure the property is represented correctly
-            Serializable propValue = (Serializable)this.editableNode.getProperties().get(propName);
+            Serializable propValue = (Serializable)props.get(propName);
             PropertyDefinition propDef = this.dictionaryService.getProperty(qname);
             
             properties.put(qname, propValue);

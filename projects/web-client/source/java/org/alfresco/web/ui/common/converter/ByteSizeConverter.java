@@ -55,12 +55,6 @@ public class ByteSizeConverter implements Converter
     */
    public String getAsString(FacesContext context, UIComponent component, Object value)
    {
-      String result = "";
-      if (value != null)
-      {
-         result = value.toString();
-      }
-      
       long size;
       if (value instanceof Long)
       {
@@ -74,12 +68,12 @@ public class ByteSizeConverter implements Converter
          }
          catch (NumberFormatException ne)
          {
-            return result;
+            return (String)value;
          }
       }
       else
       {
-         return result;
+         return "";
       }
       
       // get formatter
