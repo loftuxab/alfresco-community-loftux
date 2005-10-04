@@ -43,8 +43,6 @@ import org.alfresco.repo.webservice.types.Store;
 import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.repo.webservice.types.Version;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -255,7 +253,8 @@ public class Utils
                 nodeRefs.add(convertToNodeRef(nodes[x], nodeService,
                         searchService, namespaceService));
             }
-        } else
+        } 
+        else if (predicate.getQuery() != null)
         {
             // make sure a query is present
             Query query = predicate.getQuery();
@@ -290,6 +289,16 @@ public class Utils
 
             // get hold of all the NodeRef's from the results
             nodeRefs = searchResults.getNodeRefs();
+        }
+        else if (predicate.getStore() != null)
+        {
+            // Since only the store was supplied interpret this to mean the predicate should be resolved to the
+            // stores root node
+            Store store = predicate.getStore();
+            NodeRef rootNode = nodeService.getRootNode(Utils.convertToStoreRef(store));
+            
+            nodeRefs = new ArrayList<NodeRef>();
+            nodeRefs.add(rootNode);
         }
 
         return nodeRefs;
@@ -395,9 +404,9 @@ public class Utils
             String value = null;
             try
             {
-                DefaultTypeConverter.INSTANCE.convert(String.class, entry
-                        .getValue());
-            } catch (Throwable exception)
+                value = DefaultTypeConverter.INSTANCE.convert(String.class, entry.getValue());
+            } 
+            catch (Throwable exception)
             {
                 value = entry.getValue().toString();
             }
@@ -470,6 +479,8 @@ public class Utils
           classDef.setProperties(propDefs);
        }
        
+       // TODO need to get the child associations as well !!
+       
        // represent the associations
        Map<QName, org.alfresco.service.cmr.dictionary.AssociationDefinition> assocs = ddClassDef.getAssociations();
        if (assocs != null)
@@ -506,7 +517,12 @@ public class Utils
              targetRole.setCardinality(setupTargetCardinalityObject(ddAssocDef));;
              assocDef.setTargetRole(targetRole);
              assocDef.setTargetClass(ddAssocDef.getTargetClass().getName().toString());
+             
+             assocDefs[pos] = assocDef;
+             pos++;
           }
+          
+          classDef.setAssociations(assocDefs);
        }
        
        return classDef;

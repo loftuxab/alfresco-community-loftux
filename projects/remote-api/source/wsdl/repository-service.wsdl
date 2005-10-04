@@ -147,6 +147,22 @@
             </complexType>
          </element>
          
+         <element name="get">
+            <complexType>
+               <sequence>
+                  <element name="where" type="cms:Predicate"/>
+               </sequence>
+            </complexType>
+         </element>
+         
+         <element name="getResponse">
+            <complexType>
+               <sequence>
+                  <element name="getReturn" type="cms:Node" minOccurs="0" maxOccurs="unbounded"/>
+               </sequence>
+            </complexType>
+         </element>
+         
          <complexType name="QueryResult">
             <sequence>
                <element name="querySession" type="xsd:string" nillable="true"/>
@@ -261,6 +277,14 @@
       <wsdl:part element="rep:describeResponse" name="parameters"/>
    </wsdl:message>
    
+   <wsdl:message name="getRequest">
+      <wsdl:part element="rep:get" name="parameters"/>
+   </wsdl:message>
+
+   <wsdl:message name="getResponse">
+      <wsdl:part element="rep:getResponse" name="parameters"/>
+   </wsdl:message>
+   
    <wsdl:message name="RepositoryFault">
       <wsdl:part element="rep:RepositoryFault" name="fault"/>
    </wsdl:message>
@@ -312,6 +336,12 @@
          <wsdl:documentation>Describes a content resource.</wsdl:documentation>
          <wsdl:input message="rep:describeRequest" name="describeRequest"/>
          <wsdl:output message="rep:describeResponse" name="describeResponse"/>
+         <wsdl:fault message="rep:RepositoryFault" name="RepositoryFault"/>
+      </wsdl:operation>
+      <wsdl:operation name="get">
+         <wsdl:documentation>Gets a resource from the repository.</wsdl:documentation>
+         <wsdl:input message="rep:getRequest" name="getRequest"/>
+         <wsdl:output message="rep:getResponse" name="getResponse"/>
          <wsdl:fault message="rep:RepositoryFault" name="RepositoryFault"/>
       </wsdl:operation>
    </wsdl:portType>
@@ -420,6 +450,19 @@
             <wsdlsoap:body use="literal"/>
          </wsdl:input>
          <wsdl:output name="describeResponse">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="RepositoryFault">
+            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/repository/1.0" use="literal" name="RepositoryFault"/>
+         </wsdl:fault>
+      </wsdl:operation>      
+      <wsdl:operation name="get">
+         <wsdl:documentation>Gets a resource from the respository.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/repository/1.0/get"/>
+         <wsdl:input name="getRequest">
+            <wsdlsoap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output name="getResponse">
             <wsdlsoap:body use="literal"/>
          </wsdl:output>
          <wsdl:fault name="RepositoryFault">

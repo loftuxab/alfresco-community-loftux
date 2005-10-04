@@ -27,6 +27,7 @@ import org.alfresco.example.webservice.types.CMLAddAspect;
 import org.alfresco.example.webservice.types.CMLCreate;
 import org.alfresco.example.webservice.types.ClassDefinition;
 import org.alfresco.example.webservice.types.NamedValue;
+import org.alfresco.example.webservice.types.Node;
 import org.alfresco.example.webservice.types.NodeDefinition;
 import org.alfresco.example.webservice.types.ParentReference;
 import org.alfresco.example.webservice.types.Predicate;
@@ -531,5 +532,30 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         UpdateResult[] results = this.repoService.update(cml);
         assertNotNull(results);
         assertEquals(2, results.length);
+    }
+    
+    public void testGet() 
+        throws Exception
+    {
+        Predicate predicate = new Predicate(null, getStore(), null);
+        Node[] nodes = this.repoService.get(predicate);
+        assertNotNull(nodes);
+        assertEquals(1, nodes.length);
+        
+        Node rootNode = nodes[0];
+        assertEquals(getRootNodeReference().getUuid(), rootNode.getReference().getUuid());
+        
+        logger.debug("Root node type = " + rootNode.getType());
+        String aspects = "";
+        for (String aspect : rootNode.getAspects())
+        {
+            aspects += aspect + ", ";
+        }
+        logger.debug("Root node aspects = " + aspects);
+        for (NamedValue prop : rootNode.getProperties())
+        {
+            logger.debug("Root node property " + prop.getName() + " = " + prop.getValue());
+        }
+        
     }
 }

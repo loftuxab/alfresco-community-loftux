@@ -16,28 +16,27 @@
  */
 package org.alfresco.repo.webservice.repository;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.UserTransaction;
 
 import org.alfresco.repo.cache.SimpleCache;
-import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.webservice.AbstractWebService;
 import org.alfresco.repo.webservice.CMLUtil;
 import org.alfresco.repo.webservice.Utils;
-import org.alfresco.repo.webservice.types.AssociationDefinition;
 import org.alfresco.repo.webservice.types.CML;
-import org.alfresco.repo.webservice.types.Cardinality;
 import org.alfresco.repo.webservice.types.ClassDefinition;
+import org.alfresco.repo.webservice.types.NamedValue;
+import org.alfresco.repo.webservice.types.Node;
 import org.alfresco.repo.webservice.types.NodeDefinition;
 import org.alfresco.repo.webservice.types.Predicate;
-import org.alfresco.repo.webservice.types.PropertyDefinition;
 import org.alfresco.repo.webservice.types.Query;
 import org.alfresco.repo.webservice.types.QueryLanguageEnum;
 import org.alfresco.repo.webservice.types.Reference;
-import org.alfresco.repo.webservice.types.RoleDefinition;
 import org.alfresco.repo.webservice.types.Store;
 import org.alfresco.repo.webservice.types.StoreEnum;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -45,6 +44,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.namespace.QName;
 import org.apache.axis.MessageContext;
 import org.apache.commons.logging.Log;
@@ -536,4 +536,96 @@ public class RepositoryWebService extends AbstractWebService implements
         return new NodeDefinition(typeDef, aspectDefs);
     }
 
+    /**
+     * Gets the nodes associatiated with the predicate provided.  Usefull when the store and ids of the required
+     * nodes are known.
+     * 
+     * @see org.alfresco.repo.webservice.repository.RepositoryServiceSoapPort#get(org.alfresco.repo.webservice.types.Predicate)
+     */
+    public Node[] get(Predicate where) throws RemoteException, RepositoryFault
+    {
+        Node[] nodes = null;
+        UserTransaction tx = null;
+
+        try
+        {
+            tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
+            tx.begin();
+            
+            // Resolve the predicate to a list of node references
+            List<NodeRef> nodeRefs = Utils.resolvePredicate(where, this.nodeService, this.searchService, this.namespaceService);
+            nodes = new Node[nodeRefs.size()];
+            int index = 0;
+            for (NodeRef nodeRef : nodeRefs)
+            {
+                // Get the nodes reference
+                Reference reference = Utils.convertToReference(nodeRef);
+                
+                // Get the nodes type
+                String type = this.nodeService.getType(nodeRef).toString();
+                
+                // Get the nodes aspects
+                Set<QName> aspectQNames = this.nodeService.getAspects(nodeRef);
+                String[] aspects = new String[aspectQNames.size()];
+                int aspectIndex = 0;
+                for (QName aspectQName : aspectQNames)
+                {
+                    aspects[aspectIndex] = aspectQName.toString();
+                    aspectIndex++;
+                }
+                
+                // Get the nodes properties
+                Map<QName, Serializable> propertyMap = this.nodeService.getProperties(nodeRef);
+                NamedValue[] properties = new NamedValue[propertyMap.size()];
+                int propertyIndex = 0;
+                for (Map.Entry<QName, Serializable> entry : propertyMap.entrySet())
+                {
+                    String value = null;
+                    try
+                    {
+                        value = DefaultTypeConverter.INSTANCE.convert(String.class, entry.getValue());
+                    } 
+                    catch (Throwable exception)
+                    {
+                        value = entry.getValue().toString();
+                    } 
+                    properties[propertyIndex] = new NamedValue(entry.getKey().toString(), value);
+                    propertyIndex++;
+                }
+                
+                // Create the node and add to the array
+                Node node = new Node(reference, type, aspects, properties);
+                nodes[index] = node;
+                
+                index++;
+            }
+            
+            // commit the transaction
+            tx.commit();
+        } 
+        catch (Throwable e)
+        {
+            // rollback the transaction
+            try
+            {
+                if (tx != null)
+                {
+                    tx.rollback();
+                }
+            } 
+            catch (Exception ex)
+            {
+                // Ignore
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.error("Unexpected error occurred", e);
+            }
+
+            throw new RepositoryFault(0, e.getMessage());
+        }
+        
+        return nodes;
+    }
 }

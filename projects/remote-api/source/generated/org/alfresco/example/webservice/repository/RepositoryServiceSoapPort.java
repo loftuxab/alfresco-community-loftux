@@ -51,4 +51,9 @@ public interface RepositoryServiceSoapPort extends java.rmi.Remote {
      * Describes a content resource.
      */
     public org.alfresco.example.webservice.types.NodeDefinition[] describe(org.alfresco.example.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault;
+
+    /**
+     * Gets a resource from the repository.
+     */
+    public org.alfresco.example.webservice.types.Node[] get(org.alfresco.example.webservice.types.Predicate where) throws java.rmi.RemoteException, org.alfresco.example.webservice.repository.RepositoryFault;
 }

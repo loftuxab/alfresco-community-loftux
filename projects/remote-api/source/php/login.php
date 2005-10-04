@@ -7,7 +7,7 @@
    $client->__options = array('trace'=>1);
          
    // authenticate with a username and password
-   $params =& new SOAP_Value('{http://www.alfresco.org/ws/service/authentication/1.0}authenticate', false,
+   $params =& new SOAP_Value('{http://www.alfresco.org/ws/service/authentication/1.0}startSession', false,
                              $v=array('username' => $_POST['username'], 'password' => $_POST['password']));
 
    $authResult = $client->call('authenticate', $v = array('authenticate' => $params), $namespace);
