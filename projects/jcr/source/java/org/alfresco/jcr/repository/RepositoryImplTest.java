@@ -37,7 +37,7 @@ public class RepositoryImplTest extends BaseJCRTest
     public void testDescriptors()
     {
         String[] keys = repository.getDescriptorKeys();
-        assertEquals(8, keys.length);
+        assertEquals(10, keys.length);
         for (String key : keys)
         {
             String value = repository.getDescriptor(key);
@@ -50,8 +50,10 @@ public class RepositoryImplTest extends BaseJCRTest
         assertNotNull(repository.getDescriptor(Repository.REP_VERSION_DESC));
         assertNotNull(repository.getDescriptor(Repository.SPEC_NAME_DESC));
         assertNotNull(repository.getDescriptor(Repository.SPEC_VERSION_DESC));
-        assertNotNull(repository.getDescriptor(Repository.LEVEL_1_SUPPORTED));
-        assertNotNull(repository.getDescriptor(Repository.OPTION_TRANSACTIONS_SUPPORTED));
+        assertEquals("true",  repository.getDescriptor(Repository.LEVEL_1_SUPPORTED));
+        assertEquals("true", repository.getDescriptor(Repository.OPTION_TRANSACTIONS_SUPPORTED));
+        assertEquals("true", repository.getDescriptor(Repository.QUERY_XPATH_DOC_ORDER));
+        assertEquals("true", repository.getDescriptor(Repository.QUERY_XPATH_POS_INDEX));
         assertNull(repository.getDescriptor(Repository.LEVEL_2_SUPPORTED));
     }
     

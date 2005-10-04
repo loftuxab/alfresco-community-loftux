@@ -53,7 +53,7 @@ public class RepositoryImpl implements Repository
         descriptors.put(Repository.REP_NAME_DESC, "Alfresco Content Repository");
         descriptors.put(Repository.REP_VENDOR_DESC, "Alfresco");
         descriptors.put(Repository.REP_VENDOR_URL_DESC, "http://www.alfresco.org");
-        descriptors.put(Repository.REP_VERSION_DESC, "0.6.0");
+        descriptors.put(Repository.REP_VERSION_DESC, "1.0");
         descriptors.put(Repository.SPEC_NAME_DESC, "Content Repository API for Java(TM) Technology Specification");
         descriptors.put(Repository.SPEC_VERSION_DESC, "1.0");
         descriptors.put(Repository.LEVEL_1_SUPPORTED, "true");
