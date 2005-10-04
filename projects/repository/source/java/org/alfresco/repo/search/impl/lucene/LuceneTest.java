@@ -199,7 +199,6 @@ public class LuceneTest extends TestCase
         testProperties.put(QName.createQName(TEST_NAMESPACE, "datetime-ista"), new Date());
         testProperties.put(QName.createQName(TEST_NAMESPACE, "boolean-ista"), Boolean.valueOf(true));
         testProperties.put(QName.createQName(TEST_NAMESPACE, "qname-ista"), QName.createQName("{wibble}wobble"));
-        testProperties.put(QName.createQName(TEST_NAMESPACE, "guid-ista"), "My-GUID");
         testProperties.put(QName.createQName(TEST_NAMESPACE, "category-ista"), new NodeRef(storeRef, "CategoryId"));
         testProperties.put(QName.createQName(TEST_NAMESPACE, "noderef-ista"), n1);
         testProperties.put(QName.createQName(TEST_NAMESPACE, "path-ista"), nodeService.getPath(n3));
@@ -930,11 +929,6 @@ public class LuceneTest extends TestCase
         
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
                 +escapeQName(QName.createQName(TEST_NAMESPACE, "qname-ista")) + ":\"{wibble}wobble\"", null, null);
-        assertEquals(1, results.length());
-        results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "guid-ista")) + ":\"My-GUID\"", null, null);
         assertEquals(1, results.length());
         results.close();
         
@@ -2259,9 +2253,6 @@ public class LuceneTest extends TestCase
     
     public static void main(String[] args) throws Exception
     {
-        // String guid = GUID.generate();
-        // System.out.println("GUID is " + guid + " length is " +
-        // guid.length());
         LuceneTest test = new LuceneTest();
         test.setUp();
         //test.testForKev();
