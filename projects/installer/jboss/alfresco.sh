@@ -9,7 +9,7 @@ if [ "$1" = "start" ]; then
     sh ./start_oo.sh
   fi
 elif [ "$1" = "stop" ]; then
-  "$APPSERVER"/bin/shutdown.sh
+  "$APPSERVER"/bin/shutdown.sh -S
   if [ -r ./start_oo.sh ]; then
     killall soffice.bin
   fi

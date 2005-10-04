@@ -41,7 +41,6 @@ Install JDK 5.0
 - Select the "JDK 5.0 Update x" option
 - Download the Windows Offline Installation" option (~55M)
 - Install once downloaded
-- Ensure the JAVA_HOME variable is set correctly
 
 
 Install MySQL

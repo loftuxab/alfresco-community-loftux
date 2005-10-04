@@ -32,6 +32,11 @@ Optional:
 Simple Installation on Linux
 ============================
 
+All these instructions assume knowledge of using Linux from Terminal commands.  You
+may need to prefix some of the commands with 'sudo' if you do not have administrative
+access.
+
+
 Install JDK 5.0
 ---------------
 
@@ -60,25 +65,25 @@ Install Alfresco Tomcat Bundle
 - Browse to http://www.alfresco.org/downloads
 - Download the "Alfresco Linux Tomcat Bundle" option
 - Create a directory named 'alfresco'
-- Tar uncompress alfresco-tomcat-xxxxxx.tar.gz in the '~/alfresco' directory
+- Tar uncompress alfresco-tomcat-xxxxxx.tar.gz in the '/opt/alfresco' directory
 
 
 Set Paths
 ---------
 
-Edit 'paths_tc.sh' and set the variables to the locations where MySQL, Java and Tomcat
-are installed.
+Edit 'alfresco.sh' and check the variables are to the location where Tomcat
+is installed:
+- For the JBoss bundle, this will be '/opt/alfresco/tomcat'
 
 
 Create Database
 ---------------
 
-Navigate to the '~/alfresco' folder and run 'db_setup.sh' if you did a new
-install of MySQL above.  
+Navigate to the '/opt/alfresco' folder and run the 'db_setup.sql' script in
+MySQL: 'mysql -u root -p <db_setup.sql'.  
 
 This creates a MySQL database named 'alfresco' with a user 
 account and password of 'alfresco'.
-
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -87,15 +92,16 @@ Optional Install of OpenOffice
 ------------------------------
 
 If you would like to have a range of document transformations available from within
-Alfresco, you need to install OpenOffice 1.1.4.  This is entirely optional and can be
+Alfresco, you need to install OpenOffice 1.1.5.  This is entirely optional and can be
 done at any point after Alfresco has been installed.  OpenOffice should be installed
-in /opt/OpenOffice.org1.1.4
+in /opt/OpenOffice.org1.1.5
 
-- Browse to http://download.openoffice.org/1.1.4/index.html
+- Browse to http://download.openoffice.org/1.1.5/index.html
 - Download the Linux version
-- Install OpenOffice into your home directory, i.e. ~/OpenOffice.org1.1.4
+- Install OpenOffice into /opt/OpenOffice.org1.1.5
 - Start one of the OpenOffice programs to go through initial registration, then close it
-- Edit '~/alfresco/start_oo.sh' and set the correct location for OpenOffice
+- Rename '/opt/alfresco/zstart_oo.sh' to '/opt/alfresco/start_oo.sh'
+- Edit '/opt/alfresco/start_oo.sh' and set the correct location for OpenOffice
 - Stop and restart the Alfresco server if it is already running
 
 
@@ -103,9 +109,8 @@ in /opt/OpenOffice.org1.1.4
 Running the Alfresco Server
 ===========================
 
-Ensure that the MySQL server is running, then navigate to the '~/alfresco' directory
-- Run 'sudo alf_start_tc.sh'
-- If you wish to use OpenOffice document transformations, run '../start_oo.sh'
+Ensure that the MySQL server is running, then navigate to the '/opt/alfresco' directory
+- Run 'alfresco.sh start'
 - You can now try Alfresco by visiting:
 
 http://localhost:8080/alfresco
@@ -122,8 +127,7 @@ http://www.alfresco.org/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the '~/alfresco' folder and run 'alf_stop_jb.sh'
-If you started OpenOffice as above, then also run 'stop_oo.sh'
+Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 
 
 =====================
@@ -157,6 +161,17 @@ so that it is something like:
 You will need to restart the Alfresco server for this to take effect.
 
 
+==================
+Image Manipulation
+==================
+
+To enable image manipulation on a Linux platform, the ImageMagick package needs to be installed.  On
+many Linux distributions it is already available.  To check, try running the 'convert' command, which 
+is part of ImageMagick and usually found in /usr/bin.  To enable Alfresco to use 'convert', a symbolic
+link named 'imconvert' to it needs to be created somewhere on the path.  For example, in '/usr/bin'
+use the command 'ln -s convert imconvert'.
+
+
 ================
 Trouble-Shooting
 ================
@@ -164,38 +179,48 @@ Trouble-Shooting
 If you have problems with your installation, please look for help on the Installation
 forum at http://www.alfresco.org/forums and ask for any additional help you may need.
 
-. The JAVA_HOME variable must be set correctly to your Java5 installation.
+- The JAVA_HOME variable must be set correctly to your Java5 installation.
 
-. Most installation issues can be resolved by following advice in this forum article:
- - http://www.alfresco.org/forums/viewtopic.php?t=7
+- Most installation issues can be resolved by following advice in this forum article:
+  http://www.alfresco.org/forums/viewtopic.php?t=7
   and in this forum generally:
- - http://www.alfresco.org/forums/viewforum.php?f=8
+  http://www.alfresco.org/forums/viewforum.php?f=8
 
-. WAR file name is now called alfresco.war
-NOTE: If you deployed the war previously from source (rather than use a standard Alfresco installation package) then you must clear out the web-client stuff from your appservers before deploying the new WAR file:
+- WAR file name is now called alfresco.war
+  NOTE: If you deployed the war previously then you must clear out the web-client files 
+  before deploying the new WAR file, having first copied any configurations made:
 
-Tomcat:
-- Delete <tomcat-home>/webapps/web-client.war
-- Delete <tomcat-home>/webapps/web-client
-- Delete <tomcat-home>/work
+  Previous release was PR6 or later:
+  Delete <tomcat-home>/webapps/alfresco.war
+  Delete <tomcat-home>/webapps/alfresco
+  Delete <tomcat-home>/work/alfresco
+  Previous release was PR5 or earlier:
+  Delete <tomcat-home>/webapps/web-client.war
+  Delete <tomcat-home>/webapps/web-client
+  Delete <tomcat-home>/work/web-client
 
-JBoss:
-- Delete <jboss-home>/server/default/deploy/web-client.war
+- If the following errors are reported on the console:
+  ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
+  ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available:
+  Failed to execute command: imconvert ...
 
-. If the following errors are reported on the console:
-ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
-ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available: Failed to execute command: imconvert ...
-  These are not issues which will cause the server to fail, Alfresco is reporting the fact that various external document transformation engines are not available for use by the server. Either follow the instructions at the bottom of the Release Notes Wiki page:
- - http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
+  These are not issues which will cause the server to fail. Alfresco is reporting that 
+  various external document transformation engines are not available for use by the server.   
+  Either follow the instructions at the bottom of the Release Notes Wiki page:
+  http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
   or remove the transformer references completely if you don't require them:
- - http://www.alfresco.org/forums/viewtopic.php?t=90
+  http://www.alfresco.org/forums/viewtopic.php?t=90
 
-. If you see this error on server startup:
- ERROR [protocol] FTP Socket error
+- If you see this error on server startup:
+  ERROR [protocol] FTP Socket error
     java.net.BindException: Address already in use: JVM_Bind
          at java.net.PlainSocketImpl.socketBind(Native Method)
- Check to see if you have any services running against port 8080 for the Alfresco server and port 21 for the Alfresco FTP integration.
+  Check to see if you have any services running against port 8080 for the Alfresco server and
+  port 21 for the Alfresco FTP integration.
 
-. To access the CIFS repository directly from the FireFox browser, you need to install the Alfresco FireFox Extension from here:
- - http://sourceforge.net/projects/alfresco
- Internet Explorer does not require the extension to see display CIFS folders directly.
+- To access the CIFS repository directly from the FireFox browser, you need to install the
+  Alfresco FireFox Extension from here:
+  http://sourceforge.net/projects/alfresco
+  
+  Internet Explorer does not require the extension to see display CIFS folders directly.
+
