@@ -15,7 +15,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.common.component;
+package org.alfresco.web.ui.repo.component;
 
 import java.util.ArrayList;
 import java.util.List;

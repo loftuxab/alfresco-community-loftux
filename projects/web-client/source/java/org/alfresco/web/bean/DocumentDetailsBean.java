@@ -233,9 +233,12 @@ public class DocumentDetailsBean
              builder.append("<ul>");
              for (Object obj : categories)
              {
-                builder.append("<li>");
-                builder.append(Repository.getNameForNode(this.nodeService, (NodeRef)obj));
-                builder.append("</li>");
+                if (this.nodeService.exists((NodeRef)obj))
+                {
+                   builder.append("<li>");
+                   builder.append(Repository.getNameForNode(this.nodeService, (NodeRef)obj));
+                   builder.append("</li>");
+                }
              }
              builder.append("</ul>");
              

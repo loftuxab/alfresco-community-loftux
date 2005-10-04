@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.common.renderer;
+package org.alfresco.web.ui.repo.renderer;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,8 +29,9 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
-import org.alfresco.web.ui.common.component.UIMultiValueEditor;
-import org.alfresco.web.ui.common.component.UIMultiValueEditor.MultiValueEditorEvent;
+import org.alfresco.web.ui.common.renderer.BaseRenderer;
+import org.alfresco.web.ui.repo.component.UIMultiValueEditor;
+import org.alfresco.web.ui.repo.component.UIMultiValueEditor.MultiValueEditorEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,6 +50,10 @@ public class MultiValueListEditorRenderer extends BaseRenderer
    private final static String MSG_SELECT_BUTTON = "select_button";
    private final static String MSG_SELECT = "select_an_item";
    private final static String MSG_ADD_TO_LIST_BUTTON = "add_to_list_button";
+   private static final String MSG_SELECT_CATEGORY = "select_category";
+   private static final String MSG_SELECTED_CATEGORIES = "selected_categories";
+   private static final String MSG_NONE = "none";
+   
    
    // ------------------------------------------------------------------------------
    // Renderer implemenation
@@ -107,7 +112,7 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          UIMultiValueEditor editor = (UIMultiValueEditor)component;
          
          // start outer table
-         out.write("<table border='0' cellspacing='4' cellpadding='0'");
+         out.write("<table border='0' cellspacing='4' cellpadding='4'");
          this.outputAttribute(out, attrs.get("style"), "style");
          this.outputAttribute(out, attrs.get("styleClass"), "styleClass");
          out.write(">");
@@ -116,27 +121,22 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          out.write("<tr><td>");
          
          // TODO: make this generic
-         out.write(Application.getMessage(context, "select_category"));
-         out.write("</td></tr>");
-            
-         // output a padding row
-         out.write("<tr><td height='10'></td></tr>");
-            
+         out.write("1. ");
+         out.write(Application.getMessage(context, MSG_SELECT_CATEGORY));
+         out.write(":</td></tr>");
+         
          if (editor.getAddingNewItem())
          {
             // TODO: remove the hard coded style - need to change the space selector to use div and not span
-            out.write("<tr><td colspan='2' style='background-color: #eeeeee; border: 1px dashed #cccccc; padding: 6px;'>");
+            out.write("<tr><td style='padding-left:8px'>");
          }
          else
          {
-            out.write("<tr><td colspan='2'><input type='submit' value='");
+            out.write("<tr><td style='padding-left:8px;'><input type='submit' value='");
             out.write(Application.getMessage(context, MSG_SELECT_BUTTON));
             out.write("' onclick=\"");
             out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_SELECT)));
             out.write("\"/></td></tr>");
-         
-            // output a padding row
-            out.write("<tr><td height='10'></td></tr>");
          }
       }
    }
@@ -157,48 +157,60 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          if (editor.getAddingNewItem())
          {
             out.write("</td></tr>");
-            
-            // output a padding row
-            out.write("<tr><td height='10'></td></tr>");
-            
-            // show the add to list button but only if something has been selected
-            if (editor.getLastItemAdded() != null)
-            {
-               out.write("<tr><td colspan='2'><input type='submit' value='");
-               out.write(Application.getMessage(context, MSG_ADD_TO_LIST_BUTTON));
-               out.write("' onclick=\"");
-               out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_ADD)));
-               out.write("\"/></td></tr>");
-            
-               // output a padding row
-               out.write("<tr><td height='10'></td></tr>");
-            }
          }
          
-         // output a padding row
-         out.write("<tr><td>");
-            
+         // show the add to list button but only if something has been selected
+         out.write("<tr><td>2. <input type='submit'");
+         if (editor.getAddingNewItem() == false && editor.getLastItemAdded() != null)
+         {
+            out.write(" disabled='true'");
+         }
+         out.write(" value='");
+         out.write(Application.getMessage(context, MSG_ADD_TO_LIST_BUTTON));
+         out.write("' onclick=\"");
+         out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_ADD)));
+         out.write("\"/></td></tr>");
+         
+         out.write("<tr><td style='padding-top:8px'>");
+         
          // TODO: make this generic
-         out.write(Application.getMessage(context, "selected_categories"));
+         out.write(Application.getMessage(context, MSG_SELECTED_CATEGORIES));
          out.write(":</td></tr>");
          
          // show the current items
          List currentItems = (List)editor.getValue();
          if (currentItems != null && currentItems.size() > 0)
          {
+            out.write("<tr><td><table cellspacing=0 cellpadding=0 border=0>");
             for (int x = 0; x < currentItems.size(); x++)
             {  
-               renderExistingItem(context, component, out, nodeService, x, currentItems.get(x));
+               Object obj = currentItems.get(x);
+               if (obj instanceof NodeRef)
+               {
+                  if (nodeService.exists((NodeRef)obj))
+                  {
+                     renderExistingItem(context, component, out, nodeService, x, obj);
+                  }
+                  else
+                  {
+                     // remove invalid NodeRefs from the list
+                     currentItems.remove(x);
+                  }
+               }
+               else
+               {
+                  renderExistingItem(context, component, out, nodeService, x, obj);
+               }
             }
+            out.write("</table></td></tr>");
          }
          else
          {
-            // output a padding row
             out.write("<tr><td>&lt;");
-            out.write(Application.getMessage(context, "none"));
+            out.write(Application.getMessage(context, MSG_NONE));
             out.write("&gt;</td></tr>");
          }
-            
+         
          // close table
          out.write("</table>");
       }
@@ -230,7 +242,7 @@ public class MultiValueListEditorRenderer extends BaseRenderer
       }
 
       out.write("&nbsp;&nbsp;");
-      out.write("</td><td align='right'><input type='submit' value='");
+      out.write("</td><td align='right' style='padding-left:8px'><input type='submit' value='");
       out.write(Application.getMessage(context, MSG_REMOVE));
       out.write("' onclick=\"");
       out.write(generateFormSubmit(context, component, UIMultiValueEditor.ACTION_REMOVE + UIMultiValueEditor.ACTION_SEPARATOR + index));

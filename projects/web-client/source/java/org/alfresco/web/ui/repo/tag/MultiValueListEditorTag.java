@@ -14,9 +14,11 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.common.tag;
+package org.alfresco.web.ui.repo.tag;
 
 import javax.faces.component.UIComponent;
+
+import org.alfresco.web.ui.common.tag.HtmlComponentTag;
 
 /**
  * Tag to combine the multi value component and list renderer

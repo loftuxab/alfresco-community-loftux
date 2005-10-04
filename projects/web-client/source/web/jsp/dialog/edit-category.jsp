@@ -100,11 +100,11 @@
                                  <tr>
                                     <td><h:outputText value="#{msg.categories}" />:</td>
                                     <td width="90%">
-                                       <a:multiValueListEditor value="#{DocumentDetailsBean.categories}"
+                                       <r:multiValueListEditor value="#{DocumentDetailsBean.categories}"
                                                                lastItemAdded="#{DocumentDetailsBean.addedCategory}" styleClass="selector">
-                                          <r:categorySelector label="#{msg.select_category_prompt}"
+                                          <r:categorySelector label="#{msg.select_category_prompt}" styleClass="selector"
                                                               value="#{DocumentDetailsBean.addedCategory}"/>
-                                       </a:multiValueListEditor>
+                                       </r:multiValueListEditor>
                                     </td>
                                  </tr>
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
