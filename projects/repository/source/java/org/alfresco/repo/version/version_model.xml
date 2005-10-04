@@ -72,10 +72,10 @@
                <type>d:text</type>
             </property>
             <property name="ver:frozenNodeId">
-               <type>d:guid</type>
+               <type>d:text</type>
             </property>
             <property name="ver:frozenNodeStoreId">
-               <type>d:guid</type>
+               <type>d:text</type>
             </property>
             <property name="ver:frozenNodeStoreProtocol">
                <type>d:text</type>
@@ -126,7 +126,7 @@
          
          <properties>
             <property name="ver:versionedNodeId">
-               <type>d:guid</type>
+               <type>d:text</type>
             </property>
          </properties>
        

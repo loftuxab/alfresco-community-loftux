@@ -32,6 +32,7 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -56,7 +57,8 @@ import org.alfresco.service.namespace.QName;
     private Map<QName, ChildAssociationDefinition> nodeChildAssocs = new HashMap<QName, ChildAssociationDefinition>();
     private Map<QName, Map<QName, Serializable>> classProperties = new HashMap<QName, Map<QName, Serializable>>();
     private Map<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
-
+    private Map<QName, DataTypeDefinition> propertyDatatypes = new HashMap<QName, DataTypeDefinition>();
+    
 
     /**
      * Construct
@@ -196,6 +198,17 @@ import org.alfresco.service.namespace.QName;
         nodeProperties.put(propDef.getName(), newValue);
     }
     
+    /**
+     * Adds a property datatype to the node
+     * 
+     * @param property  property name
+     * @param datatype  property datatype
+     */
+    /*package*/ void addDatatype(QName property, DataTypeDefinition datatype)
+    {
+        propertyDatatypes.put(property, datatype);
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.importer.ImportNode#getProperties(org.alfresco.service.namespace.QName)
      */
@@ -209,8 +222,16 @@ import org.alfresco.service.namespace.QName;
         return properties; 
     }
 
-    /**
-     * @return Return all properties
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getPropertyDatatypes()
+     */
+    public Map<QName, DataTypeDefinition> getPropertyDatatypes()
+    {
+        return propertyDatatypes;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportNode#getProperties()
      */
     public Map<QName, Serializable> getProperties()
     {

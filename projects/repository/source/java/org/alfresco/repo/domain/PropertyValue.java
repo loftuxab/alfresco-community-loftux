@@ -243,7 +243,6 @@ public class PropertyValue implements Cloneable, Serializable
         valueTypesByPropertyType.put(DataTypeDefinition.CATEGORY, ValueType.NODEREF);
         valueTypesByPropertyType.put(DataTypeDefinition.CONTENT, ValueType.CONTENT);
         valueTypesByPropertyType.put(DataTypeDefinition.TEXT, ValueType.STRING);
-        valueTypesByPropertyType.put(DataTypeDefinition.GUID, ValueType.STRING);
         valueTypesByPropertyType.put(DataTypeDefinition.NODE_REF, ValueType.NODEREF);
         valueTypesByPropertyType.put(DataTypeDefinition.PATH, ValueType.PATH);
         valueTypesByPropertyType.put(DataTypeDefinition.QNAME, ValueType.QNAME);

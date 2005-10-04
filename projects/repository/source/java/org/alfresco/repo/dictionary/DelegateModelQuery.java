@@ -19,9 +19,8 @@ package org.alfresco.repo.dictionary;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
-import org.alfresco.service.cmr.dictionary.ModelDefinition;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 
@@ -66,6 +65,20 @@ import org.alfresco.service.namespace.QName;
     }
 
     
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelQuery#getDataType(java.lang.Class)
+     */
+    public DataTypeDefinition getDataType(Class javaClass)
+    {
+        DataTypeDefinition def = query.getDataType(javaClass);
+        if (def == null)
+        {
+            def = delegate.getDataType(javaClass);
+        }
+        return def;
+    }
+
+
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.ModelQuery#getType(org.alfresco.repo.ref.QName)
      */

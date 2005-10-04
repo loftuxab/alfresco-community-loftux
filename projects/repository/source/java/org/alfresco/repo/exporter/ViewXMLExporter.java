@@ -19,6 +19,8 @@ package org.alfresco.repo.exporter;
 import java.io.InputStream;
 import java.util.Collection;
 
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -47,15 +49,18 @@ import org.xml.sax.helpers.AttributesImpl;
     private final static String ASPECTS_LOCALNAME = "aspects";
     private final static String PROPERTIES_LOCALNAME = "properties";
     private final static String ASSOCIATIONS_LOCALNAME = "associations";
+    private final static String DATATYPE_LOCALNAME = "datatype";
     private static QName VIEW_QNAME; 
     private static QName VALUE_QNAME;
     private static QName PROPERTIES_QNAME;
     private static QName ASPECTS_QNAME;
     private static QName ASSOCIATIONS_QNAME; 
-    private static QName CHILDNAME_QNAME; 
+    private static QName CHILDNAME_QNAME;
+    private static QName DATATYPE_QNAME;
     
     private NamespaceService namespaceService;
     private NodeService nodeService;
+    private DictionaryService dictionaryService;
     private ContentHandler contentHandler;
     private final static AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
     
@@ -67,10 +72,11 @@ import org.xml.sax.helpers.AttributesImpl;
      * @param nodeService  node service
      * @param contentHandler  content handler
      */
-    ViewXMLExporter(NamespaceService namespaceService, NodeService nodeService, ContentHandler contentHandler)
+    ViewXMLExporter(NamespaceService namespaceService, NodeService nodeService, DictionaryService dictionaryService, ContentHandler contentHandler)
     {
         this.namespaceService = namespaceService;
         this.nodeService = nodeService;
+        this.dictionaryService = dictionaryService;
         this.contentHandler = contentHandler;
         
         VIEW_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, namespaceService);
@@ -79,6 +85,7 @@ import org.xml.sax.helpers.AttributesImpl;
         ASPECTS_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ASPECTS_LOCALNAME, namespaceService);
         PROPERTIES_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, PROPERTIES_LOCALNAME, namespaceService);
         ASSOCIATIONS_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ASSOCIATIONS_LOCALNAME, namespaceService);
+        DATATYPE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, namespaceService);
     }
     
     
@@ -297,8 +304,35 @@ import org.xml.sax.helpers.AttributesImpl;
         {
             try
             {
+                // determine data type of value
+                QName valueDataType = null;
+                DataTypeDefinition dataTypeDef = dictionaryService.getProperty(property).getDataType();
+                if (dataTypeDef.getName().equals(DataTypeDefinition.ANY))
+                {
+                    dataTypeDef = dictionaryService.getDataType(value.getClass());
+                    if (dataTypeDef != null)
+                    {
+                        valueDataType = dataTypeDef.getName();
+                    }
+                }
+
+                // output value wrapper if property data type is any
+                if (valueDataType != null)
+                {
+                    AttributesImpl attrs = new AttributesImpl();
+                    attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, DATATYPE_QNAME.toPrefixString(), null, toPrefixString(valueDataType));
+                    contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), attrs);
+                }
+                
+                // output value
                 String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
                 contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+
+                // output value wrapper if property data type is any
+                if (valueDataType != null)
+                {
+                    contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
+                }
             }
             catch (SAXException e)
             {
@@ -314,12 +348,35 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            Collection<String> strValues = DefaultTypeConverter.INSTANCE.convert(String.class, values);
-            for (String strValue : strValues)
+            DataTypeDefinition dataTypeDef = dictionaryService.getProperty(property).getDataType();
+            
+            for (Object value : values)
             {
-                contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
-                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
-                contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
+                if (dataTypeDef.getName().equals(DataTypeDefinition.ANY))
+                {
+                    // determine value type
+                    DataTypeDefinition valueDataTypeDef = (value == null) ? null : dictionaryService.getDataType(value.getClass());
+                    QName valueDataType = null;
+                    if (valueDataTypeDef != null)
+                    {
+                        valueDataType = dataTypeDef.getName(); 
+                    }
+
+                    // output value wrapper with datatype
+                    AttributesImpl attrs = new AttributesImpl();
+                    if (valueDataType != null)
+                    {
+                        attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, DATATYPE_QNAME.toPrefixString(), null, toPrefixString(valueDataType));
+                    }
+                    contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), attrs);
+
+                    // output value
+                    String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
+                    contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+
+                    // output value wrapper if property data type is any
+                    contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
+                }
             }
         }
         catch (SAXException e)
@@ -327,6 +384,7 @@ import org.xml.sax.helpers.AttributesImpl;
             throw new ExporterException("Failed to process multi-value event - nodeRef " + nodeRef + "; property " + toPrefixString(property), e);
         }
     }
+        
     
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)

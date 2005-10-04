@@ -18,16 +18,19 @@ package org.alfresco.repo.importer.view;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 import java.util.Stack;
 
 import org.alfresco.repo.importer.Importer;
 import org.alfresco.repo.importer.Parser;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.NamespaceService;
@@ -51,6 +54,7 @@ public class ViewParser implements Parser
     
     // View schema elements and attributes
     private static final String VIEW_CHILD_NAME_ATTR = "childName";    
+    private static final String VIEW_DATATYPE_ATTR = "datatype";
     private static final QName VIEW_VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "value");
     private static final QName VIEW_ASPECTS = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "aspects");
     private static final QName VIEW_PROPERTIES = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "properties");
@@ -361,11 +365,16 @@ public class ViewParser implements Parser
             {
                 throw new ImporterException("Invalid view structure - expected element " + VIEW_VALUE_QNAME + " for property " + propDef.getName());
             }
+            QName datatype = QName.createQName(xpp.getAttributeValue(NamespaceService.REPOSITORY_VIEW_1_0_URI, VIEW_DATATYPE_ATTR), namespaceService);
             eventType = xpp.next();
             if (eventType == XmlPullParser.TEXT)
             {
                 String value = xpp.getText();
                 context.addProperty(propDef, value);
+                if (datatype != null)
+                {
+                    context.addDatatype(propDef.getName(), dictionaryService.getDataType(datatype));
+                }
                 eventType = xpp.next();
             }
             if (eventType != XmlPullParser.END_TAG)

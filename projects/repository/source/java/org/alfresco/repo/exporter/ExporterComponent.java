@@ -177,7 +177,7 @@ public class ExporterComponent
         try
         {
             XMLWriter writer = new XMLWriter(viewWriter, format);
-            return new ViewXMLExporter(namespaceService, nodeService, writer);
+            return new ViewXMLExporter(namespaceService, nodeService, dictionaryService, writer);
         }
         catch (UnsupportedEncodingException e)        
         {

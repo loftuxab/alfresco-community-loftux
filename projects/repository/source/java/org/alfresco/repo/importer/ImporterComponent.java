@@ -371,7 +371,8 @@ public class ImporterComponent
             
             // Build initial map of properties
             Map<QName, Serializable> properties = context.getProperties();
-            Map<QName, Serializable> initialProperties = bindProperties(properties);
+            Map<QName, DataTypeDefinition> datatypes = context.getPropertyDatatypes();
+            Map<QName, Serializable> initialProperties = bindProperties(properties, datatypes);
             
             // Create initial node
             ChildAssociationRef assocRef = nodeService.createNode(parentRef, assocType, childQName, nodeType.getName(), initialProperties);
@@ -529,7 +530,7 @@ public class ImporterComponent
          * @param properties
          * @return
          */
-        private Map<QName, Serializable> bindProperties(Map<QName, Serializable> properties)
+        private Map<QName, Serializable> bindProperties(Map<QName, Serializable> properties, Map<QName, DataTypeDefinition> datatypes)
         {
             Map<QName, Serializable> boundProperties = new HashMap<QName, Serializable>(properties.size());
             for (QName property : properties.keySet())
@@ -541,6 +542,13 @@ public class ImporterComponent
                     throw new ImporterException("Property " + property + " does not exist in the repository dictionary");
                 }
                 
+                // get property datatype
+                DataTypeDefinition valueDataType = datatypes.get(property);
+                if (valueDataType == null)
+                {
+                    valueDataType = propDef.getDataType();
+                }
+                
                 // bind property value to configuration and convert to appropriate type
                 Serializable value = properties.get(property);
                 if (value instanceof Collection)
@@ -549,14 +557,15 @@ public class ImporterComponent
                     for (String collectionValue : (Collection<String>)value)
                     {
                         String strValue = bindPlaceHolder(collectionValue, binding);
-                        boundCollection.add(strValue);
+                        Serializable objValue = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueDataType, strValue);
+                        boundCollection.add(objValue);
                     }
-                    value = (Serializable)DefaultTypeConverter.INSTANCE.convert(propDef.getDataType(), boundCollection);
+                    value = (Serializable)boundCollection;
                 }
                 else
                 {
                     value = bindPlaceHolder((String)value, binding);
-                    value = (Serializable)DefaultTypeConverter.INSTANCE.convert(propDef.getDataType(), value);
+                    value = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueDataType, value);
                 }
                 boundProperties.put(property, value);
             }

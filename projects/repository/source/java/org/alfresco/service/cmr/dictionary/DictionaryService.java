@@ -49,21 +49,27 @@ public interface DictionaryService
     public ModelDefinition getModel(QName model);
 
     /**
-     * @return the names of all property types that have been registered with the Repository
+     * @return the names of all data types that have been registered with the Repository
      */
     Collection<QName> getAllDataTypes();
 
     /**
-     * @param model the model to retrieve property types for
-     * @return the names of all property types defined within the specified model
+     * @param model the model to retrieve data types for
+     * @return the names of all data types defined within the specified model
      */
     Collection<QName> getDataTypes(QName model);
     
     /**
-     * @param name the name of the property type to retrieve
-     * @return the property type definition (or null, if it doesn't exist)
+     * @param name the name of the data type to retrieve
+     * @return the data type definition (or null, if it doesn't exist)
      */
     DataTypeDefinition getDataType(QName name);
+    
+    /**
+     * @param javaClass  java class to find datatype for
+     * @return  the data type definition (or null, if a mapping does not exist) 
+     */
+    DataTypeDefinition getDataType(Class javaClass);
 
     /**
      * @return the names of all types that have been registered with the Repository

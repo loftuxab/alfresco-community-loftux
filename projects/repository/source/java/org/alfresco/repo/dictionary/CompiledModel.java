@@ -304,6 +304,22 @@ import org.apache.commons.logging.LogFactory;
 
     
     /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelQuery#getDataType(java.lang.Class)
+     */
+    public DataTypeDefinition getDataType(Class javaClass)
+    {
+        for (DataTypeDefinition dataTypeDef : dataTypes.values())
+        {
+            if (dataTypeDef.getJavaClassName().equals(javaClass.getName()))
+            {
+                return dataTypeDef;
+            }
+        }
+        return null;
+    }
+
+
+    /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.ModelQuery#getType(org.alfresco.repo.ref.QName)
      */
     public TypeDefinition getType(QName name)

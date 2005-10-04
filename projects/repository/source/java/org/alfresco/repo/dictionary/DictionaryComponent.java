@@ -23,11 +23,11 @@ import java.util.Map;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
@@ -209,6 +209,15 @@ public class DictionaryComponent implements DictionaryService
     }
 
     
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.dictionary.DictionaryService#getDataType(java.lang.Class)
+     */
+    public DataTypeDefinition getDataType(Class javaClass)
+    {
+        return dictionaryDAO.getDataType(javaClass);
+    }
+
+
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.DictionaryService#getType(org.alfresco.repo.ref.QName)
      */

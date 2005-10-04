@@ -34,13 +34,21 @@ import org.alfresco.service.namespace.QName;
 /*package*/ interface ModelQuery
 {
     /**
-     * Gets the specified property type
+     * Gets the specified data type
      * 
-     * @param name  name of the property type
-     * @return  property type definition
+     * @param name  name of the data type
+     * @return  data type definition
      */
     public DataTypeDefinition getDataType(QName name);
 
+    /**
+     * Gets the data type for the specified Java Class
+     * 
+     * @param javaClass   the java class
+     * @return  the data type definition (or null, if mapping is not available)
+     */
+    public DataTypeDefinition getDataType(Class javaClass);
+    
     /**
      * Gets the specified type
      * 

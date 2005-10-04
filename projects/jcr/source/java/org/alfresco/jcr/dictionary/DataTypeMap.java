@@ -49,7 +49,6 @@ public class DataTypeMap
         dataTypeToPropertyType.put(DataTypeDefinition.DATETIME, PropertyType.DATE);
         dataTypeToPropertyType.put(DataTypeDefinition.BOOLEAN, PropertyType.BOOLEAN);
         dataTypeToPropertyType.put(DataTypeDefinition.QNAME, PropertyType.NAME);
-        dataTypeToPropertyType.put(DataTypeDefinition.GUID, PropertyType.STRING);
         dataTypeToPropertyType.put(DataTypeDefinition.CATEGORY, PropertyType.STRING);  // TODO: Check this mapping
         dataTypeToPropertyType.put(DataTypeDefinition.NODE_REF, PropertyType.REFERENCE);
         dataTypeToPropertyType.put(DataTypeDefinition.PATH, PropertyType.PATH);

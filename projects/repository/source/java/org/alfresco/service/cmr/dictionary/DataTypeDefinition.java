@@ -43,7 +43,6 @@ public interface DataTypeDefinition
     public QName DATETIME = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "datetime");
     public QName BOOLEAN = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "boolean");
     public QName QNAME = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "qname");
-    public QName GUID = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "guid");
     public QName CATEGORY = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "category");
     public QName NODE_REF = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "noderef");
     public QName PATH = QName.createQName(NamespaceService.DICTIONARY_MODEL_1_0_URI, "path");

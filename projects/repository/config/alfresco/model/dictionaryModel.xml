@@ -73,11 +73,6 @@
          <java-class>org.alfresco.service.namespace.QName</java-class>
       </data-type>
 
-      <data-type name="d:guid">
-         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
-         <java-class>java.lang.String</java-class>
-      </data-type>
-
       <data-type name="d:category">
          <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
          <java-class>org.alfresco.service.cmr.repository.NodeRef</java-class>

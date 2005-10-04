@@ -139,6 +139,23 @@ public class DictionaryDAOImpl implements DictionaryDAO
 
 
     /* (non-Javadoc)
+     * @see org.alfresco.repo.dictionary.ModelQuery#getDataType(java.lang.Class)
+     */
+    public DataTypeDefinition getDataType(Class javaClass)
+    {
+        for (CompiledModel model : compiledModels.values())
+        {
+            DataTypeDefinition dataTypeDef = model.getDataType(javaClass);
+            if (dataTypeDef != null)
+            {
+                return dataTypeDef;
+            }
+        }
+        return null;
+    }
+
+
+    /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.impl.DictionaryDAO#getPropertyTypes(org.alfresco.repo.ref.QName)
      */
     public Collection<DataTypeDefinition> getDataTypes(QName modelName)

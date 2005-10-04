@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -68,6 +69,13 @@ public interface ImportNode
      */
     public Map<QName,Serializable> getProperties();
 
+    /**
+     * Gets all property datatypes for the node
+     * 
+     * @return the property datatypes
+     */
+    public Map<QName,DataTypeDefinition> getPropertyDatatypes();
+    
     /**
      * @return  the aspects of this node
      */
