@@ -106,12 +106,9 @@
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
-                     <table cellspacing="0" cellpadding="3" border="0" width="100%">
+                     <table cellspacing="2" cellpadding="2" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              
-                              <%-- Users List --%>
-                              <div style="padding:4px">
                               
                               <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.users}">
                               
@@ -163,14 +160,12 @@
                               </a:richList>
                               
                               </a:panel>
-                     
-                              <div>
                               
                            </td>
                            
                            <td valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                              <table cellpadding="1" cellspacing="1" border="0">
+                              <table cellpadding="0" cellspacing="0" border="0">
                                  <tr>
                                     <td align="center">
                                        <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />

@@ -436,7 +436,7 @@ public abstract class AbstractItemSelector extends UIInput
                         // now remove the initial selection as we only need it the first time
                         this.initialSelectionId = null;
                      }
-                     buf.append(" onchange=\"javascript:document.getElementById('")
+                     buf.append(" onclick=\"javascript:document.getElementById('")
                         .append(okButtonId)
                         .append("').disabled=false;\"");
                      buf.append("/></td><td>");
@@ -469,7 +469,7 @@ public abstract class AbstractItemSelector extends UIInput
                         // now remove the initial selection as we only need it the first time
                         this.initialSelectionId = null;
                      }
-                     buf.append(" onchange=\"javascript:document.getElementById('")
+                     buf.append(" onclick=\"javascript:document.getElementById('")
                         .append(okButtonId)
                         .append("').disabled=false;\"");
                      buf.append("/></td><td>");

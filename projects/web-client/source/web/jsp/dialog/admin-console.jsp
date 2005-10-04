@@ -92,51 +92,46 @@
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td valign=top>
                      
-                     <table cellspacing=0 cellpadding=0 border=0 width=100%>
-                     <tr>
-                     <td width=100%>
-                     
-                        <div style="padding:16px">
+                     <table cellspacing=4 cellpadding=4 border=0 width=100%>
+                        <tr>
+                           <td width=100%>
+                           
+                                 <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "ballongrey", "#EEEEEE"); %>
+                                 <table cellpadding="6" cellspacing="6" border="0" width="100%">
+                                    <tr>
+                                       <td><a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" styleClass="title" actionListener="#{NewUserWizard.setupUsers}" /></td>
+                                    </tr>
+                                    <tr>
+                                       <td><a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" styleClass="title" /></td>
+                                    </tr>
+                                    <tr>
+                                       <td><a:actionLink value="#{msg.category_management}" image="/images/icons/categories.gif" action="manageCategories" styleClass="title" /></td>
+                                    </tr>
+                                    <tr>
+                                       <td>
+                                          <a:actionLink value="#{msg.export}" image="/images/icons/action.gif" action="export" actionListener="#{BrowseBean.setupSpaceAction}" styleClass="title">
+                                             <f:param name="id" value="#{NavigationBean.currentNodeId}" />
+                                          </a:actionLink>
+                                       </td>
+                                    </tr>
+                                 </table>
+                                 <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "ballongrey"); %>
+                           
+                           </td>
+                           
+                           <td valign="top">
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
+                              <table cellpadding="1" cellspacing="1" border="0">
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
+                           </td>
                         
-                           <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "ballongrey", "#EEEEEE"); %>
-                           <table cellpadding="6" cellspacing="6" border="0" width="100%">
-                              <tr>
-                                 <td><a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" styleClass="title" actionListener="#{NewUserWizard.setupUsers}" /></td>
-                              </tr>
-                              <tr>
-                                 <td><a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" styleClass="title" /></td>
-                              </tr>
-                              <tr>
-                                 <td><a:actionLink value="#{msg.category_management}" image="/images/icons/categories.gif" action="manageCategories" styleClass="title" /></td>
-                              </tr>
-                              <tr>
-                                 <td>
-                                    <a:actionLink value="#{msg.export}" image="/images/icons/action.gif" action="export" actionListener="#{BrowseBean.setupSpaceAction}" styleClass="title">
-                                       <f:param name="id" value="#{NavigationBean.currentNodeId}" />
-                                    </a:actionLink>
-                                 </td>
-                              </tr>
-                           </table>
-                           <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "ballongrey"); %>
-                        
-                        </div>
-                     
-                     </td>
-                     <td valign="top">
-                        <div style="padding-top:16px">
-                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                        <table cellpadding="1" cellspacing="1" border="0">
-                           <tr>
-                              <td align="center">
-                                 <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
-                              </td>
-                           </tr>
-                        </table>
-                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
-                        </div>
-                     </td>
-                     
-                     </tr>
+                        </tr>
                      </table>
                      
                   </td>

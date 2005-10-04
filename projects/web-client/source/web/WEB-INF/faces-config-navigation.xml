@@ -136,7 +136,7 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>manageInvitedUsers</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
+         <to-view-id>/jsp/roles/manage-invited-users.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>manageRules</from-outcome>
@@ -367,42 +367,30 @@
    
    <!-- Manage Invited Users navigation -->
    <navigation-rule>
-      <from-view-id>/jsp/dialog/manage-invited-users.jsp</from-view-id>
+      <from-view-id>/jsp/roles/*</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/roles/manage-invited-users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/roles/manage-invited-users.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+      
+   <navigation-rule>
+      <from-view-id>/jsp/roles/manage-invited-users.jsp</from-view-id>
       <navigation-case>
          <from-outcome>inviteUsers</from-outcome>
          <to-view-id>/jsp/wizard/invite-users/invite.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>editRoles</from-outcome>
-         <to-view-id>/jsp/dialog/edit-user-roles.jsp</to-view-id>
+         <to-view-id>/jsp/roles/edit-user-roles.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>removeUser</from-outcome>
-         <to-view-id>/jsp/dialog/remove-invited-user.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <navigation-rule>
-      <from-view-id>/jsp/dialog/edit-user-roles.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>cancel</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>finish</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-   
-   <navigation-rule>
-      <from-view-id>/jsp/dialog/remove-invited-user.jsp</from-view-id>
-      <navigation-case>
-         <from-outcome>cancel</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>finish</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
+         <to-view-id>/jsp/roles/remove-invited-user.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -419,11 +407,11 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>cancel</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
+         <to-view-id>/jsp/roles/manage-invited-users.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>finish</from-outcome>
-         <to-view-id>/jsp/dialog/manage-invited-users.jsp</to-view-id>
+         <to-view-id>/jsp/roles/manage-invited-users.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
