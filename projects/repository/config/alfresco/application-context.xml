@@ -388,8 +388,11 @@
         </property>
         <property name="labels">
             <list>
+                <value>alfresco/model/dataTypeAnalyzers</value>
+                <value>alfresco/messages/system-model</value>
                 <value>alfresco/messages/dictionary-model</value>
                 <value>alfresco/messages/content-model</value>
+                <value>alfresco/messages/application-model</value>
             </list>
         </property>
     </bean>

@@ -132,7 +132,7 @@ import org.alfresco.service.namespace.QName;
      */
     public String getAnalyserClassName(Locale locale)
     {
-        String value = M2Label.getLabel(locale, model, "datatype", name, "analyser");
+        String value = M2Label.getLabel(locale, model, "datatype", name, "analyzer");
         if (value == null)
         {
             value = dataType.getAnalyserClassName();
