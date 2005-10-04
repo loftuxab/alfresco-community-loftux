@@ -21,6 +21,7 @@
          <mkdir dir="${dir.dist}" />
          <war warfile="${dir.dist}/${file.name.war}" webxml="${dir.src.webinf}\web.xml">
             <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
+            <webinf dir="${dir.project.installer}" includes="licenses/**"/>
             <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes.@{for}}"/>   
             <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes.@{for}}" />
             <lib dir="${dir.common.lib}/jibx" includes="*.jar" />
@@ -28,10 +29,10 @@
             <lib dir="${dir.common.lib}/jmagick" includes="*.jar" />
             <lib dir="${dir.common.lib}/treecache" includes="*.jar" />
             <lib dir="${dir.dist}" includes="${file.name.jar}" />
-            <lib dir="${dir.common}/projects/core/build/dist" includes="${dir.name.core}.jar" />
-            <lib dir="${dir.common}/projects/repository/build/dist" includes="${dir.name.repository}.jar" />
+            <lib dir="${dir.project.core}/build/dist" includes="${dir.name.core}.jar" />
+            <lib dir="${dir.project.repository}/build/dist" includes="${dir.name.repository}.jar" />
+            <lib dir="${dir.project.remoteapi}/build/dist" includes="${dir.name.remoteapi}.jar" />
             <lib dir="${dir.common}/projects/enterprise/build/dist" includes="enterprise.jar" />
-            <lib dir="${dir.common}/projects/remote-api/build/dist" includes="${dir.name.remoteapi}.jar" />
             <webinf dir="${dir.project.remoteapi}/source/web/WEB-INF"/>
             <zipfileset dir="${dir.project.remoteapi}/source/wsdl" prefix="wsdl"/>  
          </war>

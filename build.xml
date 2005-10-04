@@ -113,6 +113,15 @@
       <delete dir="${home.tomcat}/work/catalina/localhost/alfresco" includeEmptyDirs="true" quiet="yes" />
       <copy file="${file.deploy}" todir="${dir.deploy.tomcat}" />
       <!-- push externally visible config files into war file -->
+      <antcall target="update-tomcat-war"/>
+      <!-- ensure mysql drivers are present -->
+      <delete>
+         <fileset dir="${home.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+      </delete>
+      <copy todir="${home.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
+   </target>
+   
+   <target name="update-tomcat-war" depends="init">
       <war warfile="${dir.deploy.tomcat}/${file.name.war.alfresco}" update="true" >
          <classes dir="${dir.config.repository}"/>
          <classes dir="${dir.config.webclient}"/>
@@ -120,11 +129,6 @@
                   prefix="WEB-INF/classes"/>
          <classes file="${dir.common}/version.properties" prefix="WEB-INF/classes/alfresco"/>
       </war>
-      <!-- ensure mysql drivers are present -->
-      <delete>
-         <fileset dir="${home.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
-      </delete>
-      <copy todir="${home.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
    </target>
 
    <target name="deploy-exploded-web-client-jboss" depends="init">
@@ -151,6 +155,11 @@
    </target>
  
    <target name="start-tomcat-debug" depends="init" description="Starts the Tomcat server on Windows">
+      <fail unless="env.JPDA_ADDRESS" 
+            message="To run Tomcat in debug mode you need to setup the JPDA_ADDRESS enviornment variable"/>
+      <fail unless="env.JPDA_TRANSPORT"
+            message="To run Tomcat in debug mode you need to setup the JPDA_TRANSPORT enviornment variable"/>
+      
       <exec dir="${home.tomcat}/bin" executable="cmd.exe" spawn="true">
          <arg line="/k catalina.bat jpda start" />
       </exec>
@@ -196,6 +205,7 @@
     
       <!-- cleanup indexes, they could be in several locations so try all of them -->
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.repository}/alf_data" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.jcr}/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${home.tomcat}/bin/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${home.jboss}/bin/alf_data" />
    </target>  

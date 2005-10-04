@@ -7,27 +7,75 @@
    <property name="dir.common" value="${basedir}" />
    <import file="${dir.common}/common-init.xml" />
 
-   <target name="init" depends="common-init.init">
+   <target name="init" depends="common-init.init, -setup-common, -setup-for-open, -setup-for-enterprise, -post-setup"/>
+   
+   <target name="-setup-common">
       <property file="continuous.properties"/>
+      
+      <!-- set flag for whether we are running an open build -->
+      <condition property="isOpenMode">
+         <or>
+            <not>
+               <isset property="mode"/>
+            </not>
+            <and>
+               <isset property="mode"/>
+               <equals arg1="${mode}" arg2="open" casesensitive="false" trim="yes"/>
+            </and>
+         </or>
+      </condition>
+      
+      <!-- set flag for whether we are running an enterprise build -->
+      <condition property="isEnterpriseMode">
+         <and>
+            <isset property="mode"/>
+            <equals arg1="${mode}" arg2="enterprise" casesensitive="false" trim="yes"/>
+         </and>
+      </condition>
+   </target>
+   
+   <target name="-setup-for-open" if="isOpenMode">
+      <echo level="info">Building in open mode...</echo>
+      <property name="file.name.build" value="build.xml"/>
+      <property name="file.name.start" value="alfresco"/>
+      <property name="excludes.dist.src" value="${excludes.dist.src.open}"/>
+   </target>
+   
+   <target name="-setup-for-enterprise" if="isEnterpriseMode">
+      <echo level="info">Building in enterprise mode...</echo>
+      <property name="file.name.build" value="build-enterprise.xml"/>
+      <property name="file.name.start" value="alfresco-enterprise"/>
+      <property name="excludes.dist.src" value="${excludes.dist.src.enterprise}"/>
+   </target>
+   
+   <target name="-post-setup">
+      <property name="file.name.dist.bin.tomcat" value="${file.name.start}-${file.suffix.tomcat}"/>
+      <property name="file.name.dist.bin.jboss" value="${file.name.start}-${file.suffix.jboss}"/>
+      <property name="file.name.dist.src" value="${file.name.start}-${file.suffix.src}"/>
+      <property name="file.name.dist.src.nightly" value="${file.name.start}-${file.suffix.src.nightly}"/>
    </target>
 
-   <!-- ************************************************************************* -->
-   <!-- ** TODO: These targets need to also be aware of the enterprise project ** -->
-   <!-- **       so that we can build both open and pro versions of the        ** -->
-   <!-- **       bundles.                                                      ** -->
-   <!-- ************************************************************************* -->
-
-   <target name="continuous" description="Target called by the continuous build to create distribution bundles">
-      <ant target="reset-database"/>
-      <ant target="test"/>
+   <!-- *********************** -->
+   <!-- ** Top level targets ** -->
+   <!-- *********************** -->
+   
+   <target name="continuous" depends="init" description="Target called by the continuous build to create distribution bundles">
+      <ant antfile="${file.name.build}" target="reset-database"/>
+      <ant antfile="${file.name.build}" target="test"/>
       <antcall target="distribute"/>
    </target>
 
-   <target name="nightly" description="Target called by the continuous build to create the nightly distribution">
-      <ant target="reset-database"/>
-      <ant target="test"/>
+   <target name="nightly" depends="init" description="Target called by the continuous build to create the nightly distribution">
+      <ant antfile="${file.name.build}" target="reset-database"/>
+      <ant antfile="${file.name.build}" target="test"/>
       <antcall target="package-source-distribution"/>
-      <ant target="compile-docs"/>
+      
+      <!-- replace the version number in the file name with the date -->
+      <move file="${dir.dist}/${file.name.dist.src}.zip" tofile="${dir.dist}/${file.name.dist.src.nightly}.zip"/>
+      <move file="${dir.dist}/${file.name.dist.src}.tar.gz" tofile="${dir.dist}/${file.name.dist.src.nightly}.tar.gz"/>
+      
+      <ant antfile="${file.name.build}" target="compile-docs"/>
+      <antcall target="generate-checksums"/>
    </target>
 
    <!-- ************************** -->
@@ -40,15 +88,15 @@
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="package-jboss-binary-distribution" description="Creates the distibution files for JBoss">
-      <ant target="clean-war"/>
-      <ant target="incremental-jboss"/>
+      <ant antfile="${file.name.build}" target="clean-war"/>
+      <ant antfile="${file.name.build}" target="incremental-jboss"/>
       <antcall target="package-jboss-binary-distribution-windows"/>
       <antcall target="package-jboss-binary-distribution-linux"/>
    </target>
 
    <target name="package-tomcat-binary-distribution" depends="init" description="Creates the distibution files for Tomcat">
-      <ant target="clean-war"/>
-      <ant target="incremental-tomcat"/>
+      <ant antfile="${file.name.build}" target="clean-war"/>
+      <ant antfile="${file.name.build}" target="incremental-tomcat"/>
       <antcall target="package-tomcat-binary-distribution-windows"/>
       <antcall target="package-tomcat-binary-distribution-linux"/>
       <!-- copy the WAR file to the distribution area too -->
@@ -149,11 +197,11 @@
            description="Creates the source distribution file for all platforms">
       <mkdir dir="${dir.dist}" />
       <zip destfile="${dir.dist}/${file.name.dist.src}.zip">
-         <zipfileset dir="${dir.common}" excludes="${dist.src.excludes}" />
+         <zipfileset dir="${dir.common}" excludes="${excludes.dist.src}" />
       </zip>
       
       <tar destfile="${dir.dist}/${file.name.dist.src}.tar" longfile="gnu">
-         <tarfileset dir="${dir.common}" excludes="${dist.src.excludes}" />
+         <tarfileset dir="${dir.common}" excludes="${excludes.dist.src}" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.src}.tar.gz" src="${dir.dist}/${file.name.dist.src}.tar" />
       <delete file="${dir.dist}/${file.name.dist.src}.tar" />
