@@ -196,8 +196,16 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     public NodeRef getRootNode(StoreRef storeRef) throws InvalidStoreRefException
     {
         Store store = nodeDaoService.getStore(storeRef.getProtocol(), storeRef.getIdentifier());
+        if (store == null)
+        {
+            throw new InvalidStoreRefException("Store does not exist", storeRef);
+        }
         // get the root
         Node node = store.getRootNode();
+        if (node == null)
+        {
+            throw new InvalidStoreRefException("Store does not have a root node", storeRef);
+        }
         NodeRef nodeRef = node.getNodeRef();
         // done
         return nodeRef;

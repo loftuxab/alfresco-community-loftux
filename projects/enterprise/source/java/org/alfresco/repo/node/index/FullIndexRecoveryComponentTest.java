@@ -24,6 +24,7 @@ import org.alfresco.repo.search.Indexer;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidStoreRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -64,9 +65,16 @@ public class FullIndexRecoveryComponentTest extends TestCase
                 List<StoreRef> storeRefs = nodeService.getStores();
                 for (StoreRef storeRef : storeRefs)
                 {
-                    NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
-                    ChildAssociationRef assocRef = nodeService.getPrimaryParent(rootNodeRef);
-                    indexer.deleteNode(assocRef);
+                    try
+                    {
+                        NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
+                        ChildAssociationRef assocRef = nodeService.getPrimaryParent(rootNodeRef);
+                        indexer.deleteNode(assocRef);
+                    }
+                    catch (InvalidStoreRefException e)
+                    {
+                        // just ignore stores that are invalid
+                    }
                 }
                 return null;
             }
