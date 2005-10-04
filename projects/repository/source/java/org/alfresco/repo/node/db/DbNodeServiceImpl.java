@@ -807,11 +807,13 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             return Collections.emptyList();
         }
         // sort results
-        SortedSet<ChildAssoc> filteredSet = new TreeSet<ChildAssoc>(childAssocs);
+        ArrayList<ChildAssoc> orderedList = new ArrayList<ChildAssoc>(childAssocs);
+        Collections.sort(orderedList);
+        
         // list of results
         List<ChildAssociationRef> results = new ArrayList<ChildAssociationRef>(childAssocs.size());
         int nthSibling = 0;
-        for (ChildAssoc assoc : filteredSet)
+        for (ChildAssoc assoc : orderedList)
         {
             // does the qname match the pattern?
             if (!qnamePattern.isMatch(assoc.getQname()))

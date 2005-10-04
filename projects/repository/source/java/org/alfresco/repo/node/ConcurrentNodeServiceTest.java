@@ -23,6 +23,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -43,18 +44,26 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ConcurrentNodeServiceTest extends TestCase
 {
     public static final String NAMESPACE = "http://www.alfresco.org/test/BaseNodeServiceTest";
+
     public static final String TEST_PREFIX = "test";
+
     public static final QName TYPE_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
+
     public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
+
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
+
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
 
     static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private NodeService nodeService;
+
     private PlatformTransactionManager transactionManager;
 
     private NodeRef rootNodeRef;
+
+    private FullTextSearchIndexer luceneFTS;
 
     public ConcurrentNodeServiceTest()
     {
@@ -78,6 +87,7 @@ public class ConcurrentNodeServiceTest extends TestCase
 
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         transactionManager = (PlatformTransactionManager) ctx.getBean("transactionManager");
+        luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
 
         // create a first store directly
         SpringAwareUserTransaction tx = new SpringAwareUserTransaction(transactionManager);
@@ -98,15 +108,16 @@ public class ConcurrentNodeServiceTest extends TestCase
         tx.begin();
         Map<QName, ChildAssociationRef> answer = buildNodeGraph();
         tx.commit();
-        
-        return null;//answer;
+
+        return null;// answer;
     }
 
     public void testConcurrent() throws Exception
     {
+        luceneFTS.pause();
         IndexWriter.COMMIT_LOCK_TIMEOUT = 100000;
-        int count = 4;
-        int repeats = 4;
+        int count = 10;
+        int repeats = 10;
 
         Map<QName, ChildAssociationRef> assocRefs = commitNodeGraph();
         Thread runner = null;
@@ -130,9 +141,11 @@ public class ConcurrentNodeServiceTest extends TestCase
         }
 
         SearchService searcher = (SearchService) ctx.getBean(ServiceRegistry.SEARCH_SERVICE.getLocalName());
-        assertEquals(2 * ((count * repeats) + 1), searcher.selectNodes(rootNodeRef, "/*", null, getNamespacePrefixReolsver(""), false).size());
+        assertEquals(2 * ((count * repeats) + 1), searcher.selectNodes(rootNodeRef, "/*", null,
+                getNamespacePrefixReolsver(""), false).size());
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*\"");
-        // n6 has root aspect - there are three things at the root level in the index
+        // n6 has root aspect - there are three things at the root level in the
+        // index
         assertEquals(3 * ((count * repeats) + 1), results.length());
         results.close();
     }
@@ -173,6 +186,7 @@ public class ConcurrentNodeServiceTest extends TestCase
             catch (Exception e)
             {
                 e.printStackTrace();
+                System.exit(12);
             }
             if (waiter != null)
             {

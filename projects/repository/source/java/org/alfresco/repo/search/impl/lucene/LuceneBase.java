@@ -116,7 +116,7 @@ public abstract class LuceneBase implements Lockable
     private IndexReader mainReader;
 
     /**
-     * The idetifier for the store
+     * The identifier for the store
      */
 
     protected StoreRef store;
@@ -134,7 +134,7 @@ public abstract class LuceneBase implements Lockable
     // "lucene-indexes";
 
     /**
-     * Initiase the configuration elements of the lucene store indexers and
+     * Initialise the configuration elements of the lucene store indexers and
      * searchers.
      * 
      * @param store
@@ -160,6 +160,7 @@ public abstract class LuceneBase implements Lockable
             }
             catch (IOException e)
             {
+                s_logger.error("Error", e);
                 throw new LuceneIndexException("Failed to close directory after initialisation " + basePath);
             }
             if (deltaId != null)
@@ -172,14 +173,14 @@ public abstract class LuceneBase implements Lockable
                 }
                 catch (IOException e)
                 {
+                    s_logger.error("Error", e);
                     throw new LuceneIndexException("Failed to close directory after initialisation " + deltaPath);
                 }
                 // undoDir = initialiseFSDirectory(basePath + File.separator +
                 // "undo" + File.separator + deltaId + File.separator, true,
                 // true);
             }
-        }
-        finally
+        } finally
         {
             if (createMain)
             {
@@ -217,7 +218,8 @@ public abstract class LuceneBase implements Lockable
         {
             throw new IndexerException("No configuration for index location");
         }
-        String basePath = config.getIndexRootLocation() + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
+        String basePath = config.getIndexRootLocation()
+                + File.separator + store.getProtocol() + File.separator + store.getIdentifier() + File.separator;
         return basePath;
     }
 
@@ -230,7 +232,8 @@ public abstract class LuceneBase implements Lockable
      * @return
      * @throws IOException
      */
-    private Directory initialiseFSDirectory(String path, boolean deleteOnExit, boolean overwrite) throws LuceneIndexException
+    private Directory initialiseFSDirectory(String path, boolean deleteOnExit, boolean overwrite)
+            throws LuceneIndexException
     {
         try
         {
@@ -256,6 +259,7 @@ public abstract class LuceneBase implements Lockable
         }
         catch (IOException e)
         {
+            s_logger.error("Error", e);
             throw new LuceneIndexException("Filed to initialise lucene file directory " + path, e);
         }
     }
@@ -263,7 +267,7 @@ public abstract class LuceneBase implements Lockable
     /**
      * Get a searcher for the main index TODO: Split out support for the main
      * index. We really only need this if we want to search over the changing
-     * index before it is commited
+     * index before it is committed
      * 
      * @return
      * @throws IOException
@@ -277,6 +281,7 @@ public abstract class LuceneBase implements Lockable
         }
         catch (IOException e)
         {
+            s_logger.error("Error", e);
             throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath(), e);
         }
     }
@@ -296,12 +301,14 @@ public abstract class LuceneBase implements Lockable
                 // from the first
                 //
                 luceneIndexer.flushPending();
-                return new ClosingIndexSearcher(new MultiReader(new IndexReader[] { new FilterIndexReaderByNodeRefs(IndexReader.open(getMainPath()), luceneIndexer.getDeletions()),
+                return new ClosingIndexSearcher(new MultiReader(new IndexReader[] {
+                        new FilterIndexReaderByNodeRefs(IndexReader.open(getMainPath()), luceneIndexer.getDeletions()),
                         IndexReader.open(getDeltaPath()) }));
             }
         }
         catch (IOException e)
         {
+            s_logger.error("Error", e);
             throw new LuceneIndexException("Failed to open IndexSarcher for " + getMainPath(), e);
         }
     }
@@ -317,22 +324,34 @@ public abstract class LuceneBase implements Lockable
     {
         if (deltaReader == null)
         {
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Trying to get index delta reader for tx " + deltaDir);
+            }
             // Readers and writes can not exists at the same time so we swap
             // between them.
             closeDeltaWriter();
 
             if (!indexExists(deltaDir))
             {
-
+                if (s_logger.isDebugEnabled())
+                {
+                    s_logger.debug("... index does not already exist for " + deltaDir + " creating ...");
+                }
                 try
                 {
                     // Make sure there is something we can read
                     IndexWriter writer = new IndexWriter(deltaDir, new LuceneAnalyser(dictionaryService), true);
                     writer.setUseCompoundFile(true);
                     writer.close();
+                    if (s_logger.isDebugEnabled())
+                    {
+                        s_logger.debug("... index created " + deltaDir);
+                    }
                 }
                 catch (IOException e)
                 {
+                    s_logger.error("Error", e);
                     throw new LuceneIndexException("Failed to create empty index for delta reader: " + deltaDir, e);
                 }
             }
@@ -340,9 +359,14 @@ public abstract class LuceneBase implements Lockable
             try
             {
                 deltaReader = IndexReader.open(deltaDir);
+                if (s_logger.isDebugEnabled())
+                {
+                    s_logger.debug("Opened delta reader for " + deltaDir);
+                }
             }
             catch (IOException e)
             {
+                s_logger.error("Error", e);
                 throw new LuceneIndexException("Failed to open delta reader: " + deltaDir, e);
             }
 
@@ -370,13 +394,17 @@ public abstract class LuceneBase implements Lockable
                 try
                 {
                     deltaReader.close();
+                    if (s_logger.isDebugEnabled())
+                    {
+                        s_logger.debug("Closed delta read for " + deltaDir);
+                    }
                 }
                 catch (IOException e)
                 {
+                    s_logger.error("Error", e);
                     throw new LuceneIndexException("Filed to close delta reader " + deltaDir, e);
                 }
-            }
-            finally
+            } finally
             {
                 deltaReader = null;
             }
@@ -394,6 +422,10 @@ public abstract class LuceneBase implements Lockable
     {
         if (deltaWriter == null)
         {
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Trying to create delta writer " + deltaDir);
+            }
             // Readers and writes can not exists at the same time so we swap
             // between them.
             closeDeltaReader();
@@ -401,10 +433,15 @@ public abstract class LuceneBase implements Lockable
             try
             {
                 boolean create = !IndexReader.indexExists(deltaDir);
+                if (s_logger.isDebugEnabled())
+                {
+                    s_logger.debug("Creating delta writer " + deltaDir + " " + (create ? "CREATE" : "OPEN"));
+                }
                 deltaWriter = new IndexWriter(deltaDir, new LuceneAnalyser(dictionaryService), create);
             }
             catch (IOException e)
             {
+                s_logger.error("Error", e);
                 throw new IndexerException("Failed to get delta writer for " + deltaDir, e);
             }
         }
@@ -412,6 +449,10 @@ public abstract class LuceneBase implements Lockable
         deltaWriter.minMergeDocs = config.getIndexerMinMergeDocs();
         deltaWriter.mergeFactor = config.getIndexerMergeFactor();
         deltaWriter.maxMergeDocs = config.getIndexerMaxMergeDocs();
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Created delta writer " + deltaDir);
+        }
         return deltaWriter;
     }
 
@@ -425,16 +466,24 @@ public abstract class LuceneBase implements Lockable
     {
         if (deltaWriter != null)
         {
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Trying to close delta writer... " + deltaDir);
+            }
             try
             {
                 // deltaWriter.optimize();
                 deltaWriter.close();
+                if (s_logger.isDebugEnabled())
+                {
+                    s_logger.debug("Closed delta writer " + deltaDir);
+                }
             }
             catch (IOException e)
             {
-                throw new LuceneIndexException("Filed to close delta writer " + deltaDir, e);
-            }
-            finally
+                s_logger.error("Error", e);
+                throw new LuceneIndexException("Failed to close delta writer " + deltaDir, e);
+            } finally
             {
                 deltaWriter = null;
             }
@@ -474,8 +523,15 @@ public abstract class LuceneBase implements Lockable
         {
             throw new IndexerException("Can not merge as main reader is active");
         }
-
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Getting write lock for " + baseDir + " for " + deltaDir);
+        }
         getWriteLock();
+        if (s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Got write lock for " + baseDir + " for " + deltaDir);
+        }
         try
         {
             getDeltaReader(); // Flush any deletes
@@ -483,6 +539,7 @@ public abstract class LuceneBase implements Lockable
         }
         catch (LuceneIndexException e)
         {
+            s_logger.error("Error", e);
             releaseWriteLock();
             throw e;
         }
@@ -502,29 +559,42 @@ public abstract class LuceneBase implements Lockable
     {
         if (writeLockCount < 1)
         {
-            throw new LuceneIndexException("Muist hold the write lock to merge");
+            throw new LuceneIndexException("Must hold the write lock to merge");
         }
 
         if (!indexExists(baseDir))
         {
-
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Creating base index " + baseDir);
+            }
             try
             {
                 mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), true);
                 mainWriter.setUseCompoundFile(true);
                 mainWriter.close();
+                if (s_logger.isDebugEnabled())
+                {
+                    s_logger.debug("Created base index " + baseDir);
+                }
             }
             catch (IOException e)
             {
+                s_logger.error("Error", e);
                 throw new LuceneIndexException("Failed to create empty base index at " + baseDir, e);
             }
         }
         try
         {
             mainReader = IndexReader.open(baseDir);
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Opened base index for deletes " + baseDir);
+            }
         }
         catch (IOException e)
         {
+            s_logger.error("Error", e);
             throw new LuceneIndexException("Failed to create base index reader at " + baseDir, e);
         }
         try
@@ -542,25 +612,29 @@ public abstract class LuceneBase implements Lockable
                         }
                         catch (IOException e)
                         {
+                            s_logger.error("Error", e);
                             throw new LuceneIndexException("Failed to delete term from main index at " + baseDir, e);
                         }
                     }
                 }
-            }
-            finally
+            } finally
             {
                 try
                 {
                     try
                     {
                         mainReader.close();
+                        if (s_logger.isDebugEnabled())
+                        {
+                            s_logger.debug("Completed index deletes on " + baseDir + " for " + deltaDir);
+                        }
                     }
                     catch (IOException e)
                     {
+                        s_logger.error("Error", e);
                         throw new LuceneIndexException("Failed to close from main index reader at " + baseDir, e);
                     }
-                }
-                finally
+                } finally
                 {
                     mainReader = null;
                 }
@@ -571,9 +645,14 @@ public abstract class LuceneBase implements Lockable
             try
             {
                 mainWriter = new IndexWriter(baseDir, new LuceneAnalyser(dictionaryService), false);
+                if (s_logger.isDebugEnabled())
+                {
+                    s_logger.debug("Opened index for append " + baseDir + " for " + deltaDir);
+                }
             }
             catch (IOException e)
             {
+                s_logger.error("Error", e);
                 throw new LuceneIndexException("Failed to open main index for append at " + baseDir, e);
             }
             mainWriter.setUseCompoundFile(true);
@@ -595,7 +674,8 @@ public abstract class LuceneBase implements Lockable
                     }
                     catch (IOException e)
                     {
-                        throw new LuceneIndexException("Failed to merge indexes into the main index", e);
+                        s_logger.error("Error", e);
+                        throw new LuceneIndexException("Failed to merge indexes into the main index for "+baseDir +" merging in "+deltaDir, e);
                     }
                     // mainWriter.optimize();
                     closeDeltaReader();
@@ -604,8 +684,11 @@ public abstract class LuceneBase implements Lockable
                 {
                     closeDeltaReader();
                 }
-            }
-            finally
+                if (s_logger.isDebugEnabled())
+                {
+                    s_logger.debug("Closed index after append " + baseDir + " for " + deltaDir);
+                }
+            } finally
             {
                 try
                 {
@@ -615,16 +698,15 @@ public abstract class LuceneBase implements Lockable
                     }
                     catch (IOException e)
                     {
+                        s_logger.error("Error", e);
                         throw new LuceneIndexException("Failed to cloase main index after append at " + baseDir, e);
                     }
-                }
-                finally
+                } finally
                 {
                     mainWriter = null;
                 }
             }
-        }
-        finally
+        } finally
         {
             releaseWriteLock();
         }
@@ -645,7 +727,10 @@ public abstract class LuceneBase implements Lockable
         try
         {
             // Try and close everything
-
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Deleting delta " + deltaDir);
+            }
             try
             {
                 closeDeltaReader();
@@ -713,15 +798,14 @@ public abstract class LuceneBase implements Lockable
             File file = new File(deltaPath);
 
             deleteDirectory(file);
-        }
-        finally
+        } finally
         {
             releaseWriteLock();
         }
     }
 
     /**
-     * Suport to help deleting directories
+     * Support to help deleting directories
      * 
      * @param file
      */
@@ -792,6 +876,7 @@ public abstract class LuceneBase implements Lockable
         }
         catch (IOException e)
         {
+            s_logger.error("Error", e);
             throw new LuceneIndexException("Write lock failed to check or clear any existing lucene locks", e);
         }
     }
@@ -808,7 +893,8 @@ public abstract class LuceneBase implements Lockable
         {
             try
             {
-                if (((writeLockCount == 1) && IndexReader.indexExists(baseDir) && (IndexReader.isLocked(baseDir.getPath()))))
+                if (((writeLockCount == 1) && IndexReader.indexExists(baseDir) && (IndexReader.isLocked(baseDir
+                        .getPath()))))
                 {
                     Directory dir = FSDirectory.getDirectory(baseDir, false);
                     IndexReader.unlock(dir);
@@ -817,10 +903,16 @@ public abstract class LuceneBase implements Lockable
             }
             catch (IOException e)
             {
+                s_logger.error("Error", e);
                 throw new LuceneIndexException("Write lock failed to check or clear any existing lucene locks", e);
             }
             getLuceneIndexLock().releaseWriteLock(store);
             writeLockCount--;
+            
+            if (s_logger.isDebugEnabled())
+            {
+                s_logger.debug("Released write lock " + baseDir + " for " + deltaDir);
+            }
         }
     }
 
@@ -850,11 +942,11 @@ public abstract class LuceneBase implements Lockable
                     }
                     catch (IOException e)
                     {
+                        s_logger.error("Error", e);
                         throw new LuceneIndexException("Failed to create empty main index", e);
                     }
                 }
-            }
-            finally
+            } finally
             {
                 releaseWriteLock();
             }
@@ -866,6 +958,7 @@ public abstract class LuceneBase implements Lockable
         }
         catch (IOException e)
         {
+            s_logger.error("Error", e);
             throw new LuceneIndexException("Failed to open main index reader", e);
         }
 
