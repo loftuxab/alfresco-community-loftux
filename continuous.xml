@@ -87,11 +87,13 @@
       <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
       <mkdir dir="${dir.dist}" />
       <tar destfile="${dir.dist}/${file.name.dist.bin.jboss}.tar" longfile="gnu">
-         <tarfileset dir="${dir.project.installer}" includes="AlfrescoTest.pdf,licenses/**,*.sql,zstart_oo.sh," />
-         <tarfileset dir="${dir.project.installer}" includes="jboss/alfresco.sh" fullpath="alfresco.sh" />
+         <tarfileset dir="${dir.project.installer}" includes="AlfrescoTest.pdf,licenses/**,*.sql" />
+         <tarfileset dir="${dir.project.installer}" includes="jboss/alfresco.sh" fullpath="alfresco.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_osx.txt" fullpath="README_osx.txt" />
+         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
+         <tarfileset dir="${dir.distribution.jboss}/bin" prefix="jboss/bin" includes="*.sh" mode="755" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="${file.name.war.alfresco}"
                      prefix="jboss/server/default/deploy" />
          <tarfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf" />
@@ -130,12 +132,11 @@
       <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
       <mkdir dir="${dir.dist}" />
       <tar destfile="${dir.dist}/${file.name.dist.bin.tomcat}.tar" longfile="gnu">
-         <tarfileset dir="${dir.project.installer}" includes="AlfrescoTest.pdf,licenses/**,*.sql,zstart_oo.sh," />
-         <tarfileset dir="${dir.project.installer}" includes="tomcat/alfresco.sh" fullpath="alfresco.sh" />
+         <tarfileset dir="${dir.project.installer}" includes="AlfrescoTest.pdf,licenses/**,*.sql" />
+         <tarfileset dir="${dir.project.installer}" includes="tomcat/alfresco.sh" fullpath="alfresco.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_osx.txt" fullpath="README_osx.txt" />
-         <tarfileset dir="${dir.project.installer}"
-                     includes="start_oo.sh,tomcat/alfresco.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
          <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
          <tarfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.alfresco}"/>
