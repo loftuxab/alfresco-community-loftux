@@ -29,7 +29,7 @@
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="alfresco.messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
    <h:form acceptCharset="UTF-8" id="users">
    
@@ -80,7 +80,7 @@
                               <a:actionLink value="#{msg.create_user}" image="/images/icons/adduser.gif" padding="4" action="createUser" actionListener="#{NewUserWizard.startWizard}" />
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
-                           <td width=100 style="padding-left:2px">
+                           <td width=110 style="padding-left:2px">
                               <%-- View mode settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif" value="0">

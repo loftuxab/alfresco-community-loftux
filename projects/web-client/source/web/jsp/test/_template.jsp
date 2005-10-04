@@ -30,7 +30,7 @@
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="alfresco.messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
    <%-- REPLACE ME: set the form name here --%>
    <h:form acceptCharset="UTF-8" id="myform">

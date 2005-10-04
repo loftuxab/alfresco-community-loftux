@@ -29,7 +29,7 @@
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="alfresco.messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
    <h:form acceptCharset="UTF-8" id="browse">
    
@@ -82,7 +82,7 @@
                                  </div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
-                              <td width=100 style="padding-left:2px">
+                              <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren" id="eval1">

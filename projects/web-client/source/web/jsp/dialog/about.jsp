@@ -29,7 +29,7 @@
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
-   <f:loadBundle basename="alfresco.messages" var="msg"/>
+   <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    <f:loadBundle basename="alfresco.version" var="version"/>
    
    <h:form acceptCharset="UTF-8" id="about">
@@ -103,7 +103,7 @@
                         <div style="padding:4px">
                            <a href="http://www.alfresco.org/" class="title" target="new">http://www.alfresco.org</a>
                            <p>
-                           Alfresco Software Inc. (C) 2005 All rights reserved. <a href="http://www.alfresco.org/legalandlicense.html" target="new">Legal and License</a>
+                           Alfresco Software Inc. &#169; 2005 All rights reserved. <a href="http://www.alfresco.org/legalandlicense.html" target="new">Legal and License</a>
                         </div>
                         
                         <div style="padding:4px" class="mainSubTitle">
@@ -156,8 +156,70 @@
                            <span align=center>
                               <a href="http://tinymce.moxiecode.com/" target="new"><img src="<%=request.getContextPath()%>/images/logo/tinymce.png" border=0></a>
                            </span>
+                           <span align=center>
+                              <a href="http://www.openoffice.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/open-office.gif" border=0></a>
+                           </span>
+                           <span align=center>
+                              <a href="http://freemarker.sourceforge.net/" target="new"><img src="<%=request.getContextPath()%>/images/logo/freemarker.png" border=0></a>
+                           </span>
                         </div>
-                     
+                        
+                        <p>
+                        <p>
+                        
+                        <div style="padding:4px" class="mainSubTitle">
+                           Alfresco Development tools:
+                        </div>
+                        
+                        <div style="padding:4px">
+                           <span align=center>
+                              <a href="http://subversion.tigris.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/subversion_logo.png" border=0></a>
+                           </span>
+                           <span align=center>
+                              <a href="http://www.eclipse.org/" target="new"><img src="<%=request.getContextPath()%>/images/logo/eclipse_logo.jpg" border=0></a>
+                           </span>
+                        </div>
+                        
+                        <p>
+                        <p>
+                        
+                        <div style="padding:4px" class="mainSubTitle">
+                           Alfresco Software contributors:
+                        </div>
+                        
+                        <table border=0 cellspacing=2 cellpadding=2>
+                           <tr>
+                              <td width=50% align=right>
+                                 Meta Data Extraction Framework and PDF/Open Office Format meta data extraction.
+                              </td>
+                              <td>&nbsp;&#8226;&nbsp;</td>
+                              <td width=50%>
+                                 Jesper Steen M&#248;ller
+                              </td>
+                           </tr>
+                           <tr>
+                              <td align=right width=50%>
+                                 Language and translation packs.
+                              </td>
+                              <td>&nbsp;&#8226;&nbsp;</td>
+                              <td width=50%>
+                                 Gian Luca Farina Perseu,
+                                 Betty Mai,
+                                 Gert Thiel,
+                                 Camille B&#233;gnis,
+                                 Laurent Genier,
+                                 Christian Roy,
+                                 Philippe Seillier,
+                                 Frank Shipley,
+                                 Alex Revesz,
+                                 Michiel Steltman,
+                                 cnalfresco,
+                                 Theodoros Papageorgiou,
+                                 Andrejus Chaliapinas
+                              </td>
+                           </tr>
+                        </table>
+                        
                      </td>
                      <td valign="top">
                         <div style="padding-top:16px">
