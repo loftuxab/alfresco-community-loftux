@@ -1116,7 +1116,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
 
     /**
      * @see #getPaths(NodeRef, boolean)
-     * @see #prependPaths(Node, Path, Collection<Path>, Stack<ChildAssoc>, boolean)
+     * @see #prependPaths(Node, Path, Collection, Stack, boolean)
      */
     public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
     {
@@ -1131,7 +1131,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     /**
      * When searching for <code>primaryOnly == true</code>, checks that there is exactly
      * one path.
-     * @see #prependPaths(Node, Path, Collection<Path>, Stack<ChildAssoc>, boolean)
+     * @see #prependPaths(Node, Path, Collection, Stack, boolean)
      */
     public List<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
     {
