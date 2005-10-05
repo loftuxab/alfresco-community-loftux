@@ -29,6 +29,7 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
+import org.alfresco.web.app.Application;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,6 +45,8 @@ import org.apache.commons.logging.LogFactory;
 public class UIMultiValueEditor extends UIInput
 {
    private static final Log logger = LogFactory.getLog(UIMultiValueEditor.class);
+   private static final String SELECTED_ITEMS_MSG = "selected_items";
+   private static final String SELECT_ITEM_MSG = "select_an_item";
    
    public final static String ACTION_SEPARATOR = ";";
    public final static int ACTION_NONE   = -1;
@@ -133,6 +136,70 @@ public class UIMultiValueEditor extends UIInput
       this.lastItemAdded = lastItemAdded;
    }
    
+   /**
+    * Returns the message to display for the selected items, if one hasn't been
+    * set it defaults to the message in the bundle under key 'selected_items'.
+    * 
+    * @return The message
+    */
+   public String getSelectedItemsMsg()
+   {
+      ValueBinding vb = getValueBinding("selectedItemsMsg");
+      if (vb != null)
+      {
+         this.selectedItemsMsg = (String)vb.getValue(getFacesContext());
+      }
+      
+      if (this.selectedItemsMsg == null)
+      {
+         this.selectedItemsMsg = Application.getMessage(getFacesContext(), SELECTED_ITEMS_MSG);
+      }
+      
+      return this.selectedItemsMsg;
+   }
+
+   /**
+    * Sets the selected items message to display in the UI
+    * 
+    * @param selectedItemsMsg The message
+    */
+   public void setSelectedItemsMsg(String selectedItemsMsg)
+   {
+      this.selectedItemsMsg = selectedItemsMsg;
+   }
+
+   /**
+    * Returns the message to display for the selected items, if one hasn't been
+    * set it defaults to the message in the bundle under key 'select_an_item'.
+    * 
+    * @return The message
+    */
+   public String getSelectItemMsg()
+   {
+      ValueBinding vb = getValueBinding("selectItemMsg");
+      if (vb != null)
+      {
+         this.selectItemMsg = (String)vb.getValue(getFacesContext());
+      }
+      
+      if (this.selectItemMsg == null)
+      {
+         this.selectItemMsg = Application.getMessage(getFacesContext(), SELECT_ITEM_MSG);
+      }
+      
+      return this.selectItemMsg;
+   }
+
+   /**
+    * Sets the select an item message to display in the UI
+    * 
+    * @param selectedItemsMsg The message
+    */
+   public void setSelectItemMsg(String selectItemMsg)
+   {
+      this.selectItemMsg = selectItemMsg;
+   }
+
    /**
     * Determines whether the component is in read only mode
     * 

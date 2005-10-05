@@ -1171,6 +1171,18 @@
       </attribute>
       
       <attribute>
+         <name>selectItemMsg</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>selectedItemsMsg</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
          <name>style</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>

@@ -119,15 +119,12 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          
          // show the select an item message
          out.write("<tr><td>");
-         
-         // TODO: make this generic
          out.write("1. ");
-         out.write(Application.getMessage(context, MSG_SELECT_CATEGORY));
+         out.write(editor.getSelectItemMsg());
          out.write(":</td></tr>");
          
          if (editor.getAddingNewItem())
          {
-            // TODO: remove the hard coded style - need to change the space selector to use div and not span
             out.write("<tr><td style='padding-left:8px'>");
          }
          else
@@ -161,7 +158,8 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          
          // show the add to list button but only if something has been selected
          out.write("<tr><td>2. <input type='submit'");
-         if (editor.getAddingNewItem() == false && editor.getLastItemAdded() != null)
+         if (editor.getAddingNewItem() == false && editor.getLastItemAdded() != null || 
+             editor.getLastItemAdded() == null)
          {
             out.write(" disabled='true'");
          }
@@ -172,9 +170,7 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          out.write("\"/></td></tr>");
          
          out.write("<tr><td style='padding-top:8px'>");
-         
-         // TODO: make this generic
-         out.write(Application.getMessage(context, MSG_SELECTED_CATEGORIES));
+         out.write(editor.getSelectedItemsMsg());
          out.write(":</td></tr>");
          
          // show the current items

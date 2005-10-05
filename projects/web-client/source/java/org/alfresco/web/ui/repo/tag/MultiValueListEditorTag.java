@@ -30,6 +30,8 @@ public class MultiValueListEditorTag extends HtmlComponentTag
    private String value;
    private String lastItemAdded;
    private String readOnly;
+   private String selectItemMsg;
+   private String selectedItemsMsg;
    
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
@@ -55,6 +57,8 @@ public class MultiValueListEditorTag extends HtmlComponentTag
       super.setProperties(component);
       setStringBindingProperty(component, "value", this.value);
       setStringBindingProperty(component, "lastItemAdded", this.lastItemAdded);
+      setStringProperty(component, "selectItemMsg", this.selectItemMsg);
+      setStringProperty(component, "selectedItemsMsg", this.selectedItemsMsg);
       setBooleanProperty(component, "readOnly", this.readOnly);
    }
    
@@ -67,6 +71,8 @@ public class MultiValueListEditorTag extends HtmlComponentTag
       this.value = null;
       this.lastItemAdded = null;
       this.readOnly = null;
+      this.selectedItemsMsg = null;
+      this.selectItemMsg = null;
    }
 
    /**
@@ -95,5 +101,25 @@ public class MultiValueListEditorTag extends HtmlComponentTag
    public void setReadOnly(String readOnly)
    {
       this.readOnly = readOnly;
+   }
+
+   /**
+    * Sets the message to display for the selected items
+    * 
+    * @param selectedItemsMsg The message
+    */
+   public void setSelectedItemsMsg(String selectedItemsMsg)
+   {
+      this.selectedItemsMsg = selectedItemsMsg;
+   }
+
+   /**
+    * Sets the message to display for inviting the user to select an item
+    * 
+    * @param selectItemMsg The message
+    */
+   public void setSelectItemMsg(String selectItemMsg)
+   {
+      this.selectItemMsg = selectItemMsg;
    }
 }

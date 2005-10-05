@@ -101,7 +101,10 @@
                                     <td><h:outputText value="#{msg.categories}" />:</td>
                                     <td width="90%">
                                        <r:multiValueListEditor value="#{DocumentDetailsBean.categories}"
-                                                               lastItemAdded="#{DocumentDetailsBean.addedCategory}" styleClass="selector">
+                                                               lastItemAdded="#{DocumentDetailsBean.addedCategory}" 
+                                                               selectItemMsg="#{msg.select_category}"
+                                                               selectedItemsMsg="#{msg.selected_categories}"
+                                                               styleClass="selector">
                                           <r:categorySelector label="#{msg.select_category_prompt}" styleClass="selector"
                                                               value="#{DocumentDetailsBean.addedCategory}"/>
                                        </r:multiValueListEditor>
