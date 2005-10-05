@@ -346,12 +346,20 @@ public class RuleServiceImplTest extends BaseRuleTest
         assertTrue(allRules16.contains(rule5));
         assertTrue(allRules16.contains(rule6));
         
-        // Add an association
-        this.nodeService.addChild(
-                rootWithRules2, 
-                childWithRules, 
-                ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{test}testnode"));
+        this.ruleService.disableRules(rootWithRules2);
+        try
+        {
+            // Add an association
+            this.nodeService.addChild(
+                    rootWithRules2, 
+                    childWithRules, 
+                    ContentModel.ASSOC_CHILDREN,
+                    QName.createQName("{test}testnode"));
+        }
+        finally
+        {
+            this.ruleService.enableRules(rootWithRules2);
+        }
         
         List<? extends Rule> allRules17 = this.ruleService.getRules(childWithRules, true);
         assertNotNull(allRules17);

@@ -165,16 +165,22 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	 */
 	private NodeRef getSavedRuleFolderRef(NodeRef nodeRef)
 	{
+        NodeRef result = null;
+        
 		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
                 nodeRef,
                 RegexQNamePattern.MATCH_ALL,
                 RuleModel.ASSOC_RULE_FOLDER);
-		if (assocs.size() != 1)
+		if (assocs.size() > 1)
 		{
-			throw new ActionServiceException("Unable to retrieve the saved rule folder reference.");
+			throw new ActionServiceException("There is more than one rule folder, which is invalid.");
 		}
+        else if (assocs.size() == 1)
+        {
+            result = assocs.get(0).getChildRef();
+        }
 		
-		return assocs.get(0).getChildRef();
+		return result;
 	}
     
     /**
@@ -267,35 +273,39 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     		
     		if (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
     		{
-    			List<Rule> allRules = this.ruleCache.getRules(nodeRef);
-    			if (allRules == null)
-    			{
-    				allRules = new ArrayList<Rule>();
-    				
-		    		// Get the rules for this node
-		    		List<ChildAssociationRef> ruleChildAssocRefs = 
-		    			this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
-		    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
-					{
-		    			// Create the rule and add to the list
-						NodeRef ruleNodeRef = ruleChildAssocRef.getChildRef();
-						Rule rule = createRule(nodeRef, ruleNodeRef);
-						allRules.add(rule);
-					}
-		    		
-		    		// Add the list to the cache
-		    		this.ruleCache.setRules(nodeRef, allRules);
-    			}
-    			
-    			// Build the list of rules that is returned to the client
-    			for (Rule rule : allRules)
-				{					
-					if ((rules.contains(rule) == false) &&
-					    (ruleTypeName == null || ruleTypeName.equals(rule.getRuleTypeName()) == true))
-					{
-						rules.add(rule);						
-					}
-				}
+                NodeRef ruleFolder = getSavedRuleFolderRef(nodeRef);
+                if (ruleFolder != null)
+                {
+        			List<Rule> allRules = this.ruleCache.getRules(nodeRef);
+        			if (allRules == null)
+        			{
+        				allRules = new ArrayList<Rule>();
+        				
+    		    		// Get the rules for this node
+    		    		List<ChildAssociationRef> ruleChildAssocRefs = 
+    		    			this.nodeService.getChildAssocs(ruleFolder, RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
+    		    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
+    					{
+    		    			// Create the rule and add to the list
+    						NodeRef ruleNodeRef = ruleChildAssocRef.getChildRef();
+    						Rule rule = createRule(nodeRef, ruleNodeRef);
+    						allRules.add(rule);
+    					}
+    		    		
+    		    		// Add the list to the cache
+    		    		this.ruleCache.setRules(nodeRef, allRules);
+        			}
+        			
+        			// Build the list of rules that is returned to the client
+        			for (Rule rule : allRules)
+    				{					
+    					if ((rules.contains(rule) == false) &&
+    					    (ruleTypeName == null || ruleTypeName.equals(rule.getRuleTypeName()) == true))
+    					{
+    						rules.add(rule);						
+    					}
+    				}
+                }
     		}
     	}
     	
@@ -406,19 +416,23 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 		NodeRef result = null;
 		if (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
 		{
-			DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
-			namespacePrefixResolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
-			
-			List<NodeRef> nodeRefs = searchService.selectNodes(
-					getSavedRuleFolderRef(nodeRef), 
-					"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + ruleId + "']",
-					null,
-					namespacePrefixResolver,
-					false);
-			if (nodeRefs.size() != 0)
-			{
-				result = nodeRefs.get(0);
-			}
+            NodeRef ruleFolder = getSavedRuleFolderRef(nodeRef);
+            if (ruleFolder != null)
+            {
+    			DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver();
+    			namespacePrefixResolver.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
+    			
+    			List<NodeRef> nodeRefs = searchService.selectNodes(
+                        ruleFolder, 
+    					"*[@sys:" + ContentModel.PROP_NODE_UUID.getLocalName() + "='" + ruleId + "']",
+    					null,
+    					namespacePrefixResolver,
+    					false);
+    			if (nodeRefs.size() != 0)
+    			{
+    				result = nodeRefs.get(0);
+    			}
+            }
 		}
 		
 		return result;
@@ -509,11 +523,19 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	if (this.nodeService.exists(nodeRef) == true &&
     		this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
     	{
-    		NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
-    		if (ruleNodeRef != null)
-    		{
-    			this.nodeService.removeChild(getSavedRuleFolderRef(nodeRef), ruleNodeRef);
-    		}
+            disableRules(nodeRef);
+            try
+            {
+        		NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
+        		if (ruleNodeRef != null)
+        		{
+        			this.nodeService.removeChild(getSavedRuleFolderRef(nodeRef), ruleNodeRef);
+        		}
+            }
+            finally
+            {
+                enableRules(nodeRef);
+            }
     	}
     }	
     
@@ -525,13 +547,17 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	if (this.nodeService.exists(nodeRef) == true && 
         	this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
     	{
-    		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(
-                                                                        getSavedRuleFolderRef(nodeRef), 
-                                                                        RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
-    		for (ChildAssociationRef ruleChildAssoc : ruleChildAssocs)
-			{
-				this.nodeService.removeChild(getSavedRuleFolderRef(nodeRef), ruleChildAssoc.getChildRef());
-			}
+            NodeRef folder = getSavedRuleFolderRef(nodeRef);
+            if (folder != null)
+            {
+        		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(
+                                                                            folder, 
+                                                                            RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
+        		for (ChildAssociationRef ruleChildAssoc : ruleChildAssocs)
+    			{
+    				this.nodeService.removeChild(folder, ruleChildAssoc.getChildRef());
+    			}
+            }
     	}
     }
 	
