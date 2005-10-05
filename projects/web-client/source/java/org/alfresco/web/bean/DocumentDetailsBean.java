@@ -221,29 +221,32 @@ public class DocumentDetailsBean
          Collection categories = (Collection)this.nodeService.getProperty(this.browseBean.getDocument().getNodeRef(), 
                ContentModel.PROP_CATEGORIES);
          
-          if (categories == null || categories.size() == 0)
-          {
-             html = Application.getMessage(FacesContext.getCurrentInstance(), "no_categories_applied");
-          }
-          else
-          {
-             StringBuilder builder = new StringBuilder(Application.getMessage(FacesContext.getCurrentInstance(), 
-                   "has_following_categories"));
-             
-             builder.append("<ul>");
-             for (Object obj : categories)
-             {
-                if (this.nodeService.exists((NodeRef)obj))
-                {
-                   builder.append("<li>");
-                   builder.append(Repository.getNameForNode(this.nodeService, (NodeRef)obj));
-                   builder.append("</li>");
-                }
-             }
-             builder.append("</ul>");
-             
-             html = builder.toString();
-          }
+         if (categories == null || categories.size() == 0)
+         {
+            html = Application.getMessage(FacesContext.getCurrentInstance(), "no_categories_applied");
+         }
+         else
+         {
+            StringBuilder builder = new StringBuilder(Application.getMessage(FacesContext.getCurrentInstance(), 
+                  "has_following_categories"));
+            
+            builder.append("<ul>");
+            for (Object obj : categories)
+            {
+               if (obj instanceof NodeRef)
+               {
+                  if (this.nodeService.exists((NodeRef)obj))
+                  {
+                     builder.append("<li>");
+                     builder.append(Repository.getNameForNode(this.nodeService, (NodeRef)obj));
+                     builder.append("</li>");
+                  }
+               }
+            }
+            builder.append("</ul>");
+            
+            html = builder.toString();
+         }
       }
       
       return html;
