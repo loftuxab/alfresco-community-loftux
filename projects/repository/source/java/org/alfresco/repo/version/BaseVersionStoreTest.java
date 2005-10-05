@@ -131,6 +131,8 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.contentService = (ContentService)applicationContext.getBean("contentService");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         
+        authenticationService.clearCurrentSecurityContext();
+        
 		// Create the test model
 		createTestModel();
 		

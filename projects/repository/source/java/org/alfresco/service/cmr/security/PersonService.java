@@ -47,6 +47,14 @@ public interface PersonService
     public NodeRef getPerson(String userName);
 
     /**
+     * Check if a person exists.
+     * 
+     * @param userName
+     * @return
+     */
+    public boolean personExists(String userName);
+    
+    /**
      * Does this service create people on demand if they are missing. If this is
      * true, a call to getPerson() will create a person if they are missing.
      * 

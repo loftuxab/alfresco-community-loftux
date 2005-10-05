@@ -70,6 +70,7 @@ public class LockServiceImplTest extends BaseSpringTest
         this.nodeService = (NodeService)applicationContext.getBean("dbNodeService");
         this.lockService = (LockService)applicationContext.getBean("lockService");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
+        authenticationService.clearCurrentSecurityContext();
         
         // Create the node properties
         HashMap<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();

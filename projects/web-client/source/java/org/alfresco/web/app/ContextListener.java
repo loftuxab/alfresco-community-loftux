@@ -161,6 +161,14 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 
             // create the node to represent the Person instance for the
             // admin user
+
+         }
+         
+         PersonService personService = (PersonService) ctx.getBean("personService");
+         if(!personService.personExists(ADMIN))
+         {
+             // create the node to represent the Person instance for the
+             // admin user
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
             props.put(ContentModel.PROP_USERNAME, ADMIN);
             props.put(ContentModel.PROP_FIRSTNAME, ADMIN_FIRSTNAME);
@@ -168,15 +176,9 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             props.put(ContentModel.PROP_HOMEFOLDER, companySpaceNodeRef);
             props.put(ContentModel.PROP_EMAIL, "");
             props.put(ContentModel.PROP_ORGID, "");
-
-            // Create the person under the special people system folder
-            // This is required to allow authenticate() to succeed during
-            // login
-
-            PersonService personService = (PersonService) ctx.getBean("personService");
+          
             personService.createPerson(props);
          }
-
          PermissionService permissionService = (PermissionService) ctx.getBean("permissionService");
          permissionService.setPermission(rootNodeRef, ADMIN, permissionService.getAllPermission(), true);
          permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), PermissionService.READ, true);

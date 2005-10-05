@@ -203,4 +203,56 @@ public class PersonTest extends BaseSpringTest
         properties.put(ContentModel.PROP_ORGID, orgId);
         return properties;
     }
+    
+    public void testCaseSensitive()
+    {
+        if(personService.getUserNamesAreCaseSensitive())
+        {
+            personService.createPerson(createDefaultProperties("Derek", "Derek", "Hulley", "dh@dh",
+                    "alfresco", rootNodeRef));
+            
+            try
+            {
+                personService.getPerson("derek");
+                assertNotNull(null);
+            }
+            catch (PersonException pe)
+            {
+
+            }
+            try
+            {
+                personService.getPerson("deRek");
+                assertNotNull(null);
+            }
+            catch (PersonException pe)
+            {
+
+            }
+            try
+            {
+                personService.getPerson("DEREK");
+                assertNotNull(null);
+            }
+            catch (PersonException pe)
+            {
+
+            }
+            personService.getPerson("Derek");
+        }
+    }
+    
+    public void testCaseInsensitive()
+    {
+        if(!personService.getUserNamesAreCaseSensitive())
+        {
+            personService.createPerson(createDefaultProperties("Derek", "Derek", "Hulley", "dh@dh",
+                    "alfresco", rootNodeRef));
+            
+            personService.getPerson("derek");
+            personService.getPerson("deRek");
+            personService.getPerson("Derek");
+            personService.getPerson("DEREK");
+        }
+    }
 }

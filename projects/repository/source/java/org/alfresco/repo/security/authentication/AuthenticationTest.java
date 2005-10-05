@@ -130,6 +130,9 @@ public class AuthenticationTest extends TestCase
         Map<QName, Serializable> props = createPersonProperties("Andy");
         personAndyNodeRef = nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
         assertNotNull(personAndyNodeRef);
+        
+        authenticationService.deleteAuthentication("andy");
+        
     }
 
     
@@ -524,6 +527,7 @@ public class AuthenticationTest extends TestCase
         assertEquals(dao.getUserNamesAreCaseSensitive() ? "Andy" : "andy", authenticationService.getCurrentUserName());
         // delete the user authentication object
 
+        authenticationService.clearCurrentSecurityContext();
         authenticationService.deleteAuthentication("Andy");
 
         // create a new authentication user object

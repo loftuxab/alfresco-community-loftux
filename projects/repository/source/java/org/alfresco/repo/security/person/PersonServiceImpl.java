@@ -32,6 +32,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PersonService;
@@ -102,7 +103,7 @@ public class PersonServiceImpl implements PersonService
             }
             else
             {
-                throw new PersonException("No person found for user name" + userName);
+                throw new PersonException("No person found for user name " + userName);
             }
 
         }
@@ -110,6 +111,11 @@ public class PersonServiceImpl implements PersonService
         {
             return personNode;
         }
+    }
+    
+    public boolean personExists(String caseSensitiveUserName)
+    {
+        return getPersonOrNull(caseSensitiveUserName) != null;
     }
 
     public NodeRef getPersonOrNull(String caseSensitiveUserName)
@@ -151,10 +157,13 @@ public class PersonServiceImpl implements PersonService
             }
             else
             {
-                throw new PersonException("No person found for user name" + userName);
+                throw new PersonException("No person found for user name " + userName);
             }
 
         }
+        
+        properties.put(ContentModel.PROP_USERNAME, userName);
+        
         nodeService.setProperties(personNode, properties);
     }
 
@@ -183,6 +192,9 @@ public class PersonServiceImpl implements PersonService
 
     public NodeRef createPerson(Map<QName, Serializable> properties)
     {
+        String caseSensitiveUserName = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_USERNAME));
+        String userName = userNamesAreCaseSensitive ? caseSensitiveUserName : caseSensitiveUserName.toLowerCase();
+        properties.put(ContentModel.PROP_USERNAME, userName);
         return nodeService.createNode(getPeopleContainer(), ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON,
                 ContentModel.TYPE_PERSON, properties).getChildRef();
     }
