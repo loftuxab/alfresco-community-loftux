@@ -33,7 +33,6 @@ import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.MD4PasswordEncoder;
 import org.alfresco.repo.security.authentication.MD4PasswordEncoderImpl;
 import org.alfresco.repo.security.authentication.NTLMMode;
-import org.alfresco.repo.security.authentication.ntlm.NTLMPassthruToken;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.PersonService;
@@ -160,12 +159,6 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
             
             authSts = doMD4UserAuthentication(client, sess, alg);
         }
-        else
-        {
-            // Perform passthru authentication password check
-            
-            authSts = doPassthruUserAuthentication(client, sess, alg);
-        }
         
         // DEBUG
         
@@ -212,25 +205,6 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
     
             DataPacker.putIntelLong(m_random.nextLong(), key, 0);
         }
-        else
-        {
-            // Create an authentication token for the session
-            
-            NTLMPassthruToken authToken = new NTLMPassthruToken();
-            
-            // Run the first stage of the passthru authentication to get the challenge
-            
-            m_authComponent.authenticate( authToken);
-            
-            // Save the authentication token for the second stage of the authentication
-            
-            sess.setAuthenticationToken(authToken);
-            
-            // Get the challenge from the token
-            
-            if ( authToken.getChallenge() != null)
-                key = authToken.getChallenge().getBytes();
-        }
 
         // Return the challenge
         
@@ -268,8 +242,7 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
         if ( m_authComponent == null)
             throw new InvalidConfigurationException("Authentication component not available");
         
-        if ( m_authComponent.getNTLMMode() != NTLMMode.MD4_PROVIDER &&
-                m_authComponent.getNTLMMode() != NTLMMode.PASS_THROUGH)
+        if ( m_authComponent.getNTLMMode() != NTLMMode.MD4_PROVIDER)
             throw new InvalidConfigurationException("Required authentication mode not available");
         
         // Get hold of various services
@@ -357,96 +330,7 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
             
         return allowGuest() ? SrvAuthenticator.AUTH_GUEST : SrvAuthenticator.AUTH_DISALLOW;
     }
-    
-    /**
-     * Perform passthru user authentication
-     * 
-     * @param client Client information
-     * @param sess Server session
-     * @param alg Encryption algorithm
-     * @return int 
-     */
-    private final int doPassthruUserAuthentication(ClientInfo client, SrvSession sess, int alg)
-    {
-        // Get the authentication token for the session
 
-        NTLMPassthruToken authToken = (NTLMPassthruToken) sess.getAuthenticationToken();
-        
-        if ( authToken == null)
-            return SrvAuthenticator.AUTH_DISALLOW;
-
-        // Get the appropriate hashed password for the algorithm
-        
-        int authSts = SrvAuthenticator.AUTH_DISALLOW;
-        byte[] hashedPassword = null;
-        
-        if ( alg == NTLM1)
-            hashedPassword = client.getPassword();
-        else if ( alg == LANMAN)
-            hashedPassword = client.getANSIPassword();
-        else
-        {
-            // Invalid/unsupported algorithm specified
-            
-            return SrvAuthenticator.AUTH_DISALLOW;
-        }
-        
-        // Set the username and hashed password in the authentication token
-        
-        authToken.setUserAndPassword( client.getUserName(), hashedPassword, alg);
-        
-        // Authenticate the user
-        
-        try
-        {
-            // Run the second stage of the passthru authentication
-            
-            m_authComponent.authenticate( authToken);
-            
-            // Check if the user has been logged on as a guest
-
-            if (authToken.isGuestLogon())
-            {
-
-                // Check if the local server allows guest access
-
-                if (allowGuest() == true)
-                {
-
-                    // Allow the user access as a guest
-
-                    authSts = SrvAuthenticator.AUTH_GUEST;
-                }
-            }
-            else
-            {
-
-                // Allow the user full access to the server
-
-                authSts = SrvAuthenticator.AUTH_ALLOW;
-            }
-
-            // Set the current user to be authenticated, save the authentication token
-            
-            client.setAuthenticationToken( m_authComponent.setCurrentUser(client.getUserName()));
-            
-            // Get the users home folder node, if available
-            
-            getHomeFolderForUser( client);
-        }
-        catch ( Exception ex)
-        {
-        }
-        
-        // Clear the authentication token
-        
-        sess.setAuthenticationToken(null);
-        
-        // Return the authentication status
-        
-        return authSts;
-    }
-    
     /**
      * Get the home folder for the user
      * 

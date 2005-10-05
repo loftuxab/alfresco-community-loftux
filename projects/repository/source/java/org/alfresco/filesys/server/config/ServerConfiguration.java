@@ -1369,7 +1369,10 @@ public class ServerConfiguration
             {
                 // Load the Alfresco authenticator dynamically
                 
-                auth = loadAuthenticatorClass("org.alfresco.filesys.server.auth.AlfrescoAuthenticator");
+                auth = loadAuthenticatorClass("org.alfresco.filesys.server.auth.ntlm.AlfrescoAuthenticator");
+                if ( auth == null)
+                    auth = loadAuthenticatorClass("org.alfresco.filesys.server.auth.AlfrescoAuthenticator");
+                
                 if ( auth == null)
                     throw new AlfrescoRuntimeException("Failed to load Alfresco authenticator");
             }
