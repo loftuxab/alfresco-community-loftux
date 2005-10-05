@@ -25,6 +25,14 @@ import org.alfresco.filesys.netbios.win32.WinsockNetBIOSException;
 import org.alfresco.filesys.smb.server.PacketHandler;
 import org.alfresco.filesys.smb.server.SMBSrvPacket;
 
+/**
+ * Winsock NetBIOS Packet Handler Class
+ * 
+ * <p>Uses a Windows Winsock NetBIOS socket to provide the low level session layer for better integration
+ * with Windows.
+ *
+ * @author GKSpencer
+ */
 public class WinsockNetBIOSPacketHandler extends PacketHandler
 {
     // Constants

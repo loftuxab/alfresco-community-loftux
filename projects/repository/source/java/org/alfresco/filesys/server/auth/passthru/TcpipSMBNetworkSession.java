@@ -98,9 +98,10 @@ public class TcpipSMBNetworkSession implements NetworkSession
 
         m_socket = new Socket(toName, TcpipSMB.PORT);
 
-        // Enable the timeout on the socket
+        // Enable the timeout on the socket, disable the Nagle algorithm
 
         m_socket.setSoTimeout(m_tmo);
+        m_socket.setTcpNoDelay(true);
 
         // Attach input/output streams to the socket
 

@@ -1390,9 +1390,10 @@ public final class NetBIOSSession implements NetworkSession
 
         m_nbSocket = new Socket(addr, m_remotePort);
 
-        // Enable the timeout on the socket
+        // Enable the timeout on the socket, and disable Nagle algorithm
 
         m_nbSocket.setSoTimeout(m_tmo);
+        m_nbSocket.setTcpNoDelay(true);
 
         // Attach input/output streams to the socket
 
