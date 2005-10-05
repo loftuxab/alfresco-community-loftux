@@ -55,7 +55,7 @@ public class AssocSourceTypeIntegrityEvent extends AbstractIntegrityEvent
         QName assocTypeQName = getTypeQName();
         NodeRef sourceNodeRef = getNodeRef();
         // if the node is gone then the check is irrelevant
-        QName sourceNodeTypeQName = nodeService.getType(sourceNodeRef);
+        QName sourceNodeTypeQName = getNodeType(sourceNodeRef);
         if (sourceNodeTypeQName == null)
         {
             // target or source is missing

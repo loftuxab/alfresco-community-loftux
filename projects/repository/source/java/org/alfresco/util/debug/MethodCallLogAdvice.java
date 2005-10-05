@@ -16,6 +16,7 @@
  */
 package org.alfresco.util.debug;
 
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
@@ -123,8 +124,9 @@ public class MethodCallLogAdvice implements MethodInterceptor
      */
     private StringBuffer getInvocationInfo(String className, String methodName, Object[] args)
     {
-        StringBuffer sb = new StringBuffer(80);
+        StringBuffer sb = new StringBuffer(250);
         sb.append("\nMethod: ").append(className).append("#").append(methodName).append("\n");
+        sb.append("   Transaction: ").append(AlfrescoTransactionSupport.getTransactionId()).append("\n");
         for (Object arg : args)
         {
             sb.append("   Argument: ").append(arg).append("\n");

@@ -1070,7 +1070,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			}					
 		};
 		
-		NodeRef actionExecutionDetailsNodeRef = TransactionUtil.executeInNonPropagatingUserTransaction(
+		NodeRef actionExecutionDetailsNodeRef = TransactionUtil.executeInUserTransaction(
 				this.transactionService,
 				work);
 		

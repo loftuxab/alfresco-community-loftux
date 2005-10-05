@@ -329,7 +329,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // remove the child assoc from the old parent
         // don't cascade as we will still need the node afterwards
-        nodeDaoService.deleteChildAssoc(oldAssoc);
+        nodeDaoService.deleteChildAssoc(oldAssoc, false);
         // create a new assoc
         ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocTypeQName, assocQName);
         
@@ -506,9 +506,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      */
     public void deleteNode(NodeRef nodeRef)
     {
-		// Invoke policy behaviours
-		invokeBeforeDeleteNode(nodeRef);
-		
+        // Invoke policy behaviours
+//        invokeBeforeDeleteNode(nodeRef);
+        
         // get the node
         Node node = getNodeNotNull(nodeRef);
 
@@ -518,9 +518,14 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // get type and aspect QNames as they will be unavailable after the delete
         QName nodeTypeQName = node.getTypeQName();
         Set<QName> nodeAspectQNames = node.getAspects();
-        
+
+        // get all associations, forcing a load of the collections
+        Collection<ChildAssoc> childAssocs = new ArrayList<ChildAssoc>(node.getChildAssocs());
+        Collection<ChildAssoc> parentAssocs = new ArrayList<ChildAssoc>(node.getParentAssocs());
+        Collection<NodeAssoc> sourceAssocs = new ArrayList<NodeAssoc>(node.getSourceNodeAssocs());
+        Collection<NodeAssoc> targetAssocs = new ArrayList<NodeAssoc>(node.getTargetNodeAssocs());
+
         // remove all child associations, including the primary one
-        Collection<ChildAssoc> childAssocs = new ArrayList<ChildAssoc>(node.getChildAssocs());  // force load
         for (ChildAssoc childAssoc : childAssocs)
         {
             ChildAssociationRef childAssocRef = childAssoc.getChildAssocRef();
@@ -531,27 +536,28 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                 this.deleteNode(childNodeRef);
             }
             
+            // one or more of these associations may have been dealt with when deleting the
+            // child, so check that the association is valid
+            
             // invoke pre-deletion behaviour
             invokeBeforeDeleteChildAssociation(childAssocRef);
-            // remove it
-            nodeDaoService.deleteChildAssoc(childAssoc);
+            // remove it - cascade just to be sure
+            nodeDaoService.deleteChildAssoc(childAssoc, true);
             // invoke post-deletion behaviour
             invokeOnDeleteChildAssociation(childAssocRef);
         }
         // remove all parent associations, including the primary one
-        Collection<ChildAssoc> parentAssocs = new ArrayList<ChildAssoc>(node.getParentAssocs());  // force load
         for (ChildAssoc parentAssoc : parentAssocs)
         {
             ChildAssociationRef parentAssocRef = parentAssoc.getChildAssocRef();
             // invoke pre-deletion behaviour
             invokeBeforeDeleteChildAssociation(parentAssocRef);
-            // remove it
-            nodeDaoService.deleteChildAssoc(parentAssoc);
+            // remove it - don't cascade as this is a parent assoc
+            nodeDaoService.deleteChildAssoc(parentAssoc, false);
             // invoke post-deletion behaviour
             invokeOnDeleteChildAssociation(parentAssocRef);
         }
         // remove all source node associations
-        Collection<NodeAssoc> sourceAssocs = new ArrayList<NodeAssoc>(node.getSourceNodeAssocs());  // force load
         for (NodeAssoc sourceAssoc : sourceAssocs)
         {
             AssociationRef sourceAssocRef = sourceAssoc.getNodeAssocRef();
@@ -561,7 +567,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             invokeOnDeleteAssociation(sourceAssocRef);
         }
         // remove all target node associations
-        Collection<NodeAssoc> targetAssocs = new ArrayList<NodeAssoc>(node.getTargetNodeAssocs());  // force load
         for (NodeAssoc targetAssoc : targetAssocs)
         {
             AssociationRef targetAssocRef = targetAssoc.getNodeAssocRef();
@@ -572,12 +577,15 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
         
         // delete it
-        nodeDaoService.deleteNode(node);
-		
-		// Invoke policy behaviours
-		invokeOnDeleteNode(primaryParentAssocRef, nodeTypeQName, nodeAspectQNames);
+        // We cascade so that we are sure that any new children created by policy implementations are
+        // removed.  There won't be any noticiations for these, but it prevents the cascade and
+        // notifications from chasing each other
+        nodeDaoService.deleteNode(node, true);
+        
+        // Invoke policy behaviours
+        invokeOnDeleteNode(primaryParentAssocRef, nodeTypeQName, nodeAspectQNames);
     }
-
+    
     public ChildAssociationRef addChild(NodeRef parentRef, NodeRef childRef, QName assocTypeQName, QName assocQName)
     {
         // Invoke policy behaviours
@@ -615,33 +623,34 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         NodeKey childNodeKey = childNode.getKey();
         
         // get all the child assocs
-        boolean cascade = false;
-        Collection<ChildAssoc> childAssocs = new ArrayList<ChildAssoc>(parentNode.getChildAssocs());  // force load
-        for (ChildAssoc childAssoc : childAssocs)
+        ChildAssociationRef primaryAssocRef = null;
+        Collection<ChildAssoc> assocs = parentNode.getChildAssocs();
+        assocs = new HashSet<ChildAssoc>(assocs);   // copy set as we will be modifying it
+        for (ChildAssoc assoc : assocs)
         {
-            if (!childAssoc.getChild().getKey().equals(childNodeKey))
+            if (!assoc.getChild().getKey().equals(childNodeKey))
             {
                 continue;  // not a matching association
             }
-            ChildAssociationRef assocRef = childAssoc.getChildAssocRef();
+            ChildAssociationRef assocRef = assoc.getChildAssocRef();
             // Is this a primary association?
-            if (childAssoc.getIsPrimary())
+            if (assoc.getIsPrimary())
             {
-                // we must cascade, but first continue with all the other assocs
-                cascade = true;
+                // keep the primary associaton for last
+                primaryAssocRef = assocRef;
             }
             else
             {
                 // delete the association instance - it is not primary
                 invokeBeforeDeleteChildAssociation(assocRef);
-                nodeDaoService.deleteChildAssoc(childAssoc);
+                nodeDaoService.deleteChildAssoc(assoc, true);   // cascade
                 invokeOnDeleteChildAssociation(assocRef);
             }
         }
         // remove the child if the primary association was a match
-        if (cascade)
+        if (primaryAssocRef != null)
         {
-            deleteNode(childRef);
+            deleteNode(primaryAssocRef.getChildRef());
         }
 
 		// Invoke policy behaviours

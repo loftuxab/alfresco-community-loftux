@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.node.db.hibernate;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -246,8 +247,36 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     /**
      * Manually ensures that all cascading of associations is taken care of
      */
-    public void deleteNode(Node node)
+    public void deleteNode(Node node, boolean cascade)
     {
+        // delete all parent assocs
+        Collection<ChildAssoc> parentAssocs = node.getParentAssocs();
+        parentAssocs = new ArrayList<ChildAssoc>(parentAssocs);
+        for (ChildAssoc assoc : parentAssocs)
+        {
+            deleteChildAssoc(assoc, false);  // we don't cascade upwards
+        }
+        // delete all child assocs
+        Collection<ChildAssoc> childAssocs = node.getChildAssocs();
+        childAssocs = new ArrayList<ChildAssoc>(childAssocs);
+        for (ChildAssoc assoc : childAssocs)
+        {
+            deleteChildAssoc(assoc, cascade);   // potentially cascade downwards
+        }
+        // delete all target assocs
+        Collection<NodeAssoc> targetAssocs = node.getTargetNodeAssocs();
+        targetAssocs = new ArrayList<NodeAssoc>(targetAssocs);
+        for (NodeAssoc assoc : targetAssocs)
+        {
+            deleteNodeAssoc(assoc);
+        }
+        // delete all source assocs
+        Collection<NodeAssoc> sourceAssocs = node.getSourceNodeAssocs();
+        sourceAssocs = new ArrayList<NodeAssoc>(sourceAssocs);
+        for (NodeAssoc assoc : sourceAssocs)
+        {
+            deleteNodeAssoc(assoc);
+        }
         // update the node status
         NodeStatus nodeStatus = node.getStatus();
         nodeStatus.setDeleted(true);
@@ -328,7 +357,10 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         return null;
     }
 
-    public void deleteChildAssoc(ChildAssoc assoc)
+    /**
+     * Manually enforces cascade deletions down primary associations
+     */
+    public void deleteChildAssoc(ChildAssoc assoc, boolean cascade)
     {
         Node childNode = assoc.getChild();
         
@@ -336,6 +368,17 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         assoc.removeAssociation();
         // remove instance
         getHibernateTemplate().delete(assoc);
+        
+        if (cascade && assoc.getIsPrimary())   // the assoc is primary
+        {
+            // delete the child node
+            deleteNode(childNode, cascade);
+            /*
+             * The child node deletion will cascade delete all assocs to
+             * and from it, but we have safely removed this one, so no
+             * duplicate call will be received to do this
+             */
+        }
     }
 
     public ChildAssoc getPrimaryParentAssoc(Node node)

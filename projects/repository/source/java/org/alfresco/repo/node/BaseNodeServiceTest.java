@@ -34,6 +34,8 @@ import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.node.db.NodeDaoService;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -49,6 +51,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.BaseSpringTest;
@@ -97,6 +100,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName PROP_QNAME_NULL_VALUE = QName.createQName(NAMESPACE, "nullValue");
     public static final QName PROP_QNAME_MULTI_VALUE = QName.createQName(NAMESPACE, "multiValue");
     
+    protected PolicyComponent policyComponent;
     protected DictionaryService dictionaryService;
     protected NodeDaoService nodeDaoService;
     protected NodeService nodeService;
@@ -106,6 +110,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        policyComponent = (PolicyComponent) applicationContext.getBean("policyComponent");
+        
         DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
         // load the system model
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
@@ -135,7 +141,6 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     @Override
     protected void onTearDownInTransaction()
     {
-        flushAndClear();
     }
 
 
@@ -578,20 +583,79 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
     }
     
+    public static class BadOnDeleteNodePolicy implements
+            NodeServicePolicies.OnDeleteNodePolicy,
+            NodeServicePolicies.BeforeDeleteNodePolicy
+    {
+        private NodeService nodeService;
+        private List<NodeRef> deletedNodeRefs;
+        
+        public BadOnDeleteNodePolicy(NodeService nodeService, List<NodeRef> deletedNodeRefs)
+        {
+            this.nodeService = nodeService;
+            this.deletedNodeRefs = deletedNodeRefs;
+        }
+        
+        public void beforeDeleteNode(NodeRef nodeRef)
+        {
+            // add a new child to the child, i.e. just before it is deleted
+            ChildAssociationRef assocRef = nodeService.createNode(
+                    nodeRef,
+                    ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                    QName.createQName("pre-delete new child"),
+                    ContentModel.TYPE_CONTAINER);
+            // set some child node properties
+            nodeService.setProperty(nodeRef, PROP_QNAME_BOOLEAN_VALUE, "true");
+            // add an aspect to the child
+            nodeService.addAspect(nodeRef, ASPECT_QNAME_TEST_TITLED, null);
+        }
+
+        public void onDeleteNode(ChildAssociationRef childAssocRef)
+        {
+            // add the child to the list
+            deletedNodeRefs.add(childAssocRef.getChildRef());
+            // now perform some nasties on the node's parent, i.e. add a new child
+            NodeRef parentRef = childAssocRef.getParentRef();
+            NodeRef childRef = childAssocRef.getChildRef();
+            ChildAssociationRef assocRef = nodeService.createNode(
+                    parentRef,
+                    ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                    QName.createQName("post-delete new child"),
+                    ContentModel.TYPE_CONTAINER);
+        }
+        
+    }
+    
     public void testDelete() throws Exception
     {
-        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
-                ASSOC_TYPE_QNAME_TEST_CHILDREN,
-                QName.createQName("path1"),
-                ContentModel.TYPE_CONTAINER);
-        NodeRef nodeRef = assocRef.getChildRef();
-        int countBefore = countNodesById(nodeRef);
-        assertEquals("Node not created", 1, countBefore);
-        // delete it
-        nodeService.deleteNode(nodeRef);
-        int countAfter = countNodesById(nodeRef);
-        // check
-        assertEquals("Node not deleted", 0, countAfter);
+        final List<NodeRef> deletedNodeRefs = new ArrayList<NodeRef>(5);
+        
+        NodeServicePolicies.OnDeleteNodePolicy policy = new BadOnDeleteNodePolicy(nodeService, deletedNodeRefs);
+        // bind to listen to the deletion of a node
+        policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteNode"),
+                policy,
+                new JavaBehaviour(policy, "onDeleteNode"));   
+        
+        // build the node and commit the node graph
+        Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph(nodeService, rootNodeRef);
+        NodeRef n1Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "root_p_n1")).getChildRef();
+        NodeRef n3Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n1_p_n3")).getChildRef();
+        NodeRef n4Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n2_p_n4")).getChildRef();
+        NodeRef n6Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n3_p_n6")).getChildRef();
+        NodeRef n8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8")).getChildRef();
+        
+        // delete n1
+        nodeService.deleteNode(n1Ref);
+        assertEquals("Node not directly deleted", 0, countNodesById(n1Ref));
+        assertEquals("Node not cascade deleted", 0, countNodesById(n3Ref));
+        assertEquals("Node incorrectly cascade deleted", 1, countNodesById(n4Ref));
+        assertEquals("Node not cascade deleted", 0, countNodesById(n6Ref));
+        assertEquals("Node not cascade deleted", 0, countNodesById(n8Ref));
+        
+        // commit to check
+        setComplete();
+        endTransaction();
     }
     
     private int countChildrenOfNode(NodeRef nodeRef)
@@ -705,6 +769,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // force a flush
         getSession().flush();
         getSession().clear();
+        
+        // make sure that our integrity allows this
+        AlfrescoTransactionSupport.flush();
         
         // now get them back
         Map<QName, Serializable> checkMap = nodeService.getProperties(rootNodeRef);

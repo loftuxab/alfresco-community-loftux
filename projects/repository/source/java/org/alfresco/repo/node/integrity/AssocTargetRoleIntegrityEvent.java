@@ -22,6 +22,7 @@ import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -124,15 +125,22 @@ public class AssocTargetRoleIntegrityEvent extends AbstractIntegrityEvent
         }
         QName assocTypeQName = assocDef.getName();
         // see if there is another association with the same name
-        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(sourceNodeRef, assocTypeQName, assocQName);
-        // duplicates not allowed
-        if (childAssocs.size() > 1)
+        try
         {
-            IntegrityRecord result = new IntegrityRecord(
-                    "Duplicate child associations are not allowed: \n" +
-                    "   Association: " + assocDef + "\n" +
-                    "   Name: " + assocQName);
-            eventResults.add(result);
+            List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(sourceNodeRef, assocTypeQName, assocQName);
+            // duplicates not allowed
+            if (childAssocs.size() > 1)
+            {
+                IntegrityRecord result = new IntegrityRecord(
+                        "Duplicate child associations are not allowed: \n" +
+                        "   Association: " + assocDef + "\n" +
+                        "   Name: " + assocQName);
+                eventResults.add(result);
+            }
+        }
+        catch (InvalidNodeRefException e)
+        {
+            // node has gone
         }
     }
 }
