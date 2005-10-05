@@ -2829,7 +2829,7 @@ public class ServerConfiguration
             // Debug
             
             if ( logger.isDebugEnabled())
-                logger.debug("Failed to load authenticator class " + className, ex);
+                logger.debug("Failed to load authenticator class " + className);
         }
         
         // Return the authenticator class, or null if not available or invalid
