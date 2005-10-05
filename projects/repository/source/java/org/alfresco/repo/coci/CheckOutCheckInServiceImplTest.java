@@ -96,7 +96,8 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
 		this.versionService = (VersionService)this.applicationContext.getBean("versionService");
         this.authenticationService = (AuthenticationService)this.applicationContext.getBean("authenticationService");
-		
+        authenticationService.clearCurrentSecurityContext();
+	
 		// Create the store and get the root node reference
 		this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
 		this.rootNodeRef = this.nodeService.getRootNode(storeRef);
