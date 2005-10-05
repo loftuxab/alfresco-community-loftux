@@ -147,7 +147,7 @@
          <type id="content"/>
       </types>
       <aspects>
-         <aspect id="generalclassifiable" descriptionMsgId="classifiable"/>
+         <aspect id="generalclassifiable"/>
          <aspect id="complianceable"/>
          <aspect id="dublincore"/>
          <aspect id="effectivity"/>
