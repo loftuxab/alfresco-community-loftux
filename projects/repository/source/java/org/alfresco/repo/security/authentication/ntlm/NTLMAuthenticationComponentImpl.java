@@ -454,9 +454,19 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
      */     
     public void authenticate(String userName, char[] password) throws AuthenticationException
     {
-        // TODO Auto-generated method stub
-
-        logger.debug("authenticate() user=" + userName);
+        // Debug
+        
+        if ( logger.isDebugEnabled())
+            logger.debug("Authenticate user=" + userName + " via local credentials");
+        
+        // Create a local authentication token
+        
+        NTLMLocalToken authToken = new NTLMLocalToken(userName, new String(password));
+        
+        // Authenticate using the token
+        
+        authenticate( authToken);
+        setCurrentUser( userName);
     }
 
     /**
@@ -471,7 +481,7 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
         // DEBUG
         
         if ( logger.isDebugEnabled())
-            logger.debug("Authenticate " + auth);
+            logger.debug("Authenticate " + auth + " via token");
         
         // Check if the token is for passthru authentication
         
@@ -710,8 +720,9 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
                 {
                     // Set the guest authority
                     
-                    GrantedAuthority[] authorities = new GrantedAuthority[1];
+                    GrantedAuthority[] authorities = new GrantedAuthority[2];
                     authorities[0] = new GrantedAuthorityImpl(NTLMAuthorityGuest);
+                    authorities[1] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
                     
                     ntlmToken.setAuthorities(authorities);
                 }
@@ -719,13 +730,28 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
                 {
                     // Guest access not allowed
                     
-                    throw new BadCredentialsException("Guest logons disabled");
+                    throw new AuthenticationException("Guest logons disabled");
                 }
+            }
+            else
+            {
+                // Set authorities
+                
+                GrantedAuthority[] authorities = new GrantedAuthority[1];
+                authorities[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
+                
+                ntlmToken.setAuthorities(authorities);
             }
             
             // Indicate that the token is authenticated
             
             ntlmToken.setAuthenticated(true);
+            setCurrentUser( username);
+            
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Authenticated token=" + ntlmToken);
         }
         catch (NoSuchAlgorithmException ex)
         {
@@ -763,7 +789,7 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
                 throw authEx;
             }
             else
-                throw new BadCredentialsException("Logon failure");
+                throw new AuthenticationException("Logon failure");
         }
     }
     
@@ -862,6 +888,12 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
                 // Indicate that the token is authenticated
                 
                 ntlmToken.setAuthenticated(true);
+                setCurrentUser( username);
+                
+                // Debug
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Authenticated token=" + ntlmToken);
             }                
             catch (IOException ex)
             {
