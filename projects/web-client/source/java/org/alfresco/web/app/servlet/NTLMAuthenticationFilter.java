@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.UserTransaction;
 
+import net.sf.acegisecurity.BadCredentialsException;
+
 import org.alfresco.filesys.server.auth.PasswordEncryptor;
 import org.alfresco.filesys.server.auth.ntlm.NTLM;
 import org.alfresco.filesys.server.auth.ntlm.NTLMLogonDetails;
@@ -706,6 +708,13 @@ public class NTLMAuthenticationFilter implements Filter
                     m_authComponent.authenticate(authToken);
                     authenticated = true;
                 }
+                catch (BadCredentialsException ex)
+                {
+                    // Debug
+                    
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Authentication failed, " + ex.getMessage());
+                }
                 catch (AuthenticationException ex)
                 {
                     // Debug
@@ -745,6 +754,8 @@ public class NTLMAuthenticationFilter implements Filter
                 }
                 catch (Exception ex)
                 {
+                    logger.error(ex);
+                    
                     try
                     {
                         tx.rollback();
