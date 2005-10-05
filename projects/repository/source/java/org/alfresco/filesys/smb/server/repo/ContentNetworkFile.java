@@ -256,12 +256,12 @@ public class ContentNetworkFile extends NetworkFile
         }
         else if (modified)              // file was modified
         {
-            // write properties
-            ContentData contentData = content.getContentData();
-            nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT, contentData);
             // close it
             channel.close();
             channel = null;
+            // write properties
+            ContentData contentData = content.getContentData();
+            nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT, contentData);
         }
         else
         {
