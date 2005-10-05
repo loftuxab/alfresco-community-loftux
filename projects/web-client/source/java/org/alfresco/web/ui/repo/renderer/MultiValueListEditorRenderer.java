@@ -181,21 +181,24 @@ public class MultiValueListEditorRenderer extends BaseRenderer
             for (int x = 0; x < currentItems.size(); x++)
             {  
                Object obj = currentItems.get(x);
-               if (obj instanceof NodeRef)
+               if (obj != null)
                {
-                  if (nodeService.exists((NodeRef)obj))
+                  if (obj instanceof NodeRef)
                   {
-                     renderExistingItem(context, component, out, nodeService, x, obj);
+                     if (nodeService.exists((NodeRef)obj))
+                     {
+                        renderExistingItem(context, component, out, nodeService, x, obj);
+                     }
+                     else
+                     {
+                        // remove invalid NodeRefs from the list
+                        currentItems.remove(x);
+                     }
                   }
                   else
                   {
-                     // remove invalid NodeRefs from the list
-                     currentItems.remove(x);
+                     renderExistingItem(context, component, out, nodeService, x, obj);
                   }
-               }
-               else
-               {
-                  renderExistingItem(context, component, out, nodeService, x, obj);
                }
             }
             out.write("</table></td></tr>");
