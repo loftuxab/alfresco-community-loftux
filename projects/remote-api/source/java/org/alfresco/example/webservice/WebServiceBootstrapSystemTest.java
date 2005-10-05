@@ -67,6 +67,8 @@ public class WebServiceBootstrapSystemTest extends TestCase
         
         UserTransaction userTransaction = transactionService.getUserTransaction();
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
+        try
+        {
 
         StoreRef storeRef = null;
         NodeRef rootNodeRef = null;
@@ -142,6 +144,11 @@ public class WebServiceBootstrapSystemTest extends TestCase
         }
         
         //System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+        }
+        finally
+        {
+            authenticationComponent.clearCurrentSecurityContext();
+        }
     }
     
     public static Properties getBootstrapProperties()

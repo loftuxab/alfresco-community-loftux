@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -31,60 +32,88 @@ import org.alfresco.service.cmr.rule.RuleType;
  */
 public abstract class RuleTriggerAbstractBase implements RuleTrigger
 {
-	/**
-	 * A list of the rule types that are interested in this trigger
-	 */
-	private Set<RuleType> ruleTypes = new HashSet<RuleType>();
+    /**
+     * A list of the rule types that are interested in this trigger
+     */
+    private Set<RuleType> ruleTypes = new HashSet<RuleType>();
 
-	/**
-	 * The policy component
-	 */
-	protected PolicyComponent policyComponent;
-	
-	/**
-	 * The node service
-	 */
-	protected NodeService nodeService;
-	
-	/**
-	 * Set the policy component
-	 * 
-	 * @param policyComponent	 the policy component
-	 */
-	public void setPolicyComponent(PolicyComponent policyComponent)
-	{
-		this.policyComponent = policyComponent;
-	}
-	
-	/**
-	 * Set the node service
-	 * 
-	 * @param nodeService  the node service
-	 */
-	public void setNodeService(NodeService nodeService)
-	{
-		this.nodeService = nodeService;
-	}
-	
-	/**
-	 * Registration of an interested rule type
-	 */
-	public void registerRuleType(RuleType ruleType)
-	{
-		this.ruleTypes.add(ruleType);
-	}
-	
-	/**
-	 * Trigger the rules that relate to any interested rule types for the node references passed.
-	 * 
-	 * @param nodeRef				the node reference who rules are to be triggered
-	 * @param actionedUponNodeRef	the node reference that will be actioned upon by the rules
-	 */
-	protected void triggerRules(NodeRef nodeRef, NodeRef actionedUponNodeRef)
-	{
-		for (RuleType ruleType : this.ruleTypes)
-		{
-			ruleType.triggerRuleType(nodeRef, actionedUponNodeRef);
-		}
-	}
+    /**
+     * The policy component
+     */
+    protected PolicyComponent policyComponent;
+
+    /**
+     * The node service
+     */
+    protected NodeService nodeService;
+
+    /**
+     * The authentication Component
+     */
+
+    protected AuthenticationComponent authenticationComponent;
+
+    /**
+     * Set the policy component
+     * 
+     * @param policyComponent
+     *            the policy component
+     */
+    public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+
+    /**
+     * Set the node service
+     * 
+     * @param nodeService
+     *            the node service
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    /**
+     * Set the authenticationComponent
+     */
+
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+    {
+        this.authenticationComponent = authenticationComponent;
+    }
+
+    /**
+     * Registration of an interested rule type
+     */
+    public void registerRuleType(RuleType ruleType)
+    {
+        this.ruleTypes.add(ruleType);
+    }
+
+    /**
+     * Trigger the rules that relate to any interested rule types for the node
+     * references passed.
+     * 
+     * @param nodeRef
+     *            the node reference who rules are to be triggered
+     * @param actionedUponNodeRef
+     *            the node reference that will be actioned upon by the rules
+     */
+    protected void triggerRules(NodeRef nodeRef, NodeRef actionedUponNodeRef)
+    {
+        String userName = authenticationComponent.getCurrentUserName();
+        authenticationComponent.setSystemUserAsCurrentUser();
+        try
+        {
+            for (RuleType ruleType : this.ruleTypes)
+            {
+                ruleType.triggerRuleType(nodeRef, actionedUponNodeRef);
+            }
+        } finally
+        {
+            authenticationComponent.setCurrentUser(userName);
+        }
+    }
 }

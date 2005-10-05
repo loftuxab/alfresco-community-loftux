@@ -111,6 +111,9 @@ public class PersonTest extends BaseSpringTest
         assertEquals(2, personService.getAllPeople().size());
         assertTrue(personService.getAllPeople().contains(personService.getPerson("andy")));
         assertTrue(personService.getAllPeople().contains(personService.getPerson("derek")));
+        
+        setComplete();
+        endTransaction();
     }
 
     public void testMutableProperties()
@@ -121,6 +124,9 @@ public class PersonTest extends BaseSpringTest
         assertTrue(personService.getMutableProperties().contains(ContentModel.PROP_LASTNAME));
         assertTrue(personService.getMutableProperties().contains(ContentModel.PROP_EMAIL));
         assertTrue(personService.getMutableProperties().contains(ContentModel.PROP_ORGID));
+        
+        setComplete();
+        endTransaction();
     }
 
     public void testPersonCRUD()
@@ -165,6 +171,8 @@ public class PersonTest extends BaseSpringTest
 
         }
         
+        setComplete();
+        endTransaction();
     }
 
     private void testProperties(NodeRef nodeRef, String userName, String firstName, String lastName, String email,

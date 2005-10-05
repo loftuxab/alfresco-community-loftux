@@ -82,6 +82,9 @@
       <property name="nodeService">
          <ref bean="nodeService"/>
       </property>
+      <property name="authenticationComponent">
+         <ref bean="authenticationComponent"/>
+      </property>
    </bean>
    
    <bean id="on-create-node-trigger" class="org.alfresco.repo.rule.ruletrigger.CreateNodeRuleTrigger" parent="rule-trigger-base">

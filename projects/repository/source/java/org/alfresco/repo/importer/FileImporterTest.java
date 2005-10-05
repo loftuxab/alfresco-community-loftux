@@ -178,8 +178,9 @@ public class FileImporterTest extends TestCase
 
         int exitCode = 0;
 
+        int grandTotal = 0;
         int count = 0;
-        int target = 100;
+        int target = 1000;
         while (count < target)
         {
             count++;
@@ -216,6 +217,7 @@ public class FileImporterTest extends TestCase
 
                 long start = System.nanoTime();
                 int importCount = test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
+                grandTotal += importCount;
                 long end = System.nanoTime();
                 long first = end-start;
                 System.out.println("Created in: " + ((end - start) / 1000000.0) + "ms");
@@ -226,7 +228,8 @@ public class FileImporterTest extends TestCase
                 long second = end-start;
                 System.out.println("Committed in: " + ((end - start) / 1000000.0) + "ms");
                 double total = ((first+second)/1000000.0);
-                System.out.println("Total: "+ total + "ms");
+                System.out.println("Grand Total: "+ grandTotal);
+                System.out.println("Count: "+ count + "ms");
                 System.out.println("Imported: " + importCount + " files or directories");
                 System.out.println("Average: " + (importCount / (total / 1000.0)) + " files per second");
             }
@@ -236,7 +239,7 @@ public class FileImporterTest extends TestCase
                 e.printStackTrace();
                 exitCode = 1;
             }
-            System.exit(exitCode);
+            //System.exit(exitCode);
         }
     }
 }

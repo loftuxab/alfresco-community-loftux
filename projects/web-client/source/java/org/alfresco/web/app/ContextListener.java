@@ -197,14 +197,16 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          }
          catch (Exception ex) {}
          
-         try
-         {
-            authenticationComponent.clearCurrentSecurityContext();
-         }
-         catch (Exception ex) {}
-         
          logger.error("Failed to initialise ", e);
          throw new AlfrescoRuntimeException("Failed to initialise ", e);
+      }
+      finally
+      {
+          try
+          {
+             authenticationComponent.clearCurrentSecurityContext();
+          }
+          catch (Exception ex) {}
       }
    }
 

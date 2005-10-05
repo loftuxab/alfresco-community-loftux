@@ -101,7 +101,11 @@ public class VersionBootstrap
             try { if (userTransaction != null) {userTransaction.rollback();} } catch (Exception ex) {}
             try {authenticationComponent.clearCurrentSecurityContext(); } catch (Exception ex) {}
             throw new AlfrescoRuntimeException("Bootstrap failed", e);
-        }            
+        }    
+        finally
+        {
+            authenticationComponent.clearCurrentSecurityContext();
+        }
     }
     
 }

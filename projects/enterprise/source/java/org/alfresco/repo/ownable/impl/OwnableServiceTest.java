@@ -22,8 +22,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.ownable.OwnableService;
-import org.alfresco.repo.security.permissions.PermissionReference;
-import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -32,7 +31,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -44,6 +42,8 @@ public class OwnableServiceTest extends TestCase
     private NodeService nodeService;
 
     private AuthenticationService authenticationService;
+    
+    private AuthenticationComponent authenticationComponent;
 
     private OwnableService ownableService;
 
@@ -72,28 +72,35 @@ public class OwnableServiceTest extends TestCase
     {
         nodeService = (NodeService) ctx.getBean("nodeService");
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
+        authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
         ownableService = (OwnableService) ctx.getBean("ownableService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
         
         namespacePrefixResolver = (NamespacePrefixResolver) ctx
         .getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName());
-     
+    
+        authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
+        
         TransactionService transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName());
         userTransaction = transactionService.getUserTransaction();
         userTransaction.begin();
         
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
+        permissionService.setPermission(rootNodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.ADD_CHILDREN, true);
         
         authenticationService.createAuthentication("andy", "andy".toCharArray());
         
         dynamicAuthority = new OwnerDynamicAuthority();
         dynamicAuthority.setOwnableService(ownableService);
+       
+        authenticationComponent.clearCurrentSecurityContext();
     }
     
     @Override
     protected void tearDown() throws Exception
     {
+        authenticationComponent.clearCurrentSecurityContext();
         userTransaction.rollback();
         super.tearDown();
     }
@@ -131,9 +138,7 @@ public class OwnableServiceTest extends TestCase
     }
     
     public void testContainer()
-    {
-        PermissionReference READ = new SimplePermissionReference(QName.createQName("sys", "base", namespacePrefixResolver), "Read");
-        
+    {  
         authenticationService.authenticate("andy", "andy".toCharArray());
         NodeRef testNode = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, ContentModel.TYPE_CONTAINER, null).getChildRef();
         assertNull(ownableService.getOwner(testNode));
@@ -142,7 +147,7 @@ public class OwnableServiceTest extends TestCase
         assertFalse(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
         assertFalse(dynamicAuthority.hasAuthority(testNode, "andy"));
         
-        assertFalse(permissionService.hasPermission(testNode, READ.toString()) == AccessStatus.ALLOWED);
+        assertFalse(permissionService.hasPermission(testNode, PermissionService.READ) == AccessStatus.ALLOWED);
         assertFalse(permissionService.hasPermission(testNode, permissionService.getAllPermission()) == AccessStatus.ALLOWED);
         
         permissionService.setPermission(rootNodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
@@ -155,7 +160,7 @@ public class OwnableServiceTest extends TestCase
         assertTrue(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
         assertTrue(dynamicAuthority.hasAuthority(testNode, "andy"));
         
-        assertTrue(permissionService.hasPermission(testNode, READ.toString()) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(testNode, PermissionService.READ) == AccessStatus.ALLOWED);
         assertTrue(permissionService.hasPermission(testNode, permissionService.getAllPermission())== AccessStatus.ALLOWED);
         
         
