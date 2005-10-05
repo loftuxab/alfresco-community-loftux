@@ -31,6 +31,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * Class containing behaviour for the actions aspect
@@ -140,7 +141,10 @@ public class ActionsAspect
 	{
 		copyDetails.addAspect(ActionModel.ASPECT_ACTIONS);
 		
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(sourceNodeRef, ActionModel.ASSOC_ACTION_FOLDER);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
+                sourceNodeRef,
+                RegexQNamePattern.MATCH_ALL,
+                ActionModel.ASSOC_ACTION_FOLDER);
 		for (ChildAssociationRef assoc : assocs)
 		{
 			copyDetails.addChildAssociation(classRef, assoc, true);

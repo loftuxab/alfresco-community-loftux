@@ -58,6 +58,20 @@ import org.alfresco.service.namespace.QName;
         this.sourceRoleName = QName.createQName(assoc.getSourceRoleName(), resolver);
         this.targetRoleName = QName.createQName(assoc.getTargetRoleName(), resolver);
     }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(56);
+        sb.append("Association")
+          .append("[ class=").append(classDef)
+          .append(", name=").append(name)
+          .append(", target class=").append(targetClassName)
+          .append(", source role=").append(sourceRoleName)
+          .append(", target role=").append(targetRoleName)
+          .append("]");
+        return sb.toString();
+    }
 
     
     /*package*/ M2ClassAssociation getM2Association()

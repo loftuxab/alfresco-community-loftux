@@ -334,21 +334,7 @@ import org.alfresco.service.namespace.QName;
         AssociationDefinition def = null;
         if (nodeChildAssocs.containsKey(defName) == false)
         {
-            def = getDictionaryService().getAssociation(typeDef.getName(), defName);
-            if (def == null)
-            {
-                Set<AspectDefinition> allAspects = new HashSet<AspectDefinition>();
-                allAspects.addAll(typeDef.getDefaultAspects());
-                allAspects.addAll(nodeAspects.values());
-                for (AspectDefinition aspectDef : allAspects)
-                {
-                    def = getDictionaryService().getAssociation(aspectDef.getName(), defName);
-                    if (def != null)
-                    {
-                        break;
-                    }
-                }
-            }
+            def = getDictionaryService().getAssociation(defName);
         }
         return def;
     }

@@ -22,6 +22,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * @author Roy Wetherall
@@ -61,7 +62,10 @@ public class ConfigurableServiceImpl implements ConfigurableService
 		NodeRef result = null;
 		if (isConfigurable(nodeRef) == true)
 		{
-			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONFIGURATIONS);
+			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
+                    nodeRef,
+                    RegexQNamePattern.MATCH_ALL,
+                    ContentModel.ASSOC_CONFIGURATIONS);
 			if (assocs.size() != 0)
 			{
 				ChildAssociationRef assoc = assocs.get(0);

@@ -24,6 +24,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -78,7 +79,10 @@ public class ConfigurableServiceImplTest extends BaseSpringTest
 	{
 		this.configurableService.makeConfigurable(this.nodeRef);
 		assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_CONFIGURABLE));
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(this.nodeRef, ContentModel.ASSOC_CONFIGURATIONS);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
+                this.nodeRef,
+                RegexQNamePattern.MATCH_ALL,
+                ContentModel.ASSOC_CONFIGURATIONS);
 		assertNotNull(assocs);
 		assertEquals(1, assocs.size());
 	}

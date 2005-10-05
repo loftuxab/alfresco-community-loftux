@@ -94,7 +94,7 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
         }
         catch(Exception e)
         {
-            userTransaction.rollback();
+            try { userTransaction.rollback(); } catch (IllegalStateException ee) {}
             throw e;
         }
     }
@@ -253,7 +253,7 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
         }
         catch (Exception e)
         {
-            txn.rollback();
+            try { txn.rollback(); } catch (Throwable ee) {}
             throw e;
         }
     }

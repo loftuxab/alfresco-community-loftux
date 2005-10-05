@@ -722,7 +722,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
                 
                 // Get the meta data
                 List<ChildAssociationRef> metaData = 
-                    this.dbNodeService.getChildAssocs(versionRef, CHILD_QNAME_VERSION_META_DATA);
+                    this.dbNodeService.getChildAssocs(versionRef, RegexQNamePattern.MATCH_ALL, CHILD_QNAME_VERSION_META_DATA);
                 for (ChildAssociationRef ref : metaData)
                 {
                     NodeRef metaDataValue = (NodeRef)ref.getChildRef();
@@ -1017,7 +1017,7 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         NodeRef versionHistoryNodeRef = getVersionHistoryNodeRef(nodeRef);
         if (versionHistoryNodeRef != null)
         {
-            List<ChildAssociationRef> versionsAssoc = this.dbNodeService.getChildAssocs(versionHistoryNodeRef, VersionModel.CHILD_QNAME_VERSIONS);
+            List<ChildAssociationRef> versionsAssoc = this.dbNodeService.getChildAssocs(versionHistoryNodeRef, RegexQNamePattern.MATCH_ALL, VersionModel.CHILD_QNAME_VERSIONS);
             for (ChildAssociationRef versionAssoc : versionsAssoc)
             {
                 NodeRef versionNodeRef = versionAssoc.getChildRef();

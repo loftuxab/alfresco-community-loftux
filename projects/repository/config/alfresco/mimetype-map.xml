@@ -9,6 +9,9 @@
             <extension display="SQL">sql</extension>
             <extension display="Java Properties">properties</extension>
             <extension display="FreeMarker Template">ftl</extension>
+            <extension display="Initialization Values">ini</extension>
+            <extension display="Windows Batch Script">bat</extension>
+            <extension display="Unix Shell Script">sh</extension>
          </mimetype>
          <mimetype mimetype="text/html" display="HTML">
             <!-- first extension will be default unless otherwise specified -->

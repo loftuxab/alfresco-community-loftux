@@ -50,14 +50,10 @@ import org.alfresco.repo.policy.AssociationPolicyDelegate;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.search.Indexer;
-import org.alfresco.service.cmr.dictionary.AspectDefinition;
-import org.alfresco.service.cmr.dictionary.AssociationDefinition;
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -290,7 +286,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     {
         NodeRef parentNodeRef = childAssocRef.getParentRef();
         // get qnames to invoke against
-        Set<QName> qnames = getTypeAndAspectQNames(parentNodeRef);
+        Set<QName> qnames = new HashSet<QName>(childAspectQnames);
+        qnames.add(childNodeTypeQName);
         // execute policy for node type and aspects
         NodeServicePolicies.OnDeleteNodePolicy policy = onDeleteNodeDelegate.get(qnames);
         policy.onDeleteNode(childAssocRef);
@@ -425,15 +422,23 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @param nodeRef
      *            the node we are interested in
      * @return Returns a set of qualified names containing the node type and all
-     *         the node aspects
+     *         the node aspects, or null if the node no longer exists
      */
     protected Set<QName> getTypeAndAspectQNames(NodeRef nodeRef)
     {
-        Set<QName> aspectQNames = getAspects(nodeRef);
-        QName typeQName = getType(nodeRef);
-        // combine
-        Set<QName> qnames = new HashSet<QName>(aspectQNames);
-        qnames.add(typeQName);
+        Set<QName> qnames = null;
+        try
+        {
+            Set<QName> aspectQNames = getAspects(nodeRef);
+            QName typeQName = getType(nodeRef);
+            // combine
+            qnames = new HashSet<QName>(aspectQNames);
+            qnames.add(typeQName);
+        }
+        catch (InvalidNodeRefException e)
+        {
+            qnames = Collections.emptySet();
+        }
         // done
         return qnames;
     }
@@ -498,22 +503,22 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * Defers to the pattern matching overload
      * 
      * @see RegexQNamePattern#MATCH_ALL
-     * @see NodeService#getParentAssocs(NodeRef, QNamePattern)
+     * @see NodeService#getParentAssocs(NodeRef, QNamePattern, QNamePattern)
      */
     public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+        return getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL, RegexQNamePattern.MATCH_ALL);
     }
 
     /**
      * Defers to the pattern matching overload
      * 
      * @see RegexQNamePattern#MATCH_ALL
-     * @see NodeService#getChildAssocs(NodeRef, QNamePattern)
+     * @see NodeService#getChildAssocs(NodeRef, QNamePattern, QNamePattern)
      */
     public final List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+        return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL, RegexQNamePattern.MATCH_ALL);
     }
 
     /**
@@ -633,123 +638,6 @@ public abstract class AbstractNodeServiceImpl implements NodeService
                     "   property: " + (propertyDef == null ? "unknown" : propertyDef) + "\n" +
                     "   property value: " + propertyValue,
                     e);
-        }
-    }
-    
-    /**
-     * Checks that the type of the association is recognised and that the association may
-     * be added to the given node.  If the association name is supplied, then the check
-     * assumes that it is looking for a child association.
-     * 
-     * @param sourceNodeRef the source of the association
-     * @param targetNodeRef the target of the association
-     * @param assocTypeQName the type of the association
-     * @param assocQName the name of the association - only required for child assocs
-     * @throws DictionaryException thrown if any dictionary model violation occurs
-     */
-    protected final void checkAssoc(
-            NodeRef sourceNodeRef,
-            NodeRef targetNodeRef,
-            QName assocTypeQName,
-            QName assocQName) throws DictionaryException
-    {
-        QName sourceTypeQName = getType(sourceNodeRef);
-        QName targetTypeQName = getType(targetNodeRef);
-        
-        AssociationDefinition assocDef = dictionaryService.getAssociation(assocTypeQName);
-        if (assocDef == null)
-        {
-            throwDictionaryException("Association type not found: " + assocTypeQName,
-                    sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
-        }
-        
-        // check the association name
-        QName assocRoleQName = assocDef.getTargetRoleName();
-        if (assocRoleQName != null && assocQName != null)
-        {
-            if (!assocDef.isChild())
-            {
-                throw new IllegalArgumentException("Assoc name supplied for regular node assoc");
-            }
-            // the assoc defines a role name - check it
-            RegexQNamePattern rolePattern = new RegexQNamePattern(assocRoleQName.toString());
-            if (!rolePattern.isMatch(assocQName))
-            {
-                throwDictionaryException("Association role must match " + rolePattern,
-                        sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
-            }
-        }
-        
-        // check the association source type
-        ClassDefinition sourceDef = assocDef.getSourceClass();
-        if (sourceDef instanceof TypeDefinition)
-        {
-            // the node type must be a match
-            if (!dictionaryService.isSubClass(sourceTypeQName, sourceDef.getName()))
-            {
-                throwDictionaryException("Association source must be of type " + sourceDef.getName(),
-                        sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
-            }
-        }
-        else if (sourceDef instanceof AspectDefinition)
-        {
-            // the source must have a relevant aspect
-            Set<QName> sourceAspects = getAspects(sourceNodeRef);
-            boolean found = false;
-            for (QName sourceAspectTypeQName : sourceAspects)
-            {
-                if (dictionaryService.isSubClass(sourceAspectTypeQName, sourceDef.getName()))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                throwDictionaryException("Association source must have aspect of type " + sourceDef.getName(),
-                        sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
-            }
-        }
-        else
-        {
-            throwDictionaryException("Unknown ClassDefinition subclass: " + sourceDef,
-                    sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
-        }
-        
-        // check the association target type
-        ClassDefinition targetDef = assocDef.getTargetClass();
-        if (targetDef instanceof TypeDefinition)
-        {
-            // the node type must be a match
-            if (!dictionaryService.isSubClass(targetTypeQName, targetDef.getName()))
-            {
-                throwDictionaryException("Association target must be of type " + targetDef.getName(),
-                        sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
-            }
-        }
-        else if (targetDef instanceof AspectDefinition)
-        {
-            // the target must have a relevant aspect
-            Set<QName> targetAspects = getAspects(targetNodeRef);
-            boolean found = false;
-            for (QName targetAspectTypeQName : targetAspects)
-            {
-                if (dictionaryService.isSubClass(targetAspectTypeQName, targetDef.getName()))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                throwDictionaryException("Association target must have aspect of type " + sourceDef.getName(),
-                        sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
-            }
-        }
-        else
-        {
-            throwDictionaryException("Unknown ClassDefinition subclass: " + targetDef,
-                    sourceTypeQName, targetTypeQName, assocTypeQName, assocQName);
         }
     }
 }

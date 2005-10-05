@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.node.integrity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,13 +42,9 @@ public class IntegrityRecord
      * 
      * @param trace a stack trace
      */
-    public void addTrace(StackTraceElement[] trace)
+    public void setTraces(List<StackTraceElement[]> traces)
     {
-        if (traces == null)
-        {
-            traces = new ArrayList<StackTraceElement[]>(2);
-        }
-        traces.add(trace);
+        this.traces = traces;
     }
     
     public String getMessage()

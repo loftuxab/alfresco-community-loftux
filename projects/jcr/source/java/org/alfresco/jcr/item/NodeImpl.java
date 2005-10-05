@@ -60,6 +60,7 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.Path.Element;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 
 /**
@@ -268,7 +269,7 @@ public class NodeImpl extends ItemImpl implements Node
     {
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         JCRPatternMatch match = new JCRPatternMatch(namePattern, session.getNamespaceResolver());
-        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, match);        
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL, match);        
         NodeIterator iterator = new ChildAssocNodeIteratorImpl(session, childAssocs);
         return iterator;
     }

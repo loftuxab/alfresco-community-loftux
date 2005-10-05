@@ -37,6 +37,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 public class PersonServiceImpl implements PersonService
 {
@@ -195,8 +196,10 @@ public class PersonServiceImpl implements PersonService
         if (results.size() == 0)
         {
 
-            List<ChildAssociationRef> result = nodeService.getChildAssocs(rootNodeRef, QName.createQName("sys",
-                    "system", namespacePrefixResolver));
+            List<ChildAssociationRef> result = nodeService.getChildAssocs(
+                    rootNodeRef,
+                    RegexQNamePattern.MATCH_ALL,
+                    QName.createQName("sys", "system", namespacePrefixResolver));
             NodeRef sysNode = null;
             if (result.size() == 0)
             {
@@ -208,7 +211,10 @@ public class PersonServiceImpl implements PersonService
             {
                 sysNode = result.get(0).getChildRef();
             }
-            result = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people", namespacePrefixResolver));
+            result = nodeService.getChildAssocs(
+                    sysNode,
+                    RegexQNamePattern.MATCH_ALL,
+                    QName.createQName("sys", "people", namespacePrefixResolver));
 
             if (result.size() == 0)
             {

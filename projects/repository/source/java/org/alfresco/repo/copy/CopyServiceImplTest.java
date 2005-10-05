@@ -53,6 +53,7 @@ import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
 
@@ -554,7 +555,10 @@ public class CopyServiceImplTest extends BaseSpringTest
 		assertNotNull(nodeFourCopy);
 		
 		// Check the non primary child assoc
-		List<ChildAssociationRef> children = this.nodeService.getChildAssocs(nodeFourCopy, TEST_CHILD_ASSOC_QNAME);
+		List<ChildAssociationRef> children = this.nodeService.getChildAssocs(
+                nodeFourCopy,
+                RegexQNamePattern.MATCH_ALL,
+                TEST_CHILD_ASSOC_QNAME);
 		assertNotNull(children);
 		assertEquals(1, children.size());
 		ChildAssociationRef child = children.get(0);

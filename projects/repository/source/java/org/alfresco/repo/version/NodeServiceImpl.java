@@ -32,7 +32,6 @@ import org.alfresco.service.cmr.dictionary.InvalidAspectException;
 import org.alfresco.service.cmr.repository.AssociationExistsException;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.EntityRef;
 import org.alfresco.service.cmr.repository.InvalidChildAssociationRefException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -224,7 +223,7 @@ public class NodeServiceImpl implements NodeService, VersionModel
     /**
      * @throws UnsupportedOperationException always
      */
-    public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
+    public void removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException
     {
         // This operation is not supported for a verion store
         throw new UnsupportedOperationException(MSG_UNSUPPORTED);
@@ -352,15 +351,15 @@ public class NodeServiceImpl implements NodeService, VersionModel
      */
     public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef)
     {
-        return getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL);
+        return getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL, RegexQNamePattern.MATCH_ALL);
     }    
     
     /**
      * The node will apprear to be attached to the root of the version store
      * 
-     * @see NodeService#getParentAssocs(NodeRef, QNamePattern)
+     * @see NodeService#getParentAssocs(NodeRef, QNamePattern, QNamePattern)
      */
-    public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
+    public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef, QNamePattern typeQNamePattern, QNamePattern qnamePattern)
     {
         List<ChildAssociationRef> result = new ArrayList<ChildAssociationRef>();
         if (qnamePattern.isMatch(rootAssocName) == true)
@@ -376,22 +375,22 @@ public class NodeServiceImpl implements NodeService, VersionModel
 
     /**
      * @see RegexQNamePattern#MATCH_ALL
-     * @see #getChildAssocs(NodeRef, QNamePattern)
+     * @see #getChildAssocs(NodeRef, QNamePattern, QNamePattern)
      */
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        return getChildAssocs(convertNodeRef(nodeRef), RegexQNamePattern.MATCH_ALL);
+        return getChildAssocs(convertNodeRef(nodeRef), RegexQNamePattern.MATCH_ALL, RegexQNamePattern.MATCH_ALL);
     }
 
     /**
      * Performs conversion from version store properties to <i>real</i> associations
      */
-    public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern) throws InvalidNodeRefException
+    public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, QNamePattern typeQNamePattern, QNamePattern qnamePattern) throws InvalidNodeRefException
     {
         // Get the child assocs from the version store
         List<ChildAssociationRef> childAssocRefs = this.dbNodeService.getChildAssocs(
                 convertNodeRef(nodeRef),
-                CHILD_QNAME_VERSIONED_CHILD_ASSOCS);
+                RegexQNamePattern.MATCH_ALL, CHILD_QNAME_VERSIONED_CHILD_ASSOCS);
         List<ChildAssociationRef> result = new ArrayList<ChildAssociationRef>(childAssocRefs.size());
         for (ChildAssociationRef childAssocRef : childAssocRefs)
         {
@@ -466,7 +465,7 @@ public class NodeServiceImpl implements NodeService, VersionModel
         // Get the child assocs from the version store
         List<ChildAssociationRef> childAssocRefs = this.dbNodeService.getChildAssocs(
                 convertNodeRef(sourceRef),
-                CHILD_QNAME_VERSIONED_ASSOCS);
+                RegexQNamePattern.MATCH_ALL, CHILD_QNAME_VERSIONED_ASSOCS);
         List<AssociationRef> result = new ArrayList<AssociationRef>(childAssocRefs.size());
         for (ChildAssociationRef childAssocRef : childAssocRefs)
         {

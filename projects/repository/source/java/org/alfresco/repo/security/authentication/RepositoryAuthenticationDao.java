@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.springframework.dao.DataAccessException;
 
 public class RepositoryAuthenticationDao implements MutableAuthenticationDao
@@ -164,8 +165,10 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
     private NodeRef getOrCreateTypeLocation()
     {
         NodeRef rootNode = nodeService.getRootNode(getUserStoreRef());
-        List<ChildAssociationRef> results = nodeService.getChildAssocs(rootNode, QName.createQName("sys", "system",
-                namespacePrefixResolver));
+        List<ChildAssociationRef> results = nodeService.getChildAssocs(
+                rootNode,
+                RegexQNamePattern.MATCH_ALL,
+                QName.createQName("sys", "system", namespacePrefixResolver));
         NodeRef sysNode = null;
         if (results.size() == 0)
         {
@@ -177,7 +180,10 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         {
             sysNode = results.get(0).getChildRef();
         }
-        results = nodeService.getChildAssocs(sysNode, QName.createQName("sys", "people", namespacePrefixResolver));
+        results = nodeService.getChildAssocs(
+                sysNode,
+                RegexQNamePattern.MATCH_ALL,
+                QName.createQName("sys", "people", namespacePrefixResolver));
         NodeRef typesNode = null;
         if (results.size() == 0)
         {

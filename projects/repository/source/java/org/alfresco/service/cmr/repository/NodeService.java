@@ -17,7 +17,6 @@
 package org.alfresco.service.cmr.repository;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,7 +146,7 @@ public interface NodeService
      * @param index an arbibrary index that will affect the return order
      * 
      * @see #getChildAssocs(NodeRef)
-     * @see #getChildAssocs(NodeRef, QNamePattern)
+     * @see #getChildAssocs(NodeRef, QNamePattern, QNamePattern)
      * @see ChildAssociationRef#getNthSibling()
      */
     public void setChildAssociationIndex(
@@ -169,7 +168,7 @@ public interface NodeService
      * the node with have all the aspect-related properties present
      * 
      * @param nodeRef
-     * @param aspectRef the aspect to apply to the node
+     * @param aspectTypeQName the aspect to apply to the node
      * @param aspectProperties a minimum of the mandatory properties required for
      *      the aspect
      * @throws InvalidNodeRefException
@@ -180,7 +179,7 @@ public interface NodeService
      */
     public void addAspect(
             NodeRef nodeRef,
-            QName aspectRef,
+            QName aspectTypeQName,
             Map<QName, Serializable> aspectProperties)
             throws InvalidNodeRefException, InvalidAspectException;
     
@@ -188,12 +187,12 @@ public interface NodeService
      * Remove an aspect and all related properties from a node
      * 
      * @param nodeRef
-     * @param aspectRef the type of aspect to remove
+     * @param aspectTypeQName the type of aspect to remove
      * @throws InvalidNodeRefException if the node could not be found
      * @throws InvalidAspectException if the the aspect is unknown or if the
      *      aspect is mandatory for the <b>class</b> of the <b>node</b>
      */
-    public void removeAspect(NodeRef nodeRef, QName aspectRef)
+    public void removeAspect(NodeRef nodeRef, QName aspectTypeQName)
             throws InvalidNodeRefException, InvalidAspectException;
     
     /**
@@ -220,6 +219,10 @@ public interface NodeService
     
     /**
      * Deletes the given node.
+     * <p>
+     * All associations (both children and regular node associations)
+     * will be deleted, and where the given node is the primary parent,
+     * the children will also be cascade deleted.
      * 
      * @param nodeRef reference to a node within a store
      * @throws InvalidNodeRefException if the reference given is invalid
@@ -253,7 +256,7 @@ public interface NodeService
      * @return Returns a collection of deleted entities - both associations and node references.
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
      */
-    public Collection<EntityRef> removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException;
+    public void removeChild(NodeRef parentRef, NodeRef childRef) throws InvalidNodeRefException;
 
     /**
      * @param nodeRef
@@ -303,7 +306,7 @@ public interface NodeService
      *      node is the child
      * @throws InvalidNodeRefException if the node could not be found
      * 
-     * @see #getParentAssocs(NodeRef, QNamePattern)
+     * @see #getParentAssocs(NodeRef, QNamePattern, QNamePattern)
      */
     public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef) throws InvalidNodeRefException;
     
@@ -314,6 +317,7 @@ public interface NodeService
      * The resultant list is ordered by (a) explicit index and (b) association creation time.
      * 
      * @param nodeRef the child node
+     * @param typeQNamePattern the pattern that the type qualified name of the association must match
      * @param qnamePattern the pattern that the qnames of the assocs must match
      * @return Returns a list of all parent-child associations that exist where the given
      *      node is the child
@@ -324,7 +328,7 @@ public interface NodeService
      * @see QName
      * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
      */
-    public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
+    public List<ChildAssociationRef> getParentAssocs(NodeRef nodeRef, QNamePattern typeQNamePattern, QNamePattern qnamePattern)
             throws InvalidNodeRefException;
     
     /**
@@ -337,7 +341,7 @@ public interface NodeService
      *      node is not a <b>container</b> then the result will be empty.
      * @throws InvalidNodeRefException if the node could not be found
      * 
-     * @see #getChildAssocs(NodeRef, QNamePattern)
+     * @see #getChildAssocs(NodeRef, QNamePattern, QNamePattern)
      * @see #setChildAssociationIndex(ChildAssociationRef, int)
      * @see ChildAssociationRef#getNthSibling()
      */
@@ -348,6 +352,7 @@ public interface NodeService
      * name is a match.
      * 
      * @param nodeRef the parent node - usually a <b>container</b>
+     * @param typeQNamePattern the pattern that the type qualified name of the association must match
      * @param qnamePattern the pattern that the qnames of the assocs must match
      * @return Returns a list of <code>ChildAssocRef</code> instances.  If the
      *      node is not a <b>container</b> then the result will be empty.
@@ -356,7 +361,10 @@ public interface NodeService
      * @see QName
      * @see org.alfresco.service.namespace.RegexQNamePattern#MATCH_ALL
      */
-    public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, QNamePattern qnamePattern)
+    public List<ChildAssociationRef> getChildAssocs(
+            NodeRef nodeRef,
+            QNamePattern typeQNamePattern,
+            QNamePattern qnamePattern)
             throws InvalidNodeRefException;
     
     /**

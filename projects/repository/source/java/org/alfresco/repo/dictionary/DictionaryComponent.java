@@ -278,23 +278,6 @@ public class DictionaryComponent implements DictionaryService
         return dictionaryDAO.getProperty(propertyName);
     }
 
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.dictionary.DictionaryService#getAssociation(org.alfresco.repo.ref.QName, org.alfresco.repo.ref.QName)
-     */
-    public AssociationDefinition getAssociation(QName className, QName associationName)
-    {
-        AssociationDefinition assocDef = null;
-        ClassDefinition classDef = dictionaryDAO.getClass(className);
-        if (classDef != null)
-        {
-            Map<QName,AssociationDefinition> assocDefs = classDef.getAssociations();
-            assocDef = assocDefs.get(associationName);
-        }
-        return assocDef;
-    }
-
-    
     /* (non-Javadoc)
      * @see org.alfresco.repo.dictionary.DictionaryService#getAssociation(org.alfresco.repo.ref.QName)
      */

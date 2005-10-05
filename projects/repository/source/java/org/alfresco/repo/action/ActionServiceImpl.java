@@ -45,6 +45,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
@@ -187,7 +188,10 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	private NodeRef getSavedActionFolderRef(NodeRef nodeRef)
 	{
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionModel.ASSOC_ACTION_FOLDER);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
+                nodeRef,
+                RegexQNamePattern.MATCH_ALL,
+                ActionModel.ASSOC_ACTION_FOLDER);
 		if (assocs.size() != 1)
 		{
 			throw new ActionServiceException("Unable to retrieve the saved action folder reference.");
@@ -551,7 +555,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		
 		// Update the compensating action (model should enforce the singularity of this association)
 		Action compensatingAction = action.getCompensatingAction();
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_COMPENSATING_ACTION);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_COMPENSATING_ACTION);
 		if (assocs.size() == 0)
 		{
 			if (compensatingAction != null)
@@ -600,7 +604,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			idToAction.put(action.getId(), action);
 		}
 		
-		List<ChildAssociationRef> actionRefs = this.nodeService.getChildAssocs(compositeActionNodeRef, ActionModel.ASSOC_ACTIONS);
+		List<ChildAssociationRef> actionRefs = this.nodeService.getChildAssocs(compositeActionNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_ACTIONS);
 		for (ChildAssociationRef actionRef : actionRefs)
 		{
 			NodeRef actionNodeRef = actionRef.getChildRef();
@@ -654,7 +658,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			idToCondition.put(actionCondition.getId(), actionCondition);
 		}
 		
-		List<ChildAssociationRef> conditionRefs = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_CONDITIONS);
+		List<ChildAssociationRef> conditionRefs = this.nodeService.getChildAssocs(actionNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_CONDITIONS);
 		for (ChildAssociationRef conditionRef : conditionRefs)
 		{
 			NodeRef conditionNodeRef = conditionRef.getChildRef();
@@ -716,7 +720,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		Map<String, Serializable> parameterMap = new HashMap<String, Serializable>();
 		parameterMap.putAll(item.getParameterValues());
 		
-		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedNodeRef, ActionModel.ASSOC_PARAMETERS);
+		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_PARAMETERS);
 		for (ChildAssociationRef ref : parameters)
 		{
 			NodeRef paramNodeRef = ref.getChildRef();
@@ -764,7 +768,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		{
 			List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(
                                                     getSavedActionFolderRef(nodeRef), 
-                                                    ASSOC_NAME_ACTIONS);
+                                                    RegexQNamePattern.MATCH_ALL, ASSOC_NAME_ACTIONS);
 			for (ChildAssociationRef action : actions)
 			{
 				NodeRef actionNodeRef = action.getChildRef();
@@ -819,7 +823,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		populateParameters(actionNodeRef, action);
 		
 		// Set the conditions
-		List<ChildAssociationRef> conditions = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_CONDITIONS);
+		List<ChildAssociationRef> conditions = this.nodeService.getChildAssocs(actionNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_CONDITIONS);
 		for (ChildAssociationRef condition : conditions)
 		{
 			NodeRef conditionNodeRef = condition.getChildRef();
@@ -854,7 +858,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		((ActionImpl)action).setModifiedDate((Date)props.get(ContentModel.PROP_MODIFIED));
 		
 		// Get the compensating action
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, ActionModel.ASSOC_COMPENSATING_ACTION);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_COMPENSATING_ACTION);
 		if (assocs.size() != 0)
 		{
 			Action compensatingAction = createAction(action.getOwningNodeRef(), assocs.get(0).getChildRef());
@@ -870,7 +874,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	private void populateParameters(NodeRef parameterizedItemNodeRef, ParameterizedItem parameterizedItem)
 	{
-		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedItemNodeRef, ActionModel.ASSOC_PARAMETERS);
+		List<ChildAssociationRef> parameters = this.nodeService.getChildAssocs(parameterizedItemNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_PARAMETERS);
 		for (ChildAssociationRef parameter : parameters)
 		{
 			NodeRef parameterNodeRef = parameter.getChildRef();
@@ -914,7 +918,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		populateAction(compositeNodeRef, compositeAction);
 		
-		List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(compositeNodeRef, ActionModel.ASSOC_ACTIONS);
+		List<ChildAssociationRef> actions = this.nodeService.getChildAssocs(compositeNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_ACTIONS);
 		for (ChildAssociationRef action : actions)
 		{
 			NodeRef actionNodeRef = action.getChildRef();
@@ -966,7 +970,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		if (this.nodeService.exists(nodeRef) == true &&
 			this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTIONS) == true)
 		{
-			List<ChildAssociationRef> actions = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(getSavedActionFolderRef(nodeRef), ASSOC_NAME_ACTIONS));
+			List<ChildAssociationRef> actions = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(getSavedActionFolderRef(nodeRef), RegexQNamePattern.MATCH_ALL, ASSOC_NAME_ACTIONS));
 			for (ChildAssociationRef action : actions)
 			{
 				this.nodeService.removeChild(getSavedActionFolderRef(nodeRef), action.getChildRef());
@@ -983,7 +987,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		
 		if (this.nodeService.hasAspect(nodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY) == true)
 		{
-			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ActionModel.ASSOC_ACTION_EXECUTION_DETAILS);
+			List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_ACTION_EXECUTION_DETAILS);
 			for (ChildAssociationRef assoc : assocs)
 			{
 				NodeRef actionExecutionDetailsNodeRef = assoc.getChildRef();

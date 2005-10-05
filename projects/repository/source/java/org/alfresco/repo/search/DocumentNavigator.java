@@ -35,6 +35,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.jaxen.DefaultNavigator;
 import org.jaxen.JaxenException;
 import org.jaxen.UnsupportedAxisException;
@@ -393,7 +394,7 @@ public class DocumentNavigator extends DefaultNavigator
     
     public List<ChildAssociationRef> getNode(NodeRef nodeRef, QNamePattern qNamePattern)
     {
-        return nodeService.getParentAssocs(nodeRef, qNamePattern);
+        return nodeService.getParentAssocs(nodeRef, RegexQNamePattern.MATCH_ALL, qNamePattern);
     }
 
     public Boolean like(NodeRef childRef, QName qname, String sqlLikePattern, boolean includeFTS)

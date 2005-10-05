@@ -82,6 +82,7 @@ public class PolicyComponentImpl implements PolicyComponent
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.PolicyComponent#registerClassPolicy()
      */
+    @SuppressWarnings("unchecked")
     public <P extends ClassPolicy> ClassPolicyDelegate<P> registerClassPolicy(Class<P> policy)
     {
         ParameterCheck.mandatory("Policy interface class", policy);
@@ -99,6 +100,7 @@ public class PolicyComponentImpl implements PolicyComponent
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.PolicyComponent#registerPropertyPolicy(java.lang.Class)
      */
+    @SuppressWarnings("unchecked")
     public <P extends PropertyPolicy> PropertyPolicyDelegate<P> registerPropertyPolicy(Class<P> policy)
     {
         ParameterCheck.mandatory("Policy interface class", policy);
@@ -116,6 +118,7 @@ public class PolicyComponentImpl implements PolicyComponent
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.PolicyComponent#registerAssociationPolicy(java.lang.Class)
      */
+    @SuppressWarnings("unchecked")
     public <P extends AssociationPolicy> AssociationPolicyDelegate<P> registerAssociationPolicy(Class<P> policy)
     {
         ParameterCheck.mandatory("Policy interface class", policy);
@@ -301,7 +304,7 @@ public class PolicyComponentImpl implements PolicyComponent
         ParameterCheck.mandatory("Behaviour", behaviour);
 
         // Validate Binding
-        AssociationDefinition assocDefinition = dictionary.getAssociation(className, assocName);
+        AssociationDefinition assocDefinition = dictionary.getAssociation(assocName);
         if (assocDefinition == null)
         {
             throw new IllegalArgumentException("Association " + assocName + " of class " + className + " has not been defined in the data dictionary");
@@ -434,6 +437,7 @@ public class PolicyComponentImpl implements PolicyComponent
      * @param behaviour  the behaviour
      * @return  the behaviour definition
      */
+    @SuppressWarnings("unchecked")
     private <B extends BehaviourBinding> BehaviourDefinition<B> createBehaviourDefinition(PolicyType type, QName policy, B binding, Behaviour behaviour)
     {
         // Determine if policy has already been registered

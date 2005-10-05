@@ -151,18 +151,6 @@ public interface DictionaryService
     PropertyDefinition getProperty(QName propertyName);
 
     /**
-     * Gets the definition of the assocication as defined by the specified Class.
-     * 
-     * Note: A sub-class may override the definition of an association that's 
-     *       defined in a super-class.
-     * 
-     * @param className the class name
-     * @param propertyName the property name
-     * @return the property definition (or null, if it doesn't exist)
-     */
-    AssociationDefinition getAssociation(QName className, QName associationName);
-    
-    /**
      * Gets the definition of the association as defined by its owning Class.
      * 
      * @param associationName the property name

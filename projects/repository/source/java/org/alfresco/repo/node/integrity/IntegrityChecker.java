@@ -18,26 +18,27 @@ package org.alfresco.repo.node.integrity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.EqualsHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,20 +86,9 @@ public class IntegrityChecker
 {
     private static Log logger = LogFactory.getLog(IntegrityChecker.class);
     
-    /** key against which the event list is stored in the current transaction */
-    private static final String KEY_EVENT_LIST = "IntegrityChecker.EventList";
+    /** key against which the set of events is stored in the current transaction */
+    private static final String KEY_EVENT_SET = "IntegrityChecker.EventSet";
     
-    // build sets of event names particular to a type of integrity check
-    public static final List<IntegrityEvent.EventType> CHECK_ALL_PROPERTIES = new ArrayList<IntegrityEvent.EventType>(4);
-    static
-    {
-        // check that all required properties are present
-        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EventType.PROPERTIES_CHANGED);
-        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EventType.NODE_CREATED);
-        CHECK_ALL_PROPERTIES.add(IntegrityEvent.EventType.ASPECT_ADDED);
-        // TODO: Further checks for associations required
-    }
-
     private PolicyComponent policyComponent;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
@@ -181,6 +171,14 @@ public class IntegrityChecker
      */
     public void init()
     {
+        // check that required properties have been set
+        if (dictionaryService == null)
+            throw new AlfrescoRuntimeException("IntegrityChecker property not set: dictionaryService");
+        if (nodeService == null)
+            throw new AlfrescoRuntimeException("IntegrityChecker property not set: nodeService");
+        if (policyComponent == null)
+            throw new AlfrescoRuntimeException("IntegrityChecker property not set: policyComponent");
+
         if (enabled)  // only register behaviour if integrity checking is on
         {
             // register behaviour
@@ -224,25 +222,6 @@ public class IntegrityChecker
     }
     
     /**
-     * Helper method to set the stack trace for the event
-     * 
-     * @param event the event on which to set, or not set, the stack trace
-     */
-    private void setTrace(IntegrityEvent event)
-    {
-        if (traceOn)
-        {
-            // get a stack trace
-            Throwable t = new Throwable();
-            t.fillInStackTrace();
-            StackTraceElement[] trace = t.getStackTrace();
-            
-            event.setTrace(trace);
-            // done
-        }
-    }
-    
-    /**
      * Ensures that this service is registered with the transaction and saves the event
      * 
      * @param event
@@ -250,120 +229,286 @@ public class IntegrityChecker
     @SuppressWarnings("unchecked")
     private void save(IntegrityEvent event)
     {
+        // optionally set trace
+        if (traceOn)
+        {
+            // get a stack trace
+            Throwable t = new Throwable();
+            t.fillInStackTrace();
+            StackTraceElement[] trace = t.getStackTrace();
+            
+            event.addTrace(trace);
+            // done
+        }
+        
         // register this service
         AlfrescoTransactionSupport.bindIntegrityChecker(this);
         
         // get the event list
-        List<IntegrityEvent> events = (List<IntegrityEvent>) AlfrescoTransactionSupport.getResource(KEY_EVENT_LIST);
+        Map<IntegrityEvent, IntegrityEvent> events =
+            (Map<IntegrityEvent, IntegrityEvent>) AlfrescoTransactionSupport.getResource(KEY_EVENT_SET);
         if (events == null)
         {
-            events = new ArrayList<IntegrityEvent>(100);
-            AlfrescoTransactionSupport.bindResource(KEY_EVENT_LIST, events);
+            events = new HashMap<IntegrityEvent, IntegrityEvent>(113, 0.75F);
+            AlfrescoTransactionSupport.bindResource(KEY_EVENT_SET, events);
         }
-        // add event
-        events.add(event);
+        // check if the event is present
+        IntegrityEvent existingEvent = events.get(event);
+        if (existingEvent != null)
+        {
+            // the event (or its equivalent is already present - transfer the trace
+            if (traceOn)
+            {
+                existingEvent.getTraces().addAll(event.getTraces());
+            }
+        }
+        else
+        {
+            // the event doesn't already exist
+            events.put(event, event);
+        }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("" + (existingEvent != null ? "Event already present in" : "Added event to") + " event set: \n" +
+                    "   event: " + event);
+        }
     }
 
     /**
-     * @see IntegrityEvent#EventType.NODE_CREATED
+     * @see PropertiesIntegrityEvent
      */
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
-        IntegrityEvent event = new IntegrityEvent(
-                IntegrityEvent.EventType.NODE_CREATED,
+        IntegrityEvent event = null;
+        // check properties on child node
+        event = new PropertiesIntegrityEvent(
+                nodeService,
+                dictionaryService,
                 childAssocRef.getChildRef());
-        event.setSecondaryNodeRef(childAssocRef.getParentRef());
-        event.setAssocTypeQName(childAssocRef.getTypeQName());
-        event.setAssocQName(childAssocRef.getQName());
-        
-        // set optional tracing
-        setTrace(event);
-        // save event
         save(event);
+        
+        // check target role
+        event = new AssocTargetRoleIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getParentRef(),
+                childAssocRef.getTypeQName(),
+                childAssocRef.getQName());
+        save(event);
+        
+        // check for associations defined on the new node (child)
+        NodeRef childRef = childAssocRef.getChildRef();
+        QName childNodeTypeQName = nodeService.getType(childRef);
+        ClassDefinition nodeTypeDef = dictionaryService.getClass(childNodeTypeQName);
+        if (nodeTypeDef == null)
+        {
+            throw new DictionaryException("The node type is not recognized: " + childNodeTypeQName);
+        }
+        Map<QName, AssociationDefinition> childAssocDefs = nodeTypeDef.getAssociations();
+        
+        // check the multiplicity of each association with the node acting as a source
+        for (AssociationDefinition assocDef : childAssocDefs.values())
+        {
+            QName assocTypeQName = assocDef.getName();
+            // check target multiplicity
+            event = new AssocTargetMultiplicityIntegrityEvent(
+                    nodeService,
+                    dictionaryService,
+                    childRef,
+                    assocTypeQName,
+                    false);
+            save(event);
+        }
     }
 
     /**
-     * @see IntegrityEvent#EventType.PROPERTIES_CHANGED
+     * @see PropertiesIntegrityEvent
      */
     public void onUpdateProperties(
             NodeRef nodeRef,
             Map<QName, Serializable> before,
             Map<QName, Serializable> after)
     {
-        IntegrityEvent event = new IntegrityEvent(
-                IntegrityEvent.EventType.PROPERTIES_CHANGED,
-                nodeRef);
-
-        // set optional tracing
-        setTrace(event);
-        // save event
-        save(event);
-    }
-
-    public void onDeleteNode(ChildAssociationRef childAssocRef)
-    {
-        IntegrityEvent event = new IntegrityEvent(
-                IntegrityEvent.EventType.NODE_DELETED,
-                childAssocRef.getChildRef());
-        event.setAssocTypeQName(childAssocRef.getTypeQName());
-        event.setAssocQName(childAssocRef.getQName());
-        
-        // set optional tracing
-        setTrace(event);
-        // save event
+        IntegrityEvent event = null;
+        // check properties on node
+        event = new PropertiesIntegrityEvent(nodeService, dictionaryService, nodeRef);
         save(event);
     }
 
     /**
-     * @see IntegrityEvent#EventType.ASPECT_ADDED
+     * No checking performed: The association changes will be handled
+     */
+    public void onDeleteNode(ChildAssociationRef childAssocRef)
+    {
+    }
+
+    /**
+     * @see PropertiesIntegrityEvent
      */
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        IntegrityEvent event = new IntegrityEvent(
-                IntegrityEvent.EventType.ASPECT_ADDED,
-                nodeRef);
-        event.setAspectTypeQName(aspectTypeQName);
-        
-        // set optional tracing
-        setTrace(event);
-        // save event
+        IntegrityEvent event = null;
+        // check properties on node
+        event = new PropertiesIntegrityEvent(nodeService, dictionaryService, nodeRef);
         save(event);
+        
+        // check for associations defined on the aspect
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspectTypeQName);
+        if (aspectDef == null)
+        {
+            throw new DictionaryException("The aspect type is not recognized: " + aspectTypeQName);
+        }
+        Map<QName, AssociationDefinition> assocDefs = aspectDef.getAssociations();
+        
+        // check the multiplicity of each association with the node acting as a source
+        for (AssociationDefinition assocDef : assocDefs.values())
+        {
+            QName assocTypeQName = assocDef.getName();
+            // check target multiplicity
+            event = new AssocTargetMultiplicityIntegrityEvent(
+                    nodeService,
+                    dictionaryService,
+                    nodeRef,
+                    assocTypeQName,
+                    false);
+            save(event);
+        }
     }
 
     /**
-     * @see IntegrityEvent#EventType.ASPECT_REMOVED
+     * No checking performed: The property changes will be handled
      */
     public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        IntegrityEvent event = new IntegrityEvent(
-                IntegrityEvent.EventType.ASPECT_REMOVED,
-                nodeRef);
-        event.setAspectTypeQName(aspectTypeQName);
-        
-        // set optional tracing
-        setTrace(event);
-        // save event
-        save(event);
     }
 
     public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
     {
-//        throw new UnsupportedOperationException();
+        IntegrityEvent event = null;
+        // check source type
+        event = new AssocSourceTypeIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getParentRef(),
+                childAssocRef.getTypeQName());
+        save(event);
+        // check target type
+        event = new AssocTargetTypeIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getChildRef(),
+                childAssocRef.getTypeQName());
+        save(event);
+        // check source multiplicity
+        event = new AssocSourceMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getChildRef(),
+                childAssocRef.getTypeQName(),
+                false);
+        save(event);
+        // check target multiplicity
+        event = new AssocTargetMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getParentRef(),
+                childAssocRef.getTypeQName(),
+                false);
+        save(event);
+        // check target role
+        event = new AssocTargetRoleIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getParentRef(),
+                childAssocRef.getTypeQName(),
+                childAssocRef.getQName());
+        save(event);
     }
 
+    /**
+     * @see CreateChildAssocIntegrityEvent
+     */
     public void onDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
-//        throw new UnsupportedOperationException();
+        IntegrityEvent event = null;
+        // check source multiplicity
+        event = new AssocSourceMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getChildRef(),
+                childAssocRef.getTypeQName(),
+                true);
+        save(event);
+        // check target multiplicity
+        event = new AssocTargetMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                childAssocRef.getParentRef(),
+                childAssocRef.getTypeQName(),
+                true);
+        save(event);
     }
 
+    /**
+     * @see AbstractAssocIntegrityEvent
+     */
     public void onCreateAssociation(AssociationRef nodeAssocRef)
     {
-//        throw new UnsupportedOperationException();
+        IntegrityEvent event = null;
+        // check source type
+        event = new AssocSourceTypeIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                nodeAssocRef.getSourceRef(),
+                nodeAssocRef.getTypeQName());
+        save(event);
+        // check target type
+        event = new AssocTargetTypeIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                nodeAssocRef.getTargetRef(),
+                nodeAssocRef.getTypeQName());
+        save(event);
+        // check source multiplicity
+        event = new AssocSourceMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                nodeAssocRef.getTargetRef(),
+                nodeAssocRef.getTypeQName(),
+                false);
+        save(event);
+        // check target multiplicity
+        event = new AssocTargetMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                nodeAssocRef.getSourceRef(),
+                nodeAssocRef.getTypeQName(),
+                false);
+        save(event);
     }
 
+    /**
+     * @see AbstractAssocIntegrityEvent
+     */
     public void onDeleteAssociation(AssociationRef nodeAssocRef)
     {
-//        throw new UnsupportedOperationException();
+        IntegrityEvent event = null;
+        // check source multiplicity
+        event = new AssocSourceMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                nodeAssocRef.getTargetRef(),
+                nodeAssocRef.getTypeQName(),
+                true);
+        save(event);
+        // check target multiplicity
+        event = new AssocTargetMultiplicityIntegrityEvent(
+                nodeService,
+                dictionaryService,
+                nodeAssocRef.getSourceRef(),
+                nodeAssocRef.getTypeQName(),
+                true);
+        save(event);
     }
     
     /**
@@ -383,7 +528,7 @@ public class IntegrityChecker
         // process events and check for failures
         List<IntegrityRecord> failures = processAllEvents();
         // clear out all events
-        AlfrescoTransactionSupport.unbindResource(KEY_EVENT_LIST);
+        AlfrescoTransactionSupport.unbindResource(KEY_EVENT_SET);
         
         // drop out quickly if there are no failures
         if (failures.isEmpty())
@@ -425,173 +570,74 @@ public class IntegrityChecker
     }
     
     /**
-     * Pages through resultsets of events that occured within the transaction,
-     * processing each node.  Flushing and clearing happens between each page
-     * cycle.
+     * Loops through all the integrity events and checks integrity.
+     * <p>
+     * The events are stored in a set, so there are no duplicates.  Since each
+     * event performs a particular type of check, this ensures that we don't
+     * duplicate checks.
      * 
      * @return Returns a list of integrity violations, up to the
-     *      {@link #maxErrorsPerTransaction the maximum defined
+     *      {@link #maxErrorsPerTransaction the maximum defined}
      */
     @SuppressWarnings("unchecked")
     private List<IntegrityRecord> processAllEvents()
     {
         // the results
-        ArrayList<IntegrityRecord> results = new ArrayList<IntegrityRecord>(0); // generally unused
+        ArrayList<IntegrityRecord> allIntegrityResults = new ArrayList<IntegrityRecord>(0); // generally unused
 
-        List<IntegrityEvent> events = (List<IntegrityEvent>) AlfrescoTransactionSupport.getResource(KEY_EVENT_LIST);
+        // get all the events for the transaction (or unit of work)
+        // duplicates have been elimiated
+        Map<IntegrityEvent, IntegrityEvent> events =
+                (Map<IntegrityEvent, IntegrityEvent>) AlfrescoTransactionSupport.getResource(KEY_EVENT_SET);
         if (events == null)
         {
             // no events were registered - nothing of significance happened
-            return results;
+            return allIntegrityResults;
         }
 
-        // the current node reference
-        NodeRef currentNodeRef = null;
-        // the current event type
-        IntegrityEvent.EventType currentEventType = null;
         // failure results for the event
-        List<IntegrityRecord> eventResults = new ArrayList<IntegrityRecord>(0);
+        List<IntegrityRecord> integrityRecords = new ArrayList<IntegrityRecord>(0);
 
-        // keep tabs on what we have done with each node
-        boolean checkAllProperties = false;
-        
-        // cycle through the events, performing various integrity checks
-        for (IntegrityEvent event : events)
+        // cycle through the events, performing checking integrity
+        for (IntegrityEvent event : events.keySet())
         {
-            // have we moved onto a new node?
-            boolean newNode = !EqualsHelper.nullSafeEquals(currentNodeRef, event.getPrimaryNodeRef());
-            boolean newEventType = !EqualsHelper.nullSafeEquals(currentEventType, event.getEventType());
-            
-            if (newNode)
-            {
-                // primary node reference is mandatory on the event
-                currentNodeRef = event.getPrimaryNodeRef();
-                // reset flags
-                checkAllProperties = true;
-            }
-
-            // does the node still exist?
-            if (!nodeService.exists(currentNodeRef))
-            {
-                // ignore primary nodes that have disappeared
-                continue;
-            }
-            
-            if (newEventType)
-            {
-                currentEventType = event.getEventType();
-            }
-            // perform the various types of integrity checks
             try
             {
-                // check node properties
-                if (checkAllProperties && CHECK_ALL_PROPERTIES.contains(currentEventType))
-                {
-                    checkAllProperties = false;
-                    checkAllProperties(currentNodeRef, eventResults);
-                }
+                event.checkIntegrity(integrityRecords);
             }
             catch (Throwable e)
             {
-                // log it as an error and continue
-                IntegrityRecord record = new IntegrityRecord(e.getMessage());
-                record.addTrace(e.getStackTrace());
-                eventResults.add(record);
+                e.printStackTrace();
+                // log it as an error and move to next event
+                IntegrityRecord exceptionRecord = new IntegrityRecord("" + e.getMessage());
+                exceptionRecord.setTraces(Collections.singletonList(e.getStackTrace()));
+                allIntegrityResults.add(exceptionRecord);
+                // move on
+                continue;
             }
 
             // keep track of results needing trace added
-            if (traceOn && event.getTrace() != null)
+            if (traceOn)
             {
                 // record the current event trace if present
-                for (IntegrityRecord record : eventResults)
+                for (IntegrityRecord integrityRecord : integrityRecords)
                 {
-                    record.addTrace(event.getTrace());
+                    integrityRecord.setTraces(event.getTraces());
                 }
             }
             
             // copy all the event results to the final results
-            results.addAll(eventResults);
+            allIntegrityResults.addAll(integrityRecords);
             // clear the event results
-            eventResults.clear();
+            integrityRecords.clear();
             
-            if (results.size() >= maxErrorsPerTransaction)
+            if (allIntegrityResults.size() >= maxErrorsPerTransaction)
             {
                 // only so many errors wanted at a time
                 break;
             }
         }
         // done
-        return results;
-    }
-    
-    /**
-     * Checks the properties for the type and aspects of the given node.
-     * 
-     * @param nodeRef
-     * @param eventResults
-     */
-    private void checkAllProperties(NodeRef nodeRef, List<IntegrityRecord> eventResults)
-    {
-        // get all properties for the node
-        Map<QName, Serializable> nodeProperties = nodeService.getProperties(nodeRef);
-        
-        // get the node type
-        QName nodeTypeQName = nodeService.getType(nodeRef);
-        // get property definitions for the node type
-        TypeDefinition typeDef = dictionaryService.getType(nodeTypeQName);
-        Collection<PropertyDefinition> propertyDefs = typeDef.getProperties().values();
-        // check them
-        checkAllProperties(nodeRef, nodeTypeQName, propertyDefs, nodeProperties, eventResults);
-        
-        // get the node aspects
-        Set<QName> aspectTypeQNames = nodeService.getAspects(nodeRef);
-        for (QName aspectTypeQName : aspectTypeQNames)
-        {
-            // get property definitions for the aspect
-            AspectDefinition aspectDef = dictionaryService.getAspect(aspectTypeQName);
-            propertyDefs = aspectDef.getProperties().values();
-            // check them
-            checkAllProperties(nodeRef, aspectTypeQName, propertyDefs, nodeProperties, eventResults);
-        }
-        // done
-    }
-
-    /**
-     * Checks the specific map of properties against the required property definitions
-     * 
-     * @param nodeRef the node to which this applies
-     * @param typeQName the qualified name of the aspect or type to which the properties belong
-     * @param propertyDefs the definitions to check against - may be null or empty
-     * @param nodeProperties the properties to check
-     */
-    private void checkAllProperties(
-            NodeRef nodeRef,
-            QName typeQName,
-            Collection<PropertyDefinition> propertyDefs,
-            Map<QName, Serializable> nodeProperties,
-            Collection<IntegrityRecord> eventResults)
-    {
-        // check for null or empty definitions
-        if (propertyDefs == null || propertyDefs.isEmpty())
-        {
-            return;
-        }
-        for (PropertyDefinition propertyDef : propertyDefs)
-        {
-            QName propertyQName = propertyDef.getName();
-            Serializable propertyValue = nodeProperties.get(propertyQName);
-            // check that mandatory properties are set
-            if (propertyDef.isMandatory() && propertyValue == null)
-            {
-                IntegrityRecord result = new IntegrityRecord(
-                        "Mandatory property not set: \n" +
-                        "   Node: " + nodeRef + "\n" +
-                        "   Type: " + typeQName + "\n" +
-                        "   Property: " + propertyQName);
-                eventResults.add(result);
-                // next one
-                continue;
-            }
-        }
+        return allIntegrityResults;
     }
 }

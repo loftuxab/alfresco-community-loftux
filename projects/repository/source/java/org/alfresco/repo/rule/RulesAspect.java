@@ -31,6 +31,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * Class containing behaviour for the rules aspect
@@ -138,7 +139,10 @@ public class RulesAspect
 	{
 		copyDetails.addAspect(RuleModel.ASPECT_RULES);
 		
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(sourceNodeRef, RuleModel.ASSOC_RULE_FOLDER);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
+                sourceNodeRef,
+                RegexQNamePattern.MATCH_ALL,
+                RuleModel.ASSOC_RULE_FOLDER);
 		for (ChildAssociationRef assoc : assocs)
 		{
 			copyDetails.addChildAssociation(classRef, assoc, true);

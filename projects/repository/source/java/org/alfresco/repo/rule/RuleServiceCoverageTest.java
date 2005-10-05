@@ -74,6 +74,7 @@ import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.TestWithUserUtils;
 import org.springframework.context.ApplicationContext;
@@ -612,6 +613,7 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the created node is still there
         List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
                 this.nodeRef, 
+                RegexQNamePattern.MATCH_ALL,
                 QName.createQName(TEST_NAMESPACE, "origional"));
         assertNotNull(origRefs);
         assertEquals(1, origRefs.size());
@@ -621,7 +623,7 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the created node has been copied
         List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
                                                     this.rootNodeRef, 
-                                                    QName.createQName(TEST_NAMESPACE, "copy"));
+                                                    RegexQNamePattern.MATCH_ALL, QName.createQName(TEST_NAMESPACE, "copy"));
         assertNotNull(copyChildAssocRefs);
         assertEquals(2, copyChildAssocRefs.size());
         NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
@@ -686,7 +688,7 @@ public class RuleServiceCoverageTest extends TestCase
     	        // Check that the created node is still there
     	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
     	                this.nodeRef, 
-    	                QName.createQName(TEST_NAMESPACE, "origional"));
+    	                RegexQNamePattern.MATCH_ALL, QName.createQName(TEST_NAMESPACE, "origional"));
     	        assertNotNull(origRefs);
     	        assertEquals(1, origRefs.size());
     	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
@@ -695,7 +697,7 @@ public class RuleServiceCoverageTest extends TestCase
     	        // Check that the created node has been copied
     	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
     	                                                    this.rootNodeRef, 
-    	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
+    	                                                    RegexQNamePattern.MATCH_ALL, QName.createQName(TEST_NAMESPACE, "transformed"));
     	        assertNotNull(copyChildAssocRefs);
     	        assertEquals(1, copyChildAssocRefs.size());
     	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
@@ -768,7 +770,7 @@ public class RuleServiceCoverageTest extends TestCase
     	        // Check that the created node is still there
     	        List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
     	                this.nodeRef, 
-    	                QName.createQName(TEST_NAMESPACE, "origional"));
+    	                RegexQNamePattern.MATCH_ALL, QName.createQName(TEST_NAMESPACE, "origional"));
     	        assertNotNull(origRefs);
     	        assertEquals(1, origRefs.size());
     	        NodeRef origNodeRef = origRefs.get(0).getChildRef();
@@ -777,7 +779,7 @@ public class RuleServiceCoverageTest extends TestCase
     	        // Check that the created node has been copied
     	        List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
     	                                                    this.rootNodeRef, 
-    	                                                    QName.createQName(TEST_NAMESPACE, "transformed"));
+    	                                                    RegexQNamePattern.MATCH_ALL, QName.createQName(TEST_NAMESPACE, "transformed"));
     	        assertNotNull(copyChildAssocRefs);
     	        assertEquals(1, copyChildAssocRefs.size());
     	        NodeRef copyNodeRef = copyChildAssocRefs.get(0).getChildRef();
@@ -827,14 +829,14 @@ public class RuleServiceCoverageTest extends TestCase
         // Check that the created node has been moved
         List<ChildAssociationRef> origRefs = this.nodeService.getChildAssocs(
                 this.nodeRef, 
-                QName.createQName(TEST_NAMESPACE, "origional"));
+                RegexQNamePattern.MATCH_ALL, QName.createQName(TEST_NAMESPACE, "origional"));
         assertNotNull(origRefs);
         assertEquals(0, origRefs.size());
 
         // Check that the created node is in the new location
         List<ChildAssociationRef> copyChildAssocRefs = this.nodeService.getChildAssocs(
                                                     this.rootNodeRef, 
-                                                    QName.createQName(TEST_NAMESPACE, "copy"));
+                                                    RegexQNamePattern.MATCH_ALL, QName.createQName(TEST_NAMESPACE, "copy"));
         assertNotNull(copyChildAssocRefs);
         assertEquals(1, copyChildAssocRefs.size());
         NodeRef movedNodeRef = copyChildAssocRefs.get(0).getChildRef();

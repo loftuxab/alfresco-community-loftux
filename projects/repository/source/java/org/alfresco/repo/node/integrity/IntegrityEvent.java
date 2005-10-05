@@ -16,107 +16,23 @@
  */
 package org.alfresco.repo.node.integrity;
 
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.QName;
+import java.util.List;
 
 /**
  * Stores information for all events in the system
  * 
  * @author Derek Hulley
  */
-public class IntegrityEvent
+public interface IntegrityEvent
 {
     /**
-     * The type of integrity event 
+     * Checks integrity pertinent to the event
+     * 
+     * @param eventResults the list of event results that can be added to
      */
-    public static enum EventType
-    {
-        NODE_CREATED,
-        NODE_DELETED,
-        ASPECT_ADDED,
-        ASPECT_REMOVED,
-        PROPERTIES_CHANGED,
-        NODE_ASSOC_ADDED,
-        NODE_ASSOC_REMOVED,
-        CHILD_ASSOC_ADDED,
-        CHILD_ASSOC_REMOVED;
-    }
+    public void checkIntegrity(List<IntegrityRecord> eventResults);
     
-    private EventType eventType;
-    private NodeRef primaryNodeRef;
-    private NodeRef secondaryNodeRef;
-    private QName aspectTypeQName;
-    private QName assocTypeQName;
-    private QName assocQName;
-    private StackTraceElement[] trace;
-
-    /**
-     * @param eventType the type of the event
-     * @param primaryNodeRef the node that the event primarily applies to
-     */
-    public IntegrityEvent(EventType eventType, NodeRef primaryNodeRef)
-    {
-        this.eventType = eventType;
-        this.primaryNodeRef = primaryNodeRef;
-    }
-
-    public EventType getEventType()
-    {
-        return eventType;
-    }
-
-    public NodeRef getPrimaryNodeRef()
-    {
-        return primaryNodeRef;
-    }
-
-    public NodeRef getSecondaryNodeRef()
-    {
-        return secondaryNodeRef;
-    }
-
-    public void setSecondaryNodeRef(NodeRef secondaryNodeRef)
-    {
-        this.secondaryNodeRef = secondaryNodeRef;
-    }
-
-    public QName getAspectTypeQName()
-    {
-        return aspectTypeQName;
-    }
-
-    public void setAspectTypeQName(QName aspectTypeQName)
-    {
-        this.aspectTypeQName = aspectTypeQName;
-    }
-
-    public QName getAssocTypeQName()
-    {
-        return assocTypeQName;
-    }
-
-    public void setAssocTypeQName(QName assocTypeQName)
-    {
-        this.assocTypeQName = assocTypeQName;
-    }
-
-    public QName getAssocQName()
-    {
-        return assocQName;
-    }
-
-    public void setAssocQName(QName assocQName)
-    {
-        this.assocQName = assocQName;
-    }
-
-    public StackTraceElement[] getTrace()
-    {
-        return trace;
-    }
-
-    public void setTrace(StackTraceElement[] trace)
-    {
-        this.trace = trace;
-    }
+    public List<StackTraceElement[]> getTraces();
+    
+    public void addTrace(StackTraceElement[] trace);
 }

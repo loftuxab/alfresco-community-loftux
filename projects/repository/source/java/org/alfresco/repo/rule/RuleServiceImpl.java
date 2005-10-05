@@ -43,6 +43,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.GUID;
 
 /**
@@ -164,7 +165,10 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	 */
 	private NodeRef getSavedRuleFolderRef(NodeRef nodeRef)
 	{
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, RuleModel.ASSOC_RULE_FOLDER);
+		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
+                nodeRef,
+                RegexQNamePattern.MATCH_ALL,
+                RuleModel.ASSOC_RULE_FOLDER);
 		if (assocs.size() != 1)
 		{
 			throw new ActionServiceException("Unable to retrieve the saved rule folder reference.");
@@ -270,7 +274,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     				
 		    		// Get the rules for this node
 		    		List<ChildAssociationRef> ruleChildAssocRefs = 
-		    			this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), ASSOC_NAME_RULES);
+		    			this.nodeService.getChildAssocs(getSavedRuleFolderRef(nodeRef), RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
 		    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
 					{
 		    			// Create the rule and add to the list
@@ -523,7 +527,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	{
     		List<ChildAssociationRef> ruleChildAssocs = this.nodeService.getChildAssocs(
                                                                         getSavedRuleFolderRef(nodeRef), 
-                                                                        ASSOC_NAME_RULES);
+                                                                        RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
     		for (ChildAssociationRef ruleChildAssoc : ruleChildAssocs)
 			{
 				this.nodeService.removeChild(getSavedRuleFolderRef(nodeRef), ruleChildAssoc.getChildRef());

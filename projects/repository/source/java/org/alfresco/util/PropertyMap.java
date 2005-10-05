@@ -32,4 +32,28 @@ import org.alfresco.service.namespace.QName;
 public class PropertyMap extends HashMap<QName, Serializable>
 {
     private static final long serialVersionUID = 8052326301073209645L;
+    
+    /**
+     * @see HashMap#HashMap(int, float)
+     */
+    public PropertyMap(int initialCapacity, float loadFactor)
+    {
+        super(initialCapacity, loadFactor);
+    }
+    
+    /**
+     * @see HashMap#HashMap(int)
+     */
+    public PropertyMap(int initialCapacity)
+    {
+        super(initialCapacity);
+    }
+    
+    /**
+     * @see HashMap#HashMap()
+     */
+    public PropertyMap()
+    {
+        super();
+    }
 }

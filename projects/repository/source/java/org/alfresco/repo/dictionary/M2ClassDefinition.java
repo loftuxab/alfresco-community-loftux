@@ -138,6 +138,16 @@ import org.alfresco.service.namespace.QName;
         }
     }
     
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(120);
+        sb.append("ClassDef ")
+          .append("[ name=").append(name)
+          .append("]");
+        return sb.toString();
+    }
+    
     
     /*package*/ void resolveDependencies(ModelQuery query)
     {
