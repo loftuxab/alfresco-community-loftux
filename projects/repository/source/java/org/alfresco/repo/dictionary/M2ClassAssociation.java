@@ -26,16 +26,16 @@ package org.alfresco.repo.dictionary;
 public abstract class M2ClassAssociation
 {
     private String name = null;
-    private boolean isProtected = false;
+    private Boolean isProtected = null;
     private String title = null;
     private String description = null;
     private String sourceRoleName = null;
-    private boolean isSourceMandatory = true;
-    private boolean isSourceMany = false;
+    private Boolean isSourceMandatory = null;
+    private Boolean isSourceMany = null;
     private String targetClassName = null;
     private String targetRoleName = null;
-    private boolean isTargetMandatory = false;
-    private boolean isTargetMany = true;
+    private Boolean isTargetMandatory = null;
+    private Boolean isTargetMany = null;
     
     
     /*package*/ M2ClassAssociation()
@@ -69,7 +69,7 @@ public abstract class M2ClassAssociation
     
     public boolean isProtected()
     {
-        return isProtected;
+        return isProtected == null ? false : isProtected;
     }
     
     
@@ -117,7 +117,7 @@ public abstract class M2ClassAssociation
 
     public boolean isSourceMandatory()
     {
-        return isSourceMandatory;
+        return isSourceMandatory == null ? true : isSourceMandatory;
     }
     
     
@@ -129,7 +129,7 @@ public abstract class M2ClassAssociation
     
     public boolean isSourceMany()
     {
-        return isSourceMany;
+        return isSourceMany == null ? false : isSourceMany;
     }
     
     
@@ -165,7 +165,7 @@ public abstract class M2ClassAssociation
     
     public boolean isTargetMandatory()
     {
-        return isTargetMandatory;
+        return isTargetMandatory == null ? false : isTargetMandatory;
     }
     
     
@@ -177,7 +177,7 @@ public abstract class M2ClassAssociation
     
     public boolean isTargetMany()
     {
-        return isTargetMany;
+        return isTargetMany == null ? true : isTargetMany;
     }
     
     

@@ -231,35 +231,41 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_LOCKABLE, null);
 		}
 		
-		// Make the working copy
-		NodeRef workingCopy = this.copyService.copy(
-				nodeRef,
-				destinationParentNodeRef,
-				destinationAssocTypeQName,
-				destinationAssocQName);
-		
 		// Rename the working copy
+        String copyName = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
 		if (this.workingCopyLabel != null && this.workingCopyLabel.length() != 0)
 		{
-			String modified = "";
-			String name = (String)this.nodeService.getProperty(workingCopy, ContentModel.PROP_NAME);
-			if (name != null && name.length() != 0)
+			if (copyName != null && copyName.length() != 0)
 			{
-				int index = name.lastIndexOf(EXTENSION_CHARACTER);
+				int index = copyName.lastIndexOf(EXTENSION_CHARACTER);
 				if (index > 0)
 				{
 					// Insert the working copy label before the file extension
-					modified = name.substring(0, index) + " " + this.workingCopyLabel + name.substring(index);
+                    copyName = copyName.substring(0, index) + " " + this.workingCopyLabel + copyName.substring(index);
 				}
 				else
 				{
 					// Simply append the working copy label onto the end of the existing name
-					modified = name + " " + this.workingCopyLabel;
+                    copyName = copyName + " " + this.workingCopyLabel;
 				}
-				this.nodeService.setProperty(workingCopy, ContentModel.PROP_NAME, modified);
 			}
+            else
+            {
+                copyName = this.workingCopyLabel;
+            }
 		}
-		
+
+        // Make the working copy
+        destinationAssocQName = QName.createQName(destinationAssocQName.getNamespaceURI(), QName.createValidLocalName(copyName));
+        NodeRef workingCopy = this.copyService.copy(
+                nodeRef,
+                destinationParentNodeRef,
+                destinationAssocTypeQName,
+                destinationAssocQName);
+        
+        // Update the working copy name        
+        this.nodeService.setProperty(workingCopy, ContentModel.PROP_NAME, copyName);
+
 		// Get the user 
 		String userName = getUserName();
 		

@@ -26,7 +26,7 @@ package org.alfresco.repo.dictionary;
 public class M2ChildAssociation extends M2ClassAssociation
 {
     private String requiredChildName = null;
-    private boolean allowDuplicateChildName = true;
+    private Boolean allowDuplicateChildName = null;
     
     
     /*package*/ M2ChildAssociation()
@@ -54,7 +54,7 @@ public class M2ChildAssociation extends M2ClassAssociation
     
     public boolean allowDuplicateChildName()
     {
-        return allowDuplicateChildName;
+        return allowDuplicateChildName == null ? true : allowDuplicateChildName;
     }
     
     
