@@ -140,7 +140,8 @@ public class HtmlMetadataExtracter extends AbstractMetadataExtracter
                 try
                 {
                     cis = reader.getContentInputStream();
-                    r = new InputStreamReader(cis, charsetGuess);
+                    // TODO: for now, use default charset; we should attempt to map from html meta-data
+                    r = new InputStreamReader(cis);
                     HTMLEditorKit.Parser parser = new ParserDelegator();
                     parser.parse(r, callback, tries > 0);
                     destination.putAll(tempDestination);
