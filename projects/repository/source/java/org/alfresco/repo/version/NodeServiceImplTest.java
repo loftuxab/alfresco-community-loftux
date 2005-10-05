@@ -135,6 +135,14 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
                 version.getFrozenStateNodeRef(),
                 PROP_1);
         assertEquals(VALUE_1, value1);
+        
+        // Check the multi values property specifically
+        Collection<String> multiValue = (Collection<String>)this.lightWeightVersionStoreNodeService.getProperty(version.getFrozenStateNodeRef(), MULTI_PROP);
+        assertNotNull(multiValue);
+        assertEquals(2, multiValue.size());
+        String[] array = multiValue.toArray(new String[multiValue.size()]);
+        assertEquals(MULTI_VALUE_1, array[0]);
+        assertEquals(MULTI_VALUE_2, array[1]);
     }
     
     /**

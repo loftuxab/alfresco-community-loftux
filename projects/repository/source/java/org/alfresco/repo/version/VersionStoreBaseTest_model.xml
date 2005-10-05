@@ -37,6 +37,10 @@
                <protected>false</protected>
                <default></default>
             </property>
+            <property name="test:multiProp">
+               <type>d:text</type>             
+               <multiple>true</multiple>
+            </property>
          </properties>
          
          <associations>

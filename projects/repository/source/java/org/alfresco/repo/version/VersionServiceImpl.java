@@ -606,7 +606,17 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             // Get the property values
             HashMap<QName, Serializable> props = new HashMap<QName, Serializable>();
 			props.put(PROP_QNAME_QNAME, entry.getKey());
-			props.put(PROP_QNAME_VALUE, entry.getValue());
+            
+            if (entry.getValue() instanceof Collection)
+            {
+                props.put(PROP_QNAME_MULTI_VALUE, entry.getValue());
+                props.put(PROP_QNAME_IS_MULTI_VALUE, true);
+            }
+            else
+            {
+                props.put(PROP_QNAME_VALUE, entry.getValue());
+                props.put(PROP_QNAME_IS_MULTI_VALUE, false);
+            }
             
             // Create the node storing the frozen attribute details
             this.dbNodeService.createNode(

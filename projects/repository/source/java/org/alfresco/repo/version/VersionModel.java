@@ -111,8 +111,12 @@ public interface VersionModel
      */
     public static final String PROP_QNAME = "qname";
     public static final String PROP_VALUE = "value";
+    public static final String PROP_MULTI_VALUE = "multiValue";
+    public static final String PROP_IS_MULTI_VALUE = "isMultiValue";
     public static final QName PROP_QNAME_QNAME = QName.createQName(NAMESPACE_URI, PROP_QNAME);
     public static final QName PROP_QNAME_VALUE = QName.createQName(NAMESPACE_URI, PROP_VALUE);
+    public static final QName PROP_QNAME_MULTI_VALUE = QName.createQName(NAMESPACE_URI, PROP_MULTI_VALUE);
+    public static final QName PROP_QNAME_IS_MULTI_VALUE = QName.createQName(NAMESPACE_URI, PROP_IS_MULTI_VALUE);
     
     /**
      * Versioned child assoc type

@@ -18,6 +18,8 @@ package org.alfresco.repo.version;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,6 +75,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
 	protected static final QName PROP_1 = QName.createQName(TEST_NAMESPACE, "prop1");
 	protected static final QName PROP_2 = QName.createQName(TEST_NAMESPACE, "prop2");
 	protected static final QName PROP_3 = QName.createQName(TEST_NAMESPACE, "prop3");
+    protected static final QName MULTI_PROP = QName.createQName(TEST_NAMESPACE, "multiProp");
 	protected static final String VERSION_PROP_1 = "versionProp1";
 	protected static final String VERSION_PROP_2 = "versionProp2";
 	protected static final String VERSION_PROP_3 = "versionProp3";
@@ -83,6 +86,10 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
 	protected static final QName TEST_CHILD_ASSOC_2 = QName.createQName(TEST_NAMESPACE, "childassoc2");
 	protected static final QName TEST_ASSOC = QName.createQName(TEST_NAMESPACE, "assoc1");	
     
+    protected Collection<String> multiValue = null;
+    protected static final String MULTI_VALUE_1 = "multi1";
+    protected static final String MULTI_VALUE_2 = "multi2";
+    
     /**
      * Test content
      */
@@ -91,8 +98,8 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
     /**
      * Test user details
      */
-    private static final String PWD = "password";
-    private static final String USER_NAME = "username";	
+    private static final String PWD = "admin";
+    private static final String USER_NAME = "admin";	
     
 	/**
 	 * Sets the meta model dao
@@ -109,6 +116,14 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
      */
     protected void onSetUpInTransaction() throws Exception
     {
+        // Set the multi value if required
+        if (this.multiValue == null)
+        {
+            this.multiValue = new ArrayList<String>();
+            this.multiValue.add(MULTI_VALUE_1);
+            this.multiValue.add(MULTI_VALUE_2);
+        }
+        
         // Get the services by name from the application context
         this.dbNodeService = (NodeService)applicationContext.getBean("dbNodeService");
         this.versionService = (VersionService)applicationContext.getBean("versionService");
@@ -130,6 +145,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.nodeProperties.put(PROP_1, VALUE_1);
         this.nodeProperties.put(PROP_2, VALUE_2);
         this.nodeProperties.put(PROP_3, VALUE_3);
+        this.nodeProperties.put(MULTI_PROP, (Serializable)multiValue);
         this.nodeProperties.put(ContentModel.PROP_CONTENT, new ContentData(null, "text/plain", 0L, "UTF-8"));
         
         // Create a workspace that contains the 'live' nodes
@@ -139,7 +155,6 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.rootNodeRef = this.dbNodeService.getRootNode(this.testStoreRef);
         
         // Create an authenticate the user
-        TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.dbNodeService, this.authenticationService);
         TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);
     }
 	

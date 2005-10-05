@@ -303,10 +303,19 @@ public class NodeServiceImpl implements NodeService, VersionModel
             if (child.getQName().equals(CHILD_QNAME_VERSIONED_ATTRIBUTES))
             {
                 NodeRef versionedAttribute = child.getChildRef();
-                
+
                 // Get the QName and the value
+                Serializable value = null;
                 QName qName = (QName)this.dbNodeService.getProperty(versionedAttribute, PROP_QNAME_QNAME);
-                Serializable value = this.dbNodeService.getProperty(versionedAttribute, PROP_QNAME_VALUE);
+                Boolean isMultiValue = (Boolean)this.dbNodeService.getProperty(versionedAttribute, PROP_QNAME_IS_MULTI_VALUE);
+                if (isMultiValue.booleanValue() == false)
+                {
+                    value = this.dbNodeService.getProperty(versionedAttribute, PROP_QNAME_VALUE);
+                }
+                else
+                {
+                    value = this.dbNodeService.getProperty(versionedAttribute, PROP_QNAME_MULTI_VALUE);
+                }
                 
                 result.put(qName, value);
             }

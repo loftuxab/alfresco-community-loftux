@@ -38,6 +38,13 @@
             <property name="ver:value">
                <type>d:any</type>
             </property>
+            <property name="ver:multiValue">
+               <type>d:any</type>               
+               <multiple>true</multiple>
+            </property>
+            <property name="ver:isMultiValue">
+               <type>d:boolean</type>
+            </property>
          </properties>
       </type>
 
