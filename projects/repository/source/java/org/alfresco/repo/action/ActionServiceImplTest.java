@@ -725,9 +725,10 @@ public class ActionServiceImplTest extends BaseSpringTest
 									public Boolean doWork()
 									{	
 										// See if the action has been performed
-										return test.executeTest();
+                                        boolean done = test.executeTest();
+                                        return done;
 									}					
-								})).booleanValue();			
+								})).booleanValue();
 				} 
 				catch (InterruptedException e)
 				{
@@ -1048,7 +1049,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 	public void testCompensatingAction()
 	{
 		// Create an action that is going to fail
-		Action action = this.actionService.createAction(MoveActionExecuter.NAME);
+		final Action action = this.actionService.createAction(MoveActionExecuter.NAME);
 		action.setParameterValue(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
 		action.setParameterValue(MoveActionExecuter.PARAM_ASSOC_QNAME, ContentModel.ASSOC_CHILDREN);
 		// Create a bad node ref
@@ -1070,7 +1071,6 @@ public class ActionServiceImplTest extends BaseSpringTest
 		setComplete();
 		endTransaction();
 		
-		final NodeRef finalNodeRef = nodeRef;
 		postAsyncActionTest(
                 this.transactionService,
 				1000, 
@@ -1080,14 +1080,13 @@ public class ActionServiceImplTest extends BaseSpringTest
 					public boolean executeTest() 
 					{
 						return (
-							ActionServiceImplTest.this.nodeService.hasAspect(finalNodeRef, ContentModel.ASPECT_VERSIONABLE));
+							ActionServiceImplTest.this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
 					};
 				});
 		
 		// Modify the compensating action so that it will also fail
 		compensatingAction.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, QName.createQName("{test}badAspect"));
 		
-		final Action finalAction = action;
 		TransactionUtil.executeInUserTransaction(
 				this.transactionService,
 				new TransactionUtil.TransactionWork<Object>()
@@ -1096,7 +1095,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 					{						
 						try
 						{
-							ActionServiceImplTest.this.actionService.executeAction(finalAction, ActionServiceImplTest.this.nodeRef);
+							ActionServiceImplTest.this.actionService.executeAction(action, ActionServiceImplTest.this.nodeRef);
 						}
 						catch (RuntimeException exception)
 						{

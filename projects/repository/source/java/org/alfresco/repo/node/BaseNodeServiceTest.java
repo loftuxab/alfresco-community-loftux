@@ -701,25 +701,31 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testRemoveChildByRef() throws Exception
     {
-        ChildAssociationRef pathARef = nodeService.createNode(
+        NodeRef parentRef = nodeService.createNode(
                 rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("parent_child"),
+                ContentModel.TYPE_CONTAINER).getChildRef();
+        ChildAssociationRef pathARef = nodeService.createNode(
+                parentRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
                 ContentModel.TYPE_CONTAINER);
         NodeRef childARef = pathARef.getChildRef();
         ChildAssociationRef pathBRef = nodeService.addChild(
-                rootNodeRef, childARef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
+                parentRef, childARef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
         ChildAssociationRef pathCRef = nodeService.addChild(
-                rootNodeRef, childARef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathC"));
+                parentRef, childARef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathC"));
         AssociationRef pathDRef = nodeService.createAssociation(
-                rootNodeRef, childARef, ASSOC_TYPE_QNAME_TEST_CHILDREN);
+                parentRef, childARef, ASSOC_TYPE_QNAME_TEST_NEXT);
         // remove the child - this must cascade
-        nodeService.removeChild(rootNodeRef, childARef);
+        nodeService.removeChild(parentRef, childARef);
         
         assertFalse("Primary child not deleted", nodeService.exists(childARef));
-        assertEquals("Child assocs not removed", 0, nodeService.getChildAssocs(rootNodeRef).size());
+        assertEquals("Child assocs not removed",
+                0, nodeService.getChildAssocs(parentRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("path*")).size());
         assertEquals("Node assoc not removed",
-                0, nodeService.getTargetAssocs(rootNodeRef, RegexQNamePattern.MATCH_ALL).size());
+                0, nodeService.getTargetAssocs(parentRef, RegexQNamePattern.MATCH_ALL).size());
     }
     
     public void testAddAndRemoveChild() throws Exception
