@@ -275,7 +275,8 @@ public class LuceneCategoryServiceImpl implements CategoryService
             throw new AlfrescoRuntimeException("Missing category?");
         }
         String uri = nodeService.getPrimaryParent(parent).getQName().getNamespaceURI();
-        NodeRef newCategory = nodeService.createNode(parent, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(uri, name), ContentModel.TYPE_CATEGORY).getChildRef();
+        String validLocalName = QName.createValidLocalName(name);
+        NodeRef newCategory = nodeService.createNode(parent, ContentModel.ASSOC_SUBCATEGORIES, QName.createQName(uri, validLocalName), ContentModel.TYPE_CATEGORY).getChildRef();
         nodeService.setProperty(newCategory, ContentModel.PROP_NAME, name);
         return newCategory;
     }
@@ -289,7 +290,6 @@ public class LuceneCategoryServiceImpl implements CategoryService
         }
         NodeRef parent = nodeRefs.iterator().next();
         return createCategory(parent, name);
-       
     }
 
     public void deleteCategory(NodeRef nodeRef)
