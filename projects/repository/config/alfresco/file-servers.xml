@@ -45,7 +45,6 @@
 
    <config evaluator="string-compare" condition="Filesystem Security">
       <authenticator type="alfresco">
-         <allowGuest/>
       </authenticator>
 
 <!--
