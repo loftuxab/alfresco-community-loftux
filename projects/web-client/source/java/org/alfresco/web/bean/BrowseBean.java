@@ -75,7 +75,7 @@ public class BrowseBean implements IContextListener
 {
    // ------------------------------------------------------------------------------
    // Construction 
-   
+
    /**
     * Default Constructor
     */
@@ -238,6 +238,22 @@ public class BrowseBean implements IContextListener
    public UIRichList getSpacesRichList()
    {
       return this.spacesRichList;
+   }
+   
+   /**
+    * @return Returns the deleteMessage.
+    */
+   public String getDeleteMessage()
+   {
+      return this.deleteMessage;
+   }
+
+   /**
+    * @param deleteMessage The deleteMessage to set.
+    */
+   public void setDeleteMessage(String deleteMessage)
+   {
+      this.deleteMessage = deleteMessage;
    }
    
    /**
@@ -840,11 +856,32 @@ public class BrowseBean implements IContextListener
    }
    
    /**
+    * Acrtion event called by Delete Space actions. We setup the action space as normal, then prepare
+    * any special case message string to be shown to the user if they are trying to delete specific spaces. 
+    */
+   public void setupDeleteAction(ActionEvent event)
+   {
+      String message = null;
+      
+      setupSpaceAction(event);
+      
+      Node node = getActionSpace();
+      if (node != null)
+      {
+         NodeRef companyRootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
+         if (node.getNodeRef().equals(companyRootRef))
+         {
+            message = Application.getMessage(FacesContext.getCurrentInstance(), MSG_DELETE_COMPANYROOT);
+         }
+      }
+      
+      setDeleteMessage(message);
+   }
+   
+   /**
     * Action event called by all actions that need to setup a Content Document context on the 
     * BrowseBean before an action page/wizard is called. The context will be a Node in
     * setDocument() which can be retrieved on the action page from BrowseBean.getDocument().
-    * 
-    * @param event   ActionEvent
     */
    public void setupContentAction(ActionEvent event)
    {
@@ -1212,8 +1249,9 @@ public class BrowseBean implements IContextListener
    public static final String BROWSE_VIEW_ID = "/jsp/browse/browse.jsp";
    
    /** I18N messages */
-   private static final String MSG_ERROR_DELETE_FILE = "error_delete_file";
+   private static final String MSG_ERROR_DELETE_FILE  = "error_delete_file";
    private static final String MSG_ERROR_DELETE_SPACE = "error_delete_space";
+   private static final String MSG_DELETE_COMPANYROOT = "delete_companyroot_confirm";
    
    private static Logger logger = Logger.getLogger(BrowseBean.class);
    
@@ -1251,6 +1289,9 @@ public class BrowseBean implements IContextListener
    
    /** The current document */
    private Node document;
+   
+   /** Special message to display when user deleting certain folders e.g. Company Home */
+   private String deleteMessage;
    
    /** The current browse view mode - set to a well known IRichListRenderer identifier */
    private String browseViewMode;

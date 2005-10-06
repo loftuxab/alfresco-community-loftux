@@ -102,7 +102,7 @@
                                        <a:actionLink value="#{msg.manage_invited_users}" image="/images/icons/invite.gif" id="link4" action="manageInvitedUsers" />
                                     </r:permissionEvaluator>
                                     <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="Delete" id="eval4">
-                                       <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}" id="link2">
+                                       <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" action="deleteSpace" actionListener="#{BrowseBean.setupDeleteAction}" id="link2">
                                           <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                        </a:actionLink>
                                        <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" id="link6" actionListener="#{ClipboardBean.cutNode}">
@@ -316,7 +316,7 @@
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                            <r:permissionEvaluator value="#{r}" allow="Delete">
-                              <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
+                              <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.setupDeleteAction}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </r:permissionEvaluator>
