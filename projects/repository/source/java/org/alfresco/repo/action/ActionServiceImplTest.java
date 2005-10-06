@@ -983,7 +983,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 	{
 		assertNotNull(detail);
 		assertEquals(title, detail.getTitle());
-		assertEquals(status, detail.getExecutionStatus());
+		assertEquals(status, detail.getExecutionStatus());        
 		assertEquals(errorMessageSet, (detail.getErrorMessage() != null));
 		assertEquals(errorDetailsSet, (detail.getErrorDetails() != null));
 		assertEquals(action, detail.getAction());
@@ -1124,7 +1124,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 							checkActionExecutionDetails(details.get(0), "title", ActionExecutionStatus.COMPENSATED, true, true, null);
 							checkActionExecutionDetails(details.get(1), "title", ActionExecutionStatus.SUCCEEDED, false, false, null);
 							checkActionExecutionDetails(details.get(2), "title", ActionExecutionStatus.COMPENSATED, true, true, null);
-							checkActionExecutionDetails(details.get(3), "title", ActionExecutionStatus.FAILED, false, true, null);
+							checkActionExecutionDetails(details.get(3), "title", ActionExecutionStatus.FAILED, true, true, null);
 							
 							result = true;
 						}
