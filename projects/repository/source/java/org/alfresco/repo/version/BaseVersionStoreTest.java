@@ -26,6 +26,7 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -87,6 +88,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
 	protected static final QName TEST_ASSOC = QName.createQName(TEST_NAMESPACE, "assoc1");	
     
     protected Collection<String> multiValue = null;
+    private AuthenticationComponent authenticationComponent;
     protected static final String MULTI_VALUE_1 = "multi1";
     protected static final String MULTI_VALUE_2 = "multi2";
     
@@ -130,6 +132,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.versionCounterDaoService = (VersionCounterDaoService)applicationContext.getBean("versionCounterDaoService");
         this.contentService = (ContentService)applicationContext.getBean("contentService");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
+        this.authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
         
         authenticationService.clearCurrentSecurityContext();
         
@@ -157,6 +160,12 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.rootNodeRef = this.dbNodeService.getRootNode(this.testStoreRef);
         
         // Create an authenticate the user
+        
+        if(!authenticationComponent.exists(USER_NAME))
+        {
+            authenticationService.createAuthentication(USER_NAME, PWD.toCharArray());
+        }
+        
         TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);
     }
 	
