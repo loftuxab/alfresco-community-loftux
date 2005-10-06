@@ -50,7 +50,8 @@
          <requiredPermission on="parent" name="ReadChildren" implies="false"/>
          <requiredPermission on="parent" name="DeleteChildren" implies="false"/>
          <requiredPermission on="node" name="DeleteChildren" implies="false"/>
-         <requiredPermission on="children" name="DeleteNode" implies="false"/>
+         <!-- Remove the recursive check for now -->
+         <!-- <requiredPermission on="children" name="DeleteNode" implies="false"/> -->
       </permission>
       
       <permission name="DeleteChildren" expose="true" >

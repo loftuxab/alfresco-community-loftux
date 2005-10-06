@@ -968,5 +968,12 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
 
         return username;
     }
+
+    public boolean exists(String userName)
+    {
+       throw new UnsupportedOperationException();
+    }
+    
+    
     
 }

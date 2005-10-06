@@ -107,7 +107,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         NodeRef userRef = getUserOrNull(userNamesAreCaseSensitive ? userName: userName.toLowerCase());
         if (userRef == null)
         {
-            throw new UsernameNotFoundException("Could not find user by userName: " + userName);
+            throw new UsernameNotFoundException("Could not find user by userName: " + caseSensitiveUserName);
         }
 
         Map<QName, Serializable> properties = nodeService.getProperties(userRef);

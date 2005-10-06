@@ -102,4 +102,10 @@ public interface AuthenticationComponent
      */
     public String getMD4HashedPassword(String userName);
     
+    /**
+     * Does the user exist?
+     * @return
+     */
+    public boolean exists(String userName);
+    
 }

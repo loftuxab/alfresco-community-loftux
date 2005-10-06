@@ -177,4 +177,11 @@ public class AuthenticationComponentImpl implements AuthenticationComponent
         return NTLMMode.MD4_PROVIDER;
     }
 
+    public boolean exists(String userName)
+    {
+        return authenticationDao.userExists(userName);
+    }
+
+    
+    
 }
