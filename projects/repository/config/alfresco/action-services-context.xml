@@ -5,10 +5,13 @@
 
     <!-- Action Service -->
 
-    <bean id="actionService" class="org.alfresco.repo.action.ActionServiceImpl">
+    <bean id="actionService" class="org.alfresco.repo.action.ActionServiceImpl" init-method="initialise">
         <property name="nodeService">
             <ref bean="NodeService" />
         </property>
+        <property name="policyComponent">
+            <ref bean="policyComponent"/>
+        </property>	  	   
         <property name="searchService">
             <ref bean="SearchService" />
         </property>  

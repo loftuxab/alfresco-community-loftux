@@ -26,6 +26,9 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.ActionConditionEvaluator;
 import org.alfresco.repo.action.executer.ActionExecuter;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.action.Action;
@@ -41,6 +44,7 @@ import org.alfresco.service.cmr.action.ParameterizedItem;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -89,7 +93,12 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	 */
 	private TransactionService transactionService;
 	
-	/**
+    /**
+     * The policy component
+     */
+    private PolicyComponent policyComponent;
+
+    /**
 	 * The node service
 	 */
 	private NodeService nodeService;
@@ -129,7 +138,17 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		this.applicationContext = applicationContext;
 	}
 	
-	/**
+    /**
+     * Set the policy component
+     * 
+     * @param policyComponent the policy component to register with
+     */
+	public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+
+    /**
 	 * Set the node service
 	 * 
 	 * @param nodeService  the node service
@@ -180,7 +199,30 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		return asynchronousActionExecutionQueue;
 	}
 	
-	/**
+    /**
+     * Initialise methods called by Spring framework
+     */
+    public void initialise()
+    {
+        // Register onCopy class behaviour
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
+                ActionModel.ASPECT_ACTION_EXECUTION_HISTORY,
+                new JavaBehaviour(this, "onCopy"));
+    }
+    
+    /**
+     * Does nothing in order to ensure that the node copy behaviour does <b>not</b>
+     * copy the {@link ActionModel#ASPECT_ACTION_EXECUTION_HISTORY action execution aspect}.
+     */
+    public void onCopy(
+            QName sourceClassRef, NodeRef sourceNodeRef, StoreRef destinationStoreRef,
+            boolean copyToNewNode, PolicyScope copyDetails)
+    {
+        // do nothing
+    }
+
+    /**
 	 * Gets the saved action folder reference
 	 * 
 	 * @param nodeRef	the node reference
