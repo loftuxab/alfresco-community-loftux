@@ -26,7 +26,6 @@
    </config>
 
    <config evaluator="string-compare" condition="FTP Server">
-      <allowAnonymous/>
 <!--      <debug flags="File,Search,Error,Directory,Info,DataPort"/> -->
    </config>
    
