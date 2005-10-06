@@ -801,19 +801,6 @@ public class PropFindMethod extends WebDAVMethod
         xml.write("" + len);
         xml.endElement(WebDAV.DAV_NS, WebDAV.XML_GET_CONTENT_LENGTH, WebDAV.XML_NS_GET_CONTENT_LENGTH);
      
-        // Get the creation date
-
-        davValue = WebDAV.getDAVPropertyValue(props, WebDAV.XML_CREATION_DATE);
-
-        // Output the creation date
-
-        if ( davValue != null)
-        {
-            xml.startElement(WebDAV.DAV_NS, WebDAV.XML_CREATION_DATE, WebDAV.XML_NS_CREATION_DATE, nullAttr);
-            xml.write(WebDAV.formatModifiedDate(typeConv.convert(Date.class, davValue)));
-            xml.endElement(WebDAV.DAV_NS, WebDAV.XML_CREATION_DATE, WebDAV.XML_NS_CREATION_DATE);
-        }
-
         // Print out all the custom properties
 
         // TODO: Output custom properties
