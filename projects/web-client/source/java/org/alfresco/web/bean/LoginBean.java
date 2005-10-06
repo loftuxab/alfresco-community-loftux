@@ -261,7 +261,7 @@ public class LoginBean
             this.authenticationService.authenticate(this.username, this.password.toCharArray());
             
             // setup User object and Home space ID
-            User user = new User(this.username, this.authenticationService.getCurrentTicket(),
+            User user = new User(this.authenticationService.getCurrentUserName(), this.authenticationService.getCurrentTicket(),
                   personService.getPerson(this.username));
             NodeRef homeSpaceRef = (NodeRef) this.nodeService.getProperty(personService.getPerson(this.username), ContentModel.PROP_HOMEFOLDER);
             
