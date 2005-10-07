@@ -61,7 +61,9 @@
             </constructor-arg>
             <property name="transactionService"><ref bean="transactionComponent" /></property>
             <property name="nodeService"><ref bean="NodeService" /></property>
+            <property name="unprotectedNodeService"><ref bean="nodeService" /></property>
             <property name="searchService"><ref bean="SearchService" /></property>
+            <property name="unprotectedSearchService"><ref bean="searchService" /></property>
             <property name="dictionaryService"><ref bean="dictionaryService" /></property>
             <property name="namespaceService"><ref bean="namespaceService" /></property>
             <property name="mimetypeService"><ref bean="mimetypeMap" /></property>

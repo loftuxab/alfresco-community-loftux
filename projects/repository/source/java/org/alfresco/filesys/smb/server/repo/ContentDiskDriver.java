@@ -71,7 +71,9 @@ public class ContentDiskDriver implements ContentDiskInterface
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
+    private NodeService unprotectedNodeService;
     private SearchService searchService;
+    private SearchService unprotectedSearchService;
     private ContentService contentService;
     private MimetypeService mimetypeService;
 
@@ -125,6 +127,14 @@ public class ContentDiskDriver implements ContentDiskInterface
     {
         this.nodeService = nodeService;
     }
+    
+    /**
+     * @param nodeService the node service
+     */
+    public void setUnprotectedNodeService(NodeService nodeService)
+    {
+        this.unprotectedNodeService = nodeService;
+    }
 
     /**
      * @param searchService the search service
@@ -134,6 +144,15 @@ public class ContentDiskDriver implements ContentDiskInterface
         this.searchService = searchService;
     }
 
+    /**
+     * @param searchService the search service
+     */
+    public void setUnprotectedSearchService(SearchService searchService)
+    {
+        this.unprotectedSearchService = searchService;
+    }
+
+    
     /**
      * @param transactionService the transaction service
      */
@@ -160,11 +179,11 @@ public class ContentDiskDriver implements ContentDiskInterface
         StoreRef storeRef = new StoreRef(storeValue);
         
         // connect to the repo and ensure that the store exists
-        if (!nodeService.exists(storeRef))
+        if (!unprotectedNodeService.exists(storeRef))
         {
             throw new DeviceContextException("Store not created prior to application startup: " + storeRef);
         }
-        NodeRef storeRootNodeRef = nodeService.getRootNode(storeRef);
+        NodeRef storeRootNodeRef = unprotectedNodeService.getRootNode(storeRef);
         
         // get the root path
         ConfigElement rootPathElement = cfg.getChild(KEY_ROOT_PATH);
@@ -174,7 +193,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
         String rootPath = rootPathElement.getValue();
         // find the root node for this device
-        List<NodeRef> nodeRefs = searchService.selectNodes(
+        List<NodeRef> nodeRefs = unprotectedSearchService.selectNodes(
                 storeRootNodeRef, rootPath, null, namespaceService, false);
         if (nodeRefs.size() > 1)
         {
