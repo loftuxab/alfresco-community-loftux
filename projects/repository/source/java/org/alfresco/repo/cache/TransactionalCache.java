@@ -35,7 +35,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * A 2-level cache that mainains a both a transaction-local cache and
+ * A 2-level cache that mainains both a transaction-local cache and
  * wraps a non-transactional (shared) cache.
  * <p>
  * It uses the <b>Ehcache</b> <tt>Cache</tt> for it's per-transaction

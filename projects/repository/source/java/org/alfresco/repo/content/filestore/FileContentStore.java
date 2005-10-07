@@ -19,35 +19,26 @@ package org.alfresco.repo.content.filestore;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.content.ContentStore;
+import org.alfresco.repo.content.AbstractContentStore;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides a store of node content directly to the file system.
  * <p>
- * The file names obey a convention, but it is not important
- * exactly what they are named.  As a first pass, a subdirectory
- * is created for each protocol, a further subdirectory for each
- * store and finally another for the GUID of the node itself.
- * Within the directory, filenames are generated according to the
- * current time.
+ * The file names obey, as they must, the URL naming convention
+ * as specified in the {@link org.alfresco.repo.content.ContentStore}.
  * 
  * @author Derek Hulley
  */
-public class FileContentStore implements ContentStore
+public class FileContentStore extends AbstractContentStore
 {
-    public static final String STORE_PROTOCOL = "file://";
-    
     private static final Log logger = LogFactory.getLog(FileContentStore.class);
     
     private File rootDirectory;
@@ -81,49 +72,33 @@ public class FileContentStore implements ContentStore
     }
     
     /**
-     * Generates a new and unique file based on the current date.
+     * Generates a new URL and file appropriate to it.
      * 
      * @return Returns a new and unique file
      * @throws IOException if the file or parent directories couldn't be created
      */
-    private File getNewStorageFile() throws IOException
+    private File createNewFile() throws IOException
     {
-        Calendar calendar = new GregorianCalendar();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;  // 0-based
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        // create the directory
-        StringBuilder sb = new StringBuilder(20);
-        sb.append(FileContentStore.STORE_PROTOCOL)
-          .append(year).append('/')
-          .append(month).append('/')
-          .append(day).append('/')
-          .append(GUID.generate()).append(".bin");
-        String newContentUrl = sb.toString();
-        return getNewStorageFile(newContentUrl);
+        String contentUrl = createNewUrl();
+        return createNewFile(contentUrl);
     }
     
     /**
      * Creates a file for the specifically provided content URL.  The URL may
      * not already be in use.
+     * <p>
+     * The store prefix is stripped off the URL and the rest of the URL
+     * used directly to create a file.
      * 
      * @param newContentUrl the specific URL to use, which may not be in use
      * @return Returns a new and unique file
      * @throws IOException if the file or parent directories couldn't be created or
      *      if the URL is already in use.
      */
-    private File getNewStorageFile(String newContentUrl) throws IOException
+    public File createNewFile(String newContentUrl) throws IOException
     {
         File file = makeFile(newContentUrl);
-        // check that the URL is new
-        if (file.exists())
-        {
-            throw new ContentIOException(
-                    "When specifying a URL for new content, the URL may not be in use already. \n" +
-                    "   store: " + this + "\n" +
-                    "   new URL: " + newContentUrl);
-        }
-        
+
         // create the directory, if it doesn't exist
         File dir = file.getParentFile();
         if (!dir.exists())
@@ -131,35 +106,26 @@ public class FileContentStore implements ContentStore
             dir.mkdirs();
         }
         
+        // create a new, empty file
+        boolean created = file.createNewFile();
+        if (!created)
+        {
+            throw new ContentIOException(
+                    "When specifying a URL for new content, the URL may not be in use already. \n" +
+                    "   store: " + this + "\n" +
+                    "   new URL: " + newContentUrl);
+        }
+        
         // done
         return file;
     }
     
     /**
-     * Used to ensure that the URLs passed into the store conform to the
-     * {@link FileContentStore#STORE_PROTOCOL correct protocol}.
-     * 
-     * @param contentUrl a URL of the content to check
-     * @throws RuntimeException if the URL is not correct
-     */
-    private void checkUrl(String contentUrl) throws RuntimeException
-    {
-        if (!contentUrl.startsWith(FileContentStore.STORE_PROTOCOL))
-        {
-            throw new RuntimeException(
-                    "This store is reserved for URLs starting with " +
-                    FileContentStore.STORE_PROTOCOL + ": \n" +
-                    "   store: " + this +
-                    " the invlid url is: "+contentUrl);
-        }
-    }
-
-    /**
-     * Takes the file absolute path, strips off the protocol and the root
-     * path of the store to create the URL.
+     * Takes the file absolute path, strips off the root path of the store
+     * and appends the store URL prefix.
      * 
      * @param file the file from which to create the URL
-     * @return Returns a relative URL
+     * @return Returns the equivalent content URL
      * @throws Exception
      */
     private String makeContentUrl(File file)
@@ -179,8 +145,8 @@ public class FileContentStore implements ContentStore
         {
             index++;
         }
-        // strip off the root path
-        String url = FileContentStore.STORE_PROTOCOL + path.substring(index);
+        // strip off the root path and adds the protocol prefix
+        String url = AbstractContentStore.STORE_PROTOCOL + path.substring(index);
         // replace '\' with '/' so that URLs are consistent across all filesystems
         url = url.replace('\\', '/');
         // done
@@ -199,9 +165,8 @@ public class FileContentStore implements ContentStore
      */
     private File makeFile(String contentUrl)
     {
-        checkUrl(contentUrl);
         // take just the part after the protocol
-        String relativeUrl = contentUrl.substring(7);
+        String relativeUrl = getRelativePart(contentUrl);
         // get the file
         File file = new File(rootDirectory, relativeUrl);
         // done
@@ -247,13 +212,13 @@ public class FileContentStore implements ContentStore
             if (newContentUrl == null)              // a specific URL was not supplied
             {
                 // get a new file with a new URL
-                file = getNewStorageFile();
+                file = createNewFile();
                 // make a URL
                 contentUrl = makeContentUrl(file);
             }
             else                                    // the URL has been given
             {
-                file = getNewStorageFile(newContentUrl);
+                file = createNewFile(newContentUrl);
                 contentUrl = newContentUrl;
             }
             // create the writer
@@ -313,12 +278,11 @@ public class FileContentStore implements ContentStore
     }
     
     /**
-     * Doesn't perform any actual deletions, but rather marks files for deletion by
-     * creating a new marker file alongside the content.
+     * Attempts to delete the content.  The actual deletion is optional on the interface
+     * so it just returns the success or failure of the underlying delete.
      */
     public boolean delete(String contentUrl) throws ContentIOException
     {
-        checkUrl(contentUrl);
         // ignore files that don't exist
         File file = makeFile(contentUrl);
         if (!file.exists())

@@ -20,98 +20,85 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.alfresco.repo.content.AbstractContentReadWriteTest;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.filestore.FileContentStore;
+import org.alfresco.repo.transaction.DummyTransactionService;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.GUID;
 import org.alfresco.util.TempFileProvider;
-import org.springframework.context.ApplicationContext;
 
 /**
- * Tests read and write functionality for the replicatingStore.
+ * Tests read and write functionality for the replicating store.
+ * <p>
+ * By default, replication is off for both the inbound and outbound
+ * replication.  Specific tests change this.
  * 
  * @see org.alfresco.repo.content.replication.ReplicatingContentStore
  * 
  * @author Derek Hulley
  */
-public class ReplicatingContentStoreTest extends TestCase
+public class ReplicatingContentStoreTest extends AbstractContentReadWriteTest
 {
-    private static final ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+    private static final String SOME_CONTENT = "The No. 1 Ladies' Detective Agency";
     
-    private TransactionService transactionService;
     private ReplicatingContentStore replicatingStore;
-    private List<ContentStore> stores;
-    private String contentUrl;
+    private ContentStore primaryStore;
+    private List<ContentStore> secondaryStores;
     
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
         
-        transactionService = (TransactionService) ctx.getBean("transactionComponent");
-        
         File tempDir = TempFileProvider.getTempDir();
-        // create some file stores
-        stores = new ArrayList<ContentStore>(3);
+        // create a primary file store
+        String storeDir = tempDir.getAbsolutePath() + File.separatorChar + GUID.generate();
+        primaryStore = new FileContentStore(storeDir);
+        // create some secondary file stores
+        secondaryStores = new ArrayList<ContentStore>(3);
         for (int i = 0; i < 3; i++)
         {
-            String storeDir = tempDir.getAbsolutePath() + File.separatorChar + GUID.generate();
-            FileContentStore store = new FileContentStore(storeDir);
-            stores.add(store);
+            storeDir = tempDir.getAbsolutePath() + File.separatorChar + GUID.generate();
+            ContentStore store = new FileContentStore(storeDir);
+            secondaryStores.add(store);
         }
         replicatingStore = new ReplicatingContentStore();
-        replicatingStore.setTransactionService(transactionService);
-        replicatingStore.setStores(stores);
+        replicatingStore.setTransactionService(new DummyTransactionService());
+        replicatingStore.setPrimaryStore(primaryStore);
+        replicatingStore.setSecondaryStores(secondaryStores);
+        replicatingStore.setOutbound(false);
+        replicatingStore.setInbound(false);
     }
 
-    public void testSetUp() throws Exception
+    @Override
+    public ContentStore getStore()
     {
-        assertNotNull(transactionService);
+        return replicatingStore;
     }
     
-    public void testReplication() throws Exception
+    /**
+     * Performs checks necessary to ensure the proper replication of content for the given
+     * URL
+     */
+    private void checkForReplication(boolean inbound, boolean outbound, String contentUrl, String content)
     {
-        String contentUrl =
-            FileContentStore.STORE_PROTOCOL +
-            getName() + '/' +
-            GUID.generate() +
-            ".bin";
-        String content = "ABCDEFG";
-        // write some content to the URL
-        ContentWriter writer = replicatingStore.getWriter(null, contentUrl);
-        writer.putContent(content);
-        
-        // check the content
-        ContentReader reader = replicatingStore.getReader(contentUrl);
-        assertTrue("Content not available from replicating store", reader.exists());
-        String contentCheck = reader.getContentString();
-        assertEquals("Content check failed", content, contentCheck);
-        
-        // check that the content has been replicated to all the stores
-        for (ContentStore store : stores)
+        if (inbound)
         {
-            reader = store.getReader(contentUrl);
-            assertTrue("Content not replicated", reader.exists());
-            // check contents
-            contentCheck = reader.getContentString();
-            assertEquals("Replicated content incorrect", content, contentCheck);
+            ContentReader reader = primaryStore.getReader(contentUrl);
+            assertTrue("Content was not replicated into the primary store", reader.exists());
+            assertEquals("The replicated content was incorrect", content, reader.getContentString());
         }
-        
-        // list the urls and check that they match
-        List<String> globalUrls = replicatingStore.listUrls();
-        assertTrue("URL of new content not present in replicating store", globalUrls.contains(contentUrl));
-        // check that the URL is present for each of the stores
-        checkForUrl(contentUrl, true);
-        
-        // delete the content
-        replicatingStore.delete(contentUrl);
-        // check that the deletion was removed
-        checkForUrl(contentUrl, false);
+        if (outbound)
+        {
+            for (ContentStore store : secondaryStores)
+            {
+                ContentReader reader = store.getReader(contentUrl);
+                assertTrue("Content was not replicated out to the secondary stores", reader.exists());
+                assertEquals("The replicated content was incorrect", content, reader.getContentString());
+            }
+        }
     }
     
     /**
@@ -123,10 +110,56 @@ public class ReplicatingContentStoreTest extends TestCase
     private void checkForUrl(String contentUrl, boolean mustExist)
     {
         // check that the URL is present for each of the stores
-        for (ContentStore store : stores)
+        for (ContentStore store : secondaryStores)
         {
             List<String> urls = store.listUrls();
             assertTrue("URL of new content not present in store", urls.contains(contentUrl) == mustExist);
         }
+    }
+    
+    public void testNoReplication() throws Exception
+    {
+        ContentWriter writer = getWriter();
+        writer.putContent(SOME_CONTENT);
+        
+        checkForReplication(false, false, writer.getContentUrl(), SOME_CONTENT);
+    }
+    
+    public void testOutboundReplication() throws Exception
+    {
+        replicatingStore.setOutbound(true);
+        
+        // write some content
+        ContentWriter writer = getWriter();
+        writer.putContent(SOME_CONTENT);
+        String contentUrl = writer.getContentUrl();
+        
+        checkForReplication(false, true, contentUrl, SOME_CONTENT);
+        
+        // check for outbound deletes
+        replicatingStore.delete(contentUrl);
+        checkForUrl(contentUrl, false);
+    }
+    
+    public void testInboundReplication() throws Exception
+    {
+        replicatingStore.setInbound(false);
+        
+        // pick a secondary store and write some content to it
+        ContentStore secondaryStore = secondaryStores.get(2);
+        ContentWriter writer = secondaryStore.getWriter(null, null);
+        writer.putContent(SOME_CONTENT);
+        String contentUrl = writer.getContentUrl();
+        
+        // get a reader from the replicating store
+        ContentReader reader = replicatingStore.getReader(contentUrl);
+        assertTrue("Reader must have been found in secondary store", reader.exists());
+        
+        // set inbound replication on and repeat
+        replicatingStore.setInbound(true);
+        reader = replicatingStore.getReader(contentUrl);
+        
+        // this time, it must have been replicated to the primary store
+        checkForReplication(true, false, contentUrl, SOME_CONTENT);
     }
 }

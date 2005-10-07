@@ -79,9 +79,9 @@ import org.apache.lucene.search.TermQuery;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
-    private static final String NOT_INDEXED_NO_TRANSFORMATION = "nint";
-    private static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nift";
-    private static final String NOT_INDEXED_CONTENT_MISSING = "nicm";
+    public static final String NOT_INDEXED_NO_TRANSFORMATION = "nint";
+    public static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nift";
+    public static final String NOT_INDEXED_CONTENT_MISSING = "nicm";
     
     private static Logger s_logger = Logger.getLogger(LuceneIndexerImpl.class);
 

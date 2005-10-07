@@ -17,6 +17,9 @@
 package org.alfresco.repo.content.replication;
 
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentStore;
@@ -29,21 +32,81 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A content store implementation that is able to replicate content between
- * stores that support the same protocols.
+ * </h1><u>Replicating Content Store</u></h1>
  * <p>
- * A store that can service content URLs of type <b>file://</b> only would not
- * be able to replicate to a store that only supports URLs of type <b>db://</b>. 
+ * A content store implementation that is able to replicate content between stores.
+ * Content is not persisted by this store, but rather it relies on any number of
+ * child {@link org.alfresco.repo.content.ContentStore stores} to provide access to
+ * content readers and writers.
+ * <p>
+ * The order in which the stores appear in the list of stores participating is
+ * important.  The first store in the list is known as the <i>primary store</i>.
+ * When the replicator goes to fetch content, the stores are searched
+ * from first to last.  The stores should therefore be arranged in order of
+ * speed.
+ * <p>
+ * It supports the notion of inbound and/or outbound replication, both of which can be
+ * operational at the same time.
+ * 
+ * </h2><u>Outbound Replication</u></h2>
+ * <p>
+ * When this is enabled, then the primary store is used for writes.  When the
+ * content write completes (i.e. the write channel is closed) then the content
+ * is synchronously copied to all other stores.  The write is therefore slowed
+ * down, but the content replication will occur <i>in-transaction</i>.
+ *  
+ * </h2><u>Inbound Replication</u></h2>
+ * <p>
+ * This can be used to lazily replicate content onto the primary store.  When
+ * content can't be found in the primary store, the other stores are checked
+ * in order.  If content is found, then it is copied into the local store
+ * before being returned.  Subsequent accesses will use the primary store.<br>
+ * This should be used where the secondary stores are much slower, such as in
+ * the case of a store against some kind of archival mechanism.
+ * 
+ * <h2><u>No Replication</u></h2>
+ * <p>
+ * Content is not written to the primary store only.  The other stores are
+ * only used to retrieve content and the primary store is not updated with
+ * the content.
  * 
  * @author Derek Hulley
  */
 public class ReplicatingContentStore implements ContentStore
 {
+    /*
+     * The replication process uses thread synchronization as it can
+     * decide to write content to specific URLs during requests for
+     * a reader.
+     * While this won't help the underlying stores if there are
+     * multiple replications on top of them, it will prevent repeated
+     * work from multiple threads entering an instance of this component
+     * looking for the same content at the same time.
+     */
+    
     private static Log logger = LogFactory.getLog(ReplicatingContentStore.class);
     
     private TransactionService transactionService;
-    private List<ContentStore> stores;
+    private ContentStore primaryStore;
+    private List<ContentStore> secondaryStores;
+    private boolean inbound;
+    private boolean outbound;
+    private Lock readLock;
+    private Lock writeLock;
 
+    /**
+     * Default constructor set <code>inbound = false</code> and <code>outbound = true</code>;
+     */
+    public ReplicatingContentStore()
+    {
+        inbound = false;
+        outbound = true;
+        
+        ReadWriteLock storeLock = new ReentrantReadWriteLock();
+        readLock = storeLock.readLock();
+        writeLock = storeLock.writeLock();
+    }
+    
     /**
      * Required to ensure that content listeners are executed in a transaction
      * 
@@ -55,22 +118,46 @@ public class ReplicatingContentStore implements ContentStore
     }
 
     /**
-     * Set the stores that this store must replicate to.  The first
-     * store will be used as the default store for reading content and
-     * should therefore be configured to be the primary and fastest
-     * store.
-     * <p>
-     * All stores in the list must support the same content URL protocol.
+     * Set the primary store that content will be replicated to or from
      * 
-     * @param stores a list of stores to replicate to
+     * @param primaryStore the primary content store
      */
-    public void setStores(List<ContentStore> stores)
+    protected void setPrimaryStore(ContentStore primaryStore)
     {
-        if (this.stores != null)
-        {
-            throw new AlfrescoRuntimeException("Resetting of the store list is not allowed");
-        }
-        this.stores = stores;
+        this.primaryStore = primaryStore;
+    }
+
+    /**
+     * Set the secondary stores that this component will replicate to or from
+     * 
+     * @param stores a list of stores to replicate to or from
+     */
+    public void setSecondaryStores(List<ContentStore> secondaryStores)
+    {
+        this.secondaryStores = secondaryStores;
+    }
+    
+    /**
+     * Set whether or not this component should replicate content to the
+     * primary store if not found.
+     *  
+     * @param inbound true to pull content onto the primary store when found
+     *      on one of the other stores
+     */
+    public void setInbound(boolean inbound)
+    {
+        this.inbound = inbound;
+    }
+    
+    /**
+     * Set whether or not this component should replicate content to all stores
+     * as it is written.
+     *  
+     * @param outbound true to enable synchronous replication to all stores
+     */
+    public void setOutbound(boolean outbound)
+    {
+        this.outbound = outbound;
     }
 
     /**
@@ -78,65 +165,138 @@ public class ReplicatingContentStore implements ContentStore
      */
     public ContentReader getReader(String contentUrl) throws ContentIOException
     {
-        if (stores == null || stores.size() == 0)
+        if (primaryStore == null)
         {
             throw new AlfrescoRuntimeException("ReplicatingContentStore not initialised");
         }
-        return stores.get(0).getReader(contentUrl);
+        
+        // get a read lock so that we are sure that no replication is underway
+        ContentReader existingContenReader = null;
+        readLock.lock();
+        try
+        {
+            // get a reader from the primary store
+            ContentReader primaryReader = primaryStore.getReader(contentUrl);
+            
+            // give it straight back if the content is there
+            if (primaryReader.exists())
+            {
+                return primaryReader;
+            }
+
+            // the content is not in the primary reader so we have to go looking for it
+            ContentReader secondaryContentReader = null;
+            for (ContentStore store : secondaryStores)
+            {
+                ContentReader reader = store.getReader(contentUrl);
+                if (reader.exists())
+                {
+                    // found the content in a secondary store
+                    secondaryContentReader = reader;
+                    break;
+                }
+            }
+            // we already know that the primary has nothing
+            // drop out if no content was found
+            if (secondaryContentReader == null)
+            {
+                return primaryReader;
+            }
+            // secondary content was found
+            // return it if we are not doing inbound
+            if (!inbound)
+            {
+                return secondaryContentReader;
+            }
+            
+            // we have to replicate inbound
+            existingContenReader = secondaryContentReader;
+        }
+        finally
+        {
+            readLock.unlock();
+        }
+        
+        // -- a small gap for concurrent threads to get through --
+        
+        // do inbound replication
+        writeLock.lock();
+        try
+        {
+            // check the primary again
+            ContentReader primaryContentReader = primaryStore.getReader(contentUrl);
+            if (primaryContentReader.exists())
+            {
+                // we were beaten to it
+                return primaryContentReader;
+            }
+            // get a writer
+            ContentWriter primaryContentWriter = primaryStore.getWriter(existingContenReader, contentUrl);
+            // copy it over
+            primaryContentWriter.putContent(existingContenReader);
+            // get a writer to the new content
+            primaryContentReader = primaryContentWriter.getReader();
+            // done
+            return primaryContentReader;
+        }
+        finally
+        {
+            writeLock.unlock();
+        }
     }
 
     /**
-     * Forwards the call directly to the first store in the list of stores.  The writer
-     * has a listener attached that will ensure that, upon stream closure, the content
-     * is replicated to the remaining stores.
+     * 
      */
     public ContentWriter getWriter(ContentReader existingContentReader, String newContentUrl) throws ContentIOException
     {
-        if (stores == null || stores.size() == 0)
-        {
-            throw new AlfrescoRuntimeException("ReplicatingContentStore not initialised");
-        }
         // get the writer
-        ContentWriter writer = stores.get(0).getWriter(existingContentReader, newContentUrl);
-        if (logger.isDebugEnabled())
+        ContentWriter writer = primaryStore.getWriter(existingContentReader, newContentUrl);
+        
+        // attach a replicating listener if outbound replication is on
+        if (outbound)
         {
-            logger.debug("Attaching replicating listener to local writer: \n" +
-                    "   primary store: " + stores.get(0) + "\n" +
-                    "   writer: " + writer);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Attaching replicating listener to local writer: \n" +
+                        "   primary store: " + primaryStore + "\n" +
+                        "   writer: " + writer);
+            }
+            // attach the listener
+            ReplicatingWriteListener listener = new ReplicatingWriteListener(secondaryStores, writer);
+            writer.addListener(listener);
+            writer.setTransactionService(transactionService);   // mandatory when listeners are added
         }
-        // attach the listener
-        ReplicatingWriteListener listener = new ReplicatingWriteListener(stores, writer);
-        writer.addListener(listener);
-        writer.setTransactionService(transactionService);   // mandatory when listeners are added
         
         // done
         return writer;
     }
 
     /**
-     * Propagates the delete to all stores.
+     * Performs a delete on the local store and if outbound replication is on, propogates
+     * the delete to the other stores too.
      * 
-     * @return Returns true always
+     * @return Returns the value returned by the delete on the primary store.
      */
     public boolean delete(String contentUrl) throws ContentIOException
     {
-        if (stores == null || stores.size() == 0)
+        // delete on the primary store
+        boolean deleted = primaryStore.delete(contentUrl);
+        
+        // propogate outbound deletions
+        if (outbound)
         {
-            throw new AlfrescoRuntimeException("ReplicatingContentStore not initialised");
+            for (ContentStore store : secondaryStores)
+            {
+                store.delete(contentUrl);
+            }
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Propagated content delete: " + contentUrl);
+            }
         }
-        // call each store - these should be protecting content for a while so the content
-        // will still be available for a short while; enough to allow transactions to
-        // complete
-        for (ContentStore store : stores)
-        {
-            store.delete(contentUrl);
-        }
-        // done
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Propagated content delete: " + contentUrl);
-        }
-        return true;
+        return deleted;
     }
 
     /**
@@ -144,13 +304,9 @@ public class ReplicatingContentStore implements ContentStore
      */
     public List<String> listUrls() throws ContentIOException
     {
-        if (stores == null || stores.size() == 0)
-        {
-            throw new AlfrescoRuntimeException("ReplicatingContentStore not initialised");
-        }
         // we could choose to get this from any store, but the primary one is by contract
         // the one chosen by the configuration to be the default for reads
-        return stores.get(0).listUrls();
+        return primaryStore.listUrls();
     }
 
     /**
@@ -177,31 +333,21 @@ public class ReplicatingContentStore implements ContentStore
         {
             try
             {
-                boolean first = true;
                 for (ContentStore store : stores)
                 {
-                    if (first)
+                    // replicate the content to the store - we know the URL that we want to write to
+                    ContentReader reader = writer.getReader();
+                    String contentUrl = reader.getContentUrl();
+                    // in order to replicate, we have to specify the URL that we are going to write to
+                    ContentWriter replicatedWriter = store.getWriter(null, contentUrl);
+                    // write it
+                    replicatedWriter.putContent(reader);
+                    
+                    if (logger.isDebugEnabled())
                     {
-                        // the first store was alfready written to as it would have supplied the writer
-                        first = false;
-                        continue;
-                    }
-                    else
-                    {
-                        // replicate the content to the store - we know the URL that we want to write to
-                        ContentReader reader = writer.getReader();
-                        String contentUrl = reader.getContentUrl();
-                        // in order to replicate, we have to specify the URL that we are going to write to
-                        ContentWriter replicatedWriter = store.getWriter(null, contentUrl);
-                        // write it
-                        replicatedWriter.putContent(reader);
-                        
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Replicated content to store: \n" +
-                                    "   url: " + contentUrl + "\n" +
-                                    "   to store: " + store);
-                        }
+                        logger.debug("Replicated content to store: \n" +
+                                "   url: " + contentUrl + "\n" +
+                                "   to store: " + store);
                     }
                 }
             }

@@ -44,6 +44,10 @@ public interface ContentService
 {
     /**
      * Gets a reader for the content associated with the given node property.
+     * <p>
+     * If a content URL is present for the given node then a reader <b>must</b>
+     * be returned.  The {@link ContentReader#exists() exists} method should then
+     * be used to detect 'missing' content.
      * 
      * @param nodeRef a reference to a node having a content property
      * @param propertyQName the name of the property, which must be of type <b>content</b>
@@ -51,6 +55,8 @@ public interface ContentService
      *      or null if no content has been written for the property
      * @throws InvalidNodeRefException if the node doesn't exist
      * @throws InvalidTypeException if the node is not of type <b>content</b>
+     * 
+     * @see org.alfresco.repo.content.filestore.FileContentReader#getSafeContentReader(ContentReader, String, Object[])
      */
     public ContentReader getReader(NodeRef nodeRef, QName propertyQName)
             throws InvalidNodeRefException, InvalidTypeException;

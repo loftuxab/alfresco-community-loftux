@@ -80,6 +80,11 @@ public abstract class AbstractContentAccessor implements ContentAccessor
         return transactionService;
     }
 
+    /**
+     * Set the transaction provider to be used by {@link ContentStreamListener listeners}.
+     * 
+     * @param transactionService the transaction service to wrap callback code in
+     */
     public void setTransactionService(TransactionService transactionService)
     {
         this.transactionService = transactionService;
@@ -245,11 +250,7 @@ public abstract class AbstractContentAccessor implements ContentAccessor
                 // nothing to do
                 return;
             }
-            // ensure that we are in a transaction
-            if (transactionService == null)
-            {
-                throw new AlfrescoRuntimeException("A transaction service is required when there are listeners present");
-            }
+            // create the work to update the listeners
             TransactionUtil.TransactionWork<Object> work = new TransactionUtil.TransactionWork<Object>()
                     {
                         public Object doWork()

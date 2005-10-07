@@ -20,8 +20,8 @@ import java.io.File;
 
 import org.alfresco.repo.content.AbstractContentReadWriteTest;
 import org.alfresco.repo.content.ContentStore;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.TempFileProvider;
 
 /**
@@ -33,9 +33,7 @@ import org.alfresco.util.TempFileProvider;
  */
 public class FileContentStoreTest extends AbstractContentReadWriteTest
 {
-    private ContentStore store;
-    private ContentReader reader;
-    private ContentWriter writer;
+    private FileContentStore store;
     
     @Override
     public void setUp() throws Exception
@@ -48,17 +46,6 @@ public class FileContentStoreTest extends AbstractContentReadWriteTest
                 tempDir.getAbsolutePath() +
                 File.separatorChar +
                 getName());
-        
-        writer = store.getWriter(null, null);
-        String contentUrl = writer.getContentUrl();
-        reader = store.getReader(contentUrl);
-    }
-
-    public void testSetUp() throws Exception
-    {
-        super.testSetUp();
-        assertNotNull(reader);
-        assertNotNull(writer);
     }
     
     @Override
@@ -66,16 +53,41 @@ public class FileContentStoreTest extends AbstractContentReadWriteTest
     {
         return store;
     }
-
-    @Override
-    protected ContentReader getReader()
+    
+    public void testGetSafeContentReader() throws Exception
     {
-        return reader;
-    }
+        String template = "ABC {0}{1}";
+        String arg0 = "DEF";
+        String arg1 = "123";
+        String fakeContent = "ABC DEF123";
 
-    @Override
-    protected ContentWriter getWriter()
-    {
-        return writer;
+        // get a good reader
+        ContentReader reader = getReader();
+        assertFalse("No content has been written to the URL yet", reader.exists());
+        
+        // now create a file for it
+        File file = store.createNewFile(reader.getContentUrl());
+        assertTrue("File store did not connect new file", file.exists());
+        assertTrue("Reader did not detect creation of the underlying file", reader.exists());
+        
+        // remove the underlying content
+        file.delete();
+        assertFalse("File not missing", file.exists());
+        assertFalse("Reader doesn't show missing content", reader.exists());
+        
+        // make a safe reader
+        ContentReader safeReader = FileContentReader.getSafeContentReader(reader, template, arg0, arg1);
+        // check it
+        assertTrue("Fake content doesn't exist", safeReader.exists());
+        assertEquals("Fake content incorrect", fakeContent, safeReader.getContentString());
+        assertEquals("Fake mimetype incorrect", MimetypeMap.MIMETYPE_TEXT_PLAIN, safeReader.getMimetype());
+        assertEquals("Fake encoding incorrect", "UTF-8", safeReader.getEncoding());
+        
+        // now repeat with a null reader
+        reader = null;
+        safeReader = FileContentReader.getSafeContentReader(reader, template, arg0, arg1);
+        // check it
+        assertTrue("Fake content doesn't exist", safeReader.exists());
+        assertEquals("Fake content incorrect", fakeContent, safeReader.getContentString());
     }
 }
