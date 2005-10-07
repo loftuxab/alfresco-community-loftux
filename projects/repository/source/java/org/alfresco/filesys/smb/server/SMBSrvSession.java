@@ -23,6 +23,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.transaction.UserTransaction;
+
 import org.alfresco.filesys.netbios.NetBIOSException;
 import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.netbios.NetBIOSPacket;
@@ -51,6 +53,7 @@ import org.alfresco.filesys.smb.server.notify.NotifyRequest;
 import org.alfresco.filesys.smb.server.notify.NotifyRequestList;
 import org.alfresco.filesys.util.DataPacker;
 import org.alfresco.filesys.util.StringList;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -1477,7 +1480,11 @@ public class SMBSrvSession extends SrvSession implements Runnable
      */
     public void run()
     {
-
+        // Transaction used to wrap all processing
+        
+        UserTransaction tx = null;
+        TransactionService transactionService = getSMBServer().getConfiguration().getTransactionService();
+        
         try
         {
 
@@ -1519,6 +1526,11 @@ public class SMBSrvSession extends SrvSession implements Runnable
 
                 m_smbPkt.setReceivedLength(m_rxlen);
 
+                // Create a transaction for the request
+                
+                tx = transactionService.getUserTransaction();
+                tx.begin();
+                
                 // Process the received packet
 
                 switch (m_state)
@@ -1553,6 +1565,14 @@ public class SMBSrvSession extends SrvSession implements Runnable
 
                 } // end switch session state
 
+                // Commit the transaction
+                
+                if ( tx != null)
+                {
+                    tx.commit();
+                    tx = null;
+                }
+                
                 // Give up the CPU
 
                 Thread.yield();
@@ -1577,6 +1597,23 @@ public class SMBSrvSession extends SrvSession implements Runnable
         catch (Throwable ex)
         {
             logger.error("Closing session due to throwable", ex);
+        }
+        finally
+        {
+            // If there is an active transaction then roll it back
+            
+            if ( tx != null)
+            {
+                try
+                {
+                    tx.rollback();
+                    tx = null;
+                }
+                catch (Exception ex)
+                {
+                    logger.warn("Failed to rollback transaction", ex);
+                }
+            }                
         }
 
         // Cleanup the session, make sure all resources are released

@@ -31,6 +31,8 @@ import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.transaction.UserTransaction;
+
 import org.alfresco.filesys.server.SrvSession;
 import org.alfresco.filesys.server.auth.ClientInfo;
 import org.alfresco.filesys.server.auth.SrvAuthenticator;
@@ -53,8 +55,7 @@ import org.alfresco.filesys.server.filesys.NotifyChange;
 import org.alfresco.filesys.server.filesys.SearchContext;
 import org.alfresco.filesys.server.filesys.TreeConnection;
 import org.alfresco.filesys.server.filesys.TreeConnectionHash;
-import org.alfresco.repo.security.authentication.AuthenticationException;
-import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -3069,7 +3070,11 @@ public class FTPSrvSession extends SrvSession implements Runnable
      */
     public void run()
     {
-
+        // Transaction used to wrap all processing
+        
+        UserTransaction tx = null;
+        TransactionService transactionService = getFTPServer().getConfiguration().getTransactionService();
+        
         try
         {
 
@@ -3140,6 +3145,11 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 if (logger.isDebugEnabled() && hasDebug(DBG_PKTTYPE))
                     logger.debug("Cmd " + ftpReq);
 
+                // Create a transaction for the request
+                
+                tx = transactionService.getUserTransaction();
+                tx.begin();
+                
                 // Parse the received command, and validate
 
                 ftpReq.setCommandLine(cmd);
@@ -3346,6 +3356,14 @@ public class FTPSrvSession extends SrvSession implements Runnable
                                 + FTPCommand.getCommandName(ftpReq.isCommand()) + " in " + duration + "ms");
                 }
 
+                // Commit the transaction
+                
+                if ( tx != null)
+                {
+                    tx.commit();
+                    tx = null;
+                }
+                
             } // end while state
         }
         catch (SocketException ex)
@@ -3365,6 +3383,23 @@ public class FTPSrvSession extends SrvSession implements Runnable
             {
                 logger.debug(ex);
             }
+        }
+        finally
+        {
+            // If there is an active transaction then roll it back
+            
+            if ( tx != null)
+            {
+                try
+                {
+                    tx.rollback();
+                    tx = null;
+                }
+                catch (Exception ex)
+                {
+                    logger.warn("Failed to rollback transaction", ex);
+                }
+            }                
         }
 
         // Cleanup the session, make sure all resources are released
