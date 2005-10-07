@@ -260,8 +260,7 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
     								ActionExecutionWrapper.this.actionService.executeActionImpl(
     										ActionExecutionWrapper.this.action, 
     										ActionExecutionWrapper.this.actionedUponNodeRef, 
-    										ActionExecutionWrapper.this.checkConditions, 
-    										ActionExecutionWrapper.this.actionExecutionHistoryNodeRef,
+    										ActionExecutionWrapper.this.checkConditions,
     										true);
                                 }
                                 finally

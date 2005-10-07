@@ -211,12 +211,4 @@ public interface ActionService
 	 */
 	void removeAllActions(NodeRef nodeRef);
 	
-	/**
-	 * Gets the action execution history.  The action execution detail objects are retrieved in 
-	 * assending chronological order.
-	 * 
-	 * @param nodeRef	the node reference
-	 * @return			a list of action execution details that make up the action execution history
-	 */
-	List<ActionExecutionDetails> getActionExecutionHistory(NodeRef nodeRef);
 }

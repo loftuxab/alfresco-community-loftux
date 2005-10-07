@@ -38,18 +38,4 @@ public interface AsynchronousActionExecutionQueue
 			NodeRef actionedUponNodeRef, 			 
 			boolean checkConditions);
 	
-	/**
-	 * 
-	 * @param actionedUponNodeRef
-	 * @param action
-	 * @param checkConditions 
-	 * @param actionExecutionHistoryNodeRef
-	 */
-	void executeAction(
-			RuntimeActionService actionService,
-			Action action, 
-			NodeRef actionedUponNodeRef, 
-			boolean checkConditions, 
-			NodeRef actionExecutionHistoryNodeRef);
-	
 }

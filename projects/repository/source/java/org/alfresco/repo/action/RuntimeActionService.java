@@ -51,13 +51,11 @@ public interface RuntimeActionService
 	 * @param action
 	 * @param actionedUponNodeRef
 	 * @param checkConditions
-	 * @param actionExecutionHistoryNodeRef
 	 */
 	public void executeActionImpl(
 			Action action, 
 			NodeRef actionedUponNodeRef, 
 			boolean checkConditions, 
-			NodeRef actionExecutionHistoryNodeRef,
 			boolean executedAsynchronously);
 	
 	public void directActionExecution(Action action, NodeRef actionedUponNodeRef);

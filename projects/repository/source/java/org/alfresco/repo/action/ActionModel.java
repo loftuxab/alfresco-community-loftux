@@ -30,12 +30,5 @@ public interface ActionModel
     //static final QName ASSOC_SAVED_ACTIONS = QName.createQName(ACTION_MODEL_URI, "savedActions");
     
     static final QName PROP_CONDITION_INVERT = QName.createQName(ACTION_MODEL_URI, "invert");
-    static final QName ASPECT_ACTION_EXECUTION_HISTORY = QName.createQName(ACTION_MODEL_URI, "actionexecutionhistory");
-    static final QName ASSOC_ACTION_EXECUTION_DETAILS = QName.createQName(ACTION_MODEL_URI, "actionExecutionDetails");
-    static final QName TYPE_ACTION_EXECUTION_DETAILS = QName.createQName(ACTION_MODEL_URI, "actionexecutiondetails");
-    static final QName PROP_ACTION_EXECUTION_TITLE = QName.createQName(ACTION_MODEL_URI, "actionExecutionTitle");
-    static final QName PROP_EXECUTION_STATUS = QName.createQName(ACTION_MODEL_URI, "executionStatus");
-    static final QName PROP_ERROR_MESSAGE = QName.createQName(ACTION_MODEL_URI, "errorMessage");
-    static final QName PROP_ERROR_DETAILS = QName.createQName(ACTION_MODEL_URI, "errorDetails");
 
 }

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -194,6 +195,10 @@ public class ExporterComponent
      */
     private class DefaultCrawler implements ExporterCrawler
     {
+        // Flush threshold
+        private int flushThreshold = 500;
+        private int flushCount = 0;
+        
         /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.ExporterCrawler#export(org.alfresco.service.cmr.view.Exporter)
          */
@@ -268,6 +273,15 @@ public class ExporterComponent
             {
                 return;
             }
+            
+            // Do we need to flush?
+            flushCount++;
+            if (flushCount > flushThreshold)
+            {
+                AlfrescoTransactionSupport.flush();
+                flushCount = 0;
+            }
+            
             exporter.startNode(nodeRef);
 
             // Export node aspects

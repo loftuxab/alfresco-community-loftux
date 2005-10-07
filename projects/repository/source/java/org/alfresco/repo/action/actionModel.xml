@@ -136,7 +136,9 @@
             </child-association>
          </associations>
 	  </type>
-	  
+
+
+      <!-- This type has been deprecated: for backwards compatibility only -->	  
 	  <type name="act:actionexecutiondetails">
 	     <title>Action Execution Details</title>
 	     <parent>cm:cmobject</parent>
@@ -158,9 +160,6 @@
                <mandatory>false</mandatory>
             </property>
          </properties>
-         
-         <!-- TODO add a relationship to the action if its been saved -->
-         
 	  </type>
 
 	</types>
@@ -181,6 +180,7 @@
          </associations>  
       </aspect>
       
+      <!-- This type has been deprecated: for backwards compatibility only -->	  
       <aspect name="act:actionexecutionhistory">
          <title>Action Execution History</title>           
          <associations>
