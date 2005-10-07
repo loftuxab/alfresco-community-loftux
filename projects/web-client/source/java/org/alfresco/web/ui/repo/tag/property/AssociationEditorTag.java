@@ -16,74 +16,18 @@
  */
 package org.alfresco.web.ui.repo.tag.property;
 
-import javax.faces.component.UIComponent;
-
-import org.alfresco.web.ui.common.tag.BaseComponentTag;
-
 /**
  * Allows the AssociationEditor component to be added to a JSP page
  * 
  * @author gavinc
  */
-public class AssociationEditorTag extends BaseComponentTag
+public class AssociationEditorTag extends BaseAssociationEditorTag
 {
-   private String associationName;
-   private String availableOptionsSize;
-   
-   /**
-    * @see javax.faces.webapp.UIComponentTag#getRendererType()
-    */
-   public String getRendererType()
-   {
-      return null;
-   }
-   
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
     */
    public String getComponentType()
    {
       return "org.alfresco.faces.AssociationEditor";
-   }
-
-   /**
-    * @see javax.faces.webapp.UIComponentTag#setProperties(javax.faces.component.UIComponent)
-    */
-   protected void setProperties(UIComponent component)
-   {
-      super.setProperties(component);
-      
-      setStringProperty(component, "associationName", this.associationName);
-      setStringStaticProperty(component, "availableOptionsSize", this.availableOptionsSize);
-   }
-   
-   /**
-    * Sets the association name
-    * 
-    * @param associationName The association name
-    */
-   public void setAssociationName(String associationName)
-   {
-      this.associationName = associationName;
-   }
-   
-   /**
-    * @param availableOptionsSize Sets the size of the available options size when 
-    *        multiple items can be selected
-    */
-   public void setAvailableOptionsSize(String availableOptionsSize)
-   {
-      this.availableOptionsSize = availableOptionsSize;
-   }
-
-   /**
-    * @see javax.faces.webapp.UIComponentTag#release()
-    */
-   public void release()
-   {
-      this.associationName = null;
-      this.availableOptionsSize = null;
-
-      super.release();
    }
 }

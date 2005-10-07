@@ -169,7 +169,7 @@ public class UIMultiValueEditor extends UIInput
    }
 
    /**
-    * Returns the message to display for the selected items, if one hasn't been
+    * Returns the message to display for select an item, if one hasn't been
     * set it defaults to the message in the bundle under key 'select_an_item'.
     * 
     * @return The message

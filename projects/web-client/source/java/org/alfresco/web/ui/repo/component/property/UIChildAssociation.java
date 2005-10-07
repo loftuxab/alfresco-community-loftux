@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 
 import javax.faces.FacesException;
-import javax.faces.component.NamingContainer;
-import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
-import javax.faces.component.UIPanel;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.el.ValueBinding;
@@ -42,17 +39,12 @@ import org.springframework.web.jsf.FacesContextUtils;
  * 
  * @author gavinc
  */
-public class UIChildAssociation extends UIPanel implements NamingContainer
+public class UIChildAssociation extends PropertySheetItem
 {
    private static final String MSG_ERROR_CHILD_ASSOC = "error_child_association";
    private static final String MSG_ERROR_NOT_CHILD_ASSOC = "error_not_child_association";
 
    private static Log logger = LogFactory.getLog(UIChildAssociation.class);
-   
-   private String name;
-   private String displayLabel;
-   private String converter;
-   private Boolean readOnly;
    
    /**
     * Default constructor
@@ -72,225 +64,62 @@ public class UIChildAssociation extends UIPanel implements NamingContainer
    }
 
    /**
-    * @see javax.faces.component.UIComponentBase#encodeBegin(javax.faces.context.FacesContext)
+    * @see org.alfresco.web.ui.repo.component.property.PropertySheetItem#getIncorrectParentMsg()
     */
-   public void encodeBegin(FacesContext context) throws IOException
+   protected String getIncorrectParentMsg()
    {
-      // get the variable being used from the parent
-      UIComponent parent = this.getParent();
-      if ((parent instanceof UIPropertySheet) == false)
-      {
-         throw new IllegalStateException("The childAssociation component must be nested within a property sheet component");
-      }
-      
-      // only build the components if there are currently no children
-      int howManyKids = getChildren().size();
-      if (howManyKids == 0)
-      {
-         Node node = ((UIPropertySheet)parent).getNode();
-         String var = ((UIPropertySheet)parent).getVar();
-         String associationName = (String)getName();
+      return "The childAssociation component must be nested within a property sheet component";
+   }
    
-         // get details of the association
-         DataDictionary dd = (DataDictionary)FacesContextUtils.getRequiredWebApplicationContext(
-               context).getBean(Application.BEAN_DATA_DICTIONARY);
-         AssociationDefinition assocDef = dd.getAssociationDefinition(node, associationName);
+   /**
+    * @see org.alfresco.web.ui.repo.component.property.PropertySheetItem#generateItem(javax.faces.context.FacesContext, org.alfresco.web.bean.repository.Node, java.lang.String)
+    */
+   protected void generateItem(FacesContext context, Node node, String var) throws IOException
+   {
+      String associationName = (String)getName();
+
+      // get details of the association
+      DataDictionary dd = (DataDictionary)FacesContextUtils.getRequiredWebApplicationContext(
+            context).getBean(Application.BEAN_DATA_DICTIONARY);
+      AssociationDefinition assocDef = dd.getAssociationDefinition(node, associationName);
+      
+      if (assocDef == null)
+      {
+         logger.warn("Failed to find child association definition for association '" + associationName + "'");
          
-         if (assocDef == null)
+         // add an error message as the property is not defined in the data dictionary
+         String msg = MessageFormat.format(Application.getMessage(context, MSG_ERROR_CHILD_ASSOC), new Object[] {associationName});
+         Utils.addErrorMessage(msg);
+      }
+      else
+      {
+         // we've found the association definition but we also need to check
+         // that the association is a parent child one
+         if (assocDef.isChild() == false)
          {
-            logger.warn("Failed to find child association definition for association '" + associationName + "'");
-            
-            // add an error message as the property is not defined in the data dictionary
-            String msg = MessageFormat.format(Application.getMessage(context, MSG_ERROR_CHILD_ASSOC), new Object[] {associationName});
+            String msg = MessageFormat.format(Application.getMessage(context, MSG_ERROR_NOT_CHILD_ASSOC), new Object[] {associationName});
             Utils.addErrorMessage(msg);
          }
          else
          {
-            // we've found the association definition but we also need to check
-            // that the association is a parent child one
-            if (assocDef.isChild() == false)
+            String displayLabel = (String)getDisplayLabel();
+            if (displayLabel == null)
             {
-               String msg = MessageFormat.format(Application.getMessage(context, MSG_ERROR_NOT_CHILD_ASSOC), new Object[] {associationName});
-               Utils.addErrorMessage(msg);
-            }
-            else
-            {
-               String displayLabel = (String)getDisplayLabel();
+               // try and get the repository assigned label
+               displayLabel = assocDef.getTitle();
+               
+               // if the label is still null default to the local name of the property
                if (displayLabel == null)
                {
-                  // try and get the repository assigned label
-                  displayLabel = assocDef.getTitle();
-                  
-                  // if the label is still null default to the local name of the property
-                  if (displayLabel == null)
-                  {
-                     displayLabel = assocDef.getName().getLocalName();
-                  }
+                  displayLabel = assocDef.getName().getLocalName();
                }
-               
-               // generate the label and type specific control
-               generateLabel(context, displayLabel);
-               generateControl(context, assocDef, var);
             }
+            
+            // generate the label and type specific control
+            generateLabel(context, displayLabel);
+            generateControl(context, assocDef, var);
          }
       }
-      
-      super.encodeBegin(context);
-   }
-   
-   /**
-    * @return Returns the display label
-    */
-   public String getDisplayLabel()
-   {
-      if (this.displayLabel == null)
-      {
-         ValueBinding vb = getValueBinding("displayLabel");
-         if (vb != null)
-         {
-            this.displayLabel = (String)vb.getValue(getFacesContext());
-         }
-      }
-      
-      return this.displayLabel;
-   }
-
-   /**
-    * @param displayLabel Sets the display label
-    */
-   public void setDisplayLabel(String displayLabel)
-   {
-      this.displayLabel = displayLabel;
-   }
-
-   /**
-    * @return Returns the name
-    */
-   public String getName()
-   {
-      if (this.name == null)
-      {
-         ValueBinding vb = getValueBinding("name");
-         if (vb != null)
-         {
-            this.name = (String)vb.getValue(getFacesContext());
-         }
-      }
-      
-      return this.name;
-   }
-
-   /**
-    * @param name Sets the name
-    */
-   public void setName(String name)
-   {
-      this.name = name;
-   }
-   
-   /**
-    * @return Returns the converter
-    */
-   public String getConverter()
-   {
-      if (this.converter == null)
-      {
-         ValueBinding vb = getValueBinding("converter");
-         if (vb != null)
-         {
-            this.converter = (String)vb.getValue(getFacesContext());
-         }
-      }
-      
-      return this.converter;
-   }
-
-   /**
-    * @param converter Sets the converter
-    */
-   public void setConverter(String converter)
-   {
-      this.converter = converter;
-   }
-
-   /**
-    * @return Returns whether the property is read only
-    */
-   public boolean isReadOnly()
-   {
-      if (this.readOnly == null)
-      {
-         ValueBinding vb = getValueBinding("readOnly");
-         if (vb != null)
-         {
-            this.readOnly = (Boolean)vb.getValue(getFacesContext());
-         }
-      }
-      
-      if (this.readOnly == null)
-      {
-         this.readOnly = Boolean.FALSE;
-      }
-      
-      return this.readOnly;
-   }
-
-   /**
-    * @param readOnly Sets the read only flag for the component
-    */
-   public void setReadOnly(boolean readOnly)
-   {
-      this.readOnly = readOnly;
-   }
-   
-   /**
-    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
-    */
-   public void restoreState(FacesContext context, Object state)
-   {
-      Object values[] = (Object[])state;
-      // standard component attributes are restored by the super class
-      super.restoreState(context, values[0]);
-      this.name = (String)values[1];
-      this.displayLabel = (String)values[2];
-      this.readOnly = (Boolean)values[3];
-      this.converter = (String)values[4];
-   }
-   
-   /**
-    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
-    */
-   public Object saveState(FacesContext context)
-   {
-      Object values[] = new Object[5];
-      // standard component attributes are saved by the super class
-      values[0] = super.saveState(context);
-      values[1] = this.name;
-      values[2] = this.displayLabel;
-      values[3] = this.readOnly;
-      values[4] = this.converter;
-      return (values);
-   }
-   
-   /**
-    * Generates a JSF OutputText component/renderer
-    * 
-    * @param context JSF context
-    * @param displayLabel The display label text
-    * @param parent The parent component for the label
-    */
-   private void generateLabel(FacesContext context, String displayLabel)
-   {
-      UIOutput label = (UIOutput)context.getApplication().
-                        createComponent("javax.faces.Output");
-      label.setId(context.getViewRoot().createUniqueId());
-      label.setRendererType("javax.faces.Text");
-      label.setValue(displayLabel + ": ");
-      this.getChildren().add(label);
-      
-      if (logger.isDebugEnabled())
-         logger.debug("Created label " + label.getClientId(context) + 
-                      " for '" + displayLabel + "' and added it to component " + this);
    }
    
    /**
