@@ -107,7 +107,27 @@ public class WebDAVServlet extends HttpServlet
 
             if (method == null)
             {
+                // Debug
+                
+                if ( logger.isErrorEnabled())
+                    logger.error("WebDAV method not implemented - " + request.getMethod());
+                
+                // Return an error status
+                
                 response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+                return;
+            }
+            else if ( method.getRootNodeRef() == null)
+            {
+                // Debug
+                
+                if ( logger.isErrorEnabled())
+                    logger.error("No root node for request");
+                
+                // Return an error status
+                
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
 
             // Execute the WebDAV request, wrapped in a transaction
@@ -272,40 +292,44 @@ public class WebDAVServlet extends HttpServlet
 
         SharedDeviceList shares = fileSrvConfig.getShares();
         
-        if ( shares == null || shares.numberOfShares() == 0)
-            throw new ServletException("No shared filesystems defined in file-servers.xml");
-
-        try
+        if ( shares != null || shares.numberOfShares() > 0)
         {
-            Enumeration<SharedDevice> shareEnum = shares.enumerateShares();
-            
-            while ( shareEnum.hasMoreElements() && m_rootNodeRef == null)
+            try
             {
-                SharedDevice share = shareEnum.nextElement();
-                if ( share != null && share.getInterface() != null && share.getType() == ShareType.DISK)
+                Enumeration<SharedDevice> shareEnum = shares.enumerateShares();
+                
+                while ( shareEnum.hasMoreElements() && m_rootNodeRef == null)
                 {
-                    // Get the root node from the filesystem driver
-                    
-                    ContentDiskInterface contentDisk = (ContentDiskInterface) share.getInterface();
-                    m_rootNodeRef = contentDisk.getContextRootNodeRef();
+                    SharedDevice share = shareEnum.nextElement();
+                    if ( share != null && share.getInterface() != null && share.getType() == ShareType.DISK)
+                    {
+                        // Get the root node from the filesystem driver
+                        
+                        ContentDiskInterface contentDisk = (ContentDiskInterface) share.getInterface();
+                        m_rootNodeRef = contentDisk.getContextRootNodeRef();
+                    }
                 }
+
+                // Check if the root node was set successfully
+                
+                if ( m_rootNodeRef == null)
+                    throw new ServletException("Failed to set root node for WebDAV");
+            }
+            catch (InvalidDeviceInterfaceException ex)
+            {
+                // Log the error
+                
+                logger.error("WebDAV servlet initialization error", ex);
+                
+                // Rethrow as a servlet exception
+                
+                throw new ServletException(ex);
             }
         }
-        catch (InvalidDeviceInterfaceException ex)
+        else
         {
-            // Log the error
-            
-            logger.error("WebDAV servlet initialization error", ex);
-            
-            // Rethrow as a servlet exception
-            
-            throw new ServletException(ex);
+            logger.warn("No default root node for WebDAV, using home node only");
         }
-        
-        // Check if the root node was set successfully
-        
-        if ( m_rootNodeRef == null)
-            throw new ServletException("Failed to set root node for WebDAV");
         
         // Create the WebDAV methods table
         
