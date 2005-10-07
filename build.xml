@@ -21,21 +21,11 @@
    <!-- ** Building targets ** -->
    <!-- ********************** -->
    
-   <target name="build-jboss" depends="init" description="Builds the projects for use in JBoss Portal after cleaning">
-      <subant target="build">
-         <property name="server" value="jboss"/>
-         <filelist refid="files.project.build"/>
-      </subant>
-      <antcall target="deploy-jboss" />
-   </target> 
+   <target name="build-jboss" depends="init, clean, incremental-jboss" 
+           description="Builds the projects for use in JBoss Portal after cleaning"/>
    
-   <target name="build-tomcat" depends="init" description="Builds the projects for use in Tomcat after cleaning">
-      <subant target="build">
-         <property name="server" value="tomcat"/>
-         <filelist refid="files.project.build"/>
-      </subant>
-      <antcall target="deploy-tomcat" />
-   </target>
+   <target name="build-tomcat" depends="init, clean, incremental-tomcat" 
+           description="Builds the projects for use in Tomcat after cleaning"/>
 
    <target name="incremental-jboss" depends="init" description="Builds the projects for use in JBoss">
       <subant target="incremental">

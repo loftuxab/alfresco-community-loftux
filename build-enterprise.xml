@@ -15,10 +15,10 @@
       <filelist id="files.project.build" dir="."
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.enterprise}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.jcr}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.webclient}/project-build-enterprise.xml"/>
+                       ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
+                       ${dir.name.projects}/${dir.name.enterprise}/${file.name.project.build}"/>
    </target>
    
    <!-- build the documentation for the enterprise project -->
