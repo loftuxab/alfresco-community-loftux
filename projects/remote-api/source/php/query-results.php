@@ -1,42 +1,14 @@
 <?php
-   require_once('SOAP/Client.php');
 
-   // get hold of the repository service
-   $client = new SOAP_Client("http://localhost:8080/alfresco/api/RepositoryService");
-   $namespace = array('namespace' => 'http://www.alfresco.org/ws/service/repository/1.0', 'soapaction' => '', 'style' => 'document', 'use' => 'literal');
-   $client->__options = array('trace'=>1);
+   require_once('alfresco/Types.php');
+   require_once('alfresco/RepositoryService.php');
 
-   $username =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Username', false,
-                               $_POST['username']);
-   $password =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Password', false,
-                               $_POST['ticket'], array('Type' => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText'));
-   $usernameToken =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken', false,
-                                  $v = array($username, $password));
-   $securityHeader =& new SOAP_Header('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security', null,
-                                      $usernameToken, 1);
-   // remove the actor attribute that gets added by the constructor otherwise Axis gets upset!
-   unset($securityHeader->attributes['SOAP-ENV:actor']);
-   $client->addHeader($securityHeader);
+   $store = new Store('SpacesStore');
+   $query = new Query($_POST['statement'], 'lucene');
 
-   $scheme =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}scheme', '{http://www.alfresco.org/ws/model/content/1.0}StoreEnum', 'workspace');
-   $address =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}address', false, 'SpacesStore');
-   $store =& new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}store', false, $v=array($scheme, $address));
+   $repository_service = new RepositoryService($_POST['username'], $_POST['ticket']);
+   $queryResults = $repository_service->query($store, $query);
 
-   $language =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}language', '{http://www.alfresco.org/ws/model/content/1.0}QueryLanguageEnum', 'lucene');
-   $statement =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}statement', false, $_POST['statement']);
-   $query =& new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}query', false, $v=array($language, $statement));
-
-   $params =& new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}query', false, $v=array($store, $query, 'includeMetaData' => false));
-
-   $queryResults = $client->call('query', $v = array('query' => $params), $namespace);
-
-   /*print "<xmp>";
-   print $client->wire;
-   print "</xmp>";*/
-
-   /*print "<br><br><xmp>";
-   var_dump($queryResults);
-   print "</xmp>";*/
 ?>
 
 <html>

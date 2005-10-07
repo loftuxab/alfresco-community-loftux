@@ -18,7 +18,7 @@
 
    if (PEAR::isError($authResult) == false)
    {
-      header("Location: query.php?username=" . $_POST['username'] . "&ticket=" . $authResult->ticket);
+      header("Location: browse.php?username=" . $_POST['username'] . "&ticket=" . $authResult->ticket);
       exit;
    }
 ?>
