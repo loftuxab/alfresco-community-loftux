@@ -769,11 +769,15 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
             // Authenticate the user
 
-            try
+            SrvAuthenticator auth = getServer().getConfiguration().getAuthenticator();
+
+            int access = auth.authenticateUserPlainText(getClientInformation(), this);
+
+            if (access == SrvAuthenticator.AUTH_ALLOW)
             {
-                AuthenticationService authService = getServer().getConfiguration().getAuthenticationService();
-                authService.authenticate(getClientInformation().getUserName(), getClientInformation()
-                        .getPasswordAsString().toCharArray());
+
+                // User successfully logged on
+
                 sendFTPResponse(230, "User logged in, proceed");
                 setLoggedOn(true);
 
@@ -782,43 +786,21 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
                     logger.debug("User " + getClientInformation().getUserName() + ", logon successful");
             }
-            catch (AuthenticationException ae)
+            else
             {
-                // Fall back to local auth
 
-                SrvAuthenticator auth = getServer().getConfiguration().getAuthenticator();
+                // Return an access denied error
 
-                int access = auth.authenticateUserPlainText(getClientInformation(), this);
+                sendFTPResponse(530, "Access denied");
 
-                if (access == SrvAuthenticator.AUTH_ALLOW)
-                {
+                // DEBUG
 
-                    // User successfully logged on
+                if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
+                    logger.debug("User " + getClientInformation().getUserName() + ", logon failed");
 
-                    sendFTPResponse(230, "User logged in, proceed");
-                    setLoggedOn(true);
+                // Close the connection
 
-                    // DEBUG
-
-                    if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
-                        logger.debug("User " + getClientInformation().getUserName() + ", logon successful");
-                }
-                else
-                {
-
-                    // Return an access denied error
-
-                    sendFTPResponse(530, "Access denied");
-
-                    // DEBUG
-
-                    if (logger.isDebugEnabled() && hasDebug(DBG_STATE))
-                        logger.debug("User " + getClientInformation().getUserName() + ", logon failed");
-
-                    // Close the connection
-
-                    closeSession();
-                }
+                closeSession();
             }
         }
 

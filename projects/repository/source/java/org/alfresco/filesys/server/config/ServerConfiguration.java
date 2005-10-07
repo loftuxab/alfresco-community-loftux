@@ -63,6 +63,7 @@ import org.alfresco.filesys.server.filesys.DefaultShareMapper;
 import org.alfresco.filesys.server.filesys.DiskDeviceContext;
 import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.server.filesys.DiskSharedDevice;
+import org.alfresco.filesys.server.filesys.HomeShareMapper;
 import org.alfresco.filesys.smb.Dialect;
 import org.alfresco.filesys.smb.DialectSelector;
 import org.alfresco.filesys.smb.ServerType;
@@ -1216,7 +1217,34 @@ public class ServerConfiguration
      */
     private final void processFilesystemsConfig(Config config)
     {
-
+        // Check for the home folder filesystem
+        
+        ConfigElement homeElem = config.getConfigElement("homeFolder");
+        
+        if ( homeElem != null)
+        {
+            try
+            {
+                // Create the home folder share mapper
+                
+                HomeShareMapper shareMapper = new HomeShareMapper();
+                shareMapper.initializeMapper( this, homeElem);
+                
+                // Use the home folder share mapper
+                
+                m_shareMapper = shareMapper;
+                
+                // Debug
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Using home folder share mapper");
+            }
+            catch (InvalidConfigurationException ex)
+            {
+                throw new AlfrescoRuntimeException("Failed to initialize home folder share mapper", ex);
+            }
+        }
+        
         // Get the filesystem configuration elements
 
         List<ConfigElement> filesysElems = config.getConfigElementList("filesystem");
@@ -1819,6 +1847,16 @@ public class ServerConfiguration
         return m_comment != null ? m_comment : "";
     }
 
+    /**
+     * Return the disk interface to be used to create shares
+     * 
+     * @return DiskInterface
+     */
+    public final DiskInterface getDiskInterface()
+    {
+        return diskInterface;
+    }
+    
     /**
      * Return the domain name.
      * 

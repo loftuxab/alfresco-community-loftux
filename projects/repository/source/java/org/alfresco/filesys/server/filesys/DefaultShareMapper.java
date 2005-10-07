@@ -27,13 +27,14 @@ import org.alfresco.filesys.server.core.SharedDeviceList;
 
 /**
  * Default Share Mapper Class
- * <p>
- * Maps disk and print share lookup requests to the list of shares defined in the server
+ * 
+ * <p>Maps disk and print share lookup requests to the list of shares defined in the server
  * configuration.
+ * 
+ * @author GKSpencer
  */
 public class DefaultShareMapper implements ShareMapper
 {
-
     // Server configuration
 
     private ServerConfiguration m_config;

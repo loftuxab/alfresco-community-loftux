@@ -19,6 +19,8 @@ package org.alfresco.filesys.server;
 import java.net.InetAddress;
 
 import org.alfresco.filesys.server.auth.ClientInfo;
+import org.alfresco.filesys.server.core.SharedDevice;
+import org.alfresco.filesys.server.core.SharedDeviceList;
 
 /**
  * Server Session Base Class
@@ -76,6 +78,10 @@ public abstract class SrvSession
     // Authentication token, used during logon
     
     private Object m_authToken;
+
+    //  List of dynamic/temporary shares created for this session
+    
+    private SharedDeviceList m_dynamicShares;
     
     /**
      * Class constructor
@@ -94,6 +100,23 @@ public abstract class SrvSession
         setRemoteName(remName);
     }
 
+    /**
+     * Add a dynamic share to the list of shares created for this session
+     * 
+     * @param shrDev SharedDevice
+     */
+    public final void addDynamicShare(SharedDevice shrDev) {
+        
+        //  Check if the dynamic share list must be allocated
+        
+        if ( m_dynamicShares == null)
+            m_dynamicShares = new SharedDeviceList();
+            
+        //  Add the new share to the list
+        
+        m_dynamicShares.addShare(shrDev);
+    }
+    
     /**
      * Return the authentication token
      * 
@@ -189,6 +212,24 @@ public abstract class SrvSession
     public final ClientInfo getClientInformation()
     {
         return m_clientInfo;
+    }
+
+    /**
+     * Determine if the session has any dynamic shares
+     * 
+     * @return boolean
+     */
+    public final boolean hasDynamicShares() {
+        return m_dynamicShares != null ? true : false;
+    }
+
+    /**
+     * Return the list of dynamic shares created for this session
+     * 
+     * @return SharedDeviceList
+     */
+    public final SharedDeviceList getDynamicShareList() {
+        return m_dynamicShares;
     }
 
     /**
@@ -399,5 +440,13 @@ public abstract class SrvSession
      */
     public void closeSession()
     {
+        //  Release any dynamic shares owned by this session
+        
+        if ( hasDynamicShares()) {
+            
+            //  Close the dynamic shares
+            
+            getServer().getShareMapper().deleteShares(this);
+        }
     }
 }

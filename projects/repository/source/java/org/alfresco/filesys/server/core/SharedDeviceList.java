@@ -209,6 +209,14 @@ public class SharedDeviceList
     }
 
     /**
+     * Remove all shared devices from the share list
+     */
+    public final void removeAllShares()
+    {
+        m_shares.clear();
+    }
+    
+    /**
      * Return the share list as a string
      * 
      * @return String
