@@ -17,6 +17,7 @@
 package org.alfresco.repo.content.transform;
 
 import java.io.OutputStream;
+import java.util.Map;
 
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -69,7 +70,8 @@ public class PoiHssfContentTransformer extends AbstractContentTransformer
         }
     }
 
-    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    public void transformInternal(ContentReader reader, ContentWriter writer,  Map<String, Object> options)
+            throws Exception
     {
         OutputStream os = writer.getContentOutputStream();
         String encoding = writer.getEncoding();

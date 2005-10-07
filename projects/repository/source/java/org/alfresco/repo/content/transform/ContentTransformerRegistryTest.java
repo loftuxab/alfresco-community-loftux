@@ -19,6 +19,7 @@ package org.alfresco.repo.content.transform;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.filestore.FileContentReader;
@@ -218,7 +219,10 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         /**
          * Just notches up some average times
          */
-        public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+        public void transformInternal(
+                ContentReader reader,
+                ContentWriter writer,
+                Map<String, Object> options) throws Exception
         {
             // just update the transformation time
             super.recordTime(transformationTime);

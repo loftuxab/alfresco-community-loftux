@@ -37,7 +37,7 @@ public class ImageMagickContentTransformerTest extends AbstractContentTransforme
     {
         transformer = new ImageMagickContentTransformer();
         transformer.setMimetypeMap(mimetypeMap);
-        transformer.setConvertCommand("imconvert.exe ${source} ${target}");
+        transformer.setConvertCommand("imconvert.exe ${source} ${options} ${target}");
         transformer.init();
     }
     

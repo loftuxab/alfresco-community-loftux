@@ -18,6 +18,7 @@ package org.alfresco.repo.content.transform;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -60,7 +61,8 @@ public class TextMiningContentTransformer extends AbstractContentTransformer
         }
     }
 
-    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    public void transformInternal(ContentReader reader, ContentWriter writer,  Map<String, Object> options)
+            throws Exception
     {
         InputStream is = reader.getContentInputStream();
         String text = null;

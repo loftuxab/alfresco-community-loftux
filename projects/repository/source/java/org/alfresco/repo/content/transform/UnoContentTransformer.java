@@ -215,7 +215,8 @@ public class UnoContentTransformer extends AbstractContentTransformer
         }
     }
 
-    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    public void transformInternal(ContentReader reader, ContentWriter writer,  Map<String, Object> options)
+            throws Exception
     {
         String sourceMimetype = getMimetype(reader);
         String targetMimetype = getMimetype(writer);

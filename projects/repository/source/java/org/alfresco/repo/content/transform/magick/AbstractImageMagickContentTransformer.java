@@ -18,6 +18,8 @@ package org.alfresco.repo.content.transform.magick;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.MimetypeMap;
@@ -110,7 +112,8 @@ public abstract class AbstractImageMagickContentTransformer extends AbstractCont
                     ".png");
             
             // execute it
-            transformInternal(inputFile, outputFile);
+            Map<String, Object> options = Collections.emptyMap();
+            transformInternal(inputFile, outputFile, options);
             
             // check that the file exists
             if (!outputFile.exists())
@@ -179,7 +182,10 @@ public abstract class AbstractImageMagickContentTransformer extends AbstractCont
     /**
      * @see #transformInternal(File, File)
      */
-    protected final void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    protected final void transformInternal(
+            ContentReader reader,
+            ContentWriter writer,
+            Map<String, Object> options) throws Exception
     {
         // get mimetypes
         String sourceMimetype = getMimetype(reader);
@@ -216,7 +222,7 @@ public abstract class AbstractImageMagickContentTransformer extends AbstractCont
         reader.getContent(sourceFile);
         
         // transform the source temp file to the target temp file
-        transformInternal(sourceFile, targetFile);
+        transformInternal(sourceFile, targetFile, options);
         
         // check that the file was created
         if (!targetFile.exists())
@@ -230,16 +236,21 @@ public abstract class AbstractImageMagickContentTransformer extends AbstractCont
         {
             logger.debug("Transformation completed: \n" +
                     "   source: " + reader + "\n" +
-                    "   target: " + writer);
+                    "   target: " + writer + "\n" +
+                    "   options: " + options);
         }
     }
     
     /**
      * Transform the image content from the source file to the target file
      * 
-     * @param sourceFile
-     * @param targetFile
+     * @param sourceFile the source of the transformation
+     * @param targetFile the target of the transformation
+     * @param options the transformation options supported by ImageMagick
      * @throws Exception
      */
-    protected abstract void transformInternal(File sourceFile, File targetFile) throws Exception;
+    protected abstract void transformInternal(
+            File sourceFile,
+            File targetFile,
+            Map<String, Object> options) throws Exception;
 }

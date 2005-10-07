@@ -18,6 +18,7 @@ package org.alfresco.repo.content.transform;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.filestore.FileContentWriter;
@@ -125,11 +126,20 @@ public class CompoundContentTransformer implements ContentTransformer
         }
         return transformationTime;
     }
+    
+    /**
+     * 
+     */
+    public void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+    {
+        transform(reader, writer, null);
+    }
 
     /**
      * Executes each transformer in the chain, passing the content between them
      */
-    public void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+    public void transform(ContentReader reader, ContentWriter writer, Map<String, Object> options)
+            throws ContentIOException
     {
         if (chain.size() == 0)
         {
@@ -169,7 +179,7 @@ public class CompoundContentTransformer implements ContentTransformer
                 currentWriter.setMimetype(transformation.getTargetMimetype());
             }
             // transform from the current reader to the current writer
-            transformation.execute(currentReader, currentWriter);
+            transformation.execute(currentReader, currentWriter, options);
             if (!currentWriter.isClosed())
             {
                 throw new AlfrescoRuntimeException("Writer not closed by transformation: \n" +
@@ -211,9 +221,11 @@ public class CompoundContentTransformer implements ContentTransformer
          * 
          * @param reader the reader from which to read the content
          * @param writer the writer to write content to
+         * @param options the options to execute with
          * @throws ContentIOException if the transformation fails
          */
-        public void execute(ContentReader reader, ContentWriter writer) throws ContentIOException
+        public void execute(ContentReader reader, ContentWriter writer, Map<String, Object> options)
+                throws ContentIOException
         {
             String sourceMimetype = getSourceMimetype();
             String targetMimetype = getTargetMimetype();
@@ -230,7 +242,7 @@ public class CompoundContentTransformer implements ContentTransformer
                         "   target mimetype: " + targetMimetype + "\n" +
                         "   writer: " + writer);
             }
-            transformer.transform(reader, writer);
+            transformer.transform(reader, writer, options);
         }
     }
 }

@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Map;
 
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -75,7 +76,8 @@ public class StringExtractingContentTransformer extends AbstractContentTransform
      * be unformatted but valid. 
      */
     @Override
-    protected void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    public void transformInternal(ContentReader reader, ContentWriter writer,  Map<String, Object> options)
+            throws Exception
     {
         // is this a straight text-text transformation
         transformText(reader, writer);

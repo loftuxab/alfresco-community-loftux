@@ -17,6 +17,7 @@
 package org.alfresco.repo.content.transform.magick;
 
 import java.io.File;
+import java.util.Map;
 
 import magick.ImageInfo;
 import magick.MagickImage;
@@ -46,7 +47,7 @@ public class JMagickContentTransformer extends AbstractImageMagickContentTransfo
      * @throws Exception
      */
     @Override
-    protected void transformInternal(File sourceFile, File targetFile) throws Exception
+    protected void transformInternal(File sourceFile, File targetFile, Map<String, Object> options) throws Exception
     {
         ImageInfo imageInfo = new ImageInfo(sourceFile.getAbsolutePath());
         MagickImage image = new MagickImage(imageInfo);

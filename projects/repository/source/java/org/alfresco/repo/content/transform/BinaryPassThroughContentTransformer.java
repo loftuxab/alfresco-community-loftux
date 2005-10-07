@@ -16,6 +16,8 @@
  */
 package org.alfresco.repo.content.transform;
 
+import java.util.Map;
+
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.apache.commons.logging.Log;
@@ -61,7 +63,10 @@ public class BinaryPassThroughContentTransformer extends AbstractContentTransfor
     /**
      * Performs a direct stream provided the preconditions are met
      */
-    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    public void transformInternal(
+            ContentReader reader,
+            ContentWriter writer,
+            Map<String, Object> options) throws Exception
     {
         // just stream it
         writer.putContent(reader.getContentInputStream());

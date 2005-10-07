@@ -17,6 +17,7 @@
 package org.alfresco.repo.content.transform.magick;
 
 import java.io.File;
+import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -32,14 +33,20 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ImageMagickContentTransformer extends AbstractImageMagickContentTransformer
 {
+    /** the command options, such as <b>--resize</b>, etc. */
+    public static final String KEY_OPTIONS = "options";
     /** source variable name */
-    public static final String VAR_SOURCE = "${source}";
+    private static final String VAR_OPTIONS = "${options}";
     /** source variable regex */
-    public static final String VAR_SOURCE_REGEX = "\\$\\{source\\}";
+    private static final String VAR_OPTIONS_REGEX = "\\$\\{options\\}";
+    /** source variable name */
+    private static final String VAR_SOURCE = "${source}";
+    /** source variable regex */
+    private static final String VAR_SOURCE_REGEX = "\\$\\{source\\}";
     /** target variable name */
-    public static final String VAR_TARGET = "${target}";
+    private static final String VAR_TARGET = "${target}";
     /** target variable regex */
-    public static final String VAR_TARGET_REGEX = "\\$\\{target\\}";
+    private static final String VAR_TARGET_REGEX = "\\$\\{target\\}";
     
     private static final Log logger = LogFactory.getLog(ImageMagickContentTransformer.class);
     
@@ -65,10 +72,13 @@ public class ImageMagickContentTransformer extends AbstractImageMagickContentTra
      */
     public void setConvertCommand(String executable)
     {
-        if (!executable.contains(VAR_SOURCE) || !executable.contains(VAR_TARGET))
+        if (!executable.contains(VAR_SOURCE) ||
+                !executable.contains(VAR_TARGET) ||
+                !executable.contains(VAR_OPTIONS))
         {
             throw new AlfrescoRuntimeException
-                    ("ImageMagick convertCommand string contain the ${source} and ${target} variables");
+                    ("Missing variables from ImageMagick convertCommand: " +
+                            "imconvert ${source} ${options} ${target} variables");
         }
         this.convertCommand = executable;
     }
@@ -89,13 +99,16 @@ public class ImageMagickContentTransformer extends AbstractImageMagickContentTra
     
     /**
      * Transform the image content from the source file to the target file
-     * 
-     * @param sourceFile
-     * @param targetFile
-     * @throws Exception
      */
-    protected void transformInternal(File sourceFile, File targetFile) throws Exception
+    protected void transformInternal(File sourceFile, File targetFile, Map<String, Object> options) throws Exception
     {
+        // grab any convert options
+        String convertOptions = (String) options.get(KEY_OPTIONS);
+        if (convertOptions == null)
+        {
+            convertOptions = "";
+        }
+        
         String sourceFilename = sourceFile.getAbsolutePath();
         String targetFilename = targetFile.getAbsolutePath();
         // avoid regex replacement issue
@@ -108,6 +121,7 @@ public class ImageMagickContentTransformer extends AbstractImageMagickContentTra
         // substitute the variables for the filenames
         String exe = convertCommand.replaceAll(VAR_SOURCE_REGEX, sourceFilename);
         exe = exe.replaceAll(VAR_TARGET_REGEX, targetFilename);
+        exe = exe.replaceAll(VAR_OPTIONS_REGEX, convertOptions);
         
         // convert back
         if (File.separatorChar == '\\')

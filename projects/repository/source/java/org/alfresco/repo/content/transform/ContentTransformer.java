@@ -16,6 +16,8 @@
  */
 package org.alfresco.repo.content.transform;
 
+import java.util.Map;
+
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -54,6 +56,11 @@ public interface ContentTransformer
     public long getTransformationTime();
     
     /**
+     * @see #transform(ContentReader, ContentWriter, Map)
+     */
+    public void transform(ContentReader reader, ContentWriter writer) throws ContentIOException;
+    
+    /**
      * Transforms the content provided by the reader and source mimetype
      * to the writer and target mimetype.
      * <p>
@@ -66,7 +73,12 @@ public interface ContentTransformer
      * 
      * @param reader the source of the content
      * @param writer the destination of the transformed content
+     * @param options options to pass to the transformer.  These are transformer dependent
+     *      and may be null.
      * @throws ContentIOException if an IO exception occurs
      */
-    public void transform(ContentReader reader, ContentWriter writer) throws ContentIOException;
+    public void transform(
+            ContentReader reader,
+            ContentWriter writer,
+            Map<String, Object> options) throws ContentIOException;
 }

@@ -16,6 +16,9 @@
  */
 package org.alfresco.repo.content.transform;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -99,10 +102,24 @@ public abstract class AbstractContentTransformer implements ContentTransformer
      * 
      * @param reader the source of the content to transform
      * @param writer the target to which to write the transformed content
+     * @param options a map of options to use when performing the transformation.  The map
+     *      will never be null.
      * @throws Exception exceptions will be handled by this class - subclasses can throw anything
      */
-    protected abstract void transformInternal(ContentReader reader, ContentWriter writer) throws Exception;
+    protected abstract void transformInternal(
+            ContentReader reader,
+            ContentWriter writer,
+            Map<String, Object> options) throws Exception;
     
+    /**
+     * @see #transform(ContentReader, ContentWriter, Map)
+     * @see #transformInternal(ContentReader, ContentWriter, Map)
+     */
+    public final void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+    {
+        transform(reader, writer, null);
+    }
+
     /**
      * Performs the following:
      * <ul>
@@ -113,8 +130,13 @@ public abstract class AbstractContentTransformer implements ContentTransformer
      *   <li>Logs a successful transformation</li>
      * </ul>
      * Subclass need only be concerned with performing the transformation.
+     * <p>
+     * If the options provided are null, then an empty map will be created.
      */
-    public final void transform(ContentReader reader, ContentWriter writer) throws ContentIOException
+    public final void transform(
+            ContentReader reader,
+            ContentWriter writer,
+            Map<String, Object> options) throws ContentIOException
     {
         // begin timing
         long before = System.currentTimeMillis();
@@ -122,15 +144,22 @@ public abstract class AbstractContentTransformer implements ContentTransformer
         // check the reliability
         checkReliability(reader, writer);
         
+        // check options map
+        if (options == null)
+        {
+            options = Collections.emptyMap();
+        }
+        
         try
         {
-            transformInternal(reader, writer);
+            transformInternal(reader, writer, options);
         }
         catch (Throwable e)
         {
             throw new ContentIOException("Content conversion failed: \n" +
                     "   reader: " + reader + "\n" +
-                    "   writer: " + writer,
+                    "   writer: " + writer + "\n" +
+                    "   options: " + options,
                     e);
         }
         
@@ -144,6 +173,7 @@ public abstract class AbstractContentTransformer implements ContentTransformer
             logger.debug("Completed transformation: \n" +
                     "   reader: " + reader + "\n" +
                     "   writer: " + writer + "\n" +
+                    "   options: " + options + "\n" +
                     "   transformer: " + this);
         }
     }

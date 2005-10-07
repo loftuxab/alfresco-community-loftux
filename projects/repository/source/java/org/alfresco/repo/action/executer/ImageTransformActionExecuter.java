@@ -16,7 +16,9 @@
  */
 package org.alfresco.repo.action.executer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.content.transform.magick.ImageMagickContentTransformer;
@@ -40,9 +42,6 @@ public class ImageTransformActionExecuter extends TransformActionExecuter
 	public static final String NAME = "transform-image";
 	public static final String PARAM_CONVERT_COMMAND = "convert-command";
 	
-	private static final String IMCOVERT = "imconvert ";
-	private static final String SOURCE_TARGET =  " \"${source}\" \"${target}\"";
-    
 	private ImageMagickContentTransformer imageMagickContentTransformer;
 	
 	/**
@@ -77,10 +76,10 @@ public class ImageTransformActionExecuter extends TransformActionExecuter
         }
 		// Try and transform the content
         String convertCommand = (String)ruleAction.getParameterValue(PARAM_CONVERT_COMMAND);
-        if (convertCommand != null && convertCommand.length() != 0)
-        {
-        	this.imageMagickContentTransformer.setConvertCommand(IMCOVERT + convertCommand + SOURCE_TARGET);
-        }
-        this.imageMagickContentTransformer.transform(contentReader, contentWriter);    
+        // create some options for the transform
+        Map<String, Object> options = new HashMap<String, Object>(5);
+        options.put(ImageMagickContentTransformer.KEY_OPTIONS, convertCommand);
+        
+        this.imageMagickContentTransformer.transform(contentReader, contentWriter, options);    
 	}
 }

@@ -17,6 +17,7 @@
 package org.alfresco.repo.content.transform;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -56,7 +57,7 @@ public class PdfBoxContentTransformer extends AbstractContentTransformer
         }
     }
 
-    public void transformInternal(ContentReader reader, ContentWriter writer) throws Exception
+    public void transformInternal(ContentReader reader, ContentWriter writer,  Map<String, Object> options)
     {
         PDDocument pdf = null;
         try
