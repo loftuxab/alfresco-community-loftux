@@ -26,6 +26,8 @@ import org.alfresco.service.cmr.rule.RuleType;
 public interface RuntimeRuleService 
 {
 	void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule);
+    
+    void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule, boolean executeAtEnd);
 
 	void executePendingRules();	
 	

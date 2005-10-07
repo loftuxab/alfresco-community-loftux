@@ -344,6 +344,18 @@
             <ref bean="permissionService" />
         </property>
     </bean>
+    
+    <bean id="versionableAspect" class="org.alfresco.repo.version.VersionableAspect" init-method="init">
+        <property name="policyComponent">
+            <ref bean="policyComponent" />
+        </property>
+        <property name="ruleService">
+            <ref bean="ruleService"/>
+        </property>
+        <property name="actionService">
+            <ref bean="actionService"/>
+        </property>
+    </bean>
 
     <!--                 -->
     <!-- Data Dictionary -->

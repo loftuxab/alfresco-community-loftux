@@ -241,15 +241,15 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		
 		// Check the verioned content
 		ContentReader versionContentReader = this.contentService.getReader(versionNodeRef, ContentModel.PROP_CONTENT);
-		assertNotNull(versionContentReader);
-		assertEquals(CONTENT_1, versionContentReader.getContentString());		
+		assertNotNull(versionContentReader);	
+        assertEquals(CONTENT_2, versionContentReader.getContentString());
 		
 		// Check that the name is not updated during the check-in
 		assertEquals(TEST_VALUE_NAME, this.nodeService.getProperty(versionNodeRef, PROP_NAME_QNAME));
 		assertEquals(TEST_VALUE_NAME, this.nodeService.getProperty(origNodeRef, PROP_NAME_QNAME));
 		
 		// Check that the other properties are updated during the check-in
-		assertEquals(TEST_VALUE_2, this.nodeService.getProperty(versionNodeRef, PROP2_QNAME));
+		assertEquals(TEST_VALUE_3, this.nodeService.getProperty(versionNodeRef, PROP2_QNAME));
 		assertEquals(TEST_VALUE_3, this.nodeService.getProperty(origNodeRef, PROP2_QNAME));
 		
 		// Cancel the check out after is has been left checked out

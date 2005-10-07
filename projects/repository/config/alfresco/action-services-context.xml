@@ -107,6 +107,18 @@
             <ref bean="nodeService" />
         </property>
     </bean>
+    
+    <bean id="has-version-history" class="org.alfresco.repo.action.evaluator.HasVersionHistoryEvaluator" parent="action-condition-evaluator">
+      <property name="publicCondition">
+         <value>false</value>
+      </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="versionService">
+            <ref bean="versionService" />
+        </property>
+    </bean>
 
     <!-- Actions -->
 
@@ -122,6 +134,18 @@
       </property>
 	  <property name="actionService">
          <ref bean="actionService"/>
+	  </property>
+   </bean>
+   
+   <bean id="create-version" class="org.alfresco.repo.action.executer.CreateVersionActionExecuter" parent="action-executer">
+      <property name="publicAction">
+         <value>false</value>
+      </property>
+	  <property name="nodeService">
+         <ref bean="nodeService"/>
+	  </property>
+	  <property name="versionService">
+         <ref bean="versionService"/>
 	  </property>
    </bean>
 

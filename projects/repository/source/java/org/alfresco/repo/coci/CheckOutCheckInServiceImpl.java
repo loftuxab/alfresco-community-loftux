@@ -351,12 +351,6 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 				throw new CheckOutCheckInServiceException("This user is not the owner of the working copy and can not check it in.", exception);
 			}
 			
-			if (versionProperties != null && this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == true)
-			{
-				// Create the new version
-				this.versionService.createVersion(nodeRef, versionProperties);
-			}
-			
 			if (contentUrl != null)
 			{
                 ContentData contentData = (ContentData) workingCopyProperties.get(ContentModel.PROP_CONTENT);
@@ -382,6 +376,12 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			// Copy the contents of the working copy onto the origional
 			this.copyService.copy(workingCopyNodeRef, nodeRef);
 			
+            if (versionProperties != null && this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == true)
+            {
+                // Create the new version
+                this.versionService.createVersion(nodeRef, versionProperties);
+            }
+            
 			if (keepCheckedOut == false)
 			{
 				// Delete the working copy

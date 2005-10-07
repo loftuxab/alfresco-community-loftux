@@ -884,13 +884,13 @@ public class ActionServiceImplTest extends BaseSpringTest
 						
 						// Create an action that will succeed
 						Action goodAction = ActionServiceImplTest.this.actionService.createAction(AddFeaturesActionExecuter.NAME);
-						goodAction.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+						goodAction.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_CLASSIFIABLE);
 						goodAction.setTitle("title");
 						goodAction.setDescription("description");
 						
 						// Execute the action
 						ActionServiceImplTest.this.actionService.executeAction(goodAction, ActionServiceImplTest.this.nodeRef);
-						assertTrue(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ContentModel.ASPECT_VERSIONABLE));
+						assertTrue(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ContentModel.ASPECT_CLASSIFIABLE));
 						return goodAction;
 					}					
 				});
@@ -904,8 +904,8 @@ public class ActionServiceImplTest extends BaseSpringTest
 					{
 						assertTrue(ActionServiceImplTest.this.nodeService.hasAspect(ActionServiceImplTest.this.nodeRef, ActionModel.ASPECT_ACTION_EXECUTION_HISTORY));
 						List<ActionExecutionDetails> details = ActionServiceImplTest.this.actionService.getActionExecutionHistory(ActionServiceImplTest.this.nodeRef);
-						assertNotNull(details);
-						assertEquals(1, details.size());
+						assertNotNull(details);					
+                        assertEquals(1, details.size());
 						checkActionExecutionDetails(
 								details.get(0),
 								"title",
@@ -1059,7 +1059,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		
 		// Create the compensating action
 		Action compensatingAction = actionService.createAction(AddFeaturesActionExecuter.NAME);
-		compensatingAction.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_VERSIONABLE);
+		compensatingAction.setParameterValue(AddFeaturesActionExecuter.PARAM_ASPECT_NAME, ContentModel.ASPECT_CLASSIFIABLE);
 		compensatingAction.setTitle("title");
 		action.setCompensatingAction(compensatingAction);
 		
@@ -1080,7 +1080,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 					public boolean executeTest() 
 					{
 						return (
-							ActionServiceImplTest.this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
+							ActionServiceImplTest.this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_CLASSIFIABLE));
 					};
 				});
 		

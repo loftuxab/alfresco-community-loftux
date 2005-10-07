@@ -561,16 +561,19 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	}
     }
 	
-	/**
-	 * @see org.alfresco.repo.rule.RuleService#addRulePendingExecution(NodeRef, NodeRef, Rule)
-	 */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
+    {
+        addRulePendingExecution(actionableNodeRef, actionedUponNodeRef, rule, false);
+    }
+
+	@SuppressWarnings("unchecked")
+    public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule, boolean executeAtEnd) 
 	{
         // First check to see if the node has been disabled
         if (this.disabledNodeRefs.contains(actionableNodeRef) == false)
         {
-    		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule);
+    		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule, executeAtEnd);
             Set<ExecutedRuleData> executedRules =
                     (Set<ExecutedRuleData>) AlfrescoTransactionSupport.getResource(KEY_RULES_EXECUTED);
     		
@@ -600,7 +603,12 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
         AlfrescoTransactionSupport.bindResource(KEY_RULES_EXECUTED, new HashSet<ExecutedRuleData>());
         try
         {
-            executePendingRulesImpl();
+            List<PendingRuleData> executeAtEndRules = new ArrayList<PendingRuleData>();
+            executePendingRulesImpl(executeAtEndRules);
+            for (PendingRuleData data : executeAtEndRules)
+            {
+                executePendingRule(data);
+            }
         }
         finally
         {
@@ -612,7 +620,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
      * Executes the pending rules, iterating until all pending rules have been executed
      */
     @SuppressWarnings("unchecked")
-    private void executePendingRulesImpl()
+    private void executePendingRulesImpl(List<PendingRuleData> executeAtEndRules)
     {
         // get the transaction-local rules to execute
         Set<PendingRuleData> pendingRules =
@@ -626,11 +634,18 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
             // execute each rule
             for (PendingRuleData pendingRule : pendingRulesArr) 
             {
-                executePendingRule(pendingRule);
+                if (pendingRule.getExecuteAtEnd() == false)
+                {
+                    executePendingRule(pendingRule);
+                }
+                else
+                {
+                    executeAtEndRules.add(pendingRule);
+                }
             }
             
             // Run any rules that have been marked as pending during execution
-            executePendingRulesImpl();
+            executePendingRulesImpl(executeAtEndRules);
         }   
     }
 	
@@ -733,17 +748,24 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	private class PendingRuleData extends ExecutedRuleData
 	{
 		private NodeRef actionedUponNodeRef;
-        
-		public PendingRuleData(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule) 
-		{
-			super(actionableNodeRef, rule);
-			this.actionedUponNodeRef = actionedUponNodeRef;
-		}
+        private boolean executeAtEnd = false;
+        	
+        public PendingRuleData(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule, boolean executeAtEnd) 
+        {
+            super(actionableNodeRef, rule);
+            this.actionedUponNodeRef = actionedUponNodeRef;
+            this.executeAtEnd = executeAtEnd;
+        }
 		
 		public NodeRef getActionedUponNodeRef() 
 		{
 			return actionedUponNodeRef;
 		}
+        
+        public boolean getExecuteAtEnd()
+        {
+            return this.executeAtEnd;
+        }
 		
 		@Override
 		public int hashCode() 
