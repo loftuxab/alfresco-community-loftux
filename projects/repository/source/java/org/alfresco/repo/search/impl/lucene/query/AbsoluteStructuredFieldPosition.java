@@ -103,7 +103,4 @@ public class AbsoluteStructuredFieldPosition extends AbstractStructuredFieldPosi
     {
         return "Absolute Named child";
     }
-
- 
-    
 }

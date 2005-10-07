@@ -109,4 +109,6 @@ public interface StructuredFieldPosition
     public boolean allowsLinkingBySelf();
     
     public boolean isDescendant();
+    
+    public boolean matchesAll();
 }

@@ -47,8 +47,12 @@ public class PathScorer extends Scorer
         Scorer selfScorer = null;
         HashMap<String, Counter> selfIds = null;
         
-        StructuredFieldPosition last = pathQuery.getQNameStructuredFieldPositions().get(pathQuery.getQNameStructuredFieldPositions().size() - 1);
-        if (last.linkSelf())
+        StructuredFieldPosition last = null;
+        if(pathQuery.getQNameStructuredFieldPositions().size() > 0)
+        {
+           last = pathQuery.getQNameStructuredFieldPositions().get(pathQuery.getQNameStructuredFieldPositions().size() - 1);
+        }
+        if ((last != null) && last.linkSelf())
         {
             PathQuery selfQuery = new PathQuery(dictionarySertvice);
             selfQuery.setQuery(pathQuery.getPathStructuredFieldPositions(), pathQuery.getQNameStructuredFieldPositions());
@@ -141,7 +145,7 @@ public class PathScorer extends Scorer
         }
 
         LeafScorer ls = new LeafScorer(weight, rootLeafPositions, level0, cs, (StructuredFieldPosition[]) pathQuery.getQNameStructuredFieldPositions().toArray(new StructuredFieldPosition[] {}), nodePositions,
-                selfIds, reader, similarity, reader.norms(pathQuery.getQnameField()), dictionarySertvice, repeat);
+                selfIds, reader, similarity, reader.norms(pathQuery.getQnameField()), dictionarySertvice, repeat, tp);
 
         return new PathScorer(similarity, ls);
     }

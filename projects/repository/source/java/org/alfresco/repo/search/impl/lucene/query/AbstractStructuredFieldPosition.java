@@ -112,6 +112,13 @@ public abstract class AbstractStructuredFieldPosition implements StructuredField
     {
         return false;
     }
+    
+    public boolean matchesAll()
+    {
+        return getCachingTermPositions() == null;
+    }
+
+ 
 
     
 }

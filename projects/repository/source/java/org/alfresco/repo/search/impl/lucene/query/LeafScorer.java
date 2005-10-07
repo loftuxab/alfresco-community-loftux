@@ -18,6 +18,8 @@ package org.alfresco.repo.search.impl.lucene.query;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,14 +27,15 @@ import java.util.List;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.SearcherException;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.QName;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Scorer;
@@ -83,22 +86,35 @@ public class LeafScorer extends Scorer
 
     HashSet<String> selfLinks = new HashSet<String>();
 
+    BitSet selfDocs = new BitSet();
+
     private TermPositions root;
 
     private int rootDoc;
 
     private boolean repeat;
 
-    DictionaryService dictionaryService;
+    private DictionaryService dictionaryService;
 
-    public LeafScorer(Weight weight, TermPositions root, TermPositions level0, ContainerScorer containerScorer, StructuredFieldPosition[] sfps, TermPositions allNodes,
-            HashMap<String, Counter> selfIds, IndexReader reader, Similarity similarity, byte[] norms, DictionaryService dictionaryService, boolean repeat)
+    private int[] parents;
+
+    private int[] self;
+
+    private int[] cats;
+
+    private TermPositions tp;
+
+    public LeafScorer(Weight weight, TermPositions root, TermPositions level0, ContainerScorer containerScorer,
+            StructuredFieldPosition[] sfps, TermPositions allNodes, HashMap<String, Counter> selfIds,
+            IndexReader reader, Similarity similarity, byte[] norms, DictionaryService dictionaryService,
+            boolean repeat, TermPositions tp)
     {
         super(similarity);
         this.root = root;
         this.containerScorer = containerScorer;
         this.sfps = sfps;
         this.allNodes = allNodes;
+        this.tp = tp;
         if (selfIds == null)
         {
             this.selfIds = new HashMap<String, Counter>();
@@ -121,6 +137,7 @@ public class LeafScorer extends Scorer
         {
             throw new SearcherException(e);
         }
+
     }
 
     private void initialise() throws IOException
@@ -202,6 +219,100 @@ public class LeafScorer extends Scorer
             {
                 throw new SearcherException("More than one root node? " + parentIds.size());
             }
+        }
+
+        if (allNodes())
+        {
+            int position = 0;
+            parents = new int[10000];
+            for (String parent : parentIds.keySet())
+            {
+                Counter counter = parentIds.get(parent);
+                tp.seek(new Term("PARENT", parent));
+                while (tp.next())
+                {
+                    for (int i = 0, l = tp.freq(); i < l; i++)
+                    {
+                        for(int j = 0; j < counter.count; j++)
+                        {
+                           parents[position++] = tp.doc();
+                        }
+                    }
+                }
+                if (position == parents.length)
+                {
+                    int[] old = parents;
+                    parents = new int[old.length * 2];
+                    System.arraycopy(old, 0, parents, 0, old.length);
+                }
+            }
+            int[] old = parents;
+            parents = new int[position];
+            System.arraycopy(old, 0, parents, 0, position);
+            Arrays.sort(parents);
+
+            position = 0;
+            self = new int[10000];
+            for (String id : selfIds.keySet())
+            {
+                tp.seek(new Term("ID", id));
+                while (tp.next())
+                {
+                    Counter counter = selfIds.get(id);
+                    for(int i = 0; i < counter.count; i++)
+                    {
+                       self[position++] = tp.doc();
+                    }
+                }
+                if (position == self.length)
+                {
+                    old = self;
+                    self = new int[old.length * 2];
+                    System.arraycopy(old, 0, self, 0, old.length);
+                }
+            }
+            old = self;
+            self = new int[position];
+            System.arraycopy(old, 0, self, 0, position);
+            Arrays.sort(self);
+
+            position = 0;
+            cats = new int[10000];
+            for (String catid : categories.keySet())
+            {
+                for (QName apsectQName : dictionaryService.getAllAspects())
+                {
+                    AspectDefinition aspDef = dictionaryService.getAspect(apsectQName);
+                    if (isCategorised(aspDef))
+                    {
+                        for (PropertyDefinition propDef : aspDef.getProperties().values())
+                        {
+                            if (propDef.getDataType().getName().equals(DataTypeDefinition.CATEGORY))
+                            {
+                                tp.seek(new Term("@" + propDef.getName().toString(), catid));
+                                while (tp.next())
+                                {
+                                    for (int i = 0, l = tp.freq(); i < l; i++)
+                                    {
+                                        cats[position++] = tp.doc();
+                                    }
+                                }
+                                if (position == cats.length)
+                                {
+                                    old = cats;
+                                    cats = new int[old.length * 2];
+                                    System.arraycopy(old, 0, cats, 0, old.length);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            old = cats;
+            cats = new int[position];
+            System.arraycopy(old, 0, cats, 0, position);
+            Arrays.sort(cats);
         }
     }
 
@@ -442,7 +553,61 @@ public class LeafScorer extends Scorer
 
     private boolean check() throws IOException
     {
-        String name = reader.document(doc()).getField("QNAME").stringValue();
+        if (allNodes())
+        {
+            this.counter = 0;
+            int position;
+
+            StructuredFieldPosition last = sfps[sfps.length - 1];
+
+            if (last.linkSelf())
+            {
+                if ((self != null) && sfps[1].linkSelf() && ((position = Arrays.binarySearch(self, doc())) >= 0))
+                {
+                    if (!selfDocs.get(doc()))
+                    {
+                        selfDocs.set(doc());
+                        while (position > -1 && self[position] == doc())
+                        {
+                            position--;
+                        }
+                        for (int i = position + 1, l = self.length; ((i < l) && (self[i] == doc())); i++)
+                        {
+                            this.counter++;
+                        }
+                    }
+                }
+            }
+            if (!selfDocs.get(doc()) && last.linkParent())
+            {
+                if ((parents != null) && ((position = Arrays.binarySearch(parents, doc())) >= 0))
+                {
+                    while (position > -1 && parents[position] == doc())
+                    {
+                        position--;
+                    }
+                    for (int i = position + 1, l = parents.length; ((i < l) && (parents[i] == doc())); i++)
+                    {
+                        this.counter++;
+                    }
+                }
+
+                if ((cats != null) && ((position = Arrays.binarySearch(cats, doc())) >= 0))
+                {
+                    while (position > -1 && cats[position] == doc())
+                    {
+                        position--;
+                    }
+                    for (int i = position + 1, l = cats.length; ((i < l) && (cats[i] == doc())); i++)
+                    {
+                        this.counter++;
+                    }
+                }
+            }
+            return counter > 0;
+        }
+
+        // String name = reader.document(doc()).getField("QNAME").stringValue();
         // We have duplicate entries
         // The match must be in a known term range
         int count = root.freq();
@@ -493,8 +658,10 @@ public class LeafScorer extends Scorer
             }
         }
 
-        Field[] parentFields = reader.document(doc()).getFields("PARENT");
-        Field[] linkFields = reader.document(doc()).getFields("LINKASPECT");
+        Document doc = reader.document(doc());
+        Field[] parentFields = doc.getFields("PARENT");
+        Field[] linkFields = doc.getFields("LINKASPECT");
+
         String parentID = null;
         String linkAspect = null;
         if ((parentFields != null) && (parentFields.length > position) && (parentFields[position] != null))
@@ -506,11 +673,11 @@ public class LeafScorer extends Scorer
             linkAspect = linkFields[position].stringValue();
         }
 
-        containersIncludeCurrent(parentID, linkAspect);
+        containersIncludeCurrent(doc, parentID, linkAspect);
 
     }
 
-    private void containersIncludeCurrent(String parentID, String aspectQName) throws IOException
+    private void containersIncludeCurrent(Document document, String parentID, String aspectQName) throws IOException
     {
         if ((containerScorer != null) || (level0 != null))
         {
@@ -518,11 +685,8 @@ public class LeafScorer extends Scorer
             {
                 return;
             }
-            Document document = reader.document(doc());
+            String id = document.getField("ID").stringValue();
             StructuredFieldPosition last = sfps[sfps.length - 1];
-            Field field;
-            field = document.getField("ID");
-            String id = field.stringValue();
             if ((last.linkSelf() && selfIds.containsKey(id)))
             {
                 Counter counter = selfIds.get(id);

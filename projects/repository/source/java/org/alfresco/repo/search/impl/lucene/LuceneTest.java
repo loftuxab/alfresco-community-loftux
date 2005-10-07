@@ -686,6 +686,12 @@ public class LuceneTest extends TestCase
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one\"", null, null);
         assertEquals(1, results.length());
         results.close();
+//        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/\"", null, null);
+//        assertEquals(1, results.length());
+//        results.close();
+//        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/.\"", null, null);
+//        assertEquals(1, results.length());
+//        results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two\"", null, null);
         assertEquals(1, results.length());
         results.close();
