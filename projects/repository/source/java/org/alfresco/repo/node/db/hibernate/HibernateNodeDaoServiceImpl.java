@@ -233,6 +233,10 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
             // done
             return (Node) obj;
         }
+        catch (ObjectDeletedException e)
+        {
+            return null;
+        }
         catch (DataAccessException e)
         {
             if (e.contains(ObjectDeletedException.class))
