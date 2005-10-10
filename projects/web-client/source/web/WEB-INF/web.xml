@@ -74,6 +74,11 @@
       <filter-class>org.alfresco.web.app.servlet.ModeDetectionFilter</filter-class>
    </filter>
 
+   <filter>
+      <filter-name>WebDAV Authentication Filter</filter-name>
+      <filter-class>org.alfresco.repo.webdav.auth.AuthenticationFilter</filter-class>
+   </filter>
+
    <filter-mapping>
       <filter-name>Authentication Filter</filter-name>
       <url-pattern>/faces/*</url-pattern>
@@ -82,6 +87,11 @@
    <filter-mapping>
       <filter-name>Mode Detection Filter</filter-name>
       <url-pattern>/faces/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>WebDAV Authentication Filter</filter-name>
+      <url-pattern>/webdav/*</url-pattern>
    </filter-mapping>
    
    <listener>
@@ -124,6 +134,12 @@
       <load-on-startup>5</load-on-startup>
    </servlet>
    
+   <servlet>
+      <servlet-name>WebDAV</servlet-name>
+      <servlet-class>org.alfresco.repo.webdav.WebDAVServlet</servlet-class>
+      <load-on-startup>5</load-on-startup>
+   </servlet>
+   
    <servlet-mapping>
       <servlet-name>Faces Servlet</servlet-name>
       <url-pattern>/faces/*</url-pattern>
@@ -147,6 +163,11 @@
    <servlet-mapping>
       <servlet-name>axis</servlet-name>
       <url-pattern>/api/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+		<servlet-name>WebDAV</servlet-name>
+		<url-pattern>/webdav/*</url-pattern>
    </servlet-mapping>
    
    <session-config>
