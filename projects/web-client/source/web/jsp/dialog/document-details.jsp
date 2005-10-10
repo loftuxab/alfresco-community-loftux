@@ -224,7 +224,7 @@
                                              <tr>
                                                 <td>
                                                    <div style="border: thin solid #CCCCCC; padding:4px">
-                                                      <a:actionLink id="doc-logo1" value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" image="#{DocumentDetailsBean.document.properties.fileType32}" showLink="false" />
+                                                      <a:actionLink id="doc-logo1" value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" target="new" image="#{DocumentDetailsBean.document.properties.fileType32}" showLink="false" />
                                                    </div>
                                                 </td>
                                                 <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
@@ -263,7 +263,7 @@
                                              <tr>
                                                 <td>
                                                    <div style="border: thin solid #CCCCCC; padding:4px">
-                                                      <a:actionLink id="doc-logo2" value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" image="#{DocumentDetailsBean.document.properties.fileType32}" showLink="false" />
+                                                      <a:actionLink id="doc-logo2" value="#{DocumentDetailsBean.name}" href="#{DocumentDetailsBean.url}" target="new" image="#{DocumentDetailsBean.document.properties.fileType32}" showLink="false" />
                                                    </div>
                                                 </td>
                                                 <td><img src="<%=request.getContextPath()%>/images/parts/rightSideShadow42.gif" width=6 height=42></td>
@@ -337,7 +337,7 @@
                                        <f:facet name="header">
                                           <a:sortLink label="#{msg.version}" value="versionLabel" mode="case-insensitive" styleClass="header"/>
                                        </f:facet>
-                                       <a:actionLink id="label" value="#{r.versionLabel}" href="#{r.url}" />
+                                       <a:actionLink id="label" value="#{r.versionLabel}" href="#{r.url}" target="new" />
                                     </a:column>
                                     
                                     <%-- Description columns --%>
@@ -363,7 +363,7 @@
                                        <f:facet name="header">
                                           <h:outputText value="#{msg.actions}"/>
                                        </f:facet>
-                                       <a:actionLink id="view-link" value="View" href="#{r.url}" />
+                                       <a:actionLink id="view-link" value="View" href="#{r.url}" target="new" />
                                     </a:column>
               
                                     <a:dataPager/>

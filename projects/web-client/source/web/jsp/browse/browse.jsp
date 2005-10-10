@@ -355,27 +355,27 @@
                               <a:sortLink label="#{msg.name}" value="name" mode="case-insensitive" styleClass="header"/>
                            </f:facet>
                            <f:facet name="small-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType16}" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" target="new" image="#{r.fileType16}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
-                           <a:actionLink value="#{r.name}" href="#{r.url}" />
+                           <a:actionLink value="#{r.name}" href="#{r.url}" target="new" />
                            <r:lockIcon value="#{r.nodeRef}" align="absmiddle" />
                         </a:column>
                         
                         <%-- Primary column for icons view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;" rendered="#{BrowseBean.browseViewMode == 'icons'}">
                            <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" target="new" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
-                           <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="header" />
+                           <a:actionLink value="#{r.name}" href="#{r.url}" target="new" styleClass="header" />
                            <r:lockIcon value="#{r.nodeRef}" align="absmiddle" />
                         </a:column>
                         
                         <%-- Primary column for list view mode --%>
                         <a:column primary="true" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'list'}">
                            <f:facet name="large-icon">
-                              <a:actionLink value="#{r.name}" href="#{r.url}" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
+                              <a:actionLink value="#{r.name}" href="#{r.url}" target="new" image="#{r.fileType32}" showLink="false" styleClass="inlineAction" />
                            </f:facet>
-                           <a:actionLink value="#{r.name}" href="#{r.url}" styleClass="title" />
+                           <a:actionLink value="#{r.name}" href="#{r.url}" target="new" styleClass="title" />
                            <r:lockIcon value="#{r.nodeRef}" align="absmiddle" />
                         </a:column>
                         
