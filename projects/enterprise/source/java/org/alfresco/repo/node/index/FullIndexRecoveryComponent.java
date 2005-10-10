@@ -240,10 +240,14 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         return changeTxnIds;
     }
     
+    /**
+     * Reindexes changes specific to the store and change transaction.
+     */
     private void reindex(StoreRef storeRef, String changeTxnId)
     {
         /*
          * This must execute each within its own transaction.
+         * The cache size is therefore not an issue.
          */
         UserTransaction txn = transactionService.getNonPropagatingUserTransaction();
         try
