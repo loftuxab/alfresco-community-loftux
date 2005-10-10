@@ -6,8 +6,8 @@
 
    <target name="init" depends="common-init.init">
       <path id="classpath.unit.test.enterprise">
-         <path refid="classpath.unit.test"/>
          <pathelement location="${basedir}/${dir.name.config}"/>
+         <path refid="classpath.unit.test"/>
       </path>
    </target>
 
