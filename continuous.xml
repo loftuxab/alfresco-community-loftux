@@ -51,6 +51,7 @@
    <target name="-post-setup">
       <property name="file.name.dist.bin.tomcat" value="${file.name.start}-${file.suffix.tomcat}"/>
       <property name="file.name.dist.bin.jboss" value="${file.name.start}-${file.suffix.jboss}"/>
+      <property name="file.name.dist.bin.war" value="${file.name.start}-${file.suffix.war}"/>
       <property name="file.name.dist.src" value="${file.name.start}-${file.suffix.src}"/>
       <property name="file.name.dist.src.nightly" value="${file.name.start}-${file.suffix.src.nightly}"/>
    </target>
@@ -84,7 +85,7 @@
 
    <target name="distribute" 
            depends="init, package-jboss-binary-distribution,package-tomcat-binary-distribution,
-                    package-source-distribution, generate-checksums" 
+                    package-source-distribution, generate-checksums"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="package-jboss-binary-distribution" depends="init" description="Creates the distibution files for JBoss">
@@ -98,6 +99,7 @@
       <ant antfile="${file.name.build}" target="clean-war"/>
       <ant antfile="${file.name.build}" target="incremental-tomcat"/>
       <antcall target="package-tomcat-binary-distribution-windows"/>
+      <antcall target="package-war-binary-distribution-windows"/>
       <antcall target="package-tomcat-binary-distribution-linux"/>
       <!-- copy the WAR file to the distribution area too -->
       <!--copy tofile="${dir.dist}/alfresco-${version.number}.war" file="${dir.deploy.tomcat}/${file.name.war.alfresco}"/-->
@@ -169,6 +171,17 @@
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
          <zipfileset dir="${dir.deploy.tomcat}" prefix="tomcat/webapps" includes="${file.name.war.alfresco}"/>
+      </zip>
+   </target>
+   
+   <target name="package-war-binary-distribution-windows" depends="init">
+      <mkdir dir="${dir.dist}" />
+      <zip destfile="${dir.dist}/${file.name.dist.bin.war}.zip">
+         <zipfileset dir="${dir.project.installer}"
+                     includes="*.sql,licenses/**,AlfrescoTest.pdf, README_war.txt" />
+         <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
+         <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
+         <zipfileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}"/>
       </zip>
    </target>
    
