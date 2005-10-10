@@ -68,26 +68,23 @@ public class AddContentWizard extends BaseContentWizard
       // fields accordingly
       if (outcome.equals("properties"))
       {
-         if (this.contentType == null)
-         {
-            this.contentType = Repository.getMimeTypeForFileName(
-                  FacesContext.getCurrentInstance(), this.fileName);
-            
-            // set default for in-line editing flag
-            this.inlineEdit = (this.contentType.equals(MimetypeMap.MIMETYPE_HTML));
-         }
+         this.contentType = Repository.getMimeTypeForFileName(
+               FacesContext.getCurrentInstance(), this.fileName);
          
-         // Try and extract metadata from the file 
+         // set default for in-line editing flag
+         this.inlineEdit = (this.contentType.equals(MimetypeMap.MIMETYPE_HTML));
+         
+         // Try and extract metadata from the file
          ContentReader cr = new FileContentReader(this.file);
          cr.setMimetype(this.contentType);
          // create properties for content type
          Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(5, 1.0f);
-                  
+         
          if (Repository.extractMetadata(FacesContext.getCurrentInstance(), cr, contentProps))
          {
-            this.author = safeToString(contentProps.get(ContentModel.PROP_CREATOR));
-            this.title = safeToString(contentProps.get(ContentModel.PROP_TITLE));
-            this.description = safeToString(contentProps.get(ContentModel.PROP_DESCRIPTION));
+            this.author = (String)(contentProps.get(ContentModel.PROP_CREATOR));
+            this.title = (String)(contentProps.get(ContentModel.PROP_TITLE));
+            this.description = (String)(contentProps.get(ContentModel.PROP_DESCRIPTION));
          }
          if (this.title == null)
          {
@@ -96,16 +93,6 @@ public class AddContentWizard extends BaseContentWizard
       }
       
       return outcome;
-   }
-   
-   private String safeToString(Serializable value)
-   {
-      if (value == null)
-         return null;
-      else if (value instanceof String)
-         return (String)value;
-      else
-         return value.toString();
    }
 
    /**

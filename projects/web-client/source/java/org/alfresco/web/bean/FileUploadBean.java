@@ -23,7 +23,7 @@ import java.io.File;
  * 
  * @author gavinc
  */
-public class FileUploadBean
+public final class FileUploadBean
 {
    public static final String FILE_UPLOAD_BEAN_NAME = "alfresco.UploadBean";
    

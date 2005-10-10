@@ -695,6 +695,30 @@ public final class Repository
    }
    
    /**
+    * Convert a property of unknown type to a String value. A native String value will be
+    * returned directly, else toString() will be executed, null is returned as null. 
+    * 
+    * @param value      Property value
+    * 
+    * @return value to String or null
+    */
+   public static String safePropertyToString(Serializable value)
+   {
+      if (value == null)
+      {
+         return null;
+      }
+      else if (value instanceof String)
+      {
+         return (String)value;
+      }
+      else
+      {
+         return value.toString();
+      }
+   }
+   
+   /**
     * Returns an instance of the namespace service
     * 
     * @return The NamespaceService
@@ -709,7 +733,4 @@ public final class Repository
       
       return namespaceService;
    }
-
-      
-   
 }
