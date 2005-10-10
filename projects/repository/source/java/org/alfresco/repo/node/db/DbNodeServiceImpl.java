@@ -397,23 +397,24 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         Node node = getNodeNotNull(nodeRef);
         // physically attach the aspect to the node
-        node.getAspects().add(aspectTypeQName);
-        
-		if (aspectProperties != null)
-		{
-			// attach the properties to the current node properties
-		    Map<QName, Serializable> nodeProperties = getProperties(nodeRef);
-		    nodeProperties.putAll(aspectProperties);
-		    setProperties(nodeRef, nodeProperties);
-		}
-		
-		// Invoke policy behaviours
-		invokeOnUpdateNode(nodeRef);
-        invokeOnAddAspect(nodeRef, aspectTypeQName);
-        
-        // update the node status
-        NodeStatus nodeStatus = node.getStatus();
-        nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
+        if (node.getAspects().add(aspectTypeQName) == true)
+        {        
+    		if (aspectProperties != null)
+    		{
+    			// attach the properties to the current node properties
+    		    Map<QName, Serializable> nodeProperties = getProperties(nodeRef);
+    		    nodeProperties.putAll(aspectProperties);
+    		    setProperties(nodeRef, nodeProperties);
+    		}
+    		
+    		// Invoke policy behaviours
+    		invokeOnUpdateNode(nodeRef);
+            invokeOnAddAspect(nodeRef, aspectTypeQName);
+            
+            // update the node status
+            NodeStatus nodeStatus = node.getStatus();
+            nodeStatus.setChangeTxnId(AlfrescoTransactionSupport.getTransactionId());
+        }
     }
 
     /**
