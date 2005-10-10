@@ -362,7 +362,12 @@ public class FileOpenParams
      */
     public final boolean isReadOnlyAccess()
     {
-        return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTRead ? true : false;
+        // Check if read-only or execute access has been requested
+        
+        if (( m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTRead ||
+                (m_accessMode & AccessMode.NTExecute) != 0)
+            return true;
+        return false;
     }
 
     /**
