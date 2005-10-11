@@ -124,7 +124,7 @@
                                        </a:actionLink>
                                     </r:permissionEvaluator>
                                     <%-- admin user only actions --%>
-                                    <a:booleanEvaluator value="#{NavigationBean.currentUser.userName == 'admin'}" id="eval8">
+                                    <a:booleanEvaluator value="#{NavigationBean.currentUser.admin == true}" id="eval8">
                                        <a:actionLink value="#{msg.admin_console}" image="/images/icons/admin_console.gif" action="adminConsole" id="link11" />
                                     </a:booleanEvaluator>
                                  </a:menu>

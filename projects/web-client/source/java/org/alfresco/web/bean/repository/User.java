@@ -43,6 +43,7 @@ public final class User
    private String ticket;
    private NodeRef person;
    private String fullName = null;
+   private Boolean administrator = null;
    
    /** cached ref to our user preferences node */
    private NodeRef preferencesFolderRef = null;
@@ -121,6 +122,20 @@ public final class User
    public NodeRef getPerson()
    {
       return this.person;
+   }
+   
+   /**
+    * @return If the current user has Admin Authority
+    */
+   public boolean isAdmin()
+   {
+      if (administrator == null)
+      {
+         administrator = Repository.getServiceRegistry(FacesContext.getCurrentInstance())
+               .getAuthorityService().hasAdminAuthority();
+      }
+      
+      return administrator;
    }
    
    /**
