@@ -36,6 +36,9 @@
                 <property name="authenticationComponent">
                     <ref bean="authenticationComponent" />
                 </property>
+                 <property name="authorityService">
+                    <ref bean="authorityService" />
+                </property>
                 <property name="dynamicAuthorities">
                     <list>
                         <ref bean="ownerDynamicAuthority" />

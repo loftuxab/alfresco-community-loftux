@@ -100,10 +100,22 @@ public class AbstractPermissionTest extends BaseSpringTest
         nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
 
         // create an authentication object e.g. the user
+        if(authenticationComponent.exists("andy"))
+        {
+            authenticationService.deleteAuthentication("andy");
+        }
         authenticationService.createAuthentication("andy", "andy".toCharArray());
 
+        if(authenticationComponent.exists("lemur"))
+        {
+            authenticationService.deleteAuthentication("lemur");
+        }
         authenticationService.createAuthentication("lemur", "lemur".toCharArray());
         
+        if(authenticationComponent.exists("admin"))
+        {
+            authenticationService.deleteAuthentication("admin");
+        }
         authenticationService.createAuthentication("admin", "admin".toCharArray());
         
         authenticationComponent.clearCurrentSecurityContext();

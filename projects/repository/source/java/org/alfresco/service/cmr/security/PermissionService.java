@@ -33,6 +33,8 @@ public interface PermissionService
     public static final String ALL_AUTHORITIES = "GROUP_EVERYONE";
 
     public static final String OWNER_AUTHORITY = "ROLE_OWNER";
+    
+    public static final String ADMINISTRATOR_AUTHORITY = "GROUP_ADMINISTRATORS";
 
     public static final String ALL_PERMISSIONS = "All";
     

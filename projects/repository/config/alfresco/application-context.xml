@@ -785,7 +785,13 @@
 
     <bean id="authorityService" class="org.alfresco.repo.security.authority.AuthorityServiceImpl">
         <property name="authenticationService">
-             <ref bean="authenticationService" />
+            <ref bean="authenticationService" />
+        </property>
+        <property name="adminUsers">
+            <set>
+    			<value>admin</value>
+    			<value>administrator</value>
+    		</set>
         </property>
     </bean>
 

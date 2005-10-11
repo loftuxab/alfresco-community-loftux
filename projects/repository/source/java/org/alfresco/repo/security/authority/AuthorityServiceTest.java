@@ -54,9 +54,14 @@ public class AuthorityServiceTest extends TestCase
             authenticationService.createAuthentication("andy", "andy".toCharArray());
         }
         
-        if(!authenticationComponent.exists(AuthorityService.ALFRESCO_ADMIN_USER))
+        if(!authenticationComponent.exists("admin"))
         {
-            authenticationService.createAuthentication(AuthorityService.ALFRESCO_ADMIN_USER, AuthorityService.ALFRESCO_ADMIN_USER.toCharArray());
+            authenticationService.createAuthentication("admin", "admin".toCharArray());
+        }
+        
+        if(!authenticationComponent.exists("administrator"))
+        {
+            authenticationService.createAuthentication("administrator", "administrator".toCharArray());
         }
     }
     
@@ -72,13 +77,20 @@ public class AuthorityServiceTest extends TestCase
         authenticationComponent.setCurrentUser("andy");
         assertFalse(authorityService.hasAdminAuthority());
         assertFalse(pubAuthorityService.hasAdminAuthority());
+        assertEquals(0, authorityService.getAuthorities().size());
     }
     
     public void testAdminUser()
     {
-        authenticationComponent.setCurrentUser(AuthorityService.ALFRESCO_ADMIN_USER);
+        authenticationComponent.setCurrentUser("admin");
         assertTrue(authorityService.hasAdminAuthority());
         assertTrue(pubAuthorityService.hasAdminAuthority());
+        assertEquals(1, authorityService.getAuthorities().size());
+        
+        authenticationComponent.setCurrentUser("administrator");
+        assertTrue(authorityService.hasAdminAuthority());
+        assertTrue(pubAuthorityService.hasAdminAuthority());
+        assertEquals(1, authorityService.getAuthorities().size());
     }
 
 }

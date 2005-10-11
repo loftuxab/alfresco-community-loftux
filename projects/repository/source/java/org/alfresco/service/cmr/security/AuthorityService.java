@@ -16,6 +16,8 @@
  */
 package org.alfresco.service.cmr.security;
 
+import java.util.Set;
+
 /**
  * The service that encapsulates authorities granted to users. 
  * 
@@ -23,13 +25,6 @@ package org.alfresco.service.cmr.security;
  */
 public interface AuthorityService
 {
-    
-    /**
-     * The alfresco admin user: currently "admin".
-     */
-    public static final String ALFRESCO_ADMIN_USER = "admin";
-
-
     /**
      * Check of the current user has admin authority.
      * There is no contract for who should have this authority, only that it cna be tested here.
@@ -38,4 +33,11 @@ public interface AuthorityService
      * @return true if the currently authenticated user has the admin authority
      */
     public boolean hasAdminAuthority();
+    
+    /**
+     * Get the authorities for the current user
+   
+     * @return
+     */
+    public Set<String> getAuthorities();
 }

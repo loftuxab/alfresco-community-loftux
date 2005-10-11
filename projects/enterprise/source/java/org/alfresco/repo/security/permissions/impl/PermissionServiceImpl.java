@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
@@ -90,6 +91,8 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
     private AuthenticationComponent authenticationComponent;
 
+    private AuthorityService authorityService;
+    
     /*
      * Dynamic authorities providers
      */
@@ -137,6 +140,11 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         this.authenticationComponent = authenticationComponent;
     }
+    
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
 
     public void setDynamicAuthorities(List<DynamicAuthority> dynamicAuthorities)
     {
@@ -168,6 +176,10 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         if (authenticationComponent == null)
         {
             throw new IllegalArgumentException("There must be an authentication component");
+        }
+        if(authorityService == null)
+        {
+            throw new IllegalArgumentException("There must be an authority service"); 
         }
 
     }
@@ -431,6 +443,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
                 }
             }
         }
+        auths.addAll(authorityService.getAuthorities());
         return auths;
     }
 

@@ -16,8 +16,13 @@
  */
 package org.alfresco.repo.security.authority;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.PermissionService;
 
 /**
  * The default implementation of the authority service.
@@ -26,6 +31,12 @@ import org.alfresco.service.cmr.security.AuthorityService;
  */
 public class AuthorityServiceImpl implements AuthorityService
 {
+    
+    private Set<String> emptySet = Collections.<String>emptySet();
+    
+    private Set<String> adminSet = Collections.singleton(PermissionService.ADMINISTRATOR_AUTHORITY);
+    
+    private Set<String> adminUsers;
     
     private AuthenticationService authenticationService;
 
@@ -40,7 +51,7 @@ public class AuthorityServiceImpl implements AuthorityService
     public boolean hasAdminAuthority()
     {
         String currentUserName = authenticationService.getCurrentUserName();
-        return ((currentUserName != null) && ALFRESCO_ADMIN_USER.equals(currentUserName));
+        return ((currentUserName != null) && adminUsers.contains(currentUserName));
     }
 
     // IOC
@@ -49,4 +60,17 @@ public class AuthorityServiceImpl implements AuthorityService
     {
         this.authenticationService = authenticationService;
     }
+    
+    public void setAdminUsers(Set<String> adminUsers)
+    {
+        this.adminUsers = adminUsers;   
+    }
+
+    public Set<String> getAuthorities()
+    {
+        String currentUserName = authenticationService.getCurrentUserName();
+        return adminUsers.contains(currentUserName) ? adminSet : emptySet;
+    }
+    
+    
 }
