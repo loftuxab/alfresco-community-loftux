@@ -125,7 +125,7 @@ public class PropertiesIntegrityEvent extends AbstractIntegrityEvent
             QName propertyQName = propertyDef.getName();
             Serializable propertyValue = nodeProperties.get(propertyQName);
             // check that mandatory properties are set
-            if (propertyDef.isMandatory() && propertyValue == null)
+            if (propertyDef.isMandatory() && !nodeProperties.containsKey(propertyQName))
             {
                 IntegrityRecord result = new IntegrityRecord(
                         "Mandatory property not set: \n" +
@@ -136,6 +136,7 @@ public class PropertiesIntegrityEvent extends AbstractIntegrityEvent
                 // next one
                 continue;
             }
+            // TODO: Incorporate value constraint checks - JIRA AR166
         }
     }
 }
