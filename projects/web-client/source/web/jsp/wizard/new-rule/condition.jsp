@@ -26,20 +26,6 @@
 
 <r:page titleId="title_new_rule_condition">
 
-<script language="JavaScript1.2">
-   function itemSelected(inputField)
-   {
-      if (inputField.selectedIndex == 0)
-      {
-         document.getElementById("new-rule-condition:set-add-button").disabled = true;
-      }
-      else
-      {
-         document.getElementById("new-rule-condition:set-add-button").disabled = false;
-      }
-   }
-</script>
-
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -156,7 +142,7 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>2.</td>
-                                    <td><h:outputText value="#{msg.click_set_and_add}"/></td>
+                                    <td><h:outputText value="#{msg.click_set_and_add}" id="instruction-text"/></td>
                                  </tr>
                                  <tr>
                                     <td>&nbsp;</td>
@@ -174,7 +160,10 @@
                                     <td>
                                        <h:dataTable value="#{NewRuleWizard.allConditionsDataModel}" var="row">
                                           <h:column>
-                                             <h:outputText value="#{row.conditionSummary}" />
+                                             <h:commandLink value="#{row.conditionSummary}" action="#{NewRuleWizard.editCondition}"
+                                                            rendered='#{row.conditionName != "no-condition"}'/>
+                                             <h:outputText value="#{row.conditionSummary}" 
+                                                           rendered='#{row.conditionName == "no-condition"}'/>
                                              <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
                                           <h:column>
@@ -238,7 +227,39 @@
        </tr>
     </table>
     
-    </h:form>
+    <script language="JavaScript1.2">
+      function itemSelected(inputField)
+      {
+         if (inputField.selectedIndex == 0)
+         {
+            document.getElementById("new-rule-condition:set-add-button").disabled = true;
+         }
+         else
+         {
+            document.getElementById("new-rule-condition:set-add-button").disabled = false;
+         }
+         
+         // also check to see if the 'no-condition' option has been selected, if it has, change
+         // the explanation text and the button label
+         var short_text = "<a:outputText value='#{msg.click_add}'/>";
+         var long_text = "<a:outputText value='#{msg.click_set_and_add}'/>";
+         var short_label = "<a:outputText value='#{msg.add_to_list_button}'/>";
+         var long_label = "<a:outputText value='#{msg.set_and_add_button}'/>";
+         
+         if (inputField.value == "no-condition")
+         {
+            document.getElementById("new-rule-condition:set-add-button").value = short_label;
+            document.getElementById("new-rule-condition:instruction-text").innerHTML = short_text;
+         }
+         else
+         {
+            document.getElementById("new-rule-condition:set-add-button").value = long_label;
+            document.getElementById("new-rule-condition:instruction-text").innerHTML = long_text;
+         }
+      }
+    </script>
+    
+   </h:form>
     
 </f:view>
 

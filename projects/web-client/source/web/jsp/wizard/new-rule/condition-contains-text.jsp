@@ -133,9 +133,6 @@
                                     <td><h:outputText value="#{msg.condition_contains_hints_desc}"/></td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
-                                 </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>

@@ -103,6 +103,8 @@ public class NewRuleWizard extends BaseActionWizard
    private String condition;
    private boolean runInBackground;
    private boolean applyToSubSpaces;
+   private boolean editingAction;
+   private boolean editingCondition;
 
    private RuleService ruleService;
    private RulesBean rulesBean;
@@ -252,6 +254,9 @@ public class NewRuleWizard extends BaseActionWizard
    {
       String outcome = null;
 
+      // set the flag to show we are creating a new condition
+      this.editingCondition = false;
+      
       if ("no-condition".equals(this.condition))
       {
          HashMap<String, Serializable> condProps = new HashMap<String, Serializable>(3);
@@ -285,6 +290,25 @@ public class NewRuleWizard extends BaseActionWizard
    }
    
    /**
+    * Sets up the context for editing existing condition values 
+    * 
+    * @return The outcome
+    */
+   public String editCondition()
+   {
+      // use the built in JSF support for retrieving the object for the
+      // row that was clicked by the user
+      Map conditionToEdit = (Map)this.allConditionsDataModel.getRowData();
+      this.condition = (String)conditionToEdit.get(PROP_CONDITION_NAME);
+      this.currentConditionProperties = conditionToEdit;
+      
+      // set the flag to show we are editing a condition
+      this.editingCondition = true;
+      
+      return this.condition;
+   }
+   
+   /**
     * Adds the condition just setup by the user to the list of conditions for the rule
     * 
     * @return The outcome
@@ -296,6 +320,14 @@ public class NewRuleWizard extends BaseActionWizard
       if (summary != null)
       {
          this.currentConditionProperties.put(PROP_CONDITION_SUMMARY, summary);
+      }
+      
+      if (this.editingCondition)
+      {
+         this.condition = null;
+      }
+      else
+      {
          this.allConditionsProperties.add(this.currentConditionProperties);
       }
       
@@ -315,6 +347,9 @@ public class NewRuleWizard extends BaseActionWizard
       Map conditionToRemove = (Map)this.allConditionsDataModel.getRowData();
       this.allConditionsProperties.remove(conditionToRemove);
       
+      // reset the action drop down
+      this.condition = null;
+      
       // return no outcome to refresh page
       return null;
    }
@@ -326,7 +361,16 @@ public class NewRuleWizard extends BaseActionWizard
     */
    public String cancelAddCondition()
    {
-      this.currentConditionProperties.clear();
+      if (this.editingCondition)
+      {
+         this.condition = null;
+      }
+      else
+      {
+         this.currentConditionProperties.clear();
+      }
+      
+      
       return "condition";
    }
 
@@ -356,6 +400,9 @@ public class NewRuleWizard extends BaseActionWizard
    {
       String outcome = this.action;
       
+      // set the flag to show we are creating a new action
+      this.editingAction = false;
+      
       HashMap<String, Serializable> actionProps = new HashMap<String, Serializable>(3);
       actionProps.put(PROP_ACTION_NAME, this.action);
       this.currentActionProperties = actionProps;
@@ -377,6 +424,25 @@ public class NewRuleWizard extends BaseActionWizard
    }
    
    /**
+    * Sets up the context for editing existing action values 
+    * 
+    * @return The outcome
+    */
+   public String editAction()
+   {
+      // use the built in JSF support for retrieving the object for the
+      // row that was clicked by the user
+      Map actionToEdit = (Map)this.allActionsDataModel.getRowData();
+      this.action = (String)actionToEdit.get(PROP_ACTION_NAME);
+      this.currentActionProperties = actionToEdit;
+      
+      // set the flag to show we are editing an action
+      this.editingAction = true;
+      
+      return this.action;
+   }
+   
+   /**
     * Adds the action just setup by the user to the list of actions for the rule
     * 
     * @return The outcome
@@ -388,6 +454,14 @@ public class NewRuleWizard extends BaseActionWizard
       if (summary != null)
       {
          this.currentActionProperties.put(PROP_ACTION_SUMMARY, summary);
+      }
+      
+      if (this.editingAction)
+      {
+         this.action = null;
+      }
+      else
+      {
          this.allActionsProperties.add(this.currentActionProperties);
       }
       
@@ -407,6 +481,9 @@ public class NewRuleWizard extends BaseActionWizard
       Map actionToRemove = (Map)this.allActionsDataModel.getRowData();
       this.allActionsProperties.remove(actionToRemove);
       
+      // reset the action drop down
+      this.action = null;
+      
       // return no outcome to refresh page
       return null;
    }
@@ -418,7 +495,15 @@ public class NewRuleWizard extends BaseActionWizard
     */
    public String cancelAddAction()
    {
-      this.currentActionProperties.clear();
+      if (this.editingAction)
+      {
+         this.condition = null;
+      }
+      else
+      {
+         this.currentActionProperties.clear();
+      }
+      
       return "action";
    }
    
@@ -672,13 +757,37 @@ public class NewRuleWizard extends BaseActionWizard
       String subSpacesYesNo = this.applyToSubSpaces ? bundle.getString("yes") : bundle.getString("no");
       
       return buildSummary(
-            new String[] {bundle.getString("name"), bundle.getString("description"),
+            new String[] {bundle.getString("rule_type"), bundle.getString("name"), bundle.getString("description"),
                           bundle.getString("apply_to_sub_spaces"), bundle.getString("run_in_background"),
                           bundle.getString("conditions"), bundle.getString("actions")},
-            new String[] {this.title, this.description, subSpacesYesNo, backgroundYesNo, 
+            new String[] {this.type, this.title, this.description, subSpacesYesNo, backgroundYesNo, 
                           conditionsSummary.toString(), actionsSummary.toString()});
    }
    
+   /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#back()
+    */
+   public String back()
+   {
+      // reset the drop downs when back is clicked
+      this.action = null;
+      this.condition = null;
+      
+      return super.back();
+   }
+
+   /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#next()
+    */
+   public String next()
+   {
+      // reset the drop downs when next is clicked
+      this.action = null;
+      this.condition = null;
+      
+      return super.next();
+   }
+
    /**
     * @return Returns the description.
     */
@@ -1178,10 +1287,34 @@ public class NewRuleWizard extends BaseActionWizard
          else if ("simple-workflow".equals(actionName))
          {
             // just leave the summary as the title for now
-         }
-         else if ("set-property-value".equals(actionName))
-         {
-            // TODO: add support for this action
+            String approveStepName = (String)this.currentActionProperties.get(PROP_APPROVE_STEP_NAME);
+            String approveAction = (String)this.currentActionProperties.get(PROP_APPROVE_ACTION);
+            NodeRef approveFolder = (NodeRef)this.currentActionProperties.get(PROP_APPROVE_FOLDER);
+            String approveFolderName = Repository.getNameForNode(this.nodeService, approveFolder);
+            String approveMsg = MessageFormat.format(summary.toString(), 
+                  new Object[] {Application.getMessage(FacesContext.getCurrentInstance(), approveAction), 
+                                approveFolderName, approveStepName});
+            
+            String rejectStep = (String)this.currentActionProperties.get(PROP_REJECT_STEP_PRESENT);
+            
+            String rejectMsg = null;
+            if (rejectStep != null && "yes".equals(rejectStep))
+            {
+               String rejectStepName = (String)this.currentActionProperties.get(PROP_REJECT_STEP_NAME);
+               String rejectAction = (String)this.currentActionProperties.get(PROP_REJECT_ACTION);
+               NodeRef rejectFolder = (NodeRef)this.currentActionProperties.get(PROP_REJECT_FOLDER);
+               String rejectFolderName = Repository.getNameForNode(this.nodeService, rejectFolder);
+               rejectMsg = MessageFormat.format(summary.toString(), 
+                  new Object[] {Application.getMessage(FacesContext.getCurrentInstance(), rejectAction),
+                                rejectFolderName, rejectStepName});
+            }
+            
+            summary = new StringBuilder(approveMsg);
+            if (rejectMsg != null)
+            {
+               summary.append(" ");
+               summary.append(rejectMsg);
+            }
          }
          else if ("link-category".equals(actionName))
          {
@@ -1214,6 +1347,7 @@ public class NewRuleWizard extends BaseActionWizard
             NodeRef space = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
             String name = Repository.getNameForNode(this.nodeService, space);
             String transformer = (String)this.currentActionProperties.get(PROP_IMAGE_TRANSFORMER);
+            String option = (String)this.currentActionProperties.get(PROP_TRANSFORM_OPTIONS);
             
             // find the label used by looking through the SelectItem list
             for (SelectItem item : this.getImageTransformers())
@@ -1226,7 +1360,7 @@ public class NewRuleWizard extends BaseActionWizard
             }
             
             // recreate the summary object as it contains parameters
-            String msg = MessageFormat.format(summary.toString(), new Object[] {name, transformer});
+            String msg = MessageFormat.format(summary.toString(), new Object[] {name, transformer, option});
             summary = new StringBuilder(msg);
          }
          else if ("copy".equals(actionName) || "move".equals(actionName) || "check-out".equals(actionName))
@@ -1237,7 +1371,8 @@ public class NewRuleWizard extends BaseActionWizard
          }
          else if ("mail".equals(actionName))
          {
-            // just leave the summary as the title for now
+            String address = (String)this.currentActionProperties.get(PROP_TO);
+            summary.append("'").append(address).append("'");
          }
          else if ("check-in".equals(actionName))
          {

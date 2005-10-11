@@ -174,7 +174,7 @@
                                     <td>
                                        <h:dataTable value="#{NewRuleWizard.allActionsDataModel}" var="row">
                                           <h:column>
-                                             <h:outputText value="#{row.actionSummary}" />
+                                             <h:commandLink value="#{row.actionSummary}" action="#{NewRuleWizard.editAction}"/>
                                              <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
                                           <h:column>

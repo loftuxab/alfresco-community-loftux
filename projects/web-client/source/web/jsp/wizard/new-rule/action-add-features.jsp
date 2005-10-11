@@ -112,9 +112,6 @@
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>
-                                 </tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
