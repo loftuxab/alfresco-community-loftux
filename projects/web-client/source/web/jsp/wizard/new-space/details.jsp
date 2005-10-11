@@ -38,9 +38,11 @@
 
    function checkButtonState()
    {
-      if (document.getElementById("new-space-details:name").value.length == 0 ||
-          (document.getElementById("new-space-details:saveAsTemplate").checked && 
-           document.getElementById("new-space-details:templateName").value.length == 0) )
+      <%--
+      || (document.getElementById("new-space-details:saveAsTemplate").checked && 
+          document.getElementById("new-space-details:templateName").value.length == 0) )
+      --%>
+      if (document.getElementById("new-space-details:name").value.length == 0)
       {
          document.getElementById("new-space-details:next-button").disabled = true;
          document.getElementById("new-space-details:finish-button").disabled = true;
@@ -192,6 +194,7 @@
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>
                                  </tr>
+                                 <%--
                                  <tr>
                                     <td colspan="2">
                                        <h:selectBooleanCheckbox id="saveAsTemplate" value="#{NewSpaceWizard.saveAsTemplate}" 
@@ -208,6 +211,7 @@
                                                      &nbsp;*
                                     </td>
                                  </tr>
+                                 --%>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewSpaceWizard.stepInstructions}" /></td>

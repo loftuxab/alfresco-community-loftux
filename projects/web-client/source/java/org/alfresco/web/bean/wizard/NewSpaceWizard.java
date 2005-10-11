@@ -428,13 +428,14 @@ public class NewSpaceWizard extends AbstractWizardBean
          summaryCreateType = bundle.getString("a_template");
       }
       
-      String summarySaveAsTemplate = this.saveAsTemplate ? bundle.getString("yes") : bundle.getString("no");
+//      String summarySaveAsTemplate = this.saveAsTemplate ? bundle.getString("yes") : bundle.getString("no");
+//      bundle.getString("save_as_template"), bundle.getString("template_name")},
+//      summarySaveAsTemplate, this.templateName
       
       return buildSummary(
             new String[] {bundle.getString("name"), bundle.getString("description"), 
-                          bundle.getString("creating_from"), bundle.getString("save_as_template"), 
-                          bundle.getString("template_name")},
-            new String[] {this.name, this.description, summaryCreateType, summarySaveAsTemplate, this.templateName});
+                          bundle.getString("creating_from")},
+            new String[] {this.name, this.description, summaryCreateType});
    }
    
    /**
