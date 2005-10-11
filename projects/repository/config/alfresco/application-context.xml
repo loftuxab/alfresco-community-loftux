@@ -587,10 +587,10 @@
             </bean>
         </property>
         <property name="startDelay">
-            <value>60000</value><!-- start after 1 minute -->
+            <value>60000</value>       <!-- start after 1 minute -->
         </property>
-        <property name="repeatInterval">
-            <value>3600000</value><!-- repeat hourly -->
+        <property name="repeatCount">
+            <value>0</value>           <!-- DO NOT REPEAT !!!!! -->
         </property>
     </bean>
 

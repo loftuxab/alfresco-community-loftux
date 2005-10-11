@@ -305,14 +305,15 @@
          assoc.typeQName = :assocTypeQName
    </query>
 
-   <query name="node.GetChangeTxnIds">
+   <query name="node.GetNextChangeTxnIds">
       select distinct
          status.changeTxnId
       from
          org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
       where
-         status.key.protocol = :storeProtocol and
-         status.key.identifier = :storeIdentifier
+         status.changeTxnId > :currentTxnId
+      order by
+         status.changeTxnId
    </query>
 
    <query name="node.GetChangedNodeStatusesCount">
@@ -337,6 +338,15 @@
          status.key.identifier = :storeIdentifier and
          status.deleted = :deleted and
          status.changeTxnId = :changeTxnId
+   </query>
+
+   <query name="content.GetAllContentData">
+      select
+         node.properties.stringValue
+      from
+         org.alfresco.repo.domain.hibernate.NodeImpl as node
+      where
+         node.properties.actualType = 'CONTENT'
    </query>
 
 </hibernate-mapping>

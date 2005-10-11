@@ -4,7 +4,7 @@
 <beans>
     
    <!-- full node index recovery -->
-   <bean id="indexRecoveryComponentImpl" class="org.alfresco.repo.node.index.FullIndexRecoveryComponent" >
+   <bean id="indexRecoveryComponent" class="org.alfresco.repo.node.index.FullIndexRecoveryComponent" >
       <property name="sessionFactory">
          <ref bean="sessionFactory" />
       </property>
@@ -30,22 +30,11 @@
             <value>user://alfrescoUserStore</value>
         </list>
       </property>
-   </bean>
-    
-   <bean id="indexRecoveryComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.repo.node.index.IndexRecovery</value>
+      <property name="runContinuously">
+          <value>false</value>                  <!-- ensure the index is up to date and then stop -->
       </property>
-      <property name="transactionManager">
-         <ref bean="transactionManager" />
-      </property>
-      <property name="target">
-         <ref bean="indexRecoveryComponentImpl" />
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="reindex">PROPAGATION_REQUIRED</prop>
-         </props>
+      <property name="useL2Cache">
+          <value>true</value>                   <!-- use the L2 cache (database is changed by this server only) -->
       </property>
    </bean>
 

@@ -17,7 +17,6 @@
 package org.alfresco.repo.node.index;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
@@ -97,15 +96,10 @@ public class FtsIndexRecoveryComponent implements IndexRecovery
     }
     
     /**
-     * Ensure that the index is up to date with the current state of the persistence layer.
-     * The full list of unique transaction change IDs is retrieved and used to detect
-     * which are not present in the index.  All the node changes and deletions for the
-     * remaining transactions are then indexed.
+     * Ensures that the FTS indexing is activated for any outstanding full text searches.
      */
-    public List<String> reindex()
+    public void reindex()
     {
-        List<String> reindexedTxns = new ArrayList<String>(30);
-        
         // reindex each store
         for (StoreRef storeRef : storeRefs)
         {
@@ -120,28 +114,13 @@ public class FtsIndexRecoveryComponent implements IndexRecovery
                 continue;
             }
             
-            List<String> reindexed = reindex(storeRef);
-            reindexedTxns.addAll(reindexed);
+            // prompt FTS to reindex the store
+            ftsIndexer.requiresIndex(storeRef);
         }
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("Reindexed " + reindexedTxns.size() + " outstanding transactions");
+            logger.debug("Prompted FTS index on stores: " + storeRefs);
         }
-        return reindexedTxns;
-    }
-    
-    private List<String> reindex(StoreRef storeRef)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Reindexing store: " + storeRef);
-        }
-        
-        // prompt FTS to reindex the store
-        ftsIndexer.requiresIndex(storeRef);
-        
-        // done
-        return Collections.emptyList();
     }
 }

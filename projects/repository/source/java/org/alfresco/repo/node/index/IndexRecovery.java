@@ -16,8 +16,6 @@
  */
 package org.alfresco.repo.node.index;
 
-import java.util.List;
-
 /**
  * Interface for components able to recover indexes.
  * 
@@ -27,8 +25,6 @@ public interface IndexRecovery
 {
     /**
      * Forces a reindex
-     * 
-     * @return Returns the list of change transactions that were processed
      */
-    public List<String> reindex();
+    public void reindex();
 }

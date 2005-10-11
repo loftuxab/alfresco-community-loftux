@@ -20,7 +20,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.Indexer;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -28,6 +30,8 @@ import org.alfresco.service.cmr.repository.InvalidStoreRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -56,19 +60,24 @@ public class FullIndexRecoveryComponentTest extends TestCase
     
     public void testReindexing() throws Exception
     {
-        // deletes all nodes from the index
-        TransactionWork<Object> dropIndexWork = new TransactionWork<Object>()
+        // deletes a content node from the index
+        TransactionWork<String> dropNodeIndexWork = new TransactionWork<String>()
         {
-            public Object doWork()
+            public String doWork()
             {
-                // now drop the index for all stores
+                // create a node in each store and drop it from the index
                 List<StoreRef> storeRefs = nodeService.getStores();
                 for (StoreRef storeRef : storeRefs)
                 {
                     try
                     {
                         NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
-                        ChildAssociationRef assocRef = nodeService.getPrimaryParent(rootNodeRef);
+                        ChildAssociationRef assocRef = nodeService.createNode(
+                                rootNodeRef,
+                                ContentModel.ASSOC_CONTAINS,
+                                QName.createQName(NamespaceService.ALFRESCO_URI, "unindexedChild" + System.currentTimeMillis()),
+                                ContentModel.TYPE_BASE);
+                        // this will have indexed it, so remove it from the index
                         indexer.deleteNode(assocRef);
                     }
                     catch (InvalidStoreRefException e)
@@ -76,27 +85,40 @@ public class FullIndexRecoveryComponentTest extends TestCase
                         // just ignore stores that are invalid
                     }
                 }
-                return null;
+                return AlfrescoTransactionSupport.getTransactionId();
             }
         };
-        // performs a reindex
-        TransactionWork<List<String>> reindexWork = new TransactionWork<List<String>>()
+        
+        // create un-indexed nodes
+        String txnId = TransactionUtil.executeInNonPropagatingUserTransaction(txnService, dropNodeIndexWork);
+        
+        // reindex
+        indexRecoverer.reindex();
+
+        // check that reindexing fails
+        try
         {
-            public List<String> doWork()
+            indexRecoverer.reindex();
+            fail("Reindexer failed to prevent reindex from being called twice");
+        }
+        catch (RuntimeException e)
+        {
+            // expected
+        }
+        
+        // loop for some time, giving it a chance to do its thing
+        for (int i = 0; i < 60; i++)
+        {
+            String lastProcessedTxnId = FullIndexRecoveryComponent.getCurrentTransactionId();
+            if (lastProcessedTxnId.equals(txnId))
             {
-                return indexRecoverer.reindex();
+                break;
             }
-        };
-        
-        // drop the indexes
-        TransactionUtil.executeInNonPropagatingUserTransaction(txnService, dropIndexWork);
-        
-        // reindex
-        List<String> reindexedMany = TransactionUtil.executeInNonPropagatingUserTransaction(txnService, reindexWork);
-        assertTrue("Nothing was reindexed", reindexedMany.size() > 0);
-        
-        // reindex
-        List<String> reindexedNone = TransactionUtil.executeInNonPropagatingUserTransaction(txnService, reindexWork);
-        assertEquals("Nothing should have been reindexed", 0, reindexedNone.size());
+            // wait for a second
+            synchronized(this)
+            {
+                this.wait(1000L);
+            }
+        }
     }
 }

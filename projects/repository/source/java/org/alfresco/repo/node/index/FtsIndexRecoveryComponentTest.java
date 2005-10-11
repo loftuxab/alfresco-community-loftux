@@ -16,8 +16,6 @@
  */
 package org.alfresco.repo.node.index;
 
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import org.alfresco.repo.search.Indexer;
@@ -53,16 +51,16 @@ public class FtsIndexRecoveryComponentTest extends TestCase
     public void testReindexing() throws Exception
     {
         // performs a reindex
-        TransactionWork<List<String>> reindexWork = new TransactionWork<List<String>>()
+        TransactionWork<Object> reindexWork = new TransactionWork<Object>()
         {
-            public List<String> doWork()
+            public Object doWork()
             {
-                return indexRecoverer.reindex();
+                indexRecoverer.reindex();
+                return null;
             }
         };
         
         // reindex
-        List<String> reindexedMany = TransactionUtil.executeInNonPropagatingUserTransaction(txnService, reindexWork);
-        assertTrue("No change txns expected", reindexedMany.size() == 0);
+        TransactionUtil.executeInNonPropagatingUserTransaction(txnService, reindexWork);
     }
 }
