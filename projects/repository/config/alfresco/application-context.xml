@@ -716,7 +716,7 @@
             </props>
         </property>
     </bean>
-
+     
     <bean id="authenticationComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
             <value>org.alfresco.repo.security.authentication.AuthenticationComponent</value>
@@ -741,7 +741,6 @@
         </property>
     </bean>
 
-  
     <bean id="personService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
             <value>org.alfresco.service.cmr.security.PersonService</value>
@@ -764,10 +763,13 @@
                  <ref bean="namespaceService" />
               </property>
               <property name="storeUrl">
-                 <value>workspace://SpacesStore</value>
+                 <value>${spaces.store}</value>
+              </property>
+              <property name="companyHomePath">
+                 <value>/${spaces.company_home.childname}</value>
               </property>
               <property name="createMissingPeople">
-                 <value>false</value>
+                 <value>true</value>
               </property>
               <property name="userNamesAreCaseSensitive">
                  <value>false</value>

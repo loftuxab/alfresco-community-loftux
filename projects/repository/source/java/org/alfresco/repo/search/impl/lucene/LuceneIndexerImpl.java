@@ -1000,7 +1000,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             if (delete)
             {
-                int count = reader.delete(new Term("ID", nodeRef.toString()));
+                reader.delete(new Term("ID", nodeRef.toString()));
             }
             refs.add(nodeRef);
             if (cascade)

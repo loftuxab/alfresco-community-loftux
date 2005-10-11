@@ -57,10 +57,14 @@ public class PersonServiceImpl implements PersonService
     private SearchService searchService;
 
     private NamespacePrefixResolver namespacePrefixResolver;
-
+  
     private boolean createMissingPeople;
 
     private boolean userNamesAreCaseSensitive;
+
+    private String companyHomePath;
+
+    private NodeRef companyHomeNodeRef;
 
     private static Set<QName> mutableProperties;
 
@@ -112,7 +116,7 @@ public class PersonServiceImpl implements PersonService
             return personNode;
         }
     }
-    
+
     public boolean personExists(String caseSensitiveUserName)
     {
         return getPersonOrNull(caseSensitiveUserName) != null;
@@ -161,9 +165,9 @@ public class PersonServiceImpl implements PersonService
             }
 
         }
-        
+
         properties.put(ContentModel.PROP_USERNAME, userName);
-        
+
         nodeService.setProperties(personNode, properties);
     }
 
@@ -182,7 +186,7 @@ public class PersonServiceImpl implements PersonService
     {
         HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_USERNAME, userName);
-        properties.put(ContentModel.PROP_HOMEFOLDER, null);
+        properties.put(ContentModel.PROP_HOMEFOLDER, getCompanyHome());
         properties.put(ContentModel.PROP_FIRSTNAME, "");
         properties.put(ContentModel.PROP_LASTNAME, "");
         properties.put(ContentModel.PROP_EMAIL, "");
@@ -192,7 +196,8 @@ public class PersonServiceImpl implements PersonService
 
     public NodeRef createPerson(Map<QName, Serializable> properties)
     {
-        String caseSensitiveUserName = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_USERNAME));
+        String caseSensitiveUserName = DefaultTypeConverter.INSTANCE.convert(String.class, properties
+                .get(ContentModel.PROP_USERNAME));
         String userName = userNamesAreCaseSensitive ? caseSensitiveUserName : caseSensitiveUserName.toLowerCase();
         properties.put(ContentModel.PROP_USERNAME, userName);
         return nodeService.createNode(getPeopleContainer(), ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON,
@@ -208,9 +213,7 @@ public class PersonServiceImpl implements PersonService
         if (results.size() == 0)
         {
 
-            List<ChildAssociationRef> result = nodeService.getChildAssocs(
-                    rootNodeRef,
-                    RegexQNamePattern.MATCH_ALL,
+            List<ChildAssociationRef> result = nodeService.getChildAssocs(rootNodeRef, RegexQNamePattern.MATCH_ALL,
                     QName.createQName("sys", "system", namespacePrefixResolver));
             NodeRef sysNode = null;
             if (result.size() == 0)
@@ -223,10 +226,8 @@ public class PersonServiceImpl implements PersonService
             {
                 sysNode = result.get(0).getChildRef();
             }
-            result = nodeService.getChildAssocs(
-                    sysNode,
-                    RegexQNamePattern.MATCH_ALL,
-                    QName.createQName("sys", "people", namespacePrefixResolver));
+            result = nodeService.getChildAssocs(sysNode, RegexQNamePattern.MATCH_ALL, QName.createQName("sys",
+                    "people", namespacePrefixResolver));
 
             if (result.size() == 0)
             {
@@ -295,6 +296,25 @@ public class PersonServiceImpl implements PersonService
     public void setStoreUrl(String storeUrl)
     {
         this.storeRef = new StoreRef(storeUrl);
+    }
+
+    public void setCompanyHomePath(String companyHomePath)
+    {
+        this.companyHomePath = companyHomePath;
+    }
+
+    public synchronized NodeRef getCompanyHome()
+    {
+        if(companyHomeNodeRef == null)
+        {
+        List<NodeRef> refs = searchService.selectNodes(nodeService.getRootNode(storeRef), companyHomePath, null, namespacePrefixResolver, false);
+        if(refs.size() != 1)
+        {
+            throw new IllegalStateException("Invalid company home path: found : "+refs.size());
+        }
+        companyHomeNodeRef = refs.get(0);
+        }
+        return companyHomeNodeRef;
     }
 
     // IOC Setters

@@ -87,7 +87,7 @@ public class PersonTest extends BaseSpringTest
         personService.setCreateMissingPeople(true);
         NodeRef nodeRef = personService.getPerson("andy");
         assertNotNull(nodeRef);
-        testProperties(nodeRef, "andy", "", "", "", "", null);
+        testProperties(nodeRef, "andy", "", "", "", "");
 
         personService.setCreateMissingPeople(false);
         try
@@ -104,9 +104,9 @@ public class PersonTest extends BaseSpringTest
         personService.setCreateMissingPeople(true);
         personService.setPersonProperties("derek", createDefaultProperties("derek", "Derek", "Hulley", "dh@dh",
                 "alfresco", rootNodeRef));
-        testProperties(personService.getPerson("derek"), "derek", "Derek", "Hulley", "dh@dh", "alfresco", rootNodeRef);
+        testProperties(personService.getPerson("derek"), "derek", "Derek", "Hulley", "dh@dh", "alfresco");
 
-        testProperties(personService.getPerson("andy"), "andy", "", "", "", "", null);
+        testProperties(personService.getPerson("andy"), "andy", "", "", "", "");
 
         assertEquals(2, personService.getAllPeople().size());
         assertTrue(personService.getAllPeople().contains(personService.getPerson("andy")));
@@ -144,17 +144,17 @@ public class PersonTest extends BaseSpringTest
         personService.setCreateMissingPeople(false);
         personService.createPerson(createDefaultProperties("derek", "Derek", "Hulley", "dh@dh",
                 "alfresco", rootNodeRef));
-        testProperties(personService.getPerson("derek"), "derek", "Derek", "Hulley", "dh@dh", "alfresco", rootNodeRef);
+        testProperties(personService.getPerson("derek"), "derek", "Derek", "Hulley", "dh@dh", "alfresco");
         
         personService.setPersonProperties("derek", createDefaultProperties("derek", "Derek_", "Hulley_", "dh@dh_",
-        "alfresco_", null));
+        "alfresco_", rootNodeRef));
         
-        testProperties(personService.getPerson("derek"), "derek", "Derek_", "Hulley_", "dh@dh_", "alfresco_", null);
+        testProperties(personService.getPerson("derek"), "derek", "Derek_", "Hulley_", "dh@dh_", "alfresco_");
         
         personService.setPersonProperties("derek", createDefaultProperties("derek", "Derek", "Hulley", "dh@dh",
                 "alfresco", rootNodeRef));
         
-        testProperties(personService.getPerson("derek"), "derek", "Derek", "Hulley", "dh@dh", "alfresco", rootNodeRef);
+        testProperties(personService.getPerson("derek"), "derek", "Derek", "Hulley", "dh@dh", "alfresco");
         
         assertEquals(1, personService.getAllPeople().size());
         assertTrue(personService.getAllPeople().contains(personService.getPerson("derek")));
@@ -176,11 +176,11 @@ public class PersonTest extends BaseSpringTest
     }
 
     private void testProperties(NodeRef nodeRef, String userName, String firstName, String lastName, String email,
-            String orgId, NodeRef home)
+            String orgId)
     {
         assertEquals(userName, DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(nodeRef,
                 ContentModel.PROP_USERNAME)));
-        assertEquals(home, nodeService.getProperty(nodeRef, ContentModel.PROP_HOMEFOLDER));
+        assertNotNull(nodeService.getProperty(nodeRef, ContentModel.PROP_HOMEFOLDER));
         assertEquals(firstName, DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(nodeRef,
                 ContentModel.PROP_FIRSTNAME)));
         assertEquals(lastName, DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(nodeRef,
