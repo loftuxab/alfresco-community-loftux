@@ -620,5 +620,40 @@
     		<value>Permission Service</value>
     	</property>
     </bean>
+    
+    <!-- Authority Service -->
+    
+    <bean id="AuthorityService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.security.AuthorityService</value>
+    	</property>
+    	<property name="target"><ref bean="authorityService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    		    <idref local="AuthorityService_transaction" />
+                <idref local="exceptionTranslator" />
+                <idref bean="AuthorityService_security" />
+    			<idref local="AuthorityService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="AuthorityService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <value>org.alfresco.service.cmr.security.AuthorityService.*=PROPAGATION_REQUIRED</value> 
+        </property>
+    </bean>
+    
+    <bean id="AuthorityService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.security.AuthorityService</value>
+    	</property>
+    	<property name="description">
+    		<value>Authority Service</value>
+    	</property>
+    </bean>
       
 </beans>

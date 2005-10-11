@@ -284,4 +284,6 @@
       </property>
    </bean>
     
+   <bean id="AuthorityService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
 </beans>

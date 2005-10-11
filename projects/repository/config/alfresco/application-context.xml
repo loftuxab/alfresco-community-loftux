@@ -783,6 +783,12 @@
         </property>
     </bean>
 
+    <bean id="authorityService" class="org.alfresco.repo.security.authority.AuthorityServiceImpl">
+        <property name="authenticationService">
+             <ref bean="authenticationService" />
+        </property>
+    </bean>
+
     <bean id="ticketComponent" class="org.alfresco.repo.security.authentication.InMemoryTicketComponentImpl">
         <property name="validDuration">
             <value>P1H</value>
