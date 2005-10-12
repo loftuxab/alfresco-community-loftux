@@ -30,6 +30,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -62,6 +63,8 @@ public class AbstractPermissionTest extends BaseSpringTest
     protected AuthenticationComponent authenticationComponent;
 
     protected ModelDAO permissionModelDAO;
+    
+    protected PersonService personService;
 
     public AbstractPermissionTest()
     {
@@ -81,6 +84,7 @@ public class AbstractPermissionTest extends BaseSpringTest
         authenticationComponent = (AuthenticationComponent) applicationContext.getBean("authenticationComponent");
         serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
         permissionModelDAO = (ModelDAO) applicationContext.getBean("permissionsModelDAO");
+        personService = (PersonService) applicationContext.getBean("personService");
         
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
 
