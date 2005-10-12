@@ -333,6 +333,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // create a new assoc
         ChildAssoc newAssoc = nodeDaoService.newChildAssoc(newParentNode, nodeToMove, true, assocTypeQName, assocQName);
         
+        // check that no cyclic relationships have been created
+        getPaths(nodeToMoveRef, false);
+        
         // invoke policy behaviour
         invokeOnCreateChildAssociation(newAssoc.getChildAssocRef());
         invokeOnDeleteChildAssociation(oldAssoc.getChildAssocRef());

@@ -995,8 +995,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public void testMoveNode() throws Exception
     {
         Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();
+        ChildAssociationRef n2pn4Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n2_p_n4"));
         ChildAssociationRef n5pn7Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n5_p_n7"));
         ChildAssociationRef n6pn8Ref = assocRefs.get(QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n8"));
+        NodeRef n4Ref = n2pn4Ref.getChildRef();
         NodeRef n5Ref = n5pn7Ref.getParentRef();
         NodeRef n6Ref = n6pn8Ref.getParentRef();
         NodeRef n8Ref = n6pn8Ref.getChildRef();
@@ -1014,6 +1016,22 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // check that n5 is the parent
         ChildAssociationRef checkRef = nodeService.getPrimaryParent(n8Ref);
         assertEquals("Primary assoc incorrent", assocRef, checkRef);
+        
+        // check that cyclic associations are disallowed
+        try
+        {
+            // n6 is a non-primary child of n4.  Move n4 into n6
+            nodeService.moveNode(
+                    n4Ref,
+                    n6Ref,
+                    ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                    QName.createQName(BaseNodeServiceTest.NAMESPACE, "n6_p_n4"));
+            fail("Failed to detect cyclic relationship during move");
+        }
+        catch (CyclicChildRelationshipException e)
+        {
+            // expected
+        }
     }
     
     /**
