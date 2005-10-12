@@ -436,7 +436,7 @@ public class RuleServiceImplTest extends BaseRuleTest
      * 
      * @throws Exception
      */
-    public void xtestCyclicGraphWithInheritedRules()
+    public void testCyclicGraphWithInheritedRules()
         throws Exception
     {
         NodeRef nodeRef1 = createNewNode(this.rootNodeRef, true);
