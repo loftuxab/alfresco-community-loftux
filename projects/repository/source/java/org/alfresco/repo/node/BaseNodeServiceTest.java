@@ -686,17 +686,37 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         {
             // expected
         }
-        ChildAssociationRef assocRef = nodeService.createNode(rootNodeRef,
+        NodeRef childNodeRef = nodeService.createNode(
+                rootNodeRef,
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathA"),
-                ContentModel.TYPE_CONTAINER);
+                ContentModel.TYPE_CONTAINER).getChildRef();
          int countBefore = countChildrenOfNode(rootNodeRef);
          assertEquals("Root children count incorrect", 1, countBefore);
         // associate the two nodes
-        nodeService.addChild(rootNodeRef, assocRef.getChildRef(), ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("pathB"));
+        nodeService.addChild(
+                rootNodeRef,
+                childNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("pathB"));
         // there should now be 2 child assocs on the root
          int countAfter = countChildrenOfNode(rootNodeRef);
          assertEquals("Root children count incorrect", 2, countAfter);
+         
+         // now attempt to create a cyclical relationship
+         try
+         {
+             nodeService.addChild(
+                     childNodeRef,
+                     rootNodeRef,
+                     ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                     QName.createQName("backToRoot"));
+             fail("Failed to detect cyclic child relationship during addition of child");
+         }
+         catch (CyclicChildRelationshipException e)
+         {
+             // expected
+         }
     }
     
     public void testRemoveChildByRef() throws Exception

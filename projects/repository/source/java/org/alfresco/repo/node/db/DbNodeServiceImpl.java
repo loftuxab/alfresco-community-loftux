@@ -628,9 +628,15 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node childNode = getNodeNotNull(childRef);
         // make the association
         ChildAssoc assoc = nodeDaoService.newChildAssoc(parentNode, childNode, false, assocTypeQName, assocQName);
+        ChildAssociationRef assocRef = assoc.getChildAssocRef();
+        NodeRef childNodeRef = assocRef.getChildRef();
+        
+        // check that the child addition of the child has not created a cyclic relationship
+        // this functionality is provided for free in getPath
+        getPaths(childNodeRef, false);
 
 		// Invoke policy behaviours
-        invokeOnCreateChildAssociation(assoc.getChildAssocRef());
+        invokeOnCreateChildAssociation(assocRef);
 		invokeOnUpdateNode(parentRef);
 		
         return assoc.getChildAssocRef();
@@ -1031,7 +1037,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      *      If this is true, then the only root is the top level node having no parents.
      * @throws CyclicChildRelationshipException
      */
-    private void prependPaths(final Node currentNode,
+    private void prependPaths(
+            final Node currentNode,
             final Path currentPath,
             Collection<Path> completedPaths,
             Stack<ChildAssoc> assocStack,
@@ -1168,7 +1175,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node node = getNodeNotNull(nodeRef);
         // create storage for the paths - only need 1 bucket if we are looking for the primary path
         List<Path> paths = new ArrayList<Path>(primaryOnly ? 1 : 10);
-        // create an emtpy current path to start from
+        // create an empty current path to start from
         Path currentPath = new Path();
         // create storage for touched associations
         Stack<ChildAssoc> assocStack = new Stack<ChildAssoc>();
