@@ -30,6 +30,7 @@ import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.CyclicChildRelationshipException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -441,7 +442,16 @@ public class RuleServiceImplTest extends BaseRuleTest
         NodeRef nodeRef1 = createNewNode(this.rootNodeRef, true);
         NodeRef nodeRef2 = createNewNode(nodeRef1, true);
         NodeRef nodeRef3 = createNewNode(nodeRef2, true);
-        this.nodeService.addChild(nodeRef3, nodeRef1, ContentModel.ASSOC_CHILDREN, QName.createQName("{test}loop"));
+        try
+        {
+            this.nodeService.addChild(nodeRef3, nodeRef1, ContentModel.ASSOC_CHILDREN, QName.createQName("{test}loop"));
+            fail("Expected detection of cyclic relationship");
+        }
+        catch (CyclicChildRelationshipException e)
+        {
+            // expected
+            // the node will still have been created in the current transaction, although the txn will be rollback-only
+        }
         
         Rule rule1 = createTestRule(true);
         this.ruleService.saveRule(nodeRef1, rule1);
