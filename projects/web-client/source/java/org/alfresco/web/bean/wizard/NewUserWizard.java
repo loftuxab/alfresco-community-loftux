@@ -816,7 +816,7 @@ public class NewUserWizard extends AbstractWizardBean
       if (spaceName != null && spaceName.length() != 0)
       {
          NodeRef parentRef = new NodeRef(Repository.getStoreRef(), locationId);
-
+         
          // check for existance of home space with same name - return
          // immediately
          // if it exists or throw an exception an give user chance to enter
@@ -838,48 +838,45 @@ public class NewUserWizard extends AbstractWizardBean
                }
             }
          }
-
+         
          // space does not exist already, create a new Space under it with
          // the specified name
          String qname = QName.createValidLocalName(spaceName);
          ChildAssociationRef assocRef = this.nodeService.createNode(parentRef, ContentModel.ASSOC_CONTAINS,
                QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, qname), ContentModel.TYPE_FOLDER);
-
+         
          NodeRef nodeRef = assocRef.getChildRef();
-
+         
          // set the name property on the node
          this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, spaceName);
-
+         
          if (logger.isDebugEnabled()) logger.debug("Created Home Space for with name: " + spaceName);
-
+         
          // apply the uifacets aspect - icon, title and description props
          Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(3);
          uiFacetsProps.put(ContentModel.PROP_ICON, NewSpaceWizard.SPACE_ICON_DEFAULT);
          uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
          this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
-
-         // Admin has full permissions by default
-         // TODO: remove this once admin is outside the ACL checks...
-         this.permissionService.setPermission(nodeRef, ContextListener.ADMIN, permissionService.getAllPermission(), true);
+         
+         // Admin Authority has full permissions by default (automatic - set in the permission config)
          // give full permissions to the new user
          this.permissionService.setPermission(nodeRef, this.userName, permissionService.getAllPermission(), true);
-
-         // by default other users (except Admin) will NOT have access to the space at all
-         // the new user is the OWNER of their own space
+         
+         // by default other users will only have GUEST access to the space contents
+         this.permissionService.setPermission(nodeRef, permissionService.getAllAuthorities(), permissionService.GUEST, true);
+         
+         // the new user is the OWNER of their own space and has full permissions
          this.ownableService.setOwner(nodeRef, this.userName);
-         // give the OWNER full permissions
-         this.permissionService.setPermission(nodeRef, permissionService.getOwnerAuthority(),
-               permissionService.getAllPermission(), true);
-
-         // now detach (if we did this first we could not set any
-         // permissions!)
+         this.permissionService.setPermission(nodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
+         
+         // now detach (if we did this first we could not set any permissions!)
          this.permissionService.setInheritParentPermissions(nodeRef, false);
-
+         
          // return the ID of the created space
          homeSpaceNodeRef = nodeRef;
          homeSpaceId = nodeRef.getId();
       }
-
+      
       return homeSpaceNodeRef;
    }
 

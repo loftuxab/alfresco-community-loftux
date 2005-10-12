@@ -260,7 +260,6 @@ public class UserMembersBean implements IContextListener
          }
          
          // filter invalid users e.g. Admin and current user
-         permissionMap.remove(ContextListener.ADMIN);
          permissionMap.remove(Application.getCurrentUser(context).getUserName());
          
          // for each authentication (username key) found we get the Person

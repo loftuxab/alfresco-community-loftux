@@ -67,10 +67,8 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
 {
    private static Log logger = LogFactory.getLog(ContextListener.class);
 
-   public static final String ADMIN = "admin";
-
+   private static final String ADMIN = "admin";
    private static final String ADMIN_FIRSTNAME = "Repository";
-
    private static final String ADMIN_LASTNAME = "Administrator";
 
    private ServletContext servletContext;
@@ -158,14 +156,10 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
             // create the Authentication instance for the "admin" user
             AuthenticationService authService = (AuthenticationService) ctx.getBean("authenticationService");
             authService.createAuthentication(ADMIN, password.toCharArray());
-
-            // create the node to represent the Person instance for the
-            // admin user
-
          }
          
          PersonService personService = (PersonService) ctx.getBean("personService");
-         if(!personService.personExists(ADMIN))
+         if (!personService.personExists(ADMIN))
          {
              // create the node to represent the Person instance for the
              // admin user
@@ -181,9 +175,9 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
          }
          PermissionService permissionService = (PermissionService) ctx.getBean("permissionService");
          permissionService.setPermission(rootNodeRef, PermissionService.ADMINISTRATOR_AUTHORITY, permissionService.getAllPermission(), true);
-         permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), PermissionService.READ, true);
+         permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), PermissionService.GUEST, true);
          permissionService.setPermission(rootNodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
-
+         
          // commit the transaction
          tx.commit();
       }

@@ -99,14 +99,13 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(0));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE, 13, 10, bundle.getString(FIRST_PAGE)));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE, 16, 16, bundle.getString(FIRST_PAGE), null, "absmiddle"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE_NONE, 13, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE_NONE, 16, 16, null, null, "absmiddle"));
       }
-      buf.append("&nbsp;");
       
       // previous page
       if (nCurrentPage != 0)
@@ -114,15 +113,15 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(nCurrentPage - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE, 9, 10, bundle.getString(PREVIOUS_PAGE)));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE, 16, 16, bundle.getString(PREVIOUS_PAGE), null, "absmiddle"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE_NONE, 9, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE_NONE, 16, 16, null, null, "absmiddle"));
       }
-      buf.append("&nbsp;");
       
+      buf.append("&nbsp;");
       // handle that the page count can be zero if no data present
       buf.append(MessageFormat.format(bundle.getString(MSG_PAGEINFO), new Object[] {
             Integer.toString(dataContainer.getCurrentPage() + 1),
@@ -136,14 +135,13 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(nCurrentPage + 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE, 9, 10, bundle.getString(NEXT_PAGE)));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE, 16, 16, bundle.getString(NEXT_PAGE), null, "absmiddle"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE_NONE, 9, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE_NONE, 16, 16, null, null, "absmiddle"));
       }
-      buf.append("&nbsp;");
       
       // last page
       if ((dataContainer.getCurrentPage() < dataContainer.getPageCount() - 1) == true)
@@ -151,12 +149,12 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(dataContainer.getPageCount() - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE, 13, 10, bundle.getString(LAST_PAGE)));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE, 16, 16, bundle.getString(LAST_PAGE), null, "absmiddle"));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE_NONE, 13, 10, null));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE_NONE, 16, 16, null, null, "absmiddle"));
       }
       
       out.write(buf.toString());
