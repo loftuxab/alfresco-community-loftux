@@ -19,6 +19,9 @@ package org.alfresco.repo.content.replication;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.alfresco.repo.content.AbstractContentReadWriteTest;
 import org.alfresco.repo.content.ContentStore;
@@ -95,7 +98,7 @@ public class ReplicatingContentStoreTest extends AbstractContentReadWriteTest
             for (ContentStore store : secondaryStores)
             {
                 ContentReader reader = store.getReader(contentUrl);
-                assertTrue("Content was not replicated out to the secondary stores", reader.exists());
+                assertTrue("Content was not replicated out to the secondary stores within a second", reader.exists());
                 assertEquals("The replicated content was incorrect", content, reader.getContentString());
             }
         }
@@ -133,6 +136,31 @@ public class ReplicatingContentStoreTest extends AbstractContentReadWriteTest
         ContentWriter writer = getWriter();
         writer.putContent(SOME_CONTENT);
         String contentUrl = writer.getContentUrl();
+        
+        checkForReplication(false, true, contentUrl, SOME_CONTENT);
+        
+        // check for outbound deletes
+        replicatingStore.delete(contentUrl);
+        checkForUrl(contentUrl, false);
+    }
+    
+    public void testAsyncOutboundReplication() throws Exception
+    {
+        ThreadPoolExecutor tpe = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+        
+        replicatingStore.setOutbound(true);
+        replicatingStore.setOutboundThreadPoolExecutor(tpe);
+        
+        // write some content
+        ContentWriter writer = getWriter();
+        writer.putContent(SOME_CONTENT);
+        String contentUrl = writer.getContentUrl();
+        
+        // wait for a second
+        synchronized(this)
+        {
+            this.wait(1000L);
+        }
         
         checkForReplication(false, true, contentUrl, SOME_CONTENT);
         

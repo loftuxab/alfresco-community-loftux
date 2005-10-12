@@ -17,6 +17,7 @@
 package org.alfresco.repo.content.replication;
 
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -54,6 +55,12 @@ import org.apache.commons.logging.LogFactory;
  * content write completes (i.e. the write channel is closed) then the content
  * is synchronously copied to all other stores.  The write is therefore slowed
  * down, but the content replication will occur <i>in-transaction</i>.
+ * <p>
+ * The {@link #setOutboundThreadPoolExecutor(boolean) outboundThreadPoolExecutor }
+ * property to enable asynchronous replication.<br>
+ * With asynchronous replication, there is always a risk that a failure
+ * occurs during the replication.  Depending on the configuration of the server,
+ * further action may need to be taken to rectify the problem manually.
  *  
  * </h2><u>Inbound Replication</u></h2>
  * <p>
@@ -91,6 +98,8 @@ public class ReplicatingContentStore implements ContentStore
     private List<ContentStore> secondaryStores;
     private boolean inbound;
     private boolean outbound;
+    private ThreadPoolExecutor outboundThreadPoolExecutor;
+    
     private Lock readLock;
     private Lock writeLock;
 
@@ -161,6 +170,29 @@ public class ReplicatingContentStore implements ContentStore
     }
 
     /**
+     * Set the thread pool executer
+     * 
+     * @param outboundThreadPoolExecutor set this to have the synchronization occur in a separate
+     *      thread
+     */
+    public void setOutboundThreadPoolExecutor(ThreadPoolExecutor outboundThreadPoolExecutor)
+    {
+        this.outboundThreadPoolExecutor = outboundThreadPoolExecutor;
+    }
+    
+    /**
+     * Uses the {@link #getReader(String) reader} to determine this.
+     */
+    public boolean exists(String contentUrl) throws ContentIOException
+    {
+        /*
+         * Not the most efficient, but prevents duplication of logic 
+         */
+        ContentReader reader = getReader(contentUrl);
+        return reader.exists();
+    }
+
+    /**
      * Forwards the call directly to the first store in the list of stores.
      */
     public ContentReader getReader(String contentUrl) throws ContentIOException
@@ -223,7 +255,7 @@ public class ReplicatingContentStore implements ContentStore
         writeLock.lock();
         try
         {
-            // check the primary again
+            // double check the primary
             ContentReader primaryContentReader = primaryStore.getReader(contentUrl);
             if (primaryContentReader.exists())
             {
@@ -258,12 +290,14 @@ public class ReplicatingContentStore implements ContentStore
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Attaching replicating listener to local writer: \n" +
+                logger.debug(
+                        "Attaching " + (outboundThreadPoolExecutor == null ? "" : "a") + "synchronous " +
+                                "replicating listener to local writer: \n" +
                         "   primary store: " + primaryStore + "\n" +
                         "   writer: " + writer);
             }
             // attach the listener
-            ReplicatingWriteListener listener = new ReplicatingWriteListener(secondaryStores, writer);
+            ContentStreamListener listener = new ReplicatingWriteListener(secondaryStores, writer, outboundThreadPoolExecutor);
             writer.addListener(listener);
             writer.setTransactionService(transactionService);   // mandatory when listeners are added
         }
@@ -310,7 +344,8 @@ public class ReplicatingContentStore implements ContentStore
     }
 
     /**
-     * Replicates the content upon stream closure.
+     * Replicates the content upon stream closure.  If the thread pool is available,
+     * then the process will be asynchronous.
      * <p>
      * No transaction boundaries have been declared as the
      * {@link ContentWriter#addListener(ContentStreamListener)} method indicates that
@@ -322,38 +357,67 @@ public class ReplicatingContentStore implements ContentStore
     {
         private List<ContentStore> stores;
         private ContentWriter writer;
+        private ThreadPoolExecutor threadPoolExecutor;
         
-        public ReplicatingWriteListener(List<ContentStore> stores, ContentWriter writer)
+        public ReplicatingWriteListener(
+                List<ContentStore> stores,
+                ContentWriter writer,
+                ThreadPoolExecutor threadPoolExecutor)
         {
             this.stores = stores;
             this.writer = writer;
+            this.threadPoolExecutor = threadPoolExecutor;
         }
         
         public void contentStreamClosed() throws ContentIOException
         {
-            try
+            Runnable runnable = new ReplicateOnCloseRunnable();
+            if (threadPoolExecutor == null)
+            {
+                // execute direct
+                runnable.run();
+            }
+            else
+            {
+                threadPoolExecutor.execute(runnable);
+            }
+        }
+        
+        /**
+         * Performs the actual replication work.
+         * 
+         * @author Derek Hulley
+         */
+        private class ReplicateOnCloseRunnable implements Runnable
+        {
+            public void run()
             {
                 for (ContentStore store : stores)
                 {
-                    // replicate the content to the store - we know the URL that we want to write to
-                    ContentReader reader = writer.getReader();
-                    String contentUrl = reader.getContentUrl();
-                    // in order to replicate, we have to specify the URL that we are going to write to
-                    ContentWriter replicatedWriter = store.getWriter(null, contentUrl);
-                    // write it
-                    replicatedWriter.putContent(reader);
-                    
-                    if (logger.isDebugEnabled())
+                    try
                     {
-                        logger.debug("Replicated content to store: \n" +
-                                "   url: " + contentUrl + "\n" +
+                        // replicate the content to the store - we know the URL that we want to write to
+                        ContentReader reader = writer.getReader();
+                        String contentUrl = reader.getContentUrl();
+                        // in order to replicate, we have to specify the URL that we are going to write to
+                        ContentWriter replicatedWriter = store.getWriter(null, contentUrl);
+                        // write it
+                        replicatedWriter.putContent(reader);
+                        
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Replicated content to store: \n" +
+                                    "   url: " + contentUrl + "\n" +
+                                    "   to store: " + store);
+                        }
+                    }
+                    catch (Throwable e)
+                    {
+                        throw new ContentIOException("Content replication failed: \n" +
+                                "   url: " + writer.getContentUrl() + "\n" +
                                 "   to store: " + store);
                     }
                 }
-            }
-            catch (Throwable e)
-            {
-                throw new ContentIOException("Content replication failed", e);
             }
         }
     }

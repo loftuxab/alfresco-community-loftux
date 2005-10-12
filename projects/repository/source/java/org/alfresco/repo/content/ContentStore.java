@@ -52,6 +52,21 @@ public interface ContentStore
     public static final String STORE_PROTOCOL = "store://";
     
     /**
+     * Check for the existence of content in the store.
+     * <p>
+     * The implementation of this may be more efficient than first getting a
+     * reader to {@link ContentReader#exists() check for existence}, although
+     * that check should also be performed.
+     * 
+     * @param contentUrl the path to the content
+     * @return Returns true if the content exists.
+     * @throws ContentIOException
+     * 
+     * @see ContentReader#exists()
+     */
+    public boolean exists(String contentUrl) throws ContentIOException;
+    
+    /**
      * Get the accessor with which to read from the content
      * at the given URL.  The reader is <b>stateful</b> and
      * can <b>only be used once</b>.
@@ -61,7 +76,8 @@ public interface ContentStore
      *      be no content at the given URL, but the reader must still be returned.
      *      The reader may implement the {@link RandomAccessContent random access interface}.
      * @throws ContentIOException
-     * 
+     *
+     * @see #exists(String)
      * @see ContentReader#exists()
      */
     public ContentReader getReader(String contentUrl) throws ContentIOException;

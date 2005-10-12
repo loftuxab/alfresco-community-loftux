@@ -60,9 +60,11 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  *       By default, the Hibernate L2 cache is used during processing.
  *       This can be disabled by either disabling the L2 cache globally
  *       for the server (not recommended) or by setting the
- *       {@link #setUseL2Cache(boolean) useL2Cache} property.  If the
- *       database is static then the L2 cache should be left enabled
- *       for maximum performance.
+ *       {@link #setL2CacheMode(String) l2CacheMode} property.  If the
+ *       database is static then the L2 cache usage can be set to use
+ *       the <code>NORMAL</code> mode.  <code>REFRESH</code> should be
+ *       used where the server will still be accessed from some clients
+ *       despite the database changing.
  *   </li>
  *   <li>
  *       This process should not run continuously on a live
@@ -105,8 +107,8 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     private List<StoreRef> storeRefs;
     /** set this on to keep checking for new transactions and never stop */
     private boolean runContinuously;
-    /** controls whether the L2 cache should be used or not */
-    private boolean useL2Cache;
+    /** controls how the L2 cache is used */
+    private CacheMode l2CacheMode;
     
     /**
      * @return Returns the ID of the current (or last) transaction processed
@@ -121,7 +123,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         this.storeRefs = new ArrayList<StoreRef>(2);
         
         this.runContinuously = false;
-        this.useL2Cache = true;
+        this.l2CacheMode = CacheMode.REFRESH;
     }
     
     /**
@@ -192,16 +194,46 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     }
     
     /**
-     * Set this to false if the server this process is running in is NOT
-     * the only processing modifying the underlying data.
-     * <p>
-     * By default, it is should be <code>true</code>.
+     * Set the hibernate cache mode
      * 
-     * @param useL2Cache true to use the L2 cache
+     * @see org.hibernate.CacheMode
      */
-    public void setUseL2Cache(boolean useL2Cache)
+    public void setL2CacheMode(CacheMode l2CacheMode)
     {
-        this.useL2Cache = useL2Cache;
+        this.l2CacheMode = l2CacheMode;
+    }
+    
+    /**
+     * Set the hibernate cache mode by name
+     * 
+     * @see org.hibernate.CacheMode
+     */
+    public void setL2CacheMode(String l2CacheModeStr)
+    {
+        if (l2CacheModeStr.equals("GET"))
+        {
+            l2CacheMode = CacheMode.GET;
+        }
+        else if (l2CacheModeStr.equals("IGNORE"))
+        {
+            l2CacheMode = CacheMode.IGNORE;
+        }
+        else if (l2CacheModeStr.equals("NORMAL"))
+        {
+            l2CacheMode = CacheMode.NORMAL;
+        }
+        else if (l2CacheModeStr.equals("PUT"))
+        {
+            l2CacheMode = CacheMode.PUT;
+        }
+        else if (l2CacheModeStr.equals("REFRESH"))
+        {
+            l2CacheMode = CacheMode.REFRESH;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Unrecognised Hibernate L2 cache mode: " + l2CacheModeStr);
+        }
     }
 
     /**
@@ -282,22 +314,22 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             // keep this thread going permanently
             while (true)
             {
-                List<String> txnsIndexed = FullIndexRecoveryComponent.this.reindexImpl();
-                // check if the process should terminate
-                if (txnsIndexed.size() == 0 && !runContinuously)
-                {
-                    // the thread has caught up with all the available work and should not
-                    // run continuously
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Thread quitting - no more available indexing to do: \n" +
-                                "   last txn: " + FullIndexRecoveryComponent.getCurrentTransactionId());
-                    }
-                    break;
-                }
-                // brief pause
                 try
                 {
+                    List<String> txnsIndexed = FullIndexRecoveryComponent.this.reindexImpl();
+                    // check if the process should terminate
+                    if (txnsIndexed.size() == 0 && !runContinuously)
+                    {
+                        // the thread has caught up with all the available work and should not
+                        // run continuously
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Thread quitting - no more available indexing to do: \n" +
+                                    "   last txn: " + FullIndexRecoveryComponent.getCurrentTransactionId());
+                        }
+                        break;
+                    }
+                    // brief pause
                     synchronized(FullIndexRecoveryComponent.this)
                     {
                         FullIndexRecoveryComponent.this.wait(1000L);
@@ -306,6 +338,11 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
                 catch (InterruptedException e)
                 {
                     // ignore
+                }
+                catch (Throwable e)
+                {
+                    // report
+                    logger.error("Reindex failure", e);
                 }
             }
         }
@@ -330,6 +367,8 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
 
     /**
      * Reindexes changes specific to the change transaction ID.
+     * <p>
+     * <b>All exceptions are absorbed.</b>
      */
     private void reindex(String changeTxnId)
     {
@@ -394,17 +433,14 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         }
         
         /**
-         * Switches the L2 cache of, if necessary.
+         * Changes the L2 cache usage before reindexing for each store
          * 
          * @see #reindex(StoreRef, String)
          */
         public Object doInHibernate(Session session)
         {
-            if (!useL2Cache)
-            {
-                // we want to start with a clean L2 cache
-                getSession().setCacheMode(CacheMode.IGNORE);
-            }
+            // set the way the L2 cache is used
+            getSession().setCacheMode(l2CacheMode);
             
             // reindex each store
             for (StoreRef storeRef : storeRefs)

@@ -174,6 +174,16 @@ public class FileContentStore extends AbstractContentStore
     }
     
     /**
+     * Performs a direct check against the file for its existence.
+     */
+    @Override
+    public boolean exists(String contentUrl) throws ContentIOException
+    {
+        File file = makeFile(contentUrl);
+        return file.exists();
+    }
+
+    /**
      * This implementation requires that the URL start with
      * {@link FileContentStore#STORE_PROTOCOL }.
      */

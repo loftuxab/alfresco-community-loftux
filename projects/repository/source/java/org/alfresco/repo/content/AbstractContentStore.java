@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.repository.ContentIOException;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.util.GUID;
 
 /**
@@ -34,6 +36,16 @@ import org.alfresco.util.GUID;
  */
 public abstract class AbstractContentStore implements ContentStore
 {
+    /**
+     * Simple implementation that uses the
+     * {@link ContentReader#exists() reader's exists} method as its implementation.
+     */
+    public boolean exists(String contentUrl) throws ContentIOException
+    {
+        ContentReader reader = getReader(contentUrl);
+        return reader.exists();
+    }
+
     /**
      * Creates a new content URL.  This must be supported by all
      * stores that are compatible with Alfresco.

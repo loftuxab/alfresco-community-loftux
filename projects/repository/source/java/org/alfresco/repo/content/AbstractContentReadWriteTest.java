@@ -143,6 +143,28 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         assertEquals("Encoding and decoding of strings failed", content, contentCheck);
     }
     
+    public void testExists() throws Exception
+    {
+        ContentStore store = getStore();
+        
+        // make up a URL
+        String contentUrl = AbstractContentStore.createNewUrl();
+        
+        // it should not exist in the store
+        assertFalse("Store exists fails with new URL", store.exists(contentUrl));
+        
+        // get a reader
+        ContentReader reader = store.getReader(contentUrl);
+        assertNotNull("Reader must be present, even for missing content", reader);
+        assertFalse("Reader exists failure", reader.exists());
+        
+        // write something
+        ContentWriter writer = store.getWriter(null, contentUrl);
+        writer.putContent("ABC");
+        
+        assertTrue("Store exists should show URL to be present", store.exists(contentUrl));
+    }
+    
     public void testGetReader() throws Exception
     {
         ContentWriter writer = getWriter();

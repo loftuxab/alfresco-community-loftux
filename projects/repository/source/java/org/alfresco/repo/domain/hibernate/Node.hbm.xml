@@ -340,13 +340,4 @@
          status.changeTxnId = :changeTxnId
    </query>
 
-   <query name="content.GetAllContentData">
-      select
-         node.properties.stringValue
-      from
-         org.alfresco.repo.domain.hibernate.NodeImpl as node
-      where
-         node.properties.actualType = 'CONTENT'
-   </query>
-
 </hibernate-mapping>
