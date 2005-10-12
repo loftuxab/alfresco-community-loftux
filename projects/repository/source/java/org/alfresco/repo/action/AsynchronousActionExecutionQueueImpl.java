@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.action;
 
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -89,15 +90,15 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 	/**
 	 * @see org.alfresco.repo.action.AsynchronousActionExecutionQueue#executeAction(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.action.Action, boolean)
 	 */
-	public void executeAction(RuntimeActionService actionService, Action action, NodeRef actionedUponNodeRef, boolean checkConditions)
+	public void executeAction(RuntimeActionService actionService, Action action, NodeRef actionedUponNodeRef, boolean checkConditions, Set<String> actionChain)
 	{
-		executeAction(actionService, action, actionedUponNodeRef, checkConditions, null);
+		executeAction(actionService, action, actionedUponNodeRef, checkConditions, actionChain, null);
 	}
 
 	/**
 	 * @see org.alfresco.repo.action.AsynchronousActionExecutionQueue#executeAction(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.action.Action, boolean, org.alfresco.service.cmr.repository.NodeRef)
 	 */
-	public void executeAction(RuntimeActionService actionService, Action action, NodeRef actionedUponNodeRef, boolean checkConditions, NodeRef actionExecutionHistoryNodeRef)
+	public void executeAction(RuntimeActionService actionService, Action action, NodeRef actionedUponNodeRef, boolean checkConditions, Set<String> actionChain, NodeRef actionExecutionHistoryNodeRef)
 	{
 		execute(
 				new ActionExecutionWrapper(
@@ -107,7 +108,8 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 							action, 
 							actionedUponNodeRef, 
 							checkConditions, 
-							actionExecutionHistoryNodeRef));
+							actionExecutionHistoryNodeRef,
+                            actionChain));
 	}
 	
 	/**
@@ -167,6 +169,11 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 		 * The action execution history node reference
 		 */
 		private NodeRef actionExecutionHistoryNodeRef;
+        
+        /**
+         * The action chain
+         */
+        private Set<String> actionChain;
 		
 		/**
          * Constructor 
@@ -186,7 +193,8 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 				Action action, 
 				NodeRef actionedUponNodeRef, 
 				boolean checkConditions,
-				NodeRef actionExecutionHistoryNodeRef)
+				NodeRef actionExecutionHistoryNodeRef,
+                Set<String> actionChain)
 		{
 			this.actionService = actionService;
 			this.transactionService = transactionService;
@@ -195,6 +203,7 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 			this.action = action;
 			this.checkConditions = checkConditions;
 			this.actionExecutionHistoryNodeRef = actionExecutionHistoryNodeRef;
+            this.actionChain = actionChain;
 		}
 		
 		/**
@@ -236,6 +245,16 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
 		{
 			return this.actionExecutionHistoryNodeRef;
 		}
+        
+        /**
+         * Get the action chain
+         * 
+         * @return   the action chain
+         */
+        public Set<String> getActionChain()
+        {
+            return actionChain;
+        }
 		
 		/**
 		 * Executes the action via the action runtime service
@@ -261,7 +280,8 @@ public class AsynchronousActionExecutionQueueImpl 	extends ThreadPoolExecutor
     										ActionExecutionWrapper.this.action, 
     										ActionExecutionWrapper.this.actionedUponNodeRef, 
     										ActionExecutionWrapper.this.checkConditions,
-    										true);
+    										true,
+                                            ActionExecutionWrapper.this.actionChain);
                                 }
                                 finally
                                 {

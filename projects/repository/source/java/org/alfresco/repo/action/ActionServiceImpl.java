@@ -20,15 +20,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.ActionConditionEvaluator;
 import org.alfresco.repo.action.executer.ActionExecuter;
-import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
@@ -41,7 +41,6 @@ import org.alfresco.service.cmr.action.ParameterizedItem;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -62,7 +61,7 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class ActionServiceImpl implements ActionService, RuntimeActionService, ApplicationContextAware
 { 
-	/**
+    /**
 	 * Transaction resource name
 	 */
 	private static final String POST_TRANSACTION_PENDING_ACTIONS = "postTransactionPendingActions";
@@ -339,20 +338,24 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	{
 		executeAction(action, actionedUponNodeRef, checkConditions, action.getExecuteAsychronously());
 	}
+    
+    ThreadLocal<Set<String>> currentActionChain = new ThreadLocal<Set<String>>();
 	
 	/**
 	 * @see org.alfresco.service.cmr.action.ActionService#executeAction(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef, boolean)
 	 */
 	public void executeAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions, boolean executeAsychronously)
 	{
+        Set<String> actionChain = this.currentActionChain.get();
+        
 		if (executeAsychronously == false)
 		{
-			executeActionImpl(action, actionedUponNodeRef, checkConditions, false);
+			executeActionImpl(action, actionedUponNodeRef, checkConditions, false, actionChain);
 		}
 		else
 		{
 			// Add to the post transaction pending action list
-			addPostTransactionPendingAction(action, actionedUponNodeRef, checkConditions);
+			addPostTransactionPendingAction(action, actionedUponNodeRef, checkConditions, actionChain);
 		}
 	}
 
@@ -363,46 +366,111 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 			Action action, 
 			NodeRef actionedUponNodeRef, 
 			boolean checkConditions, 
-			boolean executedAsynchronously)
+			boolean executedAsynchronously,
+            Set<String> actionChain)
 	{	
-		try
-		{
-			// Check and execute now
-			if (checkConditions == false || evaluateAction(action, actionedUponNodeRef) == true)
-			{
-				// Execute the action
-				directActionExecution(action, actionedUponNodeRef);
-			}
-		}
-		catch (Throwable exception)
-		{
-			// Log the exception
-			logger.error(
-						"An error was encountered whilst executing the action '" + action.getActionDefinitionName() + "'.",
-						exception);
-			
-			if (executedAsynchronously == true)
-			{				
-				// If one is specified, queue the compensating action ready for execution
-				Action compensatingAction = action.getCompensatingAction();
-				if (compensatingAction != null)
-				{					
-					// Queue the compensating action ready for execution
-					this.asynchronousActionExecutionQueue.executeAction(this, compensatingAction, actionedUponNodeRef, false);
-				}
-			}
-				
-			// Rethrow the exception
-			if (exception instanceof RuntimeException)
-			{
-				throw (RuntimeException)exception;
-			}
-			else
-			{
-				throw new ActionServiceException(ERR_FAIL, exception);
-			}
-			
-		}
+        if (logger.isDebugEnabled() == true)
+        {
+            StringBuilder builder = new StringBuilder("Exceute action impl action chain = ");
+            if (actionChain == null)
+            {
+                builder.append("null");
+            }
+            else
+            {
+                for (String value : actionChain)
+                {
+                    builder.append(value).append(" ");
+                }
+            }    
+            logger.debug(builder.toString());
+            logger.debug("Current action = " + action.getId());
+        }
+        
+        if (actionChain == null || actionChain.contains(action.getId()) == false)
+        {
+            if (logger.isDebugEnabled() == true)
+            {
+                logger.debug("Doing executeActionImpl");
+            }
+            
+    		try
+    		{
+                //Set<String> currentActionChain = this.currentActionChain.get();
+                Set<String> origActionChain = null;
+                
+                if (actionChain == null)
+                {
+                    actionChain = new HashSet<String>();                    
+                }
+                else
+                {
+                    origActionChain = new HashSet<String>(actionChain);
+                }
+                actionChain.add(action.getId());
+                this.currentActionChain.set(actionChain);
+                
+                if (logger.isDebugEnabled() == true)
+                {
+                    logger.debug("Adding " + action.getId() + " to action chain.");
+                }
+                
+                try
+                {
+        			// Check and execute now
+        			if (checkConditions == false || evaluateAction(action, actionedUponNodeRef) == true)
+        			{
+        				// Execute the action
+        				directActionExecution(action, actionedUponNodeRef);
+        			}
+                }
+                finally
+                {
+                    if (origActionChain == null)
+                    {
+                        this.currentActionChain.remove();
+                    }
+                    else
+                    {
+                        this.currentActionChain.set(origActionChain);
+                    }
+                    
+                    if (logger.isDebugEnabled() == true)
+                    {
+                        logger.debug("Resetting the action chain.");
+                    }
+                }
+    		}
+    		catch (Throwable exception)
+    		{
+    			// Log the exception
+    			logger.error(
+    						"An error was encountered whilst executing the action '" + action.getActionDefinitionName() + "'.",
+    						exception);
+    			
+    			if (executedAsynchronously == true)
+    			{				
+    				// If one is specified, queue the compensating action ready for execution
+    				Action compensatingAction = action.getCompensatingAction();
+    				if (compensatingAction != null)
+    				{					
+    					// Queue the compensating action ready for execution
+    					this.asynchronousActionExecutionQueue.executeAction(this, compensatingAction, actionedUponNodeRef, false, null);
+    				}
+    			}
+    				
+    			// Rethrow the exception
+    			if (exception instanceof RuntimeException)
+    			{
+    				throw (RuntimeException)exception;
+    			}
+    			else
+    			{
+    				throw new ActionServiceException(ERR_FAIL, exception);
+    			}
+    			
+    		}
+        }
 	}
 
 	/**
@@ -991,25 +1059,53 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	private void addPostTransactionPendingAction(
 			Action action, 
 			NodeRef actionedUponNodeRef, 
-			boolean checkConditions)
+			boolean checkConditions,
+            Set<String> actionChain)
 	{
-		// Ensure that the transaction listener is bound to the transaction
-		AlfrescoTransactionSupport.bindListener(this.transactionListener);
-		
-		// Add the pending action to the transaction resource
-		List<PendingAction> pendingActions = (List<PendingAction>)AlfrescoTransactionSupport.getResource(POST_TRANSACTION_PENDING_ACTIONS);
-		if (pendingActions == null)
-		{
-			pendingActions = new ArrayList<PendingAction>();
-			AlfrescoTransactionSupport.bindResource(POST_TRANSACTION_PENDING_ACTIONS, pendingActions);
-		}
-		
-		// Check that action has only been added to the list once
-		PendingAction pendingAction = new PendingAction(action, actionedUponNodeRef, checkConditions);
-		if (pendingActions.contains(pendingAction) == false)
-		{
-			pendingActions.add(pendingAction);
-		}		
+        if (logger.isDebugEnabled() == true)
+        {
+            StringBuilder builder = new StringBuilder("addPostTransactionPendingAction action chain = ");
+            if (actionChain == null)
+            {
+                builder.append("null");
+            }
+            else
+            {
+                for (String value : actionChain)
+                {
+                    builder.append(value).append(" ");
+                }
+            }    
+            logger.debug(builder.toString());
+            logger.debug("Current action = " + action.getId());
+        }
+        
+        // Don't continue if the action is already in the action chain
+        if (actionChain == null || actionChain.contains(action.getId()) == false)
+        {        
+            if (logger.isDebugEnabled() == true)
+            {
+                logger.debug("Doing addPostTransactionPendingAction");
+            }
+            
+    		// Ensure that the transaction listener is bound to the transaction
+    		AlfrescoTransactionSupport.bindListener(this.transactionListener);
+    		
+    		// Add the pending action to the transaction resource
+    		List<PendingAction> pendingActions = (List<PendingAction>)AlfrescoTransactionSupport.getResource(POST_TRANSACTION_PENDING_ACTIONS);
+    		if (pendingActions == null)
+    		{
+    			pendingActions = new ArrayList<PendingAction>();
+    			AlfrescoTransactionSupport.bindResource(POST_TRANSACTION_PENDING_ACTIONS, pendingActions);
+    		}
+    		
+    		// Check that action has only been added to the list once
+    		PendingAction pendingAction = new PendingAction(action, actionedUponNodeRef, checkConditions, actionChain);
+    		if (pendingActions.contains(pendingAction) == false)
+    		{
+    			pendingActions.add(pendingAction);
+    		}		
+        }
 	}
 	
 	/**
@@ -1040,6 +1136,8 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		 * Indicates whether the conditions should be checked before the action is executed
 		 */
 		private boolean checkConditions;
+        
+        private Set<String> actionChain;
 		
 		/**
 		 * Constructor 
@@ -1048,11 +1146,12 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		 * @param actionedUponNodeRef			the actioned upon node reference
 		 * @param checkConditions				indicated whether the conditions need to be checked
 		 */
-		public PendingAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions)
+		public PendingAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions, Set<String> actionChain)
 		{
 			this.action = action;
 			this.actionedUponNodeRef = actionedUponNodeRef;
 			this.checkConditions = checkConditions;
+            this.actionChain = actionChain;
 		}
 		
 		/**
@@ -1084,6 +1183,11 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		{
 			return this.checkConditions;
 		}
+        
+        public Set<String> getActionChain()
+        {
+            return this.actionChain;
+        }
 		
 		/**
 		 * @see java.lang.Object#hashCode()

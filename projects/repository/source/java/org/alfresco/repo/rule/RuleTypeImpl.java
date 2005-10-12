@@ -26,6 +26,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Rule type implementation class.
@@ -34,6 +36,11 @@ import org.alfresco.service.cmr.rule.RuleType;
  */
 public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
 {
+    /**
+     * The logger
+     */
+    private static Log logger = LogFactory.getLog(RuleTypeImpl.class); 
+    
     /**
      * The action service
      */
@@ -118,6 +125,11 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
 			
             for (Rule rule : rules)
             {   
+                if (logger.isDebugEnabled() == true)
+                {
+                    logger.debug("Triggering rule " + rule.getId());
+                }
+                
                 if (rule.getExecuteAsychronously() == true)
                 {
                     // Execute the rule now since it will be be queued for async execution later

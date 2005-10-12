@@ -79,7 +79,8 @@ public class ActionTransactionListener implements TransactionListener
 					actionService,
 					pendingAction.getAction(),
 					pendingAction.getActionedUponNodeRef(),
-					pendingAction.getCheckConditions());
+					pendingAction.getCheckConditions(),
+                    pendingAction.getActionChain());
 		} 
 	}
 

@@ -16,6 +16,8 @@
  */
 package org.alfresco.repo.action;
 
+import java.util.Set;
+
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.NodeRef;
 
@@ -36,6 +38,7 @@ public interface AsynchronousActionExecutionQueue
 			RuntimeActionService actionService,
 			Action action,
 			NodeRef actionedUponNodeRef, 			 
-			boolean checkConditions);
+			boolean checkConditions,
+            Set<String> actionChain);
 	
 }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
@@ -88,6 +89,11 @@ public class ActionImpl extends ParameterizedItemImpl
      * The owning node reference
      */
     private NodeRef owningNodeRef;
+    
+    /**
+     * The chain of actions that have lead to this action
+     */
+    private Set<String> actionChain;
     
     /**
      * Action conditions
@@ -351,4 +357,24 @@ public class ActionImpl extends ParameterizedItemImpl
 	{
 		this.actionConditions.clear();
 	}	
+    
+    /**
+     * Set the action chain
+     * 
+     * @param actionChain   the list of actions that lead to this action
+     */
+    public void setActionChain(Set<String> actionChain)
+    {
+        this.actionChain = actionChain;
+    }
+    
+    /**
+     * Get the action chain 
+     * 
+     * @return  the list of actions that lead to this action
+     */
+    public Set<String> getActionChain()
+    {
+        return actionChain;
+    }
 }

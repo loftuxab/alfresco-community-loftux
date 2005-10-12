@@ -36,6 +36,7 @@ import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -93,6 +94,7 @@ public class BaseRuleTest extends BaseSpringTest
     protected NodeRef nodeRef;
     protected NodeRef configFolder;
     protected ActionService actionService;
+    protected TransactionService transactionService;
 
     /**
      * onSetUpInTransaction implementation
@@ -110,6 +112,7 @@ public class BaseRuleTest extends BaseSpringTest
         this.configService = (ConfigurableService)this.applicationContext
         		.getBean("configurableService");
         this.actionService = (ActionService)this.applicationContext.getBean("actionService");
+        this.transactionService = (TransactionService)this.applicationContext.getBean("transactionComponent");
 
         // Get the rule type
         this.ruleType = this.ruleService.getRuleType(RULE_TYPE_NAME);

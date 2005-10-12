@@ -21,11 +21,18 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SingleChildAssocRefPolicyRuleTrigger extends RuleTriggerAbstractBase
 {
 	private static final String ERR_POLICY_NAME_NOT_SET = "Unable to register rule trigger since policy name has not been set.";
 	
+    /**
+     * The logger
+     */
+    private static Log logger = LogFactory.getLog(SingleChildAssocRefPolicyRuleTrigger.class);
+    
 	private String policyNamespace = NamespaceService.ALFRESCO_URI;
 	
 	private String policyName;
@@ -75,6 +82,11 @@ public class SingleChildAssocRefPolicyRuleTrigger extends RuleTriggerAbstractBas
 
 	public void policyBehaviour(ChildAssociationRef childAssocRef)
 	{
+        if (logger.isDebugEnabled() == true)
+        {
+            logger.debug("Single child assoc trigger (policy = " + this.policyName + ") fired for parent node " + childAssocRef.getParentRef() + " and child node " + childAssocRef.getChildRef());
+        }
+        
 		triggerRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
 	}
 }

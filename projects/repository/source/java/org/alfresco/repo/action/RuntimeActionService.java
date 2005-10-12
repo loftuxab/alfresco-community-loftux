@@ -17,6 +17,7 @@
 package org.alfresco.repo.action;
 
 import java.util.List;
+import java.util.Set;
 
 import org.alfresco.repo.action.ActionServiceImpl.PendingAction;
 import org.alfresco.repo.action.evaluator.ActionConditionEvaluator;
@@ -56,7 +57,8 @@ public interface RuntimeActionService
 			Action action, 
 			NodeRef actionedUponNodeRef, 
 			boolean checkConditions, 
-			boolean executedAsynchronously);
+			boolean executedAsynchronously,
+            Set<String> actionChain);
 	
 	public void directActionExecution(Action action, NodeRef actionedUponNodeRef);
 	

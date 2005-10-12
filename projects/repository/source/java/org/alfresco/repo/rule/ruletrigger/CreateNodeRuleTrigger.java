@@ -22,6 +22,8 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * We use this specialised trigger for create node beaucse of a problem with the CIFS integration.
@@ -32,6 +34,11 @@ import org.alfresco.service.namespace.QName;
  */
 public class CreateNodeRuleTrigger extends SingleChildAssocRefPolicyRuleTrigger
 {
+    /**
+     * The logger
+     */
+    private static Log logger = LogFactory.getLog(CreateNodeRuleTrigger.class);
+    
     DictionaryService dictionaryService;
     
     public void setDictionaryService(DictionaryService dictionaryService)
@@ -60,6 +67,11 @@ public class CreateNodeRuleTrigger extends SingleChildAssocRefPolicyRuleTrigger
         
         if (triggerRule == false)
         {
+            if (logger.isDebugEnabled() == true)
+            {
+                logger.debug("Create node rule trigger fired for parent node " + childAssocRef.getParentRef() + " and child node " + childAssocRef.getChildRef());
+            }
+            
             triggerRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());
         }
     }

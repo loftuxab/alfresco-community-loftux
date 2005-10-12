@@ -16,11 +16,23 @@
  */
 package org.alfresco.repo.rule;
 
+import java.io.File;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.ActionServiceImplTest;
+import org.alfresco.repo.action.ActionServiceImplTest.AsyncTest;
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
+import org.alfresco.repo.action.executer.ImageTransformActionExecuter;
+import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleType;
@@ -494,7 +506,101 @@ public class RuleServiceImplTest extends BaseRuleTest
         assertNotNull(allRules4);
         assertEquals(2, allRules4.size());
         assertTrue(allRules4.contains(rule1));
-        assertTrue(allRules4.contains(rule4));
-        
+        assertTrue(allRules4.contains(rule4));        
     }
+    
+    public void testCyclicRules()
+    {
+    }
+    
+    public void testCyclicAsyncRules() throws Exception
+    {
+        NodeRef nodeRef = createNewNode(this.rootNodeRef, true);
+        
+        // Create the first rule
+        
+        Map<String, Serializable> conditionProps = new HashMap<String, Serializable>();
+        conditionProps.put(ComparePropertyValueEvaluator.PARAM_VALUE, "*.jpg");
+
+        Map<String, Serializable> actionProps = new HashMap<String, Serializable>();
+        actionProps.put(ImageTransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_GIF);
+        actionProps.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, nodeRef);
+        actionProps.put(ImageTransformActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
+        actionProps.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, ContentModel.ASSOC_CHILDREN);
+        
+        Rule rule = this.ruleService.createRule(this.ruleType.getName());
+        rule.setTitle("Convert from *.jpg to *.gif");
+        rule.setExecuteAsynchronously(true);
+        
+        ActionCondition actionCondition = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
+        actionCondition.setParameterValues(conditionProps);
+        rule.addActionCondition(actionCondition);
+        
+        Action action = this.actionService.createAction(ImageTransformActionExecuter.NAME);
+        action.setParameterValues(actionProps);
+        rule.addAction(action);
+        
+        // Create the next rule
+        
+        Map<String, Serializable> conditionProps2 = new HashMap<String, Serializable>();
+        conditionProps2.put(ComparePropertyValueEvaluator.PARAM_VALUE, "*.gif");
+
+        Map<String, Serializable> actionProps2 = new HashMap<String, Serializable>();
+        actionProps2.put(ImageTransformActionExecuter.PARAM_MIME_TYPE, MimetypeMap.MIMETYPE_IMAGE_JPEG);
+        actionProps2.put(ImageTransformActionExecuter.PARAM_DESTINATION_FOLDER, nodeRef);
+        actionProps2.put(ImageTransformActionExecuter.PARAM_ASSOC_QNAME, ContentModel.ASSOC_CHILDREN);
+        
+        Rule rule2 = this.ruleService.createRule(this.ruleType.getName());
+        rule2.setTitle("Convert from *.gif to *.jpg");
+        rule2.setExecuteAsynchronously(true);
+        
+        ActionCondition actionCondition2 = this.actionService.createActionCondition(ComparePropertyValueEvaluator.NAME);
+        actionCondition2.setParameterValues(conditionProps2);
+        rule2.addActionCondition(actionCondition2);
+        
+        Action action2 = this.actionService.createAction(ImageTransformActionExecuter.NAME);
+        action2.setParameterValues(actionProps2);
+        rule2.addAction(action2);
+        
+        // Save the rules
+        this.ruleService.saveRule(nodeRef, rule);
+        this.ruleService.saveRule(nodeRef, rule);
+        
+        // Now create new content
+        NodeRef contentNode = this.nodeService.createNode(nodeRef,
+                ContentModel.ASSOC_CHILDREN,
+                QName.createQName("{test}testnode"),
+                ContentModel.TYPE_CONTENT).getChildRef();
+        this.nodeService.setProperty(contentNode, ContentModel.PROP_NAME, "myFile.jpg");
+        File file = AbstractContentTransformerTest.loadQuickTestFile("jpg");
+        ContentWriter writer = this.contentService.getWriter(contentNode, ContentModel.PROP_CONTENT, true);
+        writer.setEncoding("UTF-8");
+        writer.setMimetype(MimetypeMap.MIMETYPE_IMAGE_JPEG);
+        writer.putContent(file);
+        
+        setComplete();
+        endTransaction();
+        
+        //final NodeRef finalNodeRef = nodeRef;
+        
+        // Check to see what has happened
+//        ActionServiceImplTest.postAsyncActionTest(
+//                this.transactionService,
+//                10000, 
+//                10, 
+//                new AsyncTest()
+//                {
+//                    public boolean executeTest() 
+//                    {
+//                        List<ChildAssociationRef> assocs = RuleServiceImplTest.this.nodeService.getChildAssocs(finalNodeRef);
+//                        for (ChildAssociationRef ref : assocs)
+//                        {
+//                            NodeRef child = ref.getChildRef();
+//                            System.out.println("Child name: " + RuleServiceImplTest.this.nodeService.getProperty(child, ContentModel.PROP_NAME));
+//                        }
+//                        
+//                        return true;
+//                    };
+//                });
+    }    
 }
