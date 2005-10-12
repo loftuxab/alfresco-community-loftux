@@ -24,6 +24,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
+import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -57,6 +58,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private ContentService contentService;
 	private VersionService versionService;
     private AuthenticationService authenticationService;
+    private LockService lockService;
     
     /**
 	 * Data used by the tests
@@ -96,6 +98,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
 		this.versionService = (VersionService)this.applicationContext.getBean("versionService");
         this.authenticationService = (AuthenticationService)this.applicationContext.getBean("authenticationService");
+        this.lockService = (LockService)this.applicationContext.getBean("lockService");
         authenticationService.clearCurrentSecurityContext();
 	
 		// Create the store and get the root node reference
@@ -296,12 +299,48 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	{
 		NodeRef workingCopy = checkout();
 		assertNotNull(workingCopy);
+        
+        try
+        {
+            this.lockService.checkForLock(this.nodeRef);
+            fail("The origional should be locked now.");
+        }
+        catch (Throwable exception)
+        {
+            // Good the origional is locked
+        }
 		
 		NodeRef origNodeRef = this.cociService.cancelCheckout(workingCopy);
 		assertEquals(this.nodeRef, origNodeRef);
-		
-		//System.out.println(
-		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        
+		// The origional should no longer be locked
+        this.lockService.checkForLock(origNodeRef);
 	}
+    
+    /**
+     * Test the deleting a wokring copy node removed the lock on the origional node
+     */
+    public void testAutoCancelCheckOut()
+    {
+        NodeRef workingCopy = checkout();
+        assertNotNull(workingCopy);
+        
+        try
+        {
+            this.lockService.checkForLock(this.nodeRef);
+            fail("The origional should be locked now.");
+        }
+        catch (Throwable exception)
+        {
+            // Good the origional is locked
+        }
+        
+        // Delete the working copy
+        this.nodeService.deleteNode(workingCopy);
+        
+        // The origional should no longer be locked
+        this.lockService.checkForLock(this.nodeRef);
+        
+    }
 
 }

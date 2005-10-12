@@ -435,8 +435,7 @@
     <!-- CheckOut/CheckIn Service  -->
     <!--                           -->
 
-    <bean id="checkOutCheckInService" class="org.alfresco.repo.coci.CheckOutCheckInServiceImpl"
-        init-method="init">
+    <bean id="checkOutCheckInService" class="org.alfresco.repo.coci.CheckOutCheckInServiceImpl">
         <property name="nodeService">
             <ref bean="NodeService" />
         </property>
@@ -449,14 +448,26 @@
         <property name="copyService">
             <ref bean="CopyService" />
         </property>
-        <property name="policyComponent">
-            <ref bean="policyComponent" />
-        </property>
         <property name="authenticationService">
             <ref bean="authenticationService" />
         </property>
         <property name="workingCopyLabel">
             <value>${workingcopy.label}</value>
+        </property>
+    </bean>
+    
+    <bean id="workingCopyAspect" class="org.alfresco.repo.coci.WorkingCopyAspect" init-method="init">
+        <property name="policyComponent">
+            <ref bean="policyComponent" />
+        </property>
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
+        <property name="lockService">
+            <ref bean="LockService" />
+        </property>
+        <property name="authenticationService">
+            <ref bean="authenticationService" />
         </property>
     </bean>
 

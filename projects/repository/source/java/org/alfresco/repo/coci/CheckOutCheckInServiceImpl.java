@@ -22,9 +22,6 @@ import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInServiceException;
 import org.alfresco.service.cmr.lock.LockService;
@@ -36,10 +33,8 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.version.VersionService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -79,11 +74,6 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	 * The copy service
 	 */
 	private CopyService copyService;
-	
-	/**
-	 * Policy component
-	 */
-	private PolicyComponent policyComponent;
     
     /**
      * The authentication service
@@ -135,16 +125,6 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	{
 		this.copyService = copyService;
 	}
-	
-	/**
-	 * Sets the policy component
-	 * 
-	 * @param policyComponent  the policy component
-	 */
-	public void setPolicyComponent(PolicyComponent policyComponent) 
-	{
-		this.policyComponent = policyComponent;
-	}
     
     /**
      * Sets the authenticatin service
@@ -175,39 +155,6 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
     public String getWorkingCopyLabel() 
     {
 		return workingCopyLabel;
-	}
-	
-	/**
-	 * Initialise method
-	 */
-	public void init()
-	{
-		// Register copy behaviour for the working copy aspect
-		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-				ContentModel.ASPECT_WORKING_COPY,
-				new JavaBehaviour(this, "onCopy"));
-	}
-	
-	/**
-	 * onCopy policy behaviour
-	 * 
-	 * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, StoreRef, boolean, PolicyScope)
-	 */
-	public void onCopy(
-            QName sourceClassRef, 
-            NodeRef sourceNodeRef, 
-            StoreRef destinationStoreRef,
-            boolean copyToNewNode,
-            PolicyScope copyDetails)
-	{
-		if (copyToNewNode == false)
-		{
-			// Make sure that the name of the node is not updated with the working copy name
-			copyDetails.removeProperty(ContentModel.PROP_NAME);
-		}
-		
-		// NOTE: the working copy aspect is not added since it should not be copyied
 	}
 	
 	/**
