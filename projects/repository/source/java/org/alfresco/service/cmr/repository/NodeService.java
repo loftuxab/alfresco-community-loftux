@@ -127,6 +127,7 @@ public interface NodeService
      * @param assocQName the qualified name of the new child association
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if either the parent node or move node reference is invalid
+     * @throws CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
      * 
      * @see #getPrimaryParent(NodeRef)
      */
@@ -231,6 +232,8 @@ public interface NodeService
     
     /**
      * Makes a parent-child association between the given nodes.  Both nodes must belong to the same store.
+     * <p>
+     * 
      * 
      * @param parentRef
      * @param childRef 
@@ -238,6 +241,7 @@ public interface NodeService
      * @param qname the qualified name of the association
      * @return Returns a reference to the newly created child association
      * @throws InvalidNodeRefException if the parent or child nodes could not be found
+     * @throws CyclicChildRelationshipException if the child partakes in a cyclic relationship after the add
      */
     public ChildAssociationRef addChild(
             NodeRef parentRef,
