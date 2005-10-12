@@ -89,6 +89,10 @@ public class OwnableServiceTest extends TestCase
         rootNodeRef = nodeService.getRootNode(storeRef);
         permissionService.setPermission(rootNodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.ADD_CHILDREN, true);
         
+        if(authenticationComponent.exists("andy"))
+        {
+            authenticationService.deleteAuthentication("andy");
+        }
         authenticationService.createAuthentication("andy", "andy".toCharArray());
         
         dynamicAuthority = new OwnerDynamicAuthority();
