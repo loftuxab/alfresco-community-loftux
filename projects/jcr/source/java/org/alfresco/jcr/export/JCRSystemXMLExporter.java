@@ -96,7 +96,7 @@ public class JCRSystemXMLExporter implements Exporter
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#start()
      */
-    public void start()
+    public void start(NodeRef exportNodeRef)
     {
         try
         {

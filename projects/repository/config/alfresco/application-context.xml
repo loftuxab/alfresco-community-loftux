@@ -473,9 +473,15 @@
 
     <!-- Policy Support -->
 
+    <bean id="policyBehaviourFilter" class="org.alfresco.repo.policy.BehaviourFilterImpl">
+		<property name="dictionaryService">
+			<ref bean="dictionaryService"/>
+	    </property>
+    </bean>
+
     <bean id="policyComponent" class="org.alfresco.repo.policy.PolicyComponentImpl">
         <constructor-arg index="0">
-            <ref bean="dictionaryService" />
+            <ref bean="dictionaryService"/>
         </constructor-arg>
     </bean>
 
@@ -827,9 +833,6 @@
         <property name="dictionaryService">
             <ref bean="dictionaryService" />
         </property>
-        <property name="ruleService">
-            <ref bean="ruleService" />
-        </property>
     </bean>
 
     <bean id="importerComponent" class="org.alfresco.repo.importer.ImporterComponent">
@@ -843,6 +846,9 @@
         <property name="dictionaryService">
             <ref bean="dictionaryService" />
         </property>
+        <property name="behaviourFilter">
+            <ref bean="policyBehaviourFilter" />
+        </property>
         <property name="nodeService">
             <ref bean="NodeService" />
         </property>
@@ -852,11 +858,8 @@
         <property name="contentService">
             <ref bean="ContentService" />
         </property>
-        <property name="actionAspect">
-            <ref bean="actionsAspect"/>
-        </property>
-        <property name="ruleAspect">
-            <ref bean="rulesAspect"/>
+        <property name="ruleService">
+            <ref bean="ruleService" />
         </property>
     </bean>
 

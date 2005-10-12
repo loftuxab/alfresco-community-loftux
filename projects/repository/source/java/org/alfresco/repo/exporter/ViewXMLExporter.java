@@ -62,6 +62,7 @@ import org.xml.sax.helpers.AttributesImpl;
     private NodeService nodeService;
     private DictionaryService dictionaryService;
     private ContentHandler contentHandler;
+    private Path exportNodePath;
     private final static AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
     
 
@@ -92,10 +93,11 @@ import org.xml.sax.helpers.AttributesImpl;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#start()
      */
-    public void start()
+    public void start(NodeRef exportNodeRef)
     {
         try
         {
+            exportNodePath = nodeService.getPath(exportNodeRef);
             contentHandler.startDocument();
             contentHandler.startPrefixMapping(NamespaceService.REPOSITORY_VIEW_PREFIX, NamespaceService.REPOSITORY_VIEW_1_0_URI);
             contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, VIEW_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
@@ -324,6 +326,12 @@ import org.xml.sax.helpers.AttributesImpl;
                     contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), attrs);
                 }
                 
+                // convert node references to paths
+                if (value instanceof NodeRef)
+                {
+                    value = createRelativePath(nodeRef, (NodeRef)value).toPrefixString(namespaceService);
+                }
+                
                 // output value
                 String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
                 contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
@@ -352,31 +360,37 @@ import org.xml.sax.helpers.AttributesImpl;
             
             for (Object value : values)
             {
+                // determine data type of value
+                QName valueDataType = null;
                 if (dataTypeDef.getName().equals(DataTypeDefinition.ANY))
                 {
-                    // determine value type
-                    DataTypeDefinition valueDataTypeDef = (value == null) ? null : dictionaryService.getDataType(value.getClass());
-                    QName valueDataType = null;
-                    if (valueDataTypeDef != null)
+                    dataTypeDef = (value == null) ? null : dictionaryService.getDataType(value.getClass());
+                    if (dataTypeDef != null)
                     {
-                        valueDataType = dataTypeDef.getName(); 
+                        valueDataType = dataTypeDef.getName();
                     }
-
-                    // output value wrapper with datatype
-                    AttributesImpl attrs = new AttributesImpl();
-                    if (valueDataType != null)
-                    {
-                        attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, DATATYPE_QNAME.toPrefixString(), null, toPrefixString(valueDataType));
-                    }
-                    contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), attrs);
-
-                    // output value
-                    String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
-                    contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
-
-                    // output value wrapper if property data type is any
-                    contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
                 }
+
+                // output value wrapper with datatype
+                AttributesImpl attrs = new AttributesImpl();
+                if (valueDataType != null)
+                {
+                    attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, DATATYPE_QNAME.toPrefixString(), null, toPrefixString(valueDataType));
+                }
+                contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), attrs);
+
+                // convert node references to paths
+                if (value instanceof NodeRef)
+                {
+                    value = createRelativePath(nodeRef, (NodeRef)value).toPrefixString(namespaceService);
+                }
+                
+                // output value
+                String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
+                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+
+                // output value wrapper if property data type is any
+                contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
             }
         }
         catch (SAXException e)
@@ -384,7 +398,6 @@ import org.xml.sax.helpers.AttributesImpl;
             throw new ExporterException("Failed to process multi-value event - nodeRef " + nodeRef + "; property " + toPrefixString(property), e);
         }
     }
-        
     
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
@@ -488,4 +501,53 @@ import org.xml.sax.helpers.AttributesImpl;
         return qname.toPrefixString(namespaceService);
     }
 
+    /**
+     * Return relative path between from and to references within export root
+     * 
+     * @param fromRef  from reference
+     * @param toRef  to reference
+     * @return  path
+     */    
+    private Path createRelativePath(NodeRef fromRef, NodeRef toRef)
+    {
+        Path fromPath = nodeService.getPath(fromRef);
+        Path toPath = nodeService.getPath(toRef);
+        Path relativePath = null;
+        
+        // Determine if from node is relative to export tree
+        int i = 0;
+        while (i < exportNodePath.size() && i < fromPath.size() && exportNodePath.get(i).equals(fromPath.get(i)))
+        {
+            i++;
+        }
+        if (i == exportNodePath.size())
+        {
+            // Determine if to node is relative to export tree
+            i = 0;
+            while (i < exportNodePath.size() && i < toPath.size() && exportNodePath.get(i).equals(toPath.get(i)))
+            {
+                i++;
+            }
+            if (i == exportNodePath.size())
+            {
+                // build relative path between from and to
+                relativePath = new Path();
+                for (int p = 0; p < fromPath.size() - i; p++)
+                {
+                    relativePath.append(new Path.ParentElement());
+                }
+                relativePath.append(toPath.subPath(i, toPath.size() -1));
+            }
+        }
+        
+        if (relativePath == null)
+        {
+            // default to absolute path
+            relativePath = toPath;
+        }
+
+        return relativePath;
+    }
+    
+    
 }

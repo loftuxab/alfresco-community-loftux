@@ -84,7 +84,7 @@ public class ExporterComponentTest extends BaseSpringTest
         implements Exporter
     {
 
-        public void start()
+        public void start(NodeRef exportNodeRef)
         {
             System.out.println("TestProgress: start");
         }

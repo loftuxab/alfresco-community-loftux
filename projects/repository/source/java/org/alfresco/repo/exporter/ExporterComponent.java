@@ -206,7 +206,7 @@ public class ExporterComponent
         {
             NodeRef nodeRef = getNodeRef(parameters.getExportFrom());
                     
-            exporter.start();
+            exporter.start(nodeRef);
             
             if (parameters.isCrawlSelf())
             {

@@ -18,19 +18,16 @@ package org.alfresco.repo.importer.view;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Serializable;
 import java.util.Stack;
 
 import org.alfresco.repo.importer.Importer;
 import org.alfresco.repo.importer.Parser;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.NamespaceService;
@@ -66,7 +63,6 @@ public class ViewParser implements Parser
     // Supporting services
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
-    private RuleService ruleService;
     
     
     /**
@@ -104,7 +100,7 @@ public class ViewParser implements Parser
     
     public void setRuleService(RuleService ruleService)
     {
-        this.ruleService = ruleService;
+//        this.ruleService = ruleService;
     }
 
     /* (non-Javadoc)
@@ -414,9 +410,6 @@ public class ViewParser implements Parser
     
         if (context.getNodeRef() == null)
         {
-            // TODO: Replace this with appropriate rule/action import handling
-            ruleService.disableRules(context.getParentContext().getParentRef());
-
             // Create Node
             NodeRef nodeRef = context.getImporter().importNode(context);
             context.setNodeRef(nodeRef);
@@ -465,16 +458,13 @@ public class ViewParser implements Parser
      */
     private void processEndType(NodeContext context)
     {
-        if (context.getNodeRef() == null)
+        NodeRef nodeRef = context.getNodeRef();
+        if (nodeRef == null)
         {
-            NodeRef nodeRef = context.getImporter().importNode(context);
+            nodeRef = context.getImporter().importNode(context);
             context.setNodeRef(nodeRef);
         }
-        else
-        {
-            // TODO: Replace this with appropriate rule/action import handling
-            ruleService.enableRules(context.getParentContext().getParentRef());
-        }
+        context.getImporter().childrenImported(nodeRef);
     }
 
     /**

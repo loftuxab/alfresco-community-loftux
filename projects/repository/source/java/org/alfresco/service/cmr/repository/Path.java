@@ -184,12 +184,31 @@ public final class Path implements Iterable<Path.Element>, Serializable
      */
     public Path subPath(int depth)
     {
-        if (depth < 0 || depth > (elements.size() -1))
+        return subPath(0, depth);
+    }
+
+    /**
+     * Return a new Path representing this path to the specified depth
+     *  
+     * @param depth  the path depth (0 based)
+     * @return  the sub-path
+     */
+    public Path subPath(int start, int end)
+    {
+        if (start < 0 || start > (elements.size() -1))
         {
-            throw new IndexOutOfBoundsException("Depth must between 0 and " + (elements.size() -1));
+            throw new IndexOutOfBoundsException("Start must between 0 and " + (elements.size() -1));
+        }
+        if (end < 0 || end > (elements.size() -1))
+        {
+            throw new IndexOutOfBoundsException("End must between 0 and " + (elements.size() -1));
+        }
+        if (end < start)
+        {
+            throw new IndexOutOfBoundsException("End cannot be before start");
         }
         Path subPath = new Path();
-        for (int i = 0; i <= depth; i++)
+        for (int i = start; i <= end; i++)
         {
             subPath.append(this.get(i));
         }

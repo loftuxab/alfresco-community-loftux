@@ -59,11 +59,11 @@ import org.alfresco.service.namespace.QName;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#start()
      */
-    public void start()
+    public void start(NodeRef exportNodeRef)
     {
         for (Exporter exporter : exporters)
         {
-            exporter.start();
+            exporter.start(exportNodeRef);
         }
     }
     

@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.policy;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +25,6 @@ import junit.framework.TestCase;
 import org.alfresco.repo.dictionary.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAOImpl;
-import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.NamespaceDAO;
 import org.alfresco.repo.dictionary.NamespaceDAOImpl;
 import org.alfresco.service.namespace.QName;
@@ -43,7 +41,6 @@ public class PolicyComponentTest extends TestCase
     private static QName FILE_PROP_B = QName.createQName(TEST_NAMESPACE, "file_b");
     private static QName FOLDER_TYPE = QName.createQName(TEST_NAMESPACE, "folder");
     private static QName FOLDER_PROP_D = QName.createQName(TEST_NAMESPACE, "folder_d");
-    private static QName FOLDER_ASSOC_D = QName.createQName(TEST_NAMESPACE, "folder_assoc_d");
     private static QName TEST_ASPECT = QName.createQName(TEST_NAMESPACE, "aspect");
     private static QName ASPECT_PROP_A = QName.createQName(TEST_NAMESPACE, "aspect_a");
     private static QName INVALID_TYPE = QName.createQName(TEST_NAMESPACE, "classdoesnotexist");
@@ -372,6 +369,8 @@ public class PolicyComponentTest extends TestCase
         policyComponent.bindPropertyBehaviour(policyName, BASE_TYPE, BASE_PROP_A, baseBehaviour);
         Behaviour folderBehaviour = new JavaBehaviour(this, "folderTest");
         policyComponent.bindPropertyBehaviour(policyName, FOLDER_TYPE, BASE_PROP_A, folderBehaviour);
+        Behaviour folderBehaviourD = new JavaBehaviour(this, "folderTest");
+        policyComponent.bindPropertyBehaviour(policyName, FOLDER_TYPE, FOLDER_PROP_D, folderBehaviourD);
 
         // Invoke Policies        
         TestPropertyPolicy basePolicy = delegate.get(BASE_TYPE, BASE_PROP_A);
@@ -384,7 +383,7 @@ public class PolicyComponentTest extends TestCase
         String folderResult = folderPolicy.test("folder");
         assertEquals("Folder: folder", folderResult);
         TestPropertyPolicy folderPolicy2 = delegate.get(FOLDER_TYPE, FOLDER_PROP_D);
-        String folderResult2 = folderPolicy.test("folder");
+        String folderResult2 = folderPolicy2.test("folder");
         assertEquals("Folder: folder", folderResult2);
     }
 
@@ -420,7 +419,7 @@ public class PolicyComponentTest extends TestCase
         String aspectResult = aspectPolicy.test("aspect_prop_a");
         assertEquals("Aspect: aspect_prop_a", aspectResult);
         TestPropertyPolicy aspectPolicy2 = delegate.get(TEST_ASPECT, FOLDER_PROP_D);
-        String aspectResult2 = aspectPolicy.test("aspect_folder_d");
+        String aspectResult2 = aspectPolicy2.test("aspect_folder_d");
         assertEquals("Aspect: aspect_folder_d", aspectResult2);
 
         // Override wild-card with specific property binding

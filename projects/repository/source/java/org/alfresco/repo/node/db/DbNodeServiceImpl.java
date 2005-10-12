@@ -36,6 +36,7 @@ import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.repo.node.AbstractNodeServiceImpl;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -72,10 +73,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     
     public DbNodeServiceImpl(
 			PolicyComponent policyComponent,
+            BehaviourFilter behaviourFilter,
             DictionaryService dictionaryService,
             NodeDaoService nodeDaoService)
     {
-		super(policyComponent, dictionaryService);
+		super(policyComponent, behaviourFilter);
 		
         this.dictionaryService = dictionaryService;
         this.nodeDaoService = nodeDaoService;

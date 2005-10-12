@@ -13,11 +13,12 @@
          
          <cm:systemfolder view:childName="cm:people">
             <view:aspects>
-            <cm:auditable/>
+            	<cm:auditable/>
             </view:aspects>
             <view:properties>
-            <cm:name>People</cm:name>
-            <cm:creator>administrator</cm:creator>
+            	<cm:name>People</cm:name>
+            	<cm:creator>testuser</cm:creator>
+            	<cm:modifier>testuser</cm:modifier>
             </view:properties>
             <view:associations>
             <cm:contains>

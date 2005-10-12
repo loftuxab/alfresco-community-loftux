@@ -23,13 +23,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.action.ActionsAspect;
-import org.alfresco.repo.rule.RulesAspect;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -43,7 +44,10 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.XPathException;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImportPackageHandler;
 import org.alfresco.service.cmr.view.ImporterBinding;
@@ -75,11 +79,11 @@ public class ImporterComponent
     // supporting services
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
+    private BehaviourFilter behaviourFilter;
     private NodeService nodeService;
     private SearchService searchService;
     private ContentService contentService;
-    private ActionsAspect actionAspect;
-    private RulesAspect ruleAspect;
+    private RuleService ruleService;
 
     // binding markers    
     private static final String START_BINDING_MARKER = "${";
@@ -129,22 +133,27 @@ public class ImporterComponent
     /**
      * @param namespaceService  the namespace service
      */
-    /**
-     * @param namespaceService
-     */
     public void setNamespaceService(NamespaceService namespaceService)
     {
         this.namespaceService = namespaceService;
     }
-    
-    public void setActionAspect(ActionsAspect actionAspect)
+
+    /**
+     * @param behaviourFilter  policy behaviour filter 
+     */
+    public void setBehaviourFilter(BehaviourFilter behaviourFilter)
     {
-        this.actionAspect = actionAspect;
+        this.behaviourFilter = behaviourFilter;
     }
 
-    public void setRuleAspect(RulesAspect ruleAspect)
+    /**
+     * TODO: Remove this in favour of appropriate rule disabling
+     * 
+     * @param ruleService  rule service
+     */
+    public void setRuleService(RuleService ruleService)
     {
-        this.ruleAspect = ruleAspect;
+        this.ruleService = ruleService;
     }
 
     /* (non-Javadoc)
@@ -226,8 +235,18 @@ public class ImporterComponent
         ParameterCheck.mandatory("Node Reference", nodeRef);
         ParameterCheck.mandatory("View Reader", viewReader);
         ParameterCheck.mandatory("Stream Handler", streamHandler);
-        Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, binding, streamHandler, progress);
-        viewParser.parse(viewReader, defaultImporter);
+        
+        try
+        {
+            Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, binding, streamHandler, progress);
+            defaultImporter.start();
+            viewParser.parse(viewReader, defaultImporter);
+            defaultImporter.end();
+        }
+        finally
+        {
+            behaviourFilter.enableAllBehaviours();
+        }
     }
     
     /**
@@ -298,6 +317,7 @@ public class ImporterComponent
         private ImporterBinding binding;
         private ImporterProgress progress;
         private ImportPackageHandler streamHandler;
+        private List<ImportedNodeRef> nodeRefs = new ArrayList<ImportedNodeRef>();
 
         // Flush threshold
         private int flushThreshold = 500;
@@ -338,6 +358,13 @@ public class ImporterComponent
         }
         
         /* (non-Javadoc)
+         * @see org.alfresco.repo.importer.Importer#start()
+         */
+        public void start()
+        {
+        }
+        
+        /* (non-Javadoc)
          * @see org.alfresco.repo.importer.Importer#importNode(org.alfresco.repo.importer.ImportNode)
          */
         public NodeRef importNode(ImportNode context)
@@ -370,20 +397,38 @@ public class ImporterComponent
             }
             
             // Build initial map of properties
-            Map<QName, Serializable> properties = context.getProperties();
-            Map<QName, DataTypeDefinition> datatypes = context.getPropertyDatatypes();
-            Map<QName, Serializable> initialProperties = bindProperties(properties, datatypes);
-            
-            // Create initial node
+            Map<QName, Serializable> initialProperties = bindProperties(context);
+
+            // Create initial node (but, first disable behaviour for the node to be created)
+            Set<QName> disabledBehaviours = getDisabledBehaviours(context);
+            for (QName disabledBehaviour: disabledBehaviours)
+            {
+                boolean alreadyDisabled = behaviourFilter.disableBehaviour(disabledBehaviour);
+                if (alreadyDisabled)
+                {
+                    disabledBehaviours.remove(disabledBehaviour);
+                }
+            }
             ChildAssociationRef assocRef = nodeService.createNode(parentRef, assocType, childQName, nodeType.getName(), initialProperties);
+            for (QName disabledBehaviour : disabledBehaviours)
+            {
+                behaviourFilter.enableBehaviour(disabledBehaviour);
+            }
+            
+            // Report creation
             NodeRef nodeRef = assocRef.getChildRef();
             reportNodeCreated(assocRef);
             reportPropertySet(nodeRef, initialProperties);
+
+            // Disable behaviour for the node until the complete node (and its children have been imported)
+            for (QName disabledBehaviour : disabledBehaviours)
+            {
+                behaviourFilter.disableBehaviour(nodeRef, disabledBehaviour);
+            }
+            // TODO: Replace this with appropriate rule/action import handling
+            ruleService.disableRules(nodeRef);
             
             // Apply aspects
-            // TODO: Replace these disable calls with appropriate handling of rule/action import
-            actionAspect.disbleOnAddAspect();
-            ruleAspect.disbleOnAddAspect();
             for (QName aspect : context.getNodeAspects())
             {
                 if (nodeService.hasAspect(nodeRef, aspect) == false)
@@ -392,11 +437,9 @@ public class ImporterComponent
                     reportAspectAdded(nodeRef, aspect);
                 }
             }
-            actionAspect.enableOnAddAspect();
-            ruleAspect.enableOnAddAspect();
 
             // import content, if applicable
-            for (QName propertyQName : properties.keySet())
+            for (QName propertyQName : initialProperties.keySet())
             {
                 PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
                 if (propertyDef == null)
@@ -420,6 +463,73 @@ public class ImporterComponent
             }
             
             return nodeRef;
+        }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.repo.importer.Importer#childrenImported(org.alfresco.service.cmr.repository.NodeRef)
+         */
+        public void childrenImported(NodeRef nodeRef)
+        {
+            behaviourFilter.enableBehaviours(nodeRef);
+            ruleService.enableRules(nodeRef);
+        }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.repo.importer.Importer#end()
+         */
+        public void end()
+        {
+            // Bind all node references to destination space
+            for (ImportedNodeRef importedRef : nodeRefs)
+            {
+                // Resolve path to node reference
+                NodeRef contextNode = (importedRef.value.startsWith("/")) ? nodeService.getRootNode(rootRef.getStoreRef()) : importedRef.context.getNodeRef();
+                NodeRef nodeRef = null;
+                try
+                {
+                    List<NodeRef> nodeRefs = searchService.selectNodes(contextNode, importedRef.value, null, namespaceService, false);
+                    if (nodeRefs.size() > 0)
+                    {
+                        nodeRef = nodeRefs.get(0);
+                    }
+                }
+                catch(XPathException e)
+                {
+                    // attempt to resolve as a node reference
+                    try
+                    {
+                        NodeRef directRef = new NodeRef(importedRef.value);
+                        if (nodeService.exists(directRef))
+                        {
+                            nodeRef = directRef;
+                        }
+                    }
+                    catch(AlfrescoRuntimeException e1)
+                    {
+                        // Note: Invalid reference format
+                    }
+                }
+
+                // check that reference could be bound
+                if (nodeRef == null)
+                {
+                    // TODO: Probably need an alternative mechanism here e.g. report warning
+                    throw new ImporterException("Failed to find item referenced as " + importedRef.value);
+                }
+                
+                // Set node reference on source node
+                Set<QName> disabledBehaviours = getDisabledBehaviours(importedRef.context);
+                for (QName disabledBehaviour: disabledBehaviours)
+                {
+                    boolean alreadyDisabled = behaviourFilter.disableBehaviour(importedRef.context.getNodeRef(), disabledBehaviour);
+                    if (alreadyDisabled)
+                    {
+                        disabledBehaviours.remove(disabledBehaviour);
+                    }
+                }
+                nodeService.setProperty(importedRef.context.getNodeRef(), importedRef.property, nodeRef);
+                behaviourFilter.enableBehaviours(importedRef.context.getNodeRef());
+            }
         }
         
         /**
@@ -495,6 +605,29 @@ public class ImporterComponent
             
             return closestAssocType;
         }
+
+        /**
+         * For the given import node, return the behaviours to disable during import
+         * 
+         * @param context  import node
+         * @return  the disabled behaviours
+         */
+        private Set<QName> getDisabledBehaviours(ImportNode context)
+        {
+            Set<QName> classNames = new HashSet<QName>();
+            
+            // disable the type
+            TypeDefinition typeDef = context.getTypeDefinition();
+            classNames.add(typeDef.getName());
+
+            // disable the aspects imported on the node
+            classNames.addAll(context.getNodeAspects());
+            
+            // note: do not disable default aspects that are not imported on the node.
+            //       this means they'll be added on import
+            
+            return classNames;
+        }
         
         /**
          * Import Node Content.
@@ -530,8 +663,10 @@ public class ImporterComponent
          * @param properties
          * @return
          */
-        private Map<QName, Serializable> bindProperties(Map<QName, Serializable> properties, Map<QName, DataTypeDefinition> datatypes)
+        private Map<QName, Serializable> bindProperties(ImportNode context)
         {
+            Map<QName, Serializable> properties = context.getProperties();
+            Map<QName, DataTypeDefinition> datatypes = context.getPropertyDatatypes();
             Map<QName, Serializable> boundProperties = new HashMap<QName, Serializable>(properties.size());
             for (QName property : properties.keySet())
             {
@@ -556,16 +691,14 @@ public class ImporterComponent
                     List<Serializable> boundCollection = new ArrayList<Serializable>();
                     for (String collectionValue : (Collection<String>)value)
                     {
-                        String strValue = bindPlaceHolder(collectionValue, binding);
-                        Serializable objValue = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueDataType, strValue);
+                        Serializable objValue = bindValue(context, property, valueDataType, collectionValue);
                         boundCollection.add(objValue);
                     }
                     value = (Serializable)boundCollection;
                 }
                 else
                 {
-                    value = bindPlaceHolder((String)value, binding);
-                    value = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueDataType, value);
+                    value = bindValue(context, property, valueDataType, (String)value);
                 }
                 boundProperties.put(property, value);
             }
@@ -573,6 +706,31 @@ public class ImporterComponent
             return boundProperties;
         }
 
+        /**
+         * Bind property value
+         * 
+         * @param valueType  value type
+         * @param value  string form of value
+         * @return  the bound value
+         */
+        private Serializable bindValue(ImportNode context, QName property, DataTypeDefinition valueType, String value)
+        {
+            Serializable objValue = null;
+            String strValue = bindPlaceHolder(value, binding);
+            if (valueType.getName().equals(DataTypeDefinition.NODE_REF) || valueType.getName().equals(DataTypeDefinition.CATEGORY))
+            {
+                // record node reference for end-of-import binding
+                ImportedNodeRef importedRef = new ImportedNodeRef(context, property, strValue);
+                nodeRefs.add(importedRef);
+                objValue = new NodeRef(rootRef.getStoreRef(), "unresolved reference");
+            }
+            else
+            {
+                objValue = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueType, strValue);
+            }
+            return objValue;
+        }
+        
         /**
          * Helper to report node created progress
          * 
@@ -634,8 +792,37 @@ public class ImporterComponent
                 }
             }
         }
+
+
     }
 
+    /**
+     * Imported Node Reference
+     * 
+     * @author David Caruana
+     */
+    private static class ImportedNodeRef
+    {
+        /**
+         * Construct
+         * 
+         * @param context
+         * @param property
+         * @param value
+         */
+        private ImportedNodeRef(ImportNode context, QName property, String value)
+        {
+            this.context = context;
+            this.property = property;
+            this.value = value;
+        }
+        
+        private ImportNode context;
+        private QName property;
+        private String value;
+    }
+    
+    
 
     /**
      * Default Import Stream Handler

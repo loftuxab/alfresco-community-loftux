@@ -65,7 +65,7 @@ public class ImporterComponentTest extends BaseSpringTest
     }
     
     
-    public void xtestBootstrap()
+    public void testBootstrap()
     {
         StoreRef bootstrapStoreRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         importerBootstrap.setStoreUrl(bootstrapStoreRef.toString());

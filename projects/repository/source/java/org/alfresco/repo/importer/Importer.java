@@ -38,6 +38,10 @@ public interface Importer
      */
     public QName getRootAssocType();
 
+    public void start();
+
+    public void end();
+    
     /**
      * Import a node
      * 
@@ -45,4 +49,11 @@ public interface Importer
      * @return  the node ref of the imported node
      */
     public NodeRef importNode(ImportNode node);
+
+    /**
+     * Signal completion of node import
+     * 
+     * @param nodeRef  the node ref of the imported node
+     */
+    public void childrenImported(NodeRef nodeRef);
 }

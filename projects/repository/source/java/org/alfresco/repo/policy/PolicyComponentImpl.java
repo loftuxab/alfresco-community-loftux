@@ -71,13 +71,13 @@ public class PolicyComponentImpl implements PolicyComponent
      * Construct
      * 
      * @param dictionary  dictionary service
+     * @param behaviourFilter  behaviour filter
      */
     public PolicyComponentImpl(DictionaryService dictionary)
     {
         this.dictionary = dictionary;
         this.registeredPolicies = new HashMap<PolicyKey, PolicyDefinition>();
     }
-
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.PolicyComponent#registerClassPolicy()
@@ -647,6 +647,5 @@ public class PolicyComponentImpl implements PolicyComponent
             return behaviour;
         }
     }
-    
 
 }

@@ -59,9 +59,9 @@ import org.alfresco.util.ParameterCheck;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#start()
      */
-    public void start()
+    public void start(NodeRef exportNodeRef)
     {
-        exporter.start();
+        exporter.start(exportNodeRef);
     }
 
     /* (non-Javadoc)
