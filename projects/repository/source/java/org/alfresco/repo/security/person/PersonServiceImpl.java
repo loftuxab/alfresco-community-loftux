@@ -187,7 +187,7 @@ public class PersonServiceImpl implements PersonService
         HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_USERNAME, userName);
         properties.put(ContentModel.PROP_HOMEFOLDER, getCompanyHome());
-        properties.put(ContentModel.PROP_FIRSTNAME, "");
+        properties.put(ContentModel.PROP_FIRSTNAME, userName);
         properties.put(ContentModel.PROP_LASTNAME, "");
         properties.put(ContentModel.PROP_EMAIL, "");
         properties.put(ContentModel.PROP_ORGID, "");
