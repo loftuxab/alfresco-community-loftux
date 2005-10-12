@@ -384,12 +384,12 @@ public class NewUserWizard extends AbstractWizardBean
                {
                   ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(oldHomeFolderRef);
                   NodeRef oldHomeSpaceLocationRef = childAssocRef.getParentRef();
-                  if (oldHomeSpaceLocationRef.equals(this.homeSpaceLocation) == false)
+                  if ((oldHomeFolderRef.equals(this.homeSpaceLocation) == false) && (oldHomeSpaceLocationRef.equals(this.homeSpaceLocation) == false))
                   {
                      moveHomeSpace = true;
                   }
                   String oldHomeSpaceName = Repository.getNameForNode(nodeService, oldHomeFolderRef);
-                  renameHomeSpace = (oldHomeSpaceName.equals(this.homeSpaceName) == false);
+                  renameHomeSpace = ((oldHomeFolderRef.equals(this.homeSpaceLocation) == false) && (oldHomeSpaceName.equals(this.homeSpaceName) == false));
                }
             }
             

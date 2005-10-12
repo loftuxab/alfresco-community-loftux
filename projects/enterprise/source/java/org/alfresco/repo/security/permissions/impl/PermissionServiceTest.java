@@ -584,7 +584,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testSimplePermissionSimpleInheritance()
     {
         runAs("admin");
-        
+
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
 
@@ -680,7 +680,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testPermissionGroupSimpleInheritance()
     {
         runAs("admin");
-        
+
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
 
@@ -1072,7 +1072,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
             time += (end - start);
         }
         System.out.println("Time is " + (time / 1000000000.0));
-//        assertTrue((time / 1000000000.0) < 60.0);
+        // assertTrue((time / 1000000000.0) < 60.0);
 
         time = 0;
         for (int i = 0; i < 1000; i++)
@@ -1083,7 +1083,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
             time += (end - start);
         }
         System.out.println("Time is " + (time / 1000000000.0));
-//        assertTrue((time / 1000000000.0) < 2.0);
+        // assertTrue((time / 1000000000.0) < 2.0);
 
         tx.rollback();
     }
@@ -1496,7 +1496,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testAncestorRequirementAndInheritance()
     {
         runAs("admin");
-        
+
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
         NodeRef n2 = nodeService.createNode(n1, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}two"),
@@ -1595,7 +1595,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
     public void testContentPermissions()
     {
         runAs("admin");
-        
+
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
         NodeRef n2 = nodeService.createNode(n1, ContentModel.ASSOC_CONTAINS, QName.createQName("{namespace}two"),
@@ -1745,8 +1745,10 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     public void testChildrenRequirements()
     {
-        assertEquals(1, nodeService.getChildAssocs(rootNodeRef).size());
-
+        if (!personService.createMissingPeople())
+        {
+            assertEquals(1, nodeService.getChildAssocs(rootNodeRef).size());
+        }
         runAs("andy");
         assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE)) == AccessStatus.ALLOWED);
         assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.DELETE_CHILDREN)) == AccessStatus.ALLOWED);
@@ -1819,4 +1821,6 @@ public class PermissionServiceTest extends AbstractPermissionTest
     }
 
     // TODO: Test permissions on missing nodes
+    
+   
 }

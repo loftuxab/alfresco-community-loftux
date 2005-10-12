@@ -57,7 +57,7 @@ public class PersonServiceImpl implements PersonService
     private SearchService searchService;
 
     private NamespacePrefixResolver namespacePrefixResolver;
-  
+
     private boolean createMissingPeople;
 
     private boolean userNamesAreCaseSensitive;
@@ -305,14 +305,15 @@ public class PersonServiceImpl implements PersonService
 
     public synchronized NodeRef getCompanyHome()
     {
-        if(companyHomeNodeRef == null)
+        if (companyHomeNodeRef == null)
         {
-        List<NodeRef> refs = searchService.selectNodes(nodeService.getRootNode(storeRef), companyHomePath, null, namespacePrefixResolver, false);
-        if(refs.size() != 1)
-        {
-            throw new IllegalStateException("Invalid company home path: found : "+refs.size());
-        }
-        companyHomeNodeRef = refs.get(0);
+            List<NodeRef> refs = searchService.selectNodes(nodeService.getRootNode(storeRef), companyHomePath, null,
+                    namespacePrefixResolver, false);
+            if (refs.size() != 1)
+            {
+                throw new IllegalStateException("Invalid company home path: found : " + refs.size());
+            }
+            companyHomeNodeRef = refs.get(0);
         }
         return companyHomeNodeRef;
     }
