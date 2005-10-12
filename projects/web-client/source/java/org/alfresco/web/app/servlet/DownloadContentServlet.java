@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,10 +54,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <pre>/alfresco/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
  * or
  * <pre>/alfresco/download/direct/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
+ * or
+ * <pre>/alfresco/download/get/workspace/SpacesStore/0000-0000-0000-0000/{URI}propertyName</pre>
+ * 
  * The store protocol, followed by the store ID, followed by the content Node Id
  * the last part is used for mimetype calculation and browser default filename.
  * The 'attach' or 'direct' element is used to indicate whether to display the stream directly
- * in the browser or download it as a file attachment.
+ * in the browser or download it as a file attachment.  By default, the download assumes that
+ * the content is on the {@link org.alfresco.model.ContentModel#PROP_CONTENT content property}.<br>
+ * If you want to get the content of a specific node and property, use the 'get' option,
+ * providing the workspace, node ID AND the qualified name of the property.  No file extension is
+ * necessary as the information can be fetched from the node itself.
  * 
  * @author Kevin Roast
  */
@@ -114,19 +122,43 @@ public class DownloadContentServlet extends HttpServlet
          
          t.nextToken();    // skip web app name
          t.nextToken();    // skip servlet name
-         boolean attachment = t.nextToken().equals("attach");
+         
+         String attachToken = t.nextToken();
+         boolean get = attachToken.equals("get");
+         boolean attachment = attachToken.equals("attach");
+         boolean direct = attachToken.equals("direct");
+         
          StoreRef storeRef = new StoreRef(t.nextToken(), t.nextToken());
          String id = t.nextToken();
-         String filename = t.nextToken();
+         
+         // get the filename and property qualified name
+         String fileOrQName = t.nextToken();
+         String filename = null;
+         QName propertyQName = null;
+         if (get)
+         {
+             filename = "file.bin";
+             // the parsing by '/' won't work with a QName
+             int indexOfQName = uri.indexOf("{http");
+             String qnameStr = uri.substring(indexOfQName);
+             propertyQName = QName.createQName(qnameStr);
+         }
+         else
+         {
+             filename = fileOrQName;
+             propertyQName = ContentModel.PROP_CONTENT;
+         }
+         
          NodeRef nodeRef = new NodeRef(storeRef, id);
          if (logger.isDebugEnabled())
          {
             logger.debug("Found NodeRef: " + nodeRef.toString());
             logger.debug("Will use filename: " + filename);
+            logger.debug("For property: " + filename);
             logger.debug("With attachment mode: " + attachment);
          }
          
-         if (attachment == true)
+         if (attachment == true || get == true)
          {
             // set header based on filename - will force a Save As from the browse if it doesn't recognise it
             // this is better than the default response of the browse trying to display the contents!
@@ -140,7 +172,7 @@ public class DownloadContentServlet extends HttpServlet
          ContentService contentService = serviceRegistry.getContentService();
 
          // get the content reader
-         ContentReader reader = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
+         ContentReader reader = contentService.getReader(nodeRef, propertyQName);
          // ensure that it is safe to use
          reader = FileContentReader.getSafeContentReader(
                  reader,
