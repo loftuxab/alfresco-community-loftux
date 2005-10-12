@@ -58,6 +58,8 @@ public class InputDatePickerTag extends HtmlComponentTag
       this.startYear = "1990";
       this.yearCount = "10";
       this.value = null;
+      this.showTime = null;
+      this.disabled = null;
    }
    
    /**
@@ -71,6 +73,8 @@ public class InputDatePickerTag extends HtmlComponentTag
       setIntProperty(component, "startYear", this.startYear);
       setIntProperty(component, "yearCount", this.yearCount);
       setStringProperty(component, "value", this.value);
+      setBooleanProperty(component, "showTime", this.showTime);
+      setBooleanProperty(component, "disabled", this.disabled);
    }
    
    /**
@@ -102,9 +106,30 @@ public class InputDatePickerTag extends HtmlComponentTag
    {
       this.yearCount = yearCount;
    }
-
+   
+   /**
+    * Determines whether the time is rendered
+    * 
+    * @param showTime true to allow the time to be edited
+    */
+   public void setShowTime(String showTime)
+   {
+      this.showTime = showTime;
+   }
+   
+   /**
+    * Sets whether the component should be rendered in a disabled state
+    * 
+    * @param disabled true to render the component in a disabled state
+    */
+   public void setDisabled(String disabled)
+   {
+      this.disabled = disabled;
+   }
    
    private String startYear = "1990";
    private String yearCount = "10";
    private String value = null;
+   private String showTime = null;
+   private String disabled = null;
 }

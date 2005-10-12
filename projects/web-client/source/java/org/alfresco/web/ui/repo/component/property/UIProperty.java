@@ -214,9 +214,8 @@ public class UIProperty extends PropertySheetItem
             control.setRendererType("org.alfresco.faces.DatePickerRenderer");
             control.getAttributes().put("startYear", new Integer(1970));
             control.getAttributes().put("yearCount", new Integer(50));
+            control.getAttributes().put("showTime", new Boolean(true));
             control.getAttributes().put("style", "margin-right: 7px;");
-            
-            // TODO: also add the relevant properties to display the time for editing
          }
          else if (typeName.equals(DataTypeDefinition.DATE))
          {

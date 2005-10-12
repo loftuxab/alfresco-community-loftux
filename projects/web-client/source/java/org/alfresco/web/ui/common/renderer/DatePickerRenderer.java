@@ -45,6 +45,12 @@ import org.alfresco.web.app.Application;
  */
 public class DatePickerRenderer extends BaseRenderer
 {
+   private static final String FIELD_YEAR = "_year";
+   private static final String FIELD_MONTH = "_month";
+   private static final String FIELD_DAY = "_day";
+   private static final String FIELD_HOUR = "_hour";
+   private static final String FIELD_MINUTE = "_minute";
+
    /**
     * @see javax.faces.render.Renderer#decode(javax.faces.context.FacesContext, javax.faces.component.UIComponent)
     * 
@@ -54,25 +60,36 @@ public class DatePickerRenderer extends BaseRenderer
     */
    public void decode(FacesContext context, UIComponent component)
    {
-      // TODO: should check for disabled/readonly here - no need to decode
-      String clientId = component.getClientId(context);
-      Map params = context.getExternalContext().getRequestParameterMap();
-      String year = (String)params.get(clientId + "_year");
-      if (year != null)
+      try
       {
-         // found data for our component
-         String month = (String)params.get(clientId + "_month");
-         String day = (String)params.get(clientId + "_day");
-         
-         // we encode the values needed for the component as we see fit
-         int[] parts = new int[3];
-         parts[0] = Integer.parseInt(year);
-         parts[1] = Integer.parseInt(month);
-         parts[2] = Integer.parseInt(day);
-         
-         // save the data in an object for our component as the "EditableValueHolder"
-         // all UI Input Components support this interface for the submitted value
-         ((EditableValueHolder)component).setSubmittedValue(parts);
+         // TODO: should check for disabled/readonly here - no need to decode
+         String clientId = component.getClientId(context);
+         Map params = context.getExternalContext().getRequestParameterMap();
+         String year = (String)params.get(clientId + FIELD_YEAR);
+         if (year != null)
+         {
+            // found data for our component
+            String month = (String)params.get(clientId + FIELD_MONTH);
+            String day = (String)params.get(clientId + FIELD_DAY);
+            String hour = (String)params.get(clientId + FIELD_HOUR);
+            String minute = (String)params.get(clientId + FIELD_MINUTE);
+            
+            // we encode the values needed for the component as we see fit
+            int[] parts = new int[5];
+            parts[0] = Integer.parseInt(year);
+            parts[1] = Integer.parseInt(month);
+            parts[2] = Integer.parseInt(day);
+            parts[3] = Integer.parseInt(hour);
+            parts[4] = Integer.parseInt(minute);
+            
+            // save the data in an object for our component as the "EditableValueHolder"
+            // all UI Input Components support this interface for the submitted value
+            ((EditableValueHolder)component).setSubmittedValue(parts);
+         }
+      }
+      catch (NumberFormatException nfe)
+      {
+         // just ignore the error and skip the update of the property
       }
    }
    
@@ -88,7 +105,7 @@ public class DatePickerRenderer extends BaseRenderer
    public Object getConvertedValue(FacesContext context, UIComponent component, Object val) throws ConverterException
    {
       int[] parts = (int[])val;
-      Calendar date = new GregorianCalendar(parts[0], parts[1], parts[2]);
+      Calendar date = new GregorianCalendar(parts[0], parts[1], parts[2], parts[3], parts[4]);
       return date.getTime();
    }
    
@@ -138,7 +155,8 @@ public class DatePickerRenderer extends BaseRenderer
          }
          
          // now we render the output for our component
-         // we create 3 drop-down menus for day, month and year
+         // we create 3 drop-down menus for day, month and year and 
+         // two text fields for the hour and minute 
          String clientId = component.getClientId(context);
          ResponseWriter out = context.getResponseWriter();
          
@@ -146,9 +164,24 @@ public class DatePickerRenderer extends BaseRenderer
          // able to decode() as above.
          Calendar calendar = new GregorianCalendar();
          calendar.setTime(date);
-         renderMenu(out, component, getDays(), calendar.get(Calendar.DAY_OF_MONTH), clientId + "_day");
-         renderMenu(out, component, getMonths(), calendar.get(Calendar.MONTH), clientId + "_month");
-         renderMenu(out, component, getYears(nStartYear, nYearCount), calendar.get(Calendar.YEAR), clientId + "_year");
+         renderMenu(out, component, getDays(), calendar.get(Calendar.DAY_OF_MONTH), clientId + FIELD_DAY);
+         renderMenu(out, component, getMonths(), calendar.get(Calendar.MONTH), clientId + FIELD_MONTH);
+         renderMenu(out, component, getYears(nStartYear, nYearCount), calendar.get(Calendar.YEAR), clientId + FIELD_YEAR);
+         
+         // make sure we have a flag to determine whether to show the time
+         Boolean showTime = (Boolean)component.getAttributes().get("showTime");
+         if (showTime == null)
+         {
+            showTime = Boolean.FALSE;
+         }
+         
+         out.write("&nbsp;");
+         renderTimeElement(out, component, calendar.get(Calendar.HOUR_OF_DAY), clientId + FIELD_HOUR, showTime.booleanValue());
+         if (showTime.booleanValue())
+         {
+            out.write("&nbsp;:&nbsp;");
+         }
+         renderTimeElement(out, component, calendar.get(Calendar.MINUTE), clientId + FIELD_MINUTE, showTime.booleanValue());
       }
    }
    
@@ -167,33 +200,78 @@ public class DatePickerRenderer extends BaseRenderer
          int selected, String clientId)
       throws IOException
    {
-      out.startElement("select", component);
-      out.writeAttribute("name", clientId, "id");
+      out.write("<select");
+      outputAttribute(out, clientId, "name");
       
       if (component.getAttributes().get("styleClass") != null)
       {
-         out.writeAttribute("class", component.getAttributes().get("styleClass"), "styleClass");
+         outputAttribute(out, component.getAttributes().get("styleClass"), "class");
       }
       if (component.getAttributes().get("style") != null)
       {
-         out.writeAttribute("style", component.getAttributes().get("style"), "style");
+         outputAttribute(out, component.getAttributes().get("style"), "style");
       }
+      if (component.getAttributes().get("disabled") != null)
+      {
+         outputAttribute(out, component.getAttributes().get("disabled"), "disabled");
+      }
+      out.write(">");
       
       for (Iterator i=items.iterator(); i.hasNext(); /**/)
       {
          SelectItem item = (SelectItem)i.next();
          Integer value = (Integer)item.getValue();
-         out.startElement("option", component);
-         out.writeAttribute("value", value, null);
+         out.write("<option");
+         outputAttribute(out, value, "value");
          
          // show selected value
          if (value.intValue() == selected)
          {
-            out.writeAttribute("selected", "selected", null);
+            outputAttribute(out, "selected", "selected");
          }
-         out.writeText(item.getLabel(), null);
+         out.write(">");
+         out.write(item.getLabel());
+         out.write("</option>");
       }
-      out.endElement("select");
+      out.write("</select>");
+   }
+   
+   /**
+    * Renders either the hour or minute field
+    * 
+    * @param out The ResponseWriter
+    * @param currentValue The value of the hour or minute
+    * @param clientId The id to use for the field
+    */
+   private void renderTimeElement(ResponseWriter out, UIComponent component, 
+         int currentValue, String clientId, boolean showTime) throws IOException
+   {
+      out.write("<input");
+      outputAttribute(out, clientId, "name");
+      
+      if (showTime)
+      {
+         out.write(" type='text' size='1' maxlength='2'");
+         
+         if (component.getAttributes().get("disabled") != null)
+         {
+            outputAttribute(out, component.getAttributes().get("disabled"), "disabled");
+         }
+      }
+      else
+      {
+         out.write(" type='hidden'");
+      }
+      
+      // make sure there are always 2 digits
+      String strValue = Integer.toString(currentValue);
+      if (strValue.length() == 1)
+      {
+         strValue = "0" + strValue;
+      }
+      
+      outputAttribute(out, strValue, "value");
+      out.write("/>");
    }
    
    private List getYears(int startYear, int yearCount)
