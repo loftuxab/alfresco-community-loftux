@@ -87,7 +87,7 @@ public class PersonTest extends BaseSpringTest
         personService.setCreateMissingPeople(true);
         NodeRef nodeRef = personService.getPerson("andy");
         assertNotNull(nodeRef);
-        testProperties(nodeRef, "andy", "", "", "", "");
+        testProperties(nodeRef, "andy", "andy", "", "", "");
 
         personService.setCreateMissingPeople(false);
         try
@@ -106,7 +106,7 @@ public class PersonTest extends BaseSpringTest
                 "alfresco", rootNodeRef));
         testProperties(personService.getPerson("derek"), "derek", "Derek", "Hulley", "dh@dh", "alfresco");
 
-        testProperties(personService.getPerson("andy"), "andy", "", "", "", "");
+        testProperties(personService.getPerson("andy"), "andy", "andy", "", "", "");
 
         assertEquals(2, personService.getAllPeople().size());
         assertTrue(personService.getAllPeople().contains(personService.getPerson("andy")));
