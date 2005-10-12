@@ -496,7 +496,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     		props.put(RuleModel.PROP_RULE_TYPE, rule.getRuleTypeName());
 			props.put(ActionModel.PROP_DEFINITION_NAME, rule.getActionDefinitionName());
 			props.put(ContentModel.PROP_NODE_UUID, rule.getId());
-			props.put(RuleModel.PROP_APPLY_TO_CHILDREN, rule.isAppliedToChildren());
+			//props.put(RuleModel.PROP_APPLY_TO_CHILDREN, rule.isAppliedToChildren());
 			
 			// Create the action node
 			ruleNodeRef = this.nodeService.createNode(
@@ -510,6 +510,9 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 			((RuleImpl)rule).setCreator((String)this.nodeService.getProperty(ruleNodeRef, ContentModel.PROP_CREATOR));
 			((RuleImpl)rule).setCreatedDate((Date)this.nodeService.getProperty(ruleNodeRef, ContentModel.PROP_CREATED));
     	}
+        
+        // Update the properties of the rule
+        this.nodeService.setProperty(ruleNodeRef, RuleModel.PROP_APPLY_TO_CHILDREN, rule.isAppliedToChildren());
     	
     	// Save the remainder of the rule as a composite action
     	runtimeActionService.saveActionImpl(nodeRef, ruleNodeRef, rule);

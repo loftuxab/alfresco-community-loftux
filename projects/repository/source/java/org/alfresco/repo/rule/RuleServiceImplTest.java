@@ -23,15 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.action.ActionServiceImplTest;
-import org.alfresco.repo.action.ActionServiceImplTest.AsyncTest;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.executer.ImageTransformActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
@@ -80,7 +77,19 @@ public class RuleServiceImplTest extends BaseRuleTest
     public void testAddRule()
     {
         Rule newRule = createTestRule();        
-        this.ruleService.saveRule(this.nodeRef, newRule);        
+        String ruleId = newRule.getId();
+        this.ruleService.saveRule(this.nodeRef, newRule);    
+        
+        Rule savedRule = this.ruleService.getRule(this.nodeRef, ruleId);
+        assertNotNull(savedRule);
+        assertFalse(savedRule.isAppliedToChildren());
+        
+        savedRule.applyToChildren(true);
+        this.ruleService.saveRule(this.nodeRef, savedRule);
+        
+        Rule savedRule2 = this.ruleService.getRule(this.nodeRef, ruleId);
+        assertNotNull(savedRule2);
+        assertTrue(savedRule2.isAppliedToChildren());
     }
     
     public void testRemoveAllRules()
