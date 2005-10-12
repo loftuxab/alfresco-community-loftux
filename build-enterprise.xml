@@ -52,5 +52,4 @@
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.name.projects}/${dir.name.enterprise}/alf_data" />
    </target>
    
-   
 </project>
