@@ -78,6 +78,11 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
      * The logger
      */
 	private static Log logger = LogFactory.getLog(ActionServiceImpl.class); 
+    
+    /**
+     * Thread local containing the current action chain
+     */
+    ThreadLocal<Set<String>> currentActionChain = new ThreadLocal<Set<String>>();
 	
 	/**
 	 * The application context
@@ -337,9 +342,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 	public void executeAction(Action action, NodeRef actionedUponNodeRef, boolean checkConditions)
 	{
 		executeAction(action, actionedUponNodeRef, checkConditions, action.getExecuteAsychronously());
-	}
-    
-    ThreadLocal<Set<String>> currentActionChain = new ThreadLocal<Set<String>>();
+	}    
 	
 	/**
 	 * @see org.alfresco.service.cmr.action.ActionService#executeAction(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef, boolean)
@@ -669,9 +672,11 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		// TODO Need a way of sorting the order of the actions
 
 		Map<String, Action> idToAction = new HashMap<String, Action>();
+        List<String> orderedIds = new ArrayList<String>();
 		for (Action action : compositeAction.getActions())
 		{	
 			idToAction.put(action.getId(), action);
+            orderedIds.add(action.getId());
 		}
 		
 		List<ChildAssociationRef> actionRefs = this.nodeService.getChildAssocs(compositeActionNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_ACTIONS);
@@ -688,17 +693,19 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 				// Update the action
                 Action action  = idToAction.get(actionNodeRef.getId());
 				saveActionImpl(action.getOwningNodeRef(), actionNodeRef, action);
-				idToAction.remove(actionNodeRef.getId());
+				orderedIds.remove(actionNodeRef.getId());
 			}
 			
 		}
 		
 		// Create the actions remaining
-		for (Map.Entry<String, Action> entry : idToAction.entrySet())
+		for (String actionId : orderedIds)
 		{
+            Action action = idToAction.get(actionId);
+            
 			Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
-			props.put(ActionModel.PROP_DEFINITION_NAME, entry.getValue().getActionDefinitionName());
-			props.put(ContentModel.PROP_NODE_UUID, entry.getValue().getId());
+			props.put(ActionModel.PROP_DEFINITION_NAME, action.getActionDefinitionName());
+			props.put(ContentModel.PROP_NODE_UUID, action.getId());
 			
 			NodeRef actionNodeRef = this.nodeService.createNode(
 					compositeActionNodeRef,
@@ -707,7 +714,6 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
                     ActionModel.TYPE_ACTION,
 					props).getChildRef();
 			
-            Action action = entry.getValue();
 			saveActionImpl(action.getOwningNodeRef(), actionNodeRef, action);
 		}
 	}
@@ -723,9 +729,11 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
 		// TODO Need a way of sorting out the order of the conditions
 
 		Map<String, ActionCondition> idToCondition = new HashMap<String, ActionCondition>();
+        List<String> orderedIds = new ArrayList<String>();
 		for (ActionCondition actionCondition : action.getActionConditions())
 		{	
 			idToCondition.put(actionCondition.getId(), actionCondition);
+            orderedIds.add(actionCondition.getId());
 		}
 		
 		List<ChildAssociationRef> conditionRefs = this.nodeService.getChildAssocs(actionNodeRef, RegexQNamePattern.MATCH_ALL, ActionModel.ASSOC_CONDITIONS);
@@ -743,17 +751,18 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
                 
 				// Update the conditions parameters
 				saveParameters(conditionNodeRef, idToCondition.get(conditionNodeRef.getId()));
-				idToCondition.remove(conditionNodeRef.getId());
+                orderedIds.remove(conditionNodeRef.getId());
 			}
 			
 		}
 		
 		// Create the conditions remaining
-		for (Map.Entry<String, ActionCondition> entry : idToCondition.entrySet())
+        for (String nextId : orderedIds)
 		{
+            ActionCondition actionCondition = idToCondition.get(nextId);
 			Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
-			props.put(ActionModel.PROP_DEFINITION_NAME, entry.getValue().getActionConditionDefinitionName());
-			props.put(ContentModel.PROP_NODE_UUID, entry.getValue().getId());
+			props.put(ActionModel.PROP_DEFINITION_NAME, actionCondition.getActionConditionDefinitionName());
+			props.put(ContentModel.PROP_NODE_UUID, actionCondition.getId());
 			
 			NodeRef conditionNodeRef = this.nodeService.createNode(
 					actionNodeRef,
@@ -762,8 +771,8 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
                     ActionModel.TYPE_ACTION_CONDITION,
 					props).getChildRef();
             
-            saveConditionProperties(conditionNodeRef, entry.getValue());
-			saveParameters(conditionNodeRef, entry.getValue());
+            saveConditionProperties(conditionNodeRef, actionCondition);
+			saveParameters(conditionNodeRef, actionCondition);
 		}		
 	}
 

@@ -589,6 +589,80 @@ public class ActionServiceImplTest extends BaseSpringTest
 		this.actionService.removeAllActions(this.nodeRef);
 		assertEquals(0, this.actionService.getActions(this.nodeRef).size());		
 	}
+    
+    public void testConditionOrder()
+    {
+        Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+        String actionId = action.getId();
+        
+        ActionCondition condition1 = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+        ActionCondition condition2 = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+        
+        action.addActionCondition(condition1);
+        action.addActionCondition(condition2);
+        
+        this.actionService.saveAction(this.nodeRef, action);
+        Action savedAction = this.actionService.getAction(this.nodeRef, actionId);
+        
+        // Check that the conditions have been retrieved in the correct order
+        assertNotNull(savedAction);
+        assertEquals(condition1, savedAction.getActionCondition(0));
+        assertEquals(condition2, savedAction.getActionCondition(1));
+        
+        ActionCondition condition3 = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+        ActionCondition condition4 = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
+        
+        // Update the conditions on the action
+        savedAction.removeActionCondition(condition1);
+        savedAction.addActionCondition(condition3);
+        savedAction.addActionCondition(condition4);
+        
+        this.actionService.saveAction(this.nodeRef, savedAction);
+        Action savedAction2 = this.actionService.getAction(this.nodeRef, actionId);
+        
+        // Check that the conditions are still in the correct order
+        assertNotNull(savedAction2);
+        assertEquals(condition2, savedAction2.getActionCondition(0));
+        assertEquals(condition3, savedAction2.getActionCondition(1));
+        assertEquals(condition4, savedAction2.getActionCondition(2));
+    }
+    
+    public void testActionOrder()
+    {
+        CompositeAction action = this.actionService.createCompositeAction();
+        String actionId = action.getId();
+        
+        Action action1 = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+        Action action2 = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+        
+        action.addAction(action1);
+        action.addAction(action2);
+        
+        this.actionService.saveAction(this.nodeRef, action);
+        CompositeAction savedAction = (CompositeAction)this.actionService.getAction(this.nodeRef, actionId);
+        
+        // Check that the conditions have been retrieved in the correct order
+        assertNotNull(savedAction);
+        assertEquals(action1, savedAction.getAction(0));
+        assertEquals(action2, savedAction.getAction(1));
+        
+        Action action3 = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+        Action action4 = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+        
+        // Update the conditions on the action
+        savedAction.removeAction(action1);
+        savedAction.addAction(action3);
+        savedAction.addAction(action4);
+        
+        this.actionService.saveAction(this.nodeRef, savedAction);
+        CompositeAction savedAction2 = (CompositeAction)this.actionService.getAction(this.nodeRef, actionId);
+        
+        // Check that the conditions are still in the correct order
+        assertNotNull(savedAction2);
+        assertEquals(action2, savedAction2.getAction(0));
+        assertEquals(action3, savedAction2.getAction(1));
+        assertEquals(action4, savedAction2.getAction(2));
+    }
 	
 	/** ===================================================================================
 	 *  Test asynchronous actions
