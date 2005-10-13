@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
+import org.alfresco.repo.transaction.TransactionUtil;
+import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
@@ -100,23 +102,32 @@ public class FtsIndexRecoveryComponent implements IndexRecovery
      */
     public void reindex()
     {
-        // reindex each store
-        for (StoreRef storeRef : storeRefs)
+        TransactionWork<Object> reindexWork = new TransactionWork<Object>()
         {
-            // check if the store exists
-            if (!nodeService.exists(storeRef))
+            public Object doWork()
             {
-                // store does not exist
-                if (logger.isDebugEnabled())
+                // reindex each store
+                for (StoreRef storeRef : storeRefs)
                 {
-                    logger.debug("Skipping reindex of non-existent store: " + storeRef);
+                    // check if the store exists
+                    if (!nodeService.exists(storeRef))
+                    {
+                        // store does not exist
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Skipping reindex of non-existent store: " + storeRef);
+                        }
+                        continue;
+                    }
+                    
+                    // prompt FTS to reindex the store
+                    ftsIndexer.requiresIndex(storeRef);
                 }
-                continue;
+                // done
+                return null;
             }
-            
-            // prompt FTS to reindex the store
-            ftsIndexer.requiresIndex(storeRef);
-        }
+        };
+        TransactionUtil.executeInUserTransaction(transactionService, reindexWork);
         // done
         if (logger.isDebugEnabled())
         {
