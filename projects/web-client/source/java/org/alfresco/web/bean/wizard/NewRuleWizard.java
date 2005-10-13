@@ -174,17 +174,9 @@ public class NewRuleWizard extends BaseActionWizard
                   (String)condParams.get(PROP_CONDITION_NAME));
             condition.setParameterValues(repoCondParams);
             
-            // specify whether the condition result should be inverted (JSF is storing
-            // this as a Boolean object, so cater for that)
-            Object not = (Object)condParams.get(PROP_CONDITION_NOT);
-            if (not instanceof Boolean)
-            {
-               condition.setInvertCondition(((Boolean)not).booleanValue());
-            }
-            else if (not instanceof String && not.equals("true"))
-            {
-               condition.setInvertCondition(true);
-            }
+            // specify whether the condition result should be inverted
+            Boolean not = (Boolean)condParams.get(PROP_CONDITION_NOT);
+            condition.setInvertCondition(((Boolean)not).booleanValue());
             
             rule.addActionCondition(condition);
          }
@@ -1168,7 +1160,7 @@ public class NewRuleWizard extends BaseActionWizard
       }
       
       // specify whether the condition result should be inverted
-      condProps.put(PROP_CONDITION_NOT, Boolean.toString(condition.getInvertCondition()));
+      condProps.put(PROP_CONDITION_NOT, new Boolean(condition.getInvertCondition()));
       
       // generate the summary 
       condProps.put(PROP_CONDITION_SUMMARY, buildConditionSummary(condProps));
