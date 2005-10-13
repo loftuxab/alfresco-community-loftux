@@ -202,15 +202,6 @@ public class LoginBean
                new Object[]{3, 32});
          throw new ValidatorException(new FacesMessage(err));
       }
-      
-      for (int i = 0; i < pass.length(); i++)
-      {
-         if (Character.isLetterOrDigit(pass.charAt(i)) == false)
-         {
-            String err = Application.getMessage(context, MSG_PASSWORD_CHARS);
-            throw new ValidatorException(new FacesMessage(err));
-         }
-      }
    }
 
    /**
@@ -225,15 +216,6 @@ public class LoginBean
          String err = MessageFormat.format(Application.getMessage(context, MSG_USERNAME_LENGTH),
                new Object[]{3, 32});
          throw new ValidatorException(new FacesMessage(err));
-      }
-      
-      for (int i = 0; i < pass.length(); i++)
-      {
-         if (Character.isLetterOrDigit(pass.charAt(i)) == false)
-         {
-            String err = Application.getMessage(context, MSG_USERNAME_CHARS);
-            throw new ValidatorException(new FacesMessage(err));
-         }
       }
    }
 
