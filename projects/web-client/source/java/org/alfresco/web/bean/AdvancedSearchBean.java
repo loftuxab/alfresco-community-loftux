@@ -39,27 +39,11 @@ public class AdvancedSearchBean
    // Bean property getters and setters 
    
    /**
-    * @return Returns the navigation bean instance.
-    */
-   public NavigationBean getNavigator()
-   {
-      return this.navigator;
-   }
-   
-   /**
     * @param navigator The NavigationBean to set.
     */
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
-   }
-   
-   /**
-    * @return Returns the NodeService.
-    */
-   public NodeService getNodeService()
-   {
-      return this.nodeService;
    }
 
    /**
@@ -388,6 +372,9 @@ public class AdvancedSearchBean
          {
             search.setMode(SearchContext.SEARCH_SPACE_NAMES);
          }
+         
+         // set the Search Context onto the top-level navigator bean
+         // this causes the browse screen to switch into search results view
          this.navigator.setSearchContext(search);
          
          // additional attributes search

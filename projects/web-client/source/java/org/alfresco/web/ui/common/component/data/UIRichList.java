@@ -87,6 +87,8 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       this.dataModel = (IGridDataModel)values[5];  // not serializable!
       this.viewMode = (String)values[6];
       this.pageSize = ((Integer)values[7]).intValue();
+      this.initialSortColumn = (String)values[8];
+      this.initialSortDescending = ((Boolean)values[9]).booleanValue();
    }
    
    /**
@@ -94,7 +96,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[8];
+      Object values[] = new Object[10];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = Integer.valueOf(this.currentPage);
@@ -104,6 +106,8 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       values[5] = this.dataModel;
       values[6] = this.viewMode;
       values[7] = Integer.valueOf(this.pageSize);
+      values[8] = this.initialSortColumn;
+      values[9] = (this.initialSortDescending ? Boolean.TRUE : Boolean.FALSE);
       
       return (values);
    }
@@ -135,6 +139,17 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    {
       this.dataModel = null;
       this.value = value;
+   }
+   
+   /**
+    * Clear the current sorting settings back to the defaults
+    */
+   public void clearSort()
+   {
+      this.sortColumn = null;
+      this.sortDescending = true;
+      this.initialSortColumn = null;
+      this.initialSortDescending = true;
    }
    
    /**
@@ -183,6 +198,38 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public boolean isCurrentSortDescending()
    {
       return this.sortDescending;
+   }
+   
+   /**
+    * @return Returns the initialSortColumn.
+    */
+   public String getInitialSortColumn()
+   {
+      return this.initialSortColumn;
+   }
+
+   /**
+    * @param initialSortColumn The initialSortColumn to set.
+    */
+   public void setInitialSortColumn(String initialSortColumn)
+   {
+      this.initialSortColumn = initialSortColumn;
+   }
+
+   /**
+    * @return Returns the initialSortDescending.
+    */
+   public boolean isInitialSortDescending()
+   {
+      return this.initialSortDescending;
+   }
+
+   /**
+    * @param initialSortDescending The initialSortDescending to set.
+    */
+   public void setInitialSortDescending(boolean initialSortDescending)
+   {
+      this.initialSortDescending = initialSortDescending;
    }
    
    /**
@@ -404,14 +451,11 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          }
          
          // sort first time on initially sorted column if set
-         String initialSortColumn = (String)getAttributes().get("initialSortColumn");
+         String initialSortColumn = getInitialSortColumn();
          if (initialSortColumn != null && initialSortColumn.length() != 0)
          {
-            boolean descending = true;
-            if (getAttributes().get("initialSortDescending") != null)
-            {
-               descending = ((Boolean)getAttributes().get("initialSortDescending")).booleanValue();
-            }
+            boolean descending = isInitialSortDescending();
+            
             // TODO: add support for retrieving correct column sort mode here
             this.sortColumn = initialSortColumn;
             this.sortDescending = descending;
@@ -442,6 +486,8 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    private IGridDataModel dataModel = null;
    private String viewMode = null;
    private int pageSize = -1;
+   private String initialSortColumn = null;
+   private boolean initialSortDescending = true;
    
    // transient component state that exists during a single page refresh only
    private int rowIndex = -1;

@@ -215,7 +215,7 @@
                      <%-- Spaces List --%>
                      <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
                            styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
-                           value="#{BrowseBean.nodes}" var="r" initialSortColumn="name" initialSortDescending="true">
+                           value="#{BrowseBean.nodes}" var="r">
                         
                         <%-- Primary column for details view mode --%>
                         <a:column primary="true" width="200" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
@@ -347,7 +347,7 @@
                      <%-- Content list --%>
                      <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
                            styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
-                           value="#{BrowseBean.content}" var="r" initialSortColumn="name" initialSortDescending="true">
+                           value="#{BrowseBean.content}" var="r">
                         
                         <%-- Primary column for details view mode --%>
                         <a:column primary="true" width="200" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
