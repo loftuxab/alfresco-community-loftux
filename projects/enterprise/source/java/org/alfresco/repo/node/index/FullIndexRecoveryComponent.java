@@ -194,16 +194,6 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     }
     
     /**
-     * Set the hibernate cache mode
-     * 
-     * @see org.hibernate.CacheMode
-     */
-    public void setL2CacheMode(CacheMode l2CacheMode)
-    {
-        this.l2CacheMode = l2CacheMode;
-    }
-    
-    /**
      * Set the hibernate cache mode by name
      * 
      * @see org.hibernate.CacheMode
