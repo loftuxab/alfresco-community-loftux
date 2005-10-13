@@ -15,8 +15,6 @@
         lazy="true"
         optimistic-lock="version" >
 
-        <cache usage="read-write" />
-
         <composite-id name="nodeKey" class="org.alfresco.repo.domain.NodeKey">
            <key-property name="protocol" length="50" />
            <key-property name="identifier" length="100" />
@@ -33,7 +31,6 @@
             fetch="select" 
             optimistic-lock="true"
             cascade="delete" >
-            <cache usage="read-write" />
             <key>
                <column name="protocol" length="50" />
                <column name="identifier" length="100" />
@@ -44,7 +41,6 @@
       
     </class>
     
-    
     <class 
         name="org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntryImpl"
         proxy="org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntry"
@@ -54,8 +50,6 @@
         select-before-update="false"
         lazy="true"
         optimistic-lock="version" >
-        
-        <cache usage="read-write" />
         
         <id
             name="id"
@@ -102,8 +96,6 @@
         lazy="true"
         optimistic-lock="version" >
         
-        <cache usage="read-write" />
-        
         <composite-id>
             <key-property name="typeUri" type="string" length="100" column="type_uri"/>
             <key-property name="typeName" type="string" length="100" column="type_name"/>
@@ -121,28 +113,21 @@
         lazy="true"
         optimistic-lock="version" >
         
-        <cache usage="read-write" />
-        
         <composite-id>
             <key-property name="recipient"
             column="recipient" 
             type="string" length="100"  />
         </composite-id>
-            
-
         
         <set name="externalKeys" lazy="true"
             sort="unsorted"
             fetch="select"
             optimistic-lock="true" >
-            <cache usage="read-write" />
             <key >
                <column name="id" />
             </key>
             <element column="externalKey" length="100" not-null="true" type="string" />
         </set>
     </class>
-    
-    
     
 </hibernate-mapping>

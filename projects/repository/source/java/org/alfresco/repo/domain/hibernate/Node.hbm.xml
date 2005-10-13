@@ -17,7 +17,6 @@
          select-before-update="false" 
          lazy="true" 
          optimistic-lock="version"  >
-      <cache usage="read-write" />
       <!-- composite PK -->
       <composite-id name="key" class="org.alfresco.repo.domain.NodeKey">
          <key-property name="protocol" length="50" />
@@ -43,7 +42,6 @@
             inverse="false" 
             optimistic-lock="true"
             cascade="delete" >
-         <cache usage="read-write" />
          <key>
             <column name="protocol" length="50" />
             <column name="identifier" length="100" />
@@ -72,7 +70,6 @@
             fetch="select"
             optimistic-lock="true"
             cascade="delete" >
-         <cache usage="read-write" />
          <key>
             <column name="protocol" length="50"  />
             <column name="identifier" length="100" />
@@ -101,7 +98,6 @@
             cascade="none"
             optimistic-lock="true"
             fetch="select" >
-         <cache usage="read-write" />
          <key>
             <column name="child_protocol" />
             <column name="child_identifier" />
@@ -117,7 +113,6 @@
             cascade="none"
             optimistic-lock="true"
             fetch="select" >
-         <cache usage="read-write" />
          <key>
             <column name="parent_protocol" />
             <column name="parent_identifier" />
@@ -132,7 +127,6 @@
             inverse="true" 
             cascade="none"
             optimistic-lock="true" >
-         <cache usage="read-write" />
          <key>
             <column name="target_protocol" />
             <column name="target_identifier" />
@@ -146,7 +140,6 @@
             inverse="true" 
             cascade="none"
             optimistic-lock="true" >
-         <cache usage="read-write" />
          <key>
             <column name="source_protocol" />
             <column name="source_identifier" />
@@ -165,7 +158,6 @@
          select-before-update="false" 
          lazy="true" 
          optimistic-lock="version"  >
-      <cache usage="read-write" />
       <!-- composite PK -->
       <composite-id name="key" class="org.alfresco.repo.domain.NodeKey">
          <key-property name="protocol" length="50" />
@@ -184,7 +176,6 @@
          lazy="true"
          optimistic-lock="version"
          table="child_assoc" >
-         <cache usage="read-write" />
       <id
             name="id"
             column="id" 
@@ -225,7 +216,6 @@
          name="org.alfresco.repo.domain.hibernate.NodeAssocImpl"
          proxy="org.alfresco.repo.domain.NodeAssoc"
          table="node_assoc" >
-      <cache usage="read-write" />
       <id
             name="id"
             column="id"
