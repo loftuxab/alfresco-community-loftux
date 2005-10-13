@@ -278,7 +278,7 @@
                               <a:sortLink label="#{msg.created}" value="created" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.created}">
-                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
+                              <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
                            </h:outputText>
                         </a:column>
                         
@@ -288,7 +288,7 @@
                               <a:sortLink label="#{msg.modified}" value="modified" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modified}">
-                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
+                              <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
                            </h:outputText>
                         </a:column>
                         
@@ -411,7 +411,7 @@
                               <a:sortLink label="#{msg.created}" value="created" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.created}">
-                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
+                              <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
                            </h:outputText>
                         </a:column>
                         
@@ -421,7 +421,7 @@
                               <a:sortLink label="#{msg.modified}" value="modified" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.modified}">
-                              <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
+                              <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
                            </h:outputText>
                         </a:column>
                         

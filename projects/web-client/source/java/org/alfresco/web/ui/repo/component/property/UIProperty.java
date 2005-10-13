@@ -48,6 +48,8 @@ import org.springframework.web.jsf.FacesContextUtils;
 public class UIProperty extends PropertySheetItem
 {
    private static final String MSG_ERROR_PROPERTY = "error_property";
+   private static final String MSG_DATE_TIME = "date_time_pattern";
+   private static final String MSG_DATE = "date_pattern";
 
    private static Log logger = LogFactory.getLog(UIProperty.class);
 
@@ -182,7 +184,7 @@ public class UIProperty extends PropertySheetItem
             XMLDateConverter conv = (XMLDateConverter)context.getApplication().
                createConverter("org.alfresco.faces.XMLDataConverter");
             conv.setType("both");
-            conv.setPattern("MMMM, d yyyy HH:mm");
+            conv.setPattern(Application.getMessage(context, MSG_DATE_TIME));
             control.setConverter(conv);
          }
          else if (typeName.equals(DataTypeDefinition.DATE))
@@ -190,7 +192,7 @@ public class UIProperty extends PropertySheetItem
             XMLDateConverter conv = (XMLDateConverter)context.getApplication().
                createConverter("org.alfresco.faces.XMLDataConverter");
             conv.setType("date");
-            conv.setPattern("MMMM, d yyyy");
+            conv.setPattern(Application.getMessage(context, MSG_DATE));
             control.setConverter(conv);
          }
       }

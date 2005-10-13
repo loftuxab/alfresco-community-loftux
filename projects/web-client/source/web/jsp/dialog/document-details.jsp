@@ -354,7 +354,7 @@
                                           <a:sortLink label="#{msg.date}" value="versionDate" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="date" value="#{r.versionDate}">
-                                          <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
+                                          <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
                                        </h:outputText>
                                     </a:column>
                                     

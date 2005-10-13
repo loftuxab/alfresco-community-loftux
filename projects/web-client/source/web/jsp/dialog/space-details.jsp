@@ -204,7 +204,7 @@
                                           <a:sortLink label="#{msg.created_date}" value="createdDate" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="createddate" value="#{r.createdDate}">
-                                          <a:convertXMLDate dateStyle="long" />
+                                          <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}"/>
                                        </h:outputText>
                                     </a:column>
                                     
@@ -214,7 +214,7 @@
                                           <a:sortLink label="#{msg.modified_date}" value="modifiedDate" styleClass="header"/>
                                        </f:facet>
                                        <h:outputText id="modifieddate" value="#{r.modifiedDate}">
-                                          <a:convertXMLDate type="both" pattern="MMMM, d yyyy HH:mm" />
+                                          <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
                                        </h:outputText>
                                     </a:column>
                                     
