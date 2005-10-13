@@ -15,6 +15,7 @@
    <bean id="transformer.PdfBox" class="org.alfresco.repo.content.transform.PdfBoxContentTransformer" />
    <bean id="transformer.Poi" class="org.alfresco.repo.content.transform.PoiHssfContentTransformer" />
    <bean id="transformer.TextMining" class="org.alfresco.repo.content.transform.TextMiningContentTransformer" />
+   <bean id="transformer.HtmlParser" class="org.alfresco.repo.content.transform.HtmlParserContentTransformer" />
    <bean id="transformer.OpenOffice" class="org.alfresco.repo.content.transform.UnoContentTransformer">
       <constructor-arg>
          <ref bean="mimetypeMap" />
@@ -65,6 +66,7 @@
             <ref bean="transformer.PdfBox" />
             <ref bean="transformer.Poi" />
             <ref bean="transformer.TextMining" />
+            <ref bean="transformer.HtmlParser" />
             <ref bean="transformer.OpenOffice" />
 <!--            <ref bean="transformer.JMagick" /> -->
             <ref bean="transformer.ImageMagick" />
