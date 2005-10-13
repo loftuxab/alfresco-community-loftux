@@ -19,8 +19,6 @@
          <lib dir="${dir.dist}" includes="${file.name.jar}" />
          <lib dir="${dir.project.core}/build/dist" includes="${dir.name.core}.jar" />
          <lib dir="${dir.project.repository}/build/dist" includes="${dir.name.repository}.jar" />
-      </war>
-      <war warfile="${dir.dist}/${file.name.war.tck}" update="true" >
          <classes dir="${dir.config.repository}"/>
          <classes dir="${dir.config.jcr}"/>
          <classes file="${dir.project.core}/source/java/log4j.properties" prefix="WEB-INF/classes"/>

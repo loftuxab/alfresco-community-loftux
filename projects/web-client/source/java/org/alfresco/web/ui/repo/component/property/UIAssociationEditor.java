@@ -138,6 +138,30 @@ public class UIAssociationEditor extends BaseAssociationEditor
    }
    
    /**
+    * @see org.alfresco.web.ui.repo.component.property.BaseAssociationEditor#renderReadOnlyAssociations(javax.faces.context.FacesContext, javax.faces.context.ResponseWriter, org.alfresco.service.cmr.repository.NodeService)
+    */
+   protected void renderReadOnlyAssociations(FacesContext context, ResponseWriter out, NodeService nodeService) throws IOException
+   {
+      if (this.originalAssocs.size() > 0)
+      {
+         out.write("<table cellspacing='0' cellpadding='2' border='0'>");
+         
+         Iterator iter = this.originalAssocs.values().iterator();
+         while (iter.hasNext())
+         {
+            out.write("<tr><td>");
+            AssociationRef assoc = (AssociationRef)iter.next();
+            out.write(Repository.getDisplayPath(nodeService.getPath(assoc.getTargetRef())));
+            out.write("/");
+            out.write(Repository.getNameForNode(nodeService, assoc.getTargetRef()));
+            out.write("</td></tr>");
+         }
+         
+         out.write("</table>");
+      }
+   }
+   
+   /**
     * Updates the component and node state to reflect an association being removed 
     * 
     * @param node The node we are dealing with

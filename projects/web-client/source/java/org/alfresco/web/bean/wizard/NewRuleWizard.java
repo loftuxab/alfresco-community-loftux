@@ -183,7 +183,7 @@ public class NewRuleWizard extends BaseActionWizard
             }
             else if (not instanceof String && not.equals("true"))
             {
-               condition.setInvertCondition(((Boolean)not).booleanValue());
+               condition.setInvertCondition(true);
             }
             
             rule.addActionCondition(condition);

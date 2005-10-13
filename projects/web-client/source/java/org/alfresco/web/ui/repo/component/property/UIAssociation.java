@@ -136,60 +136,23 @@ public class UIAssociation extends PropertySheetItem
                                 String varName)
    {
       UIPropertySheet propSheet = (UIPropertySheet)this.getParent();
-
+      ValueBinding vb = context.getApplication().createValueBinding("#{" + varName + "}");
+      
+      UIAssociationEditor control = (UIAssociationEditor)context.
+         getApplication().createComponent("org.alfresco.faces.AssociationEditor");
+      control.setAssociationName(assocDef.getName().toString());
+      
+      // set up the common aspects of the control
+      control.setId(context.getViewRoot().createUniqueId());
+      control.setValueBinding("value", vb);
+      
+      // disable the component if necessary
       if (propSheet.getMode().equalsIgnoreCase(UIPropertySheet.VIEW_MODE) || isReadOnly() || assocDef.isProtected())
       {
-         ValueBinding vb = context.getApplication().
-                        createValueBinding("#{" + varName + ".associations[\"" + 
-                        assocDef.getName().toString() + "\"]}");
-         
-         // if we are in view mode simply output the text to the screen
-         UIOutput control = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-         control.setRendererType("javax.faces.Text");
-         
-         // if a converter has been specified we need to instantiate it
-         // and apply it to the control otherwise add the standard one
-         if (getConverter() == null)
-         {
-            // add the standard ChildAssociation converter that shows the current association state
-            Converter conv = context.getApplication().createConverter("org.alfresco.faces.AssociationConverter");
-            control.setConverter(conv);
-         }
-         else
-         {
-            // catch null pointer exception to workaround bug in myfaces
-            try
-            {
-               Converter conv = context.getApplication().createConverter(getConverter());
-               ((UIOutput)control).setConverter(conv);
-            }
-            catch (FacesException fe)
-            {
-               logger.warn("Converter " + getConverter() + " could not be applied");
-            }
-         }
-         
-         // set up the common aspects of the control
-         control.setId(context.getViewRoot().createUniqueId());
-         control.setValueBinding("value", vb);
-         
-         // add the control itself
-         this.getChildren().add(control);
+         control.setDisabled(true);
       }
-      else
-      {
-         ValueBinding vb = context.getApplication().createValueBinding("#{" + varName + "}");
-         
-         UIAssociationEditor control = (UIAssociationEditor)context.
-            getApplication().createComponent("org.alfresco.faces.AssociationEditor");
-         control.setAssociationName(assocDef.getName().toString());
-         
-         // set up the common aspects of the control
-         control.setId(context.getViewRoot().createUniqueId());
-         control.setValueBinding("value", vb);
-         
-         // add the control itself
-         this.getChildren().add(control);
-      }
+      
+      // add the control itself
+      this.getChildren().add(control);
    }
 }

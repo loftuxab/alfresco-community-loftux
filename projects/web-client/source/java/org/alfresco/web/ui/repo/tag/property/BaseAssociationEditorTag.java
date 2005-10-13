@@ -32,6 +32,7 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
    private String selectItemMsg;
    private String selectItemsMsg;
    private String selectedItemsMsg;
+   private String disabled;
    
    /**
     * @see javax.faces.webapp.UIComponentTag#getRendererType()
@@ -53,6 +54,7 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
       setStringProperty(component, "selectItemMsg", this.selectItemMsg);
       setStringProperty(component, "selectItemsMsg", this.selectItemsMsg);
       setStringProperty(component, "selectedItemsMsg", this.selectedItemsMsg);
+      setBooleanProperty(component, "disabled", this.disabled);
    }
    
    /**
@@ -103,6 +105,16 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
    {
       this.selectItemsMsg = selectItemsMsg;
    }
+   
+   /**
+    * Sets whether the component should be rendered in a disabled state
+    * 
+    * @param disabled true to render the component in a disabled state
+    */
+   public void setDisabled(String disabled)
+   {
+      this.disabled = disabled;
+   }
 
    /**
     * @see javax.faces.webapp.UIComponentTag#release()
@@ -114,6 +126,7 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
       this.selectItemMsg = null;
       this.selectItemsMsg = null;
       this.selectedItemsMsg = null;
+      this.disabled = null;
 
       super.release();
    }

@@ -177,7 +177,7 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          List currentItems = (List)editor.getValue();
          if (currentItems != null && currentItems.size() > 0)
          {
-            out.write("<tr><td><table cellspacing=0 cellpadding=0 border=0>");
+            out.write("<tr><td><table cellspacing='0' cellpadding='2' border='0'>");
             for (int x = 0; x < currentItems.size(); x++)
             {  
                Object obj = currentItems.get(x);
@@ -241,11 +241,13 @@ public class MultiValueListEditorRenderer extends BaseRenderer
       }
 
       out.write("&nbsp;&nbsp;");
-      out.write("</td><td align='right' style='padding-left:8px'><input type='submit' value='");
+      out.write("</td><td align='right' style='padding-left:8px'><a href='#' title='");
       out.write(Application.getMessage(context, MSG_REMOVE));
       out.write("' onclick=\"");
       out.write(generateFormSubmit(context, component, UIMultiValueEditor.ACTION_REMOVE + UIMultiValueEditor.ACTION_SEPARATOR + index));
-      out.write("\"/></td></tr>");
+      out.write("\"><img src='");
+      out.write(context.getExternalContext().getRequestContextPath());
+      out.write("/images/icons/delete.gif' border='0' width='13' height='16'/></a>");
    }
 
    /**

@@ -36,7 +36,6 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.converter.XMLDateConverter;
 import org.alfresco.web.ui.repo.component.UICategorySelector;
-import org.alfresco.web.ui.repo.converter.CategoryConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -163,9 +162,19 @@ public class UIProperty extends PropertySheetItem
          
       if (propSheet.getMode().equalsIgnoreCase(UIPropertySheet.VIEW_MODE))
       {
-         // if we are in view mode simply output the text to the screen
-         control = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-         control.setRendererType("javax.faces.Text");
+         // if we are in view mode simply output the text to the screen unless the type
+         // of the property is a category
+         if (typeName.equals(DataTypeDefinition.CATEGORY))
+         {
+            control = (UICategorySelector)context.getApplication().
+                  createComponent("org.alfresco.faces.CategorySelector");
+            ((UICategorySelector)control).setDisabled(true);
+         }
+         else
+         {
+            control = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
+            control.setRendererType("javax.faces.Text");
+         }
          
          // if it is a date or datetime property add the converter
          if (typeName.equals(DataTypeDefinition.DATETIME) )
@@ -182,14 +191,6 @@ public class UIProperty extends PropertySheetItem
                createConverter("org.alfresco.faces.XMLDataConverter");
             conv.setType("date");
             conv.setPattern("MMMM, d yyyy");
-            control.setConverter(conv);
-         }
-         else if (typeName.equals(DataTypeDefinition.CATEGORY))
-         {
-            // if the property represents a category try and get the label instead of
-            // showing the id.
-            CategoryConverter conv = (CategoryConverter)context.getApplication().
-               createConverter("org.alfresco.faces.CategoryConverter");
             control.setConverter(conv);
          }
       }

@@ -48,6 +48,9 @@ public abstract class ItemSelectorTag extends HtmlComponentTag
    /** the id of initial selection */
    private String initialSelection;
    
+   /** Whether the component is disabled */
+   private String disabled;
+   
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
     */
@@ -74,6 +77,7 @@ public abstract class ItemSelectorTag extends HtmlComponentTag
       setStringProperty(component, "nodeStyle", this.nodeStyle);
       setStringProperty(component, "nodeStyleClass", this.nodeStyleClass);
       setIntProperty(component, "spacing", this.spacing);
+      setBooleanProperty(component, "disabled", this.disabled);
    }
    
    /**
@@ -89,6 +93,7 @@ public abstract class ItemSelectorTag extends HtmlComponentTag
       this.nodeStyle = null;
       this.nodeStyleClass = null;
       this.initialSelection = null;
+      this.disabled = null;
    }
    
    /**
@@ -150,5 +155,15 @@ public abstract class ItemSelectorTag extends HtmlComponentTag
    public void setInitialSelection(String initialSelection)
    {
       this.initialSelection = initialSelection;
+   }
+   
+   /**
+    * Sets whether the component should be rendered in a disabled state
+    * 
+    * @param disabled true to render the component in a disabled state
+    */
+   public void setDisabled(String disabled)
+   {
+      this.disabled = disabled;
    }
 }

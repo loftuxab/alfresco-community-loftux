@@ -105,7 +105,7 @@ public class UIChildAssociationEditor extends BaseAssociationEditor
     * @see org.alfresco.web.ui.repo.component.property.BaseAssociationEditor#renderExistingAssociations(javax.faces.context.FacesContext, javax.faces.context.ResponseWriter, org.alfresco.service.cmr.repository.NodeService, boolean)
     */
    protected void renderExistingAssociations(FacesContext context, ResponseWriter out, 
-         NodeService nodeService, boolean allowManyChildren) throws IOException
+         NodeService nodeService, boolean allowMany) throws IOException
    {
       boolean itemsRendered = false;
       
@@ -116,7 +116,7 @@ public class UIChildAssociationEditor extends BaseAssociationEditor
          ChildAssociationRef assoc = (ChildAssociationRef)iter.next();
          if (removed.containsKey(assoc.getChildRef().getId()) == false)
          {
-            renderExistingAssociation(context, out, nodeService, assoc.getChildRef(), allowManyChildren);
+            renderExistingAssociation(context, out, nodeService, assoc.getChildRef(), allowMany);
             itemsRendered = true;
          }
       }
@@ -126,17 +126,41 @@ public class UIChildAssociationEditor extends BaseAssociationEditor
       while (iter.hasNext())
       {
          ChildAssociationRef assoc = (ChildAssociationRef)iter.next();
-         renderExistingAssociation(context, out, nodeService, assoc.getChildRef(), allowManyChildren);
+         renderExistingAssociation(context, out, nodeService, assoc.getChildRef(), allowMany);
          itemsRendered = true;
       }
       
       // show the none selected message if no items were rendered
-      if (itemsRendered == false && allowManyChildren == true)
+      if (itemsRendered == false && allowMany == true)
       {
          renderNone(context, out);
       }
    }
    
+   /**
+    * @see org.alfresco.web.ui.repo.component.property.BaseAssociationEditor#renderReadOnlyAssociations(javax.faces.context.FacesContext, javax.faces.context.ResponseWriter, org.alfresco.service.cmr.repository.NodeService)
+    */
+   protected void renderReadOnlyAssociations(FacesContext context, ResponseWriter out, NodeService nodeService) throws IOException
+   {
+      if (this.originalAssocs.size() > 0)
+      {
+         out.write("<table cellspacing='0' cellpadding='2' border='0'>");
+         
+         Iterator iter = this.originalAssocs.values().iterator();
+         while (iter.hasNext())
+         {
+            out.write("<tr><td>");
+            ChildAssociationRef assoc = (ChildAssociationRef)iter.next();
+            out.write(Repository.getDisplayPath(nodeService.getPath(assoc.getChildRef())));
+            out.write("/");
+            out.write(Repository.getNameForNode(nodeService, assoc.getChildRef()));
+            out.write("</tr></td>");
+         }
+         
+         out.write("</table>");
+      }
+   }
+
    /**
     * @see org.alfresco.web.ui.repo.component.property.BaseAssociationEditor#removeTarget(org.alfresco.web.bean.repository.Node, java.lang.String)
     */

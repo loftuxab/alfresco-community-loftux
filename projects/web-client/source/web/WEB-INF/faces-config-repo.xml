@@ -105,25 +105,10 @@
    </component>
    
    <!-- ==================== CONVERTERS ==================== -->
-   <converter>
-      <converter-id>org.alfresco.faces.CategoryConverter</converter-id>
-      <converter-class>org.alfresco.web.ui.repo.converter.CategoryConverter</converter-class>
-   </converter>
-
    <component>
       <component-type>org.alfresco.faces.PermissionEvaluator</component-type>
       <component-class>org.alfresco.web.ui.repo.component.evaluator.PermissionEvaluator</component-class>
    </component>
-
-   <converter>
-      <converter-id>org.alfresco.faces.AssociationConverter</converter-id>
-      <converter-class>org.alfresco.web.ui.repo.converter.AssociationConverter</converter-class>
-   </converter>
-   
-   <converter>
-      <converter-id>org.alfresco.faces.ChildAssociationConverter</converter-id>
-      <converter-class>org.alfresco.web.ui.repo.converter.ChildAssociationConverter</converter-class>
-   </converter>
    
    <converter>
       <converter-id>org.alfresco.faces.MimeTypeConverter</converter-id>

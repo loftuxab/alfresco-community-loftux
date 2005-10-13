@@ -124,7 +124,7 @@
 
    <config evaluator="aspect-name" condition="localizable">
       <property-sheet>
-         <show-property name="locale" converter="org.alfresco.faces.CategoryConverter"/>
+         <show-property name="locale"/>
       </property-sheet>
    </config>
    

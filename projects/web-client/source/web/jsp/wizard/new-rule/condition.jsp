@@ -160,14 +160,16 @@
                                     <td>
                                        <h:dataTable value="#{NewRuleWizard.allConditionsDataModel}" var="row">
                                           <h:column>
-                                             <h:commandLink value="#{row.conditionSummary}" action="#{NewRuleWizard.editCondition}"
-                                                            rendered='#{row.conditionName != "no-condition"}'/>
-                                             <h:outputText value="#{row.conditionSummary}" 
-                                                           rendered='#{row.conditionName == "no-condition"}'/>
+                                             <h:outputText value="#{row.conditionSummary}"/>
                                              <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
                                           <h:column>
-                                             <h:commandButton value="#{msg.remove}" action="#{NewRuleWizard.removeCondition}"/>
+                                             <a:actionLink action="#{NewRuleWizard.removeCondition}" image="/images/icons/delete.gif"
+                                                           value="#{msg.remove}" showLink="false"/>
+                                             <h:outputText value="&nbsp;" escape="false"/>
+                                             <a:actionLink action="#{NewRuleWizard.editCondition}" image="/images/icons/edit_icon.gif"
+                                                           value="#{msg.change}" showLink="false" 
+                                                           rendered='#{row.conditionName != "no-condition"}'/>
                                           </h:column>
                                        </h:dataTable>
                                     </td>

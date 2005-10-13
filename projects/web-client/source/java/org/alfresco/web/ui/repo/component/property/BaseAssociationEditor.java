@@ -32,7 +32,6 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -84,12 +83,14 @@ public abstract class BaseAssociationEditor extends UIInput
    private final static String MSG_CANCEL = "cancel";
    private final static String MSG_SEARCH = "search";
    private final static String MSG_NONE = "none";
+   private final static String MSG_CHANGE = "change";
    
    protected String associationName;
    protected String availableOptionsSize;
    protected String selectItemMsg;
    protected String selectItemsMsg;
    protected String selectedItemsMsg;
+   protected Boolean disabled;
    
    protected boolean showAvailable = false;
    
@@ -272,6 +273,7 @@ public abstract class BaseAssociationEditor extends UIInput
       // get the child associations currently on the node and any that have been added
       NodeService nodeService = Repository.getServiceRegistry(context).getNodeService();
       
+      // show the editable association component
       AssociationDefinition assocDef = getAssociationDefinition(context);
       if (assocDef == null)
       {
@@ -284,96 +286,104 @@ public abstract class BaseAssociationEditor extends UIInput
       else
       {
          String targetType = assocDef.getTargetClass().getName().toString();
-         boolean allowManyChildren = assocDef.isTargetMany();
+         boolean allowMany = assocDef.isTargetMany();
          
          populateAssocationMaps((Node)getValue());
          
-         // start outer table
-         out.write("<table border='0' cellspacing='4' cellpadding='0' class='selector'>");
-         
-         if (allowManyChildren)
+         if (isDisabled())
          {
-            out.write("<tr><td colspan='2'>1.&nbsp;");
-            out.write(getSelectItemsMsg());
-            out.write("</td></tr>");
-            
-            // show the search field
-            renderSearchField(context, out);
-            
-            // show available options for this association
-            renderAvailableOptions(context, out, nodeService, targetType, allowManyChildren);
-            
-            // add the Add to List button
-            out.write("<tr><td colspan='2'>2.&nbsp;<input type='submit' value='");
-            out.write(Application.getMessage(context, MSG_ADD_TO_LIST_BUTTON));
-            out.write("' onclick=\"");
-            out.write(generateFormSubmit(context, Integer.toString(ACTION_ADD)));
-            out.write("\"/>");
-            
-            // add some padding
-            out.write("<tr><td height='6'></td></tr>");
-            
-            out.write("<tr><td colspan='2'>");
-            out.write(getSelectedItemsMsg());
-            out.write(":</td></tr>");
-            
-            // show all the current associations
-            renderExistingAssociations(context, out, nodeService, allowManyChildren);
+            // show the current list of associations in a read-only form
+            renderReadOnlyAssociations(context, out, nodeService);
          }
          else
          {
-            if (this.showAvailable)
+            // start outer table
+            out.write("<table border='0' cellspacing='4' cellpadding='0' class='selector'>");
+            
+            if (allowMany)
             {
                out.write("<tr><td colspan='2'>1.&nbsp;");
-               out.write(getSelectItemMsg());
+               out.write(getSelectItemsMsg());
                out.write("</td></tr>");
-            
+               
                // show the search field
                renderSearchField(context, out);
                
-               // show available options for this association 
-               renderAvailableOptions(context, out, nodeService, targetType, allowManyChildren);
+               // show available options for this association
+               renderAvailableOptions(context, out, nodeService, targetType, allowMany);
                
-               // add the ok and cancel buttons
-               out.write("<tr><td colspan='2' align='right'><input type='submit' value='");
-               out.write(Application.getMessage(context, MSG_OK));
+               // add the Add to List button
+               out.write("<tr><td colspan='2'>2.&nbsp;<input type='submit' value='");
+               out.write(Application.getMessage(context, MSG_ADD_TO_LIST_BUTTON));
                out.write("' onclick=\"");
-               out.write(generateFormSubmit(context, Integer.toString(ACTION_SET)));
-               out.write("\"/>&nbsp;&nbsp;<input type='submit' value='");
-               out.write(Application.getMessage(context, MSG_CANCEL));
-               out.write("' onclick=\"");
-               out.write(generateFormSubmit(context, Integer.toString(ACTION_CANCEL)));
-               out.write("\"/></td></tr>");
+               out.write(generateFormSubmit(context, Integer.toString(ACTION_ADD)));
+               out.write("\"/>");
+               
+               // add some padding
+               out.write("<tr><td height='6'></td></tr>");
+               
+               out.write("<tr><td colspan='2'>");
+               out.write(getSelectedItemsMsg());
+               out.write(":</td></tr>");
+               
+               // show all the current associations
+               renderExistingAssociations(context, out, nodeService, allowMany);
             }
             else
             {
-               // show the select button if required
-               if ((allowManyChildren == false && this.originalAssocs.size() == 0 && this.added.size() == 0) ||
-                   (allowManyChildren == false && this.originalAssocs.size() == 1 && this.removed.size() == 1 && this.added.size() == 0) )
+               if (this.showAvailable)
                {
-                  out.write("<tr><td><input type='submit' value='");
-                  out.write(Application.getMessage(context, MSG_SELECT_BUTTON));
+                  out.write("<tr><td colspan='2'>1.&nbsp;");
+                  out.write(getSelectItemMsg());
+                  out.write("</td></tr>");
+               
+                  // show the search field
+                  renderSearchField(context, out);
+                  
+                  // show available options for this association 
+                  renderAvailableOptions(context, out, nodeService, targetType, allowMany);
+                  
+                  // add the ok and cancel buttons
+                  out.write("<tr><td colspan='2' align='right'><input type='submit' value='");
+                  out.write(Application.getMessage(context, MSG_OK));
                   out.write("' onclick=\"");
-                  out.write(generateFormSubmit(context, Integer.toString(ACTION_SELECT)));
+                  out.write(generateFormSubmit(context, Integer.toString(ACTION_SET)));
+                  out.write("\"/>&nbsp;&nbsp;<input type='submit' value='");
+                  out.write(Application.getMessage(context, MSG_CANCEL));
+                  out.write("' onclick=\"");
+                  out.write(generateFormSubmit(context, Integer.toString(ACTION_CANCEL)));
                   out.write("\"/></td></tr>");
                }
                else
                {
-                  // show all the current associations
-                  renderExistingAssociations(context, out, nodeService, allowManyChildren);
+                  // show the select button if required
+                  if ((allowMany == false && this.originalAssocs.size() == 0 && this.added.size() == 0) ||
+                      (allowMany == false && this.originalAssocs.size() == 1 && this.removed.size() == 1 && this.added.size() == 0) )
+                  {
+                     out.write("<tr><td><input type='submit' value='");
+                     out.write(Application.getMessage(context, MSG_SELECT_BUTTON));
+                     out.write("' onclick=\"");
+                     out.write(generateFormSubmit(context, Integer.toString(ACTION_SELECT)));
+                     out.write("\"/></td></tr>");
+                  }
+                  else
+                  {
+                     // show all the current associations
+                     renderExistingAssociations(context, out, nodeService, allowMany);
+                  }
                }
             }
+            
+            if (logger.isDebugEnabled())
+            {
+               logger.debug("number original = " + this.originalAssocs.size());
+               logger.debug("number added = " + this.added.size());
+               logger.debug("number removed = " + this.removed.size());
+            }
+            
+            // close table
+            out.write("</table>");
          }
-         
-         if (logger.isDebugEnabled())
-         {
-            logger.debug("number original = " + this.originalAssocs.size());
-            logger.debug("number added = " + this.added.size());
-            logger.debug("number removed = " + this.removed.size());
-         }
-         
-         // close table
-         out.write("</table>");
       }
    }
    
@@ -401,6 +411,40 @@ public abstract class BaseAssociationEditor extends UIInput
    public void setAssociationName(String associationName)
    {
       this.associationName = associationName;
+   }
+   
+   /**
+    * Determines whether the component should be rendered in a disabled state
+    * 
+    * @return Returns whether the component is disabled
+    */
+   public boolean isDisabled()
+   {
+      if (this.disabled == null)
+      {
+         ValueBinding vb = getValueBinding("disabled");
+         if (vb != null)
+         {
+            this.disabled = (Boolean)vb.getValue(getFacesContext());
+         }
+      }
+      
+      if (this.disabled == null)
+      {
+         this.disabled = Boolean.FALSE;
+      }
+      
+      return this.disabled;
+   }
+
+   /**
+    * Determines whether the component should be rendered in a disabled state
+    * 
+    * @param disabled true to disable the component
+    */
+   public void setDisabled(boolean disabled)
+   {
+      this.disabled = disabled;
    }
    
    /**
@@ -534,10 +578,27 @@ public abstract class BaseAssociationEditor extends UIInput
    protected abstract void populateAssocationMaps(Node node);
    
    /**
-    * Renders the existing associations
+    * Renders the existing associations in a read-only form 
+    * 
+    * @param context FacesContext
+    * @param out ResponseWriter
+    * @param nodeService The NodeService
+    * @throws IOException
+    */
+   protected abstract void renderReadOnlyAssociations(FacesContext context, ResponseWriter out,
+         NodeService nodeService) throws IOException;
+   
+   /**
+    * Renders the existing associations in an editable form
+    * 
+    * @param context FacesContext
+    * @param out ResponseWriter
+    * @param nodeService The NodeService
+    * @param allowMany Whether multiple associations are allowed 
+    * @throws IOException
     */
    protected abstract void renderExistingAssociations(FacesContext context, ResponseWriter out, 
-         NodeService nodeService, boolean allowManyChildren) throws IOException; 
+         NodeService nodeService, boolean allowMany) throws IOException;
    
    /**
     * Updates the component and node state to reflect an association being removed 
@@ -554,7 +615,6 @@ public abstract class BaseAssociationEditor extends UIInput
     * @param childId The id of the child to add
     */
    protected abstract void addTarget(Node node, String[] toAdd);
-
    
    /**
     * Renders an existing association with the appropriate options
@@ -563,32 +623,39 @@ public abstract class BaseAssociationEditor extends UIInput
     * @param out Writer to write output to
     * @param nodeService The NodeService
     * @param targetRef The node at the end of the association being rendered
-    * @param allowManyChildren Whether the current association allows multiple children
+    * @param allowMany Whether the current association allows multiple children
     * @throws IOException
     */
    protected void renderExistingAssociation(FacesContext context, ResponseWriter out, NodeService nodeService,
-         NodeRef targetRef, boolean allowManyChildren) throws IOException
+         NodeRef targetRef, boolean allowMany) throws IOException
    {
       out.write("<tr><td>");
-      
-      if (allowManyChildren == false)
-      {
-         out.write("<a href='#' onclick=\"");
-         out.write(generateFormSubmit(context, ACTION_CHANGE + ACTION_SEPARATOR + targetRef.getId()));
-         out.write("\">");
-      }
+
       out.write(Repository.getDisplayPath(nodeService.getPath(targetRef)));
       out.write("/");
       out.write(Repository.getNameForNode(nodeService, targetRef));
-      if (allowManyChildren == false)
+      if (allowMany == false)
       {
          out.write("</a>");
       }
-      out.write("</td><td><input type='submit' value='");
+      out.write("</td><td><a href='#' title='");
       out.write(Application.getMessage(context, MSG_REMOVE));
       out.write("' onclick=\"");
       out.write(generateFormSubmit(context, ACTION_REMOVE + ACTION_SEPARATOR + targetRef.getId()));
-      out.write("\"/>");
+      out.write("\"><img src='");
+      out.write(context.getExternalContext().getRequestContextPath());
+      out.write("/images/icons/delete.gif' border='0' width='13' height='16'/></a>");
+      
+      if (allowMany == false)
+      {
+         out.write("&nbsp;<a href='#' title='");
+         out.write(Application.getMessage(context, MSG_CHANGE));
+         out.write("' onclick=\"");
+         out.write(generateFormSubmit(context, ACTION_CHANGE + ACTION_SEPARATOR + targetRef.getId()));
+         out.write("\"><img src='");
+         out.write(context.getExternalContext().getRequestContextPath());
+         out.write("/images/icons/edit_icon.gif' border='0' width='12' height='16'/></a>");
+      }
       
       out.write("</td></tr>");
    }
@@ -633,11 +700,11 @@ public abstract class BaseAssociationEditor extends UIInput
     * @param out Writer to write output to
     * @param nodeService The NodeService
     * @param targetType The type of the child at the end of the association
-    * @param allowManyChildren Whether the current association allows multiple children
+    * @param allowMany Whether the current association allows multiple children
     * @throws IOException
     */
    protected void renderAvailableOptions(FacesContext context, ResponseWriter out, NodeService nodeService, 
-         String targetType, boolean allowManyChildren) throws IOException
+         String targetType, boolean allowMany) throws IOException
    {
       boolean itemsPresent = (this.availableOptions != null && this.availableOptions.size() > 0);
       
@@ -650,7 +717,7 @@ public abstract class BaseAssociationEditor extends UIInput
       out.write("name='");
       out.write(getClientId(context) + FIELD_AVAILABLE);
       out.write("' size='");
-      if (allowManyChildren)
+      if (allowMany)
       {
          out.write(getAvailableOptionsSize());
          out.write("' multiple");

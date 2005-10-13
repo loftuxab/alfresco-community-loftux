@@ -174,11 +174,15 @@
                                     <td>
                                        <h:dataTable value="#{NewRuleWizard.allActionsDataModel}" var="row">
                                           <h:column>
-                                             <h:commandLink value="#{row.actionSummary}" action="#{NewRuleWizard.editAction}"/>
+                                             <h:outputText value="#{row.actionSummary}"/>
                                              <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
                                           <h:column>
-                                             <h:commandButton value="#{msg.remove}" action="#{NewRuleWizard.removeAction}"/>
+                                             <a:actionLink action="#{NewRuleWizard.removeAction}" image="/images/icons/delete.gif"
+                                                           value="#{msg.remove}" showLink="false"/>
+                                             <h:outputText value="&nbsp;" escape="false"/>
+                                             <a:actionLink action="#{NewRuleWizard.editAction}" image="/images/icons/edit_icon.gif"
+                                                           value="#{msg.change}" showLink="false" />
                                           </h:column>
                                        </h:dataTable>
                                     </td>
