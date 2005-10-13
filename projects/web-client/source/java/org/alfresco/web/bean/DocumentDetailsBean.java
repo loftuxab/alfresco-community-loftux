@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
@@ -32,6 +33,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.ownable.OwnableService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CopyService;
@@ -62,6 +64,17 @@ import org.apache.log4j.Logger;
  */
 public class DocumentDetailsBean
 {
+   private static final String MSG_SUCCESS_OWNERSHIP = "success_ownership";
+   private static final String MSG_HAS_FOLLOWING_CATEGORIES = "has_following_categories";
+   private static final String MSG_NO_CATEGORIES_APPLIED = "no_categories_applied";
+   private static final String MSG_ERROR_ASPECT_INLINEEDITABLE = "error_aspect_inlineeditable";
+   private static final String MSG_ERROR_ASPECT_VERSIONING = "error_aspect_versioning";
+   private static final String MSG_ERROR_ASPECT_CLASSIFY = "error_aspect_classify";
+   private static final String MSG_ERROR_WORKFLOW_REJECT = "error_workflow_reject";
+   private static final String MSG_ERROR_WORKFLOW_APPROVE = "error_workflow_approve";
+   private static final String MSG_ERROR_UPDATE_SIMPLEWORKFLOW = "error_update_simpleworkflow";
+   private static final String MSG_ERROR_UPDATE_CATEGORY = "error_update_category";
+
    private static Logger logger = Logger.getLogger(DocumentDetailsBean.class);
    
    private BrowseBean browseBean;
@@ -69,6 +82,7 @@ public class DocumentDetailsBean
    private LockService lockService;
    private CopyService copyService;
    private VersionService versionService;
+   private OwnableService ownableService;
    private NavigationBean navigator;
    
    private Map<String, Boolean> panels = new HashMap(5, 1.0f);
@@ -76,6 +90,7 @@ public class DocumentDetailsBean
    private Map<String, Serializable> workflowProperties;
    private NodeRef addedCategory;
    private List categories;
+
 
    /**
     * Default constructor
@@ -223,12 +238,12 @@ public class DocumentDetailsBean
          
          if (categories == null || categories.size() == 0)
          {
-            html = Application.getMessage(FacesContext.getCurrentInstance(), "no_categories_applied");
+            html = Application.getMessage(FacesContext.getCurrentInstance(), MSG_NO_CATEGORIES_APPLIED);
          }
          else
          {
             StringBuilder builder = new StringBuilder(Application.getMessage(FacesContext.getCurrentInstance(), 
-                  "has_following_categories"));
+                  MSG_HAS_FOLLOWING_CATEGORIES));
             
             builder.append("<ul>");
             for (Object obj : categories)
@@ -342,7 +357,7 @@ public class DocumentDetailsBean
       {
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), "error_update_category"), e.getMessage()), e);
+               FacesContext.getCurrentInstance(), MSG_ERROR_UPDATE_CATEGORY), e.getMessage()), e);
       }
       
       return outcome;
@@ -599,7 +614,7 @@ public class DocumentDetailsBean
       {
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), "error_update_simpleworkflow"), e.getMessage()), e);
+               FacesContext.getCurrentInstance(), MSG_ERROR_UPDATE_SIMPLEWORKFLOW), e.getMessage()), e);
       }
       
       return outcome;
@@ -700,7 +715,7 @@ public class DocumentDetailsBean
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), "error_workflow_approve"), e.getMessage()), e);
+               FacesContext.getCurrentInstance(), MSG_ERROR_WORKFLOW_APPROVE), e.getMessage()), e);
       }
    }
    
@@ -805,7 +820,7 @@ public class DocumentDetailsBean
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), "error_workflow_reject"), e.getMessage()), e);
+               FacesContext.getCurrentInstance(), MSG_ERROR_WORKFLOW_REJECT), e.getMessage()), e);
       }
    }
    
@@ -835,7 +850,7 @@ public class DocumentDetailsBean
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), "error_aspect_classify"), e.getMessage()), e);
+               FacesContext.getCurrentInstance(), MSG_ERROR_ASPECT_CLASSIFY), e.getMessage()), e);
       }
    }
    
@@ -865,7 +880,7 @@ public class DocumentDetailsBean
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), "error_aspect_versioning"), e.getMessage()), e);
+               FacesContext.getCurrentInstance(), MSG_ERROR_ASPECT_VERSIONING), e.getMessage()), e);
       }
    }
    
@@ -913,7 +928,7 @@ public class DocumentDetailsBean
          // rollback the transaction
          try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), "error_aspect_inlineeditable"), e.getMessage()), e);
+               FacesContext.getCurrentInstance(), MSG_ERROR_ASPECT_INLINEEDITABLE), e.getMessage()), e);
       }
       
       // force recreation of the details view - this means the properties sheet component will reinit
@@ -998,6 +1013,37 @@ public class DocumentDetailsBean
                }
             }
          }
+      }
+   }
+   
+   /**
+    * Action Handler to take Ownership of the current document
+    */
+   public void takeOwnership(ActionEvent event)
+   {
+      UserTransaction tx = null;
+      
+      try
+      {
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx.begin();
+         
+         this.ownableService.takeOwnership(getDocument().getNodeRef());
+         
+         FacesContext context = FacesContext.getCurrentInstance();
+         String msg = Application.getMessage(context, MSG_SUCCESS_OWNERSHIP);
+         FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_INFO, msg, msg);
+         context.addMessage(event.getComponent().getClientId(context), facesMsg);
+         
+         // commit the transaction
+         tx.commit();
+      }
+      catch (Exception e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), e.getMessage()), e);
       }
    }
    
@@ -1139,6 +1185,16 @@ public class DocumentDetailsBean
    public void setCopyService(CopyService copyService)
    {
       this.copyService = copyService;
+   }
+   
+   /**
+    * Sets the ownable service instance the bean should use
+    * 
+    * @param ownableService The OwnableService
+    */
+   public void setOwnableService(OwnableService ownableService)
+   {
+      this.ownableService = ownableService;
    }
    
    /**

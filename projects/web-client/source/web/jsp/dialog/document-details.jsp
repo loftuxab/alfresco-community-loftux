@@ -157,6 +157,11 @@
                                     </a:booleanEvaluator>
                                  </r:permissionEvaluator>
                                  
+                                 <%-- Take Ownership --%>
+                                 <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="TakeOwnership">
+                                    <a:actionLink value="#{msg.take_ownership}" image="/images/icons/take_ownership.gif" actionListener="#{DocumentDetailsBean.takeOwnership}" id="takeOwnership" />
+                                 </r:permissionEvaluator>
+                                 
                                  <%-- create shortcut --%>
                                  <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
                                     <f:param name="id" value="#{DocumentDetailsBean.id}" />
@@ -246,7 +251,8 @@
                                                   action="#{DocumentDetailsBean.applyInlineEditable}"
                                                   rendered="#{DocumentDetailsBean.inlineEditable == false}" />
                                           </r:permissionEvaluator>
-                                          <h:messages id="props-msgs" styleClass="errorMessage" layout="table" />
+                                          <h:messages globalOnly="true" id="props-msgs" styleClass="errorMessage" layout="table" />
+                                          <br><h:message for="takeOwnership" styleClass="statusMessage" />
                                        </td>
                                     </tr>
                                  </table>

@@ -268,6 +268,13 @@ a.headbarLink
    padding: 4px;
 }
 
+.statusMessage
+{
+   font-size: 11px;
+   color: #4272B4;
+   padding: 4px;
+}
+
 input,textarea,select
 {
    font-size: 11px;

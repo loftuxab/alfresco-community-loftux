@@ -659,6 +659,10 @@
          <value>#{CopyService}</value>
       </managed-property>
       <managed-property>
+         <property-name>ownableService</property-name>
+         <value>#{ownableService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>navigator</property-name>
          <value>#{NavigationBean}</value>
       </managed-property>

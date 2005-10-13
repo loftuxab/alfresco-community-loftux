@@ -151,7 +151,8 @@
                               <td width=100 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg14" /><br>
-                                 <a:actionLink value="#{msg.close_search}" image="/images/icons/action.gif" padding="4" actionListener="#{BrowseBean.closeSearch}" id="link20" />
+                                 <a:actionLink value="#{msg.new_search}" image="/images/icons/search_icon.gif" padding="4" action="advSearch" id="link20" />
+                                 <a:actionLink value="#{msg.close_search}" image="/images/icons/action.gif" padding="4" actionListener="#{BrowseBean.closeSearch}" id="link21" />
                               </td>
                            </a:panel>
                            
