@@ -272,7 +272,8 @@ a.headbarLink
 {
    font-size: 11px;
    color: #4272B4;
-   padding: 4px;
+   padding-top: 6px;
+   display: block;
 }
 
 input,textarea,select

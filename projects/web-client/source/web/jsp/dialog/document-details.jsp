@@ -252,7 +252,7 @@
                                                   rendered="#{DocumentDetailsBean.inlineEditable == false}" />
                                           </r:permissionEvaluator>
                                           <h:messages globalOnly="true" id="props-msgs" styleClass="errorMessage" layout="table" />
-                                          <br><h:message for="takeOwnership" styleClass="statusMessage" />
+                                          <h:message for="takeOwnership" styleClass="statusMessage" />
                                        </td>
                                     </tr>
                                  </table>
