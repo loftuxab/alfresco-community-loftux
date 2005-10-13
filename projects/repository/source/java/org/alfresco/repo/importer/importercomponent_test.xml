@@ -28,7 +28,7 @@
                   <cm:userName>${username}</cm:userName>
                   <cm:firstName>Fred</cm:firstName>
                   <cm:lastName>Bloggs</cm:lastName>
-                  <cm:homeFolder>workspace://SpacesStore/ID</cm:homeFolder>
+                  <cm:homeFolder>/</cm:homeFolder>
                   </view:properties>
                </cm:person>
             </cm:contains>
@@ -41,8 +41,8 @@
             <cm:generalclassifiable/>
             <cm:name>Some Content</cm:name>
             <cm:categories>
-                <view:value>workspace://SpacesStore/one</view:value>
-                <view:value>workspace://SpacesStore/two</view:value>
+                <view:value>/</view:value>
+                <view:value>/system/cm:people</view:value>
             </cm:categories>
             <cm:translations view:idref="xyz"/>
          </cm:cmobject>

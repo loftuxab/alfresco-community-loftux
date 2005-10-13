@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -40,6 +41,7 @@ import org.alfresco.util.debug.NodeStoreInspector;
 public class ExporterComponentTest extends BaseSpringTest
 {
 
+    private NodeService nodeService;
     private ExporterService exporterService;
     private ImporterService importerService;
     private StoreRef storeRef;
@@ -48,12 +50,15 @@ public class ExporterComponentTest extends BaseSpringTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        nodeService = (NodeService)applicationContext.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
         exporterService = (ExporterService)applicationContext.getBean("exporterComponent");
         importerService = (ImporterService)applicationContext.getBean("importerComponent");
         
         // Create the store
-        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+//        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 //        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test");
+//      this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        this.storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
     }
 
     
