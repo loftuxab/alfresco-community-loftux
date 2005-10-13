@@ -55,10 +55,15 @@ public class StringExtractingContentTransformer extends AbstractContentTransform
             // can only convert to plain text
             return 0.0;
         }
+        else if (sourceMimetype.equals(MimetypeMap.MIMETYPE_TEXT_PLAIN))
+        {
+            // conversions from any plain text format are very reliable
+            return 1.0;
+        }
         else if (sourceMimetype.startsWith(PREFIX_TEXT))
         {
-            // transformations from any text to plain text is OK
-            return 1.0;
+            // the source is text, but probably with some kind of markup
+            return 0.1;
         }
         else
         {

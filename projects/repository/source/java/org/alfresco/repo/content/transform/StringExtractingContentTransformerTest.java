@@ -94,7 +94,7 @@ public class StringExtractingContentTransformerTest extends AbstractContentTrans
         
         // check reliability
         double reliability = transformer.getReliability(reader.getMimetype(), targetWriter.getMimetype());
-        assertEquals("Reliability incorrect", 1.0, reliability);
+        assertEquals("Reliability incorrect", 1.0, reliability);   // plain text to plain text is 100%
         
         // transform
         transformer.transform(reader, targetWriter);
@@ -111,7 +111,7 @@ public class StringExtractingContentTransformerTest extends AbstractContentTrans
         
         // check reliability
         double reliability = transformer.getReliability(reader.getMimetype(), targetWriter.getMimetype());
-        assertEquals("Reliability incorrect", 1.0, reliability);
+        assertEquals("Reliability incorrect", 0.1, reliability);   // markup to plain text not 100%
         
         // transform
         transformer.transform(reader, targetWriter);
