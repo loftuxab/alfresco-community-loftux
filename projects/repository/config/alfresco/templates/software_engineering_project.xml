@@ -36,6 +36,7 @@
 	         				<app:uifacets/>
 				    		<cm:title>${templates.document.system_overview.title}</cm:title>
             				<cm:name>${templates.document.system_overview.name}</cm:name>
+            				<cm:description>${templates.document.system_overview.name}</cm:description>
             				<cm:content>contentUrl=classpath:alfresco/templates/${templates.document.system_overview.name}|mimetype=text/html|size=|encoding=</cm:content>
             	        </cm:content>
          			</cm:contains>
