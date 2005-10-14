@@ -20,10 +20,14 @@ import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentStore;
+import org.alfresco.repo.node.index.IndexRecovery;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
  * This component performs one-way replication between to content stores.
@@ -229,6 +233,33 @@ public class ContentStoreReplicator
                     "   content URL: " + contentUrl,
                     e);
             targetStore.delete(contentUrl);
+        }
+    }
+
+    /**
+     * Kicks off the {@link ContentStoreReplicator content store replicator}.
+     * 
+     * @author Derek Hulley
+     */
+    public class ContentStoreReplicatorJob implements Job
+    {
+        /** KEY_CONTENT_STORE_REPLICATOR = 'contentStoreReplicator' */
+        public static final String KEY_CONTENT_STORE_REPLICATOR = "contentStoreReplicator";
+        
+        /**
+         * Forces a full index recovery using the {@link IndexRecovery recovery component} passed
+         * in via the job detail.
+         */
+        public void execute(JobExecutionContext context) throws JobExecutionException
+        {
+            ContentStoreReplicator contentStoreReplicator = (ContentStoreReplicator) context.getJobDetail()
+                    .getJobDataMap().get(KEY_CONTENT_STORE_REPLICATOR);
+            if (contentStoreReplicator == null)
+            {
+                throw new JobExecutionException("Missing job data: " + KEY_CONTENT_STORE_REPLICATOR);
+            }
+            // reindex
+            contentStoreReplicator.start();
         }
     }
 }
