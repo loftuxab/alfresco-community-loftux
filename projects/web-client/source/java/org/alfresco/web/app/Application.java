@@ -332,6 +332,38 @@ public class Application
     */
    public static void setLanguage(FacesContext context, String code)
    {
+      Locale locale = parseLocale(code);
+      
+      // set locale for JSF framework usage
+      context.getViewRoot().setLocale(locale);
+      
+      // set locale for our framework usage
+      context.getExternalContext().getSessionMap().put(LOCALE, locale);
+      
+      // clear the current message bundle - so it's reloaded with new locale
+      context.getExternalContext().getSessionMap().remove(MESSAGE_BUNDLE);
+   }
+   
+   /**
+    * Set the language locale for the current user session
+    * 
+    * @param session        HttpSession for current user
+    * @param code           The ISO locale code to set
+    */
+   public static void setLanguage(HttpSession session, String code)
+   {
+      Locale locale = parseLocale(code);
+      
+      session.putValue(LOCALE, locale);
+      session.removeAttribute(MESSAGE_BUNDLE);
+   }
+   
+   /**
+    * @param code    Locale code (java format with underscores) to parse
+    * @return Locale object or default if unable to parse
+    */
+   private static Locale parseLocale(String code)
+   {
       Locale locale = Locale.getDefault();
       
       StringTokenizer t = new StringTokenizer(code, "_");
@@ -349,14 +381,7 @@ public class Application
          locale = new Locale(t.nextToken(), t.nextToken(), t.nextToken());
       }
       
-      // set locale for JSF framework usage
-      context.getViewRoot().setLocale(locale);
-      
-      // set locale for our framework usage
-      context.getExternalContext().getSessionMap().put(LOCALE, locale);
-      
-      // clear the current message bundle - so it's reloaded with new locale
-      context.getExternalContext().getSessionMap().remove(MESSAGE_BUNDLE);
+      return locale;
    }
    
    /**
