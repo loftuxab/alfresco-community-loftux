@@ -13,7 +13,7 @@
    <namespaces>
       <namespace uri="http://www.alfresco.org/test/BaseNodeServiceTest" prefix="test"/>
    </namespaces>
-
+   
    <types>
       <type name="test:content">
          <title>Content</title>
@@ -52,6 +52,107 @@
          <mandatory-aspects>
             <aspect>test:titled</aspect>
          </mandatory-aspects>
+      </type>
+      
+      <type name="test:multiprop">
+         <title>MultiProp</title>
+         <parent>sys:base</parent>
+         <properties>
+            <property name="test:string0">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content0">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string1">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content1">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string2">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content2">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string3">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content3">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string4">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content4">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string5">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content5">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string6">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content6">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string7">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content7">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string8">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content8">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:string9">
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="test:content9">
+               <type>d:content</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+         <associations>
+            <child-association name="test:child">
+               <source>
+                  <mandatory>false</mandatory>
+                  <many>false</many>
+               </source>
+               <target>
+                  <class>sys:base</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+               <duplicate>false</duplicate>
+            </child-association>
+         </associations>
       </type>
 
       <type name="test:many-properties">
