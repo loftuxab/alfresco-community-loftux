@@ -255,7 +255,7 @@ public class NewRuleWizard extends BaseActionWizard
          condProps.put(PROP_CONDITION_NAME, this.condition);
          condProps.put(PROP_CONDITION_SUMMARY, Application.getMessage(
                FacesContext.getCurrentInstance(), "condition_no_condition"));
-         condProps.put(PROP_CONDITION_NOT, "false");
+         condProps.put(PROP_CONDITION_NOT, Boolean.FALSE);
          this.allConditionsProperties.add(condProps);
          
          // NOTE: we don't set an outcome to stay on the same page as there are 
@@ -1186,9 +1186,8 @@ public class NewRuleWizard extends BaseActionWizard
          
          // JSF is putting the boolean into the map as a Boolean object so we
          // need to handle that - adding a converter doesn't seem to help!
-         Object not = (Object)props.get(PROP_CONDITION_NOT);
-         if ((not instanceof Boolean && ((Boolean)not).booleanValue()) ||
-             (not instanceof String && not.equals("true")))
+         Boolean not = (Boolean)props.get(PROP_CONDITION_NOT);
+         if (not.booleanValue())
          {
             msgId = msgId + "_not";
          }
