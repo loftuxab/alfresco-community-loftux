@@ -216,7 +216,7 @@ public class FileImporterTest extends TestCase
                 }
 
                 long start = System.nanoTime();
-                int importCount = test.createFileImporter().loadFile(location.get(0), new File(args[2]), true);
+                int importCount = test.createFileImporter().loadNamedFile(location.get(0), new File(args[2]), true, "import-"+count);
                 grandTotal += importCount;
                 long end = System.nanoTime();
                 long first = end-start;

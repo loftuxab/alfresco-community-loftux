@@ -62,4 +62,6 @@ public interface FileImporter
      * @throws FileImporterException
      */
     public int loadFile(NodeRef container, File file) throws FileImporterException;
+
+    public int loadNamedFile(NodeRef container, File file, boolean recurse, String name) throws FileImporterException;
 }

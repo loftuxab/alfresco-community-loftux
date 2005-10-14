@@ -64,21 +64,28 @@ public class FileImporterImpl implements FileImporter
     public int loadFile(NodeRef container, File file, boolean recurse) throws FileImporterException
     {
         Counter counter = new Counter();
-        create(counter, container, file, null, recurse);
+        create(counter, container, file, null, recurse, null);
+        return counter.getCount();
+    }
+    
+    public int loadNamedFile(NodeRef container, File file, boolean recurse, String name) throws FileImporterException
+    {
+        Counter counter = new Counter();
+        create(counter, container, file, null, recurse, name);
         return counter.getCount();
     }
 
     public int loadFile(NodeRef container, File file, FileFilter filter, boolean recurse) throws FileImporterException
     {
         Counter counter = new Counter();
-        create(counter, container, file, filter, recurse);
+        create(counter, container, file, filter, recurse, null);
         return counter.getCount();
     }
 
     public int loadFile(NodeRef container, File file) throws FileImporterException
     {
         Counter counter = new Counter();
-        create(counter, container, file, null, false);
+        create(counter, container, file, null, false, null);
         return counter.getCount();
     }
     
@@ -96,8 +103,14 @@ public class FileImporterImpl implements FileImporter
         }
     }
 
-    private NodeRef create(Counter counter, NodeRef container, File file, FileFilter filter, boolean recurse)
+    private NodeRef create(Counter counter, NodeRef container, File file, FileFilter filter, boolean recurse, String containerName)
     {
+        if(containerName != null)
+        {
+            NodeRef newContainer = createDirectory(container, containerName, containerName);
+            return create(counter, newContainer, file, filter, recurse, null);
+          
+        }
         if (file.isDirectory())
         {
             NodeRef directoryNodeRef = createDirectory(container, file);
@@ -108,7 +121,7 @@ public class FileImporterImpl implements FileImporter
                 File[] files = ((filter == null) ? file.listFiles() : file.listFiles(filter));
                 for(int i = 0; i < files.length; i++)
                 {
-                    create(counter, directoryNodeRef, files[i], filter, recurse);
+                    create(counter, directoryNodeRef, files[i], filter, recurse, null);
                 }
             }
             
@@ -211,6 +224,12 @@ public class FileImporterImpl implements FileImporter
 
     private NodeRef createDirectory(NodeRef parentNodeRef, File file)
     {
+        return createDirectory(parentNodeRef, file.getName(), file.getPath());
+        
+    }
+    
+    private NodeRef createDirectory(NodeRef parentNodeRef, String name, String path)
+    {
         // check the parent node's type to determine which association to use
         QName assocTypeQName = getAssocTypeQName(parentNodeRef);
         if (assocTypeQName == null)
@@ -220,7 +239,7 @@ public class FileImporterImpl implements FileImporter
                     "Parent type is inappropriate: " + nodeService.getType(parentNodeRef));
         }
         
-        String qname = QName.createValidLocalName(file.getName());
+        String qname = QName.createValidLocalName(name);
         ChildAssociationRef assocRef = this.nodeService.createNode(
               parentNodeRef,
               assocTypeQName,
@@ -230,16 +249,16 @@ public class FileImporterImpl implements FileImporter
         NodeRef nodeRef = assocRef.getChildRef();
         
         // set the name property on the node
-        this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, file.getName());
+        this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, name);
         
         if (logger.isDebugEnabled())
-           logger.debug("Created folder node with name: " + file.getName());
+           logger.debug("Created folder node with name: " + name);
 
         // apply the uifacets aspect - icon, title and description props
         Map<QName, Serializable> uiFacetsProps = new HashMap<QName, Serializable>(5);
         uiFacetsProps.put(ContentModel.PROP_ICON, "space-icon-default");
-        uiFacetsProps.put(ContentModel.PROP_TITLE, file.getName());
-        uiFacetsProps.put(ContentModel.PROP_DESCRIPTION, file.getPath());
+        uiFacetsProps.put(ContentModel.PROP_TITLE, name);
+        uiFacetsProps.put(ContentModel.PROP_DESCRIPTION, path);
         this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
         
         if (logger.isDebugEnabled())
