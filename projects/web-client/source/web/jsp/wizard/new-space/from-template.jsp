@@ -27,6 +27,14 @@
 <r:page titleId="title_new_space_template">
 
 <script language="JavaScript1.2">
+   
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      checkButtonState( document.getElementById("new-space-from-template:templateSpaceId") );
+   }
+   
    function checkButtonState(inputField)
    {
       if (inputField.selectedIndex == 0)
