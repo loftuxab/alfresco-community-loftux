@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.component.EditableValueHolder;
@@ -288,7 +289,12 @@ public class DatePickerRenderer extends BaseRenderer
    private List getMonths()
    {
       // get names of the months for default locale
-      DateFormatSymbols dfs = new DateFormatSymbols(Application.getLanguage(FacesContext.getCurrentInstance()));
+      Locale locale = Application.getLanguage(FacesContext.getCurrentInstance());
+      if (locale == null)
+      {
+         locale = locale.getDefault();
+      }
+      DateFormatSymbols dfs = new DateFormatSymbols(locale);
       String[] names = dfs.getMonths();
       List<SelectItem> months = new ArrayList<SelectItem>(12);
       for (int i=0; i<12; i++)
