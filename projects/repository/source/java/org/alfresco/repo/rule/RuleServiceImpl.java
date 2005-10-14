@@ -96,6 +96,12 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
      * therefore not fired.  This list is transient.
      */
     private Set<NodeRef> disabledNodeRefs = new HashSet<NodeRef>(5);
+    
+    /**
+     * List of disabled rules.  Any rules that appear in this list will not be added to the pending list and therefore
+     * not fired.
+     */
+    private Set<Rule> disabledRules = new HashSet<Rule>(5);
 
 	/**
 	 * All the rule type currently registered
@@ -223,6 +229,22 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     {
         // Remove the node from the set of disabled nodes
         this.disabledNodeRefs.remove(nodeRef);
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.rule.RuleService#disableRule(org.alfresco.service.cmr.rule.Rule)
+     */
+    public void disableRule(Rule rule)
+    {
+        this.disabledRules.add(rule);
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.rule.RuleService#enableRule(org.alfresco.service.cmr.rule.Rule)
+     */
+    public void enableRule(Rule rule)
+    {
+        this.disabledRules.remove(rule);
     }
     
     /**
@@ -574,7 +596,8 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule, boolean executeAtEnd) 
 	{
         // First check to see if the node has been disabled
-        if (this.disabledNodeRefs.contains(actionableNodeRef) == false)
+        if (this.disabledNodeRefs.contains(actionableNodeRef) == false &&
+            this.disabledRules.contains(rule) == false)
         {
     		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule, executeAtEnd);
             Set<ExecutedRuleData> executedRules =

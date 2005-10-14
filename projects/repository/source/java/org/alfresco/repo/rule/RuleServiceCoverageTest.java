@@ -343,6 +343,45 @@ public class RuleServiceCoverageTest extends TestCase
         // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));        
     }   
     
+    public void testDisableRule()
+    {
+        this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);
+        
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put("aspect-name", ContentModel.ASPECT_VERSIONABLE);        
+        
+        Rule rule = createRule(
+                RuleType.INBOUND, 
+                AddFeaturesActionExecuter.NAME, 
+                params, 
+                NoConditionEvaluator.NAME, 
+                null);
+        
+        this.ruleService.saveRule(this.nodeRef, rule);
+        this.ruleService.disableRule(rule);
+        
+        NodeRef newNodeRef = this.nodeService.createNode(
+                this.nodeRef,
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();         
+        addContentToNode(newNodeRef);
+        assertFalse(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_VERSIONABLE));  
+        
+        this.ruleService.enableRule(rule);
+        
+        NodeRef newNodeRef2 = this.nodeService.createNode(
+                this.nodeRef,
+                ContentModel.ASSOC_CHILDREN,                
+                QName.createQName(TEST_NAMESPACE, "children"),
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();         
+        addContentToNode(newNodeRef2);
+        assertTrue(this.nodeService.hasAspect(newNodeRef2, ContentModel.ASPECT_VERSIONABLE)); 
+        
+    }
+    
     public void xtestAddFeaturesToAFolder()
     {
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);

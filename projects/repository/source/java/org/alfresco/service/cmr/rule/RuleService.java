@@ -66,6 +66,20 @@ public interface RuleService
      * @param nodeRef   the node reference
      */
     public void enableRules(NodeRef nodeRef);
+    
+    /**
+     * Disables a rule, preventing it from being fired.
+     * 
+     * @param rule  the rule to disable
+     */
+    public void disableRule(Rule rule);
+    
+    /**
+     * Enables a rule previously disabled.
+     * 
+     * @param rule  the rule to enable
+     */
+    public void enableRule(Rule rule);
 
     /**
      * Indicates whether the node in question has any rules associated with it.
