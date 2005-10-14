@@ -47,18 +47,6 @@
         </property>
     </bean>
 
- 
-
-    <!-- create a transaction manager -->
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-        <property name="transactionSynchronizationName">
-            <value>SYNCHRONIZATION_ALWAYS</value>
-        </property>
-        <property name="sessionFactory">
-            <ref bean="sessionFactory" />
-        </property>
-    </bean>
-
     <!-- transaction service -->
     <bean id="transactionComponent" class="org.alfresco.repo.transaction.TransactionComponent">
         <constructor-arg>
