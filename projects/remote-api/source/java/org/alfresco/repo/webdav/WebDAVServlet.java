@@ -313,7 +313,7 @@ public class WebDAVServlet extends HttpServlet
                 // Check if the root node was set successfully
                 
                 if ( m_rootNodeRef == null)
-                    throw new ServletException("Failed to set root node for WebDAV");
+                    logger.warn("Failed to set root node for WebDAV");
             }
             catch (InvalidDeviceInterfaceException ex)
             {
