@@ -44,7 +44,6 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.XPathException;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.rule.RuleService;
@@ -363,7 +362,7 @@ public class ImporterComponent
         public void start()
         {
         }
-        
+       
         /* (non-Javadoc)
          * @see org.alfresco.repo.importer.Importer#importNode(org.alfresco.repo.importer.ImportNode)
          */
@@ -439,18 +438,12 @@ public class ImporterComponent
             }
 
             // import content, if applicable
-            for (QName propertyQName : initialProperties.keySet())
+            for (Map.Entry<QName,Serializable> property : context.getProperties().entrySet())
             {
-                PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
-                if (propertyDef == null)
+                PropertyDefinition propertyDef = dictionaryService.getProperty(property.getKey());
+                if (propertyDef != null && propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
                 {
-                    // not defined in the dictionary
-                    continue;
-                }
-                QName propertyTypeQName = propertyDef.getDataType().getName();
-                if (propertyTypeQName.equals(DataTypeDefinition.CONTENT))
-                {
-                    importContent(nodeRef, propertyQName);
+                    importContent(nodeRef, property.getKey(), (String)property.getValue());
                 }
             }
             
@@ -463,6 +456,36 @@ public class ImporterComponent
             }
             
             return nodeRef;
+        }
+        
+        /**
+         * Import Node Content.
+         * <p>
+         * The content URL, if present, will be a local URL.  This import copies the content
+         * from the local URL to a server-assigned location.
+         *
+         * @param nodeRef containing node
+         * @param propertyName the name of the content-type property
+         * @param contentData the identifier of the content to import
+         */
+        private void importContent(NodeRef nodeRef, QName propertyName, String importContentData)
+        {
+            // bind import content data description
+            DataTypeDefinition dataTypeDef = dictionaryService.getDataType(DataTypeDefinition.CONTENT);
+            importContentData = bindPlaceHolder(importContentData, binding);
+            ContentData contentData = (ContentData)DefaultTypeConverter.INSTANCE.convert(dataTypeDef, importContentData);
+            
+            String contentUrl = contentData.getContentUrl();
+            if (contentUrl != null && contentUrl.length() > 0)
+            {
+                // import the content from the url
+                InputStream contentStream = streamHandler.importStream(contentUrl);
+                ContentWriter writer = contentService.getWriter(nodeRef, propertyName, true);
+                writer.setEncoding(contentData.getEncoding());
+                writer.setMimetype(contentData.getMimetype());
+                writer.putContent(contentStream);
+                reportContentCreated(nodeRef, contentUrl);
+            }
         }
         
         /* (non-Javadoc)
@@ -630,34 +653,6 @@ public class ImporterComponent
         }
         
         /**
-         * Import Node Content.
-         * <p>
-         * The content URL, if present, will be a local URL.  This import copies the content
-         * from the local URL to a server-assigned location.
-         * 
-         * @param context
-         * @param propertyQName the name of the content-type property
-         */
-        private void importContent(NodeRef nodeRef, QName propertyQName)
-        {
-            // Extract the source location of the content
-            ContentData contentData = (ContentData)nodeService.getProperty(nodeRef, propertyQName);
-            String contentUrl = contentData.getContentUrl();
-            if (contentUrl != null && contentUrl.length() > 0)
-            {
-                // remove the 'fake' content URL - it causes failures
-                contentData = new ContentData(null, contentData.getMimetype(), 0L, contentData.getEncoding());
-                nodeService.setProperty(nodeRef, propertyQName, contentData);
-                
-                // import the content from the url
-                InputStream contentStream = streamHandler.importStream(contentUrl);
-                ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
-                writer.putContent(contentStream);
-                reportContentCreated(nodeRef, contentUrl);
-            }
-        }
-
-        /**
          * Bind properties
          * 
          * @param properties
@@ -682,6 +677,12 @@ public class ImporterComponent
                 if (valueDataType == null)
                 {
                     valueDataType = propDef.getDataType();
+                }
+
+                // filter out content properties (they're imported later)
+                if (valueDataType.getName().equals(DataTypeDefinition.CONTENT))
+                {
+                    continue;
                 }
                 
                 // bind property value to configuration and convert to appropriate type
@@ -792,8 +793,6 @@ public class ImporterComponent
                 }
             }
         }
-
-
     }
 
     /**
@@ -821,8 +820,6 @@ public class ImporterComponent
         private QName property;
         private String value;
     }
-    
-    
 
     /**
      * Default Import Stream Handler
