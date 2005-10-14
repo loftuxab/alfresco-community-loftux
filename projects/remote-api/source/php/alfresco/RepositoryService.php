@@ -1,31 +1,25 @@
 <?php
 
-require_once('alfresco/Types.php');
+require_once('alfresco/Common.php');
 require_once('alfresco/webservice/WebServiceUtils.php');
 require_once('alfresco/webservice/RepositoryWebService.php');
 
-class RepositoryService
+class RepositoryService extends BaseService
 {
-   private $repository_web_service;
-   private $user;
-   private $ticket;
-
-   public function __construct($user, $ticket)
+   public function __construct($auth_details)
    {
-      // TOD this information should be stored in the session somewhere
-      $this->user = $user;
-      $this->ticket = $ticket;
-
-      $this->repository_web_service = new RepositoryWebService();
+      parent::__construct($auth_details);
+      $this->web_service = new RepositoryWebService();
    }
 
    public function getStores()
    {
-      addSecurityHeader($this->repository_web_service, $this->user, $this->ticket);
-
-      $stores = array();
+     // Make the web service call
+      $this->addSecurityHeader();
+      $result = $this->web_service->getStores();
+      $this->checkForError($result);
       
-      $result = $this->repository_web_service->getStores();
+      $stores = array();
       $index = 0;
       foreach ($result as $value)
       {
@@ -39,28 +33,31 @@ class RepositoryService
 
    public function query($store, $query, $include_meta_data = false)
    {
-      addSecurityHeader($this->repository_web_service, $this->user, $this->ticket);
-
-      // TODO convert the returned SOAP value into an object value
-      $client = $this->repository_web_service;
+     // Make the web service call
+      $this->addSecurityHeader();
       $store_value = getStoreSOAPValue($store);
       $query_value = getQuerySOAPValue($query);
+      $result = $this->web_service->query($store_value, $query_value, $include_meta_data);
+      $this->checkForError($result);
 
-      return $client->query($store_value, $query_value, $include_meta_data);
+      // TODO marshal the returned object back into a helpful object
+      
+      return $result;
    }
 
    public function queryChildren($reference)
    {
-      addSecurityHeader($this->repository_web_service, $this->user, $this->ticket);
+      $this->addSecurityHeader();
+      $result = $this->web_service->queryChildren(getReferenceSOAPValue($reference));
+      $this->checkForError($result);
 
-      // TODO convert the returned SOAP value into an object value
-      return $this->repository_web_service->queryChildren(getReferenceSOAPValue($reference));
+      // TODO marshal the returned object back into a helpful object
+      
+      return $result;
    }
 
    public function get($references)
    {
-      addSecurityHeader($this->repository_web_service, $this->user, $this->ticket);
-
 
    }
 }

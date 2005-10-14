@@ -11,6 +11,8 @@ class AuthenticationWebService extends SOAP_Client
     function &startSession($username, $password)
     {
         $startSession =& new SOAP_Value('{http://www.alfresco.org/ws/service/authentication/1.0}startSession', false, $v = array('username' => $username, 'password' => $password));
+        
+        // startSession
         return $this->call('startSession',
                            $v = array('startSession' => $startSession),
                            array('namespace' => 'http://www.alfresco.org/ws/service/authentication/1.0',
@@ -18,6 +20,7 @@ class AuthenticationWebService extends SOAP_Client
                                  'style' => 'document',
                                  'use' => 'literal'));
     }
+    
     function &endSession()
     {
         return $this->call('endSession',
@@ -27,6 +30,8 @@ class AuthenticationWebService extends SOAP_Client
                                  'style' => 'document',
                                  'use' => 'literal'));
     }
+    
+      
 }
 
 ?>

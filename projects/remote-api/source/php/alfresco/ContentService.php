@@ -1,30 +1,27 @@
 <?php
 
-require_once('alfresco/Types.php');
+require_once('alfresco/Common.php');
 require_once('alfresco/webservice/WebServiceUtils.php');
 require_once('alfresco/webservice/ContentWebService.php');
 
-class ContentService
+class ContentService extends BaseService
 {
-   private $content_web_service;
-   private $user;
-   private $ticket;
-
-   public function __construct($user, $ticket)
+   public function __construct($auth_details)
    {
-      // TOD this information should be stored in the session somewhere
-      $this->user = $user;
-      $this->ticket = $ticket;
-
-      $this->content_web_service = new ContentWebService();
+      parent::__construct($auth_details);
+      $this->web_service = new ContentWebService();
    }
    
    public function read($reference)
    {
-      addSecurityHeader($this->content_web_service, $this->user, $this->ticket);
-
-      // TODO convert this into a more convenient object form
-      return $this->content_web_service->read(getReferenceSOAPValue($reference));
+     // Make the web service call
+      $this->addSecurityHeader();
+      $result = $this->web_service->read(getReferenceSOAPValue($reference));
+      $this->checkForError($result);
+      
+      // TODO marhsall the result into a helpful object
+      
+      return $result;
    }
 }
 
