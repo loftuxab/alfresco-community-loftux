@@ -3360,8 +3360,17 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 
                 if ( tx != null)
                 {
-                    tx.commit();
-                    tx = null;
+                    try
+                    {
+                        // Commit the transaction
+                        
+                        tx.commit();
+                        tx = null;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.warn("Failed to rollback transaction", ex);
+                    }
                 }
                 
             } // end while state
