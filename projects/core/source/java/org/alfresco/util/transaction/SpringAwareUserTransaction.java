@@ -218,7 +218,7 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
         checkThreadId();
         
         // check the status
-        if (txnStatus == null || status == Status.STATUS_NO_TRANSACTION)
+        if (status == Status.STATUS_NO_TRANSACTION)
         {
             throw new IllegalStateException("The transaction has not yet begun");
         }
@@ -233,6 +233,10 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
         else if (status == Status.STATUS_COMMITTING || status == Status.STATUS_COMMITTED)
         {
             throw new IllegalStateException("The transaction has already been committed");
+        }
+        else if (txnStatus == null)
+        {
+            throw new NullPointerException("txnStatus is null but commit expected.  Status is " + status);
         }
         
         // we definitely began a transaction on this thread
