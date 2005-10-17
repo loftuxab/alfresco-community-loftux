@@ -853,9 +853,54 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
     }
 
+    /**
+     * Set file information
+     * 
+     * @param sess SrvSession
+     * @param tree TreeConnection
+     * @param name String
+     * @param info FileInfo
+     * @exception IOException
+     */
     public void setFileInformation(SrvSession sess, TreeConnection tree, String name, FileInfo info) throws IOException
     {
-        // this will be updated automatically by the server
+        try
+        {
+            // Get the device root
+            
+            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+    
+            // Get the file/folder node
+            
+            NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, name);
+            
+            // Check permissions on the file/folder node
+            
+            if ( permissionService.hasPermission(nodeRef, PermissionService.WRITE) == AccessStatus.DENIED)
+                throw new AccessDeniedException("No write access to " + name);
+        }
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Set file information - access denied, " + name);
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Set file information " + name);
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Open file error", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Set file information " + name);
+        }
     }
 
     /**
