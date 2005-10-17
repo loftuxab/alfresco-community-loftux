@@ -16,9 +16,12 @@
             	<cm:auditable/>
             </view:aspects>
             <view:properties>
-            	<cm:name>People</cm:name>
+            	<cm:name>`Â¬Â¦!Â£$%^&amp;()-_=+tnu0000[]{};'#@~,</cm:name>
             	<cm:creator>testuser</cm:creator>
             	<cm:modifier>testuser</cm:modifier>
+            	<cm:notinmodel>
+            	    <view:value view:datatype="d:text">dfsdfsdf</view:value>
+            	</cm:notinmodel>
             </view:properties>
             <view:associations>
             <cm:contains>

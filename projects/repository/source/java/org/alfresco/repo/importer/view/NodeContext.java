@@ -19,7 +19,6 @@ package org.alfresco.repo.importer.view;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +35,6 @@ import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.QName;
 
 
@@ -55,7 +53,6 @@ import org.alfresco.service.namespace.QName;
     private String childName;
     private Map<QName, AspectDefinition> nodeAspects = new HashMap<QName, AspectDefinition>();
     private Map<QName, ChildAssociationDefinition> nodeChildAssocs = new HashMap<QName, ChildAssociationDefinition>();
-    private Map<QName, Map<QName, Serializable>> classProperties = new HashMap<QName, Map<QName, Serializable>>();
     private Map<QName, Serializable> nodeProperties = new HashMap<QName, Serializable>();
     private Map<QName, DataTypeDefinition> propertyDatatypes = new HashMap<QName, DataTypeDefinition>();
     
@@ -128,57 +125,26 @@ import org.alfresco.service.namespace.QName;
      * @param propDef  the property definition
      * @param value  the property value
      */
-    /*package*/ void addProperty(PropertyDefinition propDef, String value)
+    /*package*/ void addProperty(QName property, String value)
     {
-        // Determine appropriate slot for placing property
-        ClassDefinition owningClass = null;
-        PropertyDefinition def = getDictionaryService().getProperty(typeDef.getName(), propDef.getName());
-        if (def != null)
-        {
-            owningClass = typeDef;
-        }
-        else
-        {
-            Set<AspectDefinition> allAspects = new HashSet<AspectDefinition>();
-            allAspects.addAll(typeDef.getDefaultAspects());
-            allAspects.addAll(nodeAspects.values());
-            for (AspectDefinition aspectDef : allAspects)
-            {
-                def = getDictionaryService().getProperty(aspectDef.getName(), propDef.getName());
-                if (def != null)
-                {
-                    owningClass = aspectDef;
-                    break;
-                }
-            }
-        }
-        
         // Do not import properties of sys:referenceable or cm:versionable
         // TODO: Make this configurable...
-        if (owningClass.getName().equals(ContentModel.ASPECT_REFERENCEABLE) ||
-            owningClass.getName().equals(ContentModel.ASPECT_VERSIONABLE))
+        PropertyDefinition propDef = getDictionaryService().getProperty(property);
+        ClassDefinition classDef = (propDef == null) ? null : propDef.getContainerClass();
+        if (classDef != null)
         {
-            return;
-        }
-        
-        // Store property value
-        Map<QName, Serializable> properties = classProperties.get(owningClass.getName());
-        if (properties == null)
-        {
-            properties = new HashMap<QName, Serializable>();
-            classProperties.put(owningClass.getName(), properties);
+            if (classDef.getName().equals(ContentModel.ASPECT_REFERENCEABLE) ||
+                classDef.getName().equals(ContentModel.ASPECT_VERSIONABLE))
+            {
+                return;                
+            }
         }
         
         // Handle single / multi-valued cases
         Serializable newValue = value;
-        Serializable existingValue = properties.get(propDef.getName());
+        Serializable existingValue = nodeProperties.get(property);
         if (existingValue != null)
         {
-            // convert from single to multi-valued
-            if (!propDef.isMultiValued())
-            {
-                throw new ImporterException("Cannot import multiple values for single-valued property " + propDef.getName());
-            }
             if (existingValue instanceof Collection)
             {
                 // add to existing collection of values
@@ -194,8 +160,7 @@ import org.alfresco.service.namespace.QName;
                 newValue = (Serializable)values;
             }
         }
-        properties.put(propDef.getName(), newValue);
-        nodeProperties.put(propDef.getName(), newValue);
+        nodeProperties.put(property, newValue);
     }
     
     /**
@@ -209,19 +174,6 @@ import org.alfresco.service.namespace.QName;
         propertyDatatypes.put(property, datatype);
     }
     
-    /* (non-Javadoc)
-     * @see org.alfresco.repo.importer.ImportNode#getProperties(org.alfresco.service.namespace.QName)
-     */
-    public Map<QName,Serializable> getProperties(QName className)
-    {
-        Map<QName, Serializable> properties = classProperties.get(className);
-        if (properties == null)
-        {
-            properties = Collections.emptyMap();
-        }
-        return properties; 
-    }
-
     /* (non-Javadoc)
      * @see org.alfresco.repo.importer.ImportNode#getPropertyDatatypes()
      */

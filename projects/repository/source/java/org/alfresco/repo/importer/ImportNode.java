@@ -55,14 +55,6 @@ public interface ImportNode
     public String getChildName();
     
     /**
-     * Gets the properties of the node for the specified class (type or aspect)
-     * 
-     * @param className  the type or aspect
-     * @return  the properties
-     */
-    public Map<QName,Serializable> getProperties(QName className);
-
-    /**
      * Gets all properties for the node
      * 
      * @return the properties

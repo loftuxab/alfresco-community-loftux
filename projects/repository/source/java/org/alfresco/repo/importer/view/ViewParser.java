@@ -28,7 +28,6 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -98,11 +97,6 @@ public class ViewParser implements Parser
         this.dictionaryService = dictionaryService;
     }
     
-    public void setRuleService(RuleService ruleService)
-    {
-//        this.ruleService = ruleService;
-    }
-
     /* (non-Javadoc)
      * @see org.alfresco.repo.importer.Parser#parse(java.io.Reader, org.alfresco.repo.importer.Importer)
      */
@@ -212,7 +206,7 @@ public class ViewParser implements Parser
                 }
                 else if (def instanceof PropertyDefinition)
                 {
-                    processProperty(xpp, (PropertyDefinition)def, contextStack);
+                    processProperty(xpp, ((PropertyDefinition)def).getName(), contextStack);
                     return;
                 }
                 else if (def instanceof ChildAssociationDefinition)
@@ -233,18 +227,25 @@ public class ViewParser implements Parser
                 if (itemName.equals(VIEW_ASPECTS))
                 {
                     AspectDefinition def = nodeContext.determineAspect(defName);
+                    if (def == null)
+                    {
+                        throw new ImporterException("Aspect name " + defName + " is not valid; cannot find in Repository dictionary");
+                    }
                     processAspect(xpp, def, contextStack);
                 }
                 else if (itemName.equals(VIEW_PROPERTIES))
                 {
-                    PropertyDefinition def = nodeContext.determineProperty(defName);
-                    processProperty(xpp, def, contextStack);
+                    // Note: Allow properties which do not have a data dictionary definition
+                    processProperty(xpp, defName, contextStack);
                 }
                 else if (itemName.equals(VIEW_ASSOCIATIONS))
                 {
                     // TODO: Handle general associations...  
-                    
                     ChildAssociationDefinition def = (ChildAssociationDefinition)nodeContext.determineAssociation(defName);
+                    if (def == null)
+                    {
+                        throw new ImporterException("Association name " + defName + " is not valid; cannot find in Repository dictionary");
+                    }
                     processStartChildAssoc(xpp, def, contextStack);
                 }
             }
@@ -294,7 +295,7 @@ public class ViewParser implements Parser
         {
             context.setChildName(childName);
         }
-            
+
         contextStack.push(context);
         
         if (logger.isDebugEnabled())
@@ -325,7 +326,6 @@ public class ViewParser implements Parser
         if (logger.isDebugEnabled())
             logger.debug(indentLog("Processed aspect " + aspectDef.getName(), contextStack.size()));
     }
-
     
     /**
      * Process property definition
@@ -336,7 +336,7 @@ public class ViewParser implements Parser
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private void processProperty(XmlPullParser xpp, PropertyDefinition propDef, Stack<ElementContext> contextStack)
+    private void processProperty(XmlPullParser xpp, QName propertyName, Stack<ElementContext> contextStack)
         throws XmlPullParserException, IOException
     {
         NodeContext context = peekNodeContext(contextStack);
@@ -349,7 +349,7 @@ public class ViewParser implements Parser
             eventType = xpp.next();
             if (eventType == XmlPullParser.END_TAG)
             {
-                context.addProperty(propDef, value);
+                context.addProperty(propertyName, value);
             }
         }
 
@@ -359,23 +359,23 @@ public class ViewParser implements Parser
             QName name = getName(xpp);
             if (!name.equals(VIEW_VALUE_QNAME))
             {
-                throw new ImporterException("Invalid view structure - expected element " + VIEW_VALUE_QNAME + " for property " + propDef.getName());
+                throw new ImporterException("Invalid view structure - expected element " + VIEW_VALUE_QNAME + " for property " + propertyName);
             }
             QName datatype = QName.createQName(xpp.getAttributeValue(NamespaceService.REPOSITORY_VIEW_1_0_URI, VIEW_DATATYPE_ATTR), namespaceService);
             eventType = xpp.next();
             if (eventType == XmlPullParser.TEXT)
             {
                 String value = xpp.getText();
-                context.addProperty(propDef, value);
+                context.addProperty(propertyName, value);
                 if (datatype != null)
                 {
-                    context.addDatatype(propDef.getName(), dictionaryService.getDataType(datatype));
+                    context.addDatatype(propertyName, dictionaryService.getDataType(datatype));
                 }
                 eventType = xpp.next();
             }
             if (eventType != XmlPullParser.END_TAG)
             {
-                throw new ImporterException("Value for property " + propDef.getName() + " has not been defined correctly - missing end tag");
+                throw new ImporterException("Value for property " + propertyName + " has not been defined correctly - missing end tag");
             }
             eventType = xpp.next();
             if (eventType == XmlPullParser.TEXT)
@@ -387,11 +387,11 @@ public class ViewParser implements Parser
         // End of Property
         if (eventType != XmlPullParser.END_TAG)
         {
-            throw new ImporterException("Property " + propDef.getName() + " definition is invalid");
+            throw new ImporterException("Property " + propertyName + " definition is invalid");
         }
         
         if (logger.isDebugEnabled())
-            logger.debug(indentLog("Processed property " + propDef.getName(), contextStack.size()));
+            logger.debug(indentLog("Processed property " + propertyName, contextStack.size()));
     }
 
     /**

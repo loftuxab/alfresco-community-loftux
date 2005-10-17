@@ -383,7 +383,7 @@ public class ImporterComponent
             }
             else
             {
-                Map<QName, Serializable> typeProperties = context.getProperties(nodeType.getName());
+                Map<QName, Serializable> typeProperties = context.getProperties();
                 String name = (String)typeProperties.get(ContentModel.PROP_NAME);
                 if (name == null || name.length() == 0)
                 {
@@ -665,18 +665,19 @@ public class ImporterComponent
             Map<QName, Serializable> boundProperties = new HashMap<QName, Serializable>(properties.size());
             for (QName property : properties.keySet())
             {
-                // get property definition
-                PropertyDefinition propDef = dictionaryService.getProperty(property);
-                if (propDef == null)
-                {
-                    throw new ImporterException("Property " + property + " does not exist in the repository dictionary");
-                }
-                
                 // get property datatype
                 DataTypeDefinition valueDataType = datatypes.get(property);
                 if (valueDataType == null)
                 {
-                    valueDataType = propDef.getDataType();
+                    PropertyDefinition propDef = dictionaryService.getProperty(property);
+                    if (propDef != null)
+                    {
+                        valueDataType = propDef.getDataType();
+                    }
+                    if (valueDataType == null || valueDataType.getName().equals(DataTypeDefinition.ANY))
+                    {
+                        throw new ImporterException("Cannot determine data type of property " + property);
+                    }
                 }
 
                 // filter out content properties (they're imported later)

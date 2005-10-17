@@ -207,8 +207,10 @@ public class ExporterComponent
             NodeRef nodeRef = getNodeRef(parameters.getExportFrom());
                     
             exporter.start(nodeRef);
-            
-            if (parameters.isCrawlSelf())
+
+            // determine if root repository node
+            boolean rootNode = nodeService.getRootNode(nodeRef.getStoreRef()).equals(nodeRef);
+            if (parameters.isCrawlSelf() && !rootNode)
             {
                 walkStartNamespaces(parameters, exporter);
                 walkNode(nodeRef, parameters, exporter);
@@ -320,10 +322,9 @@ public class ExporterComponent
 
                 // get the property type
                 PropertyDefinition propertyDef = dictionaryService.getProperty(property);
-                boolean isContentProperty = propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT);
-                
-                // TODO: This should test for datatype.content
-                if (dictionaryService.isSubClass(type, ContentModel.TYPE_CMOBJECT) && isContentProperty)
+                boolean isContentProperty = (propertyDef == null) ? false : propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT);
+
+                if (isContentProperty)
                 {
                     // export property of datatype CONTENT
                     ContentReader reader = contentService.getReader(nodeRef, property);

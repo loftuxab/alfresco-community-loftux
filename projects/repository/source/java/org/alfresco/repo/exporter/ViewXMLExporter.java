@@ -21,10 +21,12 @@ import java.util.Collection;
 
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.Path.Element;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterException;
@@ -43,13 +45,14 @@ import org.xml.sax.helpers.AttributesImpl;
 /*package*/ class ViewXMLExporter
     implements Exporter
 {
-    private final static String VIEW_LOCALNAME = "view";
-    private final static String VALUE_LOCALNAME = "value";
-    private final static String CHILDNAME_LOCALNAME = "childName";
-    private final static String ASPECTS_LOCALNAME = "aspects";
-    private final static String PROPERTIES_LOCALNAME = "properties";
-    private final static String ASSOCIATIONS_LOCALNAME = "associations";
-    private final static String DATATYPE_LOCALNAME = "datatype";
+    // Repository View Schema Definitions
+    private static final String VIEW_LOCALNAME = "view";
+    private static final String VALUE_LOCALNAME = "value";
+    private static final String CHILDNAME_LOCALNAME = "childName";
+    private static final String ASPECTS_LOCALNAME = "aspects";
+    private static final String PROPERTIES_LOCALNAME = "properties";
+    private static final String ASSOCIATIONS_LOCALNAME = "associations";
+    private static final String DATATYPE_LOCALNAME = "datatype";
     private static QName VIEW_QNAME; 
     private static QName VALUE_QNAME;
     private static QName PROPERTIES_QNAME;
@@ -57,13 +60,16 @@ import org.xml.sax.helpers.AttributesImpl;
     private static QName ASSOCIATIONS_QNAME; 
     private static QName CHILDNAME_QNAME;
     private static QName DATATYPE_QNAME;
+    private static final AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
     
+    // Service dependencies
     private NamespaceService namespaceService;
     private NodeService nodeService;
     private DictionaryService dictionaryService;
+    
+    // View context
     private ContentHandler contentHandler;
     private Path exportNodePath;
-    private final static AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
     
 
     /**
@@ -145,11 +151,16 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            Path path = nodeService.getPath(nodeRef);
-            String childName = path.last().getElementString();
-            QName childQName = QName.createQName(childName);
             AttributesImpl attrs = new AttributesImpl(); 
-            attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_1_0_URI, CHILDNAME_LOCALNAME, CHILDNAME_QNAME.toPrefixString(), null, toPrefixString(childQName));
+
+            Path path = nodeService.getPath(nodeRef);
+            if (path.size() > 1)
+            {
+                // a child name does not exist for root
+                String childName = path.last().getElementString();
+                QName childQName = QName.createQName(childName);
+                attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_1_0_URI, CHILDNAME_LOCALNAME, CHILDNAME_QNAME.toPrefixString(), null, toPrefixString(childQName));
+            }
             
             QName type = nodeService.getType(nodeRef);
             contentHandler.startElement(type.getNamespaceURI(), type.getLocalName(), toPrefixString(type), attrs);
@@ -308,8 +319,9 @@ import org.xml.sax.helpers.AttributesImpl;
             {
                 // determine data type of value
                 QName valueDataType = null;
-                DataTypeDefinition dataTypeDef = dictionaryService.getProperty(property).getDataType();
-                if (dataTypeDef.getName().equals(DataTypeDefinition.ANY))
+                PropertyDefinition propDef = dictionaryService.getProperty(property);
+                DataTypeDefinition dataTypeDef = (propDef == null) ? null : propDef.getDataType();
+                if (dataTypeDef == null || dataTypeDef.getName().equals(DataTypeDefinition.ANY))
                 {
                     dataTypeDef = dictionaryService.getDataType(value.getClass());
                     if (dataTypeDef != null)
@@ -356,13 +368,14 @@ import org.xml.sax.helpers.AttributesImpl;
     {
         try
         {
-            DataTypeDefinition dataTypeDef = dictionaryService.getProperty(property).getDataType();
+            PropertyDefinition propDef = dictionaryService.getProperty(property);
+            DataTypeDefinition dataTypeDef = (propDef == null) ? null : propDef.getDataType();
             
             for (Object value : values)
             {
                 // determine data type of value
                 QName valueDataType = null;
-                if (dataTypeDef.getName().equals(DataTypeDefinition.ANY))
+                if (dataTypeDef == null || dataTypeDef.getName().equals(DataTypeDefinition.ANY))
                 {
                     dataTypeDef = (value == null) ? null : dictionaryService.getDataType(value.getClass());
                     if (dataTypeDef != null)
