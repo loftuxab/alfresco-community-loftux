@@ -54,7 +54,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class SpringAwareUserTransaction extends TransactionSynchronizationAdapter implements UserTransaction
 {
     /*
-     * The transaction status is stored in a threadlocal for two reasons:
+     * The transaction status is stored internally and the thread ID is recorded:
      * 
      * 1. We can detect whether a transaction has been started or not, whereas
      *    transactionManager.getTransaction will return a new transaction if
@@ -72,11 +72,10 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
 
     private PlatformTransactionManager transactionManager;
     private DefaultTransactionDefinition transactionDef;
-    /**
-     * Stores the transaction status.  This is thread local in order to detect illegal
-     * use of this instance by multiple threads.
-     */
-    private ThreadLocal<TransactionStatus> threadLocalTxnStatus;
+    /** the id of the thread that started this transaction */
+    private long txnThreadId;
+    /** Stores the transaction status. */
+    private TransactionStatus txnStatus;
     /** Stores the user transaction current status */
     private int status = Status.STATUS_NO_TRANSACTION;
     
@@ -92,8 +91,22 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
         this.transactionManager = transactionManager;
         transactionDef = new DefaultTransactionDefinition();
         transactionDef.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        
+        // set the creation thread ID that.  All operations must be performed with this thread.
+        txnThreadId = Thread.currentThread().getId();
     }
     
+    /**
+     * Check that this instance has not been used by another thread.
+     */
+    private void checkThreadId()
+    {
+        if (Thread.currentThread().getId() != txnThreadId)
+        {
+            throw new RuntimeException("UserTransaction may not be accessed by multiple threads");
+        }
+    }
+
     /**
      * Set the propagation mode for when the transaction is started.  The constants are
      * defined by the {@link TransactionDefinition SpringFramework}. 
@@ -104,12 +117,16 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
      */
     public void setPropagationBehviour(int propagationBehaviour)
     {
+        checkThreadId();
+        
         transactionDef.setPropagationBehavior(propagationBehaviour);
     }
 
     @Override
     public void afterCompletion(int status)
     {
+        checkThreadId();
+        
         switch (status)
         {
             case TransactionSynchronization.STATUS_ROLLED_BACK:
@@ -126,20 +143,10 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
 
     public synchronized int getStatus() throws SystemException
     {
-        if (threadLocalTxnStatus == null)
-        {
-            // no txn started
-            return Status.STATUS_NO_TRANSACTION;
-        }
-        // check that this instance has not been used by another thread
-        TransactionStatus txnStatus = threadLocalTxnStatus.get();
-        if (txnStatus == null)
-        {
-            throw new RuntimeException("UserTransaction may not be accessed by multiple threads");
-        }
+        checkThreadId();
         
         // ensure that our internal status is in synch with the Spring txn
-        if (txnStatus.isRollbackOnly())
+        if (txnStatus != null && txnStatus.isRollbackOnly())
         {
             status = Status.STATUS_MARKED_ROLLBACK;
         }
@@ -148,7 +155,9 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
 
     public void setTransactionTimeout(int timeout) throws SystemException
     {
-        if (threadLocalTxnStatus != null)
+        checkThreadId();
+        
+        if (txnStatus != null)
         {
             throw new RuntimeException("Can only set the timeout before begin");
         }
@@ -157,17 +166,11 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
 
     public synchronized void setRollbackOnly() throws IllegalStateException, SystemException
     {
-        if (threadLocalTxnStatus == null)
-        {
-            throw new IllegalStateException("Can only force rollback after a begin");
-        }
-        // check that this instance has not been used by another thread
-        TransactionStatus txnStatus = threadLocalTxnStatus.get();
+        checkThreadId();
+        
         if (txnStatus == null)
         {
-            // no need to clean up the transaction - this thread wasn't the one that
-            // started it
-            throw new RuntimeException("UserTransaction may not be accessed by multiple threads");
+            throw new IllegalStateException("Can only force rollback after a begin");
         }
         txnStatus.setRollbackOnly();
         status = Status.STATUS_MARKED_ROLLBACK;
@@ -183,16 +186,15 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
      */
     public synchronized void begin() throws NotSupportedException, SystemException
     {
-        if (threadLocalTxnStatus != null)
+        checkThreadId();
+        
+        if (txnStatus != null)
         {
             throw new NotSupportedException("The UserTransaction may not be reused");
         }
         
         // begin a transaction
-        TransactionStatus txnStatus = transactionManager.getTransaction(transactionDef);
-        // store the transaction status - we have successfully started/entered a transaction
-        threadLocalTxnStatus = new ThreadLocal<TransactionStatus>();
-        threadLocalTxnStatus.set(txnStatus);
+        txnStatus = transactionManager.getTransaction(transactionDef);
         status = Status.STATUS_ACTIVE;
         
         // register this UserTransaction as a synchronization so that we get the
@@ -213,21 +215,14 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
             throws RollbackException, HeuristicMixedException, HeuristicRollbackException,
             SecurityException, IllegalStateException, SystemException
     {
-        if (threadLocalTxnStatus == null)
-        {
-            throw new IllegalStateException("Can only call commit after a begin");
-        }
-        // check that this instance has not been used by another thread
-        TransactionStatus txnStatus = threadLocalTxnStatus.get();
-        if (txnStatus == null)
-        {
-            // no need to clean up the transaction - this thread wasn't the one that
-            // started it
-            throw new RuntimeException("UserTransaction may not be accessed by multiple threads");
-        }
+        checkThreadId();
         
         // check the status
-        if (status == Status.STATUS_ROLLING_BACK || status == Status.STATUS_ROLLEDBACK)
+        if (txnStatus == null || status == Status.STATUS_NO_TRANSACTION)
+        {
+            throw new IllegalStateException("The transaction has not yet begun");
+        }
+        else if (status == Status.STATUS_ROLLING_BACK || status == Status.STATUS_ROLLEDBACK)
         {
             throw new RollbackException("The transaction has already been rolled back");
         }
@@ -251,6 +246,11 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
             }
             // will commit or rollback
             transactionManager.commit(txnStatus);
+            // dereference to clean resources
+            txnStatus = null;
+            transactionManager = null;
+            transactionDef = null;
+            
             if (willCommit)
             {
                 status = Status.STATUS_COMMITTED;
@@ -279,17 +279,11 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
     public synchronized void rollback()
             throws IllegalStateException, SecurityException, SystemException
     {
-        if (threadLocalTxnStatus == null)
-        {
-            throw new IllegalStateException("Can only call rollback after a begin");
-        }
-        // check that this instance has not been used by another thread
-        TransactionStatus txnStatus = threadLocalTxnStatus.get();
+        checkThreadId();
+        
         if (txnStatus == null)
         {
-            // no need to clean up the transaction - this thread wasn't the one that
-            // started it
-            throw new RuntimeException("UserTransaction may not be accessed by multiple threads");
+            throw new IllegalStateException("Can only call rollback after a begin");
         }
         
         // check the status
@@ -304,6 +298,11 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
         
         // we definitely began a transaction on this thread
         transactionManager.rollback(txnStatus);
+        // dereference to clean resources
+        txnStatus = null;
+        transactionManager = null;
+        transactionDef = null;
+        
         status = Status.STATUS_ROLLEDBACK;
         
         // done
