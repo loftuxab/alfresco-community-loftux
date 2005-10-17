@@ -64,8 +64,8 @@ public class TransactionComponentTest extends TestCase
         txnInner.rollback();
         
         // check both transactions' status
-        assertEquals("Inner txn not marked rolled back", Status.STATUS_MARKED_ROLLBACK, txnInner.getStatus());
-        assertEquals("Outer txn not marked for rolled back", Status.STATUS_MARKED_ROLLBACK, txnInner.getStatus());
+        assertEquals("Inner txn not marked rolled back", Status.STATUS_ROLLEDBACK, txnInner.getStatus());
+        assertEquals("Outer txn not marked for rolled back", Status.STATUS_MARKED_ROLLBACK, txnOuter.getStatus());
         
         try
         {
@@ -75,6 +75,7 @@ public class TransactionComponentTest extends TestCase
         catch (RollbackException e)
         {
             // expected
+            txnOuter.rollback();
         }
     }
     
