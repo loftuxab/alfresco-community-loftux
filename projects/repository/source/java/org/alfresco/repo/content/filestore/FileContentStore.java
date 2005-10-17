@@ -271,6 +271,11 @@ public class FileContentStore extends AbstractContentStore
     private void listUrls(File directory, List<String> contentUrls)
     {
         File[] files = directory.listFiles();
+        if (files == null)
+        {
+            // the directory has disappeared
+            throw new ContentIOException("Failed list files in folder: " + directory);
+        }
         for (File file : files)
         {
             if (file.isDirectory())
