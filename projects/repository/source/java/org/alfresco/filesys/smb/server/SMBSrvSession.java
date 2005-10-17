@@ -1569,8 +1569,20 @@ public class SMBSrvSession extends SrvSession implements Runnable
                 
                 if ( tx != null)
                 {
-                    tx.commit();
-                    tx = null;
+                    try
+                    {
+                        // Commit the transaction
+
+                        tx.commit();
+                        tx = null;
+                    }
+                    catch ( Exception ex)
+                    {
+                        // Debug
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Error committing transaction", ex);
+                    }
                 }
                 
                 // Give up the CPU

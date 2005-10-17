@@ -1600,6 +1600,13 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
             netFile.setClosed(true);
         }
+        catch (AccessDeniedException ex)
+        {
+            // Not allowed to delete the file, when delete on close flag is set
+
+            m_sess.sendErrorResponseSMB(SMBStatus.NTAccessDenied, SMBStatus.DOSAccessDenied, SMBStatus.ErrDos);
+            return;
+        }
         catch (InvalidDeviceInterfaceException ex)
         {
 
