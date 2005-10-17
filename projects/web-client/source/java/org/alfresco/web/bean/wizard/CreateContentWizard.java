@@ -19,6 +19,7 @@ package org.alfresco.web.bean.wizard;
 import java.util.ResourceBundle;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
@@ -32,6 +33,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CreateContentWizard extends BaseContentWizard
 {
+   private static final String CONTENT_TEXT = "txt";
+   private static final String CONTENT_HTML = "html";
+
    private static Log logger = LogFactory.getLog(CreateContentWizard.class);
 
    // TODO: retrieve these from the config service
@@ -41,9 +45,12 @@ public class CreateContentWizard extends BaseContentWizard
    private static final String STEP1_DESCRIPTION_ID = "create_content_step1_desc";
    private static final String STEP2_TITLE_ID = "create_content_step2_title";
    private static final String STEP2_DESCRIPTION_ID = "create_content_step2_desc";
+   private static final String STEP3_TITLE_ID = "create_content_step3_title";
+   private static final String STEP3_DESCRIPTION_ID = "create_content_step3_desc";
    
    // create content wizard specific properties
    private String content;
+   private String createType = CONTENT_HTML;
    
    
    /**
@@ -93,6 +100,11 @@ public class CreateContentWizard extends BaseContentWizard
          }
          case 3:
          {
+            stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), STEP3_DESCRIPTION_ID);
+            break;
+         }
+         case 4:
+         {
             stepDesc = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_DESCRIPTION_ID);
             break;
          }
@@ -125,6 +137,11 @@ public class CreateContentWizard extends BaseContentWizard
             break;
          }
          case 3:
+         {
+            stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), STEP3_TITLE_ID);
+            break;
+         }
+         case 4:
          {
             stepTitle = Application.getMessage(FacesContext.getCurrentInstance(), SUMMARY_TITLE_ID);
             break;
@@ -162,10 +179,6 @@ public class CreateContentWizard extends BaseContentWizard
       super.init();
       
       this.content = null;
-      this.fileName = "newfile.html";
-      this.contentType = Repository.getMimeTypeForFileName(
-               FacesContext.getCurrentInstance(), this.fileName);
-      this.title = this.fileName;
       
       // created content is inline editable by default
       this.inlineEdit = true;
@@ -198,15 +211,32 @@ public class CreateContentWizard extends BaseContentWizard
       {
          case 1:
          {
-            outcome = "create";
+            outcome = "select";
             break;
          }
          case 2:
          {
-            outcome = "properties";
+            if (getCreateType().equals(CONTENT_HTML))
+            {
+               outcome = "create-html";
+            }
+            else if (getCreateType().equals(CONTENT_TEXT))
+            {
+               outcome = "create-text";
+            }
             break;
          }
          case 3:
+         {
+            this.fileName = "newfile." + getCreateType();
+            this.contentType = Repository.getMimeTypeForFileName(
+                  FacesContext.getCurrentInstance(), this.fileName);
+            this.title = this.fileName;
+            
+            outcome = "properties";
+            break;
+         }
+         case 4:
          {
             outcome = "summary";
             break;
@@ -218,5 +248,30 @@ public class CreateContentWizard extends BaseContentWizard
       }
       
       return outcome;
+   }
+   
+   /**
+    * Create content type value changed by the user
+    */
+   public void createContentChanged(ValueChangeEvent event)
+   {
+      // clear the content as HTML is not compatible with the plain text box etc.
+      this.content = null;
+   }
+
+   /**
+    * @return Returns the createType.
+    */
+   public String getCreateType()
+   {
+      return this.createType;
+   }
+
+   /**
+    * @param createType The createType to set.
+    */
+   public void setCreateType(String createType)
+   {
+      this.createType = createType;
    }
 }

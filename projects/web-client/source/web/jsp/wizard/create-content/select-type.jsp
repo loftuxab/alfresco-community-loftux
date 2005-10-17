@@ -26,42 +26,13 @@
 
 <r:page titleId="title_create_content">
 
-<script language="javascript" type="text/javascript" src="<%=request.getContextPath()%>/scripts/tiny_mce/tiny_mce.js"></script>
-<script language="javascript" type="text/javascript">
-
-   <%-- Init the Tiny MCE in-line HTML editor --%>
-   tinyMCE.init({
-   	theme : "advanced",
-   	mode : "exact",
-   	elements : "editor",
-   	save_callback : "saveContent",
-		plugins : "table",
-		theme_advanced_toolbar_location : "top",
-		theme_advanced_toolbar_align : "left",
-		theme_advanced_buttons1_add : "fontselect,fontsizeselect",
-		theme_advanced_buttons2_add : "separator,forecolor,backcolor",
-		theme_advanced_buttons3_add_before : "tablecontrols,separator",
-		theme_advanced_disable: "styleselect",
-		extended_valid_elements : "a[href|target|name],font[face|size|color|style],span[class|align|style]"
-   });
-   
-   function saveContent(id, content)
-   {
-      document.forms['create-file']['create-file:editorOutput'].value = content;
-   }
-   
-   var isIE = (document.all);
-   
-</script>
-
-
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form acceptCharset="UTF-8" id="create-file">
+   <h:form acceptCharset="UTF-8" id="select-type">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -128,22 +99,40 @@
                               <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="1" disabled="true">
-                                 <a:listItem value="1" label="1. #{msg.enter_content}" />
-                                 <a:listItem value="2" label="2. #{msg.properties}" />
-                                 <a:listItem value="3" label="3. #{msg.summary}" />
+                                 <a:listItem value="1" label="1. #{msg.select_type}" />
+                                 <a:listItem value="2" label="2. #{msg.enter_content}" />
+                                 <a:listItem value="3" label="3. #{msg.properties}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                            
                            <td width="100%" valign="top" height="100%">
-                              
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
                               
-                              <div id='editor' style='width:100%; height:360px'>
-                                 <h:outputText value="#{CreateContentWizard.content}" escape="false" />
-                              </div>
-                              <h:inputHidden id="editorOutput" value="#{CreateContentWizard.content}" />
-                              
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                                 <tr>
+                                    <td class="mainSubTitle"><h:outputText value="#{CreateContentWizard.stepTitle}" /></td>
+                                 </tr>
+                                 <tr>
+                                    <td class="mainSubText"><h:outputText value="#{CreateContentWizard.stepDescription}" /></td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td>
+                                       <h:selectOneRadio value="#{CreateContentWizard.createType}" layout="pageDirection" valueChangeListener="#{CreateContentWizard.createContentChanged}">
+                                          <f:selectItem itemValue="html" itemLabel="#{msg.html_content}" />
+                                          <f:selectItem itemValue="txt" itemLabel="#{msg.text_content}" />
+                                       </h:selectOneRadio>
+                                    </td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td><h:outputText value="#{CreateContentWizard.stepInstructions}" /></td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
                            
                            <td valign="top">

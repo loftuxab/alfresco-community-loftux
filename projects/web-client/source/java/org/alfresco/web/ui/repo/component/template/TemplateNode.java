@@ -237,7 +237,7 @@ public class TemplateNode extends Node
    {
       if (displayPath == null)
       {
-         displayPath = Repository.getDisplayPath(this.nodeService.getPath(this.nodeRef));
+         displayPath = Repository.getDisplayPath(this.nodeService.getPath(this.nodeRef), this.nodeService);
       }
       
       return displayPath;

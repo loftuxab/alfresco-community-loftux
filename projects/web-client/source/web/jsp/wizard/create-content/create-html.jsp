@@ -24,42 +24,36 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_new_user_user_props">
+<r:page titleId="title_create_content">
 
-<script language="JavaScript1.2">
+<script language="javascript" type="text/javascript" src="<%=request.getContextPath()%>/scripts/tiny_mce/tiny_mce.js"></script>
+<script language="javascript" type="text/javascript">
 
-   window.onload = pageLoaded;
+   <%-- Init the Tiny MCE in-line HTML editor --%>
+   tinyMCE.init({
+   	theme : "advanced",
+   	mode : "exact",
+   	elements : "editor",
+   	save_callback : "saveContent",
+		plugins : "table",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_buttons1_add : "fontselect,fontsizeselect",
+		theme_advanced_buttons2_add : "separator,forecolor,backcolor",
+		theme_advanced_buttons3_add_before : "tablecontrols,separator",
+		theme_advanced_disable: "styleselect",
+		extended_valid_elements : "a[href|target|name],font[face|size|color|style],span[class|align|style]"
+   });
    
-   function pageLoaded()
+   function saveContent(id, content)
    {
-      document.getElementById("user-props:userName").focus();
-      updateButtonState();
+      document.forms['create-html']['create-html:editorOutput'].value = content;
    }
-
-   function updateButtonState()
-   {
-      if (document.getElementById("user-props:password") != null &&
-          document.getElementById("user-props:password").disabled == false)
-      {
-         if (document.getElementById("user-props:userName").value.length == 0 ||
-             document.getElementById("user-props:password").value.length == 0)
-         {
-            document.getElementById("user-props:finish-button").disabled = true;
-            document.getElementById("user-props:next-button").disabled = true;
-         }
-         else
-         {
-            document.getElementById("user-props:finish-button").disabled = false;
-            document.getElementById("user-props:next-button").disabled = false;
-         }
-      }
-      else
-      {
-         document.getElementById("user-props:finish-button").disabled = false;
-         document.getElementById("user-props:next-button").disabled = false;
-      }
-   }
+   
+   var isIE = (document.all);
+   
 </script>
+
 
 <f:view>
    
@@ -67,7 +61,7 @@
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
    <%-- set the form name here --%>
-   <h:form acceptCharset="UTF-8" id="user-props">
+   <h:form acceptCharset="UTF-8" id="create-html">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -102,12 +96,12 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/new_user_large.gif" />
+                              <h:graphicImage id="wizard-logo" url="/images/icons/new_content_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainTitle"><h:outputText value="#{NewUserWizard.wizardTitle}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{NewUserWizard.wizardDescription}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{CreateContentWizard.wizardTitle}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{CreateContentWizard.wizardDescription}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -126,7 +120,7 @@
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
+                  <td height="100%">
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="20%" valign="top">
@@ -134,68 +128,23 @@
                               <h:outputText styleClass="mainSubTitle" value="#{msg.steps}"/><br>
                               <a:modeList itemSpacing="3" iconColumnWidth="2" selectedStyleClass="statusListHighlight"
                                     value="2" disabled="true">
-                                 <a:listItem value="1" label="1. #{msg.person_properties}" />
-                                 <a:listItem value="2" label="2. #{msg.user_properties}" />
-                                 <a:listItem value="3" label="3. #{msg.summary}" />
+                                 <a:listItem value="1" label="1. #{msg.select_type}" />
+                                 <a:listItem value="2" label="2. #{msg.enter_content}" />
+                                 <a:listItem value="3" label="3. #{msg.properties}" />
+                                 <a:listItem value="4" label="4. #{msg.summary}" />
                               </a:modeList>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
                            
-                           <td width="100%" valign="top">
+                           <td width="100%" valign="top" height="100%">
                               
                               <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
                               
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
-                                 <tr>
-                                    <td colspan="2" class="mainSubTitle"><h:outputText value="#{NewUserWizard.stepTitle}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td colspan="2" class="mainSubText"><h:outputText value="#{NewUserWizard.stepDescription}" /></td>
-                                 </tr>
-                                 
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.user_properties}"/></td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.username}"/>:</td>
-                                    <td>
-                                       <h:inputText id="userName" value="#{NewUserWizard.userName}" size="35" maxlength="1024" validator="#{LoginBean.validateUsername}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" />&nbsp;*
-                                       &nbsp;<h:message id="errors1" for="userName" style="color:red" />
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.password}"/>:</td>
-                                    <td>
-                                       <h:inputSecret id="password" value="#{NewUserWizard.password}" size="35" maxlength="1024" validator="#{LoginBean.validatePassword}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" redisplay="true" />&nbsp;*
-                                       &nbsp;<h:message id="errors2" for="password" style="color:red" />
-                                    </td>
-                                 </tr>
-                                 
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.homespace}"/></td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.home_space_location}"/>:</td>
-                                    <td>
-                                       <r:spaceSelector label="#{msg.select_home_space_prompt}" value="#{NewUserWizard.homeSpaceLocation}" initialSelection="#{NavigationBean.currentNodeId}" style="border: 1px dashed #cccccc; padding: 2px;"/>
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.home_space_name}"/>:</td>
-                                    <td>
-                                       <h:inputText id="homeSpaceName" value="#{NewUserWizard.homeSpaceName}" size="35" maxlength="1024" onkeyup="updateButtonState();" />
-                                    </td>
-                                 </tr>
-                                 
-                                 <tr><td colspan="2" class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td colspan="2"><h:outputText value="#{NewUserWizard.stepInstructions}" /></td>
-                                 </tr>
-                              </table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
+                              <div id='editor' style='width:100%; height:360px'>
+                                 <h:outputText value="#{CreateContentWizard.content}" escape="false" />
+                              </div>
+                              <h:inputHidden id="editorOutput" value="#{CreateContentWizard.content}" />
+                              
                            </td>
                            
                            <td valign="top">
@@ -203,23 +152,23 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.next_button}" id="next-button" action="#{NewUserWizard.next}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.next_button}" action="#{CreateContentWizard.next}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.back_button}" action="#{NewUserWizard.back}" styleClass="wizardButton" immediate="true" />
+                                       <h:commandButton value="#{msg.back_button}" action="#{CreateContentWizard.back}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.finish_button}" id="finish-button" action="#{NewUserWizard.finish}" styleClass="wizardButton" disabled="true" />
+                                       <h:commandButton value="#{msg.finish_button}" action="#{CreateContentWizard.finish}" styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr><td class="wizardButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel_button}" action="#{NewUserWizard.cancel}" styleClass="wizardButton" immediate="true" />
+                                       <h:commandButton value="#{msg.cancel_button}" action="#{CreateContentWizard.cancel}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -227,6 +176,16 @@
                            </td>
                         </tr>
                      </table>
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
+               </tr>
+               
+               <%-- Error Messages --%>
+               <tr valign="top">
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
+                  <td>
+                     <%-- messages tag to show messages not handled by other specific message tags --%>
+                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
@@ -246,9 +205,5 @@
     </h:form>
     
 </f:view>
-
-<script>
-   updateButtonState();
-</script>
 
 </r:page>

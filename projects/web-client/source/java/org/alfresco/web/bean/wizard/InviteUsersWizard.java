@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.bean.users.UserMembersBean.PermissionWrapper;
@@ -669,8 +670,10 @@ public class InviteUsersWizard extends AbstractWizardBean
          
          String personName = Application.getCurrentUser(context).getFullName(getNodeService());
          String msgInvite = Application.getMessage(context, MSG_INVITED_SPACE);
+         Node node = getNavigator().getCurrentNode();
+         String path = Repository.getDisplayPath(this.nodeService.getPath(node.getNodeRef()), this.nodeService);
          buf.append(MessageFormat.format(msgInvite, new Object[] {
-               getNavigator().getNodeProperties().get("name"),
+               path + '/' + node.getName(),
                personName}) );
          
          this.internalSubject = buf.toString();
@@ -678,7 +681,16 @@ public class InviteUsersWizard extends AbstractWizardBean
          buf.append("<br>");
          
          String msgRole = Application.getMessage(context, MSG_INVITED_ROLE);
-         String roleText = MessageFormat.format(msgRole, "[role]");
+         String roleText;
+         if (this.userGroupRoles.size() != 0)
+         {
+            String roleMsg = Application.getMessage(context, userGroupRoles.get(0).getRole());
+            roleText = MessageFormat.format(msgRole, roleMsg);
+         }
+         else
+         {
+            roleText = MessageFormat.format(msgRole, "[role]");
+         }
          
          buf.append(roleText);
          

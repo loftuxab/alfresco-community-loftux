@@ -255,7 +255,8 @@ public final class Repository
    }
    
    /**
-    * Return the human readable form of the specified node Path
+    * Return the human readable form of the specified node Path. Fast version of the method that
+    * simply converts QName localname components to Strings.
     * 
     * @param path    Path to extract readable form from, excluding the final element
     * 
@@ -265,19 +266,14 @@ public final class Repository
    {
       StringBuilder buf = new StringBuilder(64);
       
-      // construct the path to this Node
       for (int i=0; i<path.size()-1; i++)
       {
-         String elementString;
+         String elementString = null;
          Path.Element element = path.get(i);
          if (element instanceof Path.ChildAssocElement)
          {
             ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
-            if (elementRef.getParentRef() == null)
-            {
-               elementString = "/";
-            }
-            else
+            if (elementRef.getParentRef() != null)
             {
                elementString = elementRef.getQName().getLocalName().replace('_', ' ');
             }
@@ -287,11 +283,61 @@ public final class Repository
             elementString = element.getElementString();
          }
          
-         if (buf.length() > 1)
+         if (elementString != null)
          {
-            buf.append('/');
+            buf.append("/");
+            buf.append(elementString);
          }
-         buf.append(elementString);
+      }
+      
+      return buf.toString();
+   }
+   
+   /**
+    * Return the human readable form of the specified node Path. Slow version of the method
+    * that extracts the name of each node in the Path from the supplied NodeService.
+    * 
+    * @param path    Path to extract readable form from, excluding the final element
+    * 
+    * @return human readable form of the Path excluding the final element
+    */
+   public static String getDisplayPath(Path path, NodeService nodeService)
+   {
+      StringBuilder buf = new StringBuilder(64);
+      
+      for (int i=0; i<path.size()-1; i++)
+      {
+         String elementString = null;
+         Path.Element element = path.get(i);
+         if (element instanceof Path.ChildAssocElement)
+         {
+            ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
+            if (elementRef.getParentRef() != null)
+            {
+               elementString = Repository.getNameForNode(nodeService, elementRef.getChildRef());
+               Serializable nameProp = nodeService.getProperty(elementRef.getChildRef(), ContentModel.PROP_NAME);
+               if (nameProp != null)
+               {
+                  // use the name property if we find it
+                  elementString = nameProp.toString();
+               }
+               else
+               {
+                  // revert to using QName replacement if not found
+                  elementString = elementRef.getQName().getLocalName().replace('_', ' ');
+               }
+            }
+         }
+         else
+         {
+            elementString = element.getElementString();
+         }
+         
+         if (elementString != null)
+         {
+            buf.append("/");
+            buf.append(elementString);
+         }
       }
       
       return buf.toString();

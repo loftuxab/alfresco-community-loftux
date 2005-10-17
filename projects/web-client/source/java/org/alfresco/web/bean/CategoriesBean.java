@@ -16,10 +16,12 @@
  */
 package org.alfresco.web.bean;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.CategoryService.Depth;
 import org.alfresco.service.cmr.search.CategoryService.Mode;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
@@ -433,10 +436,11 @@ public class CategoriesBean implements IContextListener
          {
             ref = this.categoryService.createCategory(categoryRef, this.name);
          }
-         if (this.description != null)
-         {
-            this.nodeService.setProperty(ref, ContentModel.PROP_DESCRIPTION, this.description);
-         }
+         
+         // apply the titled aspect - for description
+         Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(1, 1.0f);
+         titledProps.put(ContentModel.PROP_DESCRIPTION, this.description);
+         this.nodeService.addAspect(ref, ContentModel.ASPECT_TITLED, titledProps);
          
          // commit the transaction
          tx.commit();
@@ -470,7 +474,18 @@ public class CategoriesBean implements IContextListener
          // update the category node
          NodeRef nodeRef = getActionCategory().getNodeRef();
          this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, this.name);
-         this.nodeService.setProperty(nodeRef, ContentModel.PROP_DESCRIPTION, this.description);
+         
+         // apply the titled aspect - for description
+         if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_TITLED) == false)
+         {
+            Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(1, 1.0f);
+            titledProps.put(ContentModel.PROP_DESCRIPTION, this.description);
+            this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_TITLED, titledProps);
+         }
+         else
+         {
+            this.nodeService.setProperty(nodeRef, ContentModel.PROP_DESCRIPTION, this.description);
+         }
          
          // commit the transaction
          tx.commit();

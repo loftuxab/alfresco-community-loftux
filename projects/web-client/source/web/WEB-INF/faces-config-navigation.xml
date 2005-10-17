@@ -103,7 +103,7 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>createContent</from-outcome>
-         <to-view-id>/jsp/wizard/create-content/create.jsp</to-view-id>
+         <to-view-id>/jsp/wizard/create-content/select-type.jsp</to-view-id>
       </navigation-case>
       <!-- showDocDetails and showSpaceDetails moved to /jsp/* above -->
       <navigation-case>
@@ -557,8 +557,16 @@
    <navigation-rule>
       <from-view-id>/jsp/wizard/create-content/*</from-view-id>
       <navigation-case>
-         <from-outcome>create</from-outcome>
-         <to-view-id>/jsp/wizard/create-content/create.jsp</to-view-id>
+         <from-outcome>select</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/select-type.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>create-html</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/create-html.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>create-text</from-outcome>
+         <to-view-id>/jsp/wizard/create-content/create-text.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>properties</from-outcome>
