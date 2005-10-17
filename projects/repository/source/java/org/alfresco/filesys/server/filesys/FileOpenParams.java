@@ -391,6 +391,17 @@ public class FileOpenParams
     }
 
     /**
+     * Check for a particular access mode
+     * 
+     * @param mode int
+     * @return boolean
+     */
+    public final boolean hasAccessMode(int mode)
+    {
+        return (m_accessMode & mode) == mode ? true : false;
+    }
+    
+    /**
      * Determine if the target of the create/open is a directory
      * 
      * @return boolean

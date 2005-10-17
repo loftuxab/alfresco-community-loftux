@@ -28,6 +28,7 @@ import org.alfresco.filesys.server.SrvSession;
 import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.filesys.AccessDeniedException;
+import org.alfresco.filesys.server.filesys.AccessMode;
 import org.alfresco.filesys.server.filesys.DiskDeviceContext;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
@@ -48,6 +49,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -76,6 +79,7 @@ public class ContentDiskDriver implements ContentDiskInterface
     private SearchService unprotectedSearchService;
     private ContentService contentService;
     private MimetypeService mimetypeService;
+    private PermissionService permissionService;
 
     private String shareName;
     private NodeRef rootNodeRef;
@@ -159,6 +163,16 @@ public class ContentDiskDriver implements ContentDiskInterface
     public void setTransactionService(TransactionService transactionService)
     {
         this.transactionService = transactionService;
+    }
+
+    /**
+     * Set the permission service
+     * 
+     * @param permissionService PermissionService
+     */
+    public void setPermissionService(PermissionService permissionService)
+    {
+        this.permissionService = permissionService;
     }
     
     /**
@@ -295,29 +309,69 @@ public class ContentDiskDriver implements ContentDiskInterface
             }
             throw e;
         }
-        catch (Throwable e)
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
         {
-            throw new AlfrescoRuntimeException("Failed to get file information: \n" +
-                    "   device: " + tree.getContext().getDeviceName() + "\n" +
-                    "   path: " + path,
-                    e);
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Get file info - access denied, " + path);
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Get file information " + path);
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Get file info error", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Get file information " + path);
         }
     }
 
     public SearchContext startSearch(SrvSession sess, TreeConnection tree, String searchPath, int attributes) throws FileNotFoundException
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-        
-        SearchContext ctx = ContentSearchContext.search(transactionService, cifsHelper, deviceRootNodeRef, searchPath, attributes);
-        // done
-        if (logger.isDebugEnabled())
+        try
         {
-            logger.debug("Started search: \n" +
-                    "   search path: " + searchPath + "\n" +
-                    "   attributes: " + attributes);
+            // get the device root
+            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+            
+            SearchContext ctx = ContentSearchContext.search(transactionService, cifsHelper, deviceRootNodeRef, searchPath, attributes);
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Started search: \n" +
+                        "   search path: " + searchPath + "\n" +
+                        "   attributes: " + attributes);
+            }
+            return ctx;
         }
-        return ctx;
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Start search - access denied, " + searchPath);
+            
+            // Convert to a file not found status
+            
+            throw new FileNotFoundException("Start search " + searchPath);
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Start search", ex);
+            
+            // Convert to a file not found status
+            
+            throw new FileNotFoundException("Start search " + searchPath);
+        }
     }
 
     /**
@@ -348,42 +402,106 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
         catch (IOException e)
         {
-            throw new AlfrescoRuntimeException("Failed to check for existence: " +
-                    "   device: " + tree.getContext().getDeviceName() + "\n" +
-                    "   name: " + name,
-                    e);
+            // Debug
+            
+            logger.debug("File exists error, " + name, e);
+            
+            status = FileStatus.NotExist;
         }
+
         // done
         if (logger.isDebugEnabled())
         {
-            logger.debug("File status determinded: \n" +
+            logger.debug("File status determined: \n" +
                     "   name: " + name + "\n" +
                     "   status: " + status);
         }
         return status;
     }
     
+    /**
+     * Open a file or folder
+     * 
+     * @param sess SrvSession
+     * @param tree TreeConnection
+     * @param params FileOpenParams
+     * @return NetworkFile
+     * @exception IOException
+     */
     public NetworkFile openFile(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-        
-        String path = params.getPath(); 
-
-        // get the file info
-        NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, path);
-        
-        NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
-        // done
-        if (logger.isDebugEnabled())
+        try
         {
-            logger.debug("Opened network file: \n" +
-                    "   path: " + path + "\n" +
-                    "   file open parameters: " + params + "\n" +
-                    "   network file: " + netFile);
-        }
+            // Get the device root
+            
+            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+            
+            String path = params.getPath(); 
+    
+            // Get the file/folder node
+            
+            NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, path);
+            
+            // Check permissions on the file/folder node
+            //
+            // Check for read access
+            
+            if ( params.hasAccessMode(AccessMode.NTRead) &&
+                    permissionService.hasPermission(nodeRef, PermissionService.READ) == AccessStatus.DENIED)
+                throw new AccessDeniedException("No read access to " + params.getFullPath());
+                
+            // Check for write access
+            
+            if ( params.hasAccessMode(AccessMode.NTWrite) &&
+                    permissionService.hasPermission(nodeRef, PermissionService.WRITE) == AccessStatus.DENIED)
+                throw new AccessDeniedException("No write access to " + params.getFullPath());
+            
+            // Check for delete access
+            
+            if ( params.hasAccessMode(AccessMode.NTDelete) &&
+                    permissionService.hasPermission(nodeRef, PermissionService.DELETE) == AccessStatus.DENIED)
+                throw new AccessDeniedException("No delete access to " + params.getFullPath());
+            
+            // Create the network file
+            
+            NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
+            
+            // Debug
+            
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Opened network file: \n" +
+                        "   path: " + path + "\n" +
+                        "   file open parameters: " + params + "\n" +
+                        "   network file: " + netFile);
+            }
 
-        return netFile;
+            // Return the network file
+            
+            return netFile;
+        }
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Open file - access denied, " + params.getFullPath());
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Open file " + params.getFullPath());
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Open file error", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Open file " + params.getFullPath());
+        }
     }
     
     /**
@@ -391,46 +509,97 @@ public class ContentDiskDriver implements ContentDiskInterface
      */
     public NetworkFile createFile(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-        
-        String path = params.getPath(); 
-        boolean isFile = !params.isDirectory();
-        
-        // create it - the path will be created, if necessary
-        NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
-        
-        // create the network file
-        NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
-        // done
-        if (logger.isDebugEnabled())
+        try
         {
-            logger.debug("Created file: \n" +
-                    "   path: " + path + "\n" +
-                    "   file open parameters: " + params + "\n" +
-                    "   node: " + nodeRef + "\n" +
-                    "   network file: " + netFile);
+            // get the device root
+            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+            
+            String path = params.getPath(); 
+            boolean isFile = !params.isDirectory();
+            
+            // create it - the path will be created, if necessary
+            NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
+            
+            // create the network file
+            NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Created file: \n" +
+                        "   path: " + path + "\n" +
+                        "   file open parameters: " + params + "\n" +
+                        "   node: " + nodeRef + "\n" +
+                        "   network file: " + netFile);
+            }
+            return netFile;
         }
-        return netFile;
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Create file - access denied, " + params.getFullPath());
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Create file " + params.getFullPath());
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Create file error", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Create file " + params.getFullPath());
+        }
+        
     }
 
     public void createDirectory(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-        
-        String path = params.getPath(); 
-        boolean isFile = !params.isDirectory();
-        
-        // create it - the path will be created, if necessary
-        NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
-        // done
-        if (logger.isDebugEnabled())
+        try
         {
-            logger.debug("Created directory: \n" +
-                    "   path: " + path + "\n" +
-                    "   file open params: " + params + "\n" +
-                    "   node: " + nodeRef);
+            // get the device root
+            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+            
+            String path = params.getPath(); 
+            boolean isFile = !params.isDirectory();
+            
+            // create it - the path will be created, if necessary
+            NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Created directory: \n" +
+                        "   path: " + path + "\n" +
+                        "   file open params: " + params + "\n" +
+                        "   node: " + nodeRef);
+            }
+        }
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Create directory - access denied, " + params.getFullPath());
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Create directory " + params.getFullPath());
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Create directory error", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Create directory " + params.getFullPath());
         }
     }
 
@@ -464,6 +633,28 @@ public class ContentDiskDriver implements ContentDiskInterface
                         "   directory: " + dir);
             }
         }
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Delete directory - access denied, " + dir);
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Delete directory " + dir);
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Delete directory", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Delete directory " + dir);
+        }
     }
 
     public void flushFile(SrvSession sess, TreeConnection tree, NetworkFile file) throws IOException
@@ -487,7 +678,23 @@ public class ContentDiskDriver implements ContentDiskInterface
             // we don't know how long the network file has had the reference, so check for existence
             if (nodeService.exists(nodeRef))
             {
-                nodeService.deleteNode(nodeRef);
+                try
+                {
+                    // Delete the file
+                    
+                    nodeService.deleteNode(nodeRef);
+                }
+                catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+                {
+                    // Debug
+                    
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Delete on close - access denied, " + file.getFullName());
+                    
+                    // Convert to a filesystem access denied exception
+                    
+                    throw new AccessDeniedException("Delete on close " + file.getFullName());
+                }
             }
         }
         // done
@@ -529,6 +736,28 @@ public class ContentDiskDriver implements ContentDiskInterface
                         "   file: " + name);
             }
         }
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Delete file - access denied");
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Delete " + name);
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Delete file error", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Delete file " + name);
+        }
     }
 
     /**
@@ -536,66 +765,91 @@ public class ContentDiskDriver implements ContentDiskInterface
      */
     public void renameFile(SrvSession sess, TreeConnection tree, String oldName, String newName) throws IOException
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-        
-        // get the file/folder to move
-        NodeRef nodeToMoveRef = cifsHelper.getNodeRef(deviceRootNodeRef, oldName);
-        ChildAssociationRef nodeToMoveAssoc = nodeService.getPrimaryParent(nodeToMoveRef);
-        
-        // get the new target folder - it must be a folder
-        String[] splitPaths = FileName.splitPath(newName);
-        NodeRef targetFolderRef = cifsHelper.getNodeRef(deviceRootNodeRef, splitPaths[0]);
-        if (!cifsHelper.isDirectory(targetFolderRef))
+        try
         {
-            throw new AlfrescoRuntimeException("Cannot move not into anything but a folder: \n" +
-                    "   device root: " + deviceRootNodeRef + "\n" +
-                    "   old path: " + oldName + "\n" +
-                    "   new path: " + newName);
-        }
-        
-        // we escape the local name of the path so that it conforms to the general standard of being
-        // an escaped version of the name property
-        QName newAssocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(splitPaths[1]));
-        
-        // move it
-        nodeService.moveNode(nodeToMoveRef, targetFolderRef, nodeToMoveAssoc.getTypeQName(), newAssocQName);
-        
-        // set the properties
-        Map<QName, Serializable> properties = nodeService.getProperties(nodeToMoveRef);
-        properties.put(ContentModel.PROP_NAME, splitPaths[1]);
-        if (!cifsHelper.isDirectory(nodeToMoveRef))
-        {
-            // reguess the mimetype in case the extension has changed
-            String mimetype = mimetypeService.guessMimetype(splitPaths[1]);
-            // get the current content properties
-            ContentData contentData = (ContentData) properties.get(ContentModel.PROP_CONTENT);
-            if (contentData == null)
+            // get the device root
+            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+            
+            // get the file/folder to move
+            NodeRef nodeToMoveRef = cifsHelper.getNodeRef(deviceRootNodeRef, oldName);
+            ChildAssociationRef nodeToMoveAssoc = nodeService.getPrimaryParent(nodeToMoveRef);
+            
+            // get the new target folder - it must be a folder
+            String[] splitPaths = FileName.splitPath(newName);
+            NodeRef targetFolderRef = cifsHelper.getNodeRef(deviceRootNodeRef, splitPaths[0]);
+            if (!cifsHelper.isDirectory(targetFolderRef))
             {
-                contentData = new ContentData(
-                        null,
-                        mimetype,
-                        0L,
-                        "UTF-8");
+                throw new AlfrescoRuntimeException("Cannot move not into anything but a folder: \n" +
+                        "   device root: " + deviceRootNodeRef + "\n" +
+                        "   old path: " + oldName + "\n" +
+                        "   new path: " + newName);
             }
-            else
+            
+            // we escape the local name of the path so that it conforms to the general standard of being
+            // an escaped version of the name property
+            QName newAssocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(splitPaths[1]));
+            
+            // move it
+            nodeService.moveNode(nodeToMoveRef, targetFolderRef, nodeToMoveAssoc.getTypeQName(), newAssocQName);
+            
+            // set the properties
+            Map<QName, Serializable> properties = nodeService.getProperties(nodeToMoveRef);
+            properties.put(ContentModel.PROP_NAME, splitPaths[1]);
+            if (!cifsHelper.isDirectory(nodeToMoveRef))
             {
-                contentData = new ContentData(
-                        contentData.getContentUrl(),
-                        mimetype,
-                        contentData.getSize(),
-                        contentData.getEncoding());
+                // reguess the mimetype in case the extension has changed
+                String mimetype = mimetypeService.guessMimetype(splitPaths[1]);
+                // get the current content properties
+                ContentData contentData = (ContentData) properties.get(ContentModel.PROP_CONTENT);
+                if (contentData == null)
+                {
+                    contentData = new ContentData(
+                            null,
+                            mimetype,
+                            0L,
+                            "UTF-8");
+                }
+                else
+                {
+                    contentData = new ContentData(
+                            contentData.getContentUrl(),
+                            mimetype,
+                            contentData.getSize(),
+                            contentData.getEncoding());
+                }
+                properties.put(ContentModel.PROP_CONTENT, contentData);
             }
-            properties.put(ContentModel.PROP_CONTENT, contentData);
+            nodeService.setProperties(nodeToMoveRef, properties);
+            
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Moved node: \n" +
+                        "   from: " + oldName + "\n" +
+                        "   to: " + newName);
+            }
         }
-        nodeService.setProperties(nodeToMoveRef, properties);
-        
-        // done
-        if (logger.isDebugEnabled())
+        catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
         {
-            logger.debug("Moved node: \n" +
-                    "   from: " + oldName + "\n" +
-                    "   to: " + newName);
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Rename file - access denied, " + oldName);
+            
+            // Convert to a filesystem access denied status
+            
+            throw new AccessDeniedException("Rename file " + oldName);
+        }
+        catch (AlfrescoRuntimeException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Rename file", ex);
+            
+            // Convert to a general I/O exception
+            
+            throw new IOException("Rename file " + oldName);
         }
     }
 

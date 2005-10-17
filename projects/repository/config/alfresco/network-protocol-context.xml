@@ -68,6 +68,7 @@
             <property name="namespaceService"><ref bean="namespaceService" /></property>
             <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
             <property name="contentService"><ref bean="ContentService" /></property>
+            <property name="permissionService"><ref bean="permissionService"/></property>
          </bean>
       </property>
       <property name="transactionAttributes">
