@@ -16,6 +16,9 @@
  */
 package org.alfresco.repo.webdav;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -76,9 +79,27 @@ public abstract class HierarchicalMethod extends WebDAVMethod
             int offset = -1;
             
             if ( strDestination.startsWith("http://"))
+            {
+                // Check that the URL is on this server and refers to the WebDAV path, if not then return an error
+                
+                checkDestinationPath(strDestination);
+                
+                // Set the offset to the start of the 
+                
                 offset = 7;
+            }
             else if ( strDestination.startsWith("https://"))
+            {
+                // Check that the URL is on this server and refers to the WebDAV path, if not then return an error
+                
+                checkDestinationPath(strDestination);
+                
+                // Set the offset to the start of the
+                
                 offset = 8;
+            }
+            
+            // Strip the start of the path if not a relative path
             
             if (offset != -1)
             {
@@ -124,5 +145,69 @@ public abstract class HierarchicalMethod extends WebDAVMethod
         // NOTE: Hierarchical methods do have a body to define what should happen
         // to the properties when they are moved or copied, however, this
         // feature is not implemented by many servers, including ours!!
+    }
+    
+    /**
+     * Check that the destination path is on this server and is a valid WebDAV path for this server
+     * 
+     * @param path String
+     * @exception WebDAVServerException
+     */
+    protected final void checkDestinationPath(String path)
+        throws WebDAVServerException
+    {
+        try
+        {
+            // Parse the URL
+            
+            URL url = new URL(path);
+            
+            // Check if the path is on this WebDAV server
+            
+            boolean localPath = true;
+            
+            if ( url.getPort() != -1 && url.getPort() != m_request.getLocalPort())
+            {
+                // Debug
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Destination path, different server port");
+
+                localPath = false;
+            }
+            else if ( url.getHost().equals(m_request.getLocalName()) == false &&
+                        url.getHost().equals(m_request.getLocalAddr()) == false)
+            {
+                // Debug
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Destination path, different server name/address");
+
+                localPath = false;
+            }
+            else if ( url.getPath().indexOf(m_request.getServletPath()) == -1)
+            {
+                // Debug
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Destination path, different serlet path");
+
+                localPath = false;
+            }
+            
+            // If the URL does not refer to this WebDAV server throw an exception
+            
+            if ( localPath != true)
+                throw new WebDAVServerException(HttpServletResponse.SC_BAD_GATEWAY);
+        }
+        catch (MalformedURLException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Bad destination path, " + path);
+            
+            throw new WebDAVServerException(HttpServletResponse.SC_BAD_GATEWAY);
+        }
     }
 }

@@ -105,7 +105,7 @@ public class MkcolMethod extends WebDAVMethod
             {
                 // Trim the last path component
 
-                parentPath = parentPath.substring(0, lastPos - 1);
+                parentPath = parentPath.substring(0, lastPos + 1);
                 parentNode = getDAVHelper().getNodeForPath(getRootNodeRef(), parentPath, m_request.getServletPath());
             }
             else

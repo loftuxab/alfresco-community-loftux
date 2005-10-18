@@ -61,6 +61,11 @@ public class CopyMethod extends HierarchicalMethod
        
        try {
            
+           // Debug
+           
+           if ( logger.isDebugEnabled())
+               logger.debug("Copy from " + getPath() + " to " + getDestinationPath());
+           
            // Check if the source node exists
            
            srcSts = getDAVHelper().getPathStatus(getRootNodeRef(), getPath());

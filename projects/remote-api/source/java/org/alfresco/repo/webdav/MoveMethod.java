@@ -57,6 +57,11 @@ public class MoveMethod extends HierarchicalMethod
        
        try {
            
+           // Debug
+           
+           if ( logger.isDebugEnabled())
+               logger.debug("Move from " + getPath() + " to " + getDestinationPath());
+           
            // Check if the source node exists
            
            srcSts = getDAVHelper().getPathStatus(getRootNodeRef(), getPath());
