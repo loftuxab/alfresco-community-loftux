@@ -17,37 +17,21 @@
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://myfaces.apache.org/extensions" prefix="x"%>
 <%@ taglib uri="/WEB-INF/alfresco.tld" prefix="a" %>
 <%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
 
 <%@ page buffer="32kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
+<%@ page import="org.alfresco.web.bean.ImportBean" %>
+<%@ page import="org.alfresco.web.app.portlet.AlfrescoFacesPortlet" %>
+<%@ page import="org.alfresco.web.app.Application" %>
+<%@ page import="javax.faces.context.FacesContext" %>
 
-<r:page titleId="title_export">
+<r:page titleId="title_import">
 
 <script language="JavaScript1.2">
-   window.onload = pageLoaded;
-   
-   function pageLoaded()
-   {
-      document.getElementById("export-form:package-name").focus();
-      checkButtonState();
-   }
-   
-   function checkButtonState()
-   {
-      if (document.getElementById("export-form:package-name").value.length == 0 ||
-          document.getElementById("export-form:destination_selected").value.length == 0)
-      {
-         document.getElementById("export-form:ok-button").disabled = true;
-      }
-      else
-      {
-         document.getElementById("export-form:ok-button").disabled = false;
-      }
-   }
-   
    function toggleErrorInfo(runInBg)
    {
       if (runInBg.checked)
@@ -66,7 +50,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="export-form">
+   <h:form acceptCharset="UTF-8" id="import-form">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -100,17 +84,17 @@
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
-                        	<td width="32">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/export_large.gif" />
+                           <td width="32">
+                              <h:graphicImage id="wizard-logo" url="/images/icons/import_large.gif" />
                            </td>
                            <td>
-                              <div class="mainTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
-                              <div class="mainSubTitle"><h:outputText value="#{msg.export}"/></div>
-                              <div class="mainSubText"><h:outputText value="#{msg.export_info}"/></div>
+                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.import}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.import_info}" /></div>
                            </td>
                         </tr>
                      </table>
-
+                     
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_6.gif)" width="4"></td>
                </tr>
@@ -121,81 +105,73 @@
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_8.gif)"></td>
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
                </tr>
-               
+                              
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
+                           </h:form>
+                        
                            <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_import_all}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                              <table cellpadding="2" cellspacing="2" border="0">
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><nobr><h:outputText value="#{msg.package_name}"/>:</nobr></td>
-                                    <td width="90%">
-                                       <h:inputText id="package-name" value="#{ExportDialog.packageName}" size="35" maxlength="1024" 
-                                                    onkeyup="javascript:checkButtonState();" />
+                                    <td class="mainSubText">1. <h:outputText value="#{msg.locate_document}"/></td>
+                                 </tr>
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <r:uploadForm>
+                                 <tr>
+                                    <td>
+                                       <h:outputText value="#{msg.location}"/>:<input style="margin-left:12px;" type="file" size="50" name="alfFileInput"/>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><nobr><h:outputText value="#{msg.destination}"/>:</nobr></td>
+                                    <td class="mainSubText">2. <h:outputText value="#{msg.click_upload}"/></td>
+                                 </tr>
+                                 <tr>
                                     <td>
-                                       <r:spaceSelector id="destination" label="#{msg.select_destination_prompt}" 
-                                                        value="#{ExportDialog.destination}" 
-                                                        initialSelection="#{NavigationBean.currentNodeId}"
-                                                        styleClass="selector"/>
+                                       <input style="margin-left:12px;" type="submit" value="<%=Application.getMessage(FacesContext.getCurrentInstance(), "upload")%>" />
                                     </td>
                                  </tr>
+                                 </r:uploadForm>
+                                 
+                                 <h:form acceptCharset="UTF-8" id="import-upload-end">
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <%
+                                 ImportBean bean = (ImportBean)session.getAttribute(AlfrescoFacesPortlet.MANAGED_BEAN_PREFIX + "ImportDialog");
+                                 if (bean == null)
+                                 {
+                                    bean = (ImportBean)session.getAttribute("ImportDialog");
+                                 }
+                                 if (bean != null && bean.getFileName() != null) {
+                                 %>
+                                    <tr>
+                                       <td>
+                                          <img alt="" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
+                                          <%=bean.getFileUploadSuccessMsg()%>
+                                       </td>
+                                    </tr>
+                                 <% } %>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><nobr><h:outputText value="#{msg.export_from}"/>:</nobr></td>
                                     <td>
-                                       <h:selectOneRadio value="#{ExportDialog.mode}" layout="pageDirection">
-                                          <f:selectItem itemValue="current" itemLabel="#{msg.current_space}" />
-                                          <f:selectItem itemValue="all" itemLabel="#{msg.all_spaces}" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
-                                 <%--
-                                 <tr>
-                                    <td><nobr><h:outputText value="#{msg.encoding}"/>:</nobr></td>
-                                    <td>
-                                       <h:selectOneMenu value="#{ExportDialog.encoding}">
-                                          <f:selectItems value="#{NewRuleWizard.encodings}" />
-                                       </h:selectOneMenu>
-                                    </td>
-                                 </tr>
-                                 --%>
-                                 <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                       <h:selectBooleanCheckbox value="#{ExportDialog.includeChildren}"/>&nbsp;
-                                       <span style="vertical-align:20%"><h:outputText value="#{msg.include_children}"/></span>
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                       <h:selectBooleanCheckbox value="#{ExportDialog.includeSelf}"/>&nbsp;
-                                       <span style="vertical-align:20%"><h:outputText value="#{msg.include_self}"/></span>
-                                    </td>
-                                 </tr>
-                                 <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                       <h:selectBooleanCheckbox value="#{ExportDialog.runInBackground}" 
+                                       <h:selectBooleanCheckbox value="#{ImportDialog.runInBackground}" 
                                                                 onchange="javascript:toggleErrorInfo(this);"/>&nbsp;
-                                       <span style="vertical-align:20%"><h:outputText value="#{msg.run_export_in_background}"/></span>
+                                       <span style="vertical-align:20%">3. <h:outputText value="#{msg.run_import_in_background}"/></span>
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>&nbsp;</td>
                                     <td>
                                        <div id="error-info" style="display: inline; padding-left: 24px;">
                                           <h:graphicImage alt="" value="/images/icons/info_icon.gif" style="vertical-align: middle;"/>&nbsp;
-                                          <h:outputText value="#{msg.export_error_info}"/>
+                                          <h:outputText value="#{msg.import_error_info}"/>
                                        </div>
                                     </td>
                                  </tr>
@@ -203,19 +179,18 @@
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
-                           
                            <td valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{ExportDialog.export}" 
-                                                        disabled="true" styleClass="wizardButton"/>
+                                       <h:commandButton id="ok-button" value="#{msg.ok}" action="#{ImportDialog.performImport}" 
+                                                        styleClass="wizardButton" disabled="#{ImportDialog.fileName == null}"/>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel}" action="#{ExportDialog.cancel}" 
+                                       <h:commandButton value="#{msg.cancel}" action="#{ImportDialog.cancel}" 
                                                         styleClass="wizardButton"/>
                                     </td>
                                  </tr>
@@ -224,16 +199,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>
@@ -250,7 +215,7 @@
        </tr>
     </table>
     
-    </h:form>
+  </h:form>
     
 </f:view>
 

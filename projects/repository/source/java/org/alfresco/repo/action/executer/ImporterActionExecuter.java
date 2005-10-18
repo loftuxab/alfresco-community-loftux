@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.importer.ACPImportPackageHandler;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -43,9 +44,7 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
     public static final String NAME = "import";
     public static final String PARAM_ENCODING = "encoding";
     public static final String PARAM_DESTINATION_FOLDER = "destination";
-    
-    private static final String ENCODING = "UTF-8";
-    private static final String MIMETYPE = "application/acp";
+
     private static final String TEMP_FILE_PREFIX = "alf";
     private static final String TEMP_FILE_SUFFIX = ".acp";
     
@@ -105,7 +104,7 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
            ContentReader reader = this.contentService.getReader(actionedUponNodeRef, ContentModel.PROP_CONTENT);
            if (reader != null)
            {
-               if (MIMETYPE.equals(reader.getMimetype()))
+               if (MimetypeMap.MIMETYPE_ACP.equals(reader.getMimetype()))
                {
                    File zipFile = null;
                    try
@@ -115,7 +114,8 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
                        zipFile = TempFileProvider.createTempFile(TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX);
                        reader.getContent(zipFile);
                       
-                       ACPImportPackageHandler importHandler = new ACPImportPackageHandler(zipFile, ENCODING);
+                       ACPImportPackageHandler importHandler = new ACPImportPackageHandler(zipFile, 
+                             (String)ruleAction.getParameterValue(PARAM_ENCODING));
                        NodeRef importDest = (NodeRef)ruleAction.getParameterValue(PARAM_DESTINATION_FOLDER);
                       
                        this.importerService.importView(importHandler, new Location(importDest), null, null);
@@ -133,12 +133,15 @@ public class ImporterActionExecuter extends ActionExecuterAbstractBase
         }
     }
 
-	@Override
+	/**
+     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefintions(java.util.List)
+	 */
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
         paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, DataTypeDefinition.NODE_REF, 
               true, getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
-        paramList.add(new ParameterDefinitionImpl(PARAM_ENCODING, DataTypeDefinition.TEXT, false, getParamDisplayLabel(PARAM_ENCODING)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_ENCODING, DataTypeDefinition.TEXT, 
+              true, getParamDisplayLabel(PARAM_ENCODING)));
 	}
 
 }

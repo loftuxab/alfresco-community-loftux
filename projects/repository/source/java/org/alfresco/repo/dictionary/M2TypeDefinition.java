@@ -109,4 +109,41 @@ import org.alfresco.service.namespace.QName;
         return inheritedDefaultAspects;
     }
     
+    @Override
+    public String getDescription()
+    {
+        String value = M2Label.getLabel(model, "type", name, "description");
+
+        if (value == null)
+        {
+            value = m2Class.getDescription();
+        }
+        
+        // if we still don't have a description call the super class
+        if (value == null)
+        {
+           value = super.getDescription();
+        }
+        
+        return value;
+    }
+
+    @Override
+    public String getTitle()
+    {
+        String value = M2Label.getLabel(model, "type", name, "title");
+        
+        if (value == null)
+        {
+            value = m2Class.getTitle();
+        }
+        
+        // if we still don't have a title call the super class
+        if (value == null)
+        {
+           value = super.getTitle();
+        }
+        
+        return value;
+   }
 }

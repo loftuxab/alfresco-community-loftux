@@ -60,8 +60,7 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
     public static final String PARAM_INCLUDE_CHILDREN = "include-children";
     public static final String PARAM_INCLUDE_SELF = "include-self";
     public static final String PARAM_ENCODING = "encoding";
-    
-    private static final String ENCODING = "UTF-8";
+
     private static final String TEMP_FILE_PREFIX = "alf";
     
     /**
@@ -152,8 +151,7 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
             // to hold the exported package
             NodeRef zip = createExportZip(ruleAction, actionedUponNodeRef);
             ContentWriter writer = this.contentService.getWriter(zip, ContentModel.PROP_CONTENT, true);
-            // TODO: use the encoding passed as a parameter, currently the underlying exporter service only uses UTF-8
-            writer.setEncoding(ENCODING);
+            writer.setEncoding((String)ruleAction.getParameterValue(PARAM_ENCODING));
             writer.setMimetype(MimetypeMap.MIMETYPE_ACP);
             writer.putContent(zipFile);
         }
@@ -171,21 +169,23 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
         }
     }
 
-	@Override
+	/**
+     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefintions(java.util.List)
+	 */
 	protected void addParameterDefintions(List<ParameterDefinition> paramList) 
 	{
-		paramList.add(new ParameterDefinitionImpl(PARAM_STORE, DataTypeDefinition.TEXT, false, 
-              getParamDisplayLabel(PARAM_STORE)));
         paramList.add(new ParameterDefinitionImpl(PARAM_PACKAGE_NAME, DataTypeDefinition.TEXT, true, 
               getParamDisplayLabel(PARAM_PACKAGE_NAME)));
+        paramList.add(new ParameterDefinitionImpl(PARAM_ENCODING, DataTypeDefinition.TEXT, true, 
+              getParamDisplayLabel(PARAM_ENCODING)));
+		paramList.add(new ParameterDefinitionImpl(PARAM_STORE, DataTypeDefinition.TEXT, true, 
+              getParamDisplayLabel(PARAM_STORE)));
         paramList.add(new ParameterDefinitionImpl(PARAM_DESTINATION_FOLDER, DataTypeDefinition.NODE_REF, true, 
               getParamDisplayLabel(PARAM_DESTINATION_FOLDER)));
         paramList.add(new ParameterDefinitionImpl(PARAM_INCLUDE_CHILDREN, DataTypeDefinition.BOOLEAN, false, 
               getParamDisplayLabel(PARAM_INCLUDE_CHILDREN)));
         paramList.add(new ParameterDefinitionImpl(PARAM_INCLUDE_SELF, DataTypeDefinition.BOOLEAN, false, 
               getParamDisplayLabel(PARAM_INCLUDE_SELF)));
-        paramList.add(new ParameterDefinitionImpl(PARAM_ENCODING, DataTypeDefinition.TEXT, false, 
-              getParamDisplayLabel(PARAM_ENCODING)));
 	}
 
     /**

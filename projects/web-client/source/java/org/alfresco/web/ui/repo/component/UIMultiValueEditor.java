@@ -268,6 +268,15 @@ public class UIMultiValueEditor extends UIInput
                
                items.add(getLastItemAdded());
                this.addingNewItem = Boolean.FALSE;
+               
+               // get hold of the value binding for the lastItemAdded property
+               // and set it to null to show it's been added to the list
+               ValueBinding vb = getValueBinding("lastItemAdded");
+               if (vb != null)
+               {
+                  vb.setValue(FacesContext.getCurrentInstance(), null);
+               }
+               
                break;
             }
             case ACTION_REMOVE:

@@ -109,6 +109,13 @@
                                     </tr>
                                     <tr>
                                        <td>
+                                          <a:actionLink value="#{msg.import}" image="/images/icons/import.gif" action="import" actionListener="#{BrowseBean.setupSpaceAction}" styleClass="title">
+                                             <f:param name="id" value="#{NavigationBean.currentNodeId}" />
+                                          </a:actionLink>
+                                       </td>
+                                    </tr>
+                                    <tr>
+                                       <td>
                                           <a:actionLink value="#{msg.export}" image="/images/icons/export.gif" action="export" actionListener="#{BrowseBean.setupSpaceAction}" styleClass="title">
                                              <f:param name="id" value="#{NavigationBean.currentNodeId}" />
                                           </a:actionLink>

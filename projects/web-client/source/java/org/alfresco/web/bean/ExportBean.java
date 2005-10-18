@@ -57,10 +57,11 @@ public class ExportBean
    private ActionService actionService;
    
    private String packageName;
-   private String encoding;
+   private String encoding = "UTF-8";
    private String mode = CURRENT_SPACE;
    private NodeRef destination;
    private boolean includeChildren = true;
+   private boolean runInBackground = true;
    private boolean includeSelf;
    
    /**
@@ -93,7 +94,7 @@ public class ExportBean
           
          // build the action to execute
          Action action = this.actionService.createAction(ExporterActionExecuter.NAME, params);
-         action.setExecuteAsynchronously(true);
+         action.setExecuteAsynchronously(this.runInBackground);
          
          // get the appropriate node
          NodeRef startNode = null;
@@ -150,11 +151,11 @@ public class ExportBean
    public void reset()
    {
       this.packageName = null;
-      this.encoding = null;
       this.mode = CURRENT_SPACE;
       this.destination = null;
       this.includeChildren = true;
       this.includeSelf = false;
+      this.runInBackground = true;
    }
    
    /**
@@ -277,6 +278,26 @@ public class ExportBean
       this.encoding = encoding;
    }
 
+   /**
+    * Determines whether the import should run in the background
+    * 
+    * @return true means the import will run in the background 
+    */
+   public boolean getRunInBackground()
+   {
+      return this.runInBackground;
+   }
+
+   /**
+    * Determines whether the import will run in the background
+    * 
+    * @param runInBackground true to run the import in the background
+    */
+   public void setRunInBackground(boolean runInBackground)
+   {
+      this.runInBackground = runInBackground;
+   }
+   
    /**
     * Sets the BrowseBean instance to use to retrieve the current document
     * 

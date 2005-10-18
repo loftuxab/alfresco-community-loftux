@@ -84,7 +84,8 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    public static final String PROP_SUBJECT = "subject";
    public static final String PROP_TO = "to";
    
-   private static Log logger = LogFactory.getLog(BaseActionWizard.class);
+   private static final Log logger = LogFactory.getLog(BaseActionWizard.class);
+   private static final String IMPORT_ENCODING = "UTF-8";
    
    // new rule/action wizard specific properties
    protected boolean multiActionMode = false;
@@ -317,8 +318,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       else if (this.action.equals(ImporterActionExecuter.NAME))
       {
          // add the encoding
-//         actionParams.put(ImporterActionExecuter.PARAM_ENCODING, 
-//               this.currentActionProperties.get(PROP_ENCODING));
+         actionParams.put(ImporterActionExecuter.PARAM_ENCODING, IMPORT_ENCODING);
          
          // add the destination for the import
          NodeRef destNodeRef = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
@@ -426,9 +426,6 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       }
       else if (this.action.equals(ImporterActionExecuter.NAME))
       {
-//         String encoding = (String)actionProps.get(ImporterActionExecuter.PARAM_ENCODING);
-//         this.currentActionProperties.put(PROP_ENCODING, encoding);
-         
          NodeRef destNodeRef = (NodeRef)actionProps.get(ImporterActionExecuter.PARAM_DESTINATION_FOLDER);
          this.currentActionProperties.put(PROP_DESTINATION, destNodeRef);
       }
