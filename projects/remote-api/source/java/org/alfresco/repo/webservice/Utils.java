@@ -283,12 +283,22 @@ public class Utils
             }
 
             // execute the query
-            ResultSet searchResults = searchService.query(Utils
+            ResultSet searchResults = null;
+            try
+            {
+                searchResults = searchService.query(Utils
                     .convertToStoreRef(predicate.getStore()), langEnum
                     .getValue(), query.getStatement());
-
-            // get hold of all the NodeRef's from the results
-            nodeRefs = searchResults.getNodeRefs();
+                // get hold of all the NodeRef's from the results
+                nodeRefs = searchResults.getNodeRefs();
+            }
+            finally
+            {
+                if (searchResults != null)
+                {
+                    searchResults.close();
+                }
+            }
         }
         else if (predicate.getStore() != null)
         {
