@@ -464,19 +464,30 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             String query = "TX:\"" + changeTxnId + "\"";
             sp.setLanguage(SearchService.LANGUAGE_LUCENE);
             sp.setQuery(query);
-            ResultSet results = searcher.query(sp);
-            // did the index have any of these changes?
-            if (results.length() > 0)
+            ResultSet results = null;
+            try
             {
-                // the transaction has an entry in the index - assume that it was
-                // atomically correct
-                if (logger.isDebugEnabled())
+                results = searcher.query(sp);
+                // did the index have any of these changes?
+                if (results.length() > 0)
                 {
-                    logger.debug("Transaction present in index - no indexing required: \n" +
-                            "   store: " + storeRef + "\n" +
-                            "   txn: " + changeTxnId);
+                    // the transaction has an entry in the index - assume that it was
+                    // atomically correct
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Transaction present in index - no indexing required: \n" +
+                                "   store: " + storeRef + "\n" +
+                                "   txn: " + changeTxnId);
+                    }
+                    return;
                 }
-                return;
+            }
+            finally
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
             }
             // the index has no record of this
             // were there any changes, or is it all just deletions?
