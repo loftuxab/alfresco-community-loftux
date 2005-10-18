@@ -78,7 +78,7 @@ public class TextPropertyValueComparator implements PropertyValueComparator
         // Do the match
         if (propertyValue != null)
         {
-            result = ((String)propertyValue).matches(regEx);
+            result = ((String)propertyValue).toLowerCase().matches(regEx);
         }
         
         return result;
@@ -93,7 +93,7 @@ public class TextPropertyValueComparator implements PropertyValueComparator
      */
     private String buildRegEx(String matchText, ComparePropertyValueOperation operation) 
     {
-        String result = escapeText(matchText);
+        String result = escapeText(matchText.toLowerCase());
         switch (operation) 
         {
             case CONTAINS:
