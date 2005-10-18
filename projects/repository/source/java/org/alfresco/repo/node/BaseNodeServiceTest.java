@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryComponent;
@@ -37,6 +38,8 @@ import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.repo.transaction.TransactionUtil;
+import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidAspectException;
@@ -54,6 +57,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 import org.hibernate.Session;
@@ -102,6 +106,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     protected PolicyComponent policyComponent;
     protected DictionaryService dictionaryService;
+    protected TransactionService transactionService;
     protected NodeDaoService nodeDaoService;
     protected NodeService nodeService;
     /** populated during setup */
@@ -110,6 +115,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        transactionService = (TransactionService) applicationContext.getBean("transactionComponent");
         policyComponent = (PolicyComponent) applicationContext.getBean("policyComponent");
         
         DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
@@ -1236,6 +1242,59 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertFalse("n8 not cascade deleted", nodeService.exists(n8Ref));
     }
     
+    private void garbageCollect() throws Exception
+    {
+        // garbage collect and wait
+        for (int i = 0; i < 50; i++)
+        {
+            Runtime.getRuntime().gc();
+            synchronized(this)
+            {
+                this.wait(20);
+            }
+        }
+    }
+    
+    private void reportFlushPerformance(
+            String msg,
+            Map<QName, ChildAssociationRef> lastNodeGraph,
+            int testCount,
+            long startBytes,
+            long startTime) throws Exception
+    {
+        long endTime = System.nanoTime();
+        double deltaTime = (double)(endTime - startTime)/1000000000D;
+        System.out.println(msg + "\n" +
+                "   Build and flushed " + testCount + " node graphs: \n" +
+                "   total time: " + deltaTime + "s \n" +
+                "   average: " + (double)testCount/deltaTime + " graphs/s");
+        
+        garbageCollect();
+        long endBytes = Runtime.getRuntime().freeMemory();
+        double diffBytes = (double)(startBytes - endBytes);
+        System.out.println(
+                "   total bytes: " + diffBytes/1024D/1024D + " MB \n" +
+                "   average: " + (double)diffBytes/testCount/1024D + " kb/graph");
+        
+        
+        int assocsPerGraph = lastNodeGraph.size();
+        int nodesPerGraph = 0;
+        for (ChildAssociationRef assoc : lastNodeGraph.values())
+        {
+            if (assoc.getQName().toString().contains("_p_"))
+            {
+                nodesPerGraph++;
+            }
+        }
+        int totalAssocs = assocsPerGraph * testCount;
+        int totalNodes = nodesPerGraph * testCount;
+        System.out.println(
+                "   assocs per graph: " + assocsPerGraph + "\n" +
+                "   nodes per graph: " + nodesPerGraph + "\n" +
+                "   total nodes: " + totalNodes + "\n" +
+                "   total assocs: " + totalAssocs);
+    }
+    
     /**
      * Builds N node graphs, flushing after each build.  Checks that memory is being cleared
      * adequately.
@@ -1246,27 +1305,46 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
      */
     public void testFlush() throws Exception
     {
-        long testCount = 500L;
+        setComplete();
+        endTransaction();
         
-        long start = System.nanoTime();
+        final int testCount = 500;
         
-        try
+        garbageCollect();
+        
+        final long startBytes = Runtime.getRuntime().freeMemory();
+        final long startTime = System.nanoTime();
+        
+        TransactionWork<Map<QName, ChildAssociationRef>> buildWork = new TransactionWork<Map<QName, ChildAssociationRef>>()
         {
-            for (long i = 0; i < testCount; i++)
+            public Map<QName, ChildAssociationRef> doWork()
             {
-                buildNodeGraph();
-                AlfrescoTransactionSupport.flush();
+                Map<QName, ChildAssociationRef> nodeGraph = Collections.emptyMap();
+                try
+                {
+                    for (int i = 0; i < testCount; i++)
+                    {
+                        nodeGraph = buildNodeGraph();
+                        AlfrescoTransactionSupport.flush();
+                    }
+                    
+                    // report
+                    reportFlushPerformance("Statistics pre-commit", nodeGraph, testCount, startBytes, startTime);
+                }
+                catch (OutOfMemoryError e)
+                {
+                    fail("Flush not clearing memory");
+                }
+                catch (Exception e)
+                {
+                    throw new AlfrescoRuntimeException("Node graph building failed", e);
+                }
+                return nodeGraph;
             }
-        }
-        catch (OutOfMemoryError e)
-        {
-            fail("Flush not clearing memory");
-        }
+        };
+        Map<QName, ChildAssociationRef> nodeGraph = TransactionUtil.executeInNonPropagatingUserTransaction(transactionService, buildWork);
         
-        long end = System.nanoTime();
-        double timeS = (double)(end - start)/1000000000D;
-        System.out.printf("Build and flushed " + testCount + " node graphs: \n" +
-                "   total time: " + timeS + "s \n" +
-                "   average: " + (double)testCount/timeS + " graphs/s");
+        // report post-commit stats
+        reportFlushPerformance("Statistics post-commit", nodeGraph, testCount, startBytes, startTime);
     }
 }

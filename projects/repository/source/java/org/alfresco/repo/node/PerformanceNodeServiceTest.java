@@ -18,65 +18,52 @@ package org.alfresco.repo.node;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
+import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryComponent;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
-import org.alfresco.repo.domain.hibernate.NodeImpl;
-import org.alfresco.repo.node.db.NodeDaoService;
-import org.alfresco.repo.policy.JavaBehaviour;
-import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
-import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.InvalidAspectException;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
-import org.alfresco.service.cmr.repository.AssociationExistsException;
-import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.cmr.repository.CyclicChildRelationshipException;
-import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.GUID;
-import org.hibernate.Session;
+import org.alfresco.util.ApplicationContextHelper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
  * PerformanceNodeServiceTest
  */
-public class PerformanceNodeServiceTest extends BaseSpringTest
+public class PerformanceNodeServiceTest extends TestCase
 {
     public static final String NAMESPACE = "http://www.alfresco.org/test/BaseNodeServiceTest";
     public static final String TEST_PREFIX = "test";
     public static final QName  TYPE_QNAME_TEST = QName.createQName(NAMESPACE, "multiprop");
     public static final QName  PROP_QNAME_NAME = QName.createQName(NAMESPACE, "name");
     public static final QName  ASSOC_QNAME_CHILDREN = QName.createQName(NAMESPACE, "child");
+    
+    private int flushCount = 40000;
+    
+    private int testDepth = 3;
+    private int testChildCount = 5;
+    private int testStringPropertyCount = 10;
+    private int testContentPropertyCount = 10;
+    
+    private static Log logger = LogFactory.getLog(PerformanceNodeServiceTest.class);
+    private static ApplicationContext applicationContext = ApplicationContextHelper.getApplicationContext();
     
     protected DictionaryService dictionaryService;
     protected NodeService nodeService;
@@ -85,10 +72,12 @@ public class PerformanceNodeServiceTest extends BaseSpringTest
     
     private int nodeCount = 0;
     
+    private long startTime;
     /** populated during setup */
     protected NodeRef rootNodeRef;
 
-    protected void onSetUpInTransaction() throws Exception
+    @Override
+    protected void setUp() throws Exception
     {
         DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
         
@@ -109,19 +98,26 @@ public class PerformanceNodeServiceTest extends BaseSpringTest
         dictionary.setDictionaryDAO(dictionaryDao);
         dictionaryService = loadModel(applicationContext);
         
-        nodeService = getNodeService();
+        nodeService = (NodeService) applicationContext.getBean("nodeService");
         txnService = (TransactionService) applicationContext.getBean("transactionComponent");
         contentService = (ContentService) applicationContext.getBean("contentService");
         
         // create a first store directly
-        StoreRef storeRef = nodeService.createStore(
-                StoreRef.PROTOCOL_WORKSPACE,
-                "Test_" + System.nanoTime());
-        rootNodeRef = nodeService.getRootNode(storeRef);
+        TransactionWork<NodeRef> createStoreWork = new TransactionWork<NodeRef>()
+        {
+            public NodeRef doWork()
+            {
+                StoreRef storeRef = nodeService.createStore(
+                        StoreRef.PROTOCOL_WORKSPACE,
+                        "Test_" + System.nanoTime());
+                return nodeService.getRootNode(storeRef);
+            }
+        };
+        rootNodeRef = TransactionUtil.executeInUserTransaction(txnService, createStoreWork);
     }
     
     @Override
-    protected void onTearDownInTransaction()
+    protected void tearDown()
     {
     }
 
@@ -151,22 +147,6 @@ public class PerformanceNodeServiceTest extends BaseSpringTest
         return dictionary;
     }
     
-    /**
-     * Usually just implemented by fetching the bean directly from the bean factory,
-     * for example:
-     * <p>
-     * <pre>
-     *      return (NodeService) applicationContext.getBean("dbNodeService");
-     * </pre>
-     * 
-     * @return Returns the implementation of <code>NodeService</code> to be
-     *      used for this test
-     */
-    protected NodeService getNodeService()
-    {
-        return (NodeService) applicationContext.getBean("dbNodeService");
-    }
-    
     public void testSetUp() throws Exception
     {
         assertNotNull("StoreService not set", nodeService);
@@ -174,55 +154,32 @@ public class PerformanceNodeServiceTest extends BaseSpringTest
         assertNotNull("rootNodeRef not created", rootNodeRef);
     }
     
-    public void xtestPerformanceNodeService() throws Exception
+    public void testPerformanceNodeService() throws Exception
     {
         startTime = System.currentTimeMillis();
         
-        UserTransaction txn = null;
-        txn = txnService.getUserTransaction();  
-        try
+        // ensure that we execute the node tree building in a transaction
+        TransactionWork<Object> buildChildrenWork = new TransactionWork<Object>()
         {
-            txn.begin();
-            
-            buildNodeChildren(rootNodeRef, 1);
-            
-            txn.commit();
-        }
-        catch (Throwable exception)
-        {
-            try
+            public Object doWork()
             {
-                // Roll back the exception
-                if (txn.getStatus() == Status.STATUS_ACTIVE)
-                {
-                    txn.rollback();
-                }
+                buildNodeChildren(rootNodeRef, 1, testDepth, testChildCount);
+                return null;
             }
-            catch (Throwable rollbackException)
-            {
-                // just dump the exception - we are already in a failure state
-                logger.error("Error rolling back transaction", rollbackException);
-            }
-            
-            // Re-throw the exception
-            if (exception instanceof RuntimeException)
-            {
-                throw (RuntimeException) exception;
-            }
-            else
-            {
-                throw new RuntimeException("Error during execution of transaction.", exception);
-            }
-        }
+        };
+        TransactionUtil.executeInUserTransaction(txnService, buildChildrenWork);
         
         long endTime = System.currentTimeMillis();
         
-        System.out.println("Built " + nodeCount + " nodes in " + (endTime-startTime) + "ms");
+        System.out.println("Test completed: \n" +
+                "   Built " + nodeCount + " nodes in " + (endTime-startTime) + "ms \n" +
+                "   Depth: " + testDepth + "\n" +
+                "   Child count: " + testChildCount);
     }
     
-    public void buildNodeChildren(NodeRef parent, int level)
+    public void buildNodeChildren(NodeRef parent, int level, int maxLevel, int childCount)
     {
-        for (int i=0; i<CHILD_COUNT; i++)
+        for (int i=0; i < childCount; i++)
         {
             ChildAssociationRef assocRef = this.nodeService.createNode(
                     parent, ASSOC_QNAME_CHILDREN, QName.createQName(NAMESPACE, "child" + i), TYPE_QNAME_TEST);
@@ -233,12 +190,18 @@ public class PerformanceNodeServiceTest extends BaseSpringTest
              
             this.nodeService.setProperty(childRef,
                  ContentModel.PROP_NAME, "node" + level + "_" + i);
-            
-            for (int j = 0; j < PROPERTY_COUNT; j++)
+
+            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(17);
+            for (int j = 0; j < testStringPropertyCount; j++)
             {
-                this.nodeService.setProperty(
-                      childRef, QName.createQName(NAMESPACE, "string" + j), level + "_" + i + "_" + j);
-                
+                properties.put(
+                        QName.createQName(NAMESPACE, "string" + j),
+                        level + "_" + i + "_" + j);
+            }
+            this.nodeService.setProperties(childRef, properties);
+            
+            for (int j = 0; j < testContentPropertyCount; j++)
+            {
                 ContentWriter writer = this.contentService.getWriter(
                       childRef, QName.createQName(NAMESPACE, "content" + j), true);
                 
@@ -246,50 +209,48 @@ public class PerformanceNodeServiceTest extends BaseSpringTest
                 writer.putContent( level + "_" + i + "_" + j );
             }
             
-            if (nodeCount % FLUSH == 0)
+            long currentTime = System.currentTimeMillis();
+            long diffTime = (currentTime - startTime);
+            if (nodeCount % flushCount == 0)
             {
                System.out.println("Flushing transaction cache at nodecount: " + nodeCount); 
-               System.out.println("At time index " + (System.currentTimeMillis() - startTime) + "ms");
+               System.out.println("At time index " + diffTime + "ms");
                AlfrescoTransactionSupport.flush();
             }
-            
-            if (level <= CHILD_COUNT)
+            if (nodeCount % 100 == 0)
             {
-                buildNodeChildren(childRef, level + 1);
+                System.out.println("Interim summary: \n" +
+                        "   nodes: " + nodeCount + "\n" +
+                        "   time: " + (double)diffTime/1000.0/60.0 + " minutes \n" +
+                        "   average: " + (double)nodeCount/(double)diffTime*1000.0 + " nodes/s");
+            }
+            
+            if (level <  maxLevel)
+            {
+                buildNodeChildren(childRef, level + 1, maxLevel, childCount);
             }
         }
     }
-    private final static int CHILD_COUNT = 5;
-    private final static int PROPERTY_COUNT = 10;
-    private final static int FLUSH = 2000;
-    
-    private long startTime;
-    
-    private int countNodesById(NodeRef nodeRef)
-    {
-        String query =
-                "select count(node.key.guid)" +
-                " from " +
-                NodeImpl.class.getName() + " node" +
-                " where node.key.guid = ?";
-        Session session = getSession();
-        List results = session.createQuery(query)
-            .setString(0, nodeRef.getId())
-            .list();
-        Integer count = (Integer) results.get(0);
-        return count.intValue();
-    }
     
     /**
-     * @return Returns a reference to the created store
+     * Runs a test with more depth
      */
-    private StoreRef createStore() throws Exception
+    public static void main(String[] args)
     {
-        StoreRef storeRef = nodeService.createStore(
-                StoreRef.PROTOCOL_WORKSPACE,
-                getName() + "_" + System.nanoTime());
-        assertNotNull("No reference returned", storeRef);
-        // done
-        return storeRef;
+        try
+        {
+            PerformanceNodeServiceTest test = new PerformanceNodeServiceTest();
+            test.setUp();
+            test.testChildCount = 5;
+            test.testDepth = 6;
+            
+            test.testPerformanceNodeService();
+            
+            test.tearDown();
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();
+        }
     }
 }
