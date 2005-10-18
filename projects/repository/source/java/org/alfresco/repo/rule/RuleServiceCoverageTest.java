@@ -64,6 +64,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -75,9 +76,12 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StopWatch;
+
+import sun.security.krb5.internal.crypto.t;
 
 /**
  * @author Roy Wetherall
@@ -107,7 +111,8 @@ public class RuleServiceCoverageTest extends TestCase
     private DictionaryDAO dictionaryDAO;
     private ActionService actionService;
     private ContentTransformerRegistry transformerRegistry;
-
+    private CopyService copyService;
+    
     /**
      * Category related values
      */
@@ -139,6 +144,7 @@ public class RuleServiceCoverageTest extends TestCase
         this.ruleService = serviceRegistry.getRuleService();
         this.cociService = serviceRegistry.getCheckOutCheckInService();
         this.lockService = serviceRegistry.getLockService();
+        this.copyService = serviceRegistry.getCopyService();
 		this.contentService = serviceRegistry.getContentService();
         this.dictionaryDAO = (DictionaryDAO)applicationContext.getBean("dictionaryDAO");
         this.actionService = serviceRegistry.getActionService();
@@ -378,7 +384,7 @@ public class RuleServiceCoverageTest extends TestCase
         
     }
     
-    public void xtestAddFeaturesToAFolder()
+    public void testAddFeaturesToAFolder()
     {
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put("aspect-name", ContentModel.ASPECT_TEMPLATABLE);        
@@ -401,6 +407,53 @@ public class RuleServiceCoverageTest extends TestCase
         assertTrue(this.nodeService.hasAspect(newNodeRef, ContentModel.ASPECT_TEMPLATABLE));
         
         // System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));        
+    }
+    
+    public void testCopyFolderToTriggerRules()
+    {
+        // Create the folders and content
+        NodeRef copyToFolder = this.nodeService.createNode(
+                this.rootNodeRef,
+                ContentModel.ASSOC_CHILDREN,
+                QName.createQName("{test}copyToFolder"),
+                ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef folderToCopy = this.nodeService.createNode(
+                this.rootNodeRef,
+                ContentModel.ASSOC_CHILDREN,
+                QName.createQName("{test}folderToCopy"),
+                ContentModel.TYPE_FOLDER).getChildRef();
+        NodeRef contentToCopy = this.nodeService.createNode(
+                folderToCopy,
+                ContentModel.ASSOC_CONTAINS,                
+                QName.createQName("{test}contentToCopy"),
+                ContentModel.TYPE_CONTENT,
+                getContentProperties()).getChildRef();
+        addContentToNode(contentToCopy);
+        
+        // Create the rule and add to folder
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put("aspect-name", ContentModel.ASPECT_TEMPLATABLE);             
+        Rule rule = createRule(
+                RuleType.INBOUND, 
+                AddFeaturesActionExecuter.NAME, 
+                params, 
+                NoConditionEvaluator.NAME, 
+                null);   
+        rule.applyToChildren(true);
+        this.ruleService.saveRule(copyToFolder, rule);
+        
+        // Copy the folder in order to try and trigger the rule
+        NodeRef copiedFolder = this.copyService.copy(folderToCopy, copyToFolder, ContentModel.ASSOC_CONTAINS, QName.createQName("{test}coppiedFolder"), true);
+        assertNotNull(copiedFolder);
+        
+        // Check that the rule has been applied to the copied folder and content
+        assertTrue(this.nodeService.hasAspect(copiedFolder, ContentModel.ASPECT_TEMPLATABLE));
+        for (ChildAssociationRef childAssoc : this.nodeService.getChildAssocs(copiedFolder))
+        {
+            assertTrue(this.nodeService.hasAspect(childAssoc.getChildRef(), ContentModel.ASPECT_TEMPLATABLE));
+        }
+        
+        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }
 	
 	private Map<QName, Serializable> getContentProperties()

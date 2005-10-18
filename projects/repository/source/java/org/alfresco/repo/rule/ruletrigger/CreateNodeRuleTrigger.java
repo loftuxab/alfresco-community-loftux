@@ -69,7 +69,11 @@ public class CreateNodeRuleTrigger extends SingleChildAssocRefPolicyRuleTrigger
         {
             if (logger.isDebugEnabled() == true)
             {
-                logger.debug("Create node rule trigger fired for parent node " + childAssocRef.getParentRef() + " and child node " + childAssocRef.getChildRef());
+                logger.debug(
+                        "Create node rule trigger fired for parent node " + 
+                        this.nodeService.getType(childAssocRef.getParentRef()).toString() + " " + childAssocRef.getParentRef() + 
+                        " and child node " +
+                        this.nodeService.getType(childAssocRef.getChildRef()).toString() + " " + childAssocRef.getChildRef());
             }
             
             triggerRules(childAssocRef.getParentRef(), childAssocRef.getChildRef());

@@ -32,6 +32,7 @@ import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.TransactionListener;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.action.ActionServiceException;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -87,6 +88,11 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
      * The search service
      */
     private SearchService searchService;
+    
+    /**
+     * The dictionary service
+     */
+    private DictionaryService dictionaryService;
     
     /**
      * The action service implementation which we need for some things.
@@ -169,6 +175,16 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	{
 		this.ruleCache = ruleCache;
 	}
+    
+    /**
+     * Set the dictionary service
+     * 
+     * @param dictionaryService     the dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
 	
 	/**
 	 * Gets the saved rule folder reference
@@ -285,7 +301,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     {
     	List<Rule> rules = new ArrayList<Rule>();
     	
-    	if (this.nodeService.exists(nodeRef) == true)
+    	if (this.nodeService.exists(nodeRef) == true && checkNodeType(nodeRef) == true)
     	{
     		if (includeInherited == true)
     		{
@@ -339,6 +355,33 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	}
     	
     	return rules;
+    }
+    
+    /**
+     * Looks at the type of the node and indicates whether the node can have rules associated with it
+     * 
+     * @param nodeRef   the node reference
+     * @return          true if the node can have rule associated with it (inherited or otherwise)
+     */
+    private boolean checkNodeType(NodeRef nodeRef)
+    {
+        boolean result = true;
+        
+        QName nodeType = this.nodeService.getType(nodeRef);
+        if (this.dictionaryService.isSubClass(nodeType, ContentModel.TYPE_SYSTEM_FOLDER) == true ||
+            this.dictionaryService.isSubClass(nodeType, ActionModel.TYPE_ACTION) == true ||
+            this.dictionaryService.isSubClass(nodeType, ActionModel.TYPE_ACTION_CONDITION) == true ||
+            this.dictionaryService.isSubClass(nodeType, ActionModel.TYPE_ACTION_PARAMETER) == true)
+        {
+            result = false;
+            
+            if (logger.isDebugEnabled() == true)
+            {
+                logger.debug("A node of type " + nodeType.toString() + " was checked and can not have rules.");
+            }
+        }
+        
+        return result;
     }
 	
     /**
@@ -483,7 +526,12 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 		Rule rule = new RuleImpl(ruleNodeRef.getId(), ruleTypeName, owningNodeRef);
 		
 		// Set the other rule properties
-		boolean isAppliedToChildren = ((Boolean)props.get(RuleModel.PROP_APPLY_TO_CHILDREN)).booleanValue();
+        boolean isAppliedToChildren = false;
+        Boolean value = (Boolean)props.get(RuleModel.PROP_APPLY_TO_CHILDREN);
+        if (value != null)
+        {
+            isAppliedToChildren = value.booleanValue();
+        }
 		rule.applyToChildren(isAppliedToChildren);
 		
 		// Populate the composite action details
@@ -511,7 +559,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     	{
     		throw new RuleServiceException("The node does not exist.");
     	}
-    	
+
     	NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, rule.getId());
     	if (ruleNodeRef == null)
     	{
@@ -525,7 +573,6 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     		props.put(RuleModel.PROP_RULE_TYPE, rule.getRuleTypeName());
 			props.put(ActionModel.PROP_DEFINITION_NAME, rule.getActionDefinitionName());
 			props.put(ContentModel.PROP_NODE_UUID, rule.getId());
-			//props.put(RuleModel.PROP_APPLY_TO_CHILDREN, rule.isAppliedToChildren());
 			
 			// Create the action node
 			ruleNodeRef = this.nodeService.createNode(

@@ -18,6 +18,9 @@
 	    <property name="searchService">
 		    <ref bean="SearchService"/>
 	    </property>
+	    <property name="dictionaryService">
+		    <ref bean="dictionaryService"/>
+	    </property>
    </bean>
    
    <!-- Rules Aspect -->
@@ -58,7 +61,7 @@
    <bean id="inbound" class="org.alfresco.repo.rule.RuleTypeImpl" parent="rule-type-base">
       <constructor-arg>
          <list>
-            <!-- <ref bean="on-create-node-trigger"/> -->
+            <ref bean="on-create-node-trigger"/>
          	<ref bean="on-create-child-association-trigger"/>
          	<ref bean="on-content-update-trigger"/>
          </list>

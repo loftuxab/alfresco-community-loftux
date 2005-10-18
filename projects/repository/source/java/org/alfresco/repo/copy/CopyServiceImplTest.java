@@ -378,8 +378,8 @@ public class CopyServiceImplTest extends BaseSpringTest
                 QName.createQName("{test}withRulesCopy"),
                 true);
         
-        System.out.println(
-                   NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        //System.out.println(
+         //          NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
         
         checkCopiedNode(this.sourceNodeRef, copy, true, true, true);
         
@@ -522,8 +522,8 @@ public class CopyServiceImplTest extends BaseSpringTest
 		NodeRef nodeThreeCopy = null;
 		NodeRef nodeFourCopy = null;
 		
-		System.out.println(
-				NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+		//System.out.println(
+		//		NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
 		
 		List<ChildAssociationRef> nodeOneCopyChildren = this.nodeService.getChildAssocs(nodeOneCopy);
 		assertNotNull(nodeOneCopyChildren);

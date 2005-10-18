@@ -110,13 +110,13 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
     {
         return I18NUtil.getMessage(this.name + "." + "display-label");
     }
-
+    
     /**
      * @see org.alfresco.service.cmr.rule.RuleType#triggerRuleType(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
      */
 	public void triggerRuleType(NodeRef nodeRef, NodeRef actionedUponNodeRef)
 	{
-		if (this.ruleService.rulesEnabled(nodeRef) == true && this.ruleService.hasRules(nodeRef) == true)
+		if (this.ruleService.hasRules(nodeRef) == true)
         {
             List<Rule> rules = this.ruleService.getRules(
             		nodeRef, 
@@ -140,6 +140,13 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
                     // Queue the rule to be executed at the end of the transaction (but still in the transaction)
                     ((RuntimeRuleService)this.ruleService).addRulePendingExecution(nodeRef, actionedUponNodeRef, rule);
                 }
+            }
+        }
+        else
+        {
+            if (logger.isDebugEnabled() == true)
+            {
+                logger.debug("This node has no rules to trigger.");
             }
         }
 	}
