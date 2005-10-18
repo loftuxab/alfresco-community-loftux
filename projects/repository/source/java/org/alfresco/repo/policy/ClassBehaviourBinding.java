@@ -18,6 +18,7 @@ package org.alfresco.repo.policy;
 
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 
@@ -35,7 +36,24 @@ import org.alfresco.service.namespace.QName;
     // The class qualified name
     private QName classQName; 
 
+    // Instance level node reference
+    private NodeRef nodeRef;
+    
 
+    /**
+     * Construct.
+     * 
+     * @param dictionary  the dictionary service
+     * @param nodeRef  the instance level node reference
+     * @param classQName  the Class qualified name
+     */
+    /*package*/ ClassBehaviourBinding(DictionaryService dictionary, NodeRef nodeRef, QName classQName)
+    {
+        this.dictionary = dictionary;
+        this.nodeRef = nodeRef;
+        this.classQName = classQName;
+    }
+    
     /**
      * Construct.
      * 
@@ -44,8 +62,7 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ ClassBehaviourBinding(DictionaryService dictionary, QName classQName)
     {
-        this.dictionary = dictionary;
-        this.classQName = classQName;
+        this(dictionary, null, classQName);
     }
 
     /*package*/ DictionaryService getDictionary()
@@ -71,6 +88,16 @@ import org.alfresco.service.namespace.QName;
             generalisedBinding = new ClassBehaviourBinding(dictionary, parentClassName);
         }
         return generalisedBinding;
+    }
+    
+    /**
+     * Gets the instance level node reference
+     * 
+     * @return  the node reference
+     */
+    public NodeRef getNodeRef()
+    {
+        return nodeRef;
     }
     
     /**

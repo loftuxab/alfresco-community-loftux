@@ -86,13 +86,13 @@ import java.util.List;
      * @param binding  the binding
      * @return  the collection of policy implementations
      */
+    @SuppressWarnings("unchecked")
     public Collection<P> createList(B binding)
     {
         Collection<BehaviourDefinition> behaviourDefs = index.find(binding);
         List<P> policyInterfaces = new ArrayList<P>(behaviourDefs.size());
         for (BehaviourDefinition behaviourDef : behaviourDefs)
         {
-            PolicyDefinition policyDef = behaviourDef.getPolicyDefinition();
             Behaviour behaviour = behaviourDef.getBehaviour();
             P policyIF = behaviour.getInterface(policyClass);
             policyInterfaces.add(policyIF);
@@ -109,6 +109,7 @@ import java.util.List;
      * @param policyList  the policy implementations to aggregate
      * @return  the aggregate policy implementation
      */
+    @SuppressWarnings("unchecked")
     public P toPolicy(Collection<P> policyList)
     {
         if (policyList.size() == 1)
@@ -165,6 +166,7 @@ import java.util.List;
      *
      * @param <P>  policy interface
      */
+    @SuppressWarnings("hiding")
     private static class MultiHandler<P> implements InvocationHandler, PolicyList
     {
         private Collection<P> policyInterfaces;

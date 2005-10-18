@@ -211,4 +211,14 @@ public class BehaviourFilterImpl implements BehaviourFilter
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.BehaviourFilter#isActivated()
+     */
+    public boolean isActivated()
+    {
+        List<QName> classFilters = classFilter.get();
+        Map<NodeRef,List<QName>> nodeFilters = nodeRefFilter.get();
+        return (classFilters != null && !classFilters.isEmpty()) || (nodeFilters != null && !nodeFilters.isEmpty());
+    }
+
 }

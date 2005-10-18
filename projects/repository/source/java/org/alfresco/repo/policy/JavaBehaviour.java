@@ -69,6 +69,7 @@ public class JavaBehaviour implements Behaviour
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.Behaviour#getInterface(java.lang.Class)
      */
+    @SuppressWarnings("unchecked")
     public synchronized <T> T getInterface(Class<T> policy)
     {
         ParameterCheck.mandatory("Policy class", policy);

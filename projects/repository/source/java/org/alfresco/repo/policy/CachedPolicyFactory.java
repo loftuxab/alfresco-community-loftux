@@ -39,6 +39,9 @@ import org.apache.commons.logging.LogFactory;
     // Logger
     private static final Log logger = LogFactory.getLog(PolicyComponentImpl.class);
 
+    // Behaviour Filter
+    private BehaviourFilter behaviourFilter = null;
+    
     // Cache Lock
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock(); 
 
@@ -51,8 +54,8 @@ import org.apache.commons.logging.LogFactory;
      * Cache for a collection of Policy interfaces (keyed by Binding)
      */
     private Map<B, Collection<P>> listCache = new HashMap<B, Collection<P>>();
-    
 
+    
     /**
      * Construct cached policy factory
      * 
@@ -62,6 +65,7 @@ import org.apache.commons.logging.LogFactory;
     /*package*/ CachedPolicyFactory(Class<P> policyClass, BehaviourIndex<B> index)
     {
         super(policyClass, index);
+        behaviourFilter = index.getFilter();
 
         // Register this cached policy factory as a change observer of the behaviour index
         // to allow for cache to be cleared appropriately.
@@ -79,6 +83,12 @@ import org.apache.commons.logging.LogFactory;
     @Override
     public P create(B binding)
     {
+        // When behaviour filters are activated bypass the cache 
+        if (behaviourFilter != null && behaviourFilter.isActivated())
+        {
+            return super.create(binding);
+        }
+        
         lock.readLock().lock();
 
         try
@@ -122,6 +132,12 @@ import org.apache.commons.logging.LogFactory;
     @Override
     public Collection<P> createList(B binding)
     {
+        // When behaviour filters are activated bypass the cache 
+        if (behaviourFilter != null && behaviourFilter.isActivated())
+        {
+            return super.createList(binding);
+        }
+        
         lock.readLock().lock();
 
         try

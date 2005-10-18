@@ -59,9 +59,6 @@
              <ref bean="policyComponent"/>
           </constructor-arg>
           <constructor-arg>
-             <ref bean="policyBehaviourFilter"/>
-          </constructor-arg>
-          <constructor-arg>
              <ref bean="dictionaryService" />
           </constructor-arg>
           <constructor-arg>

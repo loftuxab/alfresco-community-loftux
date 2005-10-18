@@ -47,7 +47,6 @@ import org.alfresco.repo.node.NodeServicePolicies.OnRemoveAspectPolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.AssociationPolicyDelegate;
-import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.search.Indexer;
@@ -82,7 +81,6 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     private String uuid;
     /** controls policy delegates */
     private PolicyComponent policyComponent;
-    private BehaviourFilter behaviourFilter;
 
     /*
      * Policy delegates
@@ -112,11 +110,10 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @param dictionaryService
      *            used to check that node operations conform to the model
      */
-    protected AbstractNodeServiceImpl(PolicyComponent policyComponent, BehaviourFilter behaviourFilter)
+    protected AbstractNodeServiceImpl(PolicyComponent policyComponent)
     {
         this.uuid = GUID.generate();
         this.policyComponent = policyComponent;
-        this.behaviourFilter = behaviourFilter;
     }
 
     /**
@@ -204,11 +201,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     protected void invokeBeforeCreateNode(NodeRef parentNodeRef, QName assocTypeQName, QName assocQName, QName childNodeTypeQName)
     {
         // execute policy for node type
-        if (behaviourFilter.isEnabled(childNodeTypeQName))
-        {
-            NodeServicePolicies.BeforeCreateNodePolicy policy = beforeCreateNodeDelegate.get(childNodeTypeQName);
-            policy.beforeCreateNode(parentNodeRef, assocTypeQName, assocQName, childNodeTypeQName);
-        }
+        NodeServicePolicies.BeforeCreateNodePolicy policy = beforeCreateNodeDelegate.get(parentNodeRef, childNodeTypeQName);
+        policy.beforeCreateNode(parentNodeRef, assocTypeQName, assocQName, childNodeTypeQName);
     }
 
     /**
@@ -220,7 +214,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(childNodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.OnCreateNodePolicy policy = onCreateNodeDelegate.get(qnames);
+        NodeServicePolicies.OnCreateNodePolicy policy = onCreateNodeDelegate.get(childNodeRef, qnames);
         policy.onCreateNode(childAssocRef);
     }
 
@@ -232,7 +226,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(nodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.BeforeUpdateNodePolicy policy = beforeUpdateNodeDelegate.get(qnames);
+        NodeServicePolicies.BeforeUpdateNodePolicy policy = beforeUpdateNodeDelegate.get(nodeRef, qnames);
         policy.beforeUpdateNode(nodeRef);
     }
 
@@ -244,7 +238,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(nodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.OnUpdateNodePolicy policy = onUpdateNodeDelegate.get(qnames);
+        NodeServicePolicies.OnUpdateNodePolicy policy = onUpdateNodeDelegate.get(nodeRef, qnames);
         policy.onUpdateNode(nodeRef);
     }
     
@@ -259,7 +253,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(nodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.OnUpdatePropertiesPolicy policy = onUpdatePropertiesDelegate.get(qnames);
+        NodeServicePolicies.OnUpdatePropertiesPolicy policy = onUpdatePropertiesDelegate.get(nodeRef, qnames);
         policy.onUpdateProperties(nodeRef, before, after);
     }
 
@@ -271,7 +265,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(nodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.BeforeDeleteNodePolicy policy = beforeDeleteNodeDelegate.get(qnames);
+        NodeServicePolicies.BeforeDeleteNodePolicy policy = beforeDeleteNodeDelegate.get(nodeRef, qnames);
         policy.beforeDeleteNode(nodeRef);
     }
 
@@ -282,20 +276,11 @@ public abstract class AbstractNodeServiceImpl implements NodeService
     {
         // get qnames to invoke against
         Set<QName> qnames = new HashSet<QName>(childAspectQnames.size() + 1);
-        for (QName aspectQName : childAspectQnames)
-        {
-            if (behaviourFilter.isEnabled(childAssocRef.getChildRef(), aspectQName))
-            {
-                qnames.add(aspectQName);
-            }
-        }
-        if (behaviourFilter.isEnabled(childAssocRef.getChildRef(), childNodeTypeQName))
-        {
-            qnames.add(childNodeTypeQName);
-        }
+        qnames.addAll(childAspectQnames);
+        qnames.add(childNodeTypeQName);
         
         // execute policy for node type and aspects
-        NodeServicePolicies.OnDeleteNodePolicy policy = onDeleteNodeDelegate.get(qnames);
+        NodeServicePolicies.OnDeleteNodePolicy policy = onDeleteNodeDelegate.get(childAssocRef.getChildRef(), qnames);
         policy.onDeleteNode(childAssocRef);
     }
 
@@ -305,11 +290,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      */
     protected void invokeBeforeAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        if (behaviourFilter.isEnabled(nodeRef, aspectTypeQName))
-        {
-            NodeServicePolicies.BeforeAddAspectPolicy policy = beforeAddAspectDelegate.get(aspectTypeQName);
-            policy.beforeAddAspect(nodeRef, aspectTypeQName);
-        }
+        NodeServicePolicies.BeforeAddAspectPolicy policy = beforeAddAspectDelegate.get(nodeRef, aspectTypeQName);
+        policy.beforeAddAspect(nodeRef, aspectTypeQName);
     }
 
     /**
@@ -317,11 +299,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      */
     protected void invokeOnAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        if (behaviourFilter.isEnabled(nodeRef, aspectTypeQName))
-        {
-            NodeServicePolicies.OnAddAspectPolicy policy = onAddAspectDelegate.get(aspectTypeQName);
-            policy.onAddAspect(nodeRef, aspectTypeQName);
-        }
+        NodeServicePolicies.OnAddAspectPolicy policy = onAddAspectDelegate.get(nodeRef, aspectTypeQName);
+        policy.onAddAspect(nodeRef, aspectTypeQName);
     }
 
     /**
@@ -330,11 +309,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      */
     protected void invokeBeforeRemoveAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        if (behaviourFilter.isEnabled(nodeRef, aspectTypeQName))
-        {
-            NodeServicePolicies.BeforeRemoveAspectPolicy policy = beforeRemoveAspectDelegate.get(aspectTypeQName);
-            policy.beforeRemoveAspect(nodeRef, aspectTypeQName);
-        }
+        NodeServicePolicies.BeforeRemoveAspectPolicy policy = beforeRemoveAspectDelegate.get(nodeRef, aspectTypeQName);
+        policy.beforeRemoveAspect(nodeRef, aspectTypeQName);
     }
 
     /**
@@ -343,11 +319,8 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      */
     protected void invokeOnRemoveAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        if (behaviourFilter.isEnabled(nodeRef, aspectTypeQName))
-        {
-            NodeServicePolicies.OnRemoveAspectPolicy policy = onRemoveAspectDelegate.get(aspectTypeQName);
-            policy.onRemoveAspect(nodeRef, aspectTypeQName);
-        }
+        NodeServicePolicies.OnRemoveAspectPolicy policy = onRemoveAspectDelegate.get(nodeRef, aspectTypeQName);
+        policy.onRemoveAspect(nodeRef, aspectTypeQName);
     }
 
     /**
@@ -359,7 +332,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(parentNodeRef);
         // execute policy for node type
-        NodeServicePolicies.BeforeCreateChildAssociationPolicy policy = beforeCreateChildAssociationDelegate.get(qnames, assocTypeQName);
+        NodeServicePolicies.BeforeCreateChildAssociationPolicy policy = beforeCreateChildAssociationDelegate.get(parentNodeRef, qnames, assocTypeQName);
         policy.beforeCreateChildAssociation(parentNodeRef, childNodeRef, assocTypeQName, assocQName);
     }
 
@@ -374,7 +347,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(parentNodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.OnCreateChildAssociationPolicy policy = onCreateChildAssociationDelegate.get(qnames, assocTypeQName);
+        NodeServicePolicies.OnCreateChildAssociationPolicy policy = onCreateChildAssociationDelegate.get(parentNodeRef, qnames, assocTypeQName);
         policy.onCreateChildAssociation(childAssocRef);
     }
 
@@ -388,7 +361,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(parentNodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.BeforeDeleteChildAssociationPolicy policy = beforeDeleteChildAssociationDelegate.get(qnames, assocTypeQName);
+        NodeServicePolicies.BeforeDeleteChildAssociationPolicy policy = beforeDeleteChildAssociationDelegate.get(parentNodeRef, qnames, assocTypeQName);
         policy.beforeDeleteChildAssociation(childAssocRef);
     }
 
@@ -402,7 +375,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(parentNodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.OnDeleteChildAssociationPolicy policy = onDeleteChildAssociationDelegate.get(qnames, assocTypeQName);
+        NodeServicePolicies.OnDeleteChildAssociationPolicy policy = onDeleteChildAssociationDelegate.get(parentNodeRef, qnames, assocTypeQName);
         policy.onDeleteChildAssociation(childAssocRef);
     }
 
@@ -416,7 +389,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(sourceNodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.OnCreateAssociationPolicy policy = onCreateAssociationDelegate.get(qnames, assocTypeQName);
+        NodeServicePolicies.OnCreateAssociationPolicy policy = onCreateAssociationDelegate.get(sourceNodeRef, qnames, assocTypeQName);
         policy.onCreateAssociation(nodeAssocRef);
     }
 
@@ -430,7 +403,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         // get qnames to invoke against
         Set<QName> qnames = getTypeAndAspectQNames(sourceNodeRef);
         // execute policy for node type and aspects
-        NodeServicePolicies.OnDeleteAssociationPolicy policy = onDeleteAssociationDelegate.get(qnames, assocTypeQName);
+        NodeServicePolicies.OnDeleteAssociationPolicy policy = onDeleteAssociationDelegate.get(sourceNodeRef, qnames, assocTypeQName);
         policy.onDeleteAssociation(nodeAssocRef);
     }
 
@@ -449,20 +422,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         {
             Set<QName> aspectQNames = getAspects(nodeRef);
             QName typeQName = getType(nodeRef);
-            
-            // combine and filter
             qnames = new HashSet<QName>(aspectQNames.size() + 1);
-            for (QName aspectQName : aspectQNames)
-            {
-                if (behaviourFilter.isEnabled(nodeRef, aspectQName))
-                {
-                    qnames.add(aspectQName);
-                }
-            }
-            if (behaviourFilter.isEnabled(nodeRef, typeQName))
-            {
-                qnames.add(typeQName);
-            }
+            qnames.addAll(aspectQNames);
+            qnames.add(typeQName);
         }
         catch (InvalidNodeRefException e)
         {

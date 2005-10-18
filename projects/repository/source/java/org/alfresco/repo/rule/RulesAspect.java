@@ -77,7 +77,7 @@ public class RulesAspect
 		this.onAddAspectBehaviour = new JavaBehaviour(this, "onAddAspect");
 		this.policyComponent.bindClassBehaviour(
 				QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
-				this, 
+                RuleModel.ASPECT_RULES, 
 				onAddAspectBehaviour);
 	}
     
@@ -112,22 +112,19 @@ public class RulesAspect
 	 */
 	public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
 	{
-		if (RuleModel.ASPECT_RULES.equals(aspectTypeQName) == true)
-		{
-            this.ruleService.disableRules(nodeRef);
-            try
-            {
-    			this.nodeService.createNode(
-                        nodeRef,
-    			        RuleModel.ASSOC_RULE_FOLDER,
-    					RuleModel.ASSOC_RULE_FOLDER,
-    					ContentModel.TYPE_SYSTEM_FOLDER);
-            }
-            finally
-            {
-                this.ruleService.enableRules(nodeRef);
-            }
-		}
+        this.ruleService.disableRules(nodeRef);
+        try
+        {
+			this.nodeService.createNode(
+                    nodeRef,
+			        RuleModel.ASSOC_RULE_FOLDER,
+					RuleModel.ASSOC_RULE_FOLDER,
+					ContentModel.TYPE_SYSTEM_FOLDER);
+        }
+        finally
+        {
+            this.ruleService.enableRules(nodeRef);
+        }
 	}
 	
 	public void onCopyNode(

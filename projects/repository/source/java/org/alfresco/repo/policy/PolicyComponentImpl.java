@@ -51,6 +51,9 @@ public class PolicyComponentImpl implements PolicyComponent
     // Dictionary Service
     private DictionaryService dictionary;
     
+    // Behaviour Filter
+    private BehaviourFilter behaviourFilter;
+    
     // Map of registered Policies
     private Map<PolicyKey, PolicyDefinition> registeredPolicies;; 
 
@@ -78,6 +81,18 @@ public class PolicyComponentImpl implements PolicyComponent
         this.dictionary = dictionary;
         this.registeredPolicies = new HashMap<PolicyKey, PolicyDefinition>();
     }
+    
+
+    /**
+     * Sets the behaviour filter
+     * 
+     * @param filter
+     */
+    public void setBehaviourFilter(BehaviourFilter filter)
+    {
+        this.behaviourFilter = filter;
+    }
+    
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.PolicyComponent#registerClassPolicy()
@@ -384,7 +399,7 @@ public class PolicyComponentImpl implements PolicyComponent
         ClassBehaviourIndex<ClassBehaviourBinding> index = classBehaviours.get(policy);
         if (index == null)
         {
-            index = new ClassBehaviourIndex<ClassBehaviourBinding>();
+            index = new ClassBehaviourIndex<ClassBehaviourBinding>(behaviourFilter);
             classBehaviours.put(policy, index);
         }
         return index;
@@ -402,7 +417,7 @@ public class PolicyComponentImpl implements PolicyComponent
         ClassBehaviourIndex<ClassFeatureBehaviourBinding> index = propertyBehaviours.get(policy);
         if (index == null)
         {
-            index = new ClassBehaviourIndex<ClassFeatureBehaviourBinding>();
+            index = new ClassBehaviourIndex<ClassFeatureBehaviourBinding>(behaviourFilter);
             propertyBehaviours.put(policy, index);
         }
         return index;
@@ -420,7 +435,7 @@ public class PolicyComponentImpl implements PolicyComponent
         ClassBehaviourIndex<ClassFeatureBehaviourBinding> index = associationBehaviours.get(policy);
         if (index == null)
         {
-            index = new ClassBehaviourIndex<ClassFeatureBehaviourBinding>();
+            index = new ClassBehaviourIndex<ClassFeatureBehaviourBinding>(behaviourFilter);
             associationBehaviours.put(policy, index);
         }
         return index;

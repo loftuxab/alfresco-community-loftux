@@ -82,11 +82,12 @@ public class PolicyComponentTest extends TestCase
     }
     
     
+    @SuppressWarnings("unchecked")
     public void testRegisterDefinitions()
     {
         try
         {
-            ClassPolicyDelegate<InvalidMetaDataPolicy> delegate = policyComponent.registerClassPolicy(InvalidMetaDataPolicy.class);
+            @SuppressWarnings("unused") ClassPolicyDelegate<InvalidMetaDataPolicy> delegate = policyComponent.registerClassPolicy(InvalidMetaDataPolicy.class);
             fail("Failed to catch hidden metadata");
         }
         catch(PolicyException e)
@@ -95,7 +96,7 @@ public class PolicyComponentTest extends TestCase
     
         try
         {
-            ClassPolicyDelegate<NoMethodPolicy> delegate = policyComponent.registerClassPolicy(NoMethodPolicy.class);
+            @SuppressWarnings("unused") ClassPolicyDelegate<NoMethodPolicy> delegate = policyComponent.registerClassPolicy(NoMethodPolicy.class);
             fail("Failed to catch no methods defined in policy");
         }
         catch(PolicyException e)
@@ -104,7 +105,7 @@ public class PolicyComponentTest extends TestCase
 
         try
         {
-            ClassPolicyDelegate<MultiMethodPolicy> delegate = policyComponent.registerClassPolicy(MultiMethodPolicy.class);
+            @SuppressWarnings("unused") ClassPolicyDelegate<MultiMethodPolicy> delegate = policyComponent.registerClassPolicy(MultiMethodPolicy.class);
             fail("Failed to catch multiple methods defined in policy");
         }
         catch(PolicyException e)

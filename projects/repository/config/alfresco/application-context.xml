@@ -469,6 +469,9 @@
         <constructor-arg index="0">
             <ref bean="dictionaryService"/>
         </constructor-arg>
+        <property name="behaviourFilter">
+            <ref bean="policyBehaviourFilter"/>
+        </property>
     </bean>
 
     <!-- Bean to support full text search -->

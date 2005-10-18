@@ -52,4 +52,11 @@ import java.util.Collection;
      * @param observer  the observer
      */
     public void addChangeObserver(BehaviourChangeObserver<B> observer);
+    
+    /**
+     * Gets the behaviour filter
+     *  
+     * @return  the behaviour filter
+     */
+    public BehaviourFilter getFilter();
 }

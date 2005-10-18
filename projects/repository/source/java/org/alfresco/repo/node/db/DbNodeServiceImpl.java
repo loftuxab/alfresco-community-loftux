@@ -73,11 +73,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     
     public DbNodeServiceImpl(
 			PolicyComponent policyComponent,
-            BehaviourFilter behaviourFilter,
             DictionaryService dictionaryService,
             NodeDaoService nodeDaoService)
     {
-		super(policyComponent, behaviourFilter);
+		super(policyComponent);
 		
         this.dictionaryService = dictionaryService;
         this.nodeDaoService = nodeDaoService;

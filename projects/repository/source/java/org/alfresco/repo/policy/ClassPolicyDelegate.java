@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -45,6 +46,7 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      * @param policyClass  the policy interface class
      * @param index  the behaviour index to query against
      */
+    @SuppressWarnings("unchecked")
     /*package*/ ClassPolicyDelegate(DictionaryService dictionary, Class<P> policyClass, BehaviourIndex<ClassBehaviourBinding> index)
     {
         // Get list of all pre-registered behaviours for the policy and
@@ -74,14 +76,25 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      */
     public P get(QName classQName)
     {
+        return get(null, classQName);
+    }
+
+    /**
+     * Gets the Policy implementation for the specified Class
+     * 
+     * @param nodeRef  the node reference
+     * @param classQName  the class name
+     * @return  the policy
+     */
+    public P get(NodeRef nodeRef, QName classQName)
+    {
         ClassDefinition classDefinition = dictionary.getClass(classQName);
         if (classDefinition == null)
         {
             throw new IllegalArgumentException("Class " + classQName + " has not been defined in the data dictionary");
         }
-        return factory.create(new ClassBehaviourBinding(dictionary, classQName));
+        return factory.create(new ClassBehaviourBinding(dictionary, nodeRef, classQName));
     }
-
     
     /**
      * Gets the collection of Policy implementations for the specified Class
@@ -91,14 +104,26 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      */
     public Collection<P> getList(QName classQName)
     {
+        return getList(null, classQName);
+    }
+    
+    /**
+     * Gets the collection of Policy implementations for the specified Class
+     * 
+     * @param nodeRef  the node reference
+     * @param classQName  the class qualified name
+     * @return  the collection of policies
+     */
+    public Collection<P> getList(NodeRef nodeRef, QName classQName)
+    {
         ClassDefinition classDefinition = dictionary.getClass(classQName);
         if (classDefinition == null)
         {
             throw new IllegalArgumentException("Class " + classQName + " has not been defined in the data dictionary");
         }
-        return factory.createList(new ClassBehaviourBinding(dictionary, classQName));
+        return factory.createList(new ClassBehaviourBinding(dictionary, nodeRef, classQName));
     }
-    
+
     /**
      * Gets the policy implementation for the given classes.  The single <tt>Policy</tt>
      * will be a wrapper of multiple appropriate policies.
@@ -108,7 +133,20 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      */
     public P get(Set<QName> classQNames)
     {
-        return factory.toPolicy(getList(classQNames));
+        return get(null, classQNames);
+    }
+
+    /**
+     * Gets the policy implementation for the given classes.  The single <tt>Policy</tt>
+     * will be a wrapper of multiple appropriate policies.
+     *
+     * @param nodeRef  the node reference
+     * @param classQNames the class qualified names
+     * @return Returns the policy
+     */
+    public P get(NodeRef nodeRef, Set<QName> classQNames)
+    {
+        return factory.toPolicy(getList(nodeRef, classQNames));
     }
 
     /**
@@ -119,10 +157,21 @@ public class ClassPolicyDelegate<P extends ClassPolicy>
      */
     public Collection<P> getList(Set<QName> classQNames)
     {
+        return getList(null, classQNames);
+    }
+
+    /**
+     * Gets the collection of <tt>Policy</tt> implementations for the given classes
+     * 
+     * @param classQNames the class qualified names
+     * @return Returns the collection of policies
+     */
+    public Collection<P> getList(NodeRef nodeRef, Set<QName> classQNames)
+    {
         Collection<P> policies = new HashSet<P>();
         for (QName classQName : classQNames)
         {
-            P policy = factory.create(new ClassBehaviourBinding(dictionary, classQName));
+            P policy = factory.create(new ClassBehaviourBinding(dictionary, nodeRef, classQName));
 			if (policy instanceof PolicyList)
 			{
 				policies.addAll(((PolicyList<P>)policy).getPolicies());

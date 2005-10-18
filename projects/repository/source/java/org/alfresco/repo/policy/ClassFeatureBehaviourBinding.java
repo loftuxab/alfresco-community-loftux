@@ -18,6 +18,7 @@ package org.alfresco.repo.policy;
 
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 
@@ -41,17 +42,16 @@ import org.alfresco.service.namespace.QName;
      * Construct.
      * 
      * @param dictionary  the dictionary service
+     * @param nodeRef  the node reference
      * @param classQName  the Class qualified name
      * @param featureQName  the Class feature (property or association) qualifed name
-     * @param activeFeatureQName  the currently active feature QName
      */
-    private ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classQName, QName featureQName, QName activeFeatureQName)
+    /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, NodeRef nodeRef, QName classQName, QName featureQName)
     {
-        super(dictionary, classQName);
-        this.featureQName = featureQName;
-        this.activeFeatureQName = activeFeatureQName;
+        this(dictionary, nodeRef, classQName, featureQName, featureQName);
     }
 
+    
     /**
      * Construct.
      * 
@@ -61,7 +61,20 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classQName, QName featureQName)
     {
-        this(dictionary, classQName, featureQName, featureQName);
+        this(dictionary, null, classQName, featureQName, featureQName);
+    }
+
+    
+    /**
+     * Construct.
+     * 
+     * @param dictionary  the dictionary service
+     * @param nodeRef  the node reference
+     * @param classQName  the Class qualified name
+     */
+    /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, NodeRef nodeRef, QName classQName)
+    {
+        this(dictionary, nodeRef, classQName, ALL_FEATURES);
     }
 
     
@@ -73,10 +86,27 @@ import org.alfresco.service.namespace.QName;
      */
     /*package*/ ClassFeatureBehaviourBinding(DictionaryService dictionary, QName classQName)
     {
-        this(dictionary, classQName, ALL_FEATURES);
+        this(dictionary, null, classQName, ALL_FEATURES);
     }
         
     
+    /**
+     * Construct.
+     * 
+     * @param dictionary  the dictionary service
+     * @param nodeRef  the node reference
+     * @param classQName  the Class qualified name
+     * @param featureQName  the Class feature (property or association) qualifed name
+     * @param activeFeatureQName  the currently active feature QName
+     */
+    private ClassFeatureBehaviourBinding(DictionaryService dictionary, NodeRef nodeRef, QName classQName, QName featureQName, QName activeFeatureQName)
+    {
+        super(dictionary, nodeRef, classQName);
+        this.featureQName = featureQName;
+        this.activeFeatureQName = activeFeatureQName;
+    }
+
+
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.BehaviourBinding#generaliseBinding()
      */
@@ -90,12 +120,12 @@ import org.alfresco.service.namespace.QName;
             QName parentClassName = classDefinition.getParentName();
             if (parentClassName != null)
             {
-                generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), parentClassName, featureQName, featureQName);
+                generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), getNodeRef(), parentClassName, featureQName, featureQName);
             }
         }
         else
         {
-            generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), getClassQName(), featureQName, ALL_FEATURES);
+            generalisedBinding = new ClassFeatureBehaviourBinding(getDictionary(), getNodeRef(), getClassQName(), featureQName, ALL_FEATURES);
         }
         
         return generalisedBinding;

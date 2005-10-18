@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
+
 
 /**
  * Class (Type/Aspect) oriented index of bound behaviours
@@ -44,11 +47,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
     // List of registered observers
     private List<BehaviourChangeObserver<B>> observers = new ArrayList<BehaviourChangeObserver<B>>();
 
+    // Behaviour Filter
+    private BehaviourFilter filter = null;
 
+    
     /**
      * Construct.
      */
-    /*package*/ ClassBehaviourIndex()
+    /*package*/ ClassBehaviourIndex(BehaviourFilter filter)
     {
         // Observe class binding changes and propagate to our own observers 
         this.classMap.addChangeObserver(new BehaviourChangeObserver<B>()
@@ -74,6 +80,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
                 }
             }
         });
+
+        // Setup state
+        this.filter = filter;
     }
 
     
@@ -101,6 +110,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
     /* (non-Javadoc)
      * @see org.alfresco.repo.policy.BehaviourIndex#find()
      */
+    @SuppressWarnings("unchecked")
     public Collection<BehaviourDefinition> find(B binding)
     {
         lock.readLock().lock();
@@ -109,19 +119,31 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
         {
             List<BehaviourDefinition> behaviours = new ArrayList<BehaviourDefinition>();
 
-            // Find class behaviour by scanning up the class hierarchy
-            BehaviourDefinition behaviour = null;
-            while(behaviour == null && binding != null)
+            // Determine if behaviour has been disabled
+            boolean isEnabled = true;
+            if (filter != null)
             {
-                behaviour = classMap.get(binding);
-                if (behaviour == null)
-                {
-                    binding = (B)binding.generaliseBinding();
-                }
+                NodeRef nodeRef = binding.getNodeRef();
+                QName className = binding.getClassQName();
+                isEnabled = (nodeRef == null) ? filter.isEnabled(className) : filter.isEnabled(nodeRef, className);
             }
-            if (behaviour != null)
+
+            if (isEnabled)
             {
-                behaviours.add(behaviour);
+                // Find class behaviour by scanning up the class hierarchy
+                BehaviourDefinition behaviour = null;
+                while(behaviour == null && binding != null)
+                {
+                    behaviour = classMap.get(binding);
+                    if (behaviour == null)
+                    {
+                        binding = (B)binding.generaliseBinding();
+                    }
+                }
+                if (behaviour != null)
+                {
+                    behaviours.add(behaviour);
+                }
             }
             
             // Append all service-level behaviours
@@ -144,7 +166,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
         observers.add(observer);
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.policy.BehaviourIndex#getFilter()
+     */
+    public BehaviourFilter getFilter()
+    {
+        return filter;
+    }
 
+    
     /**
      * Binds a Class Behaviour into this index
      * 

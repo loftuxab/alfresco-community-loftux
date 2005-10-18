@@ -91,4 +91,10 @@ public interface BehaviourFilter
      */
     public boolean isEnabled(NodeRef nodeRef, QName className);
     
+    /**
+     * Determine if any behaviours have been disabled?
+     * 
+     * @return  true => behaviours have been filtered
+     */
+    public boolean isActivated();
 }
