@@ -30,8 +30,8 @@ import junit.framework.TestCase;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ActionServiceImplTest;
 import org.alfresco.repo.action.ActionServiceImplTest.AsyncTest;
-import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
+import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.NoConditionEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.action.executer.CheckInActionExecuter;
@@ -71,12 +71,10 @@ import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.rule.RuleType;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.TestWithUserUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StopWatch;
@@ -107,7 +105,6 @@ public class RuleServiceCoverageTest extends TestCase
 	private ContentService contentService;
 	private ServiceRegistry serviceRegistry;
     private DictionaryDAO dictionaryDAO;
-    private AuthenticationService authenticationService;
     private ActionService actionService;
     private ContentTransformerRegistry transformerRegistry;
 
@@ -144,7 +141,6 @@ public class RuleServiceCoverageTest extends TestCase
         this.lockService = serviceRegistry.getLockService();
 		this.contentService = serviceRegistry.getContentService();
         this.dictionaryDAO = (DictionaryDAO)applicationContext.getBean("dictionaryDAO");
-        this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         this.actionService = serviceRegistry.getActionService();
         this.transactionService = serviceRegistry.getTransactionService();
         this.transformerRegistry = (ContentTransformerRegistry)applicationContext.getBean("contentTransformerRegistry");
@@ -933,7 +929,7 @@ public class RuleServiceCoverageTest extends TestCase
             if (childNodeRef.equals(newNodeRef) == true)
             {
                 // check that the node has been locked
-                LockStatus lockStatus = this.lockService.getLockStatus(childNodeRef, TestWithUserUtils.getCurrentUser(this.authenticationService));
+                LockStatus lockStatus = this.lockService.getLockStatus(childNodeRef);
                 assertEquals(LockStatus.LOCK_OWNER, lockStatus);
             }
             else if (this.nodeService.hasAspect(childNodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
@@ -1000,9 +996,7 @@ public class RuleServiceCoverageTest extends TestCase
 		assertFalse(this.nodeService.exists(list.get(1)));
 		
 		// Check that the origional is no longer locked
-		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(
-				list.get(0), 
-				TestWithUserUtils.getCurrentUser(this.authenticationService)));
+		assertEquals(LockStatus.NO_LOCK, this.lockService.getLockStatus(list.get(0)));
 		
 		//System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }

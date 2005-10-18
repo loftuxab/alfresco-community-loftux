@@ -139,16 +139,16 @@ public class UnlockMethod extends WebDAVMethod
            // Get the lock status for the node
 
            LockService lockService = getDAVHelper().getLockService();
-           String nodeId   = lockInfo[0];
-           String userName = lockInfo[1];
+           //String nodeId   = lockInfo[0];
+           //String userName = lockInfo[1];
            
-           LockStatus lockSts = lockService.getLockStatus(lockNode, userName);
+           LockStatus lockSts = lockService.getLockStatus(lockNode);
            
            if ( lockSts == LockStatus.LOCK_OWNER)
            {
                // Unlock the node
                
-               lockService.unlock(lockNode, userName);
+               lockService.unlock(lockNode);
                
                // Indicate that the unlock was successful
                

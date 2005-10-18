@@ -147,19 +147,22 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.service.cmr.lock.LockType)
      */
-    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType)
+    public synchronized void lock(NodeRef nodeRef, LockType lockType)
     {
         // Lock with no expiration
-        lock(nodeRef, userName, lockType, 0);
+        lock(nodeRef, lockType, 0);
     }
 
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.service.cmr.lock.LockType, int)
      */
-    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType, int timeToExpire)
+    public synchronized void lock(NodeRef nodeRef, LockType lockType, int timeToExpire)
     {
         // Check for lock aspect
         checkForLockApsect(nodeRef);
+        
+        // Get the current user name
+        String userName = getUserName();
 
         // Set a default value
         if (lockType == null)
@@ -217,17 +220,17 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, org.alfresco.service.cmr.lock.LockType, int, boolean)
      */
-    public synchronized void lock(NodeRef nodeRef, String userName, LockType lockType, int timeToExpire, boolean lockChildren)
+    public synchronized void lock(NodeRef nodeRef, LockType lockType, int timeToExpire, boolean lockChildren)
             throws UnableToAquireLockException
     {
-        lock(nodeRef, userName, lockType, timeToExpire);
+        lock(nodeRef, lockType, timeToExpire);
 
         if (lockChildren == true)
         {
             Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
             for (ChildAssociationRef childAssocRef : childAssocRefs)
             {
-                lock(childAssocRef.getChildRef(), userName, lockType, timeToExpire, lockChildren);
+                lock(childAssocRef.getChildRef(), lockType, timeToExpire, lockChildren);
             }
         }
     }
@@ -235,23 +238,26 @@ public class LockServiceImpl implements LockService
     /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(java.util.Collection, java.lang.String, org.alfresco.service.cmr.lock.LockType, int)
      */
-    public synchronized void lock(Collection<NodeRef> nodeRefs, String userName, LockType lockType, int timeToExpire)
+    public synchronized void lock(Collection<NodeRef> nodeRefs, LockType lockType, int timeToExpire)
             throws UnableToAquireLockException
     {
         // Lock each of the specifed nodes
         for (NodeRef nodeRef : nodeRefs)
         {
-            lock(nodeRef, userName, lockType, timeToExpire);
+            lock(nodeRef, lockType, timeToExpire);
         }
     }    
 
     /**
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String)
      */
-    public synchronized void unlock(NodeRef nodeRef, String userName) throws UnableToReleaseLockException
+    public synchronized void unlock(NodeRef nodeRef) throws UnableToReleaseLockException
     {
         // Check for lock aspect
         checkForLockApsect(nodeRef);
+        
+        // Get the current user name
+        String userName = getUserName();
 
         LockStatus lockStatus = getLockStatus(nodeRef, userName);
         if (LockStatus.LOCKED.equals(lockStatus) == true)
@@ -278,11 +284,11 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.service.cmr.lock.LockService#unlock(NodeRef, String,
      *      boolean)
      */
-    public synchronized void unlock(NodeRef nodeRef, String userName, boolean unlockChildren)
+    public synchronized void unlock(NodeRef nodeRef, boolean unlockChildren)
             throws UnableToReleaseLockException
     {
         // Unlock the parent
-        unlock(nodeRef, userName);
+        unlock(nodeRef);
 
         if (unlockChildren == true)
         {
@@ -290,7 +296,7 @@ public class LockServiceImpl implements LockService
             Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
             for (ChildAssociationRef childAssocRef : childAssocRefs)
             {
-                unlock(childAssocRef.getChildRef(), userName, unlockChildren);
+                unlock(childAssocRef.getChildRef(), unlockChildren);
             }
         }
     }
@@ -299,11 +305,11 @@ public class LockServiceImpl implements LockService
      * @see org.alfresco.repo.lock.LockService#unlock(Collection<NodeRef>,
      *      String)
      */
-    public synchronized void unlock(Collection<NodeRef> nodeRefs, String userName) throws UnableToReleaseLockException
+    public synchronized void unlock(Collection<NodeRef> nodeRefs) throws UnableToReleaseLockException
     {
         for (NodeRef nodeRef : nodeRefs)
         {
-            unlock(nodeRef, userName);
+            unlock(nodeRef);
         }
     }
 
@@ -315,11 +321,8 @@ public class LockServiceImpl implements LockService
         return getLockStatus(nodeRef, getUserName());
     }
 
-    /**
-     * @see org.alfresco.service.cmr.lock.LockService#getLockStatus(NodeRef,
-     *      String)
-     */
-    public LockStatus getLockStatus(NodeRef nodeRef, String userName)
+
+    private LockStatus getLockStatus(NodeRef nodeRef, String userName)
     {
         LockStatus result = LockStatus.NO_LOCK;
 
@@ -397,15 +400,8 @@ public class LockServiceImpl implements LockService
      */
     public void checkForLock(NodeRef nodeRef) throws NodeLockedException
     {
-        // Check the lock
-        checkForLockWithUser(nodeRef, getUserName());
-    }
-
-    /**
-     * @see LockService#checkForLockWithUser(NodeRef, String)
-     */
-    public void checkForLockWithUser(NodeRef nodeRef, String userName) throws NodeLockedException
-    {
+        String userName = getUserName();
+ 
         // Ensure we have found a node reference
         if (nodeRef != null && userName != null)
         {

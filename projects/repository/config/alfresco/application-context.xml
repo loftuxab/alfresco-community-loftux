@@ -67,6 +67,7 @@
     			<value>alfresco.messages.version-service</value>
     			<value>alfresco.messages.permissions-service</value>
     			<value>alfresco.messages.content-service</value>
+    			<value>alfresco.messages.coci-service</value>    			
     		</list>
     	</property>
     </bean>
@@ -439,8 +440,8 @@
         <property name="authenticationService">
             <ref bean="authenticationService" />
         </property>
-        <property name="workingCopyLabel">
-            <value>${workingcopy.label}</value>
+        <property name="searchService">
+            <ref bean="searchService" />
         </property>
     </bean>
     
@@ -453,9 +454,6 @@
         </property>
         <property name="lockService">
             <ref bean="LockService" />
-        </property>
-        <property name="authenticationService">
-            <ref bean="authenticationService" />
         </property>
     </bean>
 

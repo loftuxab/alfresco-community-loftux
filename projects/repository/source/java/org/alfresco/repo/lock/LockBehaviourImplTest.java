@@ -79,11 +79,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
     private static final String GOOD_USER_NAME = "goodUser";
     private static final String BAD_USER_NAME = "badUser";
     
-    /**
-     * User node references
-     */
-    private String goodUserNodeRef;
-    private String badUserNodeRef;
+    NodeRef rootNodeRef;
    
     @Override
     protected void onSetUpInTransaction() throws Exception
@@ -102,7 +98,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         
         // Get a reference to the root node
-        NodeRef rootNodeRef = this.nodeService.getRootNode(this.storeRef);
+        rootNodeRef = this.nodeService.getRootNode(this.storeRef);
         
         // Create node 
         this.nodeRef = this.nodeService.createNode(
@@ -129,9 +125,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         
         // Stash the user node ref's for later use
         TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.badUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);
-        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
-        this.goodUserNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);     
+        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);  
     }   
 
     /**
@@ -139,18 +133,18 @@ public class LockBehaviourImplTest extends BaseSpringTest
      */
     public void testCheckForLockNoUser()
     {
-        // NOTE:  we are current presumed to be the this.goodUserNodeRef        	
+        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);     	
 		
         this.lockService.checkForLock(this.nodeRef);
         this.lockService.checkForLock(this.noAspectNode);
         
         // Give the node a write lock (as the good user)
-        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.WRITE_LOCK);    
+        this.lockService.lock(this.nodeRef, LockType.WRITE_LOCK);    
         this.lockService.checkForLock(this.nodeRef);
         
         // Give the node a read only lock (as the good user)
-        this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
-        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.READ_ONLY_LOCK);
+        this.lockService.unlock(this.nodeRef);
+        this.lockService.lock(this.nodeRef, LockType.READ_ONLY_LOCK);
         try
         {
             this.lockService.checkForLock(this.nodeRef);
@@ -162,10 +156,13 @@ public class LockBehaviourImplTest extends BaseSpringTest
         }
         
         // Give the node a write lock (as the bad user)
-        this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
-        this.lockService.lock(this.nodeRef, this.badUserNodeRef, LockType.WRITE_LOCK);        
+        this.lockService.unlock(this.nodeRef);
+        
+        TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
+        this.lockService.lock(this.nodeRef, LockType.WRITE_LOCK);        
         try
         {
+            TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
             this.lockService.checkForLock(this.nodeRef);
             fail("The node locked exception should have been raised");
         }
@@ -175,10 +172,12 @@ public class LockBehaviourImplTest extends BaseSpringTest
         }
         
         // Give the node a read only lock (as the bad user)
-        this.lockService.unlock(this.nodeRef, this.badUserNodeRef);
-        this.lockService.lock(this.nodeRef, this.badUserNodeRef, LockType.READ_ONLY_LOCK);        
+        TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
+        this.lockService.unlock(this.nodeRef);
+        this.lockService.lock(this.nodeRef, LockType.READ_ONLY_LOCK);        
         try
         {
+            TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
             this.lockService.checkForLock(this.nodeRef);
             fail("The node locked exception should have been raised");
         }
@@ -187,61 +186,15 @@ public class LockBehaviourImplTest extends BaseSpringTest
             // Correct behaviour
         }
     }
-    
-    /**
-     * Test checkForLock (user specified)
-     */
-    public void testCheckForLock()
-    {
-        this.lockService.checkForLockWithUser(this.nodeRef, this.goodUserNodeRef);
-        this.lockService.checkForLockWithUser(this.nodeRef, this.badUserNodeRef);
-        this.lockService.checkForLockWithUser(this.noAspectNode, this.goodUserNodeRef);
-        this.lockService.checkForLockWithUser(this.noAspectNode, this.badUserNodeRef);
-        
-        // Give the node a write lock
-        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.WRITE_LOCK);        
-        this.lockService.checkForLockWithUser(this.nodeRef, this.goodUserNodeRef);
-        
-        try
-        {
-            this.lockService.checkForLockWithUser(this.nodeRef, this.badUserNodeRef);
-            fail("The node locked exception should have been raised");
-        }
-        catch (NodeLockedException exception)
-        {
-            // Correct behaviour
-        }
-        
-        // Give the node a read only lock
-        this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
-        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.READ_ONLY_LOCK);
-        
-        try
-        {
-            this.lockService.checkForLockWithUser(this.nodeRef, this.goodUserNodeRef);
-            fail("The node locked exception should have been raised");
-        }
-        catch (NodeLockedException exception)
-        {
-            // Correct behaviour
-        }
-        try
-        {
-            this.lockService.checkForLockWithUser(this.nodeRef, this.badUserNodeRef);
-            fail("The node locked exception should have been raised");
-        }
-        catch (NodeLockedException exception)
-        {
-            // Correct behaviour
-        }
-    }
-    
+
     public void testCheckForLockWhenExpired()
     {
-        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.READ_ONLY_LOCK, 1);        
+        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
+        
+        this.lockService.lock(this.nodeRef, LockType.READ_ONLY_LOCK, 1);        
         try 
         {
-            this.lockService.checkForLockWithUser(this.nodeRef, this.goodUserNodeRef);    
+            this.lockService.checkForLock(this.nodeRef);    
             fail("Should be locked.");
         }
         catch (NodeLockedException e)
@@ -252,7 +205,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         try {Thread.sleep(2*1000); } catch (Exception e) {};
         
         // Should now have expired so the node should no longer appear to be locked
-        this.lockService.checkForLockWithUser(this.nodeRef, this.goodUserNodeRef);
+        this.lockService.checkForLock(this.nodeRef);
     }
 	
     /**
@@ -260,6 +213,8 @@ public class LockBehaviourImplTest extends BaseSpringTest
      */
     public void testVersionServiceLockBehaviour01()
     {
+        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
+        
         // Add the version aspect to the node
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
         
@@ -273,7 +228,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         }
         
         // Lock the node as the good user with a write lock
-        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.WRITE_LOCK);
+        this.lockService.lock(this.nodeRef, LockType.WRITE_LOCK);
         try
         {
             this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
@@ -282,10 +237,10 @@ public class LockBehaviourImplTest extends BaseSpringTest
         {
             fail("Tried to version as the lock owner so should work.");
         }
-        this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
+        this.lockService.unlock(this.nodeRef);
         
         // Lock the node as the good user with a read only lock
-        this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.READ_ONLY_LOCK);
+        this.lockService.lock(this.nodeRef, LockType.READ_ONLY_LOCK);
         try
         {
             this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
@@ -294,7 +249,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         catch (NodeLockedException exception)
         {
         }
-        this.lockService.unlock(this.nodeRef, this.goodUserNodeRef);
+        this.lockService.unlock(this.nodeRef);
     }
     
     /**
@@ -306,9 +261,11 @@ public class LockBehaviourImplTest extends BaseSpringTest
         this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
         
         // Lock the node as the bad user with a write lock
-        this.lockService.lock(this.nodeRef, this.badUserNodeRef, LockType.WRITE_LOCK);
+        this.lockService.lock(this.nodeRef, LockType.WRITE_LOCK);
         try
         {
+            TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
+            
             this.versionService.createVersion(this.nodeRef, new HashMap<String, Serializable>());
             fail("Should have failed since this node has been locked by another user with a write lock.");
         }
@@ -324,6 +281,8 @@ public class LockBehaviourImplTest extends BaseSpringTest
     @SuppressWarnings("unused")
 	public void testNodeServiceLockBehaviour()
 	{
+        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
+        
 		// Check that we can create a new node and set of it properties when no lock is present
 		ChildAssociationRef childAssocRef = this.nodeService.createNode(
 				this.nodeRef, 
@@ -333,7 +292,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		 NodeRef nodeRef = childAssocRef.getChildRef();
 		
 		// Lets lock the parent node and check that whether we can still create a new node
-		this.lockService.lock(this.nodeRef, this.goodUserNodeRef, LockType.WRITE_LOCK);
+		this.lockService.lock(this.nodeRef, LockType.WRITE_LOCK);
 		ChildAssociationRef childAssocRef2 = this.nodeService.createNode(
 				this.nodeRef, 
 				ContentModel.ASSOC_CONTAINS,				
@@ -350,9 +309,13 @@ public class LockBehaviourImplTest extends BaseSpringTest
 		// TODO there are various other calls that could be more vigirously checked
 		
 		// Lock the node as the 'bad' user
-		this.lockService.unlock(this.nodeRef,this.goodUserNodeRef);
-		this.lockService.lock(this.nodeRef, this.badUserNodeRef, LockType.WRITE_LOCK);
+		this.lockService.unlock(this.nodeRef);
+        
+        TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
+		this.lockService.lock(this.nodeRef, LockType.WRITE_LOCK);
 		
+        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService); 
+        
 		// Lets check that we can't create a new child 
 		try
 		{

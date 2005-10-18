@@ -466,7 +466,12 @@
                <type>d:noderef</type>
                <protected>true</protected>
                <mandatory>true</mandatory>
-               <multiple>false</multiple>
+               <multiple>false</multiple>               
+               <index enabled="true">
+                  <atomic>true</atomic>
+                  <stored>false</stored>
+                  <tokenised>true</tokenised>
+               </index>
             </property>
          </properties>
       </aspect>

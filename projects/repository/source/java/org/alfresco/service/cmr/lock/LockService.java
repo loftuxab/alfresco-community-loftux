@@ -44,7 +44,7 @@ public interface LockService
     * @throws UnableToAquireLockException
     *                  thrown if the lock could not be obtained
     */
-   public void lock(NodeRef nodeRef, String userName, LockType lockType)
+   public void lock(NodeRef nodeRef, LockType lockType)
        throws UnableToAquireLockException;
    
    /**
@@ -69,7 +69,7 @@ public interface LockService
     * @throws UnableToAquireLockException
     *                       thrown if the lock could not be obtained
     */
-   public void lock(NodeRef nodeRef, String userName, LockType lockType, int timeToExpire)
+   public void lock(NodeRef nodeRef, LockType lockType, int timeToExpire)
        throws UnableToAquireLockException;
    
    /**
@@ -100,7 +100,7 @@ public interface LockService
     * @throws UnableToAquireLockException
     *                           thrown if the lock could not be obtained
     */
-   public void lock(NodeRef nodeRef, String userName, LockType lockType, int timeToExpire, boolean lockChildren)
+   public void lock(NodeRef nodeRef, LockType lockType, int timeToExpire, boolean lockChildren)
        throws UnableToAquireLockException;
    
    /**
@@ -127,7 +127,7 @@ public interface LockService
     * @throws UnableToAquireLockException
     *                           thrown if the lock could not be obtained
     */
-   public void lock(Collection<NodeRef> nodeRefs, String userName, LockType lockType, int timeToExpire)
+   public void lock(Collection<NodeRef> nodeRefs, LockType lockType, int timeToExpire)
        throws UnableToAquireLockException;
    
    /**
@@ -141,7 +141,7 @@ public interface LockService
     * @throws UnableToReleaseLockException
     *                  thrown if the lock could not be released             
     */
-   public void unlock(NodeRef nodeRef, String userName)
+   public void unlock(NodeRef nodeRef)
        throws UnableToReleaseLockException;
    
    /**
@@ -164,7 +164,7 @@ public interface LockService
     * @throws UnableToReleaseLockException
     *                  thrown if the lock could not be released
     */
-   public void unlock(NodeRef nodeRef, String userName, boolean lockChildren)
+   public void unlock(NodeRef nodeRef, boolean lockChildren)
        throws UnableToReleaseLockException;
    
    /**
@@ -185,7 +185,7 @@ public interface LockService
     * @throws UnableToReleaseLockException
     *                  thrown if the lock could not be released
     */
-   public void unlock(Collection<NodeRef> nodeRefs, String userName)
+   public void unlock(Collection<NodeRef> nodeRefs)
        throws UnableToReleaseLockException;
    
    /**
@@ -212,7 +212,7 @@ public interface LockService
     * @param userName    the user reference
     * @return           the status of the lock in relation to the user
     */
-   public LockStatus getLockStatus(NodeRef nodeRef, String userName);
+   //public LockStatus getLockStatus(NodeRef nodeRef, String userName);
    
    /**
     * Gets the lock type for the node indicated.  
@@ -250,6 +250,6 @@ public interface LockService
     *                  thrown if the node is determined to be locked based on the user ref and lock 
     *                  type
     */
-   public void checkForLockWithUser(NodeRef nodeRef, String userName)
-       throws NodeLockedException;
+  // public void checkForLockWithUser(NodeRef nodeRef, String userName)
+  //     throws NodeLockedException;
 }

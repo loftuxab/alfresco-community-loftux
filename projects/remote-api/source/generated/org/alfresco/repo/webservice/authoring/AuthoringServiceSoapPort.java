@@ -33,12 +33,12 @@ public interface AuthoringServiceSoapPort extends java.rmi.Remote {
     /**
      * Locks a content resource.
      */
-    public org.alfresco.repo.webservice.types.Reference[] lock(org.alfresco.repo.webservice.types.Predicate items, java.lang.String user, boolean lockChildren, org.alfresco.repo.webservice.authoring.LockTypeEnum lockType) throws java.rmi.RemoteException, org.alfresco.repo.webservice.authoring.AuthoringFault;
+    public org.alfresco.repo.webservice.types.Reference[] lock(org.alfresco.repo.webservice.types.Predicate items, boolean lockChildren, org.alfresco.repo.webservice.authoring.LockTypeEnum lockType) throws java.rmi.RemoteException, org.alfresco.repo.webservice.authoring.AuthoringFault;
 
     /**
      * Unlocks a content resource.
      */
-    public org.alfresco.repo.webservice.types.Reference[] unlock(org.alfresco.repo.webservice.types.Predicate items, java.lang.String user, boolean unlockChildren) throws java.rmi.RemoteException, org.alfresco.repo.webservice.authoring.AuthoringFault;
+    public org.alfresco.repo.webservice.types.Reference[] unlock(org.alfresco.repo.webservice.types.Predicate items, boolean unlockChildren) throws java.rmi.RemoteException, org.alfresco.repo.webservice.authoring.AuthoringFault;
 
     /**
      * Gets the lock status of the specified nodes.

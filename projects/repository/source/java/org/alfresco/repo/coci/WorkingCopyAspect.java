@@ -25,7 +25,6 @@ import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -45,11 +44,6 @@ public class WorkingCopyAspect
      * The lock service
      */
     private LockService lockService;
-    
-    /**
-     * The authentication service
-     */
-    private AuthenticationService authenticationService;
     
     /**
      * Sets the policy component
@@ -79,17 +73,6 @@ public class WorkingCopyAspect
     public void setLockService(LockService lockService)
     {
         this.lockService = lockService;
-    }
-    
-    /**
-     * Sets the authentication service
-     * 
-     * @param authenticationService     the authentication service
-     */
-    public void setAuthenticationService(
-            AuthenticationService authenticationService)
-    {
-        this.authenticationService = authenticationService;
     }
     
     /**
@@ -147,12 +130,8 @@ public class WorkingCopyAspect
             NodeRef origNodeRef = (NodeRef)this.nodeService.getProperty(nodeRef, ContentModel.PROP_COPY_REFERENCE);
             if (origNodeRef != null)
             {                  
-                String userName = this.authenticationService.getCurrentUserName();
-                if (userName != null)
-                {
-                    // Release the lock on the origional node
-                    this.lockService.unlock(origNodeRef, userName);
-                }
+               // Release the lock on the origional node
+               this.lockService.unlock(origNodeRef);                
             }
         }
     }

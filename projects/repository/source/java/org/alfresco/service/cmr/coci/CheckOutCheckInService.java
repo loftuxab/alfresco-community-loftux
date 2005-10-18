@@ -155,4 +155,14 @@ public interface CheckOutCheckInService
 	 * @return						the origional node reference
 	 */
 	public NodeRef cancelCheckout(NodeRef workingCopyNodeRef);
+    
+    /**
+     * Helper method to retrieve the working copy node reference for a checked out node.
+     * <p>
+     * A null node reference is returned if the node is not checked out.
+     * 
+     * @param   nodeRef   a node reference
+     * @return            the working copy node reference or null if none.
+     */
+    public NodeRef getWorkingCopy(NodeRef nodeRef);
 }

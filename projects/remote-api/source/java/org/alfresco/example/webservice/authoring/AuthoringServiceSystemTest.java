@@ -241,7 +241,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         checkLockStatus(predicate, null, null);
         
         // Lock with a write lock
-        Reference[] lockedRefs = this.authoringService.lock(predicate, USERNAME, false, LockTypeEnum.write);
+        Reference[] lockedRefs = this.authoringService.lock(predicate, false, LockTypeEnum.write);
         assertNotNull(lockedRefs);
         assertEquals(1, lockedRefs.length);        
         // TODO check in more detail
@@ -250,18 +250,18 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         checkLockStatus(predicate, USERNAME, LockTypeEnum.write);
         
         // Unlock (bad)
-        try
-        {
-            this.authoringService.unlock(predicate, "bad", false);
-            fail("This should have thrown an exception.");
-        }
-        catch (Throwable exception)
-        {
-            // Good .. we where expceting this
-        }
+//        try
+//        {
+//            this.authoringService.unlock(predicate, "bad", false);
+//            fail("This should have thrown an exception.");
+//        }
+//        catch (Throwable exception)
+//        {
+//            // Good .. we where expceting this
+//        }
         
         // Unlock (good)
-        Reference[] unlocked = this.authoringService.unlock(predicate, USERNAME, false);
+        Reference[] unlocked = this.authoringService.unlock(predicate, false);
         assertNotNull(unlocked);
         assertEquals(1, unlocked.length);
         
@@ -269,7 +269,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         checkLockStatus(predicate, null, null);
         
         // Read lock
-        Reference[] lockedRefs2 = this.authoringService.lock(predicate, USERNAME, false, LockTypeEnum.read);
+        Reference[] lockedRefs2 = this.authoringService.lock(predicate, false, LockTypeEnum.read);
         
         assertNotNull(lockedRefs2);
         assertEquals(1, lockedRefs2.length);
@@ -319,7 +319,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         // Get the version history
         VersionHistory versionHistory = this.authoringService.getVersionHistory(reference);
         assertNotNull(versionHistory);
-        assertEquals(1, versionHistory.getVersions().length);
+        assertEquals(2, versionHistory.getVersions().length);
         // TODO some more tests ...
         
         // Update the content
@@ -331,14 +331,14 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         assertEquals(1, versionResult2.getNodes().length);
         assertEquals(1, versionResult2.getVersions().length);
         Version version2 = versionResult2.getVersions()[0];
-        assertEquals("1.1", version2.getLabel());
+        assertEquals("1.2", version2.getLabel());
         // TODO check commentaries
         // TODO check creator
         
         // Check the version history
         VersionHistory versionHistory2 = this.authoringService.getVersionHistory(reference);
         assertNotNull(versionHistory2);
-        assertEquals(2, versionHistory2.getVersions().length);
+        assertEquals(3, versionHistory2.getVersions().length);
         // TODO some more tests ...
         
         // Confirm the current content of the node

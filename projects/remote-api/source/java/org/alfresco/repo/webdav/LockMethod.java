@@ -231,7 +231,7 @@ public class LockMethod extends WebDAVMethod
        
        // Check the lock status of the node
        
-       LockStatus lockSts = lockService.getLockStatus(lockNode, userName);
+       LockStatus lockSts = lockService.getLockStatus(lockNode);
        
        // DEBUG
        
@@ -247,7 +247,7 @@ public class LockMethod extends WebDAVMethod
        
        // Lock the node
        
-       lockService.lock(lockNode, userName, LockType.WRITE_LOCK, getLockTimeout());
+       lockService.lock(lockNode, LockType.WRITE_LOCK, getLockTimeout());
    }
    
    /**
@@ -263,7 +263,7 @@ public class LockMethod extends WebDAVMethod
        
        // Check the lock status of the node
        
-       LockStatus lockSts = lockService.getLockStatus(lockNode, userName);
+       LockStatus lockSts = lockService.getLockStatus(lockNode);
 
        // DEBUG
        
@@ -279,7 +279,7 @@ public class LockMethod extends WebDAVMethod
        
        // Update the expiry for the lock
        
-       lockService.lock(lockNode, userName, LockType.WRITE_LOCK, getLockTimeout());
+       lockService.lock(lockNode, LockType.WRITE_LOCK, getLockTimeout());
    }
    
    /**

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInServiceException;
@@ -33,6 +34,8 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
@@ -44,11 +47,15 @@ import org.alfresco.service.namespace.QName;
  */
 public class CheckOutCheckInServiceImpl implements CheckOutCheckInService 
 {
-	/**
-	 * Error messages
-	 */
-	private static final String ERR_BAD_COPY = "The original node can not be found.  Perhaps the copy has " +
-											   "been corrupted or the origional has been deleted or moved.";
+    /**
+     * I18N labels
+     */
+    private static final String MSG_ERR_BAD_COPY = "coci_service.err_bad_copy";
+    private static final String MSG_WORKING_COPY_LABEL = "coci_service.working_copy_label";
+    private static final String MSG_ERR_NOT_OWNER = "coci_service.err_not_owner"; 
+    private static final String MSG_ERR_ALREADY_WORKING_COPY = "coci_service.err_workingcopy_checkout";
+    private static final String MSG_ERR_NOT_AUTHENTICATED = "coci_service.err_not_authenticated";
+    private static final String MSG_ERR_WORKINGCOPY_HAS_NO_MIMETYPE = "coci_service.err_workingcopy_has_no_mimetype"; 
 
 	/**
 	 * Extension character, used to recalculate the working copy names
@@ -76,14 +83,14 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 	private CopyService copyService;
     
     /**
+     * The search service
+     */
+    private SearchService searchService;
+    
+    /**
      * The authentication service
      */
     private AuthenticationService authenticationService;
-    
-    /**
-     * The label used to indicate that a node is a working copy by modifying the name
-     */
-    private String workingCopyLabel;
 	
 	/**
 	 * Set the node service
@@ -138,13 +145,13 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
     }
     
     /**
-     * Set the working copy label
+     * Set the search service
      * 
-     * @param workingCopyLabel  the working copy label
+     * @param searchService     the search service
      */
-    public void setWorkingCopyLabel(String workingCopyLabel) 
+    public void setSearchService(SearchService searchService)
     {
-		this.workingCopyLabel = workingCopyLabel;
+        this.searchService = searchService;
     }
     
     /**
@@ -154,7 +161,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
      */
     public String getWorkingCopyLabel() 
     {
-		return workingCopyLabel;
+		return I18NUtil.getMessage(MSG_WORKING_COPY_LABEL);
 	}
 	
 	/**
@@ -169,7 +176,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		// Make sure we are no checking out a working copy node
 		if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_WORKING_COPY) == true)
 		{
-			throw new CheckOutCheckInServiceException("A working copy can not be checked out.");
+			throw new CheckOutCheckInServiceException(MSG_ERR_ALREADY_WORKING_COPY);
 		}
 		
 		// Apply the lock aspect if required
@@ -180,7 +187,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		
 		// Rename the working copy
         String copyName = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-		if (this.workingCopyLabel != null && this.workingCopyLabel.length() != 0)
+		if (this.getWorkingCopyLabel() != null && this.getWorkingCopyLabel().length() != 0)
 		{
 			if (copyName != null && copyName.length() != 0)
 			{
@@ -188,17 +195,17 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 				if (index > 0)
 				{
 					// Insert the working copy label before the file extension
-                    copyName = copyName.substring(0, index) + " " + this.workingCopyLabel + copyName.substring(index);
+                    copyName = copyName.substring(0, index) + " " + getWorkingCopyLabel() + copyName.substring(index);
 				}
 				else
 				{
 					// Simply append the working copy label onto the end of the existing name
-                    copyName = copyName + " " + this.workingCopyLabel;
+                    copyName = copyName + " " + getWorkingCopyLabel();
 				}
 			}
             else
             {
-                copyName = this.workingCopyLabel;
+                copyName = getWorkingCopyLabel();
             }
 		}
 
@@ -222,7 +229,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		this.nodeService.addAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY, workingCopyProperties);
 		
 		// Lock the origional node
-		this.lockService.lock(nodeRef, userName, LockType.READ_ONLY_LOCK);
+		this.lockService.lock(nodeRef, LockType.READ_ONLY_LOCK);
 		
 		// Return the working copy
 		return workingCopy;
@@ -242,7 +249,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
         }
         else
         {
-            throw new CheckOutCheckInServiceException("Can not find the currently authenticated user details required by the CheckOutCheckIn service.");
+            throw new CheckOutCheckInServiceException(MSG_ERR_NOT_AUTHENTICATED);
         }
     }
 
@@ -285,17 +292,17 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			if(nodeRef == null)
 			{
 				// Error since the origional node can not be found
-				throw new CheckOutCheckInServiceException(ERR_BAD_COPY);							
+				throw new CheckOutCheckInServiceException(MSG_ERR_BAD_COPY);							
 			}
 			
 			try
 			{
 				// Release the lock
-				this.lockService.unlock(nodeRef, getUserName());
+				this.lockService.unlock(nodeRef);
 			}
 			catch (UnableToReleaseLockException exception)
 			{
-				throw new CheckOutCheckInServiceException("This user is not the owner of the working copy and can not check it in.", exception);
+				throw new CheckOutCheckInServiceException(MSG_ERR_NOT_OWNER, exception);
 			}
 			
 			if (contentUrl != null)
@@ -303,7 +310,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
                 ContentData contentData = (ContentData) workingCopyProperties.get(ContentModel.PROP_CONTENT);
                 if (contentData == null)
                 {
-                    throw new AlfrescoRuntimeException("Working copy node has no mimetype: " + workingCopyNodeRef);
+                    throw new AlfrescoRuntimeException(MSG_ERR_WORKINGCOPY_HAS_NO_MIMETYPE, new Object[]{workingCopyNodeRef});
                 }
                 else
                 {
@@ -337,7 +344,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			else
 			{
 				// Re-lock the origional node
-				this.lockService.lock(nodeRef, getUserName(), LockType.READ_ONLY_LOCK);
+				this.lockService.lock(nodeRef, LockType.READ_ONLY_LOCK);
 			}
 			
 		}
@@ -393,11 +400,11 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			if (nodeRef == null)
 			{
 				// Error since the origional node can not be found
-				throw new CheckOutCheckInServiceException(ERR_BAD_COPY);
+				throw new CheckOutCheckInServiceException(MSG_ERR_BAD_COPY);
 			}			
 			
 			// Release the lock on the origional node
-			this.lockService.unlock(nodeRef, getUserName());
+			this.lockService.unlock(nodeRef);
 			
 			// Delete the working copy
 			this.nodeService.deleteNode(workingCopyNodeRef);
@@ -410,4 +417,24 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		
 		return nodeRef;
 	}
+    
+    /**
+     * @see org.alfresco.service.cmr.coci.CheckOutCheckInService#getWorkingCopy(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public NodeRef getWorkingCopy(NodeRef nodeRef)
+    {
+        NodeRef workingCopy = null;
+        
+        // Do a search to find the origional document
+        ResultSet resultSet = this.searchService.query(
+                nodeRef.getStoreRef(), 
+                SearchService.LANGUAGE_LUCENE, 
+                "ASPECT:\"" + ContentModel.ASPECT_WORKING_COPY.toString() + "\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}" + ContentModel.PROP_COPY_REFERENCE.getLocalName() + ":\"" + nodeRef.toString() + "\"");
+        if (resultSet.getNodeRefs().size() != 0)
+        {
+            workingCopy = resultSet.getNodeRef(0);
+        }
+        
+        return workingCopy;
+    }
 }

@@ -89,7 +89,6 @@
             <complexType>
                <sequence>
                   <element name="items" type="cms:Predicate"/>
-                  <element name="user" type="xsd:string"/>
                   <element name="lockChildren" type="xsd:boolean"/>
                   <element name="lockType" type="author:LockTypeEnum"/>
                </sequence>
@@ -108,7 +107,6 @@
             <complexType>
                <sequence>
                   <element name="items" type="cms:Predicate"/>
-                  <element name="user" type="xsd:string"/>
                   <element name="unlockChildren" type="xsd:boolean"/>
                </sequence>
             </complexType>

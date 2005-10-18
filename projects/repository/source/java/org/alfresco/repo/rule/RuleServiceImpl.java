@@ -45,6 +45,8 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.GUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Rule service implementation.
@@ -65,6 +67,11 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     
     /** qname of assoc to rules */
     private QName ASSOC_NAME_RULES = QName.createQName(RuleModel.RULE_MODEL_URI, "rules");
+    
+    /**
+     * The logger
+     */
+    private static Log logger = LogFactory.getLog(RuleServiceImpl.class); 
     
     /**
      * The node service
@@ -596,7 +603,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     public void addRulePendingExecution(NodeRef actionableNodeRef, NodeRef actionedUponNodeRef, Rule rule, boolean executeAtEnd) 
 	{
         // First check to see if the node has been disabled
-        if (this.disabledNodeRefs.contains(actionableNodeRef) == false &&
+        if (this.disabledNodeRefs.contains(rule.getOwningNodeRef()) == false &&
             this.disabledRules.contains(rule) == false)
         {
     		PendingRuleData pendingRuleData = new PendingRuleData(actionableNodeRef, actionedUponNodeRef, rule, executeAtEnd);
@@ -614,10 +621,22 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
                     AlfrescoTransactionSupport.bindResource(KEY_RULES_PENDING, pendingRules);
                     // bind the rule transaction listener
                     AlfrescoTransactionSupport.bindListener(this.ruleTransactionListener);
+                    
+                    if (logger.isDebugEnabled() == true)
+                    {
+                        logger.debug("Rule '" + rule.getTitle() + "' has been added pending execution to action upon node '" + actionedUponNodeRef.getId() + "'");
+                    }
     			}
     			
     			pendingRules.add(pendingRuleData);		
     		}
+        }
+        else
+        {
+            if (logger.isDebugEnabled() == true)
+            {
+                logger.debug("The rule '" + rule.getTitle() + "' or the node '" + rule.getOwningNodeRef().getId() + "' has been disabled.");
+            }
         }
 	}
 

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.lock.LockService;
@@ -39,9 +40,10 @@ import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.GUID;
 import org.alfresco.util.TestWithUserUtils;
-import org.alfresco.util.debug.NodeStoreInspector;
 
 /**
  * Version operations service implementation unit tests
@@ -59,6 +61,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 	private VersionService versionService;
     private AuthenticationService authenticationService;
     private LockService lockService;
+    private TransactionService transactionService;
     
     /**
 	 * Data used by the tests
@@ -82,7 +85,8 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
     /**
      * User details 
      */
-    private static final String USER_NAME = "userNameCoCiTest";
+    //private static final String USER_NAME = "cociTest" + GUID.generate();
+    private String userName;
     private static final String PWD = "password";
 	
 	/**
@@ -99,6 +103,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.versionService = (VersionService)this.applicationContext.getBean("versionService");
         this.authenticationService = (AuthenticationService)this.applicationContext.getBean("authenticationService");
         this.lockService = (LockService)this.applicationContext.getBean("lockService");
+        this.transactionService = (TransactionService)this.applicationContext.getBean("transactionComponent");
         authenticationService.clearCurrentSecurityContext();
 	
 		// Create the store and get the root node reference
@@ -127,8 +132,9 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		this.nodeService.addAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE, null);		
         
         // Create and authenticate the user
-        TestWithUserUtils.createUser(USER_NAME, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
-        TestWithUserUtils.authenticateUser(USER_NAME, PWD, this.rootNodeRef, this.authenticationService);
+        this.userName = "cociTest" + GUID.generate();
+        TestWithUserUtils.createUser(this.userName, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
+        TestWithUserUtils.authenticateUser(this.userName, PWD, this.rootNodeRef, this.authenticationService);
         this.userNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);
         
 	}
@@ -167,7 +173,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 				QName.createQName("{test}workingCopy"));
 		assertNotNull(workingCopy);
 		
-        System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
+        //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.storeRef));
         
 		// Ensure that the working copy and copy aspect has been applied
 		assertTrue(this.nodeService.hasAspect(workingCopy, ContentModel.ASPECT_WORKING_COPY));	
@@ -341,6 +347,50 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
         // The origional should no longer be locked
         this.lockService.checkForLock(this.nodeRef);
         
+    }
+    
+    /**
+     * Test the getWorkingCopy method
+     */
+    public void testGetWorkingCopy()
+    {
+        NodeRef origNodeRef = this.nodeService.createNode(
+                this.rootNodeRef,
+                ContentModel.ASSOC_CHILDREN,
+                QName.createQName("{test}test2"),
+                ContentModel.TYPE_CONTENT).getChildRef();
+        
+        
+        NodeRef wk1 = this.cociService.getWorkingCopy(origNodeRef);
+        assertNull(wk1);
+
+        // Check the document out
+        final NodeRef workingCopy = this.cociService.checkout(origNodeRef);
+        
+        // Need to commit the transaction in order to get the indexer to run
+        setComplete();
+        endTransaction();
+        
+        final NodeRef finalNodeRef = origNodeRef;        
+        
+        TransactionUtil.executeInUserTransaction(
+                this.transactionService,
+                new TransactionUtil.TransactionWork<Object>()
+                {
+                    public Object doWork()
+                    {
+                        NodeRef wk2 = CheckOutCheckInServiceImplTest.this.cociService.getWorkingCopy(finalNodeRef);
+                        assertNotNull(wk2);
+                        assertEquals(workingCopy, wk2);
+                        
+                        CheckOutCheckInServiceImplTest.this.cociService.cancelCheckout(workingCopy);                        
+                        return null;
+                    }
+                    
+                });
+        
+        //NodeRef wk3 = this.cociService.getWorkingCopy(this.nodeRef);
+        //assertNull(wk3);
     }
 
 }

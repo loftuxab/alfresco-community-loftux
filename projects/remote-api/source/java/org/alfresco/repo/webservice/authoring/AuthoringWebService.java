@@ -408,7 +408,7 @@ public class AuthoringWebService extends AbstractWebService implements
      * @see org.alfresco.repo.webservice.authoring.AuthoringServiceSoapPort#lock(org.alfresco.repo.webservice.types.Predicate,
      *      boolean, org.alfresco.repo.webservice.authoring.LockTypeEnum)
      */
-    public Reference[] lock(final Predicate items, final String user, final boolean lockChildren, final LockTypeEnum lockType) 
+    public Reference[] lock(final Predicate items, final boolean lockChildren, final LockTypeEnum lockType) 
             throws RemoteException, AuthoringFault
     {
         try
@@ -432,7 +432,7 @@ public class AuthoringWebService extends AbstractWebService implements
                             for (NodeRef node : nodes)
                             {
                                 LockType convertedLockType = convertToLockType(lockType);
-                                AuthoringWebService.this.lockService.lock(node, user, convertedLockType, 0, lockChildren);
+                                AuthoringWebService.this.lockService.lock(node, convertedLockType, 0, lockChildren);
                                 result[iIndex] = Utils.convertToReference(node);
                                 iIndex++;
                             }                        
@@ -476,7 +476,7 @@ public class AuthoringWebService extends AbstractWebService implements
      * @see org.alfresco.repo.webservice.authoring.AuthoringServiceSoapPort#unlock(org.alfresco.repo.webservice.types.Predicate,
      *      boolean)
      */
-    public Reference[] unlock(final Predicate items, final String user, final boolean unlockChildren)
+    public Reference[] unlock(final Predicate items, final boolean unlockChildren)
             throws RemoteException, AuthoringFault
     {
         try
@@ -499,7 +499,7 @@ public class AuthoringWebService extends AbstractWebService implements
                             int iIndex = 0;
                             for (NodeRef node : nodes)
                             {
-                                AuthoringWebService.this.lockService.unlock(node, user, unlockChildren);
+                                AuthoringWebService.this.lockService.unlock(node, unlockChildren);
                                 
                                 result[iIndex] = Utils.convertToReference(node);
                                 iIndex++;
