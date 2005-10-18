@@ -426,13 +426,24 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
         NodeRef workingCopy = null;
         
         // Do a search to find the origional document
-        ResultSet resultSet = this.searchService.query(
-                nodeRef.getStoreRef(), 
-                SearchService.LANGUAGE_LUCENE, 
-                "ASPECT:\"" + ContentModel.ASPECT_WORKING_COPY.toString() + "\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}" + ContentModel.PROP_COPY_REFERENCE.getLocalName() + ":\"" + nodeRef.toString() + "\"");
-        if (resultSet.getNodeRefs().size() != 0)
+        ResultSet resultSet = null;
+        try
         {
-            workingCopy = resultSet.getNodeRef(0);
+            resultSet = this.searchService.query(
+                    nodeRef.getStoreRef(), 
+                    SearchService.LANGUAGE_LUCENE, 
+                    "ASPECT:\"" + ContentModel.ASPECT_WORKING_COPY.toString() + "\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}" + ContentModel.PROP_COPY_REFERENCE.getLocalName() + ":\"" + nodeRef.toString() + "\"");
+            if (resultSet.getNodeRefs().size() != 0)
+            {
+                workingCopy = resultSet.getNodeRef(0);
+            }
+        }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
         }
         
         return workingCopy;

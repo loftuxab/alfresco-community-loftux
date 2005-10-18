@@ -41,6 +41,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ResultSetQuerySession extends AbstractQuerySession
 {
+    private static final long serialVersionUID = -9154514445963635138L;
+
    private transient static Log logger = LogFactory.getLog(ResultSetQuerySession.class);
    
    private Store store;
@@ -82,67 +84,77 @@ public class ResultSetQuerySession extends AbstractQuerySession
          {
             statement = "ISNODE:*";
          }
-         
-         ResultSet searchResults = searchService.query(Utils.convertToStoreRef(this.store), 
-               this.query.getLanguage().getValue(), statement);
-         
-         int totalRows = searchResults.length();
-         int lastRow = calculateLastRowIndex(totalRows);
-         int currentBatchSize = lastRow - this.position;
-         
-         if (logger.isDebugEnabled())
-            logger.debug("Total rows = " + totalRows + ", current batch size = " + currentBatchSize);
-         
-         org.alfresco.repo.webservice.types.ResultSet batchResults = new org.alfresco.repo.webservice.types.ResultSet();      
-         org.alfresco.repo.webservice.types.ResultSetRow[] rows = new org.alfresco.repo.webservice.types.ResultSetRow[currentBatchSize];
-         
-         int arrPos = 0;
-         for (int x = this.position; x < lastRow; x++)
+         ResultSet searchResults = null;
+         try
          {
-            ResultSetRow origRow = searchResults.getRow(x);
-            NodeRef nodeRef = origRow.getNodeRef();
-            ResultSetRowNode rowNode = new ResultSetRowNode(nodeRef.getId(), nodeService.getType(nodeRef).toString(), null);
-            
-            // get the data for the row and build up the columns structure
-            Map<Path, Serializable> values = origRow.getValues();
-            NamedValue[] columns = new NamedValue[values.size()];
-            int col = 0;
-            for (Path path : values.keySet())
+            searchResults = searchService.query(Utils.convertToStoreRef(this.store), 
+                  this.query.getLanguage().getValue(), statement);
+         
+            int totalRows = searchResults.length();
+            int lastRow = calculateLastRowIndex(totalRows);
+            int currentBatchSize = lastRow - this.position;
+         
+            if (logger.isDebugEnabled())
+               logger.debug("Total rows = " + totalRows + ", current batch size = " + currentBatchSize);
+         
+            org.alfresco.repo.webservice.types.ResultSet batchResults = new org.alfresco.repo.webservice.types.ResultSet();      
+            org.alfresco.repo.webservice.types.ResultSetRow[] rows = new org.alfresco.repo.webservice.types.ResultSetRow[currentBatchSize];
+         
+            int arrPos = 0;
+            for (int x = this.position; x < lastRow; x++)
             {
-               String value = null;
-               Serializable valueObj = values.get(path);
-               if (valueObj != null)
+               ResultSetRow origRow = searchResults.getRow(x);
+               NodeRef nodeRef = origRow.getNodeRef();
+               ResultSetRowNode rowNode = new ResultSetRowNode(nodeRef.getId(), nodeService.getType(nodeRef).toString(), null);
+            
+               // get the data for the row and build up the columns structure
+               Map<Path, Serializable> values = origRow.getValues();
+               NamedValue[] columns = new NamedValue[values.size()];
+               int col = 0;
+               for (Path path : values.keySet())
                {
-                  value = valueObj.toString();
+                  String value = null;
+                  Serializable valueObj = values.get(path);
+                  if (valueObj != null)
+                  {
+                     value = valueObj.toString();
+                  }
+                  columns[col] = new NamedValue(path.toString(), value);
+                  col++;
                }
-               columns[col] = new NamedValue(path.toString(), value);
-               col++;
+            
+               org.alfresco.repo.webservice.types.ResultSetRow row = new org.alfresco.repo.webservice.types.ResultSetRow();
+               row.setColumns(columns);
+               row.setScore(origRow.getScore());
+               row.setRowIndex(x);
+               row.setNode(rowNode);
+            
+               // add the row to the overall results
+               rows[arrPos] = row;
+               arrPos++;
             }
-            
-            org.alfresco.repo.webservice.types.ResultSetRow row = new org.alfresco.repo.webservice.types.ResultSetRow();
-            row.setColumns(columns);
-            row.setScore(origRow.getScore());
-            row.setRowIndex(x);
-            row.setNode(rowNode);
-            
-            // add the row to the overall results
-            rows[arrPos] = row;
-            arrPos++;
+         
+            // TODO: build up the meta data data structure if we've been asked to
+         
+            // add the rows to the result set and set the total row count
+            batchResults.setRows(rows);
+            batchResults.setTotalRowCount(totalRows);
+         
+            queryResult = new QueryResult(getId(), batchResults);
+         
+            // move the position on
+            updatePosition(totalRows, queryResult);
+         
+            if (logger.isDebugEnabled())
+               logger.debug("After getNextResultsBatch: " + toString());
          }
-         
-         // TODO: build up the meta data data structure if we've been asked to
-         
-         // add the rows to the result set and set the total row count
-         batchResults.setRows(rows);
-         batchResults.setTotalRowCount(totalRows);
-         
-         queryResult = new QueryResult(getId(), batchResults);
-         
-         // move the position on
-         updatePosition(totalRows, queryResult);
-         
-         if (logger.isDebugEnabled())
-            logger.debug("After getNextResultsBatch: " + toString());
+         finally
+         {
+             if (searchResults != null)
+             {
+                 searchResults.close();
+             }
+         }
       }
       
       return queryResult;

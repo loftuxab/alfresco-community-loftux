@@ -43,7 +43,6 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
-import org.alfresco.web.app.portlet.AlfrescoFacesPortlet;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
@@ -1254,7 +1253,8 @@ public class BrowseBean implements IContextListener
       /**
        * @see org.alfresco.web.ui.common.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.ui.common.component.UIBreadcrumb)
        */
-      public String navigationOutcome(UIBreadcrumb breadcrumb)
+      @SuppressWarnings("unchecked")
+    public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
          // All browse breadcrumb element relate to a Node Id - when selected we
          // set the current node id

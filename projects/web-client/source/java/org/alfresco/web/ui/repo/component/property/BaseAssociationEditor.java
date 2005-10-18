@@ -119,14 +119,15 @@ public abstract class BaseAssociationEditor extends UIInput
    /**
     * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
     */
+   @SuppressWarnings("unchecked")
    public void restoreState(FacesContext context, Object state)
    {
       Object values[] = (Object[])state;
       // standard component attributes are restored by the super class
       super.restoreState(context, values[0]);
       this.associationName = (String)values[1];
-      this.originalAssocs = (Map)values[2];
-      this.availableOptions = (List)values[3];
+      this.originalAssocs = (Map<String, Object>)values[2];
+      this.availableOptions = (List<NodeRef>)values[3];
       this.availableOptionsSize = (String)values[4];
       this.selectItemMsg = (String)values[5];
       this.selectItemsMsg = (String)values[6];
@@ -794,9 +795,20 @@ public abstract class BaseAssociationEditor extends UIInput
          
          if (logger.isDebugEnabled())
             logger.debug("Query: " + query.toString());
-          
-         ResultSet results = Repository.getServiceRegistry(context).getSearchService().query(
-               Repository.getStoreRef(), SearchService.LANGUAGE_LUCENE, query.toString());
+         
+         ResultSet results = null;
+         try
+         {
+            results = Repository.getServiceRegistry(context).getSearchService().query(
+                  Repository.getStoreRef(), SearchService.LANGUAGE_LUCENE, query.toString());
+         }
+         finally
+         {
+             if (results != null)
+             {
+                 results.close();
+             }
+         }
          this.availableOptions = results.getNodeRefs();
          
          if (logger.isDebugEnabled())
@@ -835,6 +847,8 @@ public abstract class BaseAssociationEditor extends UIInput
     */
    public static class AssocEditorEvent extends ActionEvent
    {
+      private static final long serialVersionUID = 7346758616063937703L;
+
       public int Action;
       public String[] ToAdd;
       public String RemoveId;
