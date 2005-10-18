@@ -31,6 +31,7 @@ import javax.faces.el.MethodBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.web.data.IDataContainer;
 import org.apache.commons.logging.Log;
@@ -719,9 +720,13 @@ public final class Utils
       FacesContext context = FacesContext.getCurrentInstance( );
       FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, msg);
       context.addMessage(null, facesMsg);
-      if (err != null && (logger.isDebugEnabled() || !(err instanceof InvalidNodeRefException)))
+      if (err != null)
       {
-         logger.error(msg, err);
+         if (err instanceof InvalidNodeRefException == false &&
+             err instanceof AccessDeniedException == false)
+         {
+            logger.error(msg, err);
+         }
       }
    }
    

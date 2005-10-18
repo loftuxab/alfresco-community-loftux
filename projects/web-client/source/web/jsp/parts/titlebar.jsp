@@ -46,7 +46,7 @@
                <td><img src="<%=request.getContextPath()%>/images/icons/Help_icon.gif" width=15 height=15></td>
                <td><nobr><h:outputLink value="#{NavigationBean.helpUrl}"><h:outputText value="#{msg.help}" /></h:outputLink></nobr></td>
                <td width=8>&nbsp;</td>
-               <td><nobr><a:actionLink value="#{msg.logout}" action="#{LoginBean.logout}" /></nobr></td>
+               <td><nobr><a:actionLink value="#{msg.logout} (#{NavigationBean.currentUser.userName})" action="#{LoginBean.logout}" /></nobr></td>
             </tr>
          </table>
       </td>
