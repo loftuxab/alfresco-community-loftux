@@ -47,6 +47,8 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.XPathException;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.rule.RuleService;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImportPackageHandler;
 import org.alfresco.service.cmr.view.ImporterBinding;
@@ -506,33 +508,58 @@ public class ImporterComponent
             for (ImportedNodeRef importedRef : nodeRefs)
             {
                 // Resolve path to node reference
-                NodeRef contextNode = (importedRef.value.startsWith("/")) ? nodeService.getRootNode(rootRef.getStoreRef()) : importedRef.context.getNodeRef();
                 NodeRef nodeRef = null;
-                try
+
+                if (importedRef.value.startsWith("/"))
                 {
-                    List<NodeRef> nodeRefs = searchService.selectNodes(contextNode, importedRef.value, null, namespaceService, false);
-                    if (nodeRefs.size() > 0)
-                    {
-                        nodeRef = nodeRefs.get(0);
-                    }
-                }
-                catch(XPathException e)
-                {
-                    // attempt to resolve as a node reference
+                    // resolve absolute path
+                    SearchParameters searchParameters = new SearchParameters();
+                    searchParameters.addStore(importedRef.context.getNodeRef().getStoreRef());
+                    searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+                    searchParameters.setQuery("PATH:\"" + importedRef.value + "\"");
+                    searchParameters.excludeDataInTheCurrentTransaction(true);
+                    ResultSet resultSet = searchService.query(searchParameters);
                     try
                     {
-                        NodeRef directRef = new NodeRef(importedRef.value);
-                        if (nodeService.exists(directRef))
+                        if (resultSet.length() > 0)
                         {
-                            nodeRef = directRef;
+                            nodeRef = resultSet.getNodeRef(0);
                         }
                     }
-                    catch(AlfrescoRuntimeException e1)
+                    finally
                     {
-                        // Note: Invalid reference format
+                        resultSet.close();
                     }
                 }
-
+                else
+                {
+                    // resolve relative path
+                    try
+                    {
+                        List<NodeRef> nodeRefs = searchService.selectNodes(importedRef.context.getNodeRef(), importedRef.value, null, namespaceService, false);
+                        if (nodeRefs.size() > 0)
+                        {
+                            nodeRef = nodeRefs.get(0);
+                        }
+                    }
+                    catch(XPathException e)
+                    {
+                        // attempt to resolve as a node reference
+                        try
+                        {
+                            NodeRef directRef = new NodeRef(importedRef.value);
+                            if (nodeService.exists(directRef))
+                            {
+                                nodeRef = directRef;
+                            }
+                        }
+                        catch(AlfrescoRuntimeException e1)
+                        {
+                            // Note: Invalid reference format
+                        }
+                    }
+                }
+                
                 // check that reference could be bound
                 if (nodeRef == null)
                 {
@@ -542,16 +569,22 @@ public class ImporterComponent
                 
                 // Set node reference on source node
                 Set<QName> disabledBehaviours = getDisabledBehaviours(importedRef.context);
-                for (QName disabledBehaviour: disabledBehaviours)
+                try
                 {
-                    boolean alreadyDisabled = behaviourFilter.disableBehaviour(importedRef.context.getNodeRef(), disabledBehaviour);
-                    if (alreadyDisabled)
+                    for (QName disabledBehaviour: disabledBehaviours)
                     {
-                        disabledBehaviours.remove(disabledBehaviour);
+                        boolean alreadyDisabled = behaviourFilter.disableBehaviour(importedRef.context.getNodeRef(), disabledBehaviour);
+                        if (alreadyDisabled)
+                        {
+                            disabledBehaviours.remove(disabledBehaviour);
+                        }
                     }
+                    nodeService.setProperty(importedRef.context.getNodeRef(), importedRef.property, nodeRef);
                 }
-                nodeService.setProperty(importedRef.context.getNodeRef(), importedRef.property, nodeRef);
-                behaviourFilter.enableBehaviours(importedRef.context.getNodeRef());
+                finally
+                {
+                    behaviourFilter.enableBehaviours(importedRef.context.getNodeRef());
+                }
             }
         }
         

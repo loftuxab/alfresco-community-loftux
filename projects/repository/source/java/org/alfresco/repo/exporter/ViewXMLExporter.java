@@ -22,14 +22,15 @@ import java.util.Collection;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
-import org.alfresco.service.cmr.repository.Path.Element;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.view.Exporter;
 import org.alfresco.service.cmr.view.ExporterException;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.xml.sax.ContentHandler;
@@ -524,10 +525,31 @@ import org.xml.sax.helpers.AttributesImpl;
     private Path createRelativePath(NodeRef fromRef, NodeRef toRef)
     {
         Path fromPath = nodeService.getPath(fromRef);
+        if (!nodeService.exists(toRef))
+        {
+            // return empty path for item that does not exist
+            return new Path();
+        }
         Path toPath = nodeService.getPath(toRef);
-        Path relativePath = null;
+        
+        // Determine if 'to path' is a category
+        // TODO: This needs to be resolved in a more appropriate manner - special support is
+        //       required for categories.
+        for (int i = 0; i < toPath.size(); i++)
+        {
+            Path.Element pathElement = toPath.get(i);
+            if (pathElement.getPrefixedString(namespaceService).equals("cm:categoryRoot"))
+            {
+                Path.ChildAssocElement childPath = (Path.ChildAssocElement)pathElement;
+                Path categoryPath = new Path();
+                categoryPath.append(new Path.ChildAssocElement(new ChildAssociationRef(null, null, null, childPath.getRef().getParentRef())));
+                categoryPath.append(toPath.subPath(i + 1, toPath.size() -1));
+                return categoryPath;
+            }
+        }
         
         // Determine if from node is relative to export tree
+        Path relativePath = null;
         int i = 0;
         while (i < exportNodePath.size() && i < fromPath.size() && exportNodePath.get(i).equals(fromPath.get(i)))
         {
