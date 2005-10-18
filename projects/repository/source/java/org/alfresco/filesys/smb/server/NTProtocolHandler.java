@@ -629,6 +629,7 @@ public class NTProtocolHandler extends CoreProtocolHandler
             // Process any chained commands, AndX
 
             pos = procAndXCommands(outPkt);
+            pos -= RFCNetBIOSProtocol.HEADER_LEN;
         }
         else
         {
@@ -976,6 +977,8 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
         // Allocate a tree id for the new connection
 
+        TreeConnection tree = null;
+        
         try
         {
 
@@ -986,7 +989,7 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
             // Set the file permission that this user has been granted for this share
 
-            TreeConnection tree = m_sess.findConnection(treeId);
+            tree = m_sess.findConnection(treeId);
             tree.setPermission(sharePerm);
 
             // Inform the driver that a connection has been opened
@@ -1019,6 +1022,49 @@ public class NTProtocolHandler extends CoreProtocolHandler
         int pos = outPkt.getAndXByteOffset(endOff);
         byte[] outBuf = outPkt.getBuffer();
         pos = DataPacker.putString(ShareType.TypeAsService(shareDev.getType()), outBuf, pos, true);
+
+        // Determine the filesystem type, for disk shares
+
+        String devType = "";
+
+        try
+        {
+            // Check if this is a disk shared device
+            
+            if ( shareDev.getType() == ShareType.DISK)
+            {
+                // Check if the filesystem driver implements the NTFS streams interface, and streams are
+                // enabled
+    
+                if (shareDev.getInterface() instanceof NTFSStreamsInterface)
+                {
+    
+                    // Check if NTFS streams are enabled
+    
+                    NTFSStreamsInterface ntfsStreams = (NTFSStreamsInterface) shareDev.getInterface();
+                    if (ntfsStreams.hasStreamsEnabled(m_sess, tree))
+                        devType = "NTFS";
+                }
+                else
+                {
+                    // Default to a FAT type filesystem
+                    
+                    devType = "FAT";
+                }
+            }
+        }
+        catch (InvalidDeviceInterfaceException ex)
+        {
+
+            // Log the error
+
+            logger.error("TreeConnectAndX error", ex);
+        }
+
+        // Pack the filesystem type
+        
+        pos = DataPacker.putString(devType, outBuf, pos, true, outPkt.isUnicode());
+        
         int bytLen = pos - outPkt.getAndXByteOffset(endOff);
         outPkt.setAndXByteCount(endOff, bytLen);
 
@@ -1478,24 +1524,34 @@ public class NTProtocolHandler extends CoreProtocolHandler
         int pos = outPkt.getByteOffset();
         pos = DataPacker.putString(ShareType.TypeAsService(shareDev.getType()), m_smbPkt.getBuffer(), pos, true);
 
-        // Determine the filesystem type
+        // Determine the filesystem type, for disk shares
 
-        String fsType = "FAT32";
+        String devType = "";
 
         try
         {
-
-            // Check if the filesystem driver implements the NTFS streams interface, and streams are
-            // enabled
-
-            if (shareDev.getInterface() instanceof NTFSStreamsInterface)
+            // Check if this is a disk shared device
+            
+            if ( shareDev.getType() == ShareType.DISK)
             {
-
-                // Check if NTFS streams are enabled
-
-                NTFSStreamsInterface ntfsStreams = (NTFSStreamsInterface) shareDev.getInterface();
-                if (ntfsStreams.hasStreamsEnabled(m_sess, tree))
-                    fsType = "NTFS";
+                // Check if the filesystem driver implements the NTFS streams interface, and streams are
+                // enabled
+    
+                if (shareDev.getInterface() instanceof NTFSStreamsInterface)
+                {
+    
+                    // Check if NTFS streams are enabled
+    
+                    NTFSStreamsInterface ntfsStreams = (NTFSStreamsInterface) shareDev.getInterface();
+                    if (ntfsStreams.hasStreamsEnabled(m_sess, tree))
+                        devType = "NTFS";
+                }
+                else
+                {
+                    // Default to a FAT type filesystem
+                    
+                    devType = "FAT";
+                }
             }
         }
         catch (InvalidDeviceInterfaceException ex)
@@ -1507,7 +1563,8 @@ public class NTProtocolHandler extends CoreProtocolHandler
         }
 
         // Pack the filesystem type
-        pos = DataPacker.putString(fsType, m_smbPkt.getBuffer(), pos, true);
+        
+        pos = DataPacker.putString(devType, m_smbPkt.getBuffer(), pos, true, outPkt.isUnicode());
         outPkt.setByteCount(pos - outPkt.getByteOffset());
 
         // Send the response
@@ -5392,7 +5449,8 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
                 // Return a file not found error
 
-                m_sess.sendErrorResponseSMB(SMBStatus.NTObjectNotFound, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
+//                m_sess.sendErrorResponseSMB(SMBStatus.NTObjectNotFound, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
+                m_sess.sendErrorResponseSMB(SMBStatus.NTObjectPathNotFound, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
                 return;
             }
         }
