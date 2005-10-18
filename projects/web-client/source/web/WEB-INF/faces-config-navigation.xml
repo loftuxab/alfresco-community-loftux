@@ -227,6 +227,14 @@
          <from-outcome>previousItem</from-outcome>
          <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>import</from-outcome>
+         <to-view-id>/jsp/dialog/import.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>export</from-outcome>
+         <to-view-id>/jsp/dialog/export.jsp</to-view-id>
+      </navigation-case>      
    </navigation-rule>
    
    <navigation-rule>

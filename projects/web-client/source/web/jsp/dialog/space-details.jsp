@@ -79,7 +79,7 @@
                               <%-- Current object actions --%>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" /><br>
                               
-                              <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Delete">
+                              <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Delete">
                                  <a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" padding="4" actionListener="#{ClipboardBean.cutNode}">
                                     <f:param name="id" value="#{SpaceDetailsBean.id}" />
                                  </a:actionLink>
@@ -87,12 +87,20 @@
                               <a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" padding="4" actionListener="#{ClipboardBean.copyNode}">
                                  <f:param name="id" value="#{SpaceDetailsBean.id}" />
                               </a:actionLink>
-                              <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Delete">
+                              <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Delete">
                                  <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" padding="4" action="deleteSpace" actionListener="#{BrowseBean.setupSpaceAction}">
                                     <f:param name="id" value="#{SpaceDetailsBean.id}" />
                                  </a:actionLink>
                               </r:permissionEvaluator>
                               <a:menu itemSpacing="4" label="#{msg.more_options}" image="/images/icons/more.gif" tooltip="#{msg.more_options_space}" menuStyleClass="moreActionsMenu" style="padding-left:20px">
+                                 <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write">
+                                    <a:actionLink value="#{msg.import}" image="/images/icons/import.gif" action="import" actionListener="#{BrowseBean.setupSpaceAction}">
+                                       <f:param name="id" value="#{SpaceDetailsBean.id}" />
+                                    </a:actionLink>
+                                 </r:permissionEvaluator>
+                                 <a:actionLink value="#{msg.export}" image="/images/icons/export.gif" action="export" actionListener="#{BrowseBean.setupSpaceAction}">
+                                    <f:param name="id" value="#{SpaceDetailsBean.id}" />
+                                 </a:actionLink>
                                  <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
                                     <f:param name="id" value="#{SpaceDetailsBean.id}" />
                                  </a:actionLink>
