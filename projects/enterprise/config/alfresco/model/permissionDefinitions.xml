@@ -189,7 +189,7 @@
    <!--                    -->
       
    <!-- Admin can do anything -->
-   <globalPermission permission="FullControl" authority="GROUP_ADMINISTRATORS"/>
+   <globalPermission permission="FullControl" authority="ROLE_ADMINISTRATOR"/>
    
    <!-- For now, owners can always see, find and manipulate their stuff -->
    <globalPermission permission="FullControl" authority="ROLE_OWNER"/>

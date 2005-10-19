@@ -27,6 +27,7 @@ public interface AuthorityService
 {
     /**
      * Check of the current user has admin authority.
+     * 
      * There is no contract for who should have this authority, only that it cna be tested here.
      * It could be determined by group membership, role, authentication mechanism, ... 
      * 
@@ -36,8 +37,17 @@ public interface AuthorityService
     
     /**
      * Get the authorities for the current user
-   
+     *
      * @return
      */
     public Set<String> getAuthorities();
+    
+    /**
+     * Get all authorities by type
+     * 
+     * @param type
+     * @return
+     */
+    public Set<String> getAllAuthorities(AuthorityType type);
+    
 }

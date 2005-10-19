@@ -21,6 +21,9 @@ import junit.framework.TestCase;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
 
@@ -35,6 +38,8 @@ public class AuthorityServiceTest extends TestCase
     private AuthorityService authorityService; 
     
     private AuthorityService pubAuthorityService; 
+    
+    private PersonService personService;
 
     public AuthorityServiceTest()
     {
@@ -48,6 +53,7 @@ public class AuthorityServiceTest extends TestCase
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
         authorityService = (AuthorityService) ctx.getBean("authorityService");
         pubAuthorityService = (AuthorityService) ctx.getBean("AuthorityService");
+        personService = (PersonService) ctx.getBean("personService");
         
         if(!authenticationComponent.exists("andy"))
         {
@@ -92,5 +98,37 @@ public class AuthorityServiceTest extends TestCase
         assertTrue(pubAuthorityService.hasAdminAuthority());
         assertEquals(1, authorityService.getAuthorities().size());
     }
-
+    
+    public void testAuthorities()
+    {
+        assertEquals(1, pubAuthorityService.getAllAuthorities(AuthorityType.ADMIN).size());
+        assertTrue(pubAuthorityService.getAllAuthorities(AuthorityType.ADMIN).contains(PermissionService.ADMINISTRATOR_AUTHORITY));
+        assertEquals(1, pubAuthorityService.getAllAuthorities(AuthorityType.EVERYONE).size());
+        assertTrue(pubAuthorityService.getAllAuthorities(AuthorityType.EVERYONE).contains(PermissionService.ALL_AUTHORITIES));
+        assertEquals(1, pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).size());
+        assertTrue(pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).contains(PermissionService.ALL_AUTHORITIES));
+        assertEquals(1, pubAuthorityService.getAllAuthorities(AuthorityType.GUEST).size());
+        assertTrue(pubAuthorityService.getAllAuthorities(AuthorityType.GUEST).contains(PermissionService.GUEST));
+        assertEquals(0, pubAuthorityService.getAllAuthorities(AuthorityType.OWNER).size());
+        assertEquals(0, pubAuthorityService.getAllAuthorities(AuthorityType.ROLE).size());
+        assertEquals(personService.getAllPeople().size(),  pubAuthorityService.getAllAuthorities(AuthorityType.USER).size());
+        assertTrue(pubAuthorityService.getAllAuthorities(AuthorityType.USER).contains("andy"));
+        assertTrue(pubAuthorityService.getAllAuthorities(AuthorityType.USER).contains("admin"));
+       
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

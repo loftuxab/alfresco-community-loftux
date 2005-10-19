@@ -30,14 +30,23 @@ import org.alfresco.service.namespace.QName;
  */
 public interface PermissionService
 {
+    public static final String ROLE_PREFIX = "ROLE_";
+    
+    public static final String GROUP_PREFIX = "GROUP_";
+    
+    
+    
     public static final String ALL_AUTHORITIES = "GROUP_EVERYONE";
 
     public static final String OWNER_AUTHORITY = "ROLE_OWNER";
     
     public static final String LOCK_OWNER_AUTHORITY = "ROLE_LOCK_OWNER";
     
-    public static final String ADMINISTRATOR_AUTHORITY = "GROUP_ADMINISTRATORS";
+    public static final String ADMINISTRATOR_AUTHORITY = "ROLE_ADMINISTRATOR";
 
+    
+    
+    
     public static final String ALL_PERMISSIONS = "All";
     
     public static final String FULL_CONTROL = "FullControl";
@@ -85,8 +94,6 @@ public interface PermissionService
     public static final String TAKE_OWNERSHIP = "TakeOwnership";
 
     public static final String SET_OWNER = "SetOwner";
-
-    public static final String ADMINISTRATOR = "Administrator";
 
     public static final String COORDINATOR = "Coordinator";
 

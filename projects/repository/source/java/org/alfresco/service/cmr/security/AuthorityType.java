@@ -33,5 +33,44 @@ package org.alfresco.service.cmr.security;
  */
 public enum AuthorityType
 {
-    USER, GROUP, OWNER, EVERYONE, GUEST
+    ADMIN, EVERYONE, OWNER, GUEST, GROUP, ROLE, USER ;
+    
+    public boolean equals(String authority)
+    {
+        return equals(getAuthorityType(authority));
+    }
+    
+    public static AuthorityType getAuthorityType(String authority)
+    {
+        AuthorityType authorityType;
+        if (authority.equals(PermissionService.ADMINISTRATOR_AUTHORITY))
+        {
+            authorityType = AuthorityType.ADMIN;
+        }
+        if (authority.equals(PermissionService.ALL_AUTHORITIES))
+        {
+            authorityType = AuthorityType.EVERYONE;
+        }
+        else if (authority.equals(PermissionService.OWNER_AUTHORITY))
+        {
+            authorityType = AuthorityType.OWNER;
+        }
+        else if (authority.equals(PermissionService.GUEST))
+        {
+            authorityType = AuthorityType.GUEST;
+        }
+        else if (authority.startsWith(PermissionService.GROUP_PREFIX))
+        {
+            authorityType = AuthorityType.GROUP;
+        }
+        else if (authority.startsWith(PermissionService.ROLE_PREFIX))
+        {
+            authorityType = AuthorityType.ROLE;
+        }
+        else
+        {
+            authorityType = AuthorityType.USER;
+        }
+        return authorityType;
+    }
 }

@@ -263,24 +263,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             this.permission = permission;
             this.accessStatus = accessStatus;
             this.authority = authority;
-
-            if (authority.equals(PermissionService.ALL_AUTHORITIES))
-            {
-                authorityType = AuthorityType.EVERYONE;
-            }
-            else if (authority.equals(PermissionService.OWNER_AUTHORITY))
-            {
-                authorityType = AuthorityType.OWNER;
-            }
-            else if (authority.startsWith("GROUP_"))
-            {
-                authorityType = AuthorityType.GROUP;
-            }
-            else
-            {
-                authorityType = AuthorityType.USER;
-            }
-
+            this.authorityType = AuthorityType.getAuthorityType(authority);
         }
 
         public String getPermission()
