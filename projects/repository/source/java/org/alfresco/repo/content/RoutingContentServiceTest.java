@@ -159,7 +159,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
         
         writer = contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);
         assertNull(writer.getMimetype());
-        assertNull(writer.getEncoding());
+        assertEquals("UTF-8", writer.getEncoding());
         
         // now set it on the writer
         writer.setMimetype("text/plain");
