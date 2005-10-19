@@ -22,6 +22,7 @@ import java.util.Date;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.search.ISO9075;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -447,7 +448,7 @@ public class AdvancedSearchBean
                Collection prefixes = this.namespaceService.getPrefixes(elementRef.getQName().getNamespaceURI());
                if (prefixes.size() >0)
                {
-                  elementString = '/' + (String)prefixes.iterator().next() + ':' + elementRef.getQName().getLocalName();
+                  elementString = '/' + (String)prefixes.iterator().next() + ':' + ISO9075.encode(elementRef.getQName().getLocalName());
                }
             }
          }
