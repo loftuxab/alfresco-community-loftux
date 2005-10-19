@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.alfresco.repo.importer.ImporterBootstrap;
+import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.repository.InvalidStoreRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -32,6 +33,7 @@ import org.alfresco.service.descriptor.Descriptor;
 import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
@@ -47,11 +49,17 @@ import org.springframework.core.io.Resource;
  */
 public class DescriptorServiceImpl implements DescriptorService, ApplicationListener
 {
-    private Properties serverDescriptor;
+    private Properties serverProperties;
+    
     private ImporterBootstrap systemBootstrap;
     private NamespaceService namespaceService;
     private NodeService nodeService;
     private SearchService searchService;
+    private TransactionService transactionService;
+
+    private Descriptor serverDescriptor;
+    private Descriptor repoDescriptor;
+    
     
     // Logger
     private static final Log logger = LogFactory.getLog(DescriptorService.class);
@@ -66,8 +74,8 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
     public void setServerDescriptor(Resource descriptorResource)
         throws IOException
     {
-        this.serverDescriptor = new Properties();
-        this.serverDescriptor.load(descriptorResource.getInputStream());
+        this.serverProperties = new Properties();
+        this.serverProperties.load(descriptorResource.getInputStream());
     }
 
     /**
@@ -76,6 +84,14 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
     public void setSystemBootstrap(ImporterBootstrap systemBootstrap)
     {
         this.systemBootstrap = systemBootstrap;
+    }
+    
+    /**
+     * @param transactionService  transaction service 
+     */
+    public void setTransactionService(TransactionService transactionService)
+    {
+        this.transactionService = transactionService;
     }
     
     /**
@@ -107,13 +123,57 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
      */
     public Descriptor getDescriptor()
     {
-        return new ServerDescriptor();
+        return serverDescriptor;
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.service.descriptor.DescriptorService#getRepositoryDescriptor()
      */
     public Descriptor getRepositoryDescriptor()
+    {
+        return repoDescriptor;
+    }
+
+    /**
+     * @param event
+     */
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ContextRefreshedEvent && logger.isInfoEnabled())
+        {
+            // initialise descriptors
+            serverDescriptor = createServerDescriptor();
+            repoDescriptor = TransactionUtil.executeInUserTransaction(transactionService, new TransactionUtil.TransactionWork<Descriptor>()
+            {
+                public Descriptor doWork()
+                {
+                    return createRepositoryDescriptor();
+                }
+            });
+            
+            // log output of version initialised
+            String serverVersion = serverDescriptor.getVersion();
+            String repoVersion = repoDescriptor.getVersion();
+            logger.info("Alfresco server started - version " + serverVersion + "; repository version " + repoVersion);
+        }
+    }
+    
+    /**
+     * Create server descriptor
+     * 
+     * @return  descriptor
+     */
+    private Descriptor createServerDescriptor()
+    {
+        return new ServerDescriptor();
+    }
+    
+    /**
+     * Create repository descriptor
+     * 
+     * @return  descriptor
+     */
+    private Descriptor createRepositoryDescriptor()
     {
         // retrieve system descriptor location
         StoreRef storeRef = systemBootstrap.getStoreRef();
@@ -146,23 +206,6 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
         // descriptor cannot be found
         return new UnknownDescriptor(); 
     }
-
-    /**
-     * @param event
-     */
-    public void onApplicationEvent(ApplicationEvent event)
-    {
-        if (event instanceof ContextRefreshedEvent && logger.isInfoEnabled())
-        {
-            // log output of version initialised
-            Descriptor serverDescriptor = getDescriptor();
-            String serverVersion = serverDescriptor.getVersion();
-            Descriptor repoDescriptor = getRepositoryDescriptor();
-            String repoVersion = repoDescriptor.getVersion();
-            logger.info("Alfresco server started - version " + serverVersion + "; repository version " + repoVersion);
-        }
-    }
-    
     
     /**
      * Unknown descriptor
@@ -316,9 +359,7 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
             }
             return strValue;
         }
-        
     }
-    
     
     /**
      * Server Descriptor whose meta-data is retrieved from run-time environment 
@@ -330,7 +371,7 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
          */
         public String getVersionMajor()
         {
-            return serverDescriptor.getProperty("version.major");
+            return serverProperties.getProperty("version.major");
         }
 
         /* (non-Javadoc)
@@ -338,7 +379,7 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
          */
         public String getVersionMinor()
         {
-            return serverDescriptor.getProperty("version.minor");
+            return serverProperties.getProperty("version.minor");
         }
 
         /* (non-Javadoc)
@@ -346,7 +387,7 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
          */
         public String getVersionRevision()
         {
-            return serverDescriptor.getProperty("version.revision");
+            return serverProperties.getProperty("version.revision");
         }
 
         /* (non-Javadoc)
@@ -354,7 +395,7 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
          */
         public String getVersionLabel()
         {
-            return serverDescriptor.getProperty("version.label");
+            return serverProperties.getProperty("version.label");
         }
 
         /* (non-Javadoc)
@@ -376,8 +417,8 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
          */
         public String[] getDescriptorKeys()
         {
-            String[] keys = new String[serverDescriptor.size()];
-            serverDescriptor.keySet().toArray(keys);
+            String[] keys = new String[serverProperties.size()];
+            serverProperties.keySet().toArray(keys);
             return keys;
         }
 
@@ -386,7 +427,7 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
          */
         public String getDescriptor(String key)
         {
-            return serverDescriptor.getProperty(key, "");
+            return serverProperties.getProperty(key, "");
         }
     }
 

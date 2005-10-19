@@ -41,6 +41,31 @@
     
     <bean id="exceptionTranslator" class="org.alfresco.repo.security.permissions.impl.ExceptionTranslatorMethodInterceptor"/>
 
+    <!-- Descriptor Service -->
+
+    <bean id="DescriptorService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.descriptor.DescriptorService</value>
+    	</property>
+    	<property name="target"><ref bean="descriptorComponent"/></property>
+    	<property name="interceptorNames">
+    		<list>
+                <idref local="exceptionTranslator" />
+    			<idref local="DescriptorService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="DescriptorService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.descriptor.DescriptorService</value>
+    	</property>
+    	<property name="description">
+    		<value>Descriptor service</value>
+    	</property>
+    </bean>
+
+
     <!-- Namespace Service -->
 
     <bean id="NamespaceService" class="org.springframework.aop.framework.ProxyFactoryBean">

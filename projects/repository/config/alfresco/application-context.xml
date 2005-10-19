@@ -17,21 +17,24 @@
     
 	<!-- Descriptor Service -->
 	
-    <bean id="DescriptorService" class="org.alfresco.repo.descriptor.DescriptorServiceImpl">
+    <bean id="descriptorComponent" class="org.alfresco.repo.descriptor.DescriptorServiceImpl">
        <property name="serverDescriptor">
 	       <value>classpath:alfresco/version.properties</value> 
        </property>
        <property name="systemBootstrap">
            <ref local="systemBootstrap"/>
        </property>
+       <property name="transactionService">
+           <ref bean="transactionComponent"/>
+       </property>
        <property name="namespaceService">
-           <ref bean="NamespaceService"/>
+           <ref bean="namespaceService"/>
        </property>
        <property name="nodeService">
-           <ref bean="NodeService"/>
+           <ref bean="nodeService"/>
        </property>
        <property name="searchService">
-           <ref bean="SearchService"/>
+           <ref bean="searchService"/>
        </property>
     </bean>
 
