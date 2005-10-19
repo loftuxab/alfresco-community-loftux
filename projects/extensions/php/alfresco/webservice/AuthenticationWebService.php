@@ -4,8 +4,12 @@ require_once 'SOAP/Client.php';
 
 class AuthenticationWebService extends SOAP_Client
 {
-    function AuthenticationWebService($path = 'http://localhost:8080/alfresco/api/AuthenticationService')
+    function AuthenticationWebService($path = null)
     {
+        if ($path == null)
+        {
+           $path = getServerLocation().'/alfresco/api/AuthenticationService';
+        }
         $this->SOAP_Client($path, 0);
     }
     function &startSession($username, $password)

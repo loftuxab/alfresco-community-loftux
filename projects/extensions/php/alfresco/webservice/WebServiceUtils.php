@@ -1,6 +1,11 @@
 <?php
    require_once('SOAP/Client.php');
 
+   function getServerLocation()
+   {
+      return get_cfg_var("alfresco.server");
+   }
+
    function addSecurityHeader($client, $user, $ticket)
    {
       $username =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Username', false, $user);

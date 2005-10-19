@@ -4,8 +4,12 @@ require_once 'SOAP/Client.php';
 
 class ContentWebService extends SOAP_Client
 {
-    function ContentWebService($path = 'http://localhost:8080/alfresco/api/ContentService')
+    function ContentWebService($path = null)
     {
+        if ($path == null)
+        {
+           $path = getServerLocation().'/alfresco/api/ContentService';
+        }
         $this->SOAP_Client($path, 0);
     }
     function &describe($items)

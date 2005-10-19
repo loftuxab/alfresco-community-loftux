@@ -4,8 +4,12 @@ require_once 'SOAP/Client.php';
 
 class RepositoryWebService extends SOAP_Client
 {
-    function RepositoryWebService($path = 'http://localhost:8080/alfresco/api/RepositoryService')
+    function RepositoryWebService($path = null)
     {
+        if ($path == null)
+        {
+            $path = getServerLocation().'/alfresco/api/RepositoryService';
+        }
         $this->SOAP_Client($path, 0);
     }
     function &getStores()

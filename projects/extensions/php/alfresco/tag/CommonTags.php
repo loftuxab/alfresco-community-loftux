@@ -33,7 +33,7 @@
          $error_message = $tag->attributes["error_message"];
          if ($error_message != "")
          {
-            $result = "<div>".$error_message."</div>";
+            $result = "<span style='font-weight:bold;color:red'>".$error_message."</span>";
          }
       }
       
