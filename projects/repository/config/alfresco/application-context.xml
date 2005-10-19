@@ -901,6 +901,11 @@
         <property name="storeUrl">
             <value>${system.store}</value>
         </property>
+        <property name="mustNotExistStoreUrls">
+            <list>
+                <value>${spaces.store}</value>
+            </list>
+        </property>
         <property name="configuration">
             <props>
                 <prop key="version.major">${version.major}</prop>

@@ -71,6 +71,7 @@ public class ImporterBootstrap
     private ImporterService importerService;
     private List<Properties> bootstrapViews;
     private StoreRef storeRef = null;
+    private List<String> mustNotExistStoreUrls = null;
     private Properties configuration = null;
     private String strLocale = null;
     private Locale locale = null;
@@ -138,13 +139,23 @@ public class ImporterBootstrap
     }
 
     /**
-     * Sets the Store URL to bootstrap into
+     * Sets the Store Ref to bootstrap into
      * 
      * @param storeUrl
      */
     public void setStoreUrl(String storeUrl)
     {
         this.storeRef = new StoreRef(storeUrl);
+    }
+
+    /**
+     * If any of the store urls exist, the bootstrap does not take place
+     * 
+     * @param storeUrls  the list of store urls to check
+     */
+    public void setMustNotExistStoreUrls(List<String> storeUrls)
+    {
+        this.mustNotExistStoreUrls = storeUrls;
     }
     
     /**
@@ -248,7 +259,7 @@ public class ImporterBootstrap
             userTransaction.begin();
         
             // check the repository exists, create if it doesn't
-            if (nodeService.exists(storeRef))
+            if (!performBootstrap())
             {
                 if (logger.isDebugEnabled())
                     logger.debug("Store exists - bootstrap ignored: " + storeRef);
@@ -450,5 +461,31 @@ public class ImporterBootstrap
 
     }
 
+    /**
+     * Determine if bootstrap should take place
+     * 
+     * @return  true => yes, it should
+     */
+    private boolean performBootstrap()
+    {
+        if (nodeService.exists(storeRef))
+        {
+            return false;
+        }
+        
+        if (mustNotExistStoreUrls != null)
+        {
+            for (String storeUrl : mustNotExistStoreUrls)
+            {
+                StoreRef storeRef = new StoreRef(storeUrl);
+                if (nodeService.exists(storeRef))
+                {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
     
 }
