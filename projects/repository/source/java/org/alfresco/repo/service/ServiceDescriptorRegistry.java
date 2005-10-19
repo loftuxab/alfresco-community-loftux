@@ -40,6 +40,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -124,6 +125,14 @@ public class ServiceDescriptorRegistry
         return beanFactory.getBean(service.getLocalName()); 
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getDescriptorService()
+     */
+    public DescriptorService getDescriptorService()
+    {
+        return (DescriptorService)getService(DESCRIPTOR_SERVICE);
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.service.ServiceRegistry#getNodeService()
      */
@@ -268,4 +277,5 @@ public class ServiceDescriptorRegistry
     {
         return (AuthorityService)getService(AUTHORITY_SERVICE);
     }
+
 }

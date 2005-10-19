@@ -22,6 +22,28 @@
 			</mandatory-aspects>
 		</type>
 
+		<type name="sys:descriptor">
+		    <title>Descriptor</title>
+			<parent>sys:base</parent>
+			<properties>
+				<property name="sys:versionMajor">
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="sys:versionMinor">
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="sys:versionRevision">
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="sys:versionLabel">
+					<type>d:text</type>
+				</property>
+			</properties>
+        </type>		
+
 		<type name="sys:container">
 			<title>Container</title>
 			<parent>sys:base</parent>
@@ -58,7 +80,7 @@
 				</property>
 			</properties>
 		</type>
-
+		
 	</types>
 
 

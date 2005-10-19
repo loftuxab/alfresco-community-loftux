@@ -127,7 +127,6 @@
                      includes="${file.name.war.alfresco}"/>
          <zipfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf"/>
          <zipfileset dir="${dir.config.webclient}"  prefix="jboss/server/default/conf"/>
-         <zipfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
       </zip>
    </target>
    
@@ -152,7 +151,6 @@
             <zipfileset dir="${dir.projects}/enterprise/${dir.name.config}" prefix="jboss/server/default/conf"/>
             <zipfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf"/>
             <zipfileset dir="${dir.config.webclient}"  prefix="jboss/server/default/conf"/>
-            <zipfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
          </zip>
       </target>
 
@@ -175,7 +173,6 @@
                      prefix="jboss/server/default/deploy" />
          <tarfileset dir="${dir.config.repository}" prefix="jboss/server/default/conf" />
          <tarfileset dir="${dir.config.webclient}" prefix="jboss/server/default/conf" />
-         <tarfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.bin.jboss}.tar.gz" src="${dir.dist}/${file.name.dist.bin.jboss}.tar" />
       <delete file="${dir.dist}/${file.name.dist.bin.jboss}.tar" />
@@ -203,7 +200,6 @@
                         excludes="alfresco/hibernate-context.xml,alfresco/index-recovery-context.xml,
                                   alfresco/ownable-services-context.xml,alfresco/public-services-security-context.xml"/>
             <tarfileset dir="${dir.config.webclient}" prefix="jboss/server/default/conf" />
-            <tarfileset file="${dir.common}/version.properties" prefix="jboss/server/default/conf/alfresco" />
          </tar>
          <gzip zipfile="${dir.dist}/${file.name.dist.bin.jboss}.tar.gz" src="${dir.dist}/${file.name.dist.bin.jboss}.tar" />
          <delete file="${dir.dist}/${file.name.dist.bin.jboss}.tar" />

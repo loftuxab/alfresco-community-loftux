@@ -90,7 +90,6 @@
          <fileset dir="${dir.config.repository}"/>
          <fileset dir="${dir.config.webclient}"/>
       </copy>
-      <copy file="${dir.common}/version.properties" todir="${dir.deploy.jboss}/../conf/alfresco" />
       <!-- ensure mysql drivers are present -->
       <delete>
          <fileset dir="${home.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
@@ -117,7 +116,6 @@
          <classes dir="${dir.config.webclient}"/>
          <classes file="${dir.project.core}/source/java/log4j.properties" 
                   prefix="WEB-INF/classes"/>
-         <classes file="${dir.common}/version.properties" prefix="WEB-INF/classes/alfresco"/>
       </war>
    </target>
 

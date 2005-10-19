@@ -22,7 +22,6 @@
          <classes dir="${dir.config.repository}"/>
          <classes dir="${dir.config.jcr}"/>
          <classes file="${dir.project.core}/source/java/log4j.properties" prefix="WEB-INF/classes"/>
-         <classes file="${dir.common}/version.properties" prefix="WEB-INF/classes/alfresco"/>
       </war>
    </target>
       

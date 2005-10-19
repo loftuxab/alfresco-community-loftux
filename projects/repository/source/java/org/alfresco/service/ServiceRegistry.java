@@ -34,6 +34,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -53,6 +54,7 @@ public interface ServiceRegistry
     static final String SERVICE_REGISTRY = "ServiceRegistry";
 
     static final QName REGISTRY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ServiceRegistry");
+    static final QName DESCRIPTOR_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "DescriptorService");
     static final QName TRANSACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "TransactionService");
     static final QName NAMESPACE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NamespaceService");
     static final QName DICTIONARY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "DictionaryService");
@@ -102,6 +104,11 @@ public interface ServiceRegistry
      * @return the service interface (must cast to interface as described in service meta-data)
      */  
     Object getService(QName service);
+    
+    /**
+     * @return the descriptor service
+     */
+    DescriptorService getDescriptorService();
     
     /**
      * @return the transaction service

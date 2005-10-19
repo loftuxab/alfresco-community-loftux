@@ -13,7 +13,7 @@
         <property environment="env" />
         <property file="${user.home}/user-override.properties" />
         <property file="project-override.properties" />
-        <property file="${dir.common}/version.properties" />
+        <property file="projects/repository/config/alfresco/version.properties" />
         <property file="${dir.common}/common.properties" />
         <property file="project.properties" />
 
@@ -40,7 +40,7 @@
         </path>
 
         <!-- load the JIBX task definition -->
-        <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask" 
+        <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask"
                  classpath="${dir.common.lib}/jibx/jibx-bind.jar;${dir.common.lib}/jibx/jibx-run.jar;${dir.common.lib}/bcel.jar;${dir.common.lib}/xpp3.jar" />
 
         <echo level="info">${startup.message}</echo>
