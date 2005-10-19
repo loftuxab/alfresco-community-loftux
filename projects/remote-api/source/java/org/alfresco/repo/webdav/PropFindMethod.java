@@ -524,7 +524,14 @@ public class PropFindMethod extends WebDAVMethod
     
                         xml.startElement(WebDAV.DAV_NS, WebDAV.XML_DISPLAYNAME, WebDAV.XML_NS_DISPLAYNAME, nullAttr);
                         if ( davValue != null)
-                            xml.write(typeConv.convert(String.class, davValue));
+                        {
+                            String name = typeConv.convert(String.class, davValue);
+                            if ( name == null || name.length() == 0)
+                            {
+                                logger.error("WebDAV name is null, value=" + davValue.getClass().getName() + ", node=" + node);
+                            }
+                            xml.write(name);
+                        }
                         xml.endElement(WebDAV.DAV_NS, WebDAV.XML_DISPLAYNAME, WebDAV.XML_NS_DISPLAYNAME);
                     }
                 }
@@ -722,7 +729,14 @@ public class PropFindMethod extends WebDAVMethod
 
         xml.startElement(WebDAV.DAV_NS, WebDAV.XML_DISPLAYNAME, WebDAV.XML_NS_DISPLAYNAME, nullAttr);
         if ( davValue != null)
-            xml.write(typeConv.convert(String.class, davValue));
+        {
+            String name = typeConv.convert(String.class, davValue);
+            if ( name == null || name.length() == 0)
+            {
+                logger.error("WebDAV name is null, value=" + davValue.getClass().getName() + ", node=" + node);
+            }
+            xml.write(name);
+        }
         xml.endElement(WebDAV.DAV_NS, WebDAV.XML_DISPLAYNAME, WebDAV.XML_NS_DISPLAYNAME);
 
         // Output the source
