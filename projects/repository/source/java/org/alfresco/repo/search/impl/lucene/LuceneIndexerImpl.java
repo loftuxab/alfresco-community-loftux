@@ -59,6 +59,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.EqualsHelper;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -1356,8 +1357,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             {
                                 boolean readerReady = true;
                                 // transform if necessary (it is not a UTF-8 text document)
-                                if (!reader.getMimetype().equals(MimetypeMap.MIMETYPE_TEXT_PLAIN) ||
-                                    !reader.getEncoding().equals("UTF-8"))
+                                if (!EqualsHelper.nullSafeEquals(reader.getMimetype(), MimetypeMap.MIMETYPE_TEXT_PLAIN) ||
+                                    !EqualsHelper.nullSafeEquals(reader.getEncoding(), "UTF-8"))
                                 {
                                     ContentWriter writer = contentService.getTempWriter();
                                     writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);

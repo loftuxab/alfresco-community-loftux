@@ -62,6 +62,9 @@ public abstract class AbstractContentAccessor implements ContentAccessor
             throw new IllegalArgumentException("contentUrl must be a valid String");
         }
         this.contentUrl = contentUrl;
+        
+        // the default encoding is Java's default encoding
+        encoding = "UTF-8";
     }
     
     public ContentData getContentData()
