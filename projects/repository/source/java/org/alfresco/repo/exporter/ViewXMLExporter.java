@@ -29,8 +29,8 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterContext;
 import org.alfresco.service.cmr.view.ExporterException;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.xml.sax.ContentHandler;
@@ -54,6 +54,11 @@ import org.xml.sax.helpers.AttributesImpl;
     private static final String PROPERTIES_LOCALNAME = "properties";
     private static final String ASSOCIATIONS_LOCALNAME = "associations";
     private static final String DATATYPE_LOCALNAME = "datatype";
+    private static final String METADATA_LOCALNAME  = "metadata";
+    private static final String EXPORTEDBY_LOCALNAME  = "exportBy";
+    private static final String EXPORTEDDATE_LOCALNAME  = "exportDate";
+    private static final String EXPORTERVERSION_LOCALNAME  = "exporterVersion";
+    private static final String EXPORTOF_LOCALNAME  = "exportOf";
     private static QName VIEW_QNAME; 
     private static QName VALUE_QNAME;
     private static QName PROPERTIES_QNAME;
@@ -61,6 +66,11 @@ import org.xml.sax.helpers.AttributesImpl;
     private static QName ASSOCIATIONS_QNAME; 
     private static QName CHILDNAME_QNAME;
     private static QName DATATYPE_QNAME;
+    private static QName METADATA_QNAME;
+    private static QName EXPORTEDBY_QNAME;
+    private static QName EXPORTEDDATE_QNAME;
+    private static QName EXPORTERVERSION_QNAME;
+    private static QName EXPORTOF_QNAME;
     private static final AttributesImpl EMPTY_ATTRIBUTES = new AttributesImpl();
     
     // Service dependencies
@@ -94,20 +104,54 @@ import org.xml.sax.helpers.AttributesImpl;
         PROPERTIES_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, PROPERTIES_LOCALNAME, namespaceService);
         ASSOCIATIONS_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ASSOCIATIONS_LOCALNAME, namespaceService);
         DATATYPE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, namespaceService);
+        METADATA_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, METADATA_LOCALNAME, namespaceService);
+        EXPORTEDBY_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDBY_LOCALNAME, namespaceService);
+        EXPORTEDDATE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDDATE_LOCALNAME, namespaceService);
+        EXPORTERVERSION_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTERVERSION_LOCALNAME, namespaceService);
+        EXPORTOF_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTOF_LOCALNAME, namespaceService);
     }
     
     
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#start()
      */
-    public void start(NodeRef exportNodeRef)
+    public void start(ExporterContext context)
     {
         try
         {
-            exportNodePath = nodeService.getPath(exportNodeRef);
+            exportNodePath = nodeService.getPath(context.getExportOf());
             contentHandler.startDocument();
             contentHandler.startPrefixMapping(NamespaceService.REPOSITORY_VIEW_PREFIX, NamespaceService.REPOSITORY_VIEW_1_0_URI);
             contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, VIEW_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+
+            //
+            // output metadata
+            //
+            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, METADATA_LOCALNAME, METADATA_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+
+            // exported by
+            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDBY_LOCALNAME, EXPORTEDBY_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+            contentHandler.characters(context.getExportedBy().toCharArray(), 0, context.getExportedBy().length());
+            contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDBY_LOCALNAME, EXPORTEDBY_QNAME.toPrefixString());
+
+            // exported date
+            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDDATE_LOCALNAME, EXPORTEDDATE_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+            String date = DefaultTypeConverter.INSTANCE.convert(String.class, context.getExportedDate());
+            contentHandler.characters(date.toCharArray(), 0, date.length());
+            contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDDATE_LOCALNAME, EXPORTEDDATE_QNAME.toPrefixString());
+            
+            // exporter version
+            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTERVERSION_LOCALNAME, EXPORTERVERSION_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+            contentHandler.characters(context.getExporterVersion().toCharArray(), 0, context.getExporterVersion().length());
+            contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTERVERSION_LOCALNAME, EXPORTERVERSION_QNAME.toPrefixString());
+
+            // export of
+            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTOF_LOCALNAME, EXPORTOF_QNAME.toPrefixString(), EMPTY_ATTRIBUTES);
+            String path = exportNodePath.toPrefixString(namespaceService);
+            contentHandler.characters(path.toCharArray(), 0, path.length());
+            contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTOF_LOCALNAME, EXPORTOF_QNAME.toPrefixString());
+            
+            contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, METADATA_LOCALNAME, METADATA_QNAME.toPrefixString());
         }
         catch (SAXException e)
         {

@@ -35,7 +35,7 @@ public interface Exporter
     /**
      * Start of Export
      */
-    public void start(NodeRef rootNodeRef);
+    public void start(ExporterContext context);
 
     /**
      * Start export of namespace

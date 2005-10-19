@@ -999,6 +999,12 @@
         <property name="contentService">
             <ref bean="contentService" />
         </property>
+        <property name="descriptorService">
+            <ref bean="DescriptorService" />
+        </property>
+        <property name="authenticationService">
+            <ref bean="authenticationService" />
+        </property>
     </bean>
 
     <!-- Audit -->

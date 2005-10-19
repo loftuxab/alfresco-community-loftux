@@ -27,6 +27,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterContext;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.cmr.view.ExporterService;
@@ -436,7 +437,7 @@ public final class Export extends Tool
         /* (non-Javadoc)
          * @see org.alfresco.service.cmr.view.Exporter#start()
          */
-        public void start(NodeRef exportNodeRef)
+        public void start(ExporterContext exportNodeRef)
         {
         }
 

@@ -14,7 +14,10 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.service.cmr.view;
+package org.alfresco.repo.exporter;
+
+import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 
 
 /**

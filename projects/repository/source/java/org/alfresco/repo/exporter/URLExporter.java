@@ -23,6 +23,7 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterContext;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
 
@@ -59,9 +60,9 @@ import org.alfresco.util.ParameterCheck;
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#start()
      */
-    public void start(NodeRef exportNodeRef)
+    public void start(ExporterContext context)
     {
-        exporter.start(exportNodeRef);
+        exporter.start(context);
     }
 
     /* (non-Javadoc)

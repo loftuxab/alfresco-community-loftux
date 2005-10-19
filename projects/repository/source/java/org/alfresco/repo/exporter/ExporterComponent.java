@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,14 +37,16 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
 import org.alfresco.service.cmr.view.Exporter;
-import org.alfresco.service.cmr.view.ExporterCrawler;
+import org.alfresco.service.cmr.view.ExporterContext;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.descriptor.DescriptorService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
@@ -66,6 +69,8 @@ public class ExporterComponent
     private NodeService nodeService;
     private SearchService searchService;
     private ContentService contentService;
+    private DescriptorService descriptorService;
+    private AuthenticationService authenticationService;
 
     /** Indent Size */
     private int indentSize = 2;
@@ -111,6 +116,21 @@ public class ExporterComponent
         this.namespaceService = namespaceService;
     }
 
+    /**
+     * @param descriptorService  the descriptor service
+     */
+    public void setDescriptorService(DescriptorService descriptorService)
+    {
+        this.descriptorService = descriptorService;
+    }
+
+    /**
+     * @param authenticationService  the authentication service
+     */
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService; 
+    }
     
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.ExporterService#exportView(java.io.OutputStream, org.alfresco.service.cmr.view.ExporterCrawlerParameters, org.alfresco.service.cmr.view.Exporter)
@@ -203,11 +223,11 @@ public class ExporterComponent
          */
         public void export(ExporterCrawlerParameters parameters, Exporter exporter)
         {
-            NodeRef nodeRef = getNodeRef(parameters.getExportFrom());
-                    
-            exporter.start(nodeRef);
+            ExporterContext context = new ExporterContextImpl(parameters);
+            exporter.start(context);
 
             // determine if root repository node
+            NodeRef nodeRef = context.getExportOf();
             boolean rootNode = nodeService.getRootNode(nodeRef.getStoreRef()).equals(nodeRef);
             if (parameters.isCrawlSelf() && !rootNode)
             {
@@ -442,6 +462,72 @@ public class ExporterComponent
             return false;
         }
         
+    }
+
+
+    /**
+     * Exporter Context
+     */
+    private class ExporterContextImpl implements ExporterContext
+    {
+        private NodeRef exportOf;
+        private String exportedBy;
+        private Date exportedDate;
+        private String exporterVersion;
+        
+        /**
+         * Construct
+         * 
+         * @param parameters  exporter crawler parameters
+         */
+        public ExporterContextImpl(ExporterCrawlerParameters parameters)
+        {
+            // get current user performing export
+            String currentUserName = authenticationService.getCurrentUserName();
+            exportedBy = (currentUserName == null) ? "unknown" : currentUserName;
+
+            // get current date
+            exportedDate = new Date(System.currentTimeMillis());
+            
+            // get export of
+            exportOf = getNodeRef(parameters.getExportFrom());
+            
+            // get exporter version
+            exporterVersion = descriptorService.getDescriptor().getVersion();
+        }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ExporterContext#getExportedBy()
+         */
+        public String getExportedBy()
+        {
+            return exportedBy;
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ExporterContext#getExportedDate()
+         */
+        public Date getExportedDate()
+        {
+            return exportedDate;
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ExporterContext#getExporterVersion()
+         */
+        public String getExporterVersion()
+        {
+            return exporterVersion;
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ExporterContext#getExportOf()
+         */
+        public NodeRef getExportOf()
+        {
+            return exportOf;
+        }
+        
         /**
          * Get the Node Ref from the specified Location
          * 
@@ -481,7 +567,7 @@ public class ExporterComponent
         
             return nodeRef;
         }
+        
     }
-
     
 }

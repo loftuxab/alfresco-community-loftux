@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterContext;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.ImporterService;
@@ -89,7 +90,7 @@ public class ExporterComponentTest extends BaseSpringTest
         implements Exporter
     {
 
-        public void start(NodeRef exportNodeRef)
+        public void start(ExporterContext exportNodeRef)
         {
             System.out.println("TestProgress: start");
         }

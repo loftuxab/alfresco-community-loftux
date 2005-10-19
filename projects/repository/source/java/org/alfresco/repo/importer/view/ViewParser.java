@@ -51,6 +51,7 @@ public class ViewParser implements Parser
     // View schema elements and attributes
     private static final String VIEW_CHILD_NAME_ATTR = "childName";    
     private static final String VIEW_DATATYPE_ATTR = "datatype";
+    private static final QName VIEW_METADATA = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "metadata");
     private static final QName VIEW_VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "value");
     private static final QName VIEW_ASPECTS = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "aspects");
     private static final QName VIEW_PROPERTIES = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "properties");
@@ -163,7 +164,11 @@ public class ViewParser implements Parser
         Object context = contextStack.peek();
 
         // Handle special view directives
-        if (defName.equals(VIEW_ASPECTS) || defName.equals(VIEW_PROPERTIES) || defName.equals(VIEW_ASSOCIATIONS))
+        if (defName.equals(VIEW_METADATA))
+        {
+            contextStack.push(new MetaDataContext(defName, (ElementContext)context));
+        }
+        else if (defName.equals(VIEW_ASPECTS) || defName.equals(VIEW_PROPERTIES) || defName.equals(VIEW_ASSOCIATIONS))
         {
             if (context instanceof NodeItemContext)
             {
@@ -178,7 +183,11 @@ public class ViewParser implements Parser
         }
         else
         {
-            if (context instanceof ParentContext)
+            if (context instanceof MetaDataContext)
+            {
+                // TODO: Extract view meta data
+            }
+            else if (context instanceof ParentContext)
             {
                 // Process type definition 
                 TypeDefinition typeDef = dictionaryService.getType(defName);

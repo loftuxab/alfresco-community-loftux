@@ -5,7 +5,14 @@
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
            xmlns:cm="http://www.alfresco.org/model/content/1.0"
            xmlns="">
-   
+
+   <view:metadata>
+      <view:exportBy>unknown</view:exportBy>
+      <view:exportDate>2005-10-19T19:18:01.387+01:00</view:exportDate>
+      <view:exporterVersion>1.0.0 (rc1b)</view:exporterVersion>
+      <view:exportOf>/system</view:exportOf>
+   </view:metadata>
+      
    <cm:systemfolder view:childName="system">
       <cm:name>System</cm:name>
       <cm:orderedchildren>true</cm:orderedchildren>

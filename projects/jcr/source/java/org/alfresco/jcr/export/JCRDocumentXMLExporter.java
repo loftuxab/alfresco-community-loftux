@@ -37,6 +37,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.view.Exporter;
+import org.alfresco.service.cmr.view.ExporterContext;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Base64;
@@ -76,7 +77,7 @@ public class JCRDocumentXMLExporter implements Exporter
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#start()
      */
-    public void start(NodeRef exportNodeRef)
+    public void start(ExporterContext exportNodeRef)
     {
         try
         {
