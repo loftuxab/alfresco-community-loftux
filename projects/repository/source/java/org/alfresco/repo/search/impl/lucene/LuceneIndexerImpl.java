@@ -35,6 +35,7 @@ import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.impl.lucene.fts.FTSIndexerAware;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
@@ -79,6 +80,7 @@ import org.apache.lucene.search.TermQuery;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
+   
     public static final String NOT_INDEXED_NO_TRANSFORMATION = "nint";
     public static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nift";
     public static final String NOT_INDEXED_CONTENT_MISSING = "nicm";
@@ -457,7 +459,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
         LuceneIndexerImpl indexer = new LuceneIndexerImpl();
         indexer.setLuceneConfig(config);
-        indexer.initialise(storeRef, deltaId, false);
+        indexer.initialise(storeRef, deltaId, false, true);
         return indexer;
     }
 
@@ -1189,10 +1191,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         {
                             qNameBuffer.append(";/");
                         }
-                        qNameBuffer.append(qNameRef.getQName().toString());
+                        qNameBuffer.append(ISO9075.getXPathName(qNameRef.getQName()));
                         xdoc.add(new Field("PARENT", qNameRef.getParentRef().toString(), true, true, false));
-                        xdoc.add(new Field("TYPEQNAME", qNameRef.getTypeQName().toString(), true, false, false));
-                        xdoc.add(new Field("LINKASPECT", (pair.getSecond() == null) ? "" : pair.getSecond().toString(), true, true, false));
+                        xdoc.add(new Field("TYPEQNAME", ISO9075.getXPathName(qNameRef.getTypeQName()), true, false, false));
+                        xdoc.add(new Field("LINKASPECT", (pair.getSecond() == null) ? "" : ISO9075.getXPathName(pair.getSecond()) , true, true, false));
                     }
                 }
 
@@ -1250,10 +1252,12 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             ChildAssociationRef primary = nodeService.getPrimaryParent(nodeRef);
             xdoc.add(new Field("PRIMARYPARENT", primary.getParentRef().toString(), true, true, false));
-            xdoc.add(new Field("TYPE", nodeService.getType(nodeRef).toString(), true, true, false));
+            QName typeQName = nodeService.getType(nodeRef);
+      
+            xdoc.add(new Field("TYPE", ISO9075.getXPathName(typeQName), true, true, false));
             for (QName classRef : nodeService.getAspects(nodeRef))
             {
-                xdoc.add(new Field("ASPECT", classRef.toString(), true, true, false));
+                xdoc.add(new Field("ASPECT", ISO9075.getXPathName(classRef), true, true, false));
             }
 
             xdoc.add(new Field("ISROOT", "F", true, true, false));
@@ -1389,7 +1393,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                 doc.add(Field.Text("TEXT", NOT_INDEXED_CONTENT_MISSING));
                             }
                         }
-                        doc.add(new Field("@" + propertyName, strValue, store, index, tokenise));
+                        doc.add(new Field("@" + QName.createQName(propertyName.getNamespaceURI(), ISO9075.encode(propertyName.getLocalName())), strValue, store, index, tokenise));
                     }
                 }
             }
@@ -1656,7 +1660,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                         }
                                     }
 
-                                    document.add(new Field("@" + propertyQName, strValue, store, index, tokenise));
+                                    document.add(new Field("@" + QName.createQName(propertyQName.getNamespaceURI(), ISO9075.encode(propertyQName.getLocalName())), strValue, store, index, tokenise));
                                 }
                             }
                         }

@@ -314,10 +314,11 @@ public class NodeServiceXPath extends BaseXPath
             ChildAssociationRef car = (ChildAssociationRef) nodes.get(0);
             String pattern = StringFunction.evaluate(patternObj, nav);
             boolean includeFts = BooleanFunction.evaluate(includeFtsObj, nav);
-            QName qname = QName.createQName(nav.getAttributeNamespaceUri(attribute), nav.getAttributeName(attribute));
+            QName qname = QName.createQName(nav.getAttributeNamespaceUri(attribute), ISO9075.decode(nav
+                    .getAttributeName(attribute)));
 
             DocumentNavigator dNav = (DocumentNavigator) nav;
-            // JSR 170 inclues full text matches
+            // JSR 170 includes full text matches
             return dNav.like(car.getChildRef(), qname, pattern, includeFts);
 
         }
@@ -351,8 +352,8 @@ public class NodeServiceXPath extends BaseXPath
             }
             else if (nav.isAttribute(nodes.get(0)))
             {
-                qname = QName.createQName(nav.getAttributeNamespaceUri(nodes.get(0)), nav
-                        .getAttributeName(nodes.get(0)));
+                qname = QName.createQName(nav.getAttributeNamespaceUri(nodes.get(0)), ISO9075.decode(nav
+                        .getAttributeName(nodes.get(0))));
                 nodeRef = ((DocumentNavigator.Property) nodes.get(0)).parent;
             }
 
@@ -363,8 +364,7 @@ public class NodeServiceXPath extends BaseXPath
 
         }
     }
-    
-    
+
     static class JCRContains implements Function
     {
 
@@ -388,12 +388,12 @@ public class NodeServiceXPath extends BaseXPath
             {
                 return false;
             }
-            
+
             QName qname = null;
             NodeRef nodeRef = null;
-            
+
             Object target = identifier;
-            
+
             if (identifier instanceof List)
             {
                 List list = (List) identifier;
@@ -404,7 +404,7 @@ public class NodeServiceXPath extends BaseXPath
                 // do not recurse: only first list should unwrap
                 target = list.get(0);
             }
-            
+
             if (nav.isElement(target))
             {
                 qname = null; // should use all attributes and full text index
@@ -412,8 +412,7 @@ public class NodeServiceXPath extends BaseXPath
             }
             else if (nav.isAttribute(target))
             {
-                qname = QName.createQName(nav.getAttributeNamespaceUri(target), nav
-                        .getAttributeName(target));
+                qname = QName.createQName(nav.getAttributeNamespaceUri(target), ISO9075.decode(nav.getAttributeName(target)));
                 nodeRef = ((DocumentNavigator.Property) target).parent;
             }
 

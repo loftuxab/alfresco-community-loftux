@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
@@ -597,6 +598,9 @@ public class BrowseBean implements IContextListener
       node.addPropertyResolver("fileType32", this.resolverFileType32);
       node.addPropertyResolver("templatable", this.resolverTemplatable);
       node.addPropertyResolver("size", this.resolverSize);
+      
+      node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
+      node.addPropertyResolver("checkIn", this.resolverCheckIn);
    }
    
    private NodePropertyResolver resolverlocked = new NodePropertyResolver() {
@@ -609,6 +613,32 @@ public class BrowseBean implements IContextListener
       public Object get(Node node) {
          return Repository.isNodeOwner(node, lockService);
       }
+   };
+   
+   private NodePropertyResolver resolverCancelCheckOut = new NodePropertyResolver() {
+       public Object get(Node node) {
+           if(node.hasPermission(null))
+           {
+               return Repository.isNodeOwner(node, lockService) &&  node.hasPermission(PermissionService.WRITE);
+           }
+           else
+           {
+              return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) &&  node.hasPermission(PermissionService.CANCEL_CHECK_OUT);
+           }
+       }
+   };
+   
+   private NodePropertyResolver resolverCheckIn = new NodePropertyResolver() {
+       public Object get(Node node) {
+           if(node.hasPermission(null))
+           {
+               return Repository.isNodeOwner(node, lockService) &&  node.hasPermission(PermissionService.WRITE);
+           }
+           else
+           {
+               return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CHECK_IN);
+           }
+       }
    };
    
    private NodePropertyResolver resolverWorkingCopy = new NodePropertyResolver() {

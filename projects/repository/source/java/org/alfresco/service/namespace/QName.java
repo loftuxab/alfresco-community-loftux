@@ -38,7 +38,6 @@ public final class QName implements QNamePattern, Serializable, Cloneable
     private String localName;                   // never null
     private int hashCode;
     private String prefix;
-    private static final char[] INVALID_CHARS = { '/', '.', '{', '}', ':' };
 
     public static final char NAMESPACE_PREFIX = ':';
     public static final char NAMESPACE_BEGIN = '{';
@@ -189,19 +188,6 @@ public final class QName implements QNamePattern, Serializable, Cloneable
             name = name.substring(0, MAX_LENGTH);
         }
 
-        // make sure there are no spaces in the name (these are not considered
-        // invalid
-        // at the moment but things don't work if spaces are present), therefore
-        // remove this if space becomes invalid or is dealt with
-        name = name.replace(' ', '_');
-
-        // search for any invalid QName characters
-        for (int i = 0; i < INVALID_CHARS.length; i++)
-        {
-            // replace if found - slow but this is a rare case
-            name = name.replace(INVALID_CHARS[i], '_');
-        }
-
         return name;
     }
     
@@ -234,16 +220,7 @@ public final class QName implements QNamePattern, Serializable, Cloneable
      * @param prefix  prefix (maybe null or empty string)
      */
     private QName(String namespace, String name, String prefix)
-    {
-        // Validate local name
-        for (int i=0; i<INVALID_CHARS.length; i++)
-        {
-           if (name.indexOf(INVALID_CHARS[i]) != -1)
-           {
-               throw new InvalidQNameException("The local part of a QName may not contain '" + INVALID_CHARS[i] + "'");
-           }
-        }
-        
+    {   
         this.namespaceURI = (namespace == null) ? NamespaceService.DEFAULT_URI : namespace;
         this.prefix = prefix;
         this.localName = name;

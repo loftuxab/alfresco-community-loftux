@@ -200,9 +200,8 @@ public class PermissionModel implements ModelDAO, InitializingBean
             permissionSets.put(permissionSet.getQName(), permissionSet);
         }
 
-        
         buildUniquePermissionMap();
-        
+
         // NodePermissions
 
         for (Iterator npit = root.elementIterator(GLOBAL_PERMISSION); npit.hasNext(); /**/)
@@ -210,11 +209,10 @@ public class PermissionModel implements ModelDAO, InitializingBean
             Element globalPermissionElement = (Element) npit.next();
             GlobalPermissionEntry globalPermission = new GlobalPermissionEntry();
             globalPermission.initialise(globalPermissionElement, nspr, this);
-            
+
             globalPermissions.add(globalPermission);
         }
 
-        
     }
 
     /*
@@ -267,7 +265,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
     {
         return Collections.unmodifiableSet(globalPermissions);
     }
-    
+
     public Map<QName, PermissionSet> getPermissionSets()
     {
         return Collections.unmodifiableMap(permissionSets);
@@ -292,6 +290,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
         }
         else
         {
+            mergeGeneralAspectPermissions(permissions, exposedOnly);
             addTypePermissions(type, permissions, exposedOnly);
         }
         return permissions;
@@ -318,7 +317,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
         {
             addAspectPermissions(ad.getName(), permissions, exposedOnly);
         }
-        mergePermissions(permissions, type, exposedOnly);
+        mergePermissions(permissions, type, exposedOnly, true);
     }
 
     /**
@@ -338,7 +337,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
                 addAspectPermissions(aspectDef.getParentName(), permissions, exposedOnly);
             }
         }
-        mergePermissions(permissions, type, exposedOnly);
+        mergePermissions(permissions, type, exposedOnly, true);
     }
 
     /**
@@ -347,7 +346,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
      * @param target
      * @param type
      */
-    private void mergePermissions(Set<PermissionReference> target, QName type, boolean exposedOnly)
+    private void mergePermissions(Set<PermissionReference> target, QName type, boolean exposedOnly, boolean typeRequired)
     {
         PermissionSet permissionSet = permissionSets.get(type);
         if (permissionSet != null)
@@ -358,11 +357,17 @@ public class PermissionModel implements ModelDAO, InitializingBean
                 {
                     if (!pg.isExtends())
                     {
-                        target.add(pg);
+                        if (pg.isTypeRequired() == typeRequired)
+                        {
+                            target.add(pg);
+                        }
                     }
                     else if (exposedOnly)
                     {
-                        target.add(getBasePermissionGroup(pg));
+                        if (pg.isTypeRequired() == typeRequired)
+                        {
+                            target.add(getBasePermissionGroup(pg));
+                        }
                     }
                 }
             }
@@ -370,9 +375,21 @@ public class PermissionModel implements ModelDAO, InitializingBean
             {
                 if (!exposedOnly || permissionSet.exposeAll() || p.isExposed())
                 {
-                    target.add(p);
+                    if (p.isTypeRequired() == typeRequired)
+                    {
+                        target.add(p);
+                    }
                 }
             }
+        }
+    }
+    
+    
+    private void mergeGeneralAspectPermissions(Set<PermissionReference> target, boolean exposedOnly)
+    {
+        for(QName aspect : dictionaryService.getAllAspects())
+        {
+            mergePermissions(target, aspect, exposedOnly, false);
         }
     }
 
@@ -391,6 +408,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
         QName typeName = nodeService.getType(nodeRef);
         Set<PermissionReference> permissions = getAllPermissions(typeName);
+        mergeGeneralAspectPermissions(permissions, exposedOnly);
         // Add non mandatory aspects..
         Set<QName> defaultAspects = new HashSet<QName>();
         for (AspectDefinition aspDef : dictionaryService.getType(typeName).getDefaultAspects())
@@ -583,8 +601,8 @@ public class PermissionModel implements ModelDAO, InitializingBean
      */
     private PermissionGroup getPermissionGroupOrNull(PermissionReference target)
     {
-       PermissionGroup pg = permissionGroupMap.get(target);
-       return pg == null ? null : pg;
+        PermissionGroup pg = permissionGroupMap.get(target);
+        return pg == null ? null : pg;
     }
 
     /**
@@ -753,7 +771,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
                 for (PermissionReference grantedTo : p.getGrantedToGroups())
                 {
                     PermissionGroup base = getBasePermissionGroupOrNull(getPermissionGroupOrNull(grantedTo));
-                    if (target.equals(base) && isPartOfDynamicPermissionGroup(grantedTo, qName, aspectQNames))
+                    if (target.equals(base) && (!base.isTypeRequired() || isPartOfDynamicPermissionGroup(grantedTo, qName, aspectQNames)))
                     {
                         if (on == RequiredPermission.On.NODE)
                         {
@@ -849,13 +867,17 @@ public class PermissionModel implements ModelDAO, InitializingBean
 
     public PermissionReference getPermissionReference(QName qname, String permissionName)
     {
+        if(permissionName == null)
+        {
+            return null;
+        }
         PermissionReference pr = uniqueMap.get(permissionName);
         if (pr == null)
         {
             pr = permissionReferenceMap.get(permissionName);
             if (pr == null)
             {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Can not find " + permissionName);
             }
         }
         return pr;

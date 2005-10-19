@@ -339,6 +339,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			if (keepCheckedOut == false)
 			{
 				// Delete the working copy
+                this.nodeService.removeAspect(workingCopyNodeRef, ContentModel.ASPECT_WORKING_COPY);
 				this.nodeService.deleteNode(workingCopyNodeRef);							
 			}
 			else
@@ -407,6 +408,7 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 			this.lockService.unlock(nodeRef);
 			
 			// Delete the working copy
+            this.nodeService.removeAspect(workingCopyNodeRef, ContentModel.ASPECT_WORKING_COPY);
 			this.nodeService.deleteNode(workingCopyNodeRef);
 		}
 		else

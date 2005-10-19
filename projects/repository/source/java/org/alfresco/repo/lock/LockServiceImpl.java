@@ -257,16 +257,16 @@ public class LockServiceImpl implements LockService
         checkForLockApsect(nodeRef);
         
         // Get the current user name
-        String userName = getUserName();
+        //String userName = getUserName();
 
-        LockStatus lockStatus = getLockStatus(nodeRef, userName);
-        if (LockStatus.LOCKED.equals(lockStatus) == true)
-        {
-            // Error since the lock can only be released by the lock owner
-            throw new UnableToReleaseLockException(nodeRef);
-        }
-        else if (LockStatus.LOCK_OWNER.equals(lockStatus) == true)
-        {
+        //LockStatus lockStatus = getLockStatus(nodeRef, userName);
+        //if (LockStatus.LOCKED.equals(lockStatus) == true)
+       // {
+        //    // Error since the lock can only be released by the lock owner
+        //    throw new UnableToReleaseLockException(nodeRef);
+       // }
+       // else if (LockStatus.LOCK_OWNER.equals(lockStatus) == true)
+       // {
             this.ignoreNodeRefs.add(nodeRef);
             try
             {
@@ -277,7 +277,7 @@ public class LockServiceImpl implements LockService
             {
                 this.ignoreNodeRefs.remove(nodeRef);
             }
-        }
+        //}
     }
 
     /**

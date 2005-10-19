@@ -34,6 +34,8 @@ public interface PermissionService
 
     public static final String OWNER_AUTHORITY = "ROLE_OWNER";
     
+    public static final String LOCK_OWNER_AUTHORITY = "ROLE_LOCK_OWNER";
+    
     public static final String ADMINISTRATOR_AUTHORITY = "GROUP_ADMINISTRATORS";
 
     public static final String ALL_PERMISSIONS = "All";
@@ -93,6 +95,16 @@ public interface PermissionService
     public static final String EDITOR = "Editor";
 
     public static final String GUEST = "Guest";
+    
+    public static final String LOCK = "Lock";
+    
+    public static final String UNLOCK = "Unlock";
+    
+    public static final String CHECK_OUT = "CheckOut";
+    
+    public static final String CHECK_IN = "CheckIn";
+    
+    public static final String CANCEL_CHECK_OUT = "CancelCheckOut";
 
     /**
      * Get the Owner Authority

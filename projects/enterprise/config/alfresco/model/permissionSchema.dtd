@@ -10,6 +10,7 @@
 <!ATTLIST permissionGroup extends (true | false) "false">
 <!ATTLIST permissionGroup expose (true | false) "false">
 <!ATTLIST permissionGroup allowFullControl (true | false) "false" >
+<!ATTLIST permissionGroup requiresType (true | false) "true">
 <!ELEMENT includePermissionGroup EMPTY>
 <!ATTLIST includePermissionGroup type CDATA #IMPLIED>
 <!ATTLIST includePermissionGroup permissionGroup CDATA #REQUIRED>
@@ -19,6 +20,7 @@
 <!ELEMENT permission (grantedToGroup*, requiredPermission* )>
 <!ATTLIST permission name CDATA #REQUIRED>
 <!ATTLIST permission expose (true | false) "false">
+<!ATTLIST permission requiresType (true | false) "true">
 <!ELEMENT dynamicAuthority EMPTY>
 <!ATTLIST dynamicAuthority evaluator CDATA #REQUIRED>
 <!ELEMENT requiredPermission EMPTY>

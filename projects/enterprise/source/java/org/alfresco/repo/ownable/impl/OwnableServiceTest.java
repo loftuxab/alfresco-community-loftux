@@ -133,11 +133,15 @@ public class OwnableServiceTest extends TestCase
     {
         authenticationService.authenticate("andy", "andy".toCharArray());
         NodeRef testNode = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON, ContentModel.TYPE_CMOBJECT, null).getChildRef();
+        permissionService.setPermission(rootNodeRef, "andy", PermissionService.TAKE_OWNERSHIP, true);
         assertEquals("andy", ownableService.getOwner(testNode));
         assertTrue(ownableService.hasOwner(testNode));
         assertTrue(nodeService.hasAspect(testNode, ContentModel.ASPECT_AUDITABLE));
         assertFalse(nodeService.hasAspect(testNode, ContentModel.ASPECT_OWNABLE));
         assertTrue(dynamicAuthority.hasAuthority(testNode, "andy"));
+        
+        assertEquals(AccessStatus.ALLOWED, permissionService.hasPermission(rootNodeRef, PermissionService.TAKE_OWNERSHIP));
+        assertEquals(AccessStatus.ALLOWED, permissionService.hasPermission(rootNodeRef, PermissionService.SET_OWNER));
         
         ownableService.setOwner(testNode, "muppet");
         assertEquals("muppet", ownableService.getOwner(testNode));

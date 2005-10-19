@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE permissions>
-<!--  PUBLIC '-//ALFRECSO//DTD PERMISSIONS//EN' 'permissionSchema.dtd' -->
+<!DOCTYPE permissions >
+<!--PUBLIC '-//ALFRECSO//DTD PERMISSIONS//EN' 'permissionSchema.dtd' -->
 
 <!-- The base permission model for the repository -->
 
@@ -123,15 +123,15 @@
    </permissionSet>
    
    
-   <!-- Permissins associated with the Ownable aspect -->
+   <!-- Permissions associated with the Ownable aspect -->
    
-   <permissionSet type="cm:ownable" expose="all">
+   <permissionSet type="cm:ownable" expose="selected">
       <!-- Read is controlled by the node -->
       
       <!-- Permission control to allow ownership of the node to be taken from others -->
-      <permissionGroup name="TakeOwnership" />
+      <permissionGroup name="TakeOwnership" requiresType="false" expose="false"/>
       
-      <permission name="SetOwner" expose="true">
+      <permission name="SetOwner" expose="false" requiresType="false">
         <grantedToGroup permissionGroup="TakeOwnership" />
         <requiredPermission on="parent" name="ReadChildren" />
         <!-- We need these permissions to set the owner. So they are implied by having this permission -->
@@ -139,27 +139,44 @@
         <requiredPermission on="node" name="AddChildren" implies="true" />
       </permission>
       
-      <!-- Owner authority is assigned dynamically -->
-      <dynamicAuthority evaluator="org.alfresco.repo.ownable.impl.OwnablePermissionEvaluator" />
    </permissionSet>
+   
+   <permissionSet type="cm:lockable" expose="selected">
+    
+      <permissionGroup name="CheckOut" requiresType="false" expose="false"/>
+      <permissionGroup name="CheckIn" requiresType="true" expose="false"/>
+      <permissionGroup name="CancelCheckOut" requiresType="true" expose="false"/>
+    
+      <permission name="Lock" requiresType="false" expose="false">
+        <grantedToGroup permissionGroup="CheckOut" />
+        <requiredPermission on="node" type="sys:base"  name="Write"/>
+      </permission>
+      
+      <permission name="Unlock" requiresType="true" expose="false">
+        <grantedToGroup permissionGroup="CheckIn" />
+        <grantedToGroup permissionGroup="CancelCheckOut" />
+      </permission>      
+      
+   </permissionSet>
+   
    
    <!-- Permissions for spaces -->
    
    
    <permissionSet type="cm:folder" expose="selected">
-        <permissionGroup name="Administrator" allowFullControl="true" expose="true" />
-        <permissionGroup name="Coordinator" allowFullControl="false" expose="true" >
-            <includePermissionGroup permissionGroup="Contributor" type="cm:folder"/>
-            <includePermissionGroup permissionGroup="Write" type="sys:base"/>
-            <includePermissionGroup permissionGroup="Delete" type="sys:base"/>
-        </permissionGroup>
+        <!-- Kept for backeard compatibility - Administrator permissions removed to aviod confusion --> 
+        <permissionGroup name="Administrator" allowFullControl="true" expose="false" />
+        <permissionGroup name="Coordinator" allowFullControl="true" expose="true" />
         <permissionGroup name="Contributor" allowFullControl="false" expose="true" >
             <includePermissionGroup permissionGroup="Guest" type="cm:folder"/>
             <includePermissionGroup permissionGroup="AddChildren" type="sys:base"/>
+            <!-- Check out requires write permissions so this will not apply to all documents -->
+            <includePermissionGroup type="cm:lockable" permissionGroup="CheckOut"/>
         </permissionGroup> 
         <permissionGroup name="Editor"  expose="true" allowFullControl="false" >
             <includePermissionGroup type="cm:folder" permissionGroup="Guest"/>
             <includePermissionGroup type="sys:base" permissionGroup="Write"/>
+            <includePermissionGroup type="cm:lockable" permissionGroup="CheckOut"/>
         </permissionGroup>
         <permissionGroup name="Guest" allowFullControl="false" expose="true" >
             <includePermissionGroup permissionGroup="Read" type="sys:base" />
@@ -176,5 +193,10 @@
    
    <!-- For now, owners can always see, find and manipulate their stuff -->
    <globalPermission permission="FullControl" authority="ROLE_OWNER"/>
+   
+   <!-- Unlock is granted to the lock owner -->
+   <globalPermission permission="Unlock" authority="ROLE_LOCK_OWNER"/>
+   <globalPermission permission="CheckIn" authority="ROLE_LOCK_OWNER"/>
+   <globalPermission permission="CancelCheckOut" authority="ROLE_LOCK_OWNER"/>
    
 </permissions>

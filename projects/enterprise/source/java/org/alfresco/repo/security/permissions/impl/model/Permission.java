@@ -60,10 +60,14 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
     private static final String DEFAULT_PERMISSION = "defaultPermission";
 
     private static final String EXPOSE = "expose";
+    
+    private static final String REQUIRES_TYPE = "requiresType";
 
     private AccessStatus defaultPermission;
 
     private boolean isExposed;
+    
+    private boolean requiresType;
 
     public Permission(QName typeQName)
     {
@@ -83,6 +87,16 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
         else
         {
             isExposed = true;
+        }
+        
+        att = element.attribute(REQUIRES_TYPE);
+        if (att != null)
+        {
+            requiresType = Boolean.parseBoolean(att.getStringValue());
+        }
+        else
+        {
+            requiresType = true;
         }
         
         Attribute defaultPermissionAttribute = element.attribute(DEFAULT_PERMISSION);
@@ -140,6 +154,11 @@ public class Permission extends AbstractPermission implements XMLModelInitialisa
     public boolean isExposed()
     {
         return isExposed;
+    }
+    
+    public boolean isTypeRequired()
+    {
+        return requiresType;
     }
 
 }

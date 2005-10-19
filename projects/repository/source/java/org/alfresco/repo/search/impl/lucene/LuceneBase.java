@@ -141,7 +141,7 @@ public abstract class LuceneBase implements Lockable
      * @param deltaId
      * @throws IOException
      */
-    protected void initialise(StoreRef store, String deltaId, boolean createMain) throws LuceneIndexException
+    protected void initialise(StoreRef store, String deltaId, boolean createMain, boolean createDelta) throws LuceneIndexException
     {
         this.store = store;
         this.deltaId = deltaId;
@@ -169,7 +169,7 @@ public abstract class LuceneBase implements Lockable
                 deltaDir = new File(deltaPath);
                 try
                 {
-                    initialiseFSDirectory(deltaPath, true, true).close();
+                    initialiseFSDirectory(deltaPath, createDelta, createDelta).close();
                 }
                 catch (IOException e)
                 {

@@ -38,6 +38,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.node.BaseNodeServiceTest;
+import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
@@ -56,6 +57,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
@@ -80,43 +82,73 @@ import org.springframework.context.ApplicationContext;
 public class LuceneTest extends TestCase
 {
     private static final String TEST_NAMESPACE = "http://www.alfresco.org/test/lucenetest";
+
     private static final QName ASSOC_TYPE_QNAME = QName.createQName(TEST_NAMESPACE, "assoc");
 
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
-    
+
     private static Log logger = LogFactory.getLog(LuceneTest.class);
 
     TransactionService transactionService;
+
     NodeService nodeService;
+
     DictionaryService dictionaryService;
+
     LuceneIndexLock luceneIndexLock;
+
     private NodeRef rootNodeRef;
+
     private NodeRef n1;
+
     private NodeRef n2;
+
     private NodeRef n3;
+
     private NodeRef n4;
+
     private NodeRef n5;
+
     private NodeRef n6;
+
     private NodeRef n7;
+
     private NodeRef n8;
+
     private NodeRef n9;
+
     private NodeRef n10;
+
     private NodeRef n11;
+
     private NodeRef n12;
+
     private NodeRef n13;
+
     private NodeRef n14;
+
     private DictionaryDAO dictionaryDAO;
+
     private FullTextSearchIndexer luceneFTS;
+
     private QName testType = QName.createQName(TEST_NAMESPACE, "testType");
+
     private QName testSuperType = QName.createQName(TEST_NAMESPACE, "testSuperType");
+
     private QName testAspect = QName.createQName(TEST_NAMESPACE, "testAspect");
+
     private QName testSuperAspect = QName.createQName(TEST_NAMESPACE, "testSuperAspect");
+
     private ContentService contentService;
+
     private QueryRegisterComponent queryRegisterComponent;
+
     private NamespacePrefixResolver namespacePrefixResolver;
+
     private LuceneIndexerAndSearcher indexerAndSearcher;
 
     private ServiceRegistry serviceRegistry;
+
     private UserTransaction testTX;
 
     public LuceneTest()
@@ -137,7 +169,7 @@ public class LuceneTest extends TestCase
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
         transactionService = (TransactionService) ctx.getBean("transactionComponent");
         serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        
+
         queryRegisterComponent.loadQueryCollection("testQueryRegister.xml");
 
         assertEquals(true, ctx.isSingleton("luceneIndexLock"));
@@ -145,7 +177,7 @@ public class LuceneTest extends TestCase
 
         testTX = transactionService.getUserTransaction();
         testTX.begin();
- 
+
         // load in the test model
         ClassLoader cl = BaseNodeServiceTest.class.getClassLoader();
         InputStream modelStream = cl.getResourceAsStream("org/alfresco/repo/search/impl/lucene/LuceneTest_model.xml");
@@ -156,13 +188,16 @@ public class LuceneTest extends TestCase
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
 
-        n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"), testSuperType).getChildRef();
+        n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"),
+                testSuperType).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "ValueOne");
-        n2 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}two"), testSuperType).getChildRef();
+        n2 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}two"),
+                testSuperType).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "valueone");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "valuetwo");
 
-        n3 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}three"), testSuperType).getChildRef();
+        n3 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}three"),
+                testSuperType).getChildRef();
 
         ObjectOutputStream oos;
         try
@@ -188,7 +223,8 @@ public class LuceneTest extends TestCase
         }
 
         Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
-        testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"), "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"),
+                "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
         testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"),
                 "TEXT THAT IS INDEXED STORED AND TOKENISED BUT NOT ATOMICALLY KEYTWO");
         testProperties.put(QName.createQName(TEST_NAMESPACE, "int-ista"), Integer.valueOf(1));
@@ -211,32 +247,39 @@ public class LuceneTest extends TestCase
         testList2.add("woof");
         testList2.add(null);
 
-        n4 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}four"), testType, testProperties).getChildRef();
+        n4 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}four"),
+                testType, testProperties).getChildRef();
 
         nodeService.getProperties(n1);
         nodeService.getProperties(n2);
         nodeService.getProperties(n3);
         nodeService.getProperties(n4);
 
-        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), testSuperType).getChildRef();
-        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), testSuperType).getChildRef();
-        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), testSuperType).getChildRef();
-        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), testSuperType).getChildRef();
-        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), testSuperType).getChildRef();
-        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), testSuperType).getChildRef();
-        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), testSuperType).getChildRef();
-        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), testSuperType).getChildRef();
-        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), testSuperType).getChildRef();
-       
+        n5 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}five"), testSuperType)
+                .getChildRef();
+        n6 = nodeService.createNode(n1, ASSOC_TYPE_QNAME, QName.createQName("{namespace}six"), testSuperType)
+                .getChildRef();
+        n7 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}seven"), testSuperType)
+                .getChildRef();
+        n8 = nodeService.createNode(n2, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eight-2"), testSuperType)
+                .getChildRef();
+        n9 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}nine"), testSuperType)
+                .getChildRef();
+        n10 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}ten"), testSuperType)
+                .getChildRef();
+        n11 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}eleven"), testSuperType)
+                .getChildRef();
+        n12 = nodeService.createNode(n5, ASSOC_TYPE_QNAME, QName.createQName("{namespace}twelve"), testSuperType)
+                .getChildRef();
+        n13 = nodeService.createNode(n12, ASSOC_TYPE_QNAME, QName.createQName("{namespace}thirteen"), testSuperType)
+                .getChildRef();
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_CONTENT, new ContentData(null, "text/plain", 0L, "UTF-16"));
-        n14 = nodeService.createNode(
-                n13,
-                ASSOC_TYPE_QNAME,
-                QName.createQName("{namespace}fourteen"), ContentModel.TYPE_CONTENT,
-                properties).getChildRef();
-        //nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_QNAME_CONTENT, properties);
+        n14 = nodeService.createNode(n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}fourteen"),
+                ContentModel.TYPE_CONTENT, properties).getChildRef();
+        // nodeService.addAspect(n14, DictionaryBootstrap.ASPECT_QNAME_CONTENT,
+        // properties);
 
         ContentWriter writer = contentService.getWriter(n14, ContentModel.PROP_CONTENT, true);
         // InputStream is =
@@ -254,16 +297,13 @@ public class LuceneTest extends TestCase
         nodeService.addChild(n6, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n12, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n13, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
-        
-            
+
     }
-    
-    
 
     @Override
     protected void tearDown() throws Exception
     {
-        if(testTX.getStatus() == Status.STATUS_ACTIVE)
+        if (testTX.getStatus() == Status.STATUS_ACTIVE)
         {
             testTX.rollback();
         }
@@ -273,6 +313,134 @@ public class LuceneTest extends TestCase
     public LuceneTest(String arg0)
     {
         super(arg0);
+    }
+
+    public void testDeltaIssue() throws Exception
+    {
+        final NodeService pns = (NodeService) ctx.getBean("NodeService");
+
+        testTX.commit();
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
+        luceneFTS.pause();
+        buildBaseIndex();
+        runBaseTests();
+        tx.commit();
+
+        Thread thread = new Thread(new Runnable()
+        {
+
+            public void run()
+            {
+                try
+                {
+                    UserTransaction tx = transactionService.getUserTransaction();
+                    tx = transactionService.getUserTransaction();
+                    tx.begin();
+
+                    SearchParameters sp = new SearchParameters();
+                    sp.addStore(rootNodeRef.getStoreRef());
+                    sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+                    sp.setQuery("PATH:\"//.\"");
+                    sp.excludeDataInTheCurrentTransaction(false);
+                    ResultSet results = serviceRegistry.getSearchService().query(sp);
+                    assertEquals(15, results.length());
+                    results.close();
+                    
+                    sp = new SearchParameters();
+                    sp.addStore(rootNodeRef.getStoreRef());
+                    sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+                    sp.setQuery("PATH:\"//.\"");
+                    sp.excludeDataInTheCurrentTransaction(false);
+                    results = serviceRegistry.getSearchService().query(sp);
+                    assertEquals(15, results.length());
+                    results.close();
+                    
+                    Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+                    props.put(ContentModel.PROP_TITLE, "woof");
+                    pns.addAspect(n1, ContentModel.ASPECT_TITLED, props);
+                    
+                    sp = new SearchParameters();
+                    sp.addStore(rootNodeRef.getStoreRef());
+                    sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+                    sp.setQuery("PATH:\"//.\"");
+                    sp.excludeDataInTheCurrentTransaction(false);
+                    results = serviceRegistry.getSearchService().query(sp);
+                    assertEquals(15, results.length());
+                    results.close();
+
+                    tx.rollback();
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+
+            }
+
+        });
+
+        thread.start();
+        thread.join();
+
+        tx = transactionService.getUserTransaction();
+        tx.begin();
+
+        SearchParameters sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
+        sp.excludeDataInTheCurrentTransaction(false);
+        ResultSet results = serviceRegistry.getSearchService().query(sp);
+        assertEquals(15, results.length());
+        results.close();
+
+        sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
+        sp.excludeDataInTheCurrentTransaction(false);
+        results = serviceRegistry.getSearchService().query(sp);
+        assertEquals(15, results.length());
+        results.close();
+
+        runBaseTests();
+
+        sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
+        sp.excludeDataInTheCurrentTransaction(false);
+        results = serviceRegistry.getSearchService().query(sp);
+        assertEquals(15, results.length());
+        results.close();
+
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+        props.put(ContentModel.PROP_TITLE, "woof");
+        pns.addAspect(n1, ContentModel.ASPECT_TITLED, props);
+
+        sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
+        sp.excludeDataInTheCurrentTransaction(false);
+        results = serviceRegistry.getSearchService().query(sp);
+        assertEquals(15, results.length());
+        results.close();
+
+        pns.setProperty(n1, ContentModel.PROP_TITLE, "cube");
+
+        sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("PATH:\"//.\"");
+        sp.excludeDataInTheCurrentTransaction(false);
+        results = serviceRegistry.getSearchService().query(sp);
+        assertEquals(15, results.length());
+        results.close();
+
+        tx.rollback();
+
     }
 
     public void testRepeatPerformance() throws Exception
@@ -294,7 +462,7 @@ public class LuceneTest extends TestCase
         sp.setQuery(query);
         ResultSet results = searcher.query(sp);
         assertEquals("No results found from query", 1, results.length());
-        
+
         long start = System.nanoTime();
         int count = 1000;
         // repeat
@@ -306,19 +474,18 @@ public class LuceneTest extends TestCase
         }
         long end = System.nanoTime();
         // dump results
-        double duration = ((double)(end - start))/1E6;      // duration in ms
+        double duration = ((double) (end - start)) / 1E6; // duration in ms
         double average = duration / (double) count;
-        System.out.println("Searched for identifier: \n" +
-                "   count: " + count + "\n" +
-                "   average: " + average + " ms/search \n" +
-                "   a million searches could take: " + (1E6 * average)/1E3/60D + " minutes");
+        System.out.println("Searched for identifier: \n"
+                + "   count: " + count + "\n" + "   average: " + average + " ms/search \n"
+                + "   a million searches could take: " + (1E6 * average) / 1E3 / 60D + " minutes");
         // anything over 10ms is dire
         if (average > 10.0)
         {
             logger.error("Search taking longer than 10ms: " + query);
         }
     }
-    
+
     public void testSort() throws Exception
     {
         luceneFTS.pause();
@@ -352,7 +519,7 @@ public class LuceneTest extends TestCase
             current = id;
         }
         results.close();
-        
+
         SearchParameters sp2 = new SearchParameters();
         sp2.addStore(rootNodeRef.getStoreRef());
         sp2.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -377,7 +544,7 @@ public class LuceneTest extends TestCase
 
         luceneFTS.resume();
     }
-    
+
     public void test1() throws Exception
     {
         luceneFTS.pause();
@@ -410,7 +577,8 @@ public class LuceneTest extends TestCase
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         searcher.setDictionaryService(dictionaryService);
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"valuetwo\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "\\@\\{namespace\\}property\\-2:\"valuetwo\"", null, null);
         results.close();
         luceneFTS.resume();
     }
@@ -434,7 +602,8 @@ public class LuceneTest extends TestCase
     public void testNoOp() throws Exception
     {
         luceneFTS.pause();
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1", indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis() + "_1", indexerAndSearcher);
 
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
@@ -457,7 +626,8 @@ public class LuceneTest extends TestCase
     public void testStandAloneIndexerCommit() throws Exception
     {
         luceneFTS.pause();
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_1", indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis() + "_1", indexerAndSearcher);
 
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
@@ -465,11 +635,13 @@ public class LuceneTest extends TestCase
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
 
-        ////indexer.clearIndex();
+        // //indexer.clearIndex();
 
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
-        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}two"), n2));
         indexer.updateNode(n1);
         // indexer.deleteNode(new ChildRelationshipRef(rootNode, "path",
         // newNode));
@@ -482,36 +654,38 @@ public class LuceneTest extends TestCase
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-2:\"valuetwo\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "\\@\\{namespace\\}property\\-2:\"valuetwo\"", null, null);
         simpleResultSetTest(results);
-        
+
         ChildAssocRefResultSet r2 = new ChildAssocRefResultSet(nodeService, results.getNodeRefs(), null, false);
         simpleResultSetTest(r2);
-        
+
         ChildAssocRefResultSet r3 = new ChildAssocRefResultSet(nodeService, results.getNodeRefs(), null, true);
         simpleResultSetTest(r3);
-        
+
         ChildAssocRefResultSet r4 = new ChildAssocRefResultSet(nodeService, results.getChildAssocRefs(), null);
         simpleResultSetTest(r4);
-        
+
         DetachedResultSet r5 = new DetachedResultSet(results, null);
         simpleResultSetTest(r5);
-        
+
         DetachedResultSet r6 = new DetachedResultSet(r2, null);
         simpleResultSetTest(r6);
-        
+
         DetachedResultSet r7 = new DetachedResultSet(r3, null);
         simpleResultSetTest(r7);
-        
+
         DetachedResultSet r8 = new DetachedResultSet(r4, null);
         simpleResultSetTest(r8);
-        
+
         DetachedResultSet r9 = new DetachedResultSet(r5, null);
         simpleResultSetTest(r9);
-        
+
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-1:\"valueone\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@\\{namespace\\}property\\-1:\"valueone\"",
+                null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n1.getId(), results.getNodeRef(1).getId());
@@ -519,7 +693,8 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(1));
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@namespace\\:property\\-1:\"valueone\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@namespace\\:property\\-1:\"valueone\"", null,
+                null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n1.getId(), results.getNodeRef(1).getId());
@@ -534,7 +709,7 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(0));
         assertEquals(1.0f, results.getScore(1));
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:\"Valueone\"", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
@@ -542,7 +717,7 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(0));
         assertEquals(1.0f, results.getScore(1));
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:ValueOne", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
@@ -550,7 +725,7 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(0));
         assertEquals(1.0f, results.getScore(1));
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@property\\-1:valueone", null, null);
         assertEquals(2, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
@@ -558,8 +733,6 @@ public class LuceneTest extends TestCase
         assertEquals(1.0f, results.getScore(0));
         assertEquals(1.0f, results.getScore(1));
         results.close();
-        
-        
 
         QName qname = QName.createQName("", "property-1");
 
@@ -576,16 +749,18 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         assertEquals(n2.getId(), results.getNodeRef(0).getId());
         assertEquals(n2, results.getNodeRef(0));
-        assertEquals(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2), results.getChildAssocRef(0));
+        assertEquals(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}two"), n2), results.getChildAssocRef(0));
         assertEquals(1, results.getChildAssocRefs().size());
         assertNotNull(results.getChildAssocRefs());
         assertEquals(0, results.getRow(0).getIndex());
         assertEquals(1.0f, results.getRow(0).getScore());
-        assertEquals(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2), results.getRow(0).getChildAssocRef());
+        assertEquals(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}two"), n2), results.getRow(0).getChildAssocRef());
         assertEquals(n2, results.getRow(0).getNodeRef());
         assertEquals(QName.createQName("{namespace}two"), results.getRow(0).getQName());
         assertEquals("valuetwo", results.getRow(0).getValue(QName.createQName("{namespace}property-2")));
-        for(ResultSetRow row: results)
+        for (ResultSetRow row : results)
         {
             assertNotNull(row);
         }
@@ -600,19 +775,19 @@ public class LuceneTest extends TestCase
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "@\\{namespace\\}property-1:valueone", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "@\\{namespace\\}property-1:valueone",
+                null, null);
         try
         {
             assertEquals(2, results.length());
             assertEquals(n1.getId(), results.getNodeRef(0).getId());
             assertEquals(n2.getId(), results.getNodeRef(1).getId());
-            //assertEquals(1.0f, results.getScore(0));
-            //assertEquals(1.0f, results.getScore(1));
+            // assertEquals(1.0f, results.getScore(0));
+            // assertEquals(1.0f, results.getScore(1));
 
             QName qname = QName.createQName("", "property-1");
 
-        }
-        finally
+        } finally
         {
             results.close();
         }
@@ -621,18 +796,17 @@ public class LuceneTest extends TestCase
         try
         {
             assertEquals(2, results.length());
-        }
-        finally
+        } finally
         {
             results.close();
         }
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\"" + rootNodeRef.toString() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ID:\"" + rootNodeRef.toString() + "\"", null,
+                null);
         try
         {
             assertEquals(1, results.length());
-        }
-        finally
+        } finally
         {
             results.close();
         }
@@ -641,18 +815,23 @@ public class LuceneTest extends TestCase
 
     private void buildBaseIndex()
     {
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
-        //indexer.clearIndex();
+        // indexer.clearIndex();
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
-        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}one"), n1));
-        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}two"), n2));
-        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}three"), n3));
-        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName.createQName("{namespace}four"), n4));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}one"), n1));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}two"), n2));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}three"), n3));
+        indexer.createNode(new ChildAssociationRef(ContentModel.ASSOC_CHILDREN, rootNodeRef, QName
+                .createQName("{namespace}four"), n4));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}five"), n5));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n1, QName.createQName("{namespace}six"), n6));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}seven"), n7));
@@ -661,8 +840,12 @@ public class LuceneTest extends TestCase
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}ten"), n10));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}eleven"), n11));
         indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n5, QName.createQName("{namespace}twelve"), n12));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n12, QName.createQName("{namespace}thirteen"), n13));
-        indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n13, QName.createQName("{namespace}fourteen"), n14));
+        indexer
+                .createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n12, QName.createQName("{namespace}thirteen"),
+                        n13));
+        indexer
+                .createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n13, QName.createQName("{namespace}fourteen"),
+                        n14));
         indexer.prepare();
         indexer.commit();
     }
@@ -686,12 +869,14 @@ public class LuceneTest extends TestCase
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one\"", null, null);
         assertEquals(1, results.length());
         results.close();
-//        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/\"", null, null);
-//        assertEquals(1, results.length());
-//        results.close();
-//        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/.\"", null, null);
-//        assertEquals(1, results.length());
-//        results.close();
+        // results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+        // "PATH:\"/\"", null, null);
+        // assertEquals(1, results.length());
+        // results.close();
+        // results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+        // "PATH:\"/.\"", null, null);
+        // assertEquals(1, results.length());
+        // results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two\"", null, null);
         assertEquals(1, results.length());
         results.close();
@@ -707,88 +892,115 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:five\"", null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*\"", null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(8, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*\"", null, null);
         assertEquals(6, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH_WITH_REPEATS:\"/namespace:*/namespace:*/namespace:*\"", null, null);
         assertEquals(8, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*\"", null, null);
@@ -815,7 +1027,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*/namespace:five/*\"", null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//.\"", null, null);
@@ -851,7 +1064,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//././*/././.\"", null, null);
         assertEquals(14, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
         assertEquals(25, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//common\"", null, null);
@@ -884,89 +1098,102 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen//.\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen//.\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen//.//.\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/one//thirteen/fourteen//.//.\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
 
         // Type search tests
 
         QName qname = QName.createQName(TEST_NAMESPACE, "int-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"01\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"01\"", null,
+                null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
 
         qname = QName.createQName(TEST_NAMESPACE, "long-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"2\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"2\"", null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
 
         qname = QName.createQName(TEST_NAMESPACE, "float-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"3.4\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"3.4\"", null,
+                null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "double-ista")) + ":\"5.6\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "double-ista")) + ":\"5.6\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         Date date = new Date();
         String sDate = CachingDateFormat.getDateFormat().format(date);
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "date-ista")) + ":\""+sDate+"\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "date-ista")) + ":\"" + sDate + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "datetime-ista")) + ":\""+sDate+"\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "datetime-ista")) + ":\"" + sDate + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "boolean-ista")) + ":\"true\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "boolean-ista")) + ":\"true\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "qname-ista")) + ":\"{wibble}wobble\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "qname-ista")) + ":\"{wibble}wobble\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "category-ista")) + ":\""+DefaultTypeConverter.INSTANCE.convert(String.class, new NodeRef(rootNodeRef.getStoreRef(), "CategoryId"))+"\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "category-ista"))
+                + ":\""
+                + DefaultTypeConverter.INSTANCE.convert(String.class, new NodeRef(rootNodeRef.getStoreRef(),
+                        "CategoryId")) + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "noderef-ista")) + ":\""+n1+"\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "noderef-ista")) + ":\"" + n1 + "\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                +escapeQName(QName.createQName(TEST_NAMESPACE, "path-ista")) + ":\""+nodeService.getPath(n3)+"\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "path-ista")) + ":\"" + nodeService.getPath(n3) + "\"",
+                null, null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(QName.createQName(TEST_NAMESPACE, "path-ista")));
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testType.toString() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testType.toString() + "\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testSuperType.toString() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TYPE:\"" + testSuperType.toString() + "\"",
+                null, null);
         assertEquals(13, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testAspect.toString() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testAspect.toString() + "\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testSuperAspect.toString() + "\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testSuperAspect.toString() + "\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
 
@@ -1001,14 +1228,18 @@ public class LuceneTest extends TestCase
         results.close();
 
         // TODO: should not have a null property type definition
-        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:lemur", namespacePrefixResolver), (DataTypeDefinition) null, true, "fox");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"${alf:lemur}\"", null, new QueryParameterDefinition[] { paramDef });
+        QueryParameterDefImpl paramDef = new QueryParameterDefImpl(QName.createQName("alf:lemur",
+                namespacePrefixResolver), (DataTypeDefinition) null, true, "fox");
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "TEXT:\"${alf:lemur}\"", null,
+                new QueryParameterDefinition[] { paramDef });
         assertEquals(1, results.length());
         results.close();
 
-        paramDef = new QueryParameterDefImpl(QName.createQName("alf:intvalue", namespacePrefixResolver), (DataTypeDefinition) null, true, "1");
+        paramDef = new QueryParameterDefImpl(QName.createQName("alf:intvalue", namespacePrefixResolver),
+                (DataTypeDefinition) null, true, "1");
         qname = QName.createQName(TEST_NAMESPACE, "int-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"${alf:intvalue}\"", null, new QueryParameterDefinition[] { paramDef });
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                + escapeQName(qname) + ":\"${alf:intvalue}\"", null, new QueryParameterDefinition[] { paramDef });
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
@@ -1085,9 +1316,11 @@ public class LuceneTest extends TestCase
         assertEquals(14, results.length());
         results.close();
         luceneFTS.resume();
-        
-        QueryParameterDefinition paramDef = new QueryParameterDefImpl(QName.createQName("alf:query", namespacePrefixResolver), (DataTypeDefinition) null, true, "//./*");
-        results = searcher.query(rootNodeRef.getStoreRef(), "xpath", "${alf:query}", null, new QueryParameterDefinition[] { paramDef });
+
+        QueryParameterDefinition paramDef = new QueryParameterDefImpl(QName.createQName("alf:query",
+                namespacePrefixResolver), (DataTypeDefinition) null, true, "//./*");
+        results = searcher.query(rootNodeRef.getStoreRef(), "xpath", "${alf:query}", null,
+                new QueryParameterDefinition[] { paramDef });
         assertEquals(14, results.length());
         results.close();
     }
@@ -1117,7 +1350,8 @@ public class LuceneTest extends TestCase
 
         runBaseTests();
 
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis(), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis(), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -1152,14 +1386,17 @@ public class LuceneTest extends TestCase
         buildBaseIndex();
         runBaseTests();
 
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis(), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis(), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
 
-        indexer.deleteNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n13, QName.createQName("{namespace}fourteen"), n14));
+        indexer
+                .deleteNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n13, QName.createQName("{namespace}fourteen"),
+                        n14));
 
         indexer.commit();
 
@@ -1185,61 +1422,81 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:five\"", null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*\"", null, null);
@@ -1248,22 +1505,28 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*\"", null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(6, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
         assertEquals(3, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*\"", null, null);
@@ -1287,7 +1550,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*/namespace:five/*\"", null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//.\"", null, null);
@@ -1323,7 +1587,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//././*/././.\"", null, null);
         assertEquals(13, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
         assertEquals(16, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//common\"", null, null);
@@ -1350,20 +1615,55 @@ public class LuceneTest extends TestCase
         luceneFTS.resume();
     }
 
-    public void testDeleteContainer() throws Exception
+    public void testAddEscapedChild() throws Exception
     {
+        String COMPLEX_LOCAL_NAME = " `¬¦!\"£$%^&*()-_=+\t\n\\\u0000[]{};'#:@~,./<>?\\|\u0123\u4567\u8900\uabcd\uefff_xT65A_";
+
         luceneFTS.pause();
         buildBaseIndex();
         runBaseTests();
 
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis(), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis(), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
         indexer.setLuceneFullTextSearchIndexer(luceneFTS);
         indexer.setContentService(contentService);
 
-        indexer.deleteNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n12, QName.createQName("{namespace}thirteen"), n13));
+        ChildAssociationRef car = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName
+                .createQName("{namespace}" + COMPLEX_LOCAL_NAME), testSuperType);
+        indexer.createNode(car);
+
+        indexer.commit();
+
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
+        searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:"
+                + ISO9075.encode(COMPLEX_LOCAL_NAME) + "\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+    }
+
+    public void testDeleteContainer() throws Exception
+    {
+        luceneFTS.pause();
+        buildBaseIndex();
+        runBaseTests();
+
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis(), indexerAndSearcher);
+        indexer.setNodeService(nodeService);
+        indexer.setLuceneIndexLock(luceneIndexLock);
+        indexer.setDictionaryService(dictionaryService);
+        indexer.setLuceneFullTextSearchIndexer(luceneFTS);
+        indexer.setContentService(contentService);
+
+        indexer
+                .deleteNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, n12, QName.createQName("{namespace}thirteen"),
+                        n13));
 
         indexer.commit();
 
@@ -1389,61 +1689,81 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:five\"", null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*\"", null, null);
@@ -1455,22 +1775,28 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*\"", null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
         assertEquals(3, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*\"", null, null);
@@ -1497,7 +1823,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*/namespace:five/*\"", null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//.\"", null, null);
@@ -1533,7 +1860,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//././*/././.\"", null, null);
         assertEquals(12, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
         assertEquals(14, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//common\"", null, null);
@@ -1563,7 +1891,8 @@ public class LuceneTest extends TestCase
         buildBaseIndex();
         runBaseTests();
 
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis(), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis(), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -1571,10 +1900,11 @@ public class LuceneTest extends TestCase
         indexer.setContentService(contentService);
 
         nodeService.removeChild(n2, n13);
-        indexer.deleteChildRelationship(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}link"), n13));
+        indexer.deleteChildRelationship(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName
+                .createQName("{namespace}link"), n13));
 
         indexer.commit();
-        
+
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
         searcher.setNodeService(nodeService);
@@ -1597,61 +1927,81 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:five\"", null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:one\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:two\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:six\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:seven\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-1\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-2\"",
+                null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-2\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-1\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:two/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:eight-0\"",
+                null, null);
         assertEquals(0, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:ten\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:eleven\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:five/namespace:twelve/namespace:thirteen/namespace:fourteen\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*\"", null, null);
@@ -1660,25 +2010,32 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*\"", null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(7, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:*/namespace:*\"",
+                null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"/namespace:*/namespace:*/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH_WITH_REPEATS:\"/namespace:*/namespace:*/namespace:*\"", null, null);
         assertEquals(6, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*\"", null, null);
         assertEquals(4, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:*/namespace:five/namespace:*\"", null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH:\"/namespace:one/namespace:*/namespace:nine\"", null, null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*\"", null, null);
@@ -1705,7 +2062,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/*/namespace:five/*\"", null, null);
         assertEquals(5, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"/namespace:one/*/namespace:nine\"", null,
+                null);
         assertEquals(1, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//.\"", null, null);
@@ -1741,7 +2099,8 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//././*/././.\"", null, null);
         assertEquals(14, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
+        results = searcher
+                .query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//././*/././.\"", null, null);
         assertEquals(22, results.length());
         results.close();
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//common\"", null, null);
@@ -1775,7 +2134,8 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
 
-        indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis(), indexerAndSearcher);
+        indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis(),
+                indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -1783,7 +2143,8 @@ public class LuceneTest extends TestCase
         indexer.setContentService(contentService);
 
         nodeService.addChild(n2, n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}link"));
-        indexer.createChildRelationship(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("{namespace}link"), n13));
+        indexer.createChildRelationship(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName
+                .createQName("{namespace}link"), n13));
 
         indexer.commit();
 
@@ -1802,19 +2163,23 @@ public class LuceneTest extends TestCase
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:link//.\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:link//.\"", null,
+                null);
         assertEquals(2, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//namespace:link//.\"", null, null);
+
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//namespace:link//.\"",
+                null, null);
         assertEquals(3, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:renamed_link//.\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:renamed_link//.\"", null,
+                null);
         assertEquals(0, results.length());
         results.close();
 
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis(), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis(), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -1824,10 +2189,9 @@ public class LuceneTest extends TestCase
         nodeService.removeChild(n2, n13);
         nodeService.addChild(n2, n13, ASSOC_TYPE_QNAME, QName.createQName("{namespace}renamed_link"));
 
-        indexer.updateChildRelationship(
-                new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("namespace", "link"), n13),
-                new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("namespace", "renamed_link"),
-                n13));
+        indexer.updateChildRelationship(new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("namespace",
+                "link"), n13), new ChildAssociationRef(ASSOC_TYPE_QNAME, n2, QName.createQName("namespace",
+                "renamed_link"), n13));
 
         indexer.commit();
 
@@ -1841,10 +2205,12 @@ public class LuceneTest extends TestCase
         assertEquals(0, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:renamed_link//.\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH:\"//namespace:renamed_link//.\"", null,
+                null);
         assertEquals(2, results.length());
         results.close();
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PATH_WITH_REPEATS:\"//namespace:renamed_link//.\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene",
+                "PATH_WITH_REPEATS:\"//namespace:renamed_link//.\"", null, null);
         assertEquals(3, results.length());
         results.close();
         luceneFTS.resume();
@@ -1862,18 +2228,21 @@ public class LuceneTest extends TestCase
         searcher.setDictionaryService(dictionaryService);
 
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic")) + ":\"KEYONE\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
+                + ":\"KEYONE\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"KEYTWO\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"KEYTWO\"", null, null);
         assertEquals(0, results.length());
         results.close();
 
         // Do index
 
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -1882,18 +2251,20 @@ public class LuceneTest extends TestCase
         indexer.updateFullTextSearch(1000);
         indexer.prepare();
         indexer.commit();
-        
+
         searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
         searcher.setDictionaryService(dictionaryService);
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
                 + ":\"keyone\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"keytwo\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"keytwo\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
@@ -1913,12 +2284,14 @@ public class LuceneTest extends TestCase
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
 
         ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic")) + ":\"KEYONE\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
+                + ":\"KEYONE\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"KEYTWO\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"KEYTWO\"", null, null);
         assertEquals(0, results.length());
         results.close();
 
@@ -1929,12 +2302,14 @@ public class LuceneTest extends TestCase
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"))
                 + ":\"keyone\"", null, null);
         assertEquals(1, results.length());
         results.close();
 
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -1943,21 +2318,21 @@ public class LuceneTest extends TestCase
         indexer.updateFullTextSearch(1000);
         indexer.prepare();
         indexer.commit();
-        
+
         luceneFTS.resume();
-        //luceneFTS.requiresIndex(rootNodeRef.getStoreRef());
-        //luceneFTS.index();
-        //luceneFTS.index();
-        //luceneFTS.index();
-        
+        // luceneFTS.requiresIndex(rootNodeRef.getStoreRef());
+        // luceneFTS.index();
+        // luceneFTS.index();
+        // luceneFTS.index();
 
         Thread.sleep(35000);
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
-                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic")) + ":\"keytwo\"", null, null);
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"))
+                + ":\"keytwo\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
+
         runBaseTests();
     }
 
@@ -1977,68 +2352,79 @@ public class LuceneTest extends TestCase
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
 
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PARENT:\"" + rootNodeRef.toString() + "\"", null, null);
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PARENT:\""
+                + rootNodeRef.toString() + "\"", null, null);
         assertEquals(5, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PARENT:\"" + rootNodeRef.toString() + "\" +QNAME:\"one\"", null, null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "+PARENT:\""
+                + rootNodeRef.toString() + "\" +QNAME:\"one\"", null, null);
         assertEquals(1, results.length());
         results.close();
-        
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "( +TYPE:\"{http://www.alfresco.org/model/content/1.0}linkfile\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}name:\"content woof\") OR  TEXT:\"content\"", null, null);
-          
+
+        results = searcher
+                .query(
+                        rootNodeRef.getStoreRef(),
+                        "lucene",
+                        "( +TYPE:\"{http://www.alfresco.org/model/content/1.0}linkfile\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}name:\"content woof\") OR  TEXT:\"content\"",
+                        null, null);
+
         luceneFTS.resume();
     }
 
-    
     public void testIssueAR47() throws Exception
     {
-        // This bug arose from repeated deletes and adds creating empty index segments.
-        // Two segements each containing one deletyed entry were merged together producing a single empty entry.
+        // This bug arose from repeated deletes and adds creating empty index
+        // segments.
+        // Two segements each containing one deletyed entry were merged together
+        // producing a single empty entry.
         // This seemed to be bad for lucene - I am not sure why
-        
-        // So we add something, add and delete someting repeatedly and then check we can still do the search.
+
+        // So we add something, add and delete someting repeatedly and then
+        // check we can still do the search.
 
         // Running in autocommit against the index
         testTX.commit();
         UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
-        ChildAssociationRef testFind = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}testFind"), testSuperType);
+        ChildAssociationRef testFind = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName
+                .createQName("{namespace}testFind"), testSuperType);
         tx.commit();
-        
+
         LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
         searcher.setNodeService(nodeService);
         searcher.setDictionaryService(dictionaryService);
         searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
         searcher.setQueryRegister(queryRegisterComponent);
-        
-        ResultSet results = searcher.query(rootNodeRef.getStoreRef(),  "lucene", "QNAME:\"namespace:testFind\"");
+
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "QNAME:\"namespace:testFind\"");
         assertEquals(1, results.length());
         results.close();
-        
-        for(int i = 0; i < 100; i++)
+
+        for (int i = 0; i < 100; i++)
         {
-           UserTransaction tx1 = transactionService.getUserTransaction();
-           tx1.begin();
-           ChildAssociationRef test = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}test"), testSuperType);
-           tx1.commit();
-           
-           UserTransaction tx2 = transactionService.getUserTransaction();
-           tx2.begin();
-           nodeService.deleteNode(test.getChildRef());
-           tx2.commit();
+            UserTransaction tx1 = transactionService.getUserTransaction();
+            tx1.begin();
+            ChildAssociationRef test = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName
+                    .createQName("{namespace}test"), testSuperType);
+            tx1.commit();
+
+            UserTransaction tx2 = transactionService.getUserTransaction();
+            tx2.begin();
+            nodeService.deleteNode(test.getChildRef());
+            tx2.commit();
         }
-        
+
         UserTransaction tx3 = transactionService.getUserTransaction();
         tx3.begin();
-        results = searcher.query(rootNodeRef.getStoreRef(),  "lucene", "QNAME:\"namespace:testFind\"");
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "QNAME:\"namespace:testFind\"");
         assertEquals(1, results.length());
         results.close();
         tx3.commit();
     }
-    
+
     // Ignore the following test until implementation is completed
-    
+
     public void testReadAgainstDelta() throws Exception
     {
         testTX.commit();
@@ -2048,16 +2434,15 @@ public class LuceneTest extends TestCase
         buildBaseIndex();
         runBaseTests();
         tx.commit();
-        
+
         // Delete
-        
+
         tx = transactionService.getUserTransaction();
         tx.begin();
-        
+
         runBaseTests();
-        
+
         serviceRegistry.getNodeService().deleteNode(n1);
-       
 
         SearchParameters sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
@@ -2067,7 +2452,7 @@ public class LuceneTest extends TestCase
         ResultSet results = serviceRegistry.getSearchService().query(sp);
         assertEquals(5, results.length());
         results.close();
-        
+
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
         sp.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -2076,9 +2461,9 @@ public class LuceneTest extends TestCase
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(15, results.length());
         results.close();
-        
+
         tx.rollback();
-        
+
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
         sp.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -2088,18 +2473,19 @@ public class LuceneTest extends TestCase
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(15, results.length());
         results.close();
-        
+
         // Create
-        
+
         tx = transactionService.getUserTransaction();
         tx.begin();
-        
+
         runBaseTests();
-        
+
         assertEquals(5, serviceRegistry.getNodeService().getChildAssocs(rootNodeRef).size());
-        serviceRegistry.getNodeService().createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}texas"), testSuperType).getChildRef();
+        serviceRegistry.getNodeService().createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
+                QName.createQName("{namespace}texas"), testSuperType).getChildRef();
         assertEquals(6, serviceRegistry.getNodeService().getChildAssocs(rootNodeRef).size());
-        
+
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
         sp.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -2108,9 +2494,9 @@ public class LuceneTest extends TestCase
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(16, results.length());
         results.close();
-        
+
         tx.rollback();
-        
+
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
         sp.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -2120,62 +2506,61 @@ public class LuceneTest extends TestCase
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(15, results.length());
         results.close();
-        
+
         // update property
-        
-        tx = transactionService.getUserTransaction();
-        tx.begin();
-        
-        runBaseTests();
-        
-        sp = new SearchParameters();
-        sp.addStore(rootNodeRef.getStoreRef());
-        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
-        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
-        sp.addSort("ID", true);
-        sp.excludeDataInTheCurrentTransaction(false);
-        results = serviceRegistry.getSearchService().query(sp);
-      
-        assertEquals(2, results.length());
-        results.close();
-     
-        nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "Different");
-        
-        sp = new SearchParameters();
-        sp.addStore(rootNodeRef.getStoreRef());
-        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
-        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
-        sp.addSort("ID", true);
-        sp.excludeDataInTheCurrentTransaction(false);
-        results = serviceRegistry.getSearchService().query(sp);
-      
-        assertEquals(1, results.length());
-        results.close();
-        
-        tx.rollback();
-        
-        sp = new SearchParameters();
-        sp.addStore(rootNodeRef.getStoreRef());
-        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
-        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
-        sp.excludeDataInTheCurrentTransaction(false);
-        sp.addSort("ID", true);
-        results = serviceRegistry.getSearchService().query(sp);
-      
-        assertEquals(2, results.length());
-        results.close();
-        
-        // Add and delete
-        
 
         tx = transactionService.getUserTransaction();
         tx.begin();
-        
+
         runBaseTests();
-        
+
+        sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
+        sp.addSort("ID", true);
+        sp.excludeDataInTheCurrentTransaction(false);
+        results = serviceRegistry.getSearchService().query(sp);
+
+        assertEquals(2, results.length());
+        results.close();
+
+        nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "Different");
+
+        sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
+        sp.addSort("ID", true);
+        sp.excludeDataInTheCurrentTransaction(false);
+        results = serviceRegistry.getSearchService().query(sp);
+
+        assertEquals(1, results.length());
+        results.close();
+
+        tx.rollback();
+
+        sp = new SearchParameters();
+        sp.addStore(rootNodeRef.getStoreRef());
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery("\\@\\{namespace\\}property\\-1:\"valueone\"");
+        sp.excludeDataInTheCurrentTransaction(false);
+        sp.addSort("ID", true);
+        results = serviceRegistry.getSearchService().query(sp);
+
+        assertEquals(2, results.length());
+        results.close();
+
+        // Add and delete
+
+        tx = transactionService.getUserTransaction();
+        tx.begin();
+
+        runBaseTests();
+
         serviceRegistry.getNodeService().deleteNode(n1);
-        serviceRegistry.getNodeService().createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}texas"), testSuperType).getChildRef();
-         
+        serviceRegistry.getNodeService().createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
+                QName.createQName("{namespace}texas"), testSuperType).getChildRef();
 
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
@@ -2185,7 +2570,7 @@ public class LuceneTest extends TestCase
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(6, results.length());
         results.close();
-        
+
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
         sp.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -2194,9 +2579,9 @@ public class LuceneTest extends TestCase
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(15, results.length());
         results.close();
-        
+
         tx.rollback();
-        
+
         sp = new SearchParameters();
         sp.addStore(rootNodeRef.getStoreRef());
         sp.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -2206,12 +2591,13 @@ public class LuceneTest extends TestCase
         results = serviceRegistry.getSearchService().query(sp);
         assertEquals(15, results.length());
         results.close();
-        
+
     }
-    
+
     private void runPerformanceTest(double time, boolean clear)
     {
-        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta" + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
+        LuceneIndexerImpl indexer = LuceneIndexerImpl.getUpdateIndexer(rootNodeRef.getStoreRef(), "delta"
+                + System.currentTimeMillis() + "_" + (new Random().nextInt()), indexerAndSearcher);
         indexer.setNodeService(nodeService);
         indexer.setLuceneIndexLock(luceneIndexLock);
         indexer.setDictionaryService(dictionaryService);
@@ -2219,7 +2605,7 @@ public class LuceneTest extends TestCase
         indexer.setContentService(contentService);
         if (clear)
         {
-            //indexer.clearIndex();
+            // indexer.clearIndex();
         }
         indexer.createNode(new ChildAssociationRef(null, null, null, rootNodeRef));
 
@@ -2237,13 +2623,15 @@ public class LuceneTest extends TestCase
             }
 
             QName qname = QName.createQName("{namespace}a_" + i);
-            NodeRef ref = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, qname, ContentModel.TYPE_CONTAINER).getChildRef();
+            NodeRef ref = nodeService.createNode(rootNodeRef, ASSOC_TYPE_QNAME, qname, ContentModel.TYPE_CONTAINER)
+                    .getChildRef();
             indexer.createNode(new ChildAssociationRef(ASSOC_TYPE_QNAME, rootNodeRef, qname, ref));
 
         }
         indexer.commit();
         float delta = ((System.currentTimeMillis() - startTime) / 1000.0f);
-        //System.out.println("\tCreated " + count + " in " + delta + "   = " + (count / delta));
+        // System.out.println("\tCreated " + count + " in " + delta + " = " +
+        // (count / delta));
     }
 
     private NamespacePrefixResolver getNamespacePrefixReolsver(String defaultURI)
@@ -2256,28 +2644,26 @@ public class LuceneTest extends TestCase
         nspr.registerNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;
     }
-    
+
     public static void main(String[] args) throws Exception
     {
         LuceneTest test = new LuceneTest();
         test.setUp();
-        //test.testForKev();
-        //test.testDeleteContainer();
-       
-        //test.testReadAgainstDelta();
-        
-        
+        // test.testForKev();
+        // test.testDeleteContainer();
+
+        // test.testReadAgainstDelta();
+
         NodeRef targetNode = test.rootNodeRef;
         Path path = test.serviceRegistry.getNodeService().getPath(targetNode);
 
         SearchParameters sp = new SearchParameters();
         sp.addStore(test.rootNodeRef.getStoreRef());
         sp.setLanguage(SearchService.LANGUAGE_LUCENE);
-        sp.setQuery("PATH:\"" + path + "//." + "\"");        
+        sp.setQuery("PATH:\"" + path + "//." + "\"");
         ResultSet results = test.serviceRegistry.getSearchService().query(sp);
-        
+
         results.close();
 
-        
     }
 }

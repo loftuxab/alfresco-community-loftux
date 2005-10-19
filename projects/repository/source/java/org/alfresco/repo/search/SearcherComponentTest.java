@@ -17,6 +17,7 @@
 package org.alfresco.repo.search;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -48,6 +50,8 @@ import org.springframework.context.ApplicationContext;
 public class SearcherComponentTest extends TestCase
 {
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
+    
+    private static String COMPLEX_LOCAL_NAME = " `¬¦!\"£$%^&*()-_=+\t\n\\\u0000[]{};'#:@~,./<>?\\|\u0123\u4567\u8900\uabcd\uefff_xT65A_";
     
     private ServiceRegistry serviceRegistry;
     private TransactionService transactionService;
@@ -88,8 +92,15 @@ public class SearcherComponentTest extends TestCase
 
     public void testNodeXPath() throws Exception
     {
+        
         Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(QName.createQName(BaseNodeServiceTest.NAMESPACE, COMPLEX_LOCAL_NAME), "monkey");
+        QName qnamerequiringescaping = QName.createQName(BaseNodeServiceTest.NAMESPACE, COMPLEX_LOCAL_NAME);
+        nodeService.createNode(rootNodeRef, BaseNodeServiceTest.ASSOC_TYPE_QNAME_TEST_CHILDREN, qnamerequiringescaping, ContentModel.TYPE_CONTAINER);
         QName qname = QName.createQName(BaseNodeServiceTest.NAMESPACE, "n2_p_n4");
+        
         
         NodeServiceXPath xpath;
         String xpathStr;
@@ -113,7 +124,7 @@ public class SearcherComponentTest extends TestCase
       
         xpath = new NodeServiceXPath("*", documentNavigator, null);
         list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(2, list.size());
+        assertEquals(3, list.size());
         
         xpath = new NodeServiceXPath("*/*", documentNavigator, null);
         list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
@@ -133,8 +144,7 @@ public class SearcherComponentTest extends TestCase
         
         xpath = new NodeServiceXPath("*//.", documentNavigator, null);
         list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
-        assertEquals(11, list.size());
-//        assertEquals(13, list.size());   // 13 unique paths through the graph - duplicates not being removed
+        assertEquals(12, list.size());
         
         xpathStr = "test:root_p_n1";
         xpath = new NodeServiceXPath(xpathStr, documentNavigator, null);
@@ -173,6 +183,14 @@ public class SearcherComponentTest extends TestCase
         
         xpath = new NodeServiceXPath(".", documentNavigator, null);
         list = xpath.selectNodes(assocRefs.get(qname));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("/test:"+ISO9075.encode(COMPLEX_LOCAL_NAME), documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
+        assertEquals(1, list.size());
+        
+        xpath = new NodeServiceXPath("//test:"+ISO9075.encode(COMPLEX_LOCAL_NAME), documentNavigator, null);
+        list = xpath.selectNodes(new ChildAssociationRef(null, null, null, rootNodeRef));
         assertEquals(1, list.size());
         
         xpath = new NodeServiceXPath("..", documentNavigator, null);
@@ -267,6 +285,13 @@ public class SearcherComponentTest extends TestCase
     public void testLikeAndContains() throws Exception
     {
         Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        
+        
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(QName.createQName(BaseNodeServiceTest.NAMESPACE, COMPLEX_LOCAL_NAME), "monkey");
+        QName qnamerequiringescaping = QName.createQName(BaseNodeServiceTest.NAMESPACE, COMPLEX_LOCAL_NAME);
+        nodeService.createNode(rootNodeRef, BaseNodeServiceTest.ASSOC_TYPE_QNAME_TEST_CHILDREN, qnamerequiringescaping, ContentModel.TYPE_CONTAINER, properties);
+        
         // commit the node graph
         txn.commit();
         
@@ -285,10 +310,24 @@ public class SearcherComponentTest extends TestCase
         
         answer =  searcher.selectNodes(
                 rootNodeRef,
+                "//*[like(@test:"+ISO9075.encode(COMPLEX_LOCAL_NAME)+", 'm__k%', false)]",
+                null,
+                namespacePrefixResolver, false);
+//        assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
                 "//*[like(@test:animal, 'M__K%', false)]",
                 null,
                 namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[like(@test:"+ISO9075.encode(COMPLEX_LOCAL_NAME)+", 'M__K%', false)]",
+                null,
+                namespacePrefixResolver, false);
+//        assertEquals(1, answer.size());
         
         answer =  searcher.selectNodes(
                 rootNodeRef,
@@ -304,14 +343,21 @@ public class SearcherComponentTest extends TestCase
                 namespacePrefixResolver, false);
         assertEquals(1, answer.size());
         
-        answer =  searcher.selectNodes(rootNodeRef, "//*[contains('monkey')]", null, namespacePrefixResolver, false);
+        answer =  searcher.selectNodes(
+                rootNodeRef,
+                "//*[like(@test:UPPERANIMAL, 'M__K%', true)]",
+                null,
+                namespacePrefixResolver, false);
         assertEquals(1, answer.size());
+        
+        answer =  searcher.selectNodes(rootNodeRef, "//*[contains('monkey')]", null, namespacePrefixResolver, false);
+        assertEquals(2, answer.size());
         
         answer =  searcher.selectNodes(rootNodeRef, "//*[contains('MONKEY')]", null, namespacePrefixResolver, false);
-        assertEquals(1, answer.size());
+        assertEquals(2, answer.size());
         
         answer =  searcher.selectNodes(rootNodeRef, "//*[contains(lower-case('MONKEY'))]", null, namespacePrefixResolver, false);
-        assertEquals(1, answer.size());
+        assertEquals(2, answer.size());
 
         // select the monkey node in the second level
         QueryParameterDefinition[] paramDefs = new QueryParameterDefinition[2];

@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.alfresco.repo.search.CannedQueryDef;
 import org.alfresco.repo.search.EmptyResultSet;
+import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.Indexer;
 import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.SearcherException;
@@ -102,7 +103,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
         searcher.setLuceneConfig(config);
         try
         {
-            searcher.initialise(storeRef, indexer == null ? null : indexer.getDeltaId(), false);
+            searcher.initialise(storeRef, indexer == null ? null : indexer.getDeltaId(), false, false);
             searcher.indexer = indexer;
         }
         catch (LuceneIndexException e)
@@ -498,14 +499,14 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             sb.append("+ID:\"").append(nodeRef.toString()).append("\" +(TEXT:(").append(googleLikePattern.toLowerCase()).append(") ");
             if (propertyQName != null)
             {
-                sb.append(" OR @").append(LuceneQueryParser.escape(propertyQName.toString()));
+                sb.append(" OR @").append(LuceneQueryParser.escape(QName.createQName(propertyQName.getNamespaceURI(), ISO9075.encode(propertyQName.getLocalName())).toString()));
                 sb.append(":(").append(googleLikePattern.toLowerCase()).append(")");
             }
             else
             {
                 for (QName key : nodeService.getProperties(nodeRef).keySet())
                 {
-                    sb.append(" OR @").append(LuceneQueryParser.escape(key.toString()));
+                    sb.append(" OR @").append(LuceneQueryParser.escape(QName.createQName(key.getNamespaceURI(), ISO9075.encode(key.getLocalName())).toString()));
                     sb.append(":(").append(googleLikePattern.toLowerCase()).append(")");
                 }
             }
@@ -560,7 +561,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
             }
             if (propertyQName != null)
             {
-                sb.append(" @").append(LuceneQueryParser.escape(propertyQName.toString())).append(":(").append(pattern).append(")");
+                sb.append(" @").append(LuceneQueryParser.escape(QName.createQName(propertyQName.getNamespaceURI(), ISO9075.encode(propertyQName.getLocalName())).toString())).append(":(").append(pattern).append(")");
             }
             sb.append(")");
 

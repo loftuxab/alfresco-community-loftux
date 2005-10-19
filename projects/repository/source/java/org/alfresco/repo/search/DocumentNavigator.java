@@ -177,7 +177,12 @@ public class DocumentNavigator extends DefaultNavigator
     public String getAttributeName(Object o)
     {
         // Get the local name
-        return ((Property) o).qname.getLocalName();
+        String escapedLocalName = ISO9075.encode(((Property) o).qname.getLocalName());
+        if(escapedLocalName == ((Property) o).qname.getLocalName())
+        {
+            return escapedLocalName;
+        }
+        return escapedLocalName;
     }
 
     public String getAttributeNamespaceUri(Object o)
@@ -187,7 +192,16 @@ public class DocumentNavigator extends DefaultNavigator
 
     public String getAttributeQName(Object o)
     {
-        return ((Property) o).qname.toString();
+        QName qName = ((Property) o).qname;
+        String escapedLocalName = ISO9075.encode(qName.getLocalName());
+        if(escapedLocalName == qName.getLocalName())
+        {
+            return qName.toString();
+        }
+        else
+        {
+            return QName.createQName(qName.getNamespaceURI(), escapedLocalName).toString();
+        }
     }
 
     public String getAttributeStringValue(Object o)
@@ -205,7 +219,7 @@ public class DocumentNavigator extends DefaultNavigator
 
     public String getElementName(Object o)
     {
-        return ((ChildAssociationRef) o).getQName().getLocalName();
+        return ISO9075.encode(((ChildAssociationRef) o).getQName().getLocalName());
     }
 
     public String getElementNamespaceUri(Object o)
@@ -215,7 +229,16 @@ public class DocumentNavigator extends DefaultNavigator
 
     public String getElementQName(Object o)
     {
-        return ((ChildAssociationRef) o).getQName().toString();
+        QName qName = ((ChildAssociationRef) o).getQName();
+        String escapedLocalName = ISO9075.encode(qName.getLocalName());
+        if(escapedLocalName == qName.getLocalName())
+        {
+            return qName.toString();
+        }
+        else
+        {
+            return QName.createQName(qName.getNamespaceURI(), escapedLocalName).toString();
+        }
     }
 
     public String getElementStringValue(Object o)

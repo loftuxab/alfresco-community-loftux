@@ -265,7 +265,7 @@
 
     <bean id="lockService" class="org.alfresco.repo.lock.LockServiceImpl" init-method="initialise">
         <property name="nodeService">
-            <ref bean="NodeService" />
+            <ref bean="nodeService" />
         </property>
         <property name="policyComponent">
             <ref bean="policyComponent" />
@@ -426,7 +426,7 @@
 
     <bean id="checkOutCheckInService" class="org.alfresco.repo.coci.CheckOutCheckInServiceImpl">
         <property name="nodeService">
-            <ref bean="NodeService" />
+            <ref bean="nodeService" />
         </property>
         <property name="versionService">
             <ref bean="versionService" />

@@ -206,6 +206,10 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
+            else if(cad.parameter >= invocation.getArguments().length)
+            {
+                continue;
+            }
             else if (cad.typeString.equals(ACL_NODE))
             {
                 if (StoreRef.class.isAssignableFrom(params[cad.parameter]))

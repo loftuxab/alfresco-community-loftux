@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.alfresco.repo.search.ISO9075;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
@@ -336,7 +337,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
             else
             {
                 // a parent is present
-                sb.append(resolver == null ? ref.getQName().toString() : ref.getQName().toPrefixString(resolver));
+                sb.append(resolver == null ? ISO9075.getXPathName(ref.getQName()) : ISO9075.getXPathName(ref.getQName(), resolver));
             }
             if (ref.getNthSibling() > -1)
             {
@@ -386,7 +387,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
         private String createElementString(NamespacePrefixResolver resolver)
         {
             StringBuilder sb = new StringBuilder(32);
-            sb.append("@").append(resolver == null ? attribute.toString() : attribute.toPrefixString(resolver));
+            sb.append("@").append(resolver == null ? ISO9075.getXPathName(attribute) : ISO9075.getXPathName(attribute, resolver));
             
             if (position > -1)
             {

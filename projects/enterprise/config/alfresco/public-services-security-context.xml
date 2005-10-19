@@ -42,6 +42,7 @@
                 <property name="dynamicAuthorities">
                     <list>
                         <ref bean="ownerDynamicAuthority" />
+                        <ref bean="lockOwnerDynamicAuthority" />
                     </list>
                 </property>
             </bean>
@@ -58,6 +59,12 @@
     <bean id="ownerDynamicAuthority" class="org.alfresco.repo.ownable.impl.OwnerDynamicAuthority">
         <property name="ownableService">
             <ref bean="ownableService" />
+        </property>
+    </bean>
+    
+     <bean id="lockOwnerDynamicAuthority" class="org.alfresco.repo.lockable.impl.LockOwnerDynamicAuthority">
+        <property name="lockService">
+            <ref bean="lockService" />
         </property>
     </bean>
 
@@ -247,14 +254,36 @@
    <!-- Copy security is enforced via the node service injected into the copy service -->
    <bean id="CopyService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
-   <!-- Again, the node service enforces security here -->
-   <bean id="LockService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   <bean id="LockService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
+      <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+      <property name="objectDefinitionSource">
+         <value>
+                org.alfresco.service.cmr.lock.LockService.lock=ACL_NODE.0.cm:lockable.Lock
+                org.alfresco.service.cmr.lock.LockService.unlock=ACL_NODE.0.cm:lockable.Unlock
+                org.alfresco.service.cmr.lock.LockService.getLockStatus=ACL_NODE.0.sys:base.Read
+                org.alfresco.service.cmr.lock.LockService.getLockType=ACL_NODE.0.sys:base.Read
+                org.alfresco.service.cmr.lock.LockService.checkForLock=ACL_NODE.0.sys:base.Read
+         </value>
+      </property>
+   </bean>
     
    <!-- Again, the node service enforces security here -->
    <bean id="VersionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
-   <!-- Again, the node service enforces security here -->
-   <bean id="CheckoutCheckinService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   <bean id="CheckoutCheckinService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+      <property name="authenticationManager"><ref bean="authenticationManager"/></property>
+      <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
+      <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
+      <property name="objectDefinitionSource">
+         <value>
+                org.alfresco.service.cmr.coci.CheckOutCheckInService.checkout=ACL_NODE.0.cm:lockable.CheckOut,ACL_NODE.1.sys:base.CreateChildren
+                org.alfresco.service.cmr.coci.CheckOutCheckInService.checkin=ACL_NODE.0.cm:lockable.CheckIn
+                org.alfresco.service.cmr.coci.CheckOutCheckInService.cancelCheckout=ACL_NODE.0.cm:lockable.CancelCheckOut
+         </value>
+      </property>
+   </bean> 
     
    <!-- Again, the node service enforces security here -->
    <bean id="RuleService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />

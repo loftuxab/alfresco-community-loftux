@@ -16,6 +16,13 @@
  */
 package org.alfresco.repo.search;
 
+import java.util.Collection;
+
+import org.alfresco.service.namespace.NamespaceException;
+import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
+
 import com.sun.org.apache.xerces.internal.util.XMLChar;
 
 /**
@@ -31,14 +38,14 @@ public class ISO9075
     private static final int MASK = (1 << 4) - 1;
 
     /*
-     * Digits used string encoding 
+     * Digits used string encoding
      */
     private static final char[] DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
             'f' };
 
     /**
-     * Private constructor 
-     *
+     * Private constructor
+     * 
      */
     private ISO9075()
     {
@@ -70,7 +77,7 @@ public class ISO9075
                 // First requires special test
                 if (i == 0)
                 {
-                    if (XMLChar.isNameStart(c))
+                    if (XMLChar.isNCNameStart(c))
                     {
                         // The first character may be the _ at the start of an
                         // encoding pattern
@@ -92,7 +99,7 @@ public class ISO9075
                         encode(c, builder);
                     }
                 }
-                else if (!XMLChar.isName(c))
+                else if (!XMLChar.isNCName(c))
                 {
                     encode(c, builder);
                 }
@@ -123,8 +130,6 @@ public class ISO9075
                 && (string.charAt(position + 6) == '_');
     }
 
-    
-    
     private static boolean isHexChar(char c)
     {
         switch (c)
@@ -164,11 +169,11 @@ public class ISO9075
             return toDecode;
         }
         StringBuffer decoded = new StringBuffer();
-        for(int i = 0, l = toDecode.length(); i < l; i++)
+        for (int i = 0, l = toDecode.length(); i < l; i++)
         {
-            if(matchesEncodedPattern(toDecode, i))
+            if (matchesEncodedPattern(toDecode, i))
             {
-                decoded.append( ((char) Integer.parseInt(toDecode.substring(i+2, i+6), 16)));
+                decoded.append(((char) Integer.parseInt(toDecode.substring(i + 2, i + 6), 16)));
                 i += 6;
             }
             else
@@ -190,5 +195,32 @@ public class ISO9075
         }
         while (c != 0);
         builder.append(buf);
+    }
+
+    public static String getXPathName(QName qName, NamespacePrefixResolver nspr)
+    {
+
+        Collection<String> prefixes = nspr.getPrefixes(qName.getNamespaceURI());
+        if (prefixes.size() == 0)
+        {
+            throw new NamespaceException("A namespace prefix is not registered for uri " + qName.getNamespaceURI());
+        }
+        String prefix = prefixes.iterator().next();
+        if (prefix.equals(NamespaceService.DEFAULT_PREFIX))
+        {
+            return ISO9075.encode(qName.getLocalName());
+        }
+        else
+        {
+            return prefix + ":" + ISO9075.encode(qName.getLocalName());
+        }
+
+    }
+
+    public static String getXPathName(QName qName)
+    {
+
+        return "{" + qName.getNamespaceURI() + "}" + ISO9075.encode(qName.getLocalName());
+
     }
 }

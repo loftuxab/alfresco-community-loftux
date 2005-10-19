@@ -25,8 +25,8 @@ package org.alfresco.repo.ownable.impl;
 
 import org.alfresco.repo.ownable.OwnableService;
 import org.alfresco.repo.security.permissions.DynamicAuthority;
-import org.alfresco.repo.security.permissions.impl.PermissionServiceImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.util.EqualsHelper;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -59,7 +59,7 @@ public class OwnerDynamicAuthority implements DynamicAuthority, InitializingBean
 
     public String getAuthority()
     {
-       return PermissionServiceImpl.OWNER_AUTHORITY;
+       return PermissionService.OWNER_AUTHORITY;
     }
 
 }
