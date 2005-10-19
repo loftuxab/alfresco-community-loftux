@@ -369,12 +369,17 @@ public class InviteUsersWizard extends AbstractWizardBean
          {
             // groups
             Set<String> groups = authorityService.getAllAuthorities(AuthorityType.GROUP);
-            items = new SelectItem[groups.size()];
-            int index = 0;
+            List<SelectItem> results = new ArrayList<SelectItem>(groups.size());
+            String containsLower = contains.toLowerCase();
             for (String group : groups)
             {
-               items[index++] = new SortableSelectItem(group, group, group);
+               if (group.toLowerCase().indexOf(containsLower) != -1)
+               {
+                  results.add(new SortableSelectItem(group, group, group));
+               }
             }
+            items = new SelectItem[results.size()];
+            results.toArray(items);
          }
          
          Arrays.sort(items);
