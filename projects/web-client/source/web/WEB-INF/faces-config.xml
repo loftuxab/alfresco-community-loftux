@@ -595,6 +595,10 @@
          <property-name>mailSender</property-name>
          <value>#{mailService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>authorityService</property-name>
+         <value>#{AuthorityService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>

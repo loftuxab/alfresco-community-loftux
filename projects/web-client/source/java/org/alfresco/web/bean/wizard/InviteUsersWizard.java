@@ -34,6 +34,8 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -70,14 +72,16 @@ public class InviteUsersWizard extends AbstractWizardBean
    private static final String STEP2_DESCRIPTION_ID = "invite_step2_desc";
    private static final String FINISH_INSTRUCTION_ID = "invite_finish_instruction";
    
-   private static final String INVITE_USERS = "users";
-   private static final String INVITE_ALL = "all";
+   private static final String NOTIFY_YES = "yes";
    
    /** NamespaceService bean reference */
    private NamespaceService namespaceService;
    
    /** JavaMailSender bean reference */
    private JavaMailSender mailSender;
+   
+   /** AuthorityService bean reference */
+   private AuthorityService authorityService;
    
    /** PermissionService bean reference */
    private PermissionService permissionService;
@@ -94,9 +98,8 @@ public class InviteUsersWizard extends AbstractWizardBean
    /** Cache of available folder permissions */
    Set<String> folderPermissions = null;
    
-   /** whether to invite all or specify individual users or groups */
-   private String invite = "users";
-   private String notify = "yes";
+   /** dialog state */
+   private String notify = NOTIFY_YES;
    private String subject = null;
    private String body = null;
    private String internalSubject = null;
@@ -112,7 +115,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
-    * @param mailSender         The JavaMailSender to set.
+    * @param mailSender          The JavaMailSender to set.
     */
    public void setMailSender(JavaMailSender mailSender)
    {
@@ -120,7 +123,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
-    * @param permissionService  The PermissionService to set.
+    * @param permissionService   The PermissionService to set.
     */
    public void setPermissionService(PermissionService permissionService)
    {
@@ -128,11 +131,19 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
-    * @param permissionService  The PermissionService to set.
+    * @param permissionService   The PermissionService to set.
     */
    public void setPersonService(PersonService personService)
    {
       this.personService = personService;
+   }
+   
+   /**
+    * @param authorityService    The authorityService to set.
+    */
+   public void setAuthorityService(AuthorityService authorityService)
+   {
+      this.authorityService = authorityService;
    }
 
    /**
@@ -142,8 +153,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    {
       super.init();
       
-      invite = "users";
-      notify = "yes";
+      notify = NOTIFY_YES;
       userGroupRoles = new ArrayList<UserGroupRole>(8);
       subject = "";
       body = "";
@@ -183,44 +193,35 @@ public class InviteUsersWizard extends AbstractWizardBean
          
          NodeRef folderNodeRef = this.navigator.getCurrentNode().getNodeRef();
          
-         if (INVITE_USERS.equals(getInvite()))
+         // set permissions for each user and send them a mail
+         for (int i=0; i<this.userGroupRoles.size(); i++)
          {
-            // set permissions for each user and send them a mail
-            for (int i=0; i<this.userGroupRoles.size(); i++)
+            UserGroupRole userGroupRole = this.userGroupRoles.get(i);
+            String authority = userGroupRole.getAuthority();
+            
+            // find the selected permission ref from it's name and apply for the specified user
+            Set<String> perms = getFolderPermissions();
+            for (String permission : perms)
             {
-               UserGroupRole userGroupRole = this.userGroupRoles.get(i);
-               NodeRef person = userGroupRole.getUserGroupRef();
-               
-               // find the selected permission ref from it's name and apply for the specified user
-               Set<String> perms = getFolderPermissions();
-               for (String permission : perms)
+               if (userGroupRole.getRole().equals(permission))
                {
-                  if (userGroupRole.getRole().equals(permission))
-                  {
-                     this.permissionService.setPermission(
-                           folderNodeRef,
-                           (String)this.nodeService.getProperty(person, ContentModel.PROP_USERNAME),
-                           permission,
-                           true);
-                     break;
-                  }
-               }
-               
-               // Create the mail message for each user to send too
-               if ("yes".equals(this.notify))
-               {
-                  notifyUser(person, folderNodeRef, from, userGroupRole.getRole());
+                  this.permissionService.setPermission(
+                        folderNodeRef,
+                        authority,
+                        permission,
+                        true);
+                  break;
                }
             }
-         }
-         else if (INVITE_ALL.equals(getInvite()))
-         {
-            // set ALL users permssions to GUEST
-            this.permissionService.setPermission(
-                  folderNodeRef,
-                  this.permissionService.getAllAuthorities(),
-                  this.permissionService.GUEST,
-                  true);
+            
+            // Create the mail message for sending to each User
+            if (NOTIFY_YES.equals(this.notify))
+            {
+               if (this.personService.personExists(authority) == true)
+               {
+                  notifyUser(this.personService.getPerson(authority), folderNodeRef, from, userGroupRole.getRole());
+               }
+            }
          }
          
          // commit the transaction
@@ -338,33 +339,44 @@ public class InviteUsersWizard extends AbstractWizardBean
          tx = Repository.getUserTransaction(context);
          tx.begin();
          
-         // TODO: if 'invite' drop-down is groups then select from list of groups not users!
-         
-         // build xpath to match available Person objects
-         NodeRef peopleRef = personService.getPeopleContainer();
-         // NOTE: see SearcherComponentTest
-         String xpath = "*[like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "firstName, '%" + contains + "%', false)" +
-                 " or " + "like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "lastName, '%" + contains + "%', false)]";
-         
-         if (logger.isDebugEnabled())
-            logger.debug("User/Groups Picker Query: " + xpath);
-         
-         List<NodeRef> nodes = searchService.selectNodes(
-               peopleRef,
-               xpath,
-               null,
-               this.namespaceService,
-               false);
-         
-         items = new SelectItem[nodes.size()];
-         for (int index=0; index<nodes.size(); index++)
+         if (filterIndex == 0)
          {
-            NodeRef personRef = nodes.get(index);
-            String firstName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_FIRSTNAME);
-            String lastName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_LASTNAME);
-            SelectItem item = new SortablePersonSelectItem(personRef, firstName + " " + lastName, lastName);
-            items[index] = item;
+            // build xpath to match available User/Person objects
+            NodeRef peopleRef = personService.getPeopleContainer();
+            // NOTE: see SearcherComponentTest
+            String xpath = "*[like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "firstName, '%" + contains + "%', false)" +
+                    " or " + "like(@" + NamespaceService.CONTENT_MODEL_PREFIX + ":" + "lastName, '%" + contains + "%', false)]";
+            
+            List<NodeRef> nodes = searchService.selectNodes(
+                  peopleRef,
+                  xpath,
+                  null,
+                  this.namespaceService,
+                  false);
+            
+            items = new SelectItem[nodes.size()];
+            for (int index=0; index<nodes.size(); index++)
+            {
+               NodeRef personRef = nodes.get(index);
+               String firstName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_FIRSTNAME);
+               String lastName = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_LASTNAME);
+               String username = (String)this.nodeService.getProperty(personRef, ContentModel.PROP_USERNAME);
+               SelectItem item = new SortableSelectItem(username, firstName + " " + lastName, lastName);
+               items[index] = item;
+            }
          }
+         else
+         {
+            // groups
+            Set<String> groups = authorityService.getAllAuthorities(AuthorityType.GROUP);
+            items = new SelectItem[groups.size()];
+            int index = 0;
+            for (String group : groups)
+            {
+               items[index++] = new SortableSelectItem(group, group, group);
+            }
+         }
+         
          Arrays.sort(items);
          
          // commit the transaction
@@ -399,34 +411,47 @@ public class InviteUsersWizard extends AbstractWizardBean
          {
             for (int i=0; i<results.length; i++)
             {
-               NodeRef ref = new NodeRef(results[i]);
-               String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
-               String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
+               String authority = results[i];
                
-               // only add if user ref not already present in the list with same role
+               // only add if authority not already present in the list with same role
                boolean foundExisting = false;
                for (int n=0; n<this.userGroupRoles.size(); n++)
                {
                   UserGroupRole wrapper = this.userGroupRoles.get(n);
-                  if (ref.equals(wrapper.getUserGroupRef()) &&
+                  if (authority.equals(wrapper.getAuthority()) &&
                       role.equals(wrapper.getRole()))
                   {
                      foundExisting = true;
                      break;
                   }
                }
+               
                if (foundExisting == false)
                {
-                  // build a display label showing the user and their role for the space
                   StringBuilder label = new StringBuilder(64);
-                  label.append(firstName)
-                  .append(" ")
-                  .append(lastName)
-                  .append(" (")
-                  .append(Application.getMessage(FacesContext.getCurrentInstance(), role))
-                  .append(")");
                   
-                  this.userGroupRoles.add(new UserGroupRole(ref, role, label.toString()));
+                  // build a display label showing the user and their role for the space
+                  if (this.personService.personExists(authority) == true)
+                  {
+                     // found a User authority
+                     NodeRef ref = this.personService.getPerson(authority);
+                     String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
+                     String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
+                     
+                     label.append(firstName)
+                          .append(" ")
+                          .append(lastName)
+                          .append(" (")
+                          .append(Application.getMessage(FacesContext.getCurrentInstance(), role))
+                          .append(")");
+                  }
+                  else
+                  {
+                     // found a group authority
+                     label.append(authority);
+                  }
+                  
+                  this.userGroupRoles.add(new UserGroupRole(authority, role, label.toString()));
                }
             }
          }
@@ -477,22 +502,6 @@ public class InviteUsersWizard extends AbstractWizardBean
       }
       
       return roles;
-   }
-   
-   /**
-    * @return Returns the invite listbox selection.
-    */
-   public String getInvite()
-   {
-      return this.invite;
-   }
-
-   /**
-    * @param invite The invite listbox selection to set.
-    */
-   public void setInvite(String invite)
-   {
-      this.invite = invite;
    }
    
    /**
@@ -747,21 +756,16 @@ public class InviteUsersWizard extends AbstractWizardBean
     */
    public static class UserGroupRole
    {
-      public UserGroupRole(NodeRef usergroup, String role, String label)
+      public UserGroupRole(String authority, String role, String label)
       {
-         this.userGroup = usergroup;
+         this.authority = authority;
          this.role = role;
          this.label = label;
       }
       
-      public String getUserGroup()
+      public String getAuthority()
       {
-         return userGroup.toString();
-      }
-      
-      public NodeRef getUserGroupRef()
-      {
-         return this.userGroup;
+         return this.authority;
       }
       
       public String getRole()
@@ -774,17 +778,17 @@ public class InviteUsersWizard extends AbstractWizardBean
          return this.label;
       }
       
-      private NodeRef userGroup;
+      private String authority;
       private String role;
       private String label;
    }
    
    /**
-    * Wrapper class to facilitate specific sorting functionality against Person SelectItem objects
+    * Wrapper class to facilitate specific sorting functionality against our SelectItem objects
     */
-   private static class SortablePersonSelectItem extends SelectItem implements Comparable
+   private static class SortableSelectItem extends SelectItem implements Comparable
    {
-      public SortablePersonSelectItem(Object value, String label, String sort)
+      public SortableSelectItem(String value, String label, String sort)
       {
          super(value, label);
          this.sort = sort;
@@ -795,7 +799,7 @@ public class InviteUsersWizard extends AbstractWizardBean
          if (this.sort == null && obj2 == null) return 0;
          if (this.sort == null) return -1;
          if (obj2 == null) return 1;
-         return this.sort.compareToIgnoreCase( ((SortablePersonSelectItem)obj2).sort );
+         return this.sort.compareToIgnoreCase( ((SortableSelectItem)obj2).sort );
       }
       
       private String sort;

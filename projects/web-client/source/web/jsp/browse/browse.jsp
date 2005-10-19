@@ -458,13 +458,11 @@
                                  </a:actionLink>
                               </a:booleanEvaluator>
                            </r:permissionEvaluator>   
-                              
                            <a:booleanEvaluator value="#{r.checkIn == true}">
                               <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
                                  <f:param name="id" value="#{r.id}" />
                              </a:actionLink>
                            </a:booleanEvaluator>
-                           
                            <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" showLink="false" styleClass="inlineAction" actionListener="#{BrowseBean.setupContentAction}" action="showDocDetails">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
@@ -484,13 +482,11 @@
                                     </a:actionLink>
                                  </a:booleanEvaluator>
                               </r:permissionEvaluator>
-                            
                               <a:booleanEvaluator value="#{r.cancelCheckOut == true}">
                                  <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
                                     <f:param name="id" value="#{r.id}" />
                                  </a:actionLink>
                               </a:booleanEvaluator>
-                             
                               <a:booleanEvaluator value='#{r["app:approveStep"] != null && r.workingCopy == false && r.locked == false}'>
                                  <a:actionLink value='#{r["app:approveStep"]}' image="/images/icons/approve.gif" showLink="false" styleClass="inlineAction" actionListener="#{DocumentDetailsBean.approve}">
                                     <f:param name="id" value="#{r.id}" />

@@ -116,19 +116,6 @@
                                  
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{msg.i_want_to}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <h:selectOneRadio value="#{InviteUsersWizard.invite}" layout="pageDirection">
-                                          <f:selectItem itemValue="all" itemLabel="#{msg.invite_all}" />
-                                          <f:selectItem itemValue="users" itemLabel="#{msg.invite_users}" />
-                                       </h:selectOneRadio>
-                                    </td>
-                                 </tr>
-                                 
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
                                     <td class="mainSubTitle"><h:outputText value="#{msg.specify_usersgroups}" /></td>
                                  </tr>
                                  <tr>

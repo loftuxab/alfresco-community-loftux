@@ -598,7 +598,6 @@ public class BrowseBean implements IContextListener
       node.addPropertyResolver("fileType32", this.resolverFileType32);
       node.addPropertyResolver("templatable", this.resolverTemplatable);
       node.addPropertyResolver("size", this.resolverSize);
-      
       node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
       node.addPropertyResolver("checkIn", this.resolverCheckIn);
    }
@@ -616,29 +615,29 @@ public class BrowseBean implements IContextListener
    };
    
    private NodePropertyResolver resolverCancelCheckOut = new NodePropertyResolver() {
-       public Object get(Node node) {
-           if(node.hasPermission(null))
-           {
-               return Repository.isNodeOwner(node, lockService) &&  node.hasPermission(PermissionService.WRITE);
-           }
-           else
-           {
-              return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) &&  node.hasPermission(PermissionService.CANCEL_CHECK_OUT);
-           }
-       }
+      public Object get(Node node) {
+         if (node.hasPermission(null))
+         {
+            return Repository.isNodeOwner(node, lockService) && node.hasPermission(PermissionService.WRITE);
+         }
+         else
+         {
+            return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CANCEL_CHECK_OUT);
+         }
+      }
    };
    
    private NodePropertyResolver resolverCheckIn = new NodePropertyResolver() {
-       public Object get(Node node) {
-           if(node.hasPermission(null))
-           {
-               return Repository.isNodeOwner(node, lockService) &&  node.hasPermission(PermissionService.WRITE);
-           }
-           else
-           {
-               return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CHECK_IN);
-           }
-       }
+      public Object get(Node node) {
+         if (node.hasPermission(null))
+         {
+            return Repository.isNodeOwner(node, lockService) && node.hasPermission(PermissionService.WRITE);
+         }
+         else
+         {
+            return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CHECK_IN);
+         }
+      }
    };
    
    private NodePropertyResolver resolverWorkingCopy = new NodePropertyResolver() {

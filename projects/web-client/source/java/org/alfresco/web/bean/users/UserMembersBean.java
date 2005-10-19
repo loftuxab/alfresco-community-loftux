@@ -83,7 +83,7 @@ public class UserMembersBean implements IContextListener
    private UIRichList usersRichList;
    
    /** action context */
-   private Node person = null;
+   private String personAuthority = null;
    
    /** action context */
    private String personName = null;
@@ -184,19 +184,19 @@ public class UserMembersBean implements IContextListener
    }
    
    /**
-    * @return Returns the person context.
+    * @return Returns the current person authority.
     */
-   public Node getPerson()
+   public String getPersonAuthority()
    {
-      return this.person;
+      return this.personAuthority;
    }
 
    /**
-    * @param person     The person context to set.
+    * @param person     The person person authority to set.
     */
-   public void setPerson(Node person)
+   public void setPersonAuthority(String person)
    {
-      this.person = person;
+      this.personAuthority = person;
    }
    
    /**
@@ -218,11 +218,11 @@ public class UserMembersBean implements IContextListener
    /**
     * @return the list of user nodes for list data binding
     */
-   public List<Node> getUsers()
+   public List<Map> getUsers()
    {
       FacesContext context = FacesContext.getCurrentInstance();
       
-      List<Node> personNodes = null;
+      List<Map> personNodes = null;
       
       UserTransaction tx = null;
       try
@@ -242,7 +242,9 @@ public class UserMembersBean implements IContextListener
             {
                // we are only interested in Allow and not groups/owner etc.
                if (permission.getAccessStatus() == AccessStatus.ALLOWED &&
-                   permission.getAuthorityType() == AuthorityType.USER)
+                   (permission.getAuthorityType() == AuthorityType.USER ||
+                    permission.getAuthorityType() == AuthorityType.GROUP ||
+                    permission.getAuthorityType() == AuthorityType.EVERYONE))
                {
                   String authority = permission.getAuthority();
                   
@@ -253,35 +255,49 @@ public class UserMembersBean implements IContextListener
                      userPermissions = new ArrayList<String>(4);
                      permissionMap.put(authority, userPermissions);
                   }
-                  // add the display label for the permission name
-                  userPermissions.add(Application.getMessage(context, permission.getPermission()));
+                  // add the permission name for this authority
+                  userPermissions.add(permission.getPermission());
                }
             }
          }
          
-         // filter invalid users e.g. Admin and current user
+         // filter invalid users e.g. current user
          permissionMap.remove(Application.getCurrentUser(context).getUserName());
          
          // for each authentication (username key) found we get the Person
          // node represented by it and use that for our list databinding object
-         personNodes = new ArrayList<Node>(permissionMap.size());
-         for (String username : permissionMap.keySet())
+         personNodes = new ArrayList<Map>(permissionMap.size());
+         for (String authority : permissionMap.keySet())
          {
-            NodeRef nodeRef = personService.getPerson(username);
-            if (nodeRef != null)
+            // check if we are dealing with a person (User Authority)
+            if (personService.personExists(authority))
             {
-               // create our Node representation
-               MapNode node = new MapNode(nodeRef, nodeService);
-               
-               // set data binding properties
-               // this will also force initialisation of the props now during the UserTransaction
-               // it is much better for performance to do this now rather than during page bind
-               Map<String, Object> props = node.getProperties(); 
-               props.put("fullName", ((String)props.get("firstName")) + ' ' + ((String)props.get("lastName")));
-               
-               String userName = (String)props.get("userName");
-               props.put("roles", listToString(permissionMap.get(userName)));
-               
+               NodeRef nodeRef = personService.getPerson(authority);
+               if (nodeRef != null)
+               {
+                  // create our Node representation
+                  MapNode node = new MapNode(nodeRef, nodeService);
+                  
+                  // set data binding properties
+                  // this will also force initialisation of the props now during the UserTransaction
+                  // it is much better for performance to do this now rather than during page bind
+                  Map<String, Object> props = node.getProperties(); 
+                  props.put("fullName", ((String)props.get("firstName")) + ' ' + ((String)props.get("lastName")));
+                  
+                  String userName = (String)props.get("userName");
+                  props.put("roles", listToString(context, permissionMap.get(authority)));
+                  
+                  personNodes.add(node);
+               }
+            }
+            else
+            {
+               // need a map (dummy node) to represent props for this Group Authority
+               Map<String, Object> node = new HashMap<String, Object>(5, 1.0f);
+               node.put("fullName", authority);
+               node.put("userName", authority);
+               node.put("id", authority);
+               node.put("roles", listToString(context, permissionMap.get(authority)));
                personNodes.add(node);
             }
          }
@@ -293,21 +309,21 @@ public class UserMembersBean implements IContextListener
       {
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
                context, Repository.ERROR_NODEREF), new Object[] {"root"}) );
-         personNodes = Collections.<Node>emptyList();
+         personNodes = Collections.<Map>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
       catch (Exception err)
       {
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
                context, Repository.ERROR_GENERIC), err.getMessage()), err );
-         personNodes = Collections.<Node>emptyList();
+         personNodes = Collections.<Map>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
       
       return personNodes;
    }
    
-   private static String listToString(List<String> list)
+   private static String listToString(FacesContext context, List<String> list)
    {
       StringBuilder buf = new StringBuilder();
       
@@ -319,7 +335,7 @@ public class UserMembersBean implements IContextListener
             {
                buf.append(", ");
             }
-            buf.append(list.get(i));
+            buf.append(Application.getMessage(context, list.get(i)));
          }
       }
       
@@ -329,8 +345,8 @@ public class UserMembersBean implements IContextListener
    /**
     * Action event called by all actions that need to setup a Person context on
     * the UserMembers bean before an action page is called. The context will be a
-    * Person Node in setPerson() which can be retrieved on the action page from
-    * UserMembers.getPerson().
+    * Authority in setPersonAuthority() which can be retrieved on the action page from
+    * UserMembersBean.setPersonAuthority().
     */
    public void setupUserAction(ActionEvent event)
    {
@@ -338,37 +354,37 @@ public class UserMembersBean implements IContextListener
       
       UIActionLink link = (UIActionLink) event.getComponent();
       Map<String, String> params = link.getParameterMap();
-      String id = params.get("id");
-      if (id != null && id.length() != 0)
+      String authority = params.get("userName");
+      if (authority != null && authority.length() != 0)
       {
          try
          {
-            // create the node ref, then our node representation
-            NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
+            if (this.personService.personExists(authority))
+            {
+               // create the node ref, then our node representation
+               NodeRef ref = personService.getPerson(authority);
+               Node node = new Node(ref, this.nodeService);
+               
+               // setup convience function for current user full name
+               setPersonName((String)node.getProperties().get(ContentModel.PROP_FIRSTNAME) + ' ' +
+                             (String)node.getProperties().get(ContentModel.PROP_LASTNAME));
+            }
+            else
+            {
+               setPersonName(authority);
+            }
             
-            // remember the Person node
-            setPerson(node);
-            
-            // get username authentication key
-            String userName = (String)node.getProperties().get(ContentModel.PROP_USERNAME);
-            
-            // setup convience function for current user full name
-            setPersonName((String)node.getProperties().get(ContentModel.PROP_FIRSTNAME) + ' ' +
-                  (String)node.getProperties().get(ContentModel.PROP_LASTNAME));
-            
-            // setup roles for this person
+            // setup roles for this Authority
             List<PermissionWrapper> userPermissions = new ArrayList<PermissionWrapper>(4);
             Set<AccessPermission> permissions = permissionService.getAllSetPermissions(navigator.getCurrentNode().getNodeRef());
             if (permissions != null)
             {
                for (AccessPermission permission : permissions)
                {
-                  // we are only interested in Allow and not groups/owner etc.
-                  if (permission.getAccessStatus() == AccessStatus.ALLOWED &&
-                      permission.getAuthorityType() == AuthorityType.USER)
+                  // we are only interested in Allow permissions
+                  if (permission.getAccessStatus() == AccessStatus.ALLOWED)
                   {
-                     if (userName.equals(permission.getAuthority()))
+                     if (authority.equals(permission.getAuthority()))
                      {
                         // found a permission for this user authentiaction
                         PermissionWrapper wrapper = new PermissionWrapper(
@@ -379,21 +395,23 @@ public class UserMembersBean implements IContextListener
                   }
                }
             }
+            // action context setup
             this.personRoles = userPermissions;
+            setPersonAuthority(authority);
             
             // clear the UI state in preparation for finishing the action
             // and returning to the main page
             contextUpdated();
          }
-         catch (InvalidNodeRefException refErr)
+         catch (Exception err)
          {
             Utils.addErrorMessage(MessageFormat.format(Application.getMessage(FacesContext
-                  .getCurrentInstance(), Repository.ERROR_NODEREF), new Object[] { id }));
+                  .getCurrentInstance(), Repository.ERROR_GENERIC), new Object[] { err.getMessage() }));
          }
       }
       else
       {
-         setPerson(null);
+         setPersonAuthority(null);
       }
    }
    
@@ -435,7 +453,7 @@ public class UserMembersBean implements IContextListener
       FacesContext context = FacesContext.getCurrentInstance();
       
       // persist new user permissions
-      if (this.personRoles != null && getPerson() != null)
+      if (this.personRoles != null && getPersonAuthority() != null)
       {
          UserTransaction tx = null;
          try
@@ -446,13 +464,12 @@ public class UserMembersBean implements IContextListener
             // clear the currently set permissions for this user
             // and add each of the new permissions in turn
             NodeRef nodeRef = navigator.getCurrentNode().getNodeRef();
-            String username = (String)getPerson().getProperties().get(ContentModel.PROP_USERNAME);
-            this.permissionService.clearPermission(nodeRef, username);
+            this.permissionService.clearPermission(nodeRef, getPersonAuthority());
             for (PermissionWrapper wrapper : personRoles)
             {
                this.permissionService.setPermission(
                      nodeRef,
-                     username,
+                     getPersonAuthority(),
                      wrapper.getPermission(),
                      true);
             }
@@ -486,11 +503,10 @@ public class UserMembersBean implements IContextListener
          tx.begin();
          
          // remove the invited User
-         if (getPerson() != null)
+         if (getPersonAuthority() != null)
          {
-            // clear permissions for the specified user
-            String username = (String)getPerson().getProperties().get(ContentModel.PROP_USERNAME);
-            this.permissionService.clearPermission(this.navigator.getCurrentNode().getNodeRef(), username);
+            // clear permissions for the specified Authority
+            this.permissionService.clearPermission(this.navigator.getCurrentNode().getNodeRef(), getPersonAuthority());
          }
          
          // commit the transaction

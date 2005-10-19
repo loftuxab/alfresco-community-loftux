@@ -404,6 +404,14 @@ public class UIGenericPicker extends UICommand
       
       return this.filters;
    }
+   
+   /**
+    * @return current filter drop-down selected index value 
+    */
+   public int getFilterIndex()
+   {
+      return this.filterIndex;
+   }
 
    /**
     * @return Returns the addButtonLabel.

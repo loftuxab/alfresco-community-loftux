@@ -71,7 +71,7 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle"><h:outputText value="#{msg.remove_user}" /> '<h:outputText value="#{UserMembersBean.person.properties.userName}" />'</div>
+                              <div class="mainTitle"><h:outputText value="#{msg.remove_user}" /> '<h:outputText value="#{UserMembersBean.personName}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.remove_invited_user_info}" /></div>
                            </td>
                         </tr>
@@ -101,7 +101,7 @@
                                  <tr>
                                     <td class="mainSubTitle">
                                        <h:outputFormat value="#{msg.remove_invited_user_confirm}">
-                                          <f:param value="#{UserMembersBean.person.properties.userName}"/>
+                                          <f:param value="#{UserMembersBean.personName}"/>
                                        </h:outputFormat>
                                     </td>
                                  </tr>

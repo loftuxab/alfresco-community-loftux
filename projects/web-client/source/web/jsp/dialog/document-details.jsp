@@ -82,26 +82,28 @@
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" />
                               
                               <%-- checkin, checkout and undo checkout --%>
-                              <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
+                              <r:permissionEvaluator value="#{r}" allow="CheckOut">
                                  <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
                                     <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" padding="4"
                                                   actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
                                        <f:param name="id" value="#{DocumentDetailsBean.id}" />
                                     </a:actionLink>
                                  </a:booleanEvaluator>
-                                 <a:booleanEvaluator value="#{DocumentDetailsBean.owner == true}">
-                                    <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" padding="4"
-                                                  actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
-                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                    </a:actionLink>
-                                 </a:booleanEvaluator>
-                                 <a:booleanEvaluator value="#{DocumentDetailsBean.owner == true}">
-                                    <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" padding="4" 
-                                                  actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
-                                       <f:param name="id" value="#{DocumentDetailsBean.id}" />
-                                    </a:actionLink>
-                                 </a:booleanEvaluator>
                               </r:permissionEvaluator>
+                              
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.document.properties.checkIn == true}">
+                                 <a:actionLink value="#{msg.checkin}" image="/images/icons/CheckIn_icon.gif" padding="4"
+                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkinFile">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
+                              
+                              <a:booleanEvaluator value="#{DocumentDetailsBean.document.properties.cancelCheckOut == true}">
+                                 <a:actionLink value="#{msg.undocheckout}" image="/images/icons/undo_checkout.gif" padding="4" 
+                                               actionListener="#{CheckinCheckoutBean.setupContentAction}" action="undoCheckoutFile">
+                                    <f:param name="id" value="#{DocumentDetailsBean.id}" />
+                                 </a:actionLink>
+                              </a:booleanEvaluator>
                               
                               <%-- approve and reject --%>
                               <a:booleanEvaluator value="#{DocumentDetailsBean.approveStepName != null && DocumentDetailsBean.workingCopy == false && DocumentDetailsBean.locked == false}">
