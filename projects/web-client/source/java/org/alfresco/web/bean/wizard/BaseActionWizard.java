@@ -546,11 +546,11 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                this.encodings = new ArrayList<SelectItem>();
                for (ConfigElement child : encodingsCfg.getChildren())
                {
-                  String id = child.getAttribute("id");
+                  String id = child.getAttribute("name");
                   
                   // look for a client localized string
                   String label = null;
-                  String msgId = child.getAttribute("descriptionMsgId");
+                  String msgId = child.getAttribute("displayLabelId");
                   if (msgId != null)
                   {
                      label = Application.getMessage(context, msgId);
@@ -559,7 +559,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                   // if there wasn't an externalized string look for one in the config
                   if (label == null)
                   {
-                     label = child.getAttribute("description");
+                     label = child.getAttribute("displayLabel");
                   }
                   
                   this.encodings.add(new SelectItem(id, label));
@@ -605,11 +605,11 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                this.transformers = new ArrayList<SelectItem>();
                for (ConfigElement child : transformersCfg.getChildren())
                {
-                  String id = child.getAttribute("id");
+                  String id = child.getAttribute("name");
                   
                   // look for a client localized string
                   String label = null;
-                  String msgId = child.getAttribute("descriptionMsgId");
+                  String msgId = child.getAttribute("displayLabelId");
                   if (msgId != null)
                   {
                      label = Application.getMessage(context, msgId);
@@ -618,7 +618,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                   // if there wasn't an externalized string look for one in the config
                   if (label == null)
                   {
-                     label = child.getAttribute("description");
+                     label = child.getAttribute("displayLabel");
                   }
 
                   // if there wasn't a client based label get it from the mime type service
@@ -670,11 +670,11 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                this.imageTransformers = new ArrayList<SelectItem>();
                for (ConfigElement child : transformersCfg.getChildren())
                {
-                  String id = child.getAttribute("id");
+                  String id = child.getAttribute("name");
                   
                   // look for a client localized string
                   String label = null;
-                  String msgId = child.getAttribute("descriptionMsgId");
+                  String msgId = child.getAttribute("displayLabelId");
                   if (msgId != null)
                   {
                      label = Application.getMessage(context, msgId);
@@ -683,7 +683,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                   // if there wasn't an externalized string look for one in the config
                   if (label == null)
                   {
-                     label = child.getAttribute("description");
+                     label = child.getAttribute("displayLabel");
                   }
 
                   // if there wasn't a client based label get it from the mime type service
@@ -734,11 +734,11 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                this.aspects = new ArrayList<SelectItem>();
                for (ConfigElement child : aspectsCfg.getChildren())
                {
-                  QName idQName = Repository.resolveToQName(child.getAttribute("id"));
+                  QName idQName = Repository.resolveToQName(child.getAttribute("name"));
 
                   // look for a client localized string
                   String label = null;
-                  String msgId = child.getAttribute("descriptionMsgId");
+                  String msgId = child.getAttribute("displayLabelId");
                   if (msgId != null)
                   {
                      label = Application.getMessage(context, msgId);
@@ -747,7 +747,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                   // if there wasn't an externalized string look for one in the config
                   if (label == null)
                   {
-                     label = child.getAttribute("description");
+                     label = child.getAttribute("displayLabel");
                   }
 
                   // if there wasn't a client based label try and get it from the dictionary

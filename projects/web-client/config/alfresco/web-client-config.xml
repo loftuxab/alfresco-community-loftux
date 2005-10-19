@@ -143,42 +143,42 @@
    
    <config evaluator="string-compare" condition="Action Wizards">
       <types>
-         <type id="folder" descriptionMsgId="space"/>
-         <type id="content"/>
+         <type name="folder" displayLabelId="space"/>
+         <type name="content"/>
       </types>
       <aspects>
-         <aspect id="generalclassifiable"/>
-         <aspect id="complianceable"/>
-         <aspect id="dublincore"/>
-         <aspect id="effectivity"/>
-         <aspect id="summarizable"/>
-         <aspect id="versionable"/>
-         <aspect id="templatable"/>
-         <aspect id="translatable"/>
-         <aspect id="localizable"/>
+         <aspect name="generalclassifiable"/>
+         <aspect name="complianceable"/>
+         <aspect name="dublincore"/>
+         <aspect name="effectivity"/>
+         <aspect name="summarizable"/>
+         <aspect name="versionable"/>
+         <aspect name="templatable"/>
+         <aspect name="translatable"/>
+         <aspect name="localizable"/>
       </aspects>
       <transformers>
-         <transformer id="text/html"/>
-         <transformer id="application/pdf"/>
-         <transformer id="text/plain"/>
-         <transformer id="text/xml"/>
-         <transformer id="application/x-shockwave-flash"/>
-         <transformer id="image/gif"/>
-         <transformer id="image/jpeg"/>
+         <transformer name="text/html"/>
+         <transformer name="application/pdf"/>
+         <transformer name="text/plain"/>
+         <transformer name="text/xml"/>
+         <transformer name="application/x-shockwave-flash"/>
+         <transformer name="image/gif"/>
+         <transformer name="image/jpeg"/>
       </transformers>
       <image-transformers>
-         <transformer id="image/gif"/>
-         <transformer id="image/jpeg"/>
-         <transformer id="image/png"/>
+         <transformer name="image/gif"/>
+         <transformer name="image/jpeg"/>
+         <transformer name="image/png"/>
       </image-transformers>
       <encodings>
-         <encoding id="UTF-8" descriptionMsgId="encoding_utf8"/>
+         <encoding name="UTF-8" displayLabelId="encoding_utf8"/>
       </encodings>
    </config>
    
    <config evaluator="string-compare" condition="Custom Content Types">
       <content-types>
-         <!-- <type id="my:content-type"/> -->
+         <!-- <type name="my:content-type"/> -->
       </content-types>
    </config>
    

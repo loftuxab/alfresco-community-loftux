@@ -932,11 +932,11 @@ public class NewRuleWizard extends BaseActionWizard
                this.modelTypes = new ArrayList<SelectItem>();
                for (ConfigElement child : typesCfg.getChildren())
                {
-                  QName idQName = Repository.resolveToQName(child.getAttribute("id"));
+                  QName idQName = Repository.resolveToQName(child.getAttribute("name"));
 
                   // look for a client localized string
                   String label = null;
-                  String msgId = child.getAttribute("descriptionMsgId");
+                  String msgId = child.getAttribute("displayLabelId");
                   if (msgId != null)
                   {
                      label = Application.getMessage(context, msgId);
@@ -945,7 +945,7 @@ public class NewRuleWizard extends BaseActionWizard
                   // if there wasn't an externalized string look for one in the config
                   if (label == null)
                   {
-                     label = child.getAttribute("description");
+                     label = child.getAttribute("displayLabel");
                   }
 
                   // if there wasn't a client based label try and get it from the dictionary
