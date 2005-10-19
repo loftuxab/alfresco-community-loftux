@@ -1355,11 +1355,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             if (reader != null && reader.exists())
                             {
                                 boolean readerReady = true;
-                                // transform if necessary (it is not a text document)
-                                if (!reader.getMimetype().equals(MimetypeMap.MIMETYPE_TEXT_PLAIN))
+                                // transform if necessary (it is not a UTF-8 text document)
+                                if (!reader.getMimetype().equals(MimetypeMap.MIMETYPE_TEXT_PLAIN) ||
+                                    !reader.getEncoding().equals("UTF-8"))
                                 {
                                     ContentWriter writer = contentService.getTempWriter();
                                     writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                                    writer.setEncoding("UTF-8");   // this is what the analyzers expect on the stream
                                     try
                                     {
                                         contentService.transform(reader, writer);
