@@ -55,7 +55,7 @@ public class PerformanceNodeServiceTest extends TestCase
     public static final QName  PROP_QNAME_NAME = QName.createQName(NAMESPACE, "name");
     public static final QName  ASSOC_QNAME_CHILDREN = QName.createQName(NAMESPACE, "child");
     
-    private int flushCount = 40000;
+    private int flushCount = Integer.MAX_VALUE;
     
     private int testDepth = 3;
     private int testChildCount = 5;
@@ -243,6 +243,7 @@ public class PerformanceNodeServiceTest extends TestCase
             test.setUp();
             test.testChildCount = 5;
             test.testDepth = 6;
+            test.flushCount = 1000;
             
             test.testPerformanceNodeService();
             
@@ -251,6 +252,8 @@ public class PerformanceNodeServiceTest extends TestCase
         catch (Throwable e)
         {
             e.printStackTrace();
+            System.exit(1);
         }
+        System.exit(0);
     }
 }

@@ -9,6 +9,9 @@
 		<property name="nodeService">
 			<ref bean="NodeService"/>
 		</property>		
+		<property name="runtimeNodeService">
+			<ref bean="nodeService"/>
+		</property>		
 	    <property name="actionService">
 		    <ref bean="ActionService"/>
 	    </property>	

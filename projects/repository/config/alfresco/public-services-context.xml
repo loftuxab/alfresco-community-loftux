@@ -139,8 +139,13 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.repository.NodeService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="exist*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="has*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
         </property>
     </bean>
 

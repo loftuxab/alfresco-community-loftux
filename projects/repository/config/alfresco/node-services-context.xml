@@ -8,9 +8,6 @@
       <property name="sessionFactory">
          <ref bean="sessionFactory" />
       </property>
-      <property name="maxEntityCount" >
-         <value>5000</value>     <!-- entity count above which the session will clear on flush() -->
-      </property>
    </bean>
    
    <bean id="dbNodeDaoServiceTxnRegistration" class="org.alfresco.repo.transaction.NodeDaoServiceTransactionInterceptor" >

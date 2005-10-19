@@ -35,6 +35,7 @@ import javax.transaction.Status;
 import javax.transaction.xa.XAResource;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.impl.lucene.fts.FTSIndexerAware;
@@ -1353,28 +1354,47 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             ContentReader reader = contentService.getReader(nodeRef, propertyName);
                             if (reader != null && reader.exists())
                             {
-                                ContentWriter writer = contentService.getTempWriter();
-                                writer.setMimetype("text/plain");
-                                try
+                                boolean readerReady = true;
+                                // transform if necessary (it is not a text document)
+                                if (!reader.getMimetype().equals(MimetypeMap.MIMETYPE_TEXT_PLAIN))
                                 {
-                                    contentService.transform(reader, writer);
-                                    doc.add(Field.Text("TEXT", new InputStreamReader(writer.getReader().getContentInputStream())));
-                                }
-                                catch (NoTransformerException e)
-                                {
-                                    // not indexed: no transformation
-                                    doc.add(Field.Text("TEXT", NOT_INDEXED_NO_TRANSFORMATION));
-                                }
-                                catch (ContentIOException e)
-                                {
-                                    // log it
-                                    if (s_logger.isDebugEnabled())
+                                    ContentWriter writer = contentService.getTempWriter();
+                                    writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                                    try
                                     {
-                                        s_logger.debug("Not indexed: Transformation failed", e);
-                                        s_logger.debug("");
+                                        contentService.transform(reader, writer);
+                                        // point the reader to the new-written content
+                                        reader = writer.getReader();
                                     }
-                                    // not indexed: transformation failed
-                                    doc.add(Field.Text("TEXT", NOT_INDEXED_TRANSFORMATION_FAILED));
+                                    catch (NoTransformerException e)
+                                    {
+                                        // log it
+                                        if (s_logger.isDebugEnabled())
+                                        {
+                                            s_logger.debug("Not indexed: No transformation", e);
+                                        }
+                                        // don't index from the reader
+                                        readerReady = false;
+                                        // not indexed: no transformation
+                                        doc.add(Field.Text("TEXT", NOT_INDEXED_NO_TRANSFORMATION));
+                                    }
+                                    catch (ContentIOException e)
+                                    {
+                                        // log it
+                                        if (s_logger.isDebugEnabled())
+                                        {
+                                            s_logger.debug("Not indexed: Transformation failed", e);
+                                        }
+                                        // don't index from the reader
+                                        readerReady = false;
+                                        // not indexed: transformation failed
+                                        doc.add(Field.Text("TEXT", NOT_INDEXED_TRANSFORMATION_FAILED));
+                                    }
+                                }
+                                // add the text field using the stream from the reader, but only if the reader is valid
+                                if (readerReady)
+                                {
+                                    doc.add(Field.Text("TEXT", new InputStreamReader(reader.getContentInputStream())));
                                 }
                             }
                             else        // URL not present (null reader) or no content at the URL (file missing)

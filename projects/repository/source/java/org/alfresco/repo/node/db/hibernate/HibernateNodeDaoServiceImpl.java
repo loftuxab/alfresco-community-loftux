@@ -42,7 +42,6 @@ import org.alfresco.util.GUID;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.stat.SessionStatistics;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -63,8 +62,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     
     /** a uuid identifying this unique instance */
     private String uuid;
-    /** maximum number of entities to keep in a session (L1 cache) */
-    private int maxEntityCount;
 
     /**
      * 
@@ -72,16 +69,6 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     public HibernateNodeDaoServiceImpl()
     {
         this.uuid = GUID.generate();
-        this.maxEntityCount = 5000; 
-    }
-
-    /**
-     * @param maxEntityCount the approximate maximum number of entities
-     *      to allow in the L1 cache (session)
-     */
-    public void setMaxEntityCount(int maxEntityCount)
-    {
-        this.maxEntityCount = maxEntityCount;
     }
 
     /**
@@ -110,7 +97,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     }
 
     /**
-     * Flushes the Hibernate session and, depending on the size, clears the session.
+     * Flushes the Hibernate session.
      */
     public void flush()
     {
@@ -119,15 +106,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         {
             public Object doInHibernate(Session session)
             {
-                SessionStatistics stats = session.getStatistics();
-                // have we exceeded the maximum entity count
-                int entityCount = stats.getEntityCount();
-                if (entityCount > maxEntityCount)
-                {
-                    // too many entities - flush and clear
-                    session.flush();
-                    session.clear();
-                }
+                session.flush();
                 // done
                 return null;
             }

@@ -75,9 +75,14 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     private static Log logger = LogFactory.getLog(RuleServiceImpl.class); 
     
     /**
-     * The node service
+     * The permission-safe node service
      */
     private NodeService nodeService;
+    
+    /**
+     * The runtime node service (ignores permissions)
+     */
+    private NodeService runtimeNodeService;
     
     /**
      * The action service
@@ -127,13 +132,23 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	private TransactionListener ruleTransactionListener = new RuleTransactionListener(this);      
     
     /**
-     * Set the node service 
+     * Set the permission-safe node service 
      * 
-     * @param nodeService   the node service
+     * @param nodeService   the permission-safe node service
      */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+    
+    /**
+     * Set the direct node service 
+     * 
+     * @param nodeService   the node service
+     */
+    public void setRuntimeNodeService(NodeService runtimeNodeService)
+    {
+        this.runtimeNodeService = runtimeNodeService;
     }
     
     /**
@@ -196,7 +211,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	{
         NodeRef result = null;
         
-		List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
+		List<ChildAssociationRef> assocs = this.runtimeNodeService.getChildAssocs(
                 nodeRef,
                 RegexQNamePattern.MATCH_ALL,
                 RuleModel.ASSOC_RULE_FOLDER);
@@ -301,7 +316,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
     {
     	List<Rule> rules = new ArrayList<Rule>();
     	
-    	if (this.nodeService.exists(nodeRef) == true && checkNodeType(nodeRef) == true)
+    	if (this.runtimeNodeService.exists(nodeRef) == true && checkNodeType(nodeRef) == true)
     	{
     		if (includeInherited == true)
     		{
@@ -316,7 +331,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 				}
     		}
     		
-    		if (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
+    		if (this.runtimeNodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
     		{
                 NodeRef ruleFolder = getSavedRuleFolderRef(nodeRef);
                 if (ruleFolder != null)
@@ -328,7 +343,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
         				
     		    		// Get the rules for this node
     		    		List<ChildAssociationRef> ruleChildAssocRefs = 
-    		    			this.nodeService.getChildAssocs(ruleFolder, RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
+    		    			this.runtimeNodeService.getChildAssocs(ruleFolder, RegexQNamePattern.MATCH_ALL, ASSOC_NAME_RULES);
     		    		for (ChildAssociationRef ruleChildAssocRef : ruleChildAssocRefs)
     					{
     		    			// Create the rule and add to the list
@@ -410,7 +425,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 			if (allInheritedRules == null)
 			{
 				allInheritedRules = new ArrayList<Rule>();
-				List<ChildAssociationRef> parents = this.nodeService.getParentAssocs(nodeRef);
+				List<ChildAssociationRef> parents = this.runtimeNodeService.getParentAssocs(nodeRef);
 				for (ChildAssociationRef parent : parents)
 				{
 					List<Rule> rules = getRules(parent.getParentRef(), false);
@@ -464,7 +479,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	{
 		Rule rule = null;
 		
-		if (this.nodeService.exists(nodeRef) == true)
+		if (this.runtimeNodeService.exists(nodeRef) == true)
 		{
 			NodeRef ruleNodeRef = getRuleNodeRefFromId(nodeRef, ruleId);
 			if (ruleNodeRef != null)
@@ -486,7 +501,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
 	private NodeRef getRuleNodeRefFromId(NodeRef nodeRef, String ruleId)
 	{
 		NodeRef result = null;
-		if (this.nodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
+		if (this.runtimeNodeService.hasAspect(nodeRef, RuleModel.ASPECT_RULES) == true)
 		{
             NodeRef ruleFolder = getSavedRuleFolderRef(nodeRef);
             if (ruleFolder != null)
