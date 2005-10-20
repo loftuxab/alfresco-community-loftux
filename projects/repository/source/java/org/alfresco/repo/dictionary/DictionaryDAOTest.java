@@ -71,11 +71,14 @@ public class DictionaryDAOTest extends TestCase
         
         DictionaryBootstrap bootstrap = new DictionaryBootstrap();
         List<String> bootstrapModels = new ArrayList<String>();
+        
         bootstrapModels.add("alfresco/model/dictionaryModel.xml");
         bootstrapModels.add("alfresco/model/systemModel.xml");
         bootstrapModels.add("alfresco/model/contentModel.xml");
         bootstrapModels.add("alfresco/model/applicationModel.xml");
 
+        bootstrapModels.add("alfresco/extension/exampleModel.xml");
+        
         bootstrapModels.add("org/alfresco/repo/security/authentication/userModel.xml");
         bootstrapModels.add("org/alfresco/repo/action/actionModel.xml");
         bootstrapModels.add("org/alfresco/repo/rule/ruleModel.xml");
