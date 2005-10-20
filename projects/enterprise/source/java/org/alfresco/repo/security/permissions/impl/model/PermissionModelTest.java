@@ -57,6 +57,6 @@ public class PermissionModelTest extends AbstractPermissionTest
     public void testGlobalPermissions()
     {
         Set<? extends PermissionEntry> globalPermissions = permissionModelDAO.getGlobalPermissionEntries();
-        assertEquals(2, globalPermissions.size());
+        assertEquals(5, globalPermissions.size());
     }
 }
