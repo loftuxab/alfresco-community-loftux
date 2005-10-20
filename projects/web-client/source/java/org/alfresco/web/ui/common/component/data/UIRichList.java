@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
@@ -176,6 +177,16 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public void setViewMode(String viewMode)
    {
       this.viewMode = viewMode;
+   }
+   
+   /**
+    * Return the UI Component to be used as the "no items available" message
+    * 
+    * @return UIComponent
+    */
+   public UIComponent getEmptyMessage()
+   {
+      return getFacet("empty");
    }
    
    

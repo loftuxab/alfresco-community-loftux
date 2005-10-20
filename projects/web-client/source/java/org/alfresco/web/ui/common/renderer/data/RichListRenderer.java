@@ -101,10 +101,24 @@ public class RichListRenderer extends BaseRenderer
          renderer.renderListBefore(context, richList, columns);
          out.write("</thead>");
          out.write("<tbody>");
-         while (richList.isDataAvailable() == true)
+         if (richList.isDataAvailable() == true)
          {
-            // render each row in turn
-            renderer.renderListRow(context, richList, columns, richList.nextRow());
+            while (richList.isDataAvailable() == true)
+            {
+               // render each row in turn
+               renderer.renderListRow(context, richList, columns, richList.nextRow());
+            }
+         }
+         else
+         {
+            // if no items present, render the facet with the "no items found" message
+            UIComponent emptyComponent = richList.getEmptyMessage();
+            if (emptyComponent != null)
+            {
+               emptyComponent.encodeBegin(context);
+               emptyComponent.encodeChildren(context);
+               emptyComponent.encodeEnd(context);
+            }
          }
          // call render-after to output footers if required
          renderer.renderListAfter(context, richList, columns);

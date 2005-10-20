@@ -181,30 +181,6 @@
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width=4 height=9></td>
                </tr>
                
-               <%-- Toolbar --%>
-               <%-- NOTE: removed toolbar until multi-select implemented
-               <tr style="padding-top:4px">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-                  <td>
-                     <table cellspacing=0 cellpadding=4>
-                        <tr>
-                           <td>
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
-                                 <table cellspacing=0 cellpadding=0><tr>
-                                    <td><a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
-                                    <td><a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
-                                    <td><a:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
-                                    <td><a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" /></td>
-                                 </tr></table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
-                           </td>
-                        </tr>
-                     </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
-               </tr>
-               --%>
-               
                <%-- Details - Spaces --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
@@ -217,6 +193,14 @@
                      <a:richList id="spacesList" binding="#{BrowseBean.spacesRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
                            styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
                            value="#{BrowseBean.nodes}" var="r">
+                        
+                        <%-- component to display if the list is empty --%>
+                        <f:facet name="empty">
+                           <%-- TODO: either build complete message in BrowseBean or have no icon... --%>
+                           <h:outputFormat value="#{msg.no_space_items}" escape="false">
+                              <f:param value="#{msg.new_space}" />
+                           </h:outputFormat>
+                        </f:facet>
                         
                         <%-- Primary column for details view mode --%>
                         <a:column primary="true" width="200" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
@@ -349,6 +333,15 @@
                      <a:richList id="contentRichList" binding="#{BrowseBean.contentRichList}" viewMode="#{BrowseBean.browseViewMode}" pageSize="#{BrowseBean.browsePageSize}"
                            styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
                            value="#{BrowseBean.content}" var="r">
+                        
+                        <%-- component to display if the list is empty --%>
+                        <f:facet name="empty">
+                           <%-- TODO: either build complete message in BrowseBean or have no icon... --%>
+                           <h:outputFormat value="#{msg.no_content_items}" escape="false">
+                              <f:param value="#{msg.add_content}" />
+                              <f:param value="#{msg.create_content}" />
+                           </h:outputFormat>
+                        </f:facet>
                         
                         <%-- Primary column for details view mode --%>
                         <a:column primary="true" width="200" style="padding:2px;text-align:left" rendered="#{BrowseBean.browseViewMode == 'details'}">
