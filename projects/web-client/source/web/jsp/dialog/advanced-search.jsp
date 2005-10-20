@@ -33,6 +33,19 @@
    function pageLoaded()
    {
       document.getElementById("advsearch:search-text").focus();
+      checkButtonState();
+   }
+   
+   function checkButtonState()
+   {
+      if (document.getElementById("advsearch:search-text").value.length == 0 )
+      {
+         document.getElementById("advsearch:search-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("advsearch:search-button").disabled = false;
+      }
    }
    
 </script>
@@ -117,7 +130,11 @@
                               <table cellpadding="2" cellspacing="2" border="0" valign="top">
                                  
                                  <tr>
-                                    <td colspan=3><h:outputText value="#{msg.look_for}" />:&nbsp;<h:inputText id="search-text" value="#{AdvancedSearchBean.text}" size="42" maxlength="1024" />&nbsp;*</td>
+                                    <td colspan=3>
+                                       <h:outputText value="#{msg.look_for}" />:&nbsp;
+                                       <h:inputText id="search-text" value="#{AdvancedSearchBean.text}" size="42" maxlength="1024"
+                                             onkeyup="javascript:checkButtonState();" onchange="javascript:checkButtonState();" />&nbsp;*
+                                    </td>
                                  </tr>
                                  
                                  <tr>
@@ -238,7 +255,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.search}" action="#{AdvancedSearchBean.search}" styleClass="wizardButton" />
+                                       <h:commandButton id="search-button" value="#{msg.search}" action="#{AdvancedSearchBean.search}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>

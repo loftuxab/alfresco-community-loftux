@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.alfresco.repo.search.impl.lucene.QueryParser;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Repository;
@@ -80,7 +81,7 @@ public final class SearchContext implements Serializable
       
       // match against content text
       String text = this.text.trim();
-      String safeText = Utils.remove(text, "\"");
+      String safeText = QueryParser.escape(text);
       String fullTextQuery;
       String nameAttrQuery;
       if (text.equals("*") == true)
@@ -114,7 +115,7 @@ public final class SearchContext implements Serializable
             nameAttrBuf.append('(');
             while (t.hasMoreTokens())
             {
-               String term = t.nextToken();
+               String term = QueryParser.escape(t.nextToken());
                
                fullTextBuf.append("TEXT:").append(term).append('*');
                nameAttrBuf.append("@").append(nameAttr).append(":").append(term).append('*');
@@ -161,7 +162,7 @@ public final class SearchContext implements Serializable
          for (QName qname : additionalAttributes.keySet())
          {
             String escapedName = Repository.escapeQName(qname);
-            String value = Utils.remove(additionalAttributes.get(qname), "\"");
+            String value = QueryParser.escape(additionalAttributes.get(qname));
             attributeQuery.append(" +@").append(escapedName)
                           .append(":").append(value);
          }
