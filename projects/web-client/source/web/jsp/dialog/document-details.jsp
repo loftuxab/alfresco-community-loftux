@@ -82,7 +82,7 @@
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" />
                               
                               <%-- checkin, checkout and undo checkout --%>
-                              <r:permissionEvaluator value="#{r}" allow="CheckOut">
+                              <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="CheckOut">
                                  <a:booleanEvaluator value="#{DocumentDetailsBean.locked == false && DocumentDetailsBean.workingCopy == false}">
                                     <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" padding="4"
                                                   actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">

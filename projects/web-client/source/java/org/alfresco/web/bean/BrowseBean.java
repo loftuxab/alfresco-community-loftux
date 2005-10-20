@@ -949,6 +949,8 @@ public class BrowseBean implements IContextListener
             node.addPropertyResolver("fileType32", this.resolverFileType32);
             node.addPropertyResolver("mimetype", this.resolverMimetype);
             node.addPropertyResolver("size", this.resolverSize);
+            node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
+            node.addPropertyResolver("checkIn", this.resolverCheckIn);
             
             // get hold of the DocumentDetailsBean and reset it
             DocumentDetailsBean docDetails = (DocumentDetailsBean)FacesContext.getCurrentInstance().
