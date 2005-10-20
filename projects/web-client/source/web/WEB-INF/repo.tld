@@ -231,6 +231,12 @@
       </attribute>
       
       <attribute>
+         <name>noSelectedItemsMsg</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
          <name>id</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
@@ -340,6 +346,12 @@
       
       <attribute>
          <name>selectedItemsMsg</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>noSelectedItemsMsg</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>
@@ -1238,6 +1250,12 @@
       
       <attribute>
          <name>selectedItemsMsg</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>noSelectedItemsMsg</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>

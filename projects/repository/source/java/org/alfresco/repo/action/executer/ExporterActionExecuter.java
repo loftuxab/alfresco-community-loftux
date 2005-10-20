@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.Location;
@@ -221,11 +222,20 @@ public class ExporterActionExecuter extends ActionExecuterAbstractBase
         
         // build a description string to be set on the node representing the content package
         String desc = "";
-        String spaceName = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-        String pattern = I18NUtil.getMessage("export.package.description");
-        if (pattern != null && spaceName != null)
+        String storeRef = (String)ruleAction.getParameterValue(PARAM_STORE);
+        NodeRef rootNode = this.nodeService.getRootNode(new StoreRef(storeRef));
+        if (rootNode.equals(actionedUponNodeRef))
         {
-           desc = MessageFormat.format(pattern, spaceName);
+           desc = I18NUtil.getMessage("export.root.package.description");
+        }
+        else
+        {
+           String spaceName = (String)this.nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
+           String pattern = I18NUtil.getMessage("export.package.description");
+           if (pattern != null && spaceName != null)
+           {
+              desc = MessageFormat.format(pattern, spaceName);
+           }
         }
         
         // apply the titled aspect to behave in the web client

@@ -74,6 +74,7 @@ public abstract class BaseAssociationEditor extends UIInput
    /** I18N message strings */
    private final static String MSG_ADD_TO_LIST_BUTTON = "add_to_list_button";
    private final static String MSG_SELECT_BUTTON = "select_button";
+   private static final String MSG_NO_SELECTED_ITEMS = "no_selected_items";
    private final static String MSG_SEARCH_SELECT_ITEMS = "search_select_items";
    private final static String MSG_SEARCH_SELECT_ITEM = "search_select_item";
    private final static String MSG_SELECTED_ITEMS = "selected_items";
@@ -82,7 +83,6 @@ public abstract class BaseAssociationEditor extends UIInput
    private final static String MSG_OK = "ok";
    private final static String MSG_CANCEL = "cancel";
    private final static String MSG_SEARCH = "search";
-   private final static String MSG_NONE = "none";
    private final static String MSG_CHANGE = "change";
    
    protected String associationName;
@@ -90,6 +90,7 @@ public abstract class BaseAssociationEditor extends UIInput
    protected String selectItemMsg;
    protected String selectItemsMsg;
    protected String selectedItemsMsg;
+   protected String noSelectedItemsMsg;
    protected Boolean disabled;
    
    protected boolean showAvailable = false;
@@ -102,8 +103,8 @@ public abstract class BaseAssociationEditor extends UIInput
    /** List containing the currently available options */
    protected List<NodeRef> availableOptions;
    
-   /** */
    protected String changingAssociation;
+   protected boolean highlightedRow;
    
    // ------------------------------------------------------------------------------
    // Component implementation
@@ -268,6 +269,9 @@ public abstract class BaseAssociationEditor extends UIInput
          return;
       }
       
+      // reset the highlighted row flag
+      this.highlightedRow = false;
+      
       ResponseWriter out = context.getResponseWriter();
       String clientId = getClientId(context);
 
@@ -323,12 +327,17 @@ public abstract class BaseAssociationEditor extends UIInput
                // add some padding
                out.write("<tr><td height='6'></td></tr>");
                
-               out.write("<tr><td colspan='2'>");
-               out.write(getSelectedItemsMsg());
-               out.write(":</td></tr>");
+//               out.write("<tr><td colspan='2'>");
+//               out.write(getSelectedItemsMsg());
+//               out.write(":</td></tr>");
                
                // show all the current associations
+               out.write("<tr><td colspan='2'><table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>");
+               out.write("<tr><td colspan='2' class='selectedItemsHeader'>");
+               out.write(Application.getMessage(context, "name"));
+               out.write("</td></tr>");
                renderExistingAssociations(context, out, nodeService, allowMany);
+               out.write("</table></td></tr>");
             }
             else
             {
@@ -369,7 +378,7 @@ public abstract class BaseAssociationEditor extends UIInput
                   }
                   else
                   {
-                     // show all the current associations
+                     // show the current association
                      renderExistingAssociations(context, out, nodeService, allowMany);
                   }
                }
@@ -473,6 +482,38 @@ public abstract class BaseAssociationEditor extends UIInput
    public void setAvailableOptionsSize(String availableOptionsSize)
    {
       this.availableOptionsSize = availableOptionsSize;
+   }
+   
+   /**
+    * Returns the message to display when no items have been selected, if one hasn't been
+    * set it defaults to the message in the bundle under key 'no_selected_items'.
+    * 
+    * @return The message
+    */
+   public String getNoSelectedItemsMsg()
+   {
+      ValueBinding vb = getValueBinding("noSelectedItemsMsg");
+      if (vb != null)
+      {
+         this.noSelectedItemsMsg = (String)vb.getValue(getFacesContext());
+      }
+      
+      if (this.noSelectedItemsMsg == null)
+      {
+         this.noSelectedItemsMsg = Application.getMessage(getFacesContext(), MSG_NO_SELECTED_ITEMS);
+      }
+      
+      return this.noSelectedItemsMsg;
+   }
+
+   /**
+    * Sets the no selected items message to display in the UI
+    * 
+    * @param noSelectedItemsMsg The message
+    */
+   public void setNoSelectedItemsMsg(String noSelectedItemsMsg)
+   {
+      this.noSelectedItemsMsg = noSelectedItemsMsg;
    }
    
    /**
@@ -630,16 +671,30 @@ public abstract class BaseAssociationEditor extends UIInput
    protected void renderExistingAssociation(FacesContext context, ResponseWriter out, NodeService nodeService,
          NodeRef targetRef, boolean allowMany) throws IOException
    {
-      out.write("<tr><td>");
+      out.write("<tr><td class='");
+      if (this.highlightedRow)
+      {
+         out.write("selectedItemsRowAlt");
+      }
+      else
+      {
+         out.write("selectedItemsRow");
+      }
+      out.write("'>");
 
       out.write(Repository.getDisplayPath(nodeService.getPath(targetRef)));
       out.write("/");
       out.write(Repository.getNameForNode(nodeService, targetRef));
-      if (allowMany == false)
+      out.write("</td><td class='");
+      if (this.highlightedRow)
       {
-         out.write("</a>");
+         out.write("selectedItemsRowAlt");
       }
-      out.write("</td><td><a href='#' title='");
+      else
+      {
+         out.write("selectedItemsRow");
+      }
+      out.write("'><a href='#' title='");
       out.write(Application.getMessage(context, MSG_REMOVE));
       out.write("' onclick=\"");
       out.write(generateFormSubmit(context, ACTION_REMOVE + ACTION_SEPARATOR + targetRef.getId()));
@@ -659,6 +714,8 @@ public abstract class BaseAssociationEditor extends UIInput
       }
       
       out.write("</td></tr>");
+      
+      this.highlightedRow = !this.highlightedRow;
    }
    
    /**
@@ -689,9 +746,9 @@ public abstract class BaseAssociationEditor extends UIInput
     */
    protected void renderNone(FacesContext context, ResponseWriter out) throws IOException
    {
-      out.write("<tr><td>&lt;");
-      out.write(Application.getMessage(context, MSG_NONE));
-      out.write("&gt;</td></tr>");
+      out.write("<tr><td class='selectedItemsRow'>");
+      out.write(getNoSelectedItemsMsg());
+      out.write("</td></tr>");
    }
    
    /**
@@ -801,15 +858,15 @@ public abstract class BaseAssociationEditor extends UIInput
          {
             results = Repository.getServiceRegistry(context).getSearchService().query(
                   Repository.getStoreRef(), SearchService.LANGUAGE_LUCENE, query.toString());
+            this.availableOptions = results.getNodeRefs();
          }
          finally
          {
-             if (results != null)
-             {
-                 results.close();
-             }
+            if (results != null)
+            {
+               results.close();
+            }
          }
-         this.availableOptions = results.getNodeRefs();
          
          if (logger.isDebugEnabled())
             logger.debug("Found " + this.availableOptions.size() + " available options");

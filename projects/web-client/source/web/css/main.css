@@ -369,3 +369,26 @@ a.topToolbarLinkHighlight, a.topToolbarLinkHighlight:link, a.topToolbarLinkHighl
    border: 1px dashed #cccccc;
    padding: 4px;
 }
+
+.selectedItems
+{
+   border: 1px solid #DEE5EC;
+}
+
+.selectedItemsHeader
+{
+   padding: 4px;
+   background-color: #e9f0f4;
+   font-weight: bold;
+}
+
+.selectedItemsRow
+{
+   padding: 4px;
+}
+
+.selectedItemsRowAlt
+{
+   padding: 4px;
+   background-color: #e9f0f4;
+}

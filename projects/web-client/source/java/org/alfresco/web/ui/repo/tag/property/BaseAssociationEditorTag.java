@@ -32,6 +32,7 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
    private String selectItemMsg;
    private String selectItemsMsg;
    private String selectedItemsMsg;
+   private String noSelectedItemsMsg;
    private String disabled;
    
    /**
@@ -54,6 +55,7 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
       setStringProperty(component, "selectItemMsg", this.selectItemMsg);
       setStringProperty(component, "selectItemsMsg", this.selectItemsMsg);
       setStringProperty(component, "selectedItemsMsg", this.selectedItemsMsg);
+      setStringProperty(component, "noSelectedItemsMsg", this.noSelectedItemsMsg);
       setBooleanProperty(component, "disabled", this.disabled);
    }
    
@@ -74,6 +76,16 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
    public void setAvailableOptionsSize(String availableOptionsSize)
    {
       this.availableOptionsSize = availableOptionsSize;
+   }
+   
+   /**
+    * Sets the message to display for the no selected items
+    * 
+    * @param noSelectedItemsMsg The message
+    */
+   public void setNoSelectedItemsMsg(String noSelectedItemsMsg)
+   {
+      this.noSelectedItemsMsg = noSelectedItemsMsg;
    }
    
    /**
@@ -126,6 +138,7 @@ public abstract class BaseAssociationEditorTag extends BaseComponentTag
       this.selectItemMsg = null;
       this.selectItemsMsg = null;
       this.selectedItemsMsg = null;
+      this.noSelectedItemsMsg = null;
       this.disabled = null;
 
       super.release();

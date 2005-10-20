@@ -32,6 +32,7 @@ public class MultiValueListEditorTag extends HtmlComponentTag
    private String readOnly;
    private String selectItemMsg;
    private String selectedItemsMsg;
+   private String noSelectedItemsMsg;
    
    /**
     * @see javax.faces.webapp.UIComponentTag#getComponentType()
@@ -59,6 +60,7 @@ public class MultiValueListEditorTag extends HtmlComponentTag
       setStringBindingProperty(component, "lastItemAdded", this.lastItemAdded);
       setStringProperty(component, "selectItemMsg", this.selectItemMsg);
       setStringProperty(component, "selectedItemsMsg", this.selectedItemsMsg);
+      setStringProperty(component, "noSelectedItemsMsg", this.noSelectedItemsMsg);
       setBooleanProperty(component, "readOnly", this.readOnly);
    }
    
@@ -67,12 +69,14 @@ public class MultiValueListEditorTag extends HtmlComponentTag
     */
    public void release()
    {
-      super.release();
       this.value = null;
       this.lastItemAdded = null;
       this.readOnly = null;
       this.selectedItemsMsg = null;
       this.selectItemMsg = null;
+      this.noSelectedItemsMsg = null;
+      
+      super.release();
    }
 
    /**
@@ -103,6 +107,16 @@ public class MultiValueListEditorTag extends HtmlComponentTag
       this.readOnly = readOnly;
    }
 
+   /**
+    * Sets the message to display for the no selected items
+    * 
+    * @param noSelectedItemsMsg The message
+    */
+   public void setNoSelectedItemsMsg(String noSelectedItemsMsg)
+   {
+      this.noSelectedItemsMsg = noSelectedItemsMsg;
+   }
+   
    /**
     * Sets the message to display for the selected items
     * 

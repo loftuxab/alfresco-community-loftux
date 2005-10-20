@@ -99,11 +99,11 @@
                                  <tr><td colspan="2" class="paddingRow"></td></tr>
                                  <tr>
                                     <td><h:outputText value="#{msg.categories}" />:</td>
-                                    <td width="90%">
+                                    <td width="98%">
                                        <r:multiValueListEditor value="#{DocumentDetailsBean.categories}"
                                                                lastItemAdded="#{DocumentDetailsBean.addedCategory}" 
                                                                selectItemMsg="#{msg.select_category}"
-                                                               selectedItemsMsg="#{msg.selected_categories}"
+                                                               noSelectedItemsMsg="#{msg.no_selected_categories}"
                                                                styleClass="selector">
                                           <r:categorySelector label="#{msg.select_category_prompt}" styleClass="selector"
                                                               value="#{DocumentDetailsBean.addedCategory}"/>

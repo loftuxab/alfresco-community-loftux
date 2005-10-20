@@ -48,12 +48,9 @@ public class MultiValueListEditorRenderer extends BaseRenderer
    /** I18N message strings */
    private final static String MSG_REMOVE = "remove";
    private final static String MSG_SELECT_BUTTON = "select_button";
-   private final static String MSG_SELECT = "select_an_item";
    private final static String MSG_ADD_TO_LIST_BUTTON = "add_to_list_button";
-   private static final String MSG_SELECT_CATEGORY = "select_category";
-   private static final String MSG_SELECTED_CATEGORIES = "selected_categories";
-   private static final String MSG_NONE = "none";
    
+   private boolean highlightedRow;
    
    // ------------------------------------------------------------------------------
    // Renderer implemenation
@@ -104,6 +101,9 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          return;
       }
 
+      // reset the highlighted row flag
+      this.highlightedRow = false;
+      
       if (component instanceof UIMultiValueEditor)
       {
          ResponseWriter out = context.getResponseWriter();
@@ -112,7 +112,7 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          UIMultiValueEditor editor = (UIMultiValueEditor)component;
          
          // start outer table
-         out.write("<table border='0' cellspacing='4' cellpadding='4'");
+         out.write("<table border='0' cellspacing='4' cellpadding='4' class='selector'");
          this.outputAttribute(out, attrs.get("style"), "style");
          this.outputAttribute(out, attrs.get("styleClass"), "styleClass");
          out.write(">");
@@ -169,15 +169,19 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_ADD)));
          out.write("\"/></td></tr>");
          
-         out.write("<tr><td style='padding-top:8px'>");
-         out.write(editor.getSelectedItemsMsg());
-         out.write(":</td></tr>");
+//         out.write("<tr><td style='padding-top:8px'>");
+//         out.write(editor.getSelectedItemsMsg());
+//         out.write(":</td></tr>");
          
          // show the current items
+         out.write("<tr><td><table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>");
+         out.write("<tr><td colspan='2' class='selectedItemsHeader'>");
+         out.write(Application.getMessage(context, "name"));
+         out.write("</td></tr>");
+         
          List currentItems = (List)editor.getValue();
          if (currentItems != null && currentItems.size() > 0)
          {
-            out.write("<tr><td><table cellspacing='0' cellpadding='2' border='0'>");
             for (int x = 0; x < currentItems.size(); x++)
             {  
                Object obj = currentItems.get(x);
@@ -201,17 +205,16 @@ public class MultiValueListEditorRenderer extends BaseRenderer
                   }
                }
             }
-            out.write("</table></td></tr>");
          }
          else
          {
-            out.write("<tr><td>&lt;");
-            out.write(Application.getMessage(context, MSG_NONE));
-            out.write("&gt;</td></tr>");
+            out.write("<tr><td class='selectedItemsRow'>");
+            out.write(editor.getNoSelectedItemsMsg());
+            out.write("</td></tr>");
          }
          
-         // close table
-         out.write("</table>");
+         // close tables
+         out.write("</table></td></tr></table>");
       }
    }
 
@@ -229,7 +232,16 @@ public class MultiValueListEditorRenderer extends BaseRenderer
    protected void renderExistingItem(FacesContext context, UIComponent component, ResponseWriter out, 
          NodeService nodeService, int index, Object value) throws IOException
    {
-      out.write("<tr><td>");
+      out.write("<tr><td class='");
+      if (this.highlightedRow)
+      {
+         out.write("selectedItemsRowAlt");
+      }
+      else
+      {
+         out.write("selectedItemsRow");
+      }
+      out.write("'>");
       
       if (value instanceof NodeRef)
       {
@@ -241,13 +253,24 @@ public class MultiValueListEditorRenderer extends BaseRenderer
       }
 
       out.write("&nbsp;&nbsp;");
-      out.write("</td><td align='right' style='padding-left:8px'><a href='#' title='");
+      out.write("</td><td class='");
+      if (this.highlightedRow)
+      {
+         out.write("selectedItemsRowAlt");
+      }
+      else
+      {
+         out.write("selectedItemsRow");
+      }
+      out.write("'><a href='#' title='");
       out.write(Application.getMessage(context, MSG_REMOVE));
       out.write("' onclick=\"");
       out.write(generateFormSubmit(context, component, UIMultiValueEditor.ACTION_REMOVE + UIMultiValueEditor.ACTION_SEPARATOR + index));
       out.write("\"><img src='");
       out.write(context.getExternalContext().getRequestContextPath());
       out.write("/images/icons/delete.gif' border='0' width='13' height='16'/></a>");
+      
+      this.highlightedRow = !this.highlightedRow;
    }
 
    /**

@@ -45,8 +45,10 @@ import org.apache.commons.logging.LogFactory;
 public class UIMultiValueEditor extends UIInput
 {
    private static final Log logger = LogFactory.getLog(UIMultiValueEditor.class);
-   private static final String SELECTED_ITEMS_MSG = "selected_items";
-   private static final String SELECT_ITEM_MSG = "select_an_item";
+   private static final String MSG_SELECTED_ITEMS = "selected_items";
+   private static final String MSG_NO_SELECTED_ITEMS = "no_selected_items";
+   private static final String MSG_SELECT_ITEM = "select_an_item";
+   
    
    public final static String ACTION_SEPARATOR = ";";
    public final static int ACTION_NONE   = -1;
@@ -59,6 +61,7 @@ public class UIMultiValueEditor extends UIInput
    private Object lastItemAdded;
    private String selectItemMsg;
    private String selectedItemsMsg;
+   private String noSelectedItemsMsg;
    
    // ------------------------------------------------------------------------------
    // Component implementation
@@ -92,6 +95,7 @@ public class UIMultiValueEditor extends UIInput
       this.addingNewItem = (Boolean)values[3];
       this.selectItemMsg = (String)values[4];
       this.selectedItemsMsg = (String)values[5];
+      this.noSelectedItemsMsg = (String)values[6];
    }
    
    /**
@@ -99,7 +103,7 @@ public class UIMultiValueEditor extends UIInput
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[14];
+      Object values[] = new Object[7];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.lastItemAdded;
@@ -107,6 +111,7 @@ public class UIMultiValueEditor extends UIInput
       values[3] = this.addingNewItem;
       values[4] = this.selectItemMsg;
       values[5] = this.selectedItemsMsg;
+      values[6] = this.noSelectedItemsMsg;
       return (values);
    }
 
@@ -152,7 +157,7 @@ public class UIMultiValueEditor extends UIInput
       
       if (this.selectedItemsMsg == null)
       {
-         this.selectedItemsMsg = Application.getMessage(getFacesContext(), SELECTED_ITEMS_MSG);
+         this.selectedItemsMsg = Application.getMessage(getFacesContext(), MSG_SELECTED_ITEMS);
       }
       
       return this.selectedItemsMsg;
@@ -166,6 +171,38 @@ public class UIMultiValueEditor extends UIInput
    public void setSelectedItemsMsg(String selectedItemsMsg)
    {
       this.selectedItemsMsg = selectedItemsMsg;
+   }
+   
+   /**
+    * Returns the message to display when no items have been selected, if one hasn't been
+    * set it defaults to the message in the bundle under key 'no_selected_items'.
+    * 
+    * @return The message
+    */
+   public String getNoSelectedItemsMsg()
+   {
+      ValueBinding vb = getValueBinding("noSelectedItemsMsg");
+      if (vb != null)
+      {
+         this.noSelectedItemsMsg = (String)vb.getValue(getFacesContext());
+      }
+      
+      if (this.noSelectedItemsMsg == null)
+      {
+         this.noSelectedItemsMsg = Application.getMessage(getFacesContext(), MSG_NO_SELECTED_ITEMS);
+      }
+      
+      return this.noSelectedItemsMsg;
+   }
+
+   /**
+    * Sets the no selected items message to display in the UI
+    * 
+    * @param noSelectedItemsMsg The message
+    */
+   public void setNoSelectedItemsMsg(String noSelectedItemsMsg)
+   {
+      this.noSelectedItemsMsg = noSelectedItemsMsg;
    }
 
    /**
@@ -184,7 +221,7 @@ public class UIMultiValueEditor extends UIInput
       
       if (this.selectItemMsg == null)
       {
-         this.selectItemMsg = Application.getMessage(getFacesContext(), SELECT_ITEM_MSG);
+         this.selectItemMsg = Application.getMessage(getFacesContext(), MSG_SELECT_ITEM);
       }
       
       return this.selectItemMsg;
