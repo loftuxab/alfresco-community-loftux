@@ -415,10 +415,6 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
             if (ftpPath.setSharedDevice(getShareList(), this) == false)
                 return null;
-
-            // Return the new path
-
-            return ftpPath;
         }
         else
         {
@@ -529,6 +525,14 @@ public class FTPSrvSession extends SrvSession implements Runnable
 
                     if (ftpPath.setSharedDevice(getShareList(), this) == false)
                         ftpPath = null;
+                    else
+                    {
+                        // Recheck if the path exists
+                        
+                        sts = disk.fileExists(this, tree, ftpPath.getSharePath());
+                        if ( sts == FileStatus.NotExist)
+                            ftpPath = null;
+                    }
                 }
                 else if ((sts == FileStatus.FileExists && filePath == false)
                         || (sts == FileStatus.DirectoryExists && filePath == true))
