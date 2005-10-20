@@ -23,6 +23,7 @@
  */
 package org.alfresco.repo.security.permissions.impl;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.alfresco.repo.security.permissions.PermissionEntry;
@@ -33,8 +34,13 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * 
  * @author andyh
  */
-public class SimpleNodePermissionEntry extends AbstractNodePermissionEntry
+public class SimpleNodePermissionEntry extends AbstractNodePermissionEntry implements Serializable
 {
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 8157870444595023347L;
+
     /*
      * The node 
      */

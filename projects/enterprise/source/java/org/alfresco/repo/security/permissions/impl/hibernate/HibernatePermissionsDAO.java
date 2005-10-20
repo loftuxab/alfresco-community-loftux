@@ -23,9 +23,12 @@
  */
 package org.alfresco.repo.security.permissions.impl.hibernate;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.NodeKey;
 import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
@@ -51,11 +54,23 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class HibernatePermissionsDAO extends HibernateDaoSupport implements PermissionsDAO
 {
-
+    
+    private SimpleCache<NodeRef, SimpleNodePermissionEntry> nullPermissionCache;
+    
     public HibernatePermissionsDAO()
     {
         super();
+        
     }
+
+    
+    
+    public void setNullPermissionCache(SimpleCache<NodeRef, SimpleNodePermissionEntry> nullPermissionCache)
+    {
+        this.nullPermissionCache = nullPermissionCache;
+    }
+
+
 
     public NodePermissionEntry getPermissions(NodeRef nodeRef)
     {
@@ -63,8 +78,22 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements Perm
         // Null objects are not cached in hibernate
         // If the object does not exist it will repeatedly query to check its
         // non existence.
-
-        return createSimpleNodePermissionEntry(getHibernateNodePermissionEntry(nodeRef, true));
+        
+        
+        NodePermissionEntry npe = nullPermissionCache.get(nodeRef);
+        if(npe != null)
+        {
+            return npe;
+        }
+            
+        npe = createSimpleNodePermissionEntry(getHibernateNodePermissionEntry(nodeRef, false));
+        if(npe == null)
+        {
+            SimpleNodePermissionEntry snpe = new SimpleNodePermissionEntry(nodeRef, true, Collections.<SimplePermissionEntry>emptySet());
+            npe = snpe;
+            nullPermissionCache.put(nodeRef, snpe);
+        }
+        return npe;
     }
 
     /**
@@ -90,6 +119,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements Perm
                 entry.setNodeKey(nodeKey);
                 entry.setInherits(true);
                 getHibernateTemplate().save(entry);
+                nullPermissionCache.remove(nodeRef);
                 return entry;
             }
             return (org.alfresco.repo.security.permissions.impl.hibernate.NodePermissionEntry) obj;
@@ -105,6 +135,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements Perm
                     entry.setNodeKey(nodeKey);
                     entry.setInherits(true);
                     getHibernateTemplate().save(entry);
+                    nullPermissionCache.remove(nodeRef);
                     return entry;
                 }
                 else
@@ -232,6 +263,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements Perm
         PermissionEntryImpl entry = PermissionEntryImpl.create(getHibernateNodePermissionEntry(nodeRef, true),
                 getHibernatePermissionReference(perm, true), getHibernateAuthority(authority, true), allow);
         getHibernateTemplate().save(entry);
+        nullPermissionCache.remove(nodeRef);
     }
 
     /**
@@ -304,6 +336,7 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements Perm
         entry.setInherits(nodePermissionEntry.inheritPermissions());
         entry.setNodeKey(getNodeKey(nodePermissionEntry.getNodeRef()));
         getHibernateTemplate().save(entry);
+        nullPermissionCache.remove(nodePermissionEntry.getNodeRef());
         for (PermissionEntry pe : nodePermissionEntry.getPermissionEntries())
         {
             setPermission(pe);

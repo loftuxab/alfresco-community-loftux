@@ -2,6 +2,39 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
  
 <beans>
+
+
+  <bean name="permissionEHCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" >
+      <property name="configLocation">
+         <value>classpath:ehcache.xml</value>
+      </property>
+   </bean>
+   
+   <bean name="nullPermissionCache" class="org.alfresco.repo.cache.EhCacheAdapter">
+      <property name="cache">
+         <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
+            <property name="cacheName">
+               <value>nullPermissionCache</value>
+            </property>
+         </bean>
+      </property>
+   </bean>
+   
+   <bean name="nullPermissionTransactionalCache" class="org.alfresco.repo.cache.TransactionalCache">
+      <property name="sharedCache">
+         <ref bean="nullPermissionCache" />
+      </property>
+      <property name="cacheManager" >
+         <ref bean="permissionEHCacheManager" />
+      </property>
+      <property name="name">
+         <value>transactionalCache</value>
+      </property>
+      <property name="maxCacheSize">
+         <value>20000</value>
+      </property>
+   </bean>
+
     
     <!--                         -->
     <!-- Support for permissions -->
@@ -73,6 +106,9 @@
     <bean id="permissionsDAO" class="org.alfresco.repo.security.permissions.impl.hibernate.HibernatePermissionsDAO">
         <property name="sessionFactory">
             <ref bean="sessionFactory" />
+        </property>
+        <property name="nullPermissionCache">
+            <ref bean="nullPermissionTransactionalCache" />
         </property>
     </bean>
 
