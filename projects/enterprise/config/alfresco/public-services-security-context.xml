@@ -82,7 +82,7 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>

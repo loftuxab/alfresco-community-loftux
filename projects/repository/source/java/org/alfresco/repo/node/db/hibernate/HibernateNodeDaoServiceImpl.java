@@ -106,7 +106,7 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         {
             public Object doInHibernate(Session session)
             {
-                session.flush();
+//                session.flush();
                 // done
                 return null;
             }

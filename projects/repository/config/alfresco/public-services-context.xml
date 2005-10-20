@@ -87,8 +87,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.namespace.NamespaceService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -128,8 +130,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.dictionary.DictionaryService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -166,10 +170,10 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="exist*">PROPAGATION_REQUIRED,readOnly</prop>
-                <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
-                <prop key="has*">PROPAGATION_REQUIRED,readOnly</prop>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="exist*">${server.transaction.mode.readOnly}</prop>
+                <prop key="get*">${server.transaction.mode.readOnly}</prop>
+                <prop key="has*">${server.transaction.mode.readOnly}</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>
@@ -207,8 +211,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.repository.ContentService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -243,8 +249,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.repository.MimetypeService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -279,8 +287,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.search.SearchService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -315,8 +325,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.search.CategoryService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -351,8 +363,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.repository.CopyService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -387,8 +401,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.lock.LockService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -423,8 +439,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.version.VersionService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -459,8 +477,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.coci.CheckOutCheckInService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -495,8 +515,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.rule.RuleService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -531,8 +553,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.view.ImporterService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -565,8 +589,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.view.ExporterService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
 
@@ -601,8 +627,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.action.ActionService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
     
@@ -637,8 +665,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.security.PermissionService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
     
@@ -672,8 +702,10 @@
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="transactionAttributeSource">
-            <value>org.alfresco.service.cmr.security.AuthorityService.*=PROPAGATION_REQUIRED</value> 
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
         </property>
     </bean>
     

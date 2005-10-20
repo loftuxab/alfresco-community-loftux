@@ -19,6 +19,8 @@ package org.alfresco.repo.node;
 import java.io.InputStream;
 import java.util.Map;
 
+import javax.transaction.UserTransaction;
+
 import junit.framework.TestCase;
 
 import org.alfresco.repo.dictionary.DictionaryDAO;
@@ -35,6 +37,7 @@ import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.apache.lucene.index.IndexWriter;
@@ -44,25 +47,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ConcurrentNodeServiceTest extends TestCase
 {
     public static final String NAMESPACE = "http://www.alfresco.org/test/BaseNodeServiceTest";
-
     public static final String TEST_PREFIX = "test";
-
     public static final QName TYPE_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
-
     public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
-
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
-
     public static final QName PROP_QNAME_TEST_MIMETYPE = QName.createQName(NAMESPACE, "mimetype");
 
     static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private NodeService nodeService;
-
-    private PlatformTransactionManager transactionManager;
-
+    private TransactionService transactionService;
     private NodeRef rootNodeRef;
-
     private FullTextSearchIndexer luceneFTS;
 
     public ConcurrentNodeServiceTest()
@@ -86,11 +81,11 @@ public class ConcurrentNodeServiceTest extends TestCase
         dictionaryDao.putModel(model);
 
         nodeService = (NodeService) ctx.getBean("dbNodeService");
-        transactionManager = (PlatformTransactionManager) ctx.getBean("transactionManager");
+        transactionService = (TransactionService) ctx.getBean("transactionComponent");
         luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
 
         // create a first store directly
-        SpringAwareUserTransaction tx = new SpringAwareUserTransaction(transactionManager);
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
@@ -104,7 +99,7 @@ public class ConcurrentNodeServiceTest extends TestCase
 
     protected Map<QName, ChildAssociationRef> commitNodeGraph() throws Exception
     {
-        SpringAwareUserTransaction tx = new SpringAwareUserTransaction(transactionManager);
+        UserTransaction tx = transactionService.getUserTransaction();
         tx.begin();
         Map<QName, ChildAssociationRef> answer = buildNodeGraph();
         tx.commit();

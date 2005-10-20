@@ -23,9 +23,11 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * @see org.alfresco.repo.transaction.TransactionComponent
@@ -36,24 +38,29 @@ public class TransactionComponentTest extends TestCase
 {
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     
-    private TransactionService transactionService;
+    private PlatformTransactionManager transactionManager;
+    private TransactionComponent transactionComponent;
     private NodeService nodeService;
     
     public void setUp() throws Exception
     {
-        transactionService = (TransactionService) ctx.getBean("transactionComponent");
+        transactionManager = (PlatformTransactionManager) ctx.getBean("transactionManager");
+        transactionComponent = new TransactionComponent();
+        transactionComponent.setTransactionManager(transactionManager);
+        transactionComponent.setAllowWrite(true);
+        
         nodeService = (NodeService) ctx.getBean("dbNodeService");
     }
     
     public void testPropagatingTxn() throws Exception
     {
         // start a transaction
-        UserTransaction txnOuter = transactionService.getUserTransaction();
+        UserTransaction txnOuter = transactionComponent.getUserTransaction();
         txnOuter.begin();
         String txnIdOuter = AlfrescoTransactionSupport.getTransactionId();
         
         // start a propagating txn
-        UserTransaction txnInner = transactionService.getUserTransaction();
+        UserTransaction txnInner = transactionComponent.getUserTransaction();
         txnInner.begin();
         String txnIdInner = AlfrescoTransactionSupport.getTransactionId();
         
@@ -82,12 +89,12 @@ public class TransactionComponentTest extends TestCase
     public void testNonPropagatingTxn() throws Exception
     {
         // start a transaction
-        UserTransaction txnOuter = transactionService.getUserTransaction();
+        UserTransaction txnOuter = transactionComponent.getUserTransaction();
         txnOuter.begin();
         String txnIdOuter = AlfrescoTransactionSupport.getTransactionId();
         
         // start a propagating txn
-        UserTransaction txnInner = transactionService.getNonPropagatingUserTransaction();
+        UserTransaction txnInner = transactionComponent.getNonPropagatingUserTransaction();
         txnInner.begin();
         String txnIdInner = AlfrescoTransactionSupport.getTransactionId();
         
@@ -99,5 +106,29 @@ public class TransactionComponentTest extends TestCase
 
         // outer should commit without problems
         txnOuter.commit();
+    }
+    
+    public void testReadOnlyTxn() throws Exception
+    {
+        // start a read-only transaction
+        transactionComponent.setAllowWrite(false);
+        
+        UserTransaction txn = transactionComponent.getUserTransaction();
+        txn.begin();
+        
+        // do some writing
+        try
+        {
+            nodeService.createStore(
+                    StoreRef.PROTOCOL_WORKSPACE,
+                    getName() + "_" + System.currentTimeMillis());
+            txn.commit();
+            fail("Read-only transaction wasn't detected");
+        }
+        catch (InvalidDataAccessApiUsageException e)
+        {
+            int i = 0;
+            // expected
+        }
     }
 }

@@ -47,7 +47,7 @@ public class DbNodeServiceImplTest extends BaseNodeServiceTest
     
     protected NodeService getNodeService()
     {
-        return (NodeService) applicationContext.getBean("dbNodeService");
+        return (NodeService) applicationContext.getBean("NodeService");
     }
 
     @Override

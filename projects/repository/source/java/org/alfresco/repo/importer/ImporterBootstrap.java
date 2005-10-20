@@ -65,6 +65,7 @@ public class ImporterBootstrap
     private static final Log logger = LogFactory.getLog(ImporterBootstrap.class);
 
     // Dependencies
+    private boolean allowWrite = true;
     private TransactionService transactionService;
     private NamespaceService namespaceService;
     private NodeService nodeService;
@@ -77,6 +78,15 @@ public class ImporterBootstrap
     private Locale locale = null;
     private AuthenticationComponent authenticationComponent;
     
+    /**
+     * Set whether we write or not
+     * 
+     * @param write true (default) if the import must go ahead, otherwise no import will occur
+     */
+    public void setAllowWrite(boolean write)
+    {
+        this.allowWrite = write;
+    }
 
     /**
      * Sets the Transaction Service
@@ -264,6 +274,12 @@ public class ImporterBootstrap
                 if (logger.isDebugEnabled())
                     logger.debug("Store exists - bootstrap ignored: " + storeRef);
                 
+                userTransaction.rollback();
+            }
+            else if (!allowWrite)
+            {
+                // we're in read-only node
+                logger.warn("Store does not exist, but mode is read-only: " + storeRef);
                 userTransaction.rollback();
             }
             else

@@ -31,23 +31,36 @@ import org.springframework.transaction.TransactionDefinition;
 public class TransactionComponent implements TransactionService
 {
     private PlatformTransactionManager transactionManager;
+    private boolean readOnly = false;
     
     /**
-     * Construct Transaction Component
+     * Set the transaction manager to use
      * 
      * @param transactionManager platform transaction manager
      */
-    public TransactionComponent(PlatformTransactionManager transactionManager)
+    public void setTransactionManager(PlatformTransactionManager transactionManager)
     {
         this.transactionManager = transactionManager;
     }
-    
+
+    /**
+     * Set the read-only mode for all generated transactions.
+     * 
+     * @param allowWrite false if all transactions must be read-only
+     */
+    public void setAllowWrite(boolean allowWrite)
+    {
+        this.readOnly = !allowWrite;
+    }
+
     /**
      * @see org.springframework.transaction.TransactionDefinition#PROPAGATION_REQUIRED
      */
     public UserTransaction getUserTransaction()
     {
-        return new SpringAwareUserTransaction(transactionManager);
+        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(transactionManager);
+        txn.setReadOnly(readOnly);
+        return txn;
     }
 
     /**
@@ -56,7 +69,8 @@ public class TransactionComponent implements TransactionService
     public UserTransaction getNonPropagatingUserTransaction()
     {
         SpringAwareUserTransaction txn = new SpringAwareUserTransaction(transactionManager);
-        txn.setPropagationBehviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        txn.setReadOnly(readOnly);
+        txn.setPropagationBehaviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         return txn;
     }
 }

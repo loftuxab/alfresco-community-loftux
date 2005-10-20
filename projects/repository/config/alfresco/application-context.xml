@@ -74,9 +74,12 @@
 
     <!-- transaction service -->
     <bean id="transactionComponent" class="org.alfresco.repo.transaction.TransactionComponent">
-        <constructor-arg>
+        <property name="transactionManager">
             <ref bean="transactionManager" />
-        </constructor-arg>
+        </property>
+        <property name="allowWrite">
+            <value>${server.transaction.allow-writes}</value>
+        </property>
     </bean>
 
     <!-- use around method calls to debug - see class comments for details -->
@@ -518,7 +521,7 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>
@@ -712,7 +715,7 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>
@@ -743,7 +746,7 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>
@@ -767,7 +770,7 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>
@@ -800,7 +803,7 @@
                  <value>/${spaces.company_home.childname}</value>
               </property>
               <property name="createMissingPeople">
-                 <value>true</value>
+                 <value>${server.transaction.allow-writes}</value>
               </property>
               <property name="userNamesAreCaseSensitive">
                  <value>false</value>
@@ -809,7 +812,7 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>
@@ -902,6 +905,9 @@
         <property name="storeUrl">
             <value>${system.store}</value>
         </property>
+        <property name="allowWrite">
+            <value>${server.transaction.allow-writes}</value>
+        </property>
         <property name="mustNotExistStoreUrls">
             <list>
                 <value>${spaces.store}</value>
@@ -944,6 +950,9 @@
         </property>
         <property name="storeUrl">
             <value>${spaces.store}</value>
+        </property>
+        <property name="allowWrite">
+            <value>${server.transaction.allow-writes}</value>
         </property>
         <property name="configuration">
             <props>
@@ -1045,7 +1054,7 @@
         </property>
         <property name="transactionAttributes">
             <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>
     </bean>

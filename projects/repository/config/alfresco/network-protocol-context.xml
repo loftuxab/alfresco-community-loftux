@@ -73,7 +73,13 @@
       </property>
       <property name="transactionAttributes">
          <props>
-            <prop key="*">PROPAGATION_REQUIRED</prop>
+            <prop key="*exist">${server.transaction.mode.readOnly}</prop>
+            <prop key="get*">${server.transaction.mode.readOnly}</prop>
+            <prop key="is*">${server.transaction.mode.readOnly}</prop>
+            <prop key="read*">${server.transaction.mode.readOnly}</prop>
+            <prop key="seek*">${server.transaction.mode.readOnly}</prop>
+            <prop key="start*">${server.transaction.mode.readOnly}</prop>
+            <prop key="*">${server.transaction.mode.default}</prop>
          </props>
       </property>
       <!-- only enable for debugging

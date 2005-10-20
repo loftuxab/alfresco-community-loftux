@@ -84,7 +84,7 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
      * 
      * @param transactionManager the transaction manager to use
      * 
-     * @see #setPropagationBehviour(int)
+     * @see #setPropagationBehaviour(int)
      */
     public SpringAwareUserTransaction(PlatformTransactionManager transactionManager)
     {
@@ -115,11 +115,23 @@ public class SpringAwareUserTransaction extends TransactionSynchronizationAdapte
      * 
      * @see TransactionDefinition#PROPAGATION_REQUIRED
      */
-    public void setPropagationBehviour(int propagationBehaviour)
+    public void setPropagationBehaviour(int propagationBehaviour)
     {
         checkThreadId();
         
         transactionDef.setPropagationBehavior(propagationBehaviour);
+    }
+    
+    /**
+     * Optimize the transactions for read-only.
+     * 
+     * @param readOnly true if the transaction may only read
+     */
+    public void setReadOnly(boolean readOnly)
+    {
+        checkThreadId();
+        
+        transactionDef.setReadOnly(readOnly);
     }
 
     @Override
