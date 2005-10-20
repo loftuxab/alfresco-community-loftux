@@ -366,6 +366,24 @@ public class ImporterComponent
         }
        
         /* (non-Javadoc)
+         * @see org.alfresco.repo.importer.Importer#importMetaData(java.util.Map)
+         */
+        public void importMetaData(Map<QName, String> properties)
+        {
+            // Determine if we're importing a complete repository
+            String path = properties.get(QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "exportOf"));
+            if (path != null && path.equals("/"))
+            {
+                // Only allow complete repository import into root
+                NodeRef storeRootRef = nodeService.getRootNode(rootRef.getStoreRef());
+                if (!storeRootRef.equals(rootRef))
+                {
+                    throw new ImporterException("A complete repository package cannot be imported here");
+                }
+            }
+        }
+        
+        /* (non-Javadoc)
          * @see org.alfresco.repo.importer.Importer#importNode(org.alfresco.repo.importer.ImportNode)
          */
         public NodeRef importNode(ImportNode context)

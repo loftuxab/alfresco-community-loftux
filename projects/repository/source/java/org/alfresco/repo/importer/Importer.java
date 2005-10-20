@@ -16,6 +16,8 @@
  */
 package org.alfresco.repo.importer;
 
+import java.util.Map;
+
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
@@ -24,7 +26,6 @@ import org.alfresco.service.namespace.QName;
  * a node into the Repository. 
  * 
  * @author David Caruana
- *
  */
 public interface Importer
 {
@@ -38,9 +39,20 @@ public interface Importer
      */
     public QName getRootAssocType();
 
+    /**
+     * Signal start of import
+     */
     public void start();
 
+    /**
+     * Signal end of import
+     */
     public void end();
+
+    /**
+     * Import meta-data
+     */
+    public void importMetaData(Map<QName, String> properties);
     
     /**
      * Import a node

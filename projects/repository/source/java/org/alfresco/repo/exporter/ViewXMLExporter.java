@@ -202,8 +202,8 @@ import org.xml.sax.helpers.AttributesImpl;
             if (path.size() > 1)
             {
                 // a child name does not exist for root
-                String childName = path.last().getElementString();
-                QName childQName = QName.createQName(childName);
+                Path.ChildAssocElement pathElement = (Path.ChildAssocElement)path.last();
+                QName childQName = pathElement.getRef().getQName();
                 attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_1_0_URI, CHILDNAME_LOCALNAME, CHILDNAME_QNAME.toPrefixString(), null, toPrefixString(childQName));
             }
             

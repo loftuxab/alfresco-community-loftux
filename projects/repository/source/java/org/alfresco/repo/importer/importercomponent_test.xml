@@ -18,7 +18,7 @@
       <cm:orderedchildren>true</cm:orderedchildren>
       <cm:contains>
          
-         <cm:systemfolder view:childName="cm:people">
+         <cm:systemfolder view:childName="cm:people folder">
             <view:aspects>
             	<cm:auditable/>
             </view:aspects>
@@ -38,7 +38,7 @@
                   <cm:userName>${username}</cm:userName>
                   <cm:firstName>Fred</cm:firstName>
                   <cm:lastName>Bloggs</cm:lastName>
-                  <cm:homeFolder>../../cm:people</cm:homeFolder>
+                  <cm:homeFolder>../../cm:people_x0020_folder</cm:homeFolder>
                   </view:properties>
                </cm:person>
             </cm:contains>
@@ -51,8 +51,8 @@
             <cm:generalclassifiable/>
             <cm:name>Some Content</cm:name>
             <cm:categories>
-                <view:value>../cm:people</view:value>
-                <view:value>../cm:people</view:value>
+                <view:value>../cm:people_x0020_folder</view:value>
+                <view:value>../cm:people_x0020_folder</view:value>
             </cm:categories>
             <cm:translations view:idref="xyz"/>
          </cm:cmobject>

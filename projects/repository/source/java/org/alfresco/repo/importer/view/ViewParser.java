@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -137,7 +138,7 @@ public class ViewParser implements Parser
             }
             catch(Exception e)
             {
-                throw new ImporterException("Failed to parse view at line " + xpp.getLineNumber() + "; column " + xpp.getColumnNumber(), e);
+                throw new ImporterException("Failed to import package at line " + xpp.getLineNumber() + "; column " + xpp.getColumnNumber() + " due to error: " + e.getMessage(), e);
             }
         }
         catch(XmlPullParserException e)
@@ -185,7 +186,7 @@ public class ViewParser implements Parser
         {
             if (context instanceof MetaDataContext)
             {
-                // TODO: Extract view meta data
+                processMetaData(xpp, defName, contextStack);
             }
             else if (context instanceof ParentContext)
             {
@@ -281,6 +282,37 @@ public class ViewParser implements Parser
         
         if (logger.isDebugEnabled())
             logger.debug(indentLog("Pushed " + parentContext, contextStack.size() -1));
+    }
+
+    /**
+     * Process meta-data
+     * 
+     * @param xpp
+     * @param metaDataName
+     * @param contextStack
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
+    private void processMetaData(XmlPullParser xpp, QName metaDataName, Stack<ElementContext> contextStack)
+        throws XmlPullParserException, IOException
+    {
+        MetaDataContext context = (MetaDataContext)contextStack.peek();
+
+        String value = null;
+        
+        int eventType = xpp.next();
+        if (eventType == XmlPullParser.TEXT)
+        {
+            // Extract value
+            value = xpp.getText();
+            eventType = xpp.next();
+        }
+        if (eventType != XmlPullParser.END_TAG)
+        {
+            throw new ImporterException("Meta data element " + metaDataName + " is missing end tag");
+        }
+
+        context.setProperty(metaDataName, value);
     }
     
     /**
@@ -457,6 +489,10 @@ public class ViewParser implements Parser
             {
                 processEndChildAssoc((ParentContext)context);
             }
+            else if (context instanceof MetaDataContext)
+            {
+                processEndMetaData((MetaDataContext)context);
+            }
         }
     }
     
@@ -485,6 +521,16 @@ public class ViewParser implements Parser
     {
     }
 
+    /**
+     * Process end of meta data
+     * 
+     * @param context
+     */
+    private void processEndMetaData(MetaDataContext context)
+    {
+        context.getImporter().importMetaData(context.getProperties());
+    }
+    
     /**
      * Get parent Node Context
      * 

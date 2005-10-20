@@ -251,7 +251,7 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
          */
         public String getVersion()
         {
-            return "unknown";
+            return "unknown (pre 1.0.0 RC2)";
         }
 
         /* (non-Javadoc)

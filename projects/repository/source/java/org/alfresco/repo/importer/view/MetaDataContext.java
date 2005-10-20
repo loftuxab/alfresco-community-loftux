@@ -16,6 +16,9 @@
  */
 package org.alfresco.repo.importer.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.service.namespace.QName;
 
 
@@ -27,6 +30,9 @@ import org.alfresco.service.namespace.QName;
 /*package*/ class MetaDataContext extends ElementContext
 {
     
+    private Map<QName, String> properties = new HashMap<QName, String>();
+    
+    
     /**
      * Construct
      * 
@@ -37,6 +43,41 @@ import org.alfresco.service.namespace.QName;
     MetaDataContext(QName elementName, ElementContext context)
     {
         super(elementName, context.getDictionaryService(), context.getImporter());
+    }
+    
+    
+    /**
+     * Set meta-data property
+     * 
+     * @param property  property name
+     * @param value  property value
+     */
+    public void setProperty(QName property, String value)
+    {
+        properties.put(property, value);
+    }
+    
+    
+    /**
+     * Get meta-data property
+     * 
+     * @param property  property name
+     * @return  property value
+     */
+    public String getProperty(QName property)
+    {
+        return properties.get(property);
+    }
+    
+    
+    /**
+     * Get all meta-data properties
+     * 
+     * @return all meta-data properties
+     */
+    public Map<QName, String> getProperties()
+    {
+        return properties;
     }
     
 }
