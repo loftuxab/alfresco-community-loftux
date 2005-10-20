@@ -124,6 +124,7 @@ public class CacheTest extends TestCase
             // remove 1 from the cache
             transactionalCache.remove(newGlobalOne);
             assertFalse("Item was not removed from txn cache", transactionalCache.contains(newGlobalOne));
+            assertNull("Get didn't return null", transactionalCache.get(newGlobalOne));
             assertTrue("Item was removed from backing cache", backingCache.contains(newGlobalOne));
             
             // update 3 in the cache
@@ -136,6 +137,7 @@ public class CacheTest extends TestCase
             
             // check that backing cache was updated with the in-transaction changes
             assertFalse("Item was not removed from backing cache", backingCache.contains(newGlobalOne));
+            assertNull("Item could still be fetched from backing cache", backingCache.get(newGlobalOne));
             assertEquals("Item not updated in backing cache", "XXX", backingCache.get(updatedTxnThree));
         }
         catch (Throwable e)
