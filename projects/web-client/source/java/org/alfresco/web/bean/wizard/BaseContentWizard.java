@@ -476,32 +476,33 @@ public abstract class BaseContentWizard extends AbstractWizardBean
                for (ConfigElement child : typesCfg.getChildren())
                {
                   QName idQName = Repository.resolveToQName(child.getAttribute("name"));
+                  TypeDefinition typeDef = this.dictionaryService.getType(idQName);
                   
-                  // look for a client localized string
-                  String label = null;
-                  String msgId = child.getAttribute("displayLabelId");
-                  if (msgId != null)
+                  if (typeDef != null &&
+                      this.dictionaryService.isSubClass(typeDef.getName(), ContentModel.TYPE_CONTENT))
                   {
-                     label = Application.getMessage(context, msgId);
-                  }
-                  
-                  // if there wasn't an externalized string look for one in the config
-                  if (label == null)
-                  {
-                     label = child.getAttribute("displayLabel");
-                  }
-
-                  // if there wasn't a client based label try and get it from the dictionary
-                  if (label == null)
-                  {
-                     TypeDefinition typeDef = this.dictionaryService.getType(idQName);
-                     if (typeDef != null)
+                     // look for a client localized string
+                     String label = null;
+                     String msgId = child.getAttribute("displayLabelId");
+                     if (msgId != null)
+                     {
+                        label = Application.getMessage(context, msgId);
+                     }
+                     
+                     // if there wasn't an externalized string look for one in the config
+                     if (label == null)
+                     {
+                        label = child.getAttribute("displayLabel");
+                     }
+   
+                     // if there wasn't a client based label try and get it from the dictionary
+                     if (label == null)
                      {
                         label = typeDef.getTitle();
                      }
+                     
+                     this.objectTypes.add(new SelectItem(idQName.toString(), label));
                   }
-                  
-                  this.objectTypes.add(new SelectItem(idQName.toString(), label));
                }
                
                // make sure the list is sorted by the label
