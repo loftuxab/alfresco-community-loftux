@@ -38,9 +38,9 @@ import org.alfresco.repo.domain.StoreKey;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.BaseHibernateTest;
+import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
-import org.alfresco.util.transaction.SpringAwareUserTransaction;
 
 /**
  * Test persistence and retrieval of Hibernate-specific implementations of the
@@ -48,7 +48,7 @@ import org.alfresco.util.transaction.SpringAwareUserTransaction;
  * 
  * @author Derek Hulley
  */
-public class HibernateNodeTest extends BaseHibernateTest
+public class HibernateNodeTest extends BaseSpringTest
 {
     private static final String TEST_NAMESPACE = "http://www.alfresco.org/test/HibernateNodeTest";
     
@@ -441,7 +441,8 @@ public class HibernateNodeTest extends BaseHibernateTest
         setComplete();
         endTransaction();
         
-        UserTransaction txn = new SpringAwareUserTransaction(transactionManager);
+        TransactionService transactionService = (TransactionService) applicationContext.getBean("transactionComponent");
+        UserTransaction txn = transactionService.getUserTransaction();
         try
         {
             txn.begin();
