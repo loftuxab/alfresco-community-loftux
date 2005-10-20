@@ -2,7 +2,11 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
  
 <beans>
-	
+   
+   <!--
+   <import resource="classpath:alfresco/replicating-content-services-context.xml" />
+   -->
+    
    <bean id="mimetypeMap" class="org.alfresco.repo.content.MimetypeMap" init-method="init" >
       <constructor-arg>
          <ref bean="repoConfigService" />
@@ -101,41 +105,25 @@
       </constructor-arg>
    </bean>
 
-   <bean id="contentService" class="org.springframework.aop.framework.ProxyFactoryBean">
-       <property name="target">
-           <bean class="org.alfresco.repo.content.RoutingContentService" init-method="init">
-               <property name="transactionService">
-                   <ref bean="transactionComponent" />
-               </property>
-               <property name="dictionaryService">
-                   <ref bean="dictionaryService" />
-               </property>
-               <property name="nodeService">
-                   <ref bean="nodeService" />
-               </property>
-               <property name="transformerRegistry">
-                   <ref bean="contentTransformerRegistry" />
-               </property>
-               <property name="store">
-                   <ref bean="fileContentStore" />
-               </property>
-               <property name="policyComponent">
-                   <ref bean="policyComponent" />
-               </property>
-           </bean>
-       </property>
-<!--       <property name="interceptorNames">-->
-<!--           <list>-->
-<!--               <idref bean="methodCallLogAdvice" />-->
-<!--               <idref local="contentService_PerformanceMonitorAdvice" />-->
-<!--           </list>-->
-<!--       </property>-->
+   <bean id="contentService" class="org.alfresco.repo.content.RoutingContentService" init-method="init">
+      <property name="transactionService">
+          <ref bean="transactionComponent" />
+      </property>
+      <property name="dictionaryService">
+          <ref bean="dictionaryService" />
+      </property>
+      <property name="nodeService">
+          <ref bean="nodeService" />
+      </property>
+      <property name="transformerRegistry">
+          <ref bean="contentTransformerRegistry" />
+      </property>
+      <property name="store">
+          <ref bean="fileContentStore" />
+      </property>
+      <property name="policyComponent">
+          <ref bean="policyComponent" />
+      </property>
    </bean>
-
-<!--   <bean id="contentService_PerformanceMonitorAdvice" class="org.alfresco.util.perf.PerformanceMonitorAdvice">-->
-<!--       <constructor-arg>-->
-<!--           <value>contentService</value>-->
-<!--       </constructor-arg>-->
-<!--   </bean>-->
 
 </beans>
