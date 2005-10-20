@@ -195,7 +195,7 @@ public class RoutingContentService implements ContentService
                     "   node: " + nodeRef + "\n" +
                     "   node type: " + nodeType + "\n" +
                     "   property name: " + propertyQName + "\n" +
-                    "   property type: " + contentPropDef.getDataType(),
+                    "   property type: " + ((contentPropDef == null) ? "unknown" : contentPropDef.getDataType()),
                     propertyQName);
         }
         

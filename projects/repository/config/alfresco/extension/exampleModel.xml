@@ -30,7 +30,7 @@
       <!-- Definition of new Content Type: Standard Operating Procedure -->
       <type name="my:sop">
          <title>Standard Operating Procedure</title>
-         <parent>cm:cmobject</parent>
+         <parent>cm:content</parent>
          <properties>
             <property name="my:publishedDate">
                <type>d:datetime</type>

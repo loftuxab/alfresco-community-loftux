@@ -67,7 +67,6 @@
          <show-property name="title"/>
          <show-property name="description"/>
          <show-property name="size" displayLabelId="size" converter="org.alfresco.faces.ByteSizeConverter"/>
-         <show-property name="creator"/>
       </property-sheet>
    </config>
    
@@ -77,6 +76,22 @@
          <show-property name="description"/>
       </property-sheet>
    </config>
+
+   <!-- Example client config for type defined in exampleModel.xml -->   
+   <config evaluator="node-type" condition="my:sop">
+      <property-sheet>
+         <show-property name="name"/>
+         <show-property name="mimetype" displayLabelId="mimetype" converter="org.alfresco.faces.MimeTypeConverter"/>
+         <show-property name="title"/>
+         <show-property name="description"/>
+         <show-property name="size" displayLabelId="size" converter="org.alfresco.faces.ByteSizeConverter"/>
+         <show-property name="my:publishedDate"/>
+         <show-association name="my:signOff"/>
+         <show-property name="my:authorisedBy"/>
+         <show-child-association name="my:processSteps"/>
+      </property-sheet>
+   </config>
+   <!-- End Example -->   
    
    <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
@@ -130,7 +145,9 @@
    
    <config evaluator="aspect-name" condition="auditable">
       <property-sheet>
+         <show-property name="creator"/>
          <show-property name="created" readOnly="true"/>
+         <show-property name="modifier"/>
          <show-property name="modified" readOnly="true"/>
       </property-sheet>
    </config>
@@ -141,6 +158,16 @@
       </property-sheet>
    </config>
    
+   <!-- Example Client Configuration for exposing aspects defined in exampleModel.xml -->
+   <config evaluator="aspect-name" condition="my:imageClassification">
+      <property-sheet>
+         <show-property name="my:width"/>
+         <show-property name="my:height"/>
+         <show-property name="my:resolution"/>
+      </property-sheet>
+   </config>
+   <!-- End Example -->
+
    <config evaluator="string-compare" condition="Action Wizards">
       <types>
          <type name="folder" displayLabelId="space"/>
@@ -156,6 +183,8 @@
          <aspect name="templatable"/>
          <aspect name="translatable"/>
          <aspect name="localizable"/>
+         <!-- Example configuration to demonstrate how to expose aspect from exampleModel.xml -->
+         <!-- <aspect name="my:imageClassification"/> -->
       </aspects>
       <transformers>
          <transformer name="text/html"/>
@@ -178,8 +207,8 @@
    
    <config evaluator="string-compare" condition="Custom Content Types">
       <content-types>
-         <!-- <type name="my:content-type"/> -->
+         <!-- <type name="my:sop"/> -->
       </content-types>
    </config>
-   
+      
 </alfresco-config>

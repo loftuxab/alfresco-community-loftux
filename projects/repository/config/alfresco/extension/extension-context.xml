@@ -10,6 +10,7 @@
         <property name="models">
             <list>
                 <value>alfresco/extension/exampleModel.xml</value>
+                <value>alfresco/extension/customModel.xml</value>
             </list>
         </property>
     </bean>
