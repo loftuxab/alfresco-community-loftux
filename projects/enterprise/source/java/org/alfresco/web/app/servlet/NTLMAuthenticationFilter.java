@@ -29,8 +29,15 @@ import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
+import java.util.StringTokenizer;
 
+import javax.faces.FactoryFinder;
+import javax.faces.context.FacesContext;
+import javax.faces.context.FacesContextFactory;
+import javax.faces.lifecycle.Lifecycle;
+import javax.faces.lifecycle.LifecycleFactory;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -45,6 +52,7 @@ import javax.transaction.UserTransaction;
 
 import net.sf.acegisecurity.BadCredentialsException;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.filesys.server.auth.PasswordEncryptor;
 import org.alfresco.filesys.server.auth.ntlm.NTLM;
 import org.alfresco.filesys.server.auth.ntlm.NTLMLogonDetails;
@@ -71,6 +79,7 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.User;
+import org.alfresco.web.config.ClientConfigElement;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,6 +98,11 @@ public class NTLMAuthenticationFilter implements Filter
     public static final String NTLM_AUTH_SESSION = "_alfNTLMAuthSess";
     public static final String NTLM_AUTH_DETAILS = "_alfNTLMDetails";
 
+    // Locale object stored in the session
+    
+    private static final String LOCALE = "locale";
+    public static final String MESSAGE_BUNDLE = "alfresco.messages.webclient";
+    
     // NTLM flags mask, used to mask out features that are not supported
     
     private static final int NTLM_FLAGS = NTLM.Flag56Bit + NTLM.FlagLanManKey + NTLM.FlagNegotiateNTLM +
@@ -113,6 +127,7 @@ public class NTLMAuthenticationFilter implements Filter
     private PersonService m_personService;
     private NodeService m_nodeService;
     private TransactionService m_transactionService;
+    private ConfigService m_configService;
     
     // Password encryptor
     
@@ -138,6 +153,10 @@ public class NTLMAuthenticationFilter implements Filter
     
     private String m_srvName;
     
+    // List of available locales (from the web-client configuration)
+    
+    private List<String> m_languages;
+    
     /**
      * Initialize the filter
      * 
@@ -161,6 +180,7 @@ public class NTLMAuthenticationFilter implements Filter
         m_authService = (AuthenticationService) ctx.getBean("authenticationService");
         m_authComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
         m_personService = (PersonService) ctx.getBean("personService");
+        m_configService = (ConfigService) ctx.getBean("configService");
         
         m_srvConfig = (ServerConfiguration) ctx.getBean(ServerConfiguration.SERVER_CONFIGURATION);
         
@@ -221,6 +241,13 @@ public class NTLMAuthenticationFilter implements Filter
             if ( logger.isDebugEnabled() && m_allowGuest)
                 logger.debug("NTLM filter guest access allowed");
         }
+
+        // Get a list of the available locales
+        
+        ClientConfigElement config = (ClientConfigElement) m_configService.getGlobalConfig()
+            .getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
+  
+        m_languages = config.getLanguages();
     }
 
     /**
@@ -644,7 +671,7 @@ public class NTLMAuthenticationFilter implements Filter
         }
         else
         {
-            // Cehck if we are using local MD4 password hashes or passthru authentication
+            // Check if we are using local MD4 password hashes or passthru authentication
             
             if ( m_authComponent.getNTLMMode() == NTLMMode.MD4_PROVIDER)
             {
@@ -776,7 +803,17 @@ public class NTLMAuthenticationFilter implements Filter
                 
                 httpSess.setAttribute(AuthenticationHelper.AUTHENTICATION_USER, user);
 
-                // Set the current locale
+                // Set the current locale from the Accept-Lanaguage header if available
+                
+                Locale userLocale = parseAcceptLanguageHeader(req);
+                
+                if ( userLocale != null)
+                {
+                    httpSess.setAttribute(LOCALE, userLocale);
+                    httpSess.removeAttribute(MESSAGE_BUNDLE);
+                }
+
+                // Set the locale using the session
                 
                 I18NUtil.setLocale(Application.getLanguage(httpSess));
 
@@ -870,5 +907,137 @@ public class NTLMAuthenticationFilter implements Filter
                 }
             }
         }
-    }    
+    }
+    
+    /**
+     * Parse the Accept-Lanaguage HTTP header value
+     * 
+     * @param req HttpServletRequest
+     * @return Locale
+     */
+    private final Locale parseAcceptLanguageHeader(HttpServletRequest req)
+    {
+        // Default the locale
+        
+        Locale locale = Locale.getDefault();
+        
+        // Get the accept language header value
+        
+        String acceptHeader = req.getHeader("Accept-Language");
+        if ( acceptHeader != null)
+        {
+            // Parse the accepted language list
+            
+            StringTokenizer tokens = new StringTokenizer(acceptHeader, ",");
+            List<AcceptLanguage> langList = new ArrayList<AcceptLanguage>();
+            
+            while ( tokens.hasMoreTokens())
+            {
+                // Get the current language token
+                
+                String lang = tokens.nextToken();
+                float quality = 1.0f;
+                
+                // Check if the optional quality has been specified
+                
+                int qpos = lang.indexOf(";");
+                if ( qpos != -1)
+                {
+                    // Parse the quality value
+                    
+                    try
+                    {
+                        quality = Float.parseFloat(lang.substring(qpos+3));
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        logger.error("Error parsing Accept-Language value " + lang);
+                    }
+                    
+                    // Strip the quality value from the language token
+                    
+                    lang = lang.substring(0,qpos);
+                }
+                
+                // Add the language to the list
+                
+                langList.add(new AcceptLanguage(lang, quality));
+            }
+            
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Accept-Language list : " + langList);
+            
+            // Match the client languages to the available locales
+            
+            if ( langList.size() > 0)
+            {
+                // Search for the best match locale to use for this client
+
+                AcceptLanguage useLang = null;
+                String useName = null;
+                boolean match = false;
+
+                for ( AcceptLanguage curLang : langList)
+                {
+                    // Match against the available languages
+                    
+                    for(String availLang : m_languages)
+                    {
+                        // The accept language may be in 'cc' or 'cc_cc' format
+
+                        match = false;
+                        
+                        if ( curLang.getLanguage().length() == 2)
+                        {
+                            if ( availLang.startsWith(curLang.getLanguage()))
+                                match = true;
+                        }
+                        else if ( availLang.equalsIgnoreCase(curLang.getLanguage()))
+                            match = true;
+                        
+                        // If we found a match check if it is a higher quality than the current match.
+                        // If the quality is the same we stick with the existing match as it was nearer the
+                        // start of the list.
+                        
+                        if ( match == true)
+                        {
+                            if ( useLang == null ||
+                                    ( curLang.getQuality() > useLang.getQuality()))
+                            {
+                                useLang = curLang;
+                                useName = availLang;
+                            }
+                        }
+                    }
+                }
+                
+                // Debug
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Accept-Language using " + (useLang != null ? useLang.toString() : "<none>"));
+                
+                // Create the required user locale
+                
+                if ( useLang != null)
+                {
+                    Locale useLocale = AcceptLanguage.createLocale(useName);
+                    if ( useLocale != null)
+                    {
+                        locale = useLocale;
+                        
+                        // Debug
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Using language " + useLang + ", locale " + locale);
+                    }
+                }
+            }
+        }
+
+        // Return the selected locale
+        
+        return locale;
+    }
 }
