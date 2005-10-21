@@ -103,30 +103,6 @@
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
                </tr>
                
-               <%-- Toolbar --%>
-               <%-- NOTE: removed toolbar until multi-select implemented
-               <tr style="padding-top:4px">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width=4></td>
-                  <td>
-                     <table cellspacing=0 cellpadding=4>
-                        <tr>
-                           <td>
-                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "bluetoolbar", "#E9F0F4"); %>
-                                 <table cellspacing=0 cellpadding=0><tr>
-                                    <td><a:actionLink value="#{msg.cut}" image="/images/icons/cut.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
-                                    <td><a:actionLink value="#{msg.copy}" image="/images/icons/copy.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
-                                    <td><a:actionLink value="#{msg.paste}" image="/images/icons/paste.gif" showLink="false" /></td><td>&nbsp;|&nbsp;</td>
-                                    <td><a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" /></td>
-                                 </tr></table>
-                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "bluetoolbar"); %>
-                           </td>
-                        </tr>
-                     </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
-               </tr>
-               --%>
-               
                <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
@@ -244,6 +220,16 @@
                            </td>
                         </tr>
                      </table>
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
+               </tr>
+               
+               <%-- Error Messages --%>
+               <tr valign="top">
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
+                  <td>
+                     <%-- messages tag to show messages not handled by other specific message tags --%>
+                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

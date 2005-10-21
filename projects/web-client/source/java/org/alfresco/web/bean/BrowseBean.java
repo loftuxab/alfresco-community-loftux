@@ -29,6 +29,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -418,29 +419,40 @@ public class BrowseBean implements IContextListener
             // find it's type so we can see if it's a node we are interested in
             QName type = this.nodeService.getType(nodeRef);
             
-            // look for Space or File nodes
-            if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) == true && 
-            	this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+            // make sure the type is defined in the data dictionary
+            TypeDefinition typeDef = this.dictionaryService.getType(type);
+            
+            if (typeDef != null)
             {
-               // TODO: We need to get at least Name etc. for sorting purposes,
-               //       if the props are always needed then it's better to get them here...?
-               //       AH is looking at adding sorting directly to search()
-               
-               // create our Node representation
-               MapNode node = new MapNode(nodeRef, this.nodeService, true);
-               node.addPropertyResolver("icon", this.resolverSpaceIcon);
-               node.addPropertyResolver("templatable", this.resolverTemplatable);
-               
-               this.containerNodes.add(node);
+               // look for Space or File nodes
+               if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) == true && 
+               	this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+               {
+                  // TODO: We need to get at least Name etc. for sorting purposes,
+                  //       if the props are always needed then it's better to get them here...?
+                  //       AH is looking at adding sorting directly to search()
+                  
+                  // create our Node representation
+                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                  node.addPropertyResolver("icon", this.resolverSpaceIcon);
+                  node.addPropertyResolver("templatable", this.resolverTemplatable);
+                  
+                  this.containerNodes.add(node);
+               }
+               else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+               {
+                  // create our Node representation
+                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                  
+                  setupDataBindingProperties(node);
+                  
+                  this.contentNodes.add(node);
+               }
             }
-            else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+            else
             {
-               // create our Node representation
-               MapNode node = new MapNode(nodeRef, this.nodeService, true);
-               
-               setupDataBindingProperties(node);
-               
-               this.contentNodes.add(node);
+               logger.warn("Found invalid object in database: id = " + nodeRef.toString() + 
+                     ", type = " + type.toString());
             }
          }
          
@@ -510,33 +522,44 @@ public class BrowseBean implements IContextListener
                // find it's type so we can see if it's a node we are interested in
                QName type = this.nodeService.getType(nodeRef);
                
-               // look for Space or File nodes
-               if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) && 
-                   this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+               // make sure the type is defined in the data dictionary
+               TypeDefinition typeDef = this.dictionaryService.getType(type);
+            
+               if (typeDef != null)
                {
-                  // create our Node representation
-                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
-                  
-                  // construct the path to this Node
-                  node.addPropertyResolver("path", this.resolverPath);
-                  node.addPropertyResolver("displayPath", this.resolverDisplayPath);
-                  node.addPropertyResolver("icon", this.resolverSpaceIcon);
-                  node.addPropertyResolver("templatable", this.resolverTemplatable);
-                  
-                  this.containerNodes.add(node);
+                  // look for Space or File nodes
+                  if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) && 
+                      this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+                  {
+                     // create our Node representation
+                     MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                     
+                     // construct the path to this Node
+                     node.addPropertyResolver("path", this.resolverPath);
+                     node.addPropertyResolver("displayPath", this.resolverDisplayPath);
+                     node.addPropertyResolver("icon", this.resolverSpaceIcon);
+                     node.addPropertyResolver("templatable", this.resolverTemplatable);
+                     
+                     this.containerNodes.add(node);
+                  }
+                  else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+                  {
+                     // create our Node representation
+                     MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                     
+                     setupDataBindingProperties(node);
+                     
+                     // construct the path to this Node
+                     node.addPropertyResolver("path", this.resolverPath);
+                     node.addPropertyResolver("displayPath", this.resolverDisplayPath);
+                     
+                     this.contentNodes.add(node);
+                  }
                }
-               else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+               else
                {
-                  // create our Node representation
-                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
-                  
-                  setupDataBindingProperties(node);
-                  
-                  // construct the path to this Node
-                  node.addPropertyResolver("path", this.resolverPath);
-                  node.addPropertyResolver("displayPath", this.resolverDisplayPath);
-                  
-                  this.contentNodes.add(node);
+                  logger.warn("Found invalid object in database: id = " + nodeRef.toString() + 
+                     ", type = " + type.toString());
                }
             }
          }

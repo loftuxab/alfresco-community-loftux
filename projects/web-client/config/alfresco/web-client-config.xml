@@ -200,9 +200,6 @@
          <transformer name="image/jpeg"/>
          <transformer name="image/png"/>
       </image-transformers>
-      <encodings>
-         <encoding name="UTF-8" displayLabelId="encoding_utf8"/>
-      </encodings>
    </config>
    
    <config evaluator="string-compare" condition="Custom Content Types">

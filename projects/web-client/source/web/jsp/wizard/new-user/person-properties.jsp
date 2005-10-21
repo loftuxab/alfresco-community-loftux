@@ -132,6 +132,9 @@
                            </td>
                            
                            <td width="100%" valign="top">
+                           
+                              <a:errors message="#{msg.error_wizard}" styleClass="errorMessage" />
+                           
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>

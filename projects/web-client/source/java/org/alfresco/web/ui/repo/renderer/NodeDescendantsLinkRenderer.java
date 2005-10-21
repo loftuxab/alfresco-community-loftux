@@ -29,9 +29,11 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.renderer.BaseRenderer;
@@ -118,8 +120,10 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
                for (int index=0; index<childRefs.size(); index++)
                {
                   ChildAssociationRef ref = childRefs.get(index);
-                  if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
-                      dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
+                  QName type = service.getType(ref.getChildRef());
+                  TypeDefinition typeDef = dd.getType(type);
+                  if (typeDef != null && dd.isSubClass(type, ContentModel.TYPE_FOLDER) && 
+                      dd.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
                   {
                      refs.add(ref);
                   }
@@ -131,8 +135,10 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
                for (int index=0; index<maximum; index++)
                {
                   ChildAssociationRef ref = refs.get(index);
-                  if (dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_FOLDER) && 
-                      dd.isSubClass(service.getType(ref.getChildRef()), ContentModel.TYPE_SYSTEM_FOLDER) == false)
+                  QName type = service.getType(ref.getChildRef());
+                  TypeDefinition typeDef = dd.getType(type);
+                  if (typeDef != null && dd.isSubClass(type, ContentModel.TYPE_FOLDER) && 
+                      dd.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
                   {
                      // output separator if appropriate
                      if (total > 0)

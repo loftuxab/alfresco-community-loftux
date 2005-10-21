@@ -206,16 +206,20 @@ public class UIChildAssociationEditor extends BaseAssociationEditor
          for (int x = 0; x < toAdd.length; x++)
          {
             String childId = toAdd[x];
-            QName assocQName = Repository.resolveToQName(this.associationName);
-            ChildAssociationRef childAssoc = new ChildAssociationRef(assocQName, 
-               node.getNodeRef(), assocQName, new NodeRef(Repository.getStoreRef(), childId));   
             
             // update the node so it knows to add the association
-            Map<String, ChildAssociationRef> added = node.getAddedChildAssociations().get(this.associationName);
-            added.put(childId, childAssoc);
+            if (this.originalAssocs.containsKey(childId) == false)
+            {
+               QName assocQName = Repository.resolveToQName(this.associationName);
+               ChildAssociationRef childAssoc = new ChildAssociationRef(assocQName, 
+                     node.getNodeRef(), assocQName, new NodeRef(Repository.getStoreRef(), childId));
             
-            if (logger.isDebugEnabled())
-               logger.debug("Added association to " + childId + " to the added list");
+               Map<String, ChildAssociationRef> added = node.getAddedChildAssociations().get(this.associationName);
+               added.put(childId, childAssoc);
+            
+               if (logger.isDebugEnabled())
+                  logger.debug("Added association to " + childId + " to the added list");
+            }
             
             // if the association was previously removed and has now been re-added it
             // will still be in the "to be removed" list so remove it if it is

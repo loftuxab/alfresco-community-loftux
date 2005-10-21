@@ -134,6 +134,7 @@ public abstract class BaseAssociationEditor extends UIInput
       this.selectItemsMsg = (String)values[6];
       this.selectedItemsMsg = (String)values[7];
       this.changingAssociation = (String)values[8];
+      this.disabled = (Boolean)values[9];
    }
    
    /**
@@ -141,7 +142,7 @@ public abstract class BaseAssociationEditor extends UIInput
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[14];
+      Object values[] = new Object[10];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.associationName;
@@ -152,6 +153,7 @@ public abstract class BaseAssociationEditor extends UIInput
       values[6] = this.selectItemsMsg;
       values[7] = this.selectedItemsMsg;
       values[8] = this.changingAssociation;
+      values[9] = this.disabled;
       
       // NOTE: we don't save the state of the added and removed maps as these
       //       need to be rebuilt everytime
@@ -232,7 +234,6 @@ public abstract class BaseAssociationEditor extends UIInput
             }
             case ACTION_CHANGE:
             {
-               //removeTarget(node, assocEvent.RemoveId);
                this.changingAssociation = assocEvent.RemoveId;
                this.showAvailable = true;
                break;

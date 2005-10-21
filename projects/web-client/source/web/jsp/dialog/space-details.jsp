@@ -166,7 +166,7 @@
                                           <r:propertySheetGrid id="space-props" value="#{SpaceDetailsBean.space}" var="spaceProps" 
                                                          columns="1" mode="view" labelStyleClass="propertiesLabel" 
                                                          externalConfig="true" />
-                                          <h:messages styleClass="errorMessage" layout="table" />
+                                          <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                                        </td>
                                     </tr>
                                  </table>

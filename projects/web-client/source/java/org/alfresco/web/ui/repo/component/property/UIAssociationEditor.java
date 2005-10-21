@@ -210,16 +210,21 @@ public class UIAssociationEditor extends BaseAssociationEditor
       {
          for (int x = 0; x < toAdd.length; x++)
          {
-            String targetId = toAdd[x];
-            QName assocQName = Repository.resolveToQName(this.associationName);
-            AssociationRef newAssoc = new AssociationRef(node.getNodeRef(), assocQName, new NodeRef(Repository.getStoreRef(), targetId));   
+            String targetId = toAdd[x];   
             
-            // update the node so it knows to add the association
-            Map<String, AssociationRef> added = node.getAddedAssociations().get(this.associationName);
-            added.put(targetId, newAssoc);
+            // update the node so it knows to add the association (if it wasn't there originally)
+            if (this.originalAssocs.containsKey(targetId) == false)
+            {
+               QName assocQName = Repository.resolveToQName(this.associationName);
+               AssociationRef newAssoc = new AssociationRef(node.getNodeRef(), assocQName, 
+                     new NodeRef(Repository.getStoreRef(), targetId));
             
-            if (logger.isDebugEnabled())
-               logger.debug("Added association to " + targetId + " to the added list");
+               Map<String, AssociationRef> added = node.getAddedAssociations().get(this.associationName);
+               added.put(targetId, newAssoc);
+               
+               if (logger.isDebugEnabled())
+                  logger.debug("Added association to " + targetId + " to the added list");
+            }
             
             // if the association was previously removed and has now been re-added it
             // will still be in the "to be removed" list so remove it if it is
