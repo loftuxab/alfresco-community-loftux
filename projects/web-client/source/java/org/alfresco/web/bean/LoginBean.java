@@ -16,6 +16,7 @@
  */
 package org.alfresco.web.bean;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +46,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
+import org.apache.log4j.Logger;
 
 /**
  * JSF Managed Bean. Backs the "login.jsp" view to provide the form fields used
@@ -259,13 +261,35 @@ public class LoginBean
             Map session = fc.getExternalContext().getSessionMap();
             session.put(AuthenticationHelper.AUTHENTICATION_USER, user);
             
+            // if a redirect URL has been provided then use that
+            String redirectURL = (String)fc.getExternalContext().getSessionMap().get(LOGIN_REDIRECT_KEY);
+            if (redirectURL != null)
+            {
+               if (logger.isDebugEnabled())
+                  logger.debug("Redirect URL found: " + redirectURL);
+               
+               try
+               {
+                  fc.getExternalContext().redirect(redirectURL);
+                  fc.responseComplete();
+                  return null;
+               }
+               catch (IOException ioErr)
+               {
+                  logger.warn("Unable to redirect to url: " + redirectURL);
+               }
+            }
+            
             // if an external outcome has been provided then use that, else use default
-            String externalOutcome = (String) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
+            String externalOutcome = (String)fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
             if (externalOutcome != null)
             {
                // TODO: This is a quick solution. It would be better to specify the (identifier?)
                // of a handler class that would be responsible for processing specific outcome arguments.
 
+               if (logger.isDebugEnabled())
+                  logger.debug("External outcome found: " + externalOutcome);
+               
                // setup is required for certain outcome requests
                if (OUTCOME_DOCDETAILS.equals(externalOutcome))
                {
@@ -361,6 +385,8 @@ public class LoginBean
    // ------------------------------------------------------------------------------
    // Private data
 
+   private static final Logger logger = Logger.getLogger(LoginBean.class);
+   
    /** I18N messages */
    private static final String MSG_ERROR_MISSING = "error_login_missing";
    private static final String MSG_ERROR_UNKNOWN_USER = "error_login_user";
@@ -369,10 +395,11 @@ public class LoginBean
    private static final String MSG_PASSWORD_CHARS = "login_err_password_chars";
    private static final String MSG_PASSWORD_LENGTH = "login_err_password_length";
 
-   public static final String LOGIN_OUTCOME_KEY = "_alfOutcome";
+   public static final String LOGIN_REDIRECT_KEY = "_alfRedirect";
+   public static final String LOGIN_OUTCOME_KEY  = "_alfOutcome";
    public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";
 
-   public final static String OUTCOME_DOCDETAILS = "showDocDetails";
+   public final static String OUTCOME_DOCDETAILS   = "showDocDetails";
    public final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";
 
    /** user name */

@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.LoginBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -102,7 +103,13 @@ public class DownloadContentServlet extends HttpServlet
          }
          if (index == -1)
          {
-            AuthenticationHelper.authenticate(getServletContext(), req, res);
+            if (AuthenticationHelper.authenticate(getServletContext(), req, res) == false)
+            {
+               // authentication failed - no point returning the content as we haven't logged in yet
+               // so end servlet execution and save the URL so the login page knows what to do later
+               req.getSession().setAttribute(LoginBean.LOGIN_REDIRECT_KEY, uri);
+               return;
+            }
          }
          else
          {

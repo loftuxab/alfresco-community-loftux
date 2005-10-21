@@ -723,7 +723,12 @@ public final class Repository
          
          if (uri != null)
          {
-            result = QName.NAMESPACE_BEGIN + uri + QName.NAMESPACE_END + localName;
+            result = new StringBuilder(64)
+                        .append(QName.NAMESPACE_BEGIN)
+                        .append(uri)
+                        .append(QName.NAMESPACE_END)
+                        .append(localName)
+                        .toString();
          }
          else
          {
@@ -733,8 +738,12 @@ public final class Repository
       else if (str.charAt(0) != QName.NAMESPACE_BEGIN)
       {
          // there's no namespace so prefix with Alfresco's Content Model
-         result = QName.NAMESPACE_BEGIN + NamespaceService.CONTENT_MODEL_1_0_URI + 
-                  QName.NAMESPACE_END + str;
+         result = new StringBuilder(64)
+                        .append(QName.NAMESPACE_BEGIN)
+                        .append(NamespaceService.CONTENT_MODEL_1_0_URI)
+                        .append(QName.NAMESPACE_END)
+                        .append(str)
+                        .toString();
       }
       
       return result;
