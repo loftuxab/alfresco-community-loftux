@@ -121,8 +121,10 @@ public class NodeStoreInspector
                 builder.
                     append(getIndent(iIndent+1)).
                     append("-> ").
-                    append(childAssocRef.getQName().getLocalName()).
-                    append("\n");
+                    append(childAssocRef.getQName().toString()).
+                    append(" (").
+                    append(childAssocRef.getQName().toString()).
+                    append(")\n");
                 
                 builder.append(outputNode(iIndent+2, nodeService, childAssocRef.getChildRef()));
             }

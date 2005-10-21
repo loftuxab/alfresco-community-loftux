@@ -119,9 +119,18 @@ public class ResultSetQuerySession extends AbstractQuerySession
                   {
                      value = valueObj.toString();
                   }
-                  columns[col] = new NamedValue(path.toString(), value);
+               
+                  // Get the attribute QName from the result path
+                  String attributeName = path.last().toString();
+                  if (attributeName.startsWith("@") == true)
+                  {
+                      attributeName = attributeName.substring(1);
+                  }
+               
+                  columns[col] = new NamedValue(attributeName, value);
                   col++;
                }
+
             
                org.alfresco.repo.webservice.types.ResultSetRow row = new org.alfresco.repo.webservice.types.ResultSetRow();
                row.setColumns(columns);
