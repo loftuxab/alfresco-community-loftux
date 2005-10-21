@@ -72,7 +72,7 @@
                            <td>
                               <div class="mainTitle"><h:outputText value="#{msg.system_info}" /></div>
                               <div class="mainSubTitle"><h:outputText value="#{msg.current_user}" />: <h:outputText value="#{NavigationBean.currentUser.userName}" /></div>
-                              <div class="mainSubText"><h:outputText value="#{msg.version}" />: <h:outputText value='#{version["version.major"]}.#{version["version.minor"]}.#{version["version.revision"]} (#{version["version.label"]})' /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.version}" />: <h:outputText value='#{version["version.edition"]} - v#{version["version.major"]}.#{version["version.minor"]}.#{version["version.revision"]} (#{version["version.label"]})' /></div>
                            </td>
                         </tr>
                      </table>

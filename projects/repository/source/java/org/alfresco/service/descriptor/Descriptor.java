@@ -58,6 +58,13 @@ public interface Descriptor
      * @return  full version number as major.minor.revision (label)
      */
     public String getVersion();
+
+    /**
+     * Gets the edition
+     *  
+     * @return  the edition
+     */
+    public String getEdition();
     
     /**
      * Gets the list available descriptors

@@ -153,8 +153,9 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
             
             // log output of version initialised
             String serverVersion = serverDescriptor.getVersion();
+            String serverEdition = serverDescriptor.getEdition();
             String repoVersion = repoDescriptor.getVersion();
-            logger.info("Alfresco server started - version " + serverVersion + "; repository version " + repoVersion);
+            logger.info("Alfresco started (" + serverEdition + ") - v" + serverVersion + "; repository v" + repoVersion);
         }
     }
     
@@ -255,6 +256,14 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
         }
 
         /* (non-Javadoc)
+         * @see org.alfresco.service.descriptor.Descriptor#getEdition()
+         */
+        public String getEdition()
+        {
+            return "unknown";
+        }
+
+        /* (non-Javadoc)
          * @see org.alfresco.service.descriptor.Descriptor#getDescriptorKeys()
          */
         public String[] getDescriptorKeys()
@@ -336,6 +345,14 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
         }
 
         /* (non-Javadoc)
+         * @see org.alfresco.service.descriptor.Descriptor#getEdition()
+         */
+        public String getEdition()
+        {
+            return null;
+        }
+        
+        /* (non-Javadoc)
          * @see org.alfresco.service.descriptor.Descriptor#getDescriptorKeys()
          */
         public String[] getDescriptorKeys()
@@ -412,6 +429,14 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
             return version;
         }
 
+        /* (non-Javadoc)
+         * @see org.alfresco.service.descriptor.Descriptor#getEdition()
+         */
+        public String getEdition()
+        {
+            return serverProperties.getProperty("version.edition");
+        }
+        
         /* (non-Javadoc)
          * @see org.alfresco.service.descriptor.Descriptor#getDescriptorKeys()
          */
