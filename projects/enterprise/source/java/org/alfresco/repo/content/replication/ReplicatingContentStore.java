@@ -24,6 +24,7 @@
 package org.alfresco.repo.content.replication;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -343,11 +344,11 @@ public class ReplicatingContentStore implements ContentStore
     /**
      * @return Returns the results as given by the primary store
      */
-    public List<String> listUrls() throws ContentIOException
+    public Set<String> getUrls() throws ContentIOException
     {
         // we could choose to get this from any store, but the primary one is by contract
         // the one chosen by the configuration to be the default for reads
-        return primaryStore.listUrls();
+        return primaryStore.getUrls();
     }
 
     /**

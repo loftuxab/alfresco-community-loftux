@@ -24,7 +24,7 @@
 package org.alfresco.repo.content.replication;
 
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -150,8 +150,8 @@ public class ContentStoreReplicatorTest extends TestCase
         }
         
         // check that we have an exact match of URLs
-        List<String> sourceUrls = sourceStore.listUrls();
-        List<String> targetUrls = targetStore.listUrls();
+        Set<String> sourceUrls = sourceStore.getUrls();
+        Set<String> targetUrls = targetStore.getUrls();
         
         sourceUrls.containsAll(targetUrls);
         targetUrls.contains(sourceUrls);

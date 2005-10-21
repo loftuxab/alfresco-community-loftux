@@ -16,10 +16,11 @@
  */
 package org.alfresco.repo.content;
 
-import java.util.List;
+import java.util.Set;
 
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentStreamListener;
 import org.alfresco.service.cmr.repository.ContentWriter;
 
 /**
@@ -107,13 +108,13 @@ public interface ContentStore
     public ContentWriter getWriter(ContentReader existingContentReader, String newContentUrl) throws ContentIOException;
 
     /**
-     * Get a list of all content in the store
+     * Get a set of all content in the store
      * 
-     * @return Returns a complete list of the URLs of all available content
+     * @return Returns a complete set of the unique URLs of all available content
      *      in the store
      * @throws ContentIOException
      */
-    public List<String> listUrls() throws ContentIOException;
+    public Set<String> getUrls() throws ContentIOException;
     
     /**
      * Deletes the content at the given URL.

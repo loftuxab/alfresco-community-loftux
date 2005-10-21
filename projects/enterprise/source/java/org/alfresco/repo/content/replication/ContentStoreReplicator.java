@@ -23,7 +23,7 @@
  */
 package org.alfresco.repo.content.replication;
 
-import java.util.List;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.ContentStore;
@@ -180,8 +180,13 @@ public class ContentStoreReplicator
     private void replicate()
     {
         // get all the URLs from the source
-        List<String> sourceUrls = sourceStore.listUrls();
-        // ensure that each one is present in the target
+        Set<String> sourceUrls = sourceStore.getUrls();
+        // get all the URLs from the target
+        Set<String> targetUrls = targetStore.getUrls();
+        // remove source URLs that are present in the target
+        sourceUrls.removeAll(targetUrls);
+        
+        // ensure that each remaining source URL is present in the target
         for (String contentUrl : sourceUrls)
         {
             replicate(contentUrl);

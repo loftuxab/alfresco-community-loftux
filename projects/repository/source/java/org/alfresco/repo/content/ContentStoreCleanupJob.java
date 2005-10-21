@@ -16,7 +16,7 @@
  */
 package org.alfresco.repo.content;
 
-import java.util.List;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -86,7 +86,7 @@ public class ContentStoreCleanupJob implements Job
         long lastModifiedSafeTimeMs = (now - protectMillis);   // able to remove anything modified before this
         
         // get all URLs in the store
-        List<String> contentUrls = contentStore.listUrls();
+        Set<String> contentUrls = contentStore.getUrls();
         for (String contentUrl : contentUrls)
         {
             // TODO here we need to get hold of all the orphaned content in this store

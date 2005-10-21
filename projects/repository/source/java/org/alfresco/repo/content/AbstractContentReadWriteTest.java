@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -500,7 +500,7 @@ public abstract class AbstractContentReadWriteTest extends TestCase
 
         ContentWriter writer = getWriter();
         
-        List<String> contentUrls = store.listUrls();
+        Set<String> contentUrls = store.getUrls();
         String contentUrl = writer.getContentUrl();
         assertTrue("Writer URL not listed by store", contentUrls.contains(contentUrl));
         
@@ -508,14 +508,14 @@ public abstract class AbstractContentReadWriteTest extends TestCase
         writer.putContent("The quick brown fox...");
 
         // check again
-        contentUrls = store.listUrls();
+        contentUrls = store.getUrls();
         assertTrue("Writer URL not listed by store", contentUrls.contains(contentUrl));
         
         // delete the content
         boolean deleted = store.delete(contentUrl);
         if (deleted)
         {
-            contentUrls = store.listUrls();
+            contentUrls = store.getUrls();
             assertFalse("Successfully deleted URL still shown by store", contentUrls.contains(contentUrl));
         }
     }

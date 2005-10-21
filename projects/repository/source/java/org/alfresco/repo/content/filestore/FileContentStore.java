@@ -18,8 +18,8 @@ package org.alfresco.repo.content.filestore;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentStore;
@@ -248,11 +248,11 @@ public class FileContentStore extends AbstractContentStore
         }
     }
 
-    public List<String> listUrls()
+    public Set<String> getUrls()
     {
         // recursively get all files within the root
-        List<String> contentUrls = new ArrayList<String>(1000);
-        listUrls(rootDirectory, contentUrls);
+        Set<String> contentUrls = new HashSet<String>(1000);
+        getUrls(rootDirectory, contentUrls);
         // done
         if (logger.isDebugEnabled())
         {
@@ -268,7 +268,7 @@ public class FileContentStore extends AbstractContentStore
      * @param contentUrls the list of current content URLs to add to
      * @return Returns a list of all files within the given directory and all subdirectories
      */
-    private void listUrls(File directory, List<String> contentUrls)
+    private void getUrls(File directory, Set<String> contentUrls)
     {
         File[] files = directory.listFiles();
         if (files == null)
@@ -281,7 +281,7 @@ public class FileContentStore extends AbstractContentStore
             if (file.isDirectory())
             {
                 // we have a subdirectory - recurse
-                listUrls(file, contentUrls);
+                getUrls(file, contentUrls);
             }
             else
             {
