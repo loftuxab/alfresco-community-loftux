@@ -3,39 +3,9 @@
  
 <beans>
 
+    <!-- import cache beans -->
+    <import resource="classpath:alfresco/cache-context.xml" />
 
-  <bean name="permissionEHCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" >
-      <property name="configLocation">
-         <value>classpath:ehcache.xml</value>
-      </property>
-   </bean>
-   
-   <bean name="nullPermissionCache" class="org.alfresco.repo.cache.EhCacheAdapter">
-      <property name="cache">
-         <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
-            <property name="cacheName">
-               <value>nullPermissionCache</value>
-            </property>
-         </bean>
-      </property>
-   </bean>
-   
-   <bean name="nullPermissionTransactionalCache" class="org.alfresco.repo.cache.TransactionalCache">
-      <property name="sharedCache">
-         <ref bean="nullPermissionCache" />
-      </property>
-      <property name="cacheManager" >
-         <ref bean="permissionEHCacheManager" />
-      </property>
-      <property name="name">
-         <value>transactionalCache</value>
-      </property>
-      <property name="maxCacheSize">
-         <value>20000</value>
-      </property>
-   </bean>
-
-    
     <!--                         -->
     <!-- Support for permissions -->
     <!--                         -->
@@ -108,7 +78,7 @@
             <ref bean="sessionFactory" />
         </property>
         <property name="nullPermissionCache">
-            <ref bean="nullPermissionTransactionalCache" />
+            <ref bean="nullPermissionCache" />
         </property>
     </bean>
 

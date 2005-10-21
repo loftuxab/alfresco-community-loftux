@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+
+   <!-- EH Cache Manager to produce in-transaction EH Caches -->
+   <bean name="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" >
+      <property name="configLocation">
+         <value>classpath:ehcache.xml</value>
+      </property>
+   </bean>
+   
+   <!-- The cross-transaction shared cache for Null Node Permissions -->
+   <bean name="nullPermissionEHCache" class="org.alfresco.repo.cache.EhCacheAdapter">
+      <property name="cache">
+         <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
+            <property name="cacheName">
+               <value>nullPermissionCache</value>
+            </property>
+         </bean>
+      </property>
+   </bean>
+   
+   <!-- The transactional cache for Null Node Permissions -->
+   <bean name="nullPermissionCache" class="org.alfresco.repo.cache.TransactionalCache">
+      <property name="sharedCache">
+         <ref bean="nullPermissionEHCache" />
+      </property>
+      <property name="cacheManager" >
+         <ref bean="ehCacheManager" />
+      </property>
+      <property name="name">
+         <value>transactionalCache</value>
+      </property>
+      <property name="maxCacheSize">
+         <value>20000</value>
+      </property>
+   </bean>
+
+</beans>
