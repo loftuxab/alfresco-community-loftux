@@ -11,7 +11,6 @@
 <b>Current Document Name:</b> ${document.name}
 <br>
 <b>Current Space Name:</b> ${space.name}
-<br>
 
 <h4>List of child spaces in my Home Space:</h4>
 <table>
@@ -31,9 +30,9 @@
 <#list userhome.children as child>
    <#if child.isDocument>
       <tr><td><img src="/alfresco${child.icon16}"></td><td><a href="/alfresco${child.url}">${child.properties.name}</a></td></tr>
-      <#if child.properties.mimetype = "text/plain">
+      <#if child.mimetype = "text/plain">
          <tr><td></td><td>${child.content}</td></tr>
-      <#elseif child.properties.mimetype = "image/jpeg">
+      <#elseif child.mimetype = "image/jpeg">
          <tr><td></td><td><img width=100 height=65 src="/alfresco${child.url}"></td></tr>
       </#if>
    </#if>
@@ -44,18 +43,5 @@
 <#if userhome.children[0].assocs["cm:contains"]?exists>
    ${userhome.children[0].assocs["cm:contains"][0].name}
 </#if>
-
-<h4>Info on the Current Document:</h4>
-<b>Name:</b> ${document.name}<br>
-<b>Ref:</b> ${document.nodeRef}<br>
-<b>Type:</b> ${document.type}<br>
-<b>Content URL:</b> <a href="/alfresco${document.url}">/alfresco${document.url}</a><br>
-<b>Locked:</b> <#if document.isLocked>Yes<#else>No</#if><br>
-<b>Aspects:</b>
-<table>
-<#list document.aspects as aspect>
-   <tr><td>${aspect}</td></tr>
-</#list>
-</table>
 
 <h3>=====Example Template End=====</h3>
