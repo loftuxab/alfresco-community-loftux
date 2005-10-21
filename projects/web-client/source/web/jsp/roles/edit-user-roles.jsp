@@ -70,7 +70,10 @@
                            </td>
                            <td>
                               <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle"><h:outputText value="#{msg.modify_user_roles}" /></div>
+                              <div class="mainTitle">
+                                 <h:outputText value="#{msg.modify_user_roles}" />
+                                 '<h:outputText value="#{UserMembersBean.personName}" />'
+                              </div>
                               <div class="mainSubText"><h:outputText value="#{msg.modify_user_roles_description}" /></div>
                            </td>
                         </tr>
@@ -97,32 +100,13 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td colspan=2 class="mainSubTitle"><h:outputText value="#{msg.change_user_roles}" /></td>
+                                    <td class="mainSubTitle"><h:outputText value="#{msg.change_user_roles}" /></td>
                                  </tr>
-                                 <tr><td colspan=2 class="paddingRow"></td></tr>
-                                 
+                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td><h:outputText value="#{msg.name}" />:</td>
-                                    <td><h:outputText value="#{UserMembersBean.personName}" /></td>
+                                    <td>1.&nbsp;<h:outputText value="#{msg.select_role}" />:</td>
                                  </tr>
-                                 
-                                 <tr valign="top">
-                                    <td><h:outputText value="#{msg.roles}" />:</td>
-                                    <td>
-                                       <h:dataTable value="#{UserMembersBean.personRolesDataModel}" var="row">
-                                          <h:column>
-                                             <h:outputText value="#{row.role}" />
-                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
-                                          </h:column>
-                                          <h:column>
-                                             <h:commandButton value="#{msg.remove}" actionListener="#{UserMembersBean.removeRole}" />
-                                          </h:column>
-                                       </h:dataTable>
-                                    </td>
-                                 </tr>
-                                 
-                                 <tr valign="top">
-                                    <td><h:outputText value="#{msg.add_role}" />:</td>
+                                 <tr>
                                     <td>
                                        <h:selectOneListbox id="roles" style="width:250px" size="5">
                                           <f:selectItems value="#{InviteUsersWizard.roles}" />
@@ -130,12 +114,38 @@
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td></td>
-                                    <td><h:commandButton value="#{msg.add}" actionListener="#{UserMembersBean.addRole}" /></td>
+                                    <td>
+                                       2.&nbsp;<h:commandButton value="#{msg.add_to_list_button}" actionListener="#{UserMembersBean.addRole}" />
+                                    </td>
                                  </tr>
-                                 
+                                 <tr><td class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td><h:outputText value="#{msg.selected_roles}" /></td>
+                                 </tr>
+                                 <tr>
+                                    <td>
+                                       <h:dataTable value="#{UserMembersBean.personRolesDataModel}" var="row"
+                                                    rowClasses="selectedItemsRow,selectedItemsRowAlt"
+                                                    styleClass="selectedItems" headerClass="selectedItemsHeader"
+                                                    cellspacing="0" cellpadding="4" 
+                                                    rendered="#{UserMembersBean.personRolesDataModel.rowCount != 0}">
+                                          <h:column>
+                                             <f:facet name="header">
+                                                <h:outputText value="#{msg.name}" />
+                                             </f:facet>
+                                             <h:outputText value="#{row.role}" />
+                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
+                                          </h:column>
+                                          <h:column>
+                                             <a:actionLink actionListener="#{UserMembersBean.removeRole}" image="/images/icons/delete.gif"
+                                                           value="#{msg.remove}" showLink="false"/>
+                                          </h:column>
+                                       </h:dataTable>
+                                       <h:outputText value="<#{msg.none}>"
+                                                     rendered="#{UserMembersBean.personRolesDataModel.rowCount == 0}" />
+                                    </td>
+                                 </tr>
                                  <tr><td colspan=2 class="paddingRow"></td></tr>
-                                 
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
@@ -145,7 +155,7 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.finish_button}" action="#{UserMembersBean.finishOK}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.ok}" action="#{UserMembersBean.finishOK}" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                                  <tr>

@@ -169,14 +169,19 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>3.</td>
-                                    <td><h:outputText value="#{msg.selected_actions}"/></td>
+                                    <td colspan='2'><h:outputText value="#{msg.selected_actions}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                       <h:dataTable value="#{NewRuleWizard.allActionsDataModel}" var="row">
+                                    <td colspan='2'>
+                                       <h:dataTable value="#{NewRuleWizard.allActionsDataModel}" var="row"
+                                                    rowClasses="selectedItemsRow,selectedItemsRowAlt"
+                                                    styleClass="selectedItems" headerClass="selectedItemsHeader"
+                                                    cellspacing="0" cellpadding="4" 
+                                                    rendered="#{NewRuleWizard.allActionsDataModel.rowCount != 0}">
                                           <h:column>
+                                             <f:facet name="header">
+                                                <h:outputText value="#{msg.summary}" />
+                                             </f:facet>
                                              <h:outputText value="#{row.actionSummary}"/>
                                              <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
@@ -188,6 +193,8 @@
                                                            value="#{msg.change}" showLink="false" />
                                           </h:column>
                                        </h:dataTable>
+                                       <h:outputText value="<#{msg.none}>"
+                                                     rendered="#{NewRuleWizard.allActionsDataModel.rowCount == 0}" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

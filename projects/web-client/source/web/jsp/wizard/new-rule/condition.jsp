@@ -155,14 +155,19 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>3.</td>
-                                    <td><h:outputText value="#{msg.selected_conditions}"/></td>
+                                    <td colspan='2'><h:outputText value="#{msg.selected_conditions}"/></td>
                                  </tr>
                                  <tr>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                       <h:dataTable value="#{NewRuleWizard.allConditionsDataModel}" var="row">
+                                    <td colspan='2'>
+                                       <h:dataTable value="#{NewRuleWizard.allConditionsDataModel}" var="row"
+                                                    rowClasses="selectedItemsRow,selectedItemsRowAlt"
+                                                    styleClass="selectedItems" headerClass="selectedItemsHeader"
+                                                    cellspacing="0" cellpadding="4" 
+                                                    rendered="#{NewRuleWizard.allConditionsDataModel.rowCount != 0}">
                                           <h:column>
+                                             <f:facet name="header">
+                                                <h:outputText value="#{msg.summary}" />
+                                             </f:facet>
                                              <h:outputText value="#{row.conditionSummary}"/>
                                              <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
@@ -175,6 +180,8 @@
                                                            rendered='#{row.conditionName != "no-condition"}'/>
                                           </h:column>
                                        </h:dataTable>
+                                       <h:outputText value="<#{msg.none}>"
+                                                     rendered="#{NewRuleWizard.allConditionsDataModel.rowCount == 0}" />
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

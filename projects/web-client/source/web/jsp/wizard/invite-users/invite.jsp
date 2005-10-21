@@ -143,27 +143,36 @@
                                  
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="2. #{msg.click_add}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td><h:commandButton value="#{msg.add}" actionListener="#{InviteUsersWizard.addSelection}" styleClass="wizardButton" /></td>
+                                    <td class="mainSubText">
+                                       2. <h:commandButton value="#{msg.add_to_list_button}" actionListener="#{InviteUsersWizard.addSelection}" styleClass="wizardButton" />
+                                    </td>
                                  </tr>
                                  
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td class="mainSubText"><h:outputText value="3. #{msg.selected_usersgroups}" /></td>
+                                    <td class="mainSubText"><h:outputText value="#{msg.selected_usersgroups}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       <h:dataTable value="#{InviteUsersWizard.userRolesDataModel}" var="row">
+                                       <h:dataTable value="#{InviteUsersWizard.userRolesDataModel}" var="row" 
+                                                    rowClasses="selectedItemsRow,selectedItemsRowAlt"
+                                                    styleClass="selectedItems" headerClass="selectedItemsHeader"
+                                                    cellspacing="0" cellpadding="4" 
+                                                    rendered="#{InviteUsersWizard.userRolesDataModel.rowCount != 0}">
                                           <h:column>
+                                             <f:facet name="header">
+                                                <h:outputText value="#{msg.name}" />
+                                             </f:facet>
                                              <h:outputText value="#{row.label}" />
                                              <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
                                           <h:column>
-                                             <h:commandButton value="#{msg.remove}" actionListener="#{InviteUsersWizard.removeSelection}" />
+                                             <a:actionLink actionListener="#{InviteUsersWizard.removeSelection}" image="/images/icons/delete.gif"
+                                                           value="#{msg.remove}" showLink="false"/>
                                           </h:column>
                                        </h:dataTable>
+                                       <h:outputText value="<#{msg.none}>"
+                                                     rendered="#{InviteUsersWizard.userRolesDataModel.rowCount == 0}" />
                                     </td>
                                  </tr>
                                  
