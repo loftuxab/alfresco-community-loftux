@@ -391,7 +391,10 @@ import org.xml.sax.helpers.AttributesImpl;
                 
                 // output value
                 String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
-                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+                if (strValue != null)
+                {
+                    contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+                }
 
                 // output value wrapper if property data type is any
                 if (valueDataType != null)
@@ -445,7 +448,10 @@ import org.xml.sax.helpers.AttributesImpl;
                 
                 // output value
                 String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
-                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+                if (strValue != null)
+                {
+                    contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
+                }
 
                 // output value wrapper if property data type is any
                 contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
