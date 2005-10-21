@@ -15,6 +15,9 @@
   License.
 --%>
 
+<%@ page import="org.alfresco.web.app.Application" %>
+<%@ page import="javax.faces.context.FacesContext" %>
+
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -27,6 +30,12 @@
 <r:page titleId="title_browse">
 
 <f:view>
+   <%
+      FacesContext fc = FacesContext.getCurrentInstance();
+     
+      // set locale for JSF framework usage
+      fc.getViewRoot().setLocale(Application.getLanguage(fc));
+   %>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
