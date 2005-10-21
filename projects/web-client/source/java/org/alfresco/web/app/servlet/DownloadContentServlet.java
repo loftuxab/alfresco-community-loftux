@@ -18,6 +18,7 @@ package org.alfresco.web.app.servlet;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -201,7 +202,24 @@ public class DownloadContentServlet extends HttpServlet
          // get the content and stream directly to the response output stream
          // assuming the repo is capable of streaming in chunks, this should allow large files
          // to be streamed directly to the browser response stream.
-         reader.getContent( res.getOutputStream() );
+         try
+         {
+            reader.getContent( res.getOutputStream() );
+         }
+         catch (SocketException e)
+         {
+            if (e.getMessage().contains("ClientAbortException"))
+            {
+                // the client cut the connection - our mission was accomplished apart from a little error message
+               logger.error("Client aborted stream read: \n" +
+                       "   node: " + nodeRef + "\n" +
+                       "   content: " + reader);
+            }
+            else
+            {
+               throw e;
+            }
+         }
       }
       catch (Throwable err)
       {
