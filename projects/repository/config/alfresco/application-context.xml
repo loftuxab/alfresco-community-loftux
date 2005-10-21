@@ -52,6 +52,7 @@
             <list>
                 <value>classpath:alfresco/repository.properties</value>
                 <value>classpath:alfresco/version.properties</value>
+                <value>classpath:alfresco/domain/transaction.properties</value>
             </list>
         </property>
     </bean>
