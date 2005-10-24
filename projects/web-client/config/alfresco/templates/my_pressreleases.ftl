@@ -6,13 +6,19 @@
          <#list child.children as doc>
             <#if doc.isDocument>
                <tr>
-                   <td><h3>${doc.properties.title}</h3></td>
+                   <td><a class="title" href="/alfresco/${doc.url}">${doc.properties.title}</a></td>
                </tr>
                <tr>
                    <td style="padding-left:4px"><b>${doc.properties.description}</b></td>
                </tr>
                <tr>
-                   <td style="padding-left:8px"><small>${doc.content}</small></td>
+                   <td style="padding-left:8px">
+                     <#if (doc.content?length > 500)>
+                        <small>${doc.content[0..500]}...</small>
+                     <#else>
+                        <small>${doc.content}</small>
+                     </#if>
+                   </td>
                </tr>
                <tr><td><div style="padding:6px"></div></td></tr>
             </#if>

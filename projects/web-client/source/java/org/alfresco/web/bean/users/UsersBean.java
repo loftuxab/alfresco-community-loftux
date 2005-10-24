@@ -47,7 +47,7 @@ public class UsersBean implements IContextListener
 {
    private static Logger logger = Logger.getLogger(UsersBean.class);
 
-   private static final String ERROR_PASSWORD_MATCH = "error_password_match";
+   public static final String ERROR_PASSWORD_MATCH = "error_password_match";
    private static final String ERROR_DELETE = "error_delete_user";
    
    private static final String DEFAULT_OUTCOME = "manageUsers";
@@ -258,6 +258,9 @@ public class UsersBean implements IContextListener
       return DEFAULT_OUTCOME;
    }
    
+   /**
+    * Action handler called for OK button press on Change Password screen
+    */
    public String changePasswordOK()
    {
       String outcome = DEFAULT_OUTCOME;

@@ -46,6 +46,7 @@ import org.alfresco.web.app.ContextListener;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.users.UsersBean;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.log4j.Logger;
@@ -73,6 +74,7 @@ public class NewUserWizard extends AbstractWizardBean
    private String lastName = null;
    private String userName = null;
    private String password = null;
+   private String confirm = null;
    private String email = null;
    private String companyId = null;
    private String homeSpaceName = null;
@@ -155,6 +157,7 @@ public class NewUserWizard extends AbstractWizardBean
       this.lastName = "";
       this.userName = "";
       this.password = "";
+      this.confirm = "";
       this.email = "";
       this.companyId = "";
       this.homeSpaceName = "";
@@ -173,6 +176,7 @@ public class NewUserWizard extends AbstractWizardBean
       this.lastName = (String) props.get("lastName");
       this.userName = (String) props.get("userName");
       this.password = "";
+      this.confirm = "";
       this.email = (String) props.get("email");
       this.companyId = (String) props.get("organizationId");
 
@@ -435,37 +439,45 @@ public class NewUserWizard extends AbstractWizardBean
          }
          else
          {
-            // create properties for Person type from submitted Form data
-            Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
-            props.put(ContentModel.PROP_USERNAME, this.userName);
-            props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
-            props.put(ContentModel.PROP_LASTNAME, this.lastName);
-            NodeRef homeSpaceNodeRef;
-            if (this.homeSpaceLocation != null && this.homeSpaceName.length() != 0)
+            if (this.password.equals(this.confirm))
             {
-               homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation.getId(), this.homeSpaceName, true);
+               // create properties for Person type from submitted Form data
+               Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
+               props.put(ContentModel.PROP_USERNAME, this.userName);
+               props.put(ContentModel.PROP_FIRSTNAME, this.firstName);
+               props.put(ContentModel.PROP_LASTNAME, this.lastName);
+               NodeRef homeSpaceNodeRef;
+               if (this.homeSpaceLocation != null && this.homeSpaceName.length() != 0)
+               {
+                  homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation.getId(), this.homeSpaceName, true);
+               }
+               else
+               {
+                  homeSpaceNodeRef = getCompanyHomeSpace();
+               }
+               props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceNodeRef);
+               props.put(ContentModel.PROP_EMAIL, this.email);
+               props.put(ContentModel.PROP_ORGID, this.companyId);
+   
+               // create the node to represent the Person
+               String assocName = QName.createValidLocalName(this.userName);
+               NodeRef newPerson = this.personService.createPerson(props);
+   
+               // ensure the user can access their own Person object
+               this.permissionService.setPermission(newPerson, this.userName, permissionService.getAllPermission(), true);
+   
+               if (logger.isDebugEnabled()) logger.debug("Created Person node for username: " + this.userName);
+   
+               // create the ACEGI Authentication instance for the new user
+               this.authenticationService.createAuthentication(this.userName, this.password.toCharArray());
+   
+               if (logger.isDebugEnabled()) logger.debug("Created User Authentication instance for username: " + this.userName);
             }
             else
             {
-               homeSpaceNodeRef = getCompanyHomeSpace();
+               outcome = null;
+               Utils.addErrorMessage(Application.getMessage(context, UsersBean.ERROR_PASSWORD_MATCH));
             }
-            props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceNodeRef);
-            props.put(ContentModel.PROP_EMAIL, this.email);
-            props.put(ContentModel.PROP_ORGID, this.companyId);
-
-            // create the node to represent the Person
-            String assocName = QName.createValidLocalName(this.userName);
-            NodeRef newPerson = this.personService.createPerson(props);
-
-            // ensure the user can access their own Person object
-            this.permissionService.setPermission(newPerson, this.userName, permissionService.getAllPermission(), true);
-
-            if (logger.isDebugEnabled()) logger.debug("Created Person node for username: " + this.userName);
-
-            // create the ACEGI Authentication instance for the new user
-            this.authenticationService.createAuthentication(this.userName, this.password.toCharArray());
-
-            if (logger.isDebugEnabled()) logger.debug("Created User Authentication instance for username: " + this.userName);
          }
 
          // commit the transaction
@@ -477,16 +489,7 @@ public class NewUserWizard extends AbstractWizardBean
       catch (Exception e)
       {
          // rollback the transaction
-         try
-         {
-            if (tx != null)
-            {
-               tx.rollback();
-            }
-         }
-         catch (Exception ex)
-         {
-         }
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(FacesContext.getCurrentInstance(), ERROR), e
                .getMessage()), e);
          outcome = null;
@@ -695,6 +698,22 @@ public class NewUserWizard extends AbstractWizardBean
    public void setPassword(String password)
    {
       this.password = password;
+   }
+   
+   /**
+    * @return Returns the confirm password.
+    */
+   public String getConfirm()
+   {
+      return this.confirm;
+   }
+
+   /**
+    * @param confirm The confirm password to set.
+    */
+   public void setConfirm(String confirm)
+   {
+      this.confirm = confirm;
    }
 
    /**

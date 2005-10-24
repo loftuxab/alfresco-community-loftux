@@ -42,7 +42,8 @@
           document.getElementById("user-props:password").disabled == false)
       {
          if (document.getElementById("user-props:userName").value.length == 0 ||
-             document.getElementById("user-props:password").value.length == 0)
+             document.getElementById("user-props:password").value.length == 0 ||
+             document.getElementById("user-props:confirm").value.length == 0)
          {
             document.getElementById("user-props:finish-button").disabled = true;
             document.getElementById("user-props:next-button").disabled = true;
@@ -170,6 +171,13 @@
                                     <td>
                                        <h:inputSecret id="password" value="#{NewUserWizard.password}" size="35" maxlength="1024" validator="#{LoginBean.validatePassword}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" redisplay="true" />&nbsp;*
                                        &nbsp;<h:message id="errors2" for="password" style="color:red" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td><h:outputText value="#{msg.confirm}"/>:</td>
+                                    <td>
+                                       <h:inputSecret id="confirm" value="#{NewUserWizard.confirm}" size="35" maxlength="1024" validator="#{LoginBean.validatePassword}" onkeyup="updateButtonState();" disabled="#{NewUserWizard.editMode}" redisplay="true" />&nbsp;*
+                                       &nbsp;<h:message id="errors3" for="confirm" style="color:red" />
                                     </td>
                                  </tr>
                                  
