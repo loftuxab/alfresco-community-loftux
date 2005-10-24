@@ -18,6 +18,7 @@ package org.alfresco.web.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -389,6 +390,20 @@ public class AdminNodeBrowseBean
     }
 
     /**
+     * Action to select node property
+     * 
+     * @return  next action
+     */
+    public String selectNodeProperty()
+    {
+        Property property = (Property)properties.getRowData();
+        Property.Value value = (Property.Value)property.getValues().getRowData();
+        NodeRef nodeRef = (NodeRef)value.getValue();
+        setNodeRef(nodeRef);
+        return "success";
+    }
+    
+    /**
      * Action to select child
      * 
      * @return  next action
@@ -457,7 +472,7 @@ public class AdminNodeBrowseBean
     public class Property
     {
         private QName name;
-        private Serializable value;
+        private DataModel values;
         private String datatype;
         private String residual;
     
@@ -465,12 +480,11 @@ public class AdminNodeBrowseBean
          * Construct
          * 
          * @param name  property name
-         * @param value  property value
+         * @param value  property values
          */
         public Property(QName name, Serializable value)
         {
             this.name = name;
-            this.value = value;
             
             PropertyDefinition propDef = dictionaryService.getProperty(name);
             if (propDef != null)
@@ -480,9 +494,24 @@ public class AdminNodeBrowseBean
             }
             else
             {
-                datatype = dictionaryService.getDataType(value.getClass()).getName().toString();
                 residual = "true";
             }
+            
+            // handle multi/single values
+            // TODO: perhaps this is not the most efficient way - lots of list creations
+            List<Value> values = new ArrayList<Value>();
+            if (value instanceof Collection)
+            {
+                for (Serializable multiValue : (Collection<Serializable>)value)
+                {
+                    values.add(new Value(multiValue));
+                }
+            }
+            else
+            {
+                values.add(new Value(value));
+            }
+            this.values = new ListDataModel(values);
         }
         
         /**
@@ -496,16 +525,6 @@ public class AdminNodeBrowseBean
         }
         
         /**
-         * Gets the property value
-         * 
-         * @return  value
-         */
-        public Serializable getValue()
-        {
-            return value;
-        }
-        
-        /**
          * Gets the property data type
          * 
          * @return  data type
@@ -513,6 +532,16 @@ public class AdminNodeBrowseBean
         public String getDataType()
         {
             return datatype;
+        }
+        
+        /**
+         * Gets the property value
+         * 
+         * @return  value
+         */
+        public DataModel getValues()
+        {
+            return values;
         }
         
         /**
@@ -525,27 +554,81 @@ public class AdminNodeBrowseBean
             return residual;
         }
         
-        /**
-         * Gets the property download url (for content properties)
-         * 
-         * @return  url
-         */
-        public String getUrl()
-        {
-            String url = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-            url += DownloadContentServlet.generateBrowserURL(nodeRef, "file.bin");
-            url += "?property=" + name;
-            return url;
-        }
         
         /**
-         * Gets whether the property is content
-         * 
-         * @return  true => is content
+         * Value wrapper
          */
-        public boolean isContent()
+        public class Value
         {
-            return datatype.equals(DataTypeDefinition.CONTENT.toString());
+            private Serializable value;
+
+            /**
+             * Construct
+             * 
+             * @param value  value
+             */
+            public Value(Serializable value)
+            {
+                this.value = value;
+            }
+            
+            /**
+             * Gets the value
+             * 
+             * @return  the value
+             */
+            public Serializable getValue()
+            {
+                return value;
+            }
+            
+            /**
+             * Gets the value datatype
+             * 
+             * @return  the value datatype
+             */
+            public String getDataType()
+            {
+                String datatype = Property.this.getDataType();
+                if (datatype == null || datatype.equals(DataTypeDefinition.ANY))
+                {
+                    datatype = dictionaryService.getDataType(value.getClass()).getName().toString();
+                }
+                return datatype;
+            }
+            
+            /**
+             * Gets the download url (for content properties)
+             * 
+             * @return  url
+             */
+            public String getUrl()
+            {
+                String url = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+                url += DownloadContentServlet.generateBrowserURL(nodeRef, "file.bin");
+                url += "?property=" + name;
+                return url;
+            }
+            
+            /**
+             * Determines whether the value is content
+             * 
+             * @return  true => is content
+             */
+            public boolean isContent()
+            {
+                return getDataType().equals(DataTypeDefinition.CONTENT.toString());
+            }
+            
+            /**
+             * Determines whether the value is a node ref
+             * 
+             * @return  true => is node ref
+             */
+            public boolean isNodeRef()
+            {
+                return getDataType().equals(DataTypeDefinition.NODE_REF.toString()) || datatype.equals(DataTypeDefinition.CATEGORY.toString());
+            }
         }
     }
 

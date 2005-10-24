@@ -86,10 +86,17 @@
            <f:facet name="header">
                <h:outputText value="Value"/>
            </f:facet>
-           <h:outputLink value="#{property.url}" target="_blank" rendered="#{property.content}">
-               <h:outputText value="#{property.value}" />
-           </h:outputLink>
-           <h:outputText value="#{property.value}" rendered="#{property.content == false}"/>
+           <h:dataTable id="values" cellspacing="0" value="#{property.values}" var="value">
+                <h:column>
+                    <h:outputLink value="#{value.url}" target="_blank" rendered="#{value.content}">
+                        <h:outputText value="#{value.value}" />
+                    </h:outputLink>
+                    <h:commandLink action="#{AdminNodeBrowseBean.selectNodeProperty}" rendered="#{value.nodeRef}">
+                        <h:outputText value="#{value.value}"/>
+                    </h:commandLink>
+                    <h:outputText value="#{value.value}" rendered="#{value.content == false && value.nodeRef == false}"/>
+               </h:column>
+           </h:dataTable>
        </h:column>
        <h:column>
            <f:facet name="header">

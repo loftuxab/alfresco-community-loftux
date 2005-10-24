@@ -786,8 +786,12 @@
            <from-outcome>success</from-outcome>
            <to-view-id>/jsp/admin/store-browser.jsp</to-view-id>
        </navigation-case>
+       <navigation-case>
+           <from-outcome>nodeBrowser</from-outcome>
+           <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
+       </navigation-case>
    </navigation-rule>
-
+   
    <navigation-rule>
        <from-view-id>/jsp/admin/store-browser.jsp</from-view-id>
        <navigation-case>
@@ -804,58 +808,35 @@
            <from-outcome>success</from-outcome>
            <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
        </navigation-case>
-   </navigation-rule>
-
-   <navigation-rule>
-       <from-view-id>/jsp/admin/node-browser.jsp</from-view-id>
        <navigation-case>
            <from-action>#{AdminNodeBrowseBean.selectPrimaryParent}</from-action>
            <from-outcome>success</from-outcome>
            <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
        </navigation-case>
-   </navigation-rule>
-
-   <navigation-rule>
-       <from-view-id>/jsp/admin/node-browser.jsp</from-view-id>
        <navigation-case>
            <from-action>#{AdminNodeBrowseBean.selectParent}</from-action>
            <from-outcome>success</from-outcome>
            <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
        </navigation-case>
-   </navigation-rule>
-
-   <navigation-rule>
-       <from-view-id>/jsp/admin/node-browser.jsp</from-view-id>
+       <navigation-case>
+           <from-action>#{AdminNodeBrowseBean.selectNodeProperty}</from-action>
+           <from-outcome>success</from-outcome>
+           <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
+       </navigation-case>
        <navigation-case>
            <from-action>#{AdminNodeBrowseBean.submitSearch}</from-action>
            <from-outcome>error</from-outcome>
            <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
        </navigation-case>
-   </navigation-rule>
-
-   <navigation-rule>
-       <from-view-id>/jsp/admin/node-browser.jsp</from-view-id>
        <navigation-case>
            <from-action>#{AdminNodeBrowseBean.submitSearch}</from-action>
            <from-outcome>node</from-outcome>
            <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
        </navigation-case>
-   </navigation-rule>
-   
-   <navigation-rule>
-       <from-view-id>/jsp/admin/node-browser.jsp</from-view-id>
        <navigation-case>
            <from-action>#{AdminNodeBrowseBean.submitSearch}</from-action>
            <from-outcome>search</from-outcome>
            <to-view-id>/jsp/admin/search-results.jsp</to-view-id>
-       </navigation-case>
-   </navigation-rule>
-
-   <navigation-rule>
-       <from-view-id>/jsp/admin/*</from-view-id>
-       <navigation-case>
-           <from-outcome>nodeBrowser</from-outcome>
-           <to-view-id>/jsp/admin/node-browser.jsp</to-view-id>
        </navigation-case>
    </navigation-rule>
 
