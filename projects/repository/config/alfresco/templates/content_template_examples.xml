@@ -13,7 +13,7 @@
       <sys:node-uuid>8138e003-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/company_logos.ftl|mimetype=text/plain|size=690|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/company_logos.ftl|mimetype=text/plain|size=690|encoding=UTF-8</cm:content>
       <cm:title>company_logos.ftl</cm:title>
       <cm:name>company_logos.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -34,7 +34,7 @@
       <sys:node-uuid>81d1768e-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/doc_info.ftl|mimetype=text/plain|size=577|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/doc_info.ftl|mimetype=text/plain|size=577|encoding=UTF-8</cm:content>
       <cm:title>doc_info.ftl</cm:title>
       <cm:name>doc_info.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -55,7 +55,7 @@
       <sys:node-uuid>8243e77b-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/example.ftl|mimetype=text/plain|size=1577|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/example.ftl|mimetype=text/plain|size=1577|encoding=UTF-8</cm:content>
       <cm:title>example.ftl</cm:title>
       <cm:name>example.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -76,7 +76,7 @@
       <sys:node-uuid>82d7c318-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/localizable.ftl|mimetype=text/plain|size=293|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/localizable.ftl|mimetype=text/plain|size=293|encoding=UTF-8</cm:content>
       <cm:title>localizable.ftl</cm:title>
       <cm:name>localizable.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -97,7 +97,7 @@
       <sys:node-uuid>83692db5-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/my_docs.ftl|mimetype=text/plain|size=750|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/my_docs.ftl|mimetype=text/plain|size=750|encoding=UTF-8</cm:content>
       <cm:title>my_docs.ftl</cm:title>
       <cm:name>my_docs.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -118,7 +118,7 @@
       <sys:node-uuid>83db9ea2-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/my_pressreleases.ftl|mimetype=text/plain|size=910|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/my_pressreleases.ftl|mimetype=text/plain|size=910|encoding=UTF-8</cm:content>
       <cm:title>my_pressreleases.ftl</cm:title>
       <cm:name>my_pressreleases.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -139,7 +139,7 @@
       <sys:node-uuid>84553b7f-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/my_spaces.ftl|mimetype=text/plain|size=682|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/my_spaces.ftl|mimetype=text/plain|size=682|encoding=UTF-8</cm:content>
       <cm:title>my_spaces.ftl</cm:title>
       <cm:name>my_spaces.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -160,7 +160,7 @@
       <sys:node-uuid>84d3934c-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/my_summary.ftl|mimetype=text/plain|size=537|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/my_summary.ftl|mimetype=text/plain|size=537|encoding=UTF-8</cm:content>
       <cm:title>my_summary.ftl</cm:title>
       <cm:name>my_summary.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -181,7 +181,7 @@
       <sys:node-uuid>854f7a19-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/translatable.ftl|mimetype=text/plain|size=322|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/translatable.ftl|mimetype=text/plain|size=322|encoding=UTF-8</cm:content>
       <cm:title>translatable.ftl</cm:title>
       <cm:name>translatable.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -202,7 +202,7 @@
       <sys:node-uuid>85c45b07-423c-11da-be9d-bb84ac6911f1</sys:node-uuid>
       <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
-      <cm:content>contentUrl=classpath:alfresco/templates/content template examples/userhome_docs.ftl|mimetype=text/plain|size=652|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/templates/content/examples/userhome_docs.ftl|mimetype=text/plain|size=652|encoding=UTF-8</cm:content>
       <cm:title>userhome_docs.ftl</cm:title>
       <cm:name>userhome_docs.ftl</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
