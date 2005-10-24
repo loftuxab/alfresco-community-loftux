@@ -69,7 +69,7 @@
 
    <table>
    <tr>
-      <td><b>Primary Path:</b></td><td><nobr><h:outputText id="primaryPath" value="#{AdminNodeBrowseBean.primaryPath}"/></nobr></td>
+      <td><nobr><b>Primary Path:</b></nobr></td><td><nobr><h:outputText id="primaryPath" value="#{AdminNodeBrowseBean.primaryPath}"/></nobr></td>
    </tr>
    <tr>
       <td><b>Reference:</b></td><td><h:outputText id="nodeRef" value="#{AdminNodeBrowseBean.nodeRef}"/></td>
@@ -101,7 +101,7 @@
            <f:facet name="header">
                <h:outputText value="Value"/>
            </f:facet>
-           <h:dataTable id="values" cellspacing="0" value="#{property.values}" var="value">
+           <h:dataTable id="values" border="0" cellspacing="0" value="#{property.values}" var="value" rendered="#{property.values.rowCount > 0}">
                 <h:column>
                     <h:outputLink value="#{value.url}" target="_blank" rendered="#{value.content}">
                         <h:outputText value="#{value.value}" />
@@ -109,15 +109,27 @@
                     <h:commandLink id="selectNodeProperty" action="#{AdminNodeBrowseBean.selectNodeProperty}" rendered="#{value.nodeRef}">
                         <h:outputText value="#{value.value}"/>
                     </h:commandLink>
-                    <h:outputText value="#{value.value}" rendered="#{value.content == false && value.nodeRef == false}"/>
+                    <h:outputText value="#{value.value}" rendered="#{value.content == false && value.nodeRef == false && value.nullValue == false}"/>
+                    <h:outputText styleClass="errorMessage" value="<<null value>>" rendered="#{value.nullValue}"/>
                </h:column>
            </h:dataTable>
+           <h:outputText styleClass="errorMessage" value="<<empty collection>>" rendered="#{property.values.rowCount == 0}"/>
        </h:column>
        <h:column>
            <f:facet name="header">
                <h:outputText value="Property Type"/>
            </f:facet>
            <h:outputText value="#{property.dataType}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Value Type"/>
+           </f:facet>
+           <h:dataTable id="valueTypes" border="0" cellspacing="0" value="#{property.values}" var="value">
+                <h:column>
+                    <h:outputText value="#{value.dataType}" rendered="#{property.dataType == null || property.any}"/>
+                </h:column>
+           </h:dataTable>
        </h:column>
        <h:column>
            <f:facet name="header">
@@ -182,7 +194,10 @@
            <f:facet name="header">
                <h:outputText value="To Node"/>
            </f:facet>
-           <h:outputText value="#{assoc.targetRef}"/>
+           <h:commandLink id="selectToNode" action="#{AdminNodeBrowseBean.selectToNode}">
+               <h:outputText value="#{assoc.targetRef}"/>
+           </h:commandLink>
+           
        </h:column>
        <h:column>
            <f:facet name="header">

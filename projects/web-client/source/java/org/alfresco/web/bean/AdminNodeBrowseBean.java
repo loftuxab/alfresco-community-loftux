@@ -390,6 +390,19 @@ public class AdminNodeBrowseBean
     }
 
     /**
+     * Action to select association To node
+     * 
+     * @return  next action
+     */
+    public String selectToNode()
+    {
+        AssociationRef assocRef = (AssociationRef)assocs.getRowData();
+        NodeRef targetRef = assocRef.getTargetRef();
+        setNodeRef(targetRef);
+        return "success";
+    }
+
+    /**
      * Action to select node property
      * 
      * @return  next action
@@ -543,15 +556,25 @@ public class AdminNodeBrowseBean
         {
             return values;
         }
-        
+
         /**
-         * Gets whether the property is residual
+         * Determines whether the property is residual
          * 
          * @return  true => property is not defined in dictionary
          */
         public String getResidual()
         {
             return residual;
+        }
+        
+        /**
+         * Determines whether the property is of ANY type
+         * 
+         * @return  true => is any
+         */
+        public boolean isAny()
+        {
+            return (datatype == null) ? false : datatype.equals(DataTypeDefinition.ANY.toString());
         }
         
         
@@ -590,7 +613,7 @@ public class AdminNodeBrowseBean
             public String getDataType()
             {
                 String datatype = Property.this.getDataType();
-                if (datatype == null || datatype.equals(DataTypeDefinition.ANY))
+                if (datatype == null || datatype.equals(DataTypeDefinition.ANY.toString()))
                 {
                     if (value != null)
                     {
@@ -633,6 +656,16 @@ public class AdminNodeBrowseBean
             {
                 String datatype = getDataType();
                 return (datatype == null) ? false : datatype.equals(DataTypeDefinition.NODE_REF.toString()) || datatype.equals(DataTypeDefinition.CATEGORY.toString());
+            }
+            
+            /**
+             * Determines whether the value is null
+             * 
+             * @return  true => value is null
+             */
+            public boolean isNullValue()
+            {
+                return value == null;
             }
         }
     }
