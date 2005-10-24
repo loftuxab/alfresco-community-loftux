@@ -56,8 +56,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <pre>/alfresco/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
  * or
  * <pre>/alfresco/download/direct/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
- * or
- * <pre>/alfresco/download/get/workspace/SpacesStore/0000-0000-0000-0000/{URI}propertyName</pre>
  * 
  * The store protocol, followed by the store ID, followed by the content Node Id
  * the last part is used for mimetype calculation and browser default filename.
@@ -96,12 +94,8 @@ public class DownloadContentServlet extends HttpServlet
             logger.debug("Processing URL: " + uri + (params != null ? ("?" + params) : ""));
          
          // see if a ticket has been supplied
-         int index = -1;
-         if (params != null)
-         {
-            index = params.indexOf("ticket=");
-         }
-         if (index == -1)
+         String ticket = req.getParameter("ticket");
+         if (ticket == null || ticket.length() == 0)
          {
             if (AuthenticationHelper.authenticate(getServletContext(), req, res) == false)
             {
@@ -113,8 +107,6 @@ public class DownloadContentServlet extends HttpServlet
          }
          else
          {
-            // extract ticket from URI, use to authenticate
-            String ticket = params.substring(index + 7);
             AuthenticationHelper.authenticate(getServletContext(), req, res, ticket);
          }
          
@@ -132,29 +124,22 @@ public class DownloadContentServlet extends HttpServlet
          t.nextToken();    // skip servlet name
          
          String attachToken = t.nextToken();
-         boolean get = attachToken.equals("get");
          boolean attachment = attachToken.equals("attach");
-         boolean direct = attachToken.equals("direct");
          
          StoreRef storeRef = new StoreRef(t.nextToken(), t.nextToken());
          String id = t.nextToken();
+         String filename = t.nextToken();
          
-         // get the filename and property qualified name
-         String fileOrQName = t.nextToken();
-         String filename = null;
+         // get property qualified name
          QName propertyQName = null;
-         if (get)
+         String property = req.getParameter("property");
+         if (property == null || property.length() == 0)
          {
-             filename = "file.bin";
-             // the parsing by '/' won't work with a QName
-             int indexOfQName = uri.indexOf("{http");
-             String qnameStr = uri.substring(indexOfQName);
-             propertyQName = QName.createQName(qnameStr);
+             propertyQName = ContentModel.PROP_CONTENT;
          }
          else
          {
-             filename = fileOrQName;
-             propertyQName = ContentModel.PROP_CONTENT;
+             propertyQName = QName.createQName(property);
          }
          
          NodeRef nodeRef = new NodeRef(storeRef, id);
@@ -162,11 +147,11 @@ public class DownloadContentServlet extends HttpServlet
          {
             logger.debug("Found NodeRef: " + nodeRef.toString());
             logger.debug("Will use filename: " + filename);
-            logger.debug("For property: " + filename);
+            logger.debug("For property: " + propertyQName);
             logger.debug("With attachment mode: " + attachment);
          }
          
-         if (attachment == true || get == true)
+         if (attachment == true)
          {
             // set header based on filename - will force a Save As from the browse if it doesn't recognise it
             // this is better than the default response of the browse trying to display the contents!
@@ -238,6 +223,9 @@ public class DownloadContentServlet extends HttpServlet
       }
    }
    
+   
+   
+   
    /**
     * Helper to generate a URL to a content node for downloading content from the server.
     * The content is supplied as an HTTP1.1 attachment to the response. This generally means
@@ -286,7 +274,7 @@ public class DownloadContentServlet extends HttpServlet
             ref.getId(),
             name} );
    }
-   
+
    
    private static Log logger = LogFactory.getLog(DownloadContentServlet.class);
    
