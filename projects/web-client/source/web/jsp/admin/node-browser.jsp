@@ -32,7 +32,7 @@
 
    <%@ include file="admin-title.jsp" %>
 
-   <h:commandLink action="#{AdminNodeBrowseBean.selectStores}">
+   <h:commandLink id="selectStores" action="#{AdminNodeBrowseBean.selectStores}">
        <h:outputText styleClass="mainSubText" value="Stores"/>
    </h:commandLink>
    <br>
@@ -41,13 +41,28 @@
    <h:outputText styleClass="mainTitle" value="Search"/>
 
    <h:form id="searchForm">
-      <h:selectOneMenu id="queryLanguage" value="#{AdminNodeBrowseBean.queryLanguage}">
-          <f:selectItems value="#{AdminNodeBrowseBean.queryLanguages}"/>
-      </h:selectOneMenu>
-
-      <h:inputText id="query" size="100" value="#{AdminNodeBrowseBean.query}"/>
-      <h:commandButton id="submitSearch" action="#{AdminNodeBrowseBean.submitSearch}" value="Search"/>  <br>
-      <h:message id="queryError" for="query"/>
+      <table>
+         <tr>
+            <td>
+               <h:selectOneMenu id="queryLanguage" value="#{AdminNodeBrowseBean.queryLanguage}">
+                   <f:selectItems value="#{AdminNodeBrowseBean.queryLanguages}"/>
+               </h:selectOneMenu>
+            </td>
+            <td>
+               <h:inputText id="query" size="100" value="#{AdminNodeBrowseBean.query}"/>
+            </td>
+            <td>
+               <h:commandButton id="submitSearch" action="#{AdminNodeBrowseBean.submitSearch}" value="Search"/>
+            </td>
+         </tr>
+         <tr>
+            <td></td>
+            <td>
+                <h:message styleClass="errorMessage" id="queryError" for="query"/>
+            </td>
+            <td></td>
+         </tr>
+      </table>
    </h:form>
    
    <h:outputText styleClass="mainTitle" value="Node Identifier"/>
@@ -65,7 +80,7 @@
    <tr>
       <td><b>Parent:</b></td>
       <td>
-          <h:commandLink action="#{AdminNodeBrowseBean.selectPrimaryParent}">
+          <h:commandLink id="selectPrimaryParent" action="#{AdminNodeBrowseBean.selectPrimaryParent}">
               <h:outputText id="primaryParent" value="#{AdminNodeBrowseBean.primaryParent}"/>
           </h:commandLink>
       </td>
@@ -91,7 +106,7 @@
                     <h:outputLink value="#{value.url}" target="_blank" rendered="#{value.content}">
                         <h:outputText value="#{value.value}" />
                     </h:outputLink>
-                    <h:commandLink action="#{AdminNodeBrowseBean.selectNodeProperty}" rendered="#{value.nodeRef}">
+                    <h:commandLink id="selectNodeProperty" action="#{AdminNodeBrowseBean.selectNodeProperty}" rendered="#{value.nodeRef}">
                         <h:outputText value="#{value.value}"/>
                     </h:commandLink>
                     <h:outputText value="#{value.value}" rendered="#{value.content == false && value.nodeRef == false}"/>
@@ -135,7 +150,7 @@
            <f:facet name="header">
                <h:outputText value="Child Node"/>
            </f:facet>
-           <h:commandLink action="#{AdminNodeBrowseBean.selectChild}">
+           <h:commandLink id="selectChild" action="#{AdminNodeBrowseBean.selectChild}">
                <h:outputText value="#{child.childRef}"/>
            </h:commandLink>
        </h:column>
@@ -191,7 +206,7 @@
            <f:facet name="header">
                <h:outputText value="Parent Node"/>
            </f:facet>
-           <h:commandLink action="#{AdminNodeBrowseBean.selectParent}">
+           <h:commandLink id="selectParent" action="#{AdminNodeBrowseBean.selectParent}">
                <h:outputText value="#{parent.parentRef}"/>
            </h:commandLink>
        </h:column>

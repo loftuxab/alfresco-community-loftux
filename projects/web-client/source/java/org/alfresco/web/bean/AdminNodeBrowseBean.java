@@ -460,7 +460,7 @@ public class AdminNodeBrowseBean
             FacesContext context = FacesContext.getCurrentInstance();
             FacesMessage message = new FacesMessage();
             message.setSeverity(FacesMessage.SEVERITY_ERROR);
-            message.setDetail(e.toString());
+            message.setDetail("Search failed due to: " + e.toString());
             context.addMessage("searchForm:query", message);
             return "error";
         }
@@ -592,7 +592,10 @@ public class AdminNodeBrowseBean
                 String datatype = Property.this.getDataType();
                 if (datatype == null || datatype.equals(DataTypeDefinition.ANY))
                 {
-                    datatype = dictionaryService.getDataType(value.getClass()).getName().toString();
+                    if (value != null)
+                    {
+                        datatype = dictionaryService.getDataType(value.getClass()).getName().toString();
+                    }
                 }
                 return datatype;
             }
