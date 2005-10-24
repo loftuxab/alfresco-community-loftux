@@ -43,6 +43,8 @@ import org.alfresco.example.webservice.types.Store;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.commons.logging.Log;
@@ -274,14 +276,14 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
      */
     public void testQueryAssociated() throws Exception
     {
-        try
-        {
-            this.repoService.queryAssociated(null, null);
-            fail("This method should have thrown a repository fault");
-        } catch (RepositoryFault rf)
-        {
-            // expected to get this
-        }
+        Reference contentRef = this.getContentReference();
+        
+        Association association = new Association(QName.createQName(NamespaceService.CONTENT_MODEL_PREFIX, "translations").toString(), AssociationDirectionEnum.target);
+        QueryResult result = this.repoService.queryAssociated(contentRef, new Association[]{association});
+        assertNotNull(result);
+        assertNotNull(result.getResultSet());
+        assertNotNull(result.getResultSet().getRows());
+        assertEquals(1, result.getResultSet().getRows().length);
     }
 
     /**

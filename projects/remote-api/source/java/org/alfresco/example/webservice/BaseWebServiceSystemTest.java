@@ -68,6 +68,7 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
     private Properties properties;
     private Store store;
     private Reference rootNodeReference;
+    private Reference contentReference;
     
     protected ContentServiceSoapBindingStub contentService;
 
@@ -152,6 +153,17 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
                     .getId(), null);
         }
         return this.rootNodeReference;
+    }
+    
+    protected Reference getContentReference()
+    {
+        if (this.contentReference == null)
+        {
+            String strNodeRef = getProperties().getProperty(WebServiceBootstrapSystemTest.PROP_CONTENT_NODE_REF);
+            NodeRef nodeRef = new NodeRef(strNodeRef);
+            this.contentReference = new Reference(getStore(), nodeRef.getId(), null);
+        }
+        return this.contentReference;
     }
     
     protected ParentReference getFolderParentReference(QName assocName)

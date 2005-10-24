@@ -26,9 +26,12 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.sun.corba.se.impl.orb.ParserTable.TestContactInfoListFactory;
 
 public class WebServiceBootstrapSystemTest extends TestCase
 {   
@@ -45,10 +48,11 @@ public class WebServiceBootstrapSystemTest extends TestCase
     public static final String PROP_STORE_REF = "storeRef";
     public static final String PROP_ROOT_NODE_REF = "rootNodeRef";
     public static final String PROP_FOLDER_NODE_REF = "folderNodeRef";
+    public static final String PROP_CONTENT_NODE_REF = "contentNodeRef";
     
     private static final String TEMP_BOOTSTRAP_PROPERTIES = "./WebServiceTestBootstrap.properties";    
     
-    private static final String TEST_CONTENT = "This is some test content.  This is some test content.";
+    private static final String TEST_CONTENT = "This is some test content.  This is some test content.";    
     
     
     /**
@@ -73,6 +77,7 @@ public class WebServiceBootstrapSystemTest extends TestCase
         StoreRef storeRef = null;
         NodeRef rootNodeRef = null;
         NodeRef folderNodeRef = null;
+        NodeRef testContent = null;
         
         try
         {
@@ -105,7 +110,7 @@ public class WebServiceBootstrapSystemTest extends TestCase
             contentProps.put(ContentModel.PROP_NAME, CONTENT_NAME);
             
             // Create some test content        
-            NodeRef testContent = nodeService.createNode(
+            testContent = nodeService.createNode(
                     rootNodeRef,
                     ContentModel.ASSOC_CHILDREN,
                     ContentModel.ASSOC_CHILDREN,
@@ -115,7 +120,25 @@ public class WebServiceBootstrapSystemTest extends TestCase
             writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
             writer.setEncoding("UTF-8");
             writer.putContent(TEST_CONTENT);
-        
+            
+            // Add the translatable aspect to the test content
+            nodeService.addAspect(testContent, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "translatable"), null);
+            
+            // Create content to be the translation of the translatable content
+            NodeRef testContent2 = nodeService.createNode(
+                    rootNodeRef,
+                    ContentModel.ASSOC_CHILDREN,
+                    ContentModel.ASSOC_CHILDREN,
+                    ContentModel.TYPE_CONTENT,
+                    contentProps).getChildRef();
+            ContentWriter writer2 = contentService.getWriter(testContent2, ContentModel.PROP_CONTENT, true);
+            writer2.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            writer2.setEncoding("UTF-8");
+            writer2.putContent(TEST_CONTENT);
+            
+            // Add the association from the master content to the translated content
+            nodeService.createAssociation(testContent, testContent2, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "translations"));
+            
             userTransaction.commit();
         }
         catch(Throwable e)
@@ -130,6 +153,7 @@ public class WebServiceBootstrapSystemTest extends TestCase
         properties.put(PROP_STORE_REF, storeRef.toString());
         properties.put(PROP_ROOT_NODE_REF, rootNodeRef.toString());
         properties.put(PROP_FOLDER_NODE_REF, folderNodeRef.toString());
+        properties.put(PROP_CONTENT_NODE_REF, testContent.toString());
         
         try
         {

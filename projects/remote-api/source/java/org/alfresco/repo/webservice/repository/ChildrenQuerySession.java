@@ -41,6 +41,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ChildrenQuerySession extends AbstractQuerySession
 {
+   private static final long serialVersionUID = -5347036309571057074L;
+
    private transient static Log logger = LogFactory.getLog(ChildrenQuerySession.class);
    
    private Reference node;

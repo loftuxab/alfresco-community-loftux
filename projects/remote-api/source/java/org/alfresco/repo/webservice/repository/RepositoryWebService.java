@@ -333,8 +333,52 @@ public class RepositoryWebService extends AbstractWebService implements
     public QueryResult queryAssociated(Reference node, Association[] association)
             throws RemoteException, RepositoryFault
     {
-        throw new RepositoryFault(1,
-                "queryAssociated() is not implemented yet!");
+        UserTransaction tx = null;
+
+        try
+        {
+            tx = Utils.getUserTransaction(MessageContext.getCurrentContext());
+            tx.begin();
+
+            // setup a query session and get the first batch of results
+            QuerySession querySession = new AssociatedQuerySession(Utils.getBatchSize(MessageContext.getCurrentContext()), node);
+            QueryResult queryResult = querySession
+                    .getNextResultsBatch(this.searchService, this.nodeService,
+                            this.namespaceService);
+
+            // add the session to the cache if there are more results to come
+            if (queryResult.getQuerySession() != null)
+            {
+                // this.querySessionCache.putQuerySession(querySession);
+                this.querySessionCache.put(queryResult.getQuerySession(),
+                        querySession);
+            }
+
+            // commit the transaction
+            tx.commit();
+
+            return queryResult;
+        } 
+        catch (Throwable e)
+        {
+            // rollback the transaction
+            try
+            {
+                if (tx != null)
+                {
+                    tx.rollback();
+                }
+            } catch (Exception ex)
+            {
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.error("Unexpected error occurred", e);
+            }
+
+            throw new RepositoryFault(0, e.getMessage());
+        }
     }
 
     /**
