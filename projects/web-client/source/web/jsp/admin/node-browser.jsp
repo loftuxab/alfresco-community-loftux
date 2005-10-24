@@ -1,0 +1,208 @@
+<%--
+  Copyright (C) 2005 Alfresco, Inc.
+ 
+  Licensed under the Mozilla Public License version 1.1 
+  with a permitted attribution clause. You may obtain a
+  copy of the License at
+ 
+    http://www.alfresco.org/legal/license.txt
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+  either express or implied. See the License for the specific
+  language governing permissions and limitations under the
+  License.
+--%>
+<%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
+<%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="/WEB-INF/repo.tld" prefix="r" %>
+
+<%@ page buffer="32kb" contentType="text/html;charset=UTF-8" %>
+<%@ page isELIgnored="false" %>
+<%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
+
+<r:page titleId="title_admin_node_browser">
+
+<f:view>
+   
+   <%-- load a bundle of properties with I18N strings --%>
+   <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
+
+   <%@ include file="admin-title.jsp" %>
+
+   <h:commandLink action="#{AdminNodeBrowseBean.selectStores}">
+       <h:outputText styleClass="mainSubText" value="Stores"/>
+   </h:commandLink>
+   <br>
+   <br>
+
+   <h:outputText styleClass="mainTitle" value="Search"/>
+
+   <h:form id="searchForm">
+      <h:selectOneMenu id="queryLanguage" value="#{AdminNodeBrowseBean.queryLanguage}">
+          <f:selectItems value="#{AdminNodeBrowseBean.queryLanguages}"/>
+      </h:selectOneMenu>
+
+      <h:inputText id="query" size="100" value="#{AdminNodeBrowseBean.query}"/>
+      <h:commandButton id="submitSearch" action="#{AdminNodeBrowseBean.submitSearch}" value="Search"/>  <br>
+      <h:message id="queryError" for="query"/>
+   </h:form>
+   
+   <h:outputText styleClass="mainTitle" value="Node Identifier"/>
+
+   <table>
+   <tr>
+      <td><b>Primary Path:</b></td><td><nobr><h:outputText id="primaryPath" value="#{AdminNodeBrowseBean.primaryPath}"/></nobr></td>
+   </tr>
+   <tr>
+      <td><b>Reference:</b></td><td><h:outputText id="nodeRef" value="#{AdminNodeBrowseBean.nodeRef}"/></td>
+   </tr>
+   <tr>
+      <td><b>Type:</b></td><td><h:outputText id="nodeType" value="#{AdminNodeBrowseBean.nodeType}"/></td>
+   </tr>
+   <tr>
+      <td><b>Parent:</b></td>
+      <td>
+          <h:commandLink action="#{AdminNodeBrowseBean.selectPrimaryParent}">
+              <h:outputText id="primaryParent" value="#{AdminNodeBrowseBean.primaryParent}"/>
+          </h:commandLink>
+      </td>
+   </tr>
+   </table>
+
+   <br>
+   <h:outputText styleClass="mainTitle" value="Propertes"/>
+   
+   <h:dataTable id="properties" border="1" value="#{AdminNodeBrowseBean.properties}" var="property">
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Name"/>
+           </f:facet>
+           <h:outputText value="#{property.name}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Value"/>
+           </f:facet>
+           <h:outputLink value="#{property.url}" target="_blank" rendered="#{property.content}">
+               <h:outputText value="#{property.value}" />
+           </h:outputLink>
+           <h:outputText value="#{property.value}" rendered="#{property.content == false}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Type"/>
+           </f:facet>
+           <h:outputText value="#{property.dataType}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Residual"/>
+           </f:facet>
+           <h:outputText value="#{property.residual}"/>
+       </h:column>
+   </h:dataTable>
+
+   <br>
+   <h:outputText styleClass="mainTitle" value="Aspects"/>
+
+   <h:dataTable id="aspects" value="#{AdminNodeBrowseBean.aspects}" var="aspect">
+       <h:column>
+           <h:outputText value="#{aspect}"/>
+       </h:column>
+   </h:dataTable>
+
+   <br>
+   <h:outputText styleClass="mainTitle" value="Children"/>
+
+   <h:dataTable id="children" border="1" value="#{AdminNodeBrowseBean.children}" var="child">
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Child Name"/>
+           </f:facet>
+           <h:outputText value="#{child.QName}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Child Node"/>
+           </f:facet>
+           <h:commandLink action="#{AdminNodeBrowseBean.selectChild}">
+               <h:outputText value="#{child.childRef}"/>
+           </h:commandLink>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Primary"/>
+           </f:facet>
+           <h:outputText value="#{child.primary}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Association Type"/>
+           </f:facet>
+           <h:outputText value="#{child.typeQName}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Index"/>
+           </f:facet>
+           <h:outputText value="#{child.nthSibling}"/>
+       </h:column>
+   </h:dataTable>
+
+   <br>
+   <h:outputText styleClass="mainTitle" value="Associations"/>
+
+   <h:dataTable id="assocs" border="1" value="#{AdminNodeBrowseBean.assocs}" var="assoc">
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="To Node"/>
+           </f:facet>
+           <h:outputText value="#{assoc.targetRef}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Association Type"/>
+           </f:facet>
+           <h:outputText value="#{assoc.typeQName}"/>
+       </h:column>
+   </h:dataTable>
+
+   <br>
+   <h:outputText styleClass="mainTitle" value="Parents"/>
+
+   <h:dataTable id="parents" border="1" value="#{AdminNodeBrowseBean.parents}" var="parent">
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Child Name"/>
+           </f:facet>
+           <h:outputText value="#{parent.QName}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Parent Node"/>
+           </f:facet>
+           <h:commandLink action="#{AdminNodeBrowseBean.selectParent}">
+               <h:outputText value="#{parent.parentRef}"/>
+           </h:commandLink>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Primary"/>
+           </f:facet>
+           <h:outputText value="#{parent.primary}"/>
+       </h:column>
+       <h:column>
+           <f:facet name="header">
+               <h:outputText value="Association Type"/>
+           </f:facet>
+           <h:outputText value="#{parent.typeQName}"/>
+       </h:column>
+   </h:dataTable>
+
+   <br>
+</f:view>
+
+</r:page>
