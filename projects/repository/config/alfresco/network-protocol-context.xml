@@ -114,6 +114,7 @@
       <property name="dictionaryService"><ref bean="dictionaryService" /></property>
       <property name="namespaceService"><ref bean="namespaceService" /></property>
       <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
+      <property name="permissionService"><ref bean="permissionService"/></property>
       <!--
       <property name="filePathCache">
          <bean class="org.alfresco.filesys.server.filesys.cache.FilePathCache" >

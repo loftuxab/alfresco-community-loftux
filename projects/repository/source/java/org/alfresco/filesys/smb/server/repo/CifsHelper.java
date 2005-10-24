@@ -46,6 +46,8 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.SearchLanguageConversion;
@@ -69,6 +71,7 @@ public class CifsHelper
     private NodeService nodeService;
     private SearchService searchService;
     private MimetypeService mimetypeService;
+    private PermissionService permissionService;
     
     /**
      * Default
@@ -107,6 +110,11 @@ public class CifsHelper
         this.mimetypeService = mimetypeService;
     }
 
+    public void setPermissionService(PermissionService permissionService)
+    {
+        this.permissionService = permissionService;
+    }
+    
     /**
      * @param serviceRegistry for repo connection
      * @param nodeRef
@@ -249,7 +257,9 @@ public class CifsHelper
         }
         
         // read/write access
-        // TODO: "Set read/write access flags"); //TODO
+        
+        if ( permissionService.hasPermission(nodeRef, PermissionService.WRITE) == AccessStatus.DENIED)
+            fileInfo.setFileAttributes(fileInfo.getFileAttributes() + FileAttribute.ReadOnly);
         
         // done
         if (logger.isDebugEnabled())
