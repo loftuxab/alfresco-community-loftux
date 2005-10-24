@@ -115,7 +115,7 @@
        </h:column>
        <h:column>
            <f:facet name="header">
-               <h:outputText value="Type"/>
+               <h:outputText value="Property Type"/>
            </f:facet>
            <h:outputText value="#{property.dataType}"/>
        </h:column>

@@ -620,7 +620,8 @@ public class AdminNodeBrowseBean
              */
             public boolean isContent()
             {
-                return getDataType().equals(DataTypeDefinition.CONTENT.toString());
+                String datatype = getDataType();
+                return (datatype == null) ? false : datatype.equals(DataTypeDefinition.CONTENT.toString());
             }
             
             /**
@@ -630,7 +631,8 @@ public class AdminNodeBrowseBean
              */
             public boolean isNodeRef()
             {
-                return getDataType().equals(DataTypeDefinition.NODE_REF.toString()) || datatype.equals(DataTypeDefinition.CATEGORY.toString());
+                String datatype = getDataType();
+                return (datatype == null) ? false : datatype.equals(DataTypeDefinition.NODE_REF.toString()) || datatype.equals(DataTypeDefinition.CATEGORY.toString());
             }
         }
     }
