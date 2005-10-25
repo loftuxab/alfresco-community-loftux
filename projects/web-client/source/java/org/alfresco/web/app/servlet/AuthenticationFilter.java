@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.LoginBean;
 
 /**
  * @author Kevin Roast
@@ -58,14 +59,20 @@ public class AuthenticationFilter implements Filter
    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
          throws IOException, ServletException
    {
+      HttpServletRequest httpReq = (HttpServletRequest)req;
+      
       // allow the login page to proceed
-      if (((HttpServletRequest)req).getRequestURI().endsWith(getLoginPage()) == false)
+      if (httpReq.getRequestURI().endsWith(getLoginPage()) == false)
       {
-         if (AuthenticationHelper.authenticate(
-               this.context, (HttpServletRequest)req, (HttpServletResponse)res))
+         if (AuthenticationHelper.authenticate(this.context, httpReq, (HttpServletResponse)res))
          {
             // continue filter chaining
             chain.doFilter(req, res);
+         }
+         else
+         {
+            // failed to authenticate - save redirect URL for after login process
+            httpReq.getSession().setAttribute(LoginBean.LOGIN_REDIRECT_KEY, httpReq.getRequestURI());
          }
       }
       else
