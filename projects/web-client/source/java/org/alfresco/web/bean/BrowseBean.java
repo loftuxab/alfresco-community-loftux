@@ -178,6 +178,18 @@ public class BrowseBean implements IContextListener
    }
    
    /**
+    * @return Returns the minimum length of a valid search string.
+    */
+   public int getMinimumSearchLength()
+   {
+      if (this.clientConfig == null)
+      {
+         initFromClientConfig();
+      }
+      return this.clientConfig.getSearchMinimum();
+   }
+   
+   /**
     * @return Returns the Space Node being used for the current browse screen action.
     */
    public Node getActionSpace()
@@ -263,6 +275,22 @@ public class BrowseBean implements IContextListener
    public void setDeleteMessage(String deleteMessage)
    {
       this.deleteMessage = deleteMessage;
+   }
+   
+   /**
+    * @return Returns the emptyContentMessage.
+    */
+   public String getEmptyContentMessage()
+   {
+      return this.emptyContentMessage;
+   }
+
+   /**
+    * @return Returns the emptySpacesMessage.
+    */
+   public String getEmptySpacesMessage()
+   {
+      return this.emptySpacesMessage;
    }
    
    /**
@@ -426,12 +454,8 @@ public class BrowseBean implements IContextListener
             {
                // look for Space or File nodes
                if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) == true && 
-               	this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+               	 this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
                {
-                  // TODO: We need to get at least Name etc. for sorting purposes,
-                  //       if the props are always needed then it's better to get them here...?
-                  //       AH is looking at adding sorting directly to search()
-                  
                   // create our Node representation
                   MapNode node = new MapNode(nodeRef, this.nodeService, true);
                   node.addPropertyResolver("icon", this.resolverSpaceIcon);
@@ -493,6 +517,16 @@ public class BrowseBean implements IContextListener
       long startTime = 0;
       if (logger.isDebugEnabled())
          startTime = System.currentTimeMillis();
+      
+      // special exit case for < 3 characters in length
+      if (searchContext.getText().length() < getMinimumSearchLength())
+      {
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(FacesContext.getCurrentInstance(), MSG_SEARCH_MINIMUM),
+               new Object[] {getMinimumSearchLength()}));
+         this.containerNodes = Collections.<Node>emptyList();
+         this.contentNodes = Collections.<Node>emptyList();
+         return;
+      }
       
       // get the searcher object and perform the search of the root node
       String query = searchContext.buildQuery();
@@ -1338,6 +1372,7 @@ public class BrowseBean implements IContextListener
    private static final String MSG_ERROR_DELETE_FILE  = "error_delete_file";
    private static final String MSG_ERROR_DELETE_SPACE = "error_delete_space";
    private static final String MSG_DELETE_COMPANYROOT = "delete_companyroot_confirm";
+   private static final String MSG_SEARCH_MINIMUM     = "search_minimum";
    
    private static Logger logger = Logger.getLogger(BrowseBean.class);
    
@@ -1384,4 +1419,7 @@ public class BrowseBean implements IContextListener
    
    /** The current browse view page size */
    private int browsePageSize;
+   
+   private String emptySpacesMessage = null;
+   private String emptyContentMessage = null;
 }

@@ -98,8 +98,6 @@ public class UISimpleSearch extends UICommand
          {
             String searchText = (String)requestMap.get(getClientId(context));
             
-            // TODO: strip or escape undesirable characters - for screen and search API
-            //searchText = searchText.replace('"', ' ');
             if (searchText.length() != 0)
             {
                if (logger.isDebugEnabled())

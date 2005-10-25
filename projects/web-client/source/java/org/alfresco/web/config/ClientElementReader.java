@@ -44,6 +44,7 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_ENGINE = "engine";
    public static final String ATTRIBUTE_NAME = "name";
    public static final String ELEMENT_HELPURL = "help-url";
+   public static final String ELEMENT_SEARCHMINIMUM = "search-minimum";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -149,6 +150,13 @@ public class ClientElementReader implements ConfigElementReader
          if (helpUrl != null)
          {
             configElement.setHelpUrl(helpUrl.getTextTrim());
+         }
+         
+         // get the minimum number of characters for valid search string
+         Element searchMin = element.element(ELEMENT_SEARCHMINIMUM);
+         if (searchMin != null)
+         {
+            configElement.setSearchMinimum(Integer.parseInt(searchMin.getTextTrim()));
          }
       }
       

@@ -40,6 +40,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    private int iconsPageSize = 9;
    private String defaultView = "list";
    private int recentSpacesItems = 6;
+   private int searchMinimum = 3;
    private String helpUrl = null;
    private Map<String, String> localeMap = new HashMap<String, String>();
    private List<String> languages = new ArrayList<String>(8);
@@ -219,4 +220,22 @@ public class ClientConfigElement extends ConfigElementAdapter
    {
       this.helpUrl = helpUrl;
    }
+
+   /**
+    * @return Returns the search minimum number of characters.
+    */
+   public int getSearchMinimum()
+   {
+      return this.searchMinimum;
+   }
+
+   /**
+    * @param searchMinimum The searchMinimum to set.
+    */
+   /*package*/ void setSearchMinimum(int searchMinimum)
+   {
+      this.searchMinimum = searchMinimum;
+   }
+   
+   
 }

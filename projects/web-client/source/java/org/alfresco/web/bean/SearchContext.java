@@ -84,13 +84,8 @@ public final class SearchContext implements Serializable
       String safeText = QueryParser.escape(text);
       String fullTextQuery;
       String nameAttrQuery;
-      if (text.equals("*") == true)
-      {
-         // special case to handle search against EVERYTHING
-         fullTextQuery = " ISNODE:*";
-         nameAttrQuery = " ISNODE:*";
-      }
-      else if (text.indexOf(' ') == -1)
+      
+      if (text.indexOf(' ') == -1)
       {
          // simple single word text search
          fullTextQuery = " TEXT:" + safeText + '*';
