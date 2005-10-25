@@ -18,8 +18,10 @@ package org.alfresco.web.ui.repo.component.template;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
 
@@ -102,6 +104,23 @@ public class TemplateNode extends Node
       }
       
       return this.children;
+   }
+   
+   /**
+    * @return A map capable of returning the TemplateNode at the specified Path as a child of this node.
+    */
+   public Map getChildByNamePath()
+   {
+      return new NamePathResultsMap(this.nodeService, this.nodeRef);
+   }
+   
+   /**
+    * @return A map capable of returning a List of TemplateNode objects from an XPath query
+    *         as children of this node.
+    */
+   public Map getChildrenByXPath()
+   {
+      return new XPathResultsMap(this.nodeService, this.nodeRef);
    }
    
    /**

@@ -261,25 +261,6 @@ public class LoginBean
             Map session = fc.getExternalContext().getSessionMap();
             session.put(AuthenticationHelper.AUTHENTICATION_USER, user);
             
-            // if a redirect URL has been provided then use that
-            String redirectURL = (String)fc.getExternalContext().getSessionMap().get(LOGIN_REDIRECT_KEY);
-            if (redirectURL != null)
-            {
-               if (logger.isDebugEnabled())
-                  logger.debug("Redirect URL found: " + redirectURL);
-               
-               try
-               {
-                  fc.getExternalContext().redirect(redirectURL);
-                  fc.responseComplete();
-                  return null;
-               }
-               catch (IOException ioErr)
-               {
-                  logger.warn("Unable to redirect to url: " + redirectURL);
-               }
-            }
-            
             // if an external outcome has been provided then use that, else use default
             String externalOutcome = (String)fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_KEY);
             if (externalOutcome != null)
@@ -323,7 +304,28 @@ public class LoginBean
             }
             else
             {
-               return "success";
+               // if a redirect URL has been provided then use that
+               String redirectURL = (String)fc.getExternalContext().getSessionMap().get(LOGIN_REDIRECT_KEY);
+               if (redirectURL != null)
+               {
+                  if (logger.isDebugEnabled())
+                     logger.debug("Redirect URL found: " + redirectURL);
+                  
+                  try
+                  {
+                     fc.getExternalContext().redirect(redirectURL);
+                     fc.responseComplete();
+                     return null;
+                  }
+                  catch (IOException ioErr)
+                  {
+                     logger.warn("Unable to redirect to url: " + redirectURL);
+                  }
+               }
+               else
+               {
+                  return "success";
+               }
             }
          }
          catch (AuthenticationException aerr)

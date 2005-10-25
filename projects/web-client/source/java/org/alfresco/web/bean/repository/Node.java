@@ -45,7 +45,7 @@ public class Node implements Serializable
 {
    private static final long serialVersionUID = 3544390322739034169L;
 
-   private static Log logger = LogFactory.getLog(Node.class);
+   protected static Log logger = LogFactory.getLog(Node.class);
    
    protected NodeRef nodeRef;
    private String name;
