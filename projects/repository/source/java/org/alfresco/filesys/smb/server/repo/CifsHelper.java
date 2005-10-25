@@ -62,10 +62,30 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CifsHelper
 {
+    // Constants
+    //
+    // XPath query strings for wildcard and specific file/folder searches
+    
+    private final String xpathQueryWildcard     = "./*[like(@cm:name, $cm:name, false) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
+    private final String xpathQueryFile         = "./*[@cm:name = $cm:name and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
+    private final String xpathQueryFilesFolders = "./*[(subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
+        
+    // Query parameter names
+    
+    private final String xpathParamName         = "cm:name";
+    private final String xpathParamFileType     = "cm:filetype";
+    private final String xpathParamFolderType   = "cm:foldertype";
+    
+    // Logging
+    
     private static Log logger = LogFactory.getLog(CifsHelper.class);
+    
+    // File state caching
     
     private FilePathCache filePathCache;
 
+    // Services
+    
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
@@ -73,11 +93,42 @@ public class CifsHelper
     private MimetypeService mimetypeService;
     private PermissionService permissionService;
     
+    // Query data types and fixed parameter types
+    
+    private DataTypeDefinition dataType;
+    
+    private QName cmName;
+    private QName cmFolderType;
+    private QName cmFileType;
+    
+    private QueryParameterDefinition fileType;
+    private QueryParameterDefinition folderType;
+    
     /**
-     * Default
+     * Class constructor
+     * 
+     * @param dictionService DictionaryService
+     * @param namespaceService NamespaceService
      */
-    public CifsHelper()
+    public CifsHelper(DictionaryService dictionaryService, NamespaceService namespaceService)
     {
+        this.dictionaryService = dictionaryService;
+        this.namespaceService  = namespaceService;
+        
+        // Get the text data type
+        
+        dataType = dictionaryService.getDataType(DataTypeDefinition.TEXT);
+        
+        // Generate the parameter names for searches
+        
+        cmName       = QName.createQName("cm:name", namespaceService);
+        cmFolderType = QName.createQName("cm:foldertype", namespaceService);
+        cmFileType   = QName.createQName("cm:filetype", namespaceService);
+        
+        // Create the fixed search parameter definitions
+        
+        fileType   = new QueryParameterDefImpl( cmFileType, dataType, true, ContentModel.TYPE_CONTENT.toString());
+        folderType = new QueryParameterDefImpl( cmFolderType, dataType, true, ContentModel.TYPE_FOLDER.toString());
     }
     
     public void setDictionaryService(DictionaryService dictionaryService)
@@ -399,7 +450,8 @@ public class CifsHelper
      */
     private List<NodeRef> getDirectDescendents(NodeRef pathRootNodeRef, String pathElement)
     {
-        // first check the cache to see if there are any results for this path query
+        // First check the cache to see if there are any results for this path query
+        
         List<NodeRef> cachedResults = (filePathCache == null) ? null : filePathCache.getPathResults(pathRootNodeRef, pathElement);
         if (cachedResults != null)
         {
@@ -407,57 +459,41 @@ public class CifsHelper
             return cachedResults;
         }
         
-        // perform the search
-        StringBuilder sb = new StringBuilder(250);
+        // Perform the search
         
         boolean wildcardSearch = WildCard.containsWildcards(pathElement);
+        String xpathQuery = null;
         
-        String nameParam = "cm:name";
-        String folderTypeParam = "cm:foldertype";
-        String fileTypeParam = "cm:filetype";
-        // append to the xpath
         if (wildcardSearch)
         {
             // escape the path element
             pathElement = SearchLanguageConversion.escapeForXPathLike(pathElement);
+            
             // fix up wildcard matches for like function
             pathElement = pathElement.replace('*', '%');
+            
             // use the like function (do not match FTS)
-            sb.append("./*[like(@cm:name, $").append(nameParam).append(", false)");
+            xpathQuery = xpathQueryWildcard;
         }
         else
         {
-            sb.append("./*[@cm:name = $").append(nameParam);
+            xpathQuery = xpathQueryFile;
         }
-        sb.append(" and ")
-          .append("(")
-          .append("subtypeOf($").append(folderTypeParam).append(")")
-          .append(" or ")
-          .append("subtypeOf($").append(fileTypeParam).append(")")
-          .append(")]");
+
         // create the query parameters
         QueryParameterDefinition[] params = new QueryParameterDefinition[3];
         params[0] = new QueryParameterDefImpl(
-                QName.createQName(nameParam, namespaceService),
+                QName.createQName(xpathParamName, namespaceService),
                 dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 pathElement);
-        params[1] = new QueryParameterDefImpl(
-                QName.createQName(folderTypeParam, namespaceService),
-                dictionaryService.getDataType(DataTypeDefinition.TEXT),
-                true,
-                ContentModel.TYPE_FOLDER.toString());
-        params[2] = new QueryParameterDefImpl(
-                QName.createQName(fileTypeParam, namespaceService),
-                dictionaryService.getDataType(DataTypeDefinition.TEXT),
-                true,
-                ContentModel.TYPE_CONTENT.toString());
+        params[1] = folderType;
+        params[2] = fileType; 
     
-        String xpath = sb.toString();
         // execute the query
         List<NodeRef> nodes = searchService.selectNodes(
                 pathRootNodeRef,
-                xpath,
+                xpathQuery,
                 params,
                 namespaceService,
                 false);

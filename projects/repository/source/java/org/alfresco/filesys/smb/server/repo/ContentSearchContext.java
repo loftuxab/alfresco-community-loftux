@@ -16,9 +16,8 @@
  */
 package org.alfresco.filesys.smb.server.repo;
 
+import java.io.FileNotFoundException;
 import java.util.List;
-
-import javax.transaction.UserTransaction;
 
 import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileInfo;
@@ -135,23 +134,17 @@ public class ContentSearchContext extends SearchContext
         NodeRef nextNodeRef = results.get(index);
         // get the file info
 
-        UserTransaction userTransaction = transactionService.getUserTransaction();
         try
         {
-            userTransaction.begin();
-            
             FileInfo nextInfo = cifsHelper.getFileInformation(nextNodeRef, "", true);
             // copy to info handle
             info.copyFrom(nextInfo);
             
-            userTransaction.commit();
-            
             // success
             return true;
         }
-        catch (Exception e)
+        catch (FileNotFoundException e)
         {
-            try { if (userTransaction != null) {userTransaction.rollback();} } catch (Exception ex) {}
             return false;
         }
     }

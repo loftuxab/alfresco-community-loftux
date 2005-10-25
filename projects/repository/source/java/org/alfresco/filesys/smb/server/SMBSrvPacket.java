@@ -766,6 +766,18 @@ public class SMBSrvPacket
         case PacketType.LogoffAndX:
             pktType = "LOGOFF_ANDX";
             break;
+        case PacketType.NTCancel:
+            pktType = "NTCANCEL";
+            break;
+        case PacketType.NTCreateAndX:
+            pktType = "NTCREATE_ANDX";
+            break;
+        case PacketType.NTTransact:
+            pktType = "NTTRANSACT";
+            break;
+        case PacketType.NTTransactSecond:
+            pktType = "NTTRANSACT_SECONDARY";
+            break;
         default:
             pktType = "0x" + Integer.toHexString(getCommand());
             break;
