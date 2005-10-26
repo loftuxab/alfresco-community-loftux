@@ -639,7 +639,7 @@ import org.xml.sax.helpers.AttributesImpl;
                 relativePath = toPath;
             }
         }
-        catch(AlfrescoRuntimeException e)
+        catch(Throwable e)
         {
             String msg = "Failed to determine relative path: export path=" + exportNodePath + "; from path=" + fromPath + "; to path=" + toPath;
             throw new ExporterException(msg, e);
