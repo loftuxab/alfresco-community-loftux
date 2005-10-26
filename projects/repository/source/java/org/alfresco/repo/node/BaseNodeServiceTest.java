@@ -749,7 +749,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         
         assertFalse("Primary child not deleted", nodeService.exists(childARef));
         assertEquals("Child assocs not removed",
-                0, nodeService.getChildAssocs(parentRef, ASSOC_TYPE_QNAME_TEST_CHILDREN, QName.createQName("path*")).size());
+                0, nodeService.getChildAssocs(
+                        parentRef,
+                        ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                        new RegexQNamePattern(".*", "path*")).size());
         assertEquals("Node assoc not removed",
                 0, nodeService.getTargetAssocs(parentRef, RegexQNamePattern.MATCH_ALL).size());
     }
@@ -976,8 +979,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals("Second child added to n1 was to n4: Order of refs is wrong",
                 n1n4Ref, childAssocRefs.get(1));
         // now set the child ordering explicitly - change the order
-        nodeService.setChildAssociationIndex(childAssocRefs.get(0), 1);
-        nodeService.setChildAssociationIndex(childAssocRefs.get(1), 0);
+        nodeService.setChildAssociationIndex(n1pn3Ref, 1);
+        nodeService.setChildAssociationIndex(n1n4Ref, 0);
         
         // repeat
         childAssocRefs = nodeService.getChildAssocs(n1Ref);
