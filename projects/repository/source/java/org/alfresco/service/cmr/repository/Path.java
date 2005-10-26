@@ -198,15 +198,15 @@ public final class Path implements Iterable<Path.Element>, Serializable
     {
         if (start < 0 || start > (elements.size() -1))
         {
-            throw new IndexOutOfBoundsException("Start must between 0 and " + (elements.size() -1));
+            throw new IndexOutOfBoundsException("Start index " + start + " must be between 0 and " + (elements.size() -1));
         }
         if (end < 0 || end > (elements.size() -1))
         {
-            throw new IndexOutOfBoundsException("End must between 0 and " + (elements.size() -1));
+            throw new IndexOutOfBoundsException("End index " + end + " must be between 0 and " + (elements.size() -1));
         }
         if (end < start)
         {
-            throw new IndexOutOfBoundsException("End cannot be before start");
+            throw new IndexOutOfBoundsException("End index " + end + " cannot be before start index " + start);
         }
         Path subPath = new Path();
         for (int i = start; i <= end; i++)

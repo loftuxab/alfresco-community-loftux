@@ -19,6 +19,7 @@ package org.alfresco.repo.exporter;
 import java.io.InputStream;
 import java.util.Collection;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -574,65 +575,77 @@ import org.xml.sax.helpers.AttributesImpl;
      */    
     private Path createRelativePath(NodeRef fromRef, NodeRef toRef)
     {
-        Path fromPath = nodeService.getPath(fromRef);
+        // Check that item exists first
         if (!nodeService.exists(toRef))
         {
             // return empty path for item that does not exist
             return new Path();
         }
+        
+        Path fromPath = nodeService.getPath(fromRef);
         Path toPath = nodeService.getPath(toRef);
-        
-        // Determine if 'to path' is a category
-        // TODO: This needs to be resolved in a more appropriate manner - special support is
-        //       required for categories.
-        for (int i = 0; i < toPath.size(); i++)
-        {
-            Path.Element pathElement = toPath.get(i);
-            if (pathElement.getPrefixedString(namespaceService).equals("cm:categoryRoot"))
-            {
-                Path.ChildAssocElement childPath = (Path.ChildAssocElement)pathElement;
-                Path categoryPath = new Path();
-                categoryPath.append(new Path.ChildAssocElement(new ChildAssociationRef(null, null, null, childPath.getRef().getParentRef())));
-                categoryPath.append(toPath.subPath(i + 1, toPath.size() -1));
-                return categoryPath;
-            }
-        }
-        
-        // Determine if from node is relative to export tree
         Path relativePath = null;
-        int i = 0;
-        while (i < exportNodePath.size() && i < fromPath.size() && exportNodePath.get(i).equals(fromPath.get(i)))
+
+        try
         {
-            i++;
-        }
-        if (i == exportNodePath.size())
-        {
-            // Determine if to node is relative to export tree
-            i = 0;
-            while (i < exportNodePath.size() && i < toPath.size() && exportNodePath.get(i).equals(toPath.get(i)))
+            // Determine if 'to path' is a category
+            // TODO: This needs to be resolved in a more appropriate manner - special support is
+            //       required for categories.
+            for (int i = 0; i < toPath.size(); i++)
             {
-                i++;
-            }
-            if (i == exportNodePath.size())
-            {
-                // build relative path between from and to
-                relativePath = new Path();
-                for (int p = 0; p < fromPath.size() - i; p++)
+                Path.Element pathElement = toPath.get(i);
+                if (pathElement.getPrefixedString(namespaceService).equals("cm:categoryRoot"))
                 {
-                    relativePath.append(new Path.ParentElement());
+                    Path.ChildAssocElement childPath = (Path.ChildAssocElement)pathElement;
+                    relativePath = new Path();
+                    relativePath.append(new Path.ChildAssocElement(new ChildAssociationRef(null, null, null, childPath.getRef().getParentRef())));
+                    relativePath.append(toPath.subPath(i + 1, toPath.size() -1));
+                    break;
                 }
-                relativePath.append(toPath.subPath(i, toPath.size() -1));
             }
+
+            if (relativePath == null)
+            {
+                // Determine if from node is relative to export tree
+                int i = 0;
+                while (i < exportNodePath.size() && i < fromPath.size() && exportNodePath.get(i).equals(fromPath.get(i)))
+                {
+                    i++;
+                }
+                if (i == exportNodePath.size())
+                {
+                    // Determine if to node is relative to export tree
+                    i = 0;
+                    while (i < exportNodePath.size() && i < toPath.size() && exportNodePath.get(i).equals(toPath.get(i)))
+                    {
+                        i++;
+                    }
+                    if (i == exportNodePath.size())
+                    {
+                        // build relative path between from and to
+                        relativePath = new Path();
+                        for (int p = 0; p < fromPath.size() - i; p++)
+                        {
+                            relativePath.append(new Path.ParentElement());
+                        }
+                        relativePath.append(toPath.subPath(i, toPath.size() -1));
+                    }
+                }
+            }
+            
+            if (relativePath == null)
+            {
+                // default to absolute path
+                relativePath = toPath;
+            }
+        }
+        catch(AlfrescoRuntimeException e)
+        {
+            String msg = "Failed to determine relative path: export path=" + exportNodePath + "; from path=" + fromPath + "; to path=" + toPath;
+            throw new ExporterException(msg, e);
         }
         
-        if (relativePath == null)
-        {
-            // default to absolute path
-            relativePath = toPath;
-        }
-
         return relativePath;
     }
-    
     
 }
