@@ -63,6 +63,10 @@ public class ContentNetworkFile extends NetworkFile
     /** keeps track of any writes */
     private boolean modified;
     
+    // Flag to indicate if the file channel is writable
+    
+    private boolean writableChannel;
+    
     /**
      * Helper method to create a {@link NetworkFile network file} given a node reference.
      * 
@@ -155,6 +159,7 @@ public class ContentNetworkFile extends NetworkFile
         sb.append("ContentNetworkFile:")
           .append("[ node=").append(nodeRef)
           .append(", channel=").append(channel)
+          .append(writableChannel ? "(Write)" : "(Read)")
           .append(", writable=").append(isWritable())
           .append(", content=").append(content)
           .append(", modified=").append(modified)
@@ -205,6 +210,28 @@ public class ContentNetworkFile extends NetworkFile
         {
             throw new AlfrescoRuntimeException("Unable to open channel for a directory network file: " + this);
         }
+        
+        // Check if write access is required and the current channel is read-only
+        
+        else if ( write && writableChannel == false && channel != null)
+        {
+            // Close the existing read-only channel
+            
+            try
+            {
+                channel.close();
+                channel = null;
+            }
+            catch (IOException ex)
+            {
+                logger.error("Error closing read-only channel", ex);
+            }
+            
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Switching to writable channel for " + getName());
+        }
         else if (channel != null)
         {
             // already have channel open
@@ -221,6 +248,10 @@ public class ContentNetworkFile extends NetworkFile
         if (write)
         {
             content = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, false);
+            
+            // Indicate that we have a writable channel to the file
+            
+            writableChannel = true;
         }
         else
         {
@@ -230,6 +261,10 @@ public class ContentNetworkFile extends NetworkFile
                     (ContentReader) content,
                     I18NUtil.getMessage("content.content_missing"),
                     nodeRef, content);
+            
+            // Indicate that we only have a read-only channel to the data
+            
+            writableChannel = false;
         }
         // wrap the channel accessor, if required
         if (!(content instanceof RandomAccessContent))
@@ -311,8 +346,8 @@ public class ContentNetworkFile extends NetworkFile
     @Override
     public synchronized int readFile(byte[] buffer, int length, int position, long fileOffset) throws IOException
     {
-        // open the channel for reading, open for read/write access if that is how the file was opened
-        openContent(getGrantedAccess() == NetworkFile.READWRITE);
+        // open the channel for reading
+        openContent(false);
         
         // read from the channel
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, position, length);
