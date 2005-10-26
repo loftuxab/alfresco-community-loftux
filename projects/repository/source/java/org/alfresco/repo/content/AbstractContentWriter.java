@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.content;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -217,7 +218,7 @@ public abstract class AbstractContentWriter extends AbstractContentAccessor impl
         try
         {
             WritableByteChannel channel = getWritableChannel();
-            OutputStream is = Channels.newOutputStream(channel);
+            OutputStream is = new BufferedOutputStream(Channels.newOutputStream(channel));
             // done
             return is;
         }

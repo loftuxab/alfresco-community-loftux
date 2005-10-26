@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.content;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -202,7 +203,7 @@ public abstract class AbstractContentReader extends AbstractContentAccessor impl
         try
         {
             ReadableByteChannel channel = getReadableChannel();
-            InputStream is = Channels.newInputStream(channel);
+            InputStream is = new BufferedInputStream(Channels.newInputStream(channel));
             // done
             return is;
         }

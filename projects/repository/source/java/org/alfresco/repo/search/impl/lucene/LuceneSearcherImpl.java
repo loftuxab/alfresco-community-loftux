@@ -72,7 +72,7 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
     /**
      * Default field name
      */
-    private static final String DEFAULT_FIELD = "FTS";
+    private static final String DEFAULT_FIELD = "TEXT";
 
     private NamespacePrefixResolver namespacePrefixResolver;
 

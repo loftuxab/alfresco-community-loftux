@@ -82,17 +82,20 @@ import org.apache.lucene.search.TermQuery;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
-   
+
     public static final String NOT_INDEXED_NO_TRANSFORMATION = "nint";
+
     public static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nift";
+
     public static final String NOT_INDEXED_CONTENT_MISSING = "nicm";
-    
+
     private static Logger s_logger = Logger.getLogger(LuceneIndexerImpl.class);
 
     /**
      * Enum for indexing actions against a node
      */
-    private enum Action {
+    private enum Action
+    {
         INDEX, REINDEX, DELETE, CASCADEREINDEX
     };
 
@@ -140,7 +143,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      */
     private List<Command> commandList = new ArrayList<Command>(10000);
 
-    
     /**
      * Call back to make after doing non atomic indexing
      */
@@ -158,7 +160,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     /**
      * Default construction
-     *
+     * 
      */
     LuceneIndexerImpl()
     {
@@ -168,7 +170,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     /**
      * IOC setting of dictionary service
      */
-    
+
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         super.setDictionaryService(dictionaryService);
@@ -195,9 +197,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         this.contentService = contentService;
     }
 
-    /*    **************************
-     *    * Indexer Implementation *
-     *    **************************
+    /***************************************************************************
+     * * Indexer Implementation * **************************
      */
 
     /**
@@ -206,7 +207,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * 
      */
 
-    private void checkAbleToDoWork(boolean isFTS)
+    private void checkAbleToDoWork(boolean isFTS, boolean isModified)
     {
         if (isFTSUpdate == null)
         {
@@ -232,7 +233,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             // All other states are a problem
             throw new IndexerException(buildErrorString());
         }
-        isModified = true;
+        this.isModified = isModified;
     }
 
     /**
@@ -286,12 +287,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             s_logger.debug("Create node " + relationshipRef.getChildRef());
         }
-        checkAbleToDoWork(false);
+        checkAbleToDoWork(false, true);
         try
         {
             NodeRef childRef = relationshipRef.getChildRef();
             // If we have the root node we delete all other root nodes first
-            if ((relationshipRef.getParentRef() == null) && childRef.equals(nodeService.getRootNode(childRef.getStoreRef())))
+            if ((relationshipRef.getParentRef() == null)
+                    && childRef.equals(nodeService.getRootNode(childRef.getStoreRef())))
             {
                 addRootNodesToDeletionList();
                 s_logger.warn("Detected root node addition: deleting all nodes from the index");
@@ -350,7 +352,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             s_logger.debug("Update node " + nodeRef);
         }
-        checkAbleToDoWork(false);
+        checkAbleToDoWork(false, true);
         try
         {
             reindex(nodeRef, false);
@@ -368,7 +370,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             s_logger.debug("Delete node " + relationshipRef.getChildRef());
         }
-        checkAbleToDoWork(false);
+        checkAbleToDoWork(false, true);
         try
         {
             delete(relationshipRef.getChildRef());
@@ -386,7 +388,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             s_logger.debug("Create child " + relationshipRef);
         }
-        checkAbleToDoWork(false);
+        checkAbleToDoWork(false, true);
         try
         {
             // TODO: Optimise
@@ -400,13 +402,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef, ChildAssociationRef relationshipAfterRef) throws LuceneIndexException
+    public void updateChildRelationship(ChildAssociationRef relationshipBeforeRef,
+            ChildAssociationRef relationshipAfterRef) throws LuceneIndexException
     {
         if (s_logger.isDebugEnabled())
         {
             s_logger.debug("Update child " + relationshipBeforeRef + " to " + relationshipAfterRef);
         }
-        checkAbleToDoWork(false);
+        checkAbleToDoWork(false, true);
         try
         {
             // TODO: Optimise
@@ -429,7 +432,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             s_logger.debug("Delete child " + relationshipRef);
         }
-        checkAbleToDoWork(false);
+        checkAbleToDoWork(false, true);
         try
         {
             // TODO: Optimise
@@ -453,7 +456,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
      * @param deltaId
      * @return
      */
-    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, LuceneConfig config) throws LuceneIndexException
+    public static LuceneIndexerImpl getUpdateIndexer(StoreRef storeRef, String deltaId, LuceneConfig config)
+            throws LuceneIndexException
     {
         if (s_logger.isDebugEnabled())
         {
@@ -899,7 +903,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex, boolean cascade, IndexReader mainReader) throws LuceneIndexException
+    private Set<NodeRef> deleteImpl(NodeRef nodeRef, boolean forReindex, boolean cascade, IndexReader mainReader)
+            throws LuceneIndexException
     {
         // startTimer();
         getDeltaReader();
@@ -928,7 +933,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     }
 
-    private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws LuceneIndexException
+    private Set<NodeRef> deletePrimary(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete)
+            throws LuceneIndexException
     {
 
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
@@ -962,7 +968,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     }
 
-    private Set<NodeRef> deleteReference(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete) throws LuceneIndexException
+    private Set<NodeRef> deleteReference(Collection<NodeRef> nodeRefs, IndexReader reader, boolean delete)
+            throws LuceneIndexException
     {
 
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
@@ -996,7 +1003,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     }
 
-    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete, boolean cascade) throws LuceneIndexException
+    private Set<NodeRef> deleteContainerAndBelow(NodeRef nodeRef, IndexReader reader, boolean delete, boolean cascade)
+            throws LuceneIndexException
     {
         Set<NodeRef> refs = new LinkedHashSet<NodeRef>();
 
@@ -1132,7 +1140,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         Collection<Path> directPaths = nodeService.getPaths(nodeRef, false);
         Collection<Pair<Path, QName>> categoryPaths = getCategoryPaths(nodeRef, properties);
-        Collection<Pair<Path, QName>> paths = new ArrayList<Pair<Path, QName>>(directPaths.size() + categoryPaths.size());
+        Collection<Pair<Path, QName>> paths = new ArrayList<Pair<Path, QName>>(directPaths.size()
+                + categoryPaths.size());
         for (Path path : directPaths)
         {
             paths.add(new Pair<Path, QName>(path, null));
@@ -1168,8 +1177,6 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 pathString = pathString.substring(1);
             }
 
-          
-
             if (isRoot)
             {
                 // Root node
@@ -1195,8 +1202,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         }
                         qNameBuffer.append(ISO9075.getXPathName(qNameRef.getQName()));
                         xdoc.add(new Field("PARENT", qNameRef.getParentRef().toString(), true, true, false));
-                        xdoc.add(new Field("TYPEQNAME", ISO9075.getXPathName(qNameRef.getTypeQName()), true, false, false));
-                        xdoc.add(new Field("LINKASPECT", (pair.getSecond() == null) ? "" : ISO9075.getXPathName(pair.getSecond()) , true, true, false));
+                        xdoc.add(new Field("ASSOCTYPEQNAME", ISO9075.getXPathName(qNameRef.getTypeQName()), true,
+                                false, false));
+                        xdoc.add(new Field("LINKASPECT", (pair.getSecond() == null) ? "" : ISO9075.getXPathName(pair
+                                .getSecond()), true, true, false));
                     }
                 }
 
@@ -1216,7 +1225,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         Document directoryEntry = new Document();
                         directoryEntry.add(new Field("ID", nodeRef.toString(), true, true, false));
                         directoryEntry.add(new Field("PATH", pathString, true, true, true));
-                        for(NodeRef parent : getParents(pair.getFirst()))
+                        for (NodeRef parent : getParents(pair.getFirst()))
                         {
                             directoryEntry.add(new Field("ANCESTOR", parent.toString(), true, true, false));
                         }
@@ -1241,6 +1250,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             xdoc.add(new Field("PATH", "", true, true, true));
             xdoc.add(new Field("QNAME", "", true, true, true));
             xdoc.add(new Field("ISROOT", "T", true, true, false));
+            xdoc.add(new Field("PRIMARYASSOCTYPEQNAME", ISO9075.getXPathName(ContentModel.ASSOC_CHILDREN), true, false,
+                    false));
             xdoc.add(new Field("ISNODE", "T", true, true, false));
             docs.add(xdoc);
 
@@ -1254,8 +1265,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
             ChildAssociationRef primary = nodeService.getPrimaryParent(nodeRef);
             xdoc.add(new Field("PRIMARYPARENT", primary.getParentRef().toString(), true, true, false));
+            xdoc.add(new Field("PRIMARYASSOCTYPEQNAME", ISO9075.getXPathName(primary.getTypeQName()), true, false,
+                    false));
             QName typeQName = nodeService.getType(nodeRef);
-      
+
             xdoc.add(new Field("TYPE", ISO9075.getXPathName(typeQName), true, true, false));
             for (QName classRef : nodeService.getAspects(nodeRef))
             {
@@ -1318,7 +1331,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    private boolean indexProperty(NodeRef nodeRef, QName propertyName, Serializable value, Document doc, boolean isAtomic)
+    private boolean indexProperty(NodeRef nodeRef, QName propertyName, Serializable value, Document doc,
+            boolean isAtomic)
     {
         boolean store = true;
         boolean index = true;
@@ -1356,17 +1370,24 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             if (reader != null && reader.exists())
                             {
                                 boolean readerReady = true;
-                                // transform if necessary (it is not a UTF-8 text document)
-                                if (!EqualsHelper.nullSafeEquals(reader.getMimetype(), MimetypeMap.MIMETYPE_TEXT_PLAIN) ||
-                                    !EqualsHelper.nullSafeEquals(reader.getEncoding(), "UTF-8"))
+                                // transform if necessary (it is not a UTF-8
+                                // text document)
+                                if (!EqualsHelper.nullSafeEquals(reader.getMimetype(), MimetypeMap.MIMETYPE_TEXT_PLAIN)
+                                        || !EqualsHelper.nullSafeEquals(reader.getEncoding(), "UTF-8"))
                                 {
                                     ContentWriter writer = contentService.getTempWriter();
                                     writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-                                    writer.setEncoding("UTF-8");   // this is what the analyzers expect on the stream
+                                    writer.setEncoding("UTF-8"); // this is
+                                    // what the
+                                    // analyzers
+                                    // expect on
+                                    // the
+                                    // stream
                                     try
                                     {
                                         contentService.transform(reader, writer);
-                                        // point the reader to the new-written content
+                                        // point the reader to the new-written
+                                        // content
                                         reader = writer.getReader();
                                     }
                                     catch (NoTransformerException e)
@@ -1394,29 +1415,32 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                         doc.add(Field.Text("TEXT", NOT_INDEXED_TRANSFORMATION_FAILED));
                                     }
                                 }
-                                // add the text field using the stream from the reader, but only if the reader is valid
+                                // add the text field using the stream from the
+                                // reader, but only if the reader is valid
                                 if (readerReady)
                                 {
                                     doc.add(Field.Text("TEXT", new InputStreamReader(reader.getContentInputStream())));
                                 }
                             }
-                            else        // URL not present (null reader) or no content at the URL (file missing)
+                            else
+                            // URL not present (null reader) or no content at
+                            // the URL (file missing)
                             {
                                 // log it
                                 if (s_logger.isDebugEnabled())
                                 {
-                                    s_logger.debug(
-                                            "Not indexed: Content Missing \n" +
-                                            "   node: " + nodeRef + "\n" +
-                                            "   reader: " + reader + "\n" +
-                                            "   content exists: " + (reader == null ? " --- " : Boolean.toString(reader.exists()))
-                                            );
+                                    s_logger.debug("Not indexed: Content Missing \n"
+                                            + "   node: " + nodeRef + "\n" + "   reader: " + reader + "\n"
+                                            + "   content exists: "
+                                            + (reader == null ? " --- " : Boolean.toString(reader.exists())));
                                 }
                                 // not indexed: content missing
                                 doc.add(Field.Text("TEXT", NOT_INDEXED_CONTENT_MISSING));
                             }
                         }
-                        doc.add(new Field("@" + QName.createQName(propertyName.getNamespaceURI(), ISO9075.encode(propertyName.getLocalName())), strValue, store, index, tokenise));
+                        doc.add(new Field("@"
+                                + QName.createQName(propertyName.getNamespaceURI(), ISO9075.encode(propertyName
+                                        .getLocalName())), strValue, store, index, tokenise));
                     }
                 }
             }
@@ -1458,7 +1482,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 {
                     if (propDef.getDataType().getName().equals(DataTypeDefinition.CATEGORY))
                     {
-                        for (NodeRef catRef : DefaultTypeConverter.INSTANCE.getCollection(NodeRef.class, properties.get(propDef.getName())))
+                        for (NodeRef catRef : DefaultTypeConverter.INSTANCE.getCollection(NodeRef.class, properties
+                                .get(propDef.getName())))
                         {
                             if (catRef != null)
                             {
@@ -1468,7 +1493,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                     {
                                         Path.ChildAssocElement cae = (Path.ChildAssocElement) path.get(1);
                                         boolean isFakeRoot = true;
-                                        for (ChildAssociationRef car : nodeService.getParentAssocs(cae.getRef().getChildRef()))
+                                        for (ChildAssociationRef car : nodeService.getParentAssocs(cae.getRef()
+                                                .getChildRef()))
                                         {
                                             if (cae.getRef().equals(car))
                                             {
@@ -1500,7 +1526,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             {
                 Path.ChildAssocElement cae = (Path.ChildAssocElement) pair.getFirst().last();
                 ChildAssociationRef assocRef = cae.getRef();
-                pair.getFirst().append(new Path.ChildAssocElement(new ChildAssociationRef(assocRef.getTypeQName(), assocRef.getChildRef(), QName.createQName("member"), nodeRef)));
+                pair.getFirst().append(
+                        new Path.ChildAssocElement(new ChildAssociationRef(assocRef.getTypeQName(), assocRef
+                                .getChildRef(), QName.createQName("member"), nodeRef)));
             }
         }
 
@@ -1557,7 +1585,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     public void updateFullTextSearch(int size) throws LuceneIndexException
     {
-        checkAbleToDoWork(true);
+        checkAbleToDoWork(true, false);
         try
         {
             String lastId = null;
@@ -1580,7 +1608,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
                 catch (IOException e)
                 {
-                    throw new LuceneIndexException("Failed to execute query to find content which needs updating in the index", e);
+                    throw new LuceneIndexException(
+                            "Failed to execute query to find content which needs updating in the index", e);
                 }
                 results = new LuceneResultSet(hits, searcher, nodeService, null);
 
@@ -1615,121 +1644,135 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 }
             }
 
-            IndexWriter writer = null;
-            try
+            if (toFTSIndex.size() > 0)
             {
-                writer = getDeltaWriter();
-                for (Helper helper : toFTSIndex)
+                checkAbleToDoWork(true, true);
+
+                IndexWriter writer = null;
+                try
                 {
-                    Document document = helper.document;
-                    NodeRef ref = helper.nodeRef;
-                    Map<QName, Serializable> properties = nodeService.getProperties(ref);
-
-                    for (QName propertyQName : properties.keySet())
+                    writer = getDeltaWriter();
+                    for (Helper helper : toFTSIndex)
                     {
-                        boolean store = true;
-                        boolean index = true;
-                        boolean tokenise = true;
-                        boolean atomic = true;
-                        boolean isContent = false;
+                        Document document = helper.document;
+                        NodeRef ref = helper.nodeRef;
+                        Map<QName, Serializable> properties = nodeService.getProperties(ref);
 
-                        PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
-                        if (propertyDefinition != null)
+                        for (QName propertyQName : properties.keySet())
                         {
-                            index = propertyDefinition.isIndexed();
-                            store = propertyDefinition.isStoredInIndex();
-                            tokenise = propertyDefinition.isTokenisedInIndex();
-                            atomic = propertyDefinition.isIndexedAtomically();
-                            isContent = propertyDefinition.getDataType().getName().equals(DataTypeDefinition.CONTENT);
-                        }
+                            boolean store = true;
+                            boolean index = true;
+                            boolean tokenise = true;
+                            boolean atomic = true;
+                            boolean isContent = false;
 
-                        Serializable value = properties.get(propertyQName);
-                        if (value != null)
-                        {
-                            // convert value to String
-                            for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
+                            PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
+                            if (propertyDefinition != null)
                             {
+                                index = propertyDefinition.isIndexed();
+                                store = propertyDefinition.isStoredInIndex();
+                                tokenise = propertyDefinition.isTokenisedInIndex();
+                                atomic = propertyDefinition.isIndexedAtomically();
+                                isContent = propertyDefinition.getDataType().getName().equals(
+                                        DataTypeDefinition.CONTENT);
+                            }
 
-                                // TODO: Need converter here
-                                // Conversion should be done in the anlyser as
-                                // we
-                                // may
-                                // take
-                                // advantage of tokenisation
-
-                                // Need to add with the correct language based
-                                // analyser
-                                if (index && !atomic)
+                            Serializable value = properties.get(propertyQName);
+                            if (value != null)
+                            {
+                                // convert value to String
+                                for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
                                 {
-                                    document.removeFields(propertyQName.toString());
-                                    if (isContent)
+
+                                    // TODO: Need converter here
+                                    // Conversion should be done in the anlyser
+                                    // as
+                                    // we
+                                    // may
+                                    // take
+                                    // advantage of tokenisation
+
+                                    // Need to add with the correct language
+                                    // based
+                                    // analyser
+                                    if (index && !atomic)
                                     {
-                                        ContentReader reader = contentService.getReader(ref, propertyQName);
-                                        if (reader != null)
+                                        document.removeFields(propertyQName.toString());
+                                        if (isContent)
                                         {
-                                            ContentWriter cwriter = contentService.getTempWriter();
-                                            cwriter.setMimetype("text/plain");
-                                            try
+                                            ContentReader reader = contentService.getReader(ref, propertyQName);
+                                            if (reader != null)
                                             {
-                                                contentService.transform(reader, cwriter);
-                                                document.add(Field.Text("TEXT", new InputStreamReader(cwriter.getReader().getContentInputStream())));
-                                            }
-                                            catch (NoTransformerException e)
-                                            {
-                                                // if it does not convert we did
-                                                // not
-                                                // write and text
+                                                ContentWriter cwriter = contentService.getTempWriter();
+                                                cwriter.setMimetype("text/plain");
+                                                try
+                                                {
+                                                    contentService.transform(reader, cwriter);
+                                                    document.add(Field.Text("TEXT", new InputStreamReader(cwriter
+                                                            .getReader().getContentInputStream())));
+                                                }
+                                                catch (NoTransformerException e)
+                                                {
+                                                    // if it does not convert we
+                                                    // did
+                                                    // not
+                                                    // write and text
+                                                }
                                             }
                                         }
-                                    }
 
-                                    document.add(new Field("@" + QName.createQName(propertyQName.getNamespaceURI(), ISO9075.encode(propertyQName.getLocalName())), strValue, store, index, tokenise));
+                                        document.add(new Field("@"
+                                                + QName.createQName(propertyQName.getNamespaceURI(), ISO9075
+                                                        .encode(propertyQName.getLocalName())), strValue, store, index,
+                                                tokenise));
+                                    }
                                 }
+                            }
+                        }
+
+                        document.removeField("FTSSTATUS");
+                        document.add(new Field("FTSSTATUS", "Clean", true, true, false));
+
+                        try
+                        {
+                            writer.addDocument(document /*
+                                                         * TODO: Select the
+                                                         * language based
+                                                         * analyser
+                                                         */);
+                        }
+                        catch (IOException e)
+                        {
+                            throw new LuceneIndexException("Failed to add document while updating fts index", e);
+                        }
+
+                        // Need to do all the current id in the TX - should all
+                        // be
+                        // together so skip until id changes
+                        if (writer.docCount() > size)
+                        {
+                            String id = document.getField("ID").stringValue();
+                            if (lastId == null)
+                            {
+                                lastId = id;
+                            }
+                            if (!lastId.equals(id))
+                            {
+                                break;
                             }
                         }
                     }
 
-                    document.removeField("FTSSTATUS");
-                    document.add(new Field("FTSSTATUS", "Clean", true, true, false));
-
-                    try
-                    {
-                        writer.addDocument(document /*
-                                                     * TODO: Select the language
-                                                     * based analyser
-                                                     */);
-                    }
-                    catch (IOException e)
-                    {
-                        throw new LuceneIndexException("Failed to add document while updating fts index", e);
-                    }
-
-                    // Need to do all the current id in the TX - should all be
-                    // together so skip until id changes
-                    if (writer.docCount() > size)
-                    {
-                        String id = document.getField("ID").stringValue();
-                        if (lastId == null)
-                        {
-                            lastId = id;
-                        }
-                        if (!lastId.equals(id))
-                        {
-                            break;
-                        }
-                    }
+                    remainingCount = count - writer.docCount();
                 }
-
-                remainingCount = count - writer.docCount();
-            }
-            catch (LuceneIndexException e)
-            {
-                if (writer != null)
+                catch (LuceneIndexException e)
                 {
-                    closeDeltaWriter();
+                    if (writer != null)
+                    {
+                        closeDeltaWriter();
+                    }
                 }
             }
-
         }
         catch (LuceneIndexException e)
         {
@@ -1804,7 +1847,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     {
         this.luceneFullTextSearchIndexer = luceneFullTextSearchIndexer;
     }
-    
+
     public Set<NodeRef> getDeletions()
     {
         return Collections.unmodifiableSet(deletions);

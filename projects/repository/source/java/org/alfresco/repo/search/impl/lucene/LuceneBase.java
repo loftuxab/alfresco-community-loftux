@@ -141,7 +141,8 @@ public abstract class LuceneBase implements Lockable
      * @param deltaId
      * @throws IOException
      */
-    protected void initialise(StoreRef store, String deltaId, boolean createMain, boolean createDelta) throws LuceneIndexException
+    protected void initialise(StoreRef store, String deltaId, boolean createMain, boolean createDelta)
+            throws LuceneIndexException
     {
         this.store = store;
         this.deltaId = deltaId;
@@ -180,7 +181,8 @@ public abstract class LuceneBase implements Lockable
                 // "undo" + File.separator + deltaId + File.separator, true,
                 // true);
             }
-        } finally
+        }
+        finally
         {
             if (createMain)
             {
@@ -404,7 +406,8 @@ public abstract class LuceneBase implements Lockable
                     s_logger.error("Error", e);
                     throw new LuceneIndexException("Filed to close delta reader " + deltaDir, e);
                 }
-            } finally
+            }
+            finally
             {
                 deltaReader = null;
             }
@@ -483,7 +486,8 @@ public abstract class LuceneBase implements Lockable
             {
                 s_logger.error("Error", e);
                 throw new LuceneIndexException("Failed to close delta writer " + deltaDir, e);
-            } finally
+            }
+            finally
             {
                 deltaWriter = null;
             }
@@ -617,7 +621,8 @@ public abstract class LuceneBase implements Lockable
                         }
                     }
                 }
-            } finally
+            }
+            finally
             {
                 try
                 {
@@ -634,7 +639,8 @@ public abstract class LuceneBase implements Lockable
                         s_logger.error("Error", e);
                         throw new LuceneIndexException("Failed to close from main index reader at " + baseDir, e);
                     }
-                } finally
+                }
+                finally
                 {
                     mainReader = null;
                 }
@@ -675,7 +681,8 @@ public abstract class LuceneBase implements Lockable
                     catch (IOException e)
                     {
                         s_logger.error("Error", e);
-                        throw new LuceneIndexException("Failed to merge indexes into the main index for "+baseDir +" merging in "+deltaDir, e);
+                        throw new LuceneIndexException("Failed to merge indexes into the main index for "
+                                + baseDir + " merging in " + deltaDir, e);
                     }
                     // mainWriter.optimize();
                     closeDeltaReader();
@@ -688,7 +695,8 @@ public abstract class LuceneBase implements Lockable
                 {
                     s_logger.debug("Closed index after append " + baseDir + " for " + deltaDir);
                 }
-            } finally
+            }
+            finally
             {
                 try
                 {
@@ -701,12 +709,14 @@ public abstract class LuceneBase implements Lockable
                         s_logger.error("Error", e);
                         throw new LuceneIndexException("Failed to cloase main index after append at " + baseDir, e);
                     }
-                } finally
+                }
+                finally
                 {
                     mainWriter = null;
                 }
             }
-        } finally
+        }
+        finally
         {
             releaseWriteLock();
         }
@@ -798,7 +808,8 @@ public abstract class LuceneBase implements Lockable
             File file = new File(deltaPath);
 
             deleteDirectory(file);
-        } finally
+        }
+        finally
         {
             releaseWriteLock();
         }
@@ -825,14 +836,14 @@ public abstract class LuceneBase implements Lockable
                 {
                     if (child.exists() && !child.delete() && child.exists())
                     {
-                        throw new IllegalStateException("Failed to delete " + child);
+                        s_logger.warn("Failed to delete " + child);
                     }
                 }
             }
         }
         if (file.exists() && !file.delete() && file.exists())
         {
-            throw new IllegalStateException("Failed to delete " + file);
+            s_logger.warn("Failed to delete " + file);
         }
     }
 
@@ -908,7 +919,7 @@ public abstract class LuceneBase implements Lockable
             }
             getLuceneIndexLock().releaseWriteLock(store);
             writeLockCount--;
-            
+
             if (s_logger.isDebugEnabled())
             {
                 s_logger.debug("Released write lock " + baseDir + " for " + deltaDir);
@@ -946,7 +957,8 @@ public abstract class LuceneBase implements Lockable
                         throw new LuceneIndexException("Failed to create empty main index", e);
                     }
                 }
-            } finally
+            }
+            finally
             {
                 releaseWriteLock();
             }

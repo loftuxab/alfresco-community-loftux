@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 
@@ -57,7 +58,6 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
-import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.cmr.search.QueryParameter;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.ResultSet;
@@ -315,6 +315,174 @@ public class LuceneTest extends TestCase
         super(arg0);
     }
 
+    
+    
+    public void testDeleteIssue() throws Exception
+    {
+       
+        testTX.commit();
+        
+        
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
+        ChildAssociationRef testFind = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName
+                .createQName("{namespace}testFind"), testSuperType);
+        tx.commit();
+
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
+        searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
+        searcher.setQueryRegister(queryRegisterComponent);
+
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "QNAME:\"namespace:testFind\"");
+        assertEquals(1, results.length());
+        results.close();
+
+        UserTransaction tx1 = transactionService.getUserTransaction();
+        tx1.begin();
+        for (int i = 0; i < 100; i++)
+        {
+            HashSet<ChildAssociationRef> refs = new HashSet<ChildAssociationRef>();
+            for (int j =0 ; j < i; j++)
+            {
+               ChildAssociationRef test = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName
+                    .createQName("{namespace}test"), testSuperType);
+               refs.add(test);
+            }
+            
+            for(ChildAssociationRef car : refs)
+            {
+               nodeService.deleteNode(car.getChildRef());
+            }
+            
+        }
+        tx1.commit();
+
+        UserTransaction tx3 = transactionService.getUserTransaction();
+        tx3.begin();
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "QNAME:\"namespace:testFind\"");
+        assertEquals(1, results.length());
+        results.close();
+        tx3.commit();
+    }
+
+    
+    public void testMTDeleteIssue() throws Exception
+    {
+       
+        testTX.commit();
+        
+        
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
+        ChildAssociationRef testFind = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName
+                .createQName("{namespace}testFind"), testSuperType);
+        tx.commit();
+
+        LuceneSearcherImpl searcher = LuceneSearcherImpl.getSearcher(rootNodeRef.getStoreRef(), indexerAndSearcher);
+        searcher.setNodeService(nodeService);
+        searcher.setDictionaryService(dictionaryService);
+        searcher.setNamespacePrefixResolver(getNamespacePrefixReolsver("namespace"));
+        searcher.setQueryRegister(queryRegisterComponent);
+
+        ResultSet results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "QNAME:\"namespace:testFind\"");
+        assertEquals(1, results.length());
+        results.close();
+
+        
+        Thread runner = null;
+
+        for (int i = 0; i < 20; i++)
+        {
+            runner = new Nester("Concurrent-" + i, runner);
+        }
+        if (runner != null)
+        {
+            runner.start();
+
+            try
+            {
+                runner.join();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        
+
+        UserTransaction tx3 = transactionService.getUserTransaction();
+        tx3.begin();
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "QNAME:\"namespace:testFind\"");
+        assertEquals(1, results.length());
+        results.close();
+        tx3.commit();
+    }
+
+    class Nester extends Thread
+    {
+        Thread waiter;
+
+        Nester(String name, Thread waiter)
+        {
+            super(name);
+            this.setDaemon(true);
+            this.waiter = waiter;
+        }
+
+        public void run()
+        {
+            if (waiter != null)
+            {
+                waiter.start();
+            }
+            try
+            {
+                System.out.println("Start " + this.getName());
+                UserTransaction tx1 = transactionService.getUserTransaction();
+                tx1.begin();
+                for (int i = 0; i < 20; i++)
+                {
+                    HashSet<ChildAssociationRef> refs = new HashSet<ChildAssociationRef>();
+                    for (int j =0 ; j < i; j++)
+                    {
+                       ChildAssociationRef test = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName
+                            .createQName("{namespace}test"), testSuperType);
+                       refs.add(test);
+                    }
+                    
+                    for(ChildAssociationRef car : refs)
+                    {
+                       nodeService.deleteNode(car.getChildRef());
+                    }
+                    
+                }
+                tx1.commit();
+                System.out.println("End " + this.getName());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                System.exit(12);
+            }
+            if (waiter != null)
+            {
+                try
+                {
+                    waiter.join();
+                }
+                catch (InterruptedException e)
+                {
+                }
+            }
+        }
+
+    }
+
+    
+    
     public void testDeltaIssue() throws Exception
     {
         final NodeService pns = (NodeService) ctx.getBean("NodeService");
@@ -1111,6 +1279,20 @@ public class LuceneTest extends TestCase
 
         QName qname = QName.createQName(TEST_NAMESPACE, "int-ista");
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@" + escapeQName(qname) + ":\"01\"", null,
+                null);
+        assertEquals(1, results.length());
+        assertNotNull(results.getRow(0).getValue(qname));
+        results.close();
+        
+        qname = QName.createQName(TEST_NAMESPACE, "int-ista");
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "@" + escapeQName(qname) + ":\"01\"", null,
+                null);
+        assertEquals(1, results.length());
+        assertNotNull(results.getRow(0).getValue(qname));
+        results.close();
+        
+        qname = QName.createQName(TEST_NAMESPACE, "int-ista");
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@test\\:int\\-ista:\"01\"", null,
                 null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));

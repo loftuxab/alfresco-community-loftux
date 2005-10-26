@@ -19,12 +19,14 @@ package org.alfresco.repo.search.impl.lucene;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.AbstractResultSetRow;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.QName;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 
 /**
  * A row ina result set. Created on the fly.
@@ -83,22 +85,51 @@ public class LuceneResultSetRow extends AbstractResultSetRow
 
     public QName getQName()
     {
-        String qname = getDocument().getField("QNAME").stringValue();
-        return QName.createQName(qname);
+        Field field = getDocument().getField("QNAME");
+        if (field != null)
+        {
+            String qname = field.stringValue();
+            if((qname == null) || (qname.length() == 0))
+            {
+                return null;
+            }
+            else
+            {
+               return QName.createQName(qname);
+            }
+        }
+        else
+        {
+            return null;
+        }
     }
-    
-    public QName getTypeQName()
+
+    public QName getPrimaryAssocTypeQName()
     {
-        String qname = getDocument().getField("TYPEQNAME").stringValue();
-        return QName.createQName(qname);
+        
+        Field field = getDocument().getField("PRIMARYASSOCTYPEQNAME");
+        if (field != null)
+        {
+            String qname = field.stringValue();
+            return QName.createQName(qname);
+        }
+        else
+        {
+            return ContentModel.ASSOC_CHILDREN;
+        }
     }
 
     public ChildAssociationRef getChildAssocRef()
     {
-        String primaryParent = getDocument().getField("PRIMARYPARENT").stringValue();
+        Field field = getDocument().getField("PRIMARYPARENT");
+        String primaryParent = null;
+        if (field != null)
+        {
+            primaryParent = field.stringValue();
+        }
         NodeRef childNodeRef = getNodeRef();
-        NodeRef paretnNodeRef = new NodeRef(primaryParent);
-        return new ChildAssociationRef(getTypeQName(), paretnNodeRef, getQName(), childNodeRef);
+        NodeRef parentNodeRef = primaryParent == null ? null : new NodeRef(primaryParent);
+        return new ChildAssociationRef(getPrimaryAssocTypeQName(), parentNodeRef, getQName(), childNodeRef);
     }
 
 }

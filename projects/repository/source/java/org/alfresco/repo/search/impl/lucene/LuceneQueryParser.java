@@ -25,6 +25,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
@@ -36,6 +37,8 @@ import com.werken.saxpath.XPathReader;
 
 public class LuceneQueryParser extends QueryParser
 {
+    private static Logger s_logger = Logger.getLogger(LuceneQueryParser.class);
+    
     private NamespacePrefixResolver namespacePrefixResolver;
     
     private DictionaryService dictionaryService;
@@ -54,6 +57,10 @@ public class LuceneQueryParser extends QueryParser
      */
     static public Query parse(String query, String field, Analyzer analyzer, NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService, int defaultOperator) throws ParseException
     {
+        if(s_logger.isDebugEnabled())
+        {
+            s_logger.debug("Using Alfresco Lucene Query Parser for query: "+query);
+        }
         LuceneQueryParser parser = new LuceneQueryParser(field, analyzer);
         parser.setOperator(defaultOperator);
         parser.setNamespacePrefixResolver(namespacePrefixResolver);

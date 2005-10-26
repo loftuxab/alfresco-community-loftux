@@ -270,7 +270,8 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                 testNodeRef = nodeService.getPrimaryParent(returnedObject).getParentRef();
             }
 
-            if ((testNodeRef != null) && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
+            if ((testNodeRef != null)
+                    && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -327,7 +328,8 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                 testNodeRef = ((ChildAssociationRef) returnedObject).getParentRef();
             }
 
-            if ((testNodeRef != null) && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
+            if ((testNodeRef != null)
+                    && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -414,7 +416,15 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
 
                 if (cad.typeString.equals(AFTER_ACL_NODE))
                 {
-                    if (NodeRef.class.isAssignableFrom(nextObject.getClass()))
+                    if (StoreRef.class.isAssignableFrom(nextObject.getClass()))
+                    {
+                        testNodeRef = nodeService.getRootNode((StoreRef) nextObject);
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tNode Test on store " + nodeService.getPath(testNodeRef));
+                        }
+                    }
+                    else if (NodeRef.class.isAssignableFrom(nextObject.getClass()))
                     {
                         testNodeRef = (NodeRef) nextObject;
                         if (log.isDebugEnabled())
@@ -438,7 +448,16 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                 }
                 else if (cad.typeString.equals(AFTER_ACL_PARENT))
                 {
-                    if (NodeRef.class.isAssignableFrom(nextObject.getClass()))
+                    if (StoreRef.class.isAssignableFrom(nextObject.getClass()))
+                    {
+                        // Will be allowed
+                        testNodeRef = null;
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("\tParent Test on store ");
+                        }
+                    }
+                    else if (NodeRef.class.isAssignableFrom(nextObject.getClass()))
                     {
                         testNodeRef = nodeService.getPrimaryParent((NodeRef) nextObject).getParentRef();
                         if (log.isDebugEnabled())
@@ -462,7 +481,9 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     }
                 }
 
-                if (allowed && (testNodeRef != null) && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
+                if (allowed
+                        && (testNodeRef != null)
+                        && (permissionService.hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED))
                 {
                     allowed = false;
                 }
@@ -497,8 +518,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
         {
             return returnedObject;
         }
-        
-        
+
         for (int i = 0, l = returnedObject.length; i < l; i++)
         {
             Object current = returnedObject[i];
@@ -508,7 +528,11 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                 NodeRef testNodeRef = null;
                 if (cad.typeString.equals(AFTER_ACL_NODE))
                 {
-                    if (NodeRef.class.isAssignableFrom(current.getClass()))
+                    if (StoreRef.class.isAssignableFrom(current.getClass()))
+                    {
+                        testNodeRef = nodeService.getRootNode((StoreRef) current);
+                    }
+                    else if (NodeRef.class.isAssignableFrom(current.getClass()))
                     {
                         testNodeRef = (NodeRef) current;
                     }
@@ -518,28 +542,29 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     }
                     else
                     {
-                        throw new ACLEntryVoterException(
-                                "The specified array is not of NodeRef or ChildAssociationRef");
+                        throw new ACLEntryVoterException("The specified array is not of NodeRef or ChildAssociationRef");
                     }
                 }
-                
-                    else if (cad.typeString.equals(AFTER_ACL_PARENT))
+
+                else if (cad.typeString.equals(AFTER_ACL_PARENT))
+                {
+                    if (StoreRef.class.isAssignableFrom(current.getClass()))
                     {
-                        if (NodeRef.class.isAssignableFrom(current.getClass()))
-                        {
-                            testNodeRef = nodeService.getPrimaryParent((NodeRef) current).getParentRef();
-                        }
-                        else if (ChildAssociationRef.class.isAssignableFrom(current.getClass()))
-                        {
-                            testNodeRef = ((ChildAssociationRef) current).getParentRef();
-                        }
-                        else
-                        {
-                            throw new ACLEntryVoterException(
-                                    "The specified array is not of NodeRef or ChildAssociationRef");
-                        }
+                        testNodeRef = null;
                     }
-                
+                    else if (NodeRef.class.isAssignableFrom(current.getClass()))
+                    {
+                        testNodeRef = nodeService.getPrimaryParent((NodeRef) current).getParentRef();
+                    }
+                    else if (ChildAssociationRef.class.isAssignableFrom(current.getClass()))
+                    {
+                        testNodeRef = ((ChildAssociationRef) current).getParentRef();
+                    }
+                    else
+                    {
+                        throw new ACLEntryVoterException("The specified array is not of NodeRef or ChildAssociationRef");
+                    }
+                }
 
                 if (incudedSet.get(i)
                         && (testNodeRef != null)
@@ -547,7 +572,7 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                 {
                     incudedSet.set(i, false);
                 }
-                
+
             }
         }
 
