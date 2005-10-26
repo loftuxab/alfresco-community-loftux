@@ -119,10 +119,37 @@ import org.alfresco.service.namespace.QName;
         this.childName = childName;
     }
     
+    
+    /**
+     * Adds a collection property to the node
+     * 
+     * @param property
+     */
+    /*package*/ void addPropertyCollection(QName property)
+    {
+        // Do not import properties of sys:referenceable or cm:versionable
+        // TODO: Make this configurable...
+        PropertyDefinition propDef = getDictionaryService().getProperty(property);
+        ClassDefinition classDef = (propDef == null) ? null : propDef.getContainerClass();
+        if (classDef != null)
+        {
+            if (classDef.getName().equals(ContentModel.ASPECT_REFERENCEABLE) ||
+                classDef.getName().equals(ContentModel.ASPECT_VERSIONABLE))
+            {
+                return;                
+            }
+        }
+        
+        // create collection and assign to property
+        List<Serializable>values = new ArrayList<Serializable>();
+        nodeProperties.put(property, (Serializable)values);
+    }
+    
+    
     /**
      * Adds a property to the node
      * 
-     * @param propDef  the property definition
+     * @param property  the property name
      * @param value  the property value
      */
     /*package*/ void addProperty(QName property, String value)

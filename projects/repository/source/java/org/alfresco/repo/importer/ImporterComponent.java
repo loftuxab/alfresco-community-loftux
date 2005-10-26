@@ -716,6 +716,9 @@ public class ImporterComponent
             Map<QName, Serializable> boundProperties = new HashMap<QName, Serializable>(properties.size());
             for (QName property : properties.keySet())
             {
+                // get property value
+                Serializable value = properties.get(property);
+
                 // get property datatype
                 DataTypeDefinition valueDataType = datatypes.get(property);
                 if (valueDataType == null)
@@ -725,20 +728,15 @@ public class ImporterComponent
                     {
                         valueDataType = propDef.getDataType();
                     }
-                    if (valueDataType == null || valueDataType.getName().equals(DataTypeDefinition.ANY))
-                    {
-                        throw new ImporterException("Cannot determine data type of property " + property);
-                    }
                 }
 
                 // filter out content properties (they're imported later)
-                if (valueDataType.getName().equals(DataTypeDefinition.CONTENT))
+                if (valueDataType != null && valueDataType.getName().equals(DataTypeDefinition.CONTENT))
                 {
                     continue;
                 }
                 
                 // bind property value to configuration and convert to appropriate type
-                Serializable value = properties.get(property);
                 if (value instanceof Collection)
                 {
                     List<Serializable> boundCollection = new ArrayList<Serializable>();
@@ -769,17 +767,23 @@ public class ImporterComponent
         private Serializable bindValue(ImportNode context, QName property, DataTypeDefinition valueType, String value)
         {
             Serializable objValue = null;
-            String strValue = bindPlaceHolder(value, binding);
-            if (valueType.getName().equals(DataTypeDefinition.NODE_REF) || valueType.getName().equals(DataTypeDefinition.CATEGORY))
+            if (value != null && valueType != null)
             {
-                // record node reference for end-of-import binding
-                ImportedNodeRef importedRef = new ImportedNodeRef(context, property, strValue);
-                nodeRefs.add(importedRef);
-                objValue = new NodeRef(rootRef.getStoreRef(), "unresolved reference");
-            }
-            else
-            {
-                objValue = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueType, strValue);
+                String strValue = bindPlaceHolder(value, binding);
+                if (valueType.getName().equals(DataTypeDefinition.NODE_REF) || valueType.getName().equals(DataTypeDefinition.CATEGORY))
+                {
+                    if (value.length() > 0)
+                    {
+                        // record node reference for end-of-import binding
+                        ImportedNodeRef importedRef = new ImportedNodeRef(context, property, strValue);
+                        nodeRefs.add(importedRef);
+                        objValue = new NodeRef(rootRef.getStoreRef(), "unresolved reference");
+                    }
+                }
+                else
+                {
+                    objValue = (Serializable)DefaultTypeConverter.INSTANCE.convert(valueType, strValue);
+                }
             }
             return objValue;
         }

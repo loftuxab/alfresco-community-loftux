@@ -485,6 +485,7 @@ public class AdminNodeBrowseBean
     public class Property
     {
         private QName name;
+        private boolean isCollection = false;
         private DataModel values;
         private String datatype;
         private String residual;
@@ -515,6 +516,7 @@ public class AdminNodeBrowseBean
             List<Value> values = new ArrayList<Value>();
             if (value instanceof Collection)
             {
+                isCollection = true;
                 for (Serializable multiValue : (Collection<Serializable>)value)
                 {
                     values.add(new Value(multiValue));
@@ -575,6 +577,16 @@ public class AdminNodeBrowseBean
         public boolean isAny()
         {
             return (datatype == null) ? false : datatype.equals(DataTypeDefinition.ANY.toString());
+        }
+        
+        /**
+         * Determines whether the property is a collection
+         * 
+         * @return  true => is collection
+         */
+        public boolean isCollection()
+        {
+            return isCollection;
         }
         
         

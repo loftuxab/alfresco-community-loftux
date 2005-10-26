@@ -19,7 +19,6 @@ package org.alfresco.repo.exporter;
 import java.io.InputStream;
 import java.util.Collection;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -49,24 +48,28 @@ import org.xml.sax.helpers.AttributesImpl;
 {
     // Repository View Schema Definitions
     private static final String VIEW_LOCALNAME = "view";
+    private static final String VALUES_LOCALNAME = "values";
     private static final String VALUE_LOCALNAME = "value";
     private static final String CHILDNAME_LOCALNAME = "childName";
     private static final String ASPECTS_LOCALNAME = "aspects";
     private static final String PROPERTIES_LOCALNAME = "properties";
     private static final String ASSOCIATIONS_LOCALNAME = "associations";
     private static final String DATATYPE_LOCALNAME = "datatype";
+    private static final String ISNULL_LOCALNAME = "isNull";
     private static final String METADATA_LOCALNAME  = "metadata";
     private static final String EXPORTEDBY_LOCALNAME  = "exportBy";
     private static final String EXPORTEDDATE_LOCALNAME  = "exportDate";
     private static final String EXPORTERVERSION_LOCALNAME  = "exporterVersion";
     private static final String EXPORTOF_LOCALNAME  = "exportOf";
-    private static QName VIEW_QNAME; 
+    private static QName VIEW_QNAME;
+    private static QName VALUES_QNAME;
     private static QName VALUE_QNAME;
     private static QName PROPERTIES_QNAME;
     private static QName ASPECTS_QNAME;
     private static QName ASSOCIATIONS_QNAME; 
     private static QName CHILDNAME_QNAME;
     private static QName DATATYPE_QNAME;
+    private static QName ISNULL_QNAME;
     private static QName METADATA_QNAME;
     private static QName EXPORTEDBY_QNAME;
     private static QName EXPORTEDDATE_QNAME;
@@ -100,11 +103,13 @@ import org.xml.sax.helpers.AttributesImpl;
         
         VIEW_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VIEW_LOCALNAME, namespaceService);
         VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, namespaceService);
+        VALUES_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUES_LOCALNAME, namespaceService);
         CHILDNAME_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, CHILDNAME_LOCALNAME, namespaceService);
         ASPECTS_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ASPECTS_LOCALNAME, namespaceService);
         PROPERTIES_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, PROPERTIES_LOCALNAME, namespaceService);
         ASSOCIATIONS_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ASSOCIATIONS_LOCALNAME, namespaceService);
         DATATYPE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, namespaceService);
+        ISNULL_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, ISNULL_LOCALNAME, namespaceService);
         METADATA_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, METADATA_LOCALNAME, namespaceService);
         EXPORTEDBY_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDBY_LOCALNAME, namespaceService);
         EXPORTEDDATE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_PREFIX, EXPORTEDDATE_LOCALNAME, namespaceService);
@@ -359,54 +364,59 @@ import org.xml.sax.helpers.AttributesImpl;
      */
     public void value(NodeRef nodeRef, QName property, Object value)
     {
-        if (value != null)
+        try
         {
-            try
+            // determine data type of value
+            QName valueDataType = null;
+            PropertyDefinition propDef = dictionaryService.getProperty(property);
+            DataTypeDefinition dataTypeDef = (propDef == null) ? null : propDef.getDataType();
+            if (dataTypeDef == null || dataTypeDef.getName().equals(DataTypeDefinition.ANY))
             {
-                // determine data type of value
-                QName valueDataType = null;
-                PropertyDefinition propDef = dictionaryService.getProperty(property);
-                DataTypeDefinition dataTypeDef = (propDef == null) ? null : propDef.getDataType();
-                if (dataTypeDef == null || dataTypeDef.getName().equals(DataTypeDefinition.ANY))
+                dataTypeDef = (value == null) ? null : dictionaryService.getDataType(value.getClass());
+                if (dataTypeDef != null)
                 {
-                    dataTypeDef = dictionaryService.getDataType(value.getClass());
-                    if (dataTypeDef != null)
-                    {
-                        valueDataType = dataTypeDef.getName();
-                    }
+                    valueDataType = dataTypeDef.getName();
                 }
+            }
 
-                // output value wrapper if property data type is any
+            // convert node references to paths
+            if (value instanceof NodeRef)
+            {
+                Path nodeRefPath = createRelativePath(nodeRef, (NodeRef)value);
+                value = (nodeRefPath == null) ? null : nodeRefPath.toPrefixString(namespaceService);
+            }
+            
+            // output value wrapper if value is null or property data type is ANY
+            if (value == null || valueDataType != null)
+            {
+                AttributesImpl attrs = new AttributesImpl();
+                if (value == null)
+                {
+                    attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, ISNULL_LOCALNAME, ISNULL_QNAME.toPrefixString(), null, "true");
+                }
                 if (valueDataType != null)
                 {
-                    AttributesImpl attrs = new AttributesImpl();
                     attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, DATATYPE_QNAME.toPrefixString(), null, toPrefixString(valueDataType));
-                    contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), attrs);
                 }
-                
-                // convert node references to paths
-                if (value instanceof NodeRef)
-                {
-                    value = createRelativePath(nodeRef, (NodeRef)value).toPrefixString(namespaceService);
-                }
-                
-                // output value
-                String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
-                if (strValue != null)
-                {
-                    contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
-                }
-
-                // output value wrapper if property data type is any
-                if (valueDataType != null)
-                {
-                    contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
-                }
+                contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), attrs);
             }
-            catch (SAXException e)
+            
+            // output value
+            String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
+            if (strValue != null)
             {
-                throw new ExporterException("Failed to process value event - nodeRef " + nodeRef + "; property " + toPrefixString(property) + "; value " + value, e);
+                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
             }
+
+            // output value wrapper if property data type is any
+            if (value == null || valueDataType != null)
+            {
+                contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
+            }
+        }
+        catch (SAXException e)
+        {
+            throw new ExporterException("Failed to process value event - nodeRef " + nodeRef + "; property " + toPrefixString(property) + "; value " + value, e);
         }
     }
 
@@ -419,6 +429,9 @@ import org.xml.sax.helpers.AttributesImpl;
         {
             PropertyDefinition propDef = dictionaryService.getProperty(property);
             DataTypeDefinition dataTypeDef = (propDef == null) ? null : propDef.getDataType();
+            
+            // start collection
+            contentHandler.startElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUES_LOCALNAME, toPrefixString(VALUES_QNAME), EMPTY_ATTRIBUTES);
             
             for (Object value : values)
             {
@@ -435,6 +448,10 @@ import org.xml.sax.helpers.AttributesImpl;
 
                 // output value wrapper with datatype
                 AttributesImpl attrs = new AttributesImpl();
+                if (value == null)
+                {
+                    attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, ISNULL_LOCALNAME, ISNULL_QNAME.toPrefixString(), null, "true");
+                }
                 if (valueDataType != null)
                 {
                     attrs.addAttribute(NamespaceService.REPOSITORY_VIEW_PREFIX, DATATYPE_LOCALNAME, DATATYPE_QNAME.toPrefixString(), null, toPrefixString(valueDataType));
@@ -457,6 +474,9 @@ import org.xml.sax.helpers.AttributesImpl;
                 // output value wrapper if property data type is any
                 contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
             }
+
+            // end collection
+            contentHandler.endElement(NamespaceService.REPOSITORY_VIEW_PREFIX, VALUES_LOCALNAME, toPrefixString(VALUES_QNAME));
         }
         catch (SAXException e)
         {
@@ -578,8 +598,8 @@ import org.xml.sax.helpers.AttributesImpl;
         // Check that item exists first
         if (!nodeService.exists(toRef))
         {
-            // return empty path for item that does not exist
-            return new Path();
+            // return null path
+            return null;
         }
         
         Path fromPath = nodeService.getPath(fromRef);
@@ -628,7 +648,10 @@ import org.xml.sax.helpers.AttributesImpl;
                         {
                             relativePath.append(new Path.ParentElement());
                         }
-                        relativePath.append(toPath.subPath(i, toPath.size() -1));
+                        if (i < toPath.size())
+                        {
+                            relativePath.append(toPath.subPath(i, toPath.size() -1));
+                        }
                     }
                 }
             }

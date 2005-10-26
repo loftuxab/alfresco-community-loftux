@@ -28,7 +28,6 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -52,8 +51,10 @@ public class ViewParser implements Parser
     // View schema elements and attributes
     private static final String VIEW_CHILD_NAME_ATTR = "childName";    
     private static final String VIEW_DATATYPE_ATTR = "datatype";
+    private static final String VIEW_ISNULL_ATTR = "isNull";
     private static final QName VIEW_METADATA = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "metadata");
     private static final QName VIEW_VALUE_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "value");
+    private static final QName VIEW_VALUES_QNAME = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "values");
     private static final QName VIEW_ASPECTS = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "aspects");
     private static final QName VIEW_PROPERTIES = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "properties");
     private static final QName VIEW_ASSOCIATIONS = QName.createQName(NamespaceService.REPOSITORY_VIEW_1_0_URI, "associations");
@@ -381,54 +382,95 @@ public class ViewParser implements Parser
         throws XmlPullParserException, IOException
     {
         NodeContext context = peekNodeContext(contextStack);
-        
+
+        // Extract single value
+        String value = "";
         int eventType = xpp.next();
         if (eventType == XmlPullParser.TEXT)
         {
-            // Extract single value
-            String value = xpp.getText();
+            value = xpp.getText();
             eventType = xpp.next();
-            if (eventType == XmlPullParser.END_TAG)
-            {
-                context.addProperty(propertyName, value);
-            }
-        }
-
-        // Extract multi value
-        while (eventType == XmlPullParser.START_TAG)
+        }            
+        if (eventType == XmlPullParser.END_TAG)
         {
-            QName name = getName(xpp);
-            if (!name.equals(VIEW_VALUE_QNAME))
+            context.addProperty(propertyName, value);
+        }
+        else
+        {
+            
+            // Extract collection, if specified
+            boolean isCollection = false;
+            if (eventType == XmlPullParser.START_TAG)
             {
-                throw new ImporterException("Invalid view structure - expected element " + VIEW_VALUE_QNAME + " for property " + propertyName);
-            }
-            QName datatype = QName.createQName(xpp.getAttributeValue(NamespaceService.REPOSITORY_VIEW_1_0_URI, VIEW_DATATYPE_ATTR), namespaceService);
-            eventType = xpp.next();
-            if (eventType == XmlPullParser.TEXT)
-            {
-                String value = xpp.getText();
-                context.addProperty(propertyName, value);
-                if (datatype != null)
+                QName name = getName(xpp);
+                if (name.equals(VIEW_VALUES_QNAME))
                 {
-                    context.addDatatype(propertyName, dictionaryService.getDataType(datatype));
+                    context.addPropertyCollection(propertyName);
+                    isCollection = true;
+                    eventType = xpp.next();
+                    if (eventType == XmlPullParser.TEXT)
+                    {
+                        eventType = xpp.next();
+                    }
+                }
+            }
+            
+            // Extract decorated value
+            while (eventType == XmlPullParser.START_TAG)
+            {
+                QName name = getName(xpp);
+                if (!name.equals(VIEW_VALUE_QNAME))
+                {
+                    throw new ImporterException("Invalid view structure - expected element " + VIEW_VALUE_QNAME + " for property " + propertyName);
+                }
+                QName datatype = QName.createQName(xpp.getAttributeValue(NamespaceService.REPOSITORY_VIEW_1_0_URI, VIEW_DATATYPE_ATTR), namespaceService);
+                Boolean isNull = Boolean.valueOf(xpp.getAttributeValue(NamespaceService.REPOSITORY_VIEW_1_0_URI, VIEW_ISNULL_ATTR));
+                String decoratedValue = isNull ? null : "";
+                eventType = xpp.next();
+                if (eventType == XmlPullParser.TEXT)
+                {
+                    decoratedValue = xpp.getText();
+                    eventType = xpp.next();
+                }
+                if (eventType == XmlPullParser.END_TAG)
+                {
+                    context.addProperty(propertyName, decoratedValue);
+                    if (datatype != null)
+                    {
+                        context.addDatatype(propertyName, dictionaryService.getDataType(datatype));
+                    }
+                }
+                else
+                {
+                    throw new ImporterException("Value for property " + propertyName + " has not been defined correctly - missing end tag");
                 }
                 eventType = xpp.next();
+                if (eventType == XmlPullParser.TEXT)
+                {
+                    eventType = xpp.next();
+                }
             }
+    
+            // End of value
             if (eventType != XmlPullParser.END_TAG)
             {
-                throw new ImporterException("Value for property " + propertyName + " has not been defined correctly - missing end tag");
+                throw new ImporterException("Invalid view structure - property " + propertyName + " definition is invalid");
             }
-            eventType = xpp.next();
-            if (eventType == XmlPullParser.TEXT)
+            
+            // End of collection
+            if (isCollection)
             {
                 eventType = xpp.next();
+                if (eventType == XmlPullParser.TEXT)
+                {
+                    eventType = xpp.next();
+                }
+                if (eventType != XmlPullParser.END_TAG)
+                {
+                    throw new ImporterException("Invalid view structure - property " + propertyName + " definition is invalid");
+                }
             }
-        }
 
-        // End of Property
-        if (eventType != XmlPullParser.END_TAG)
-        {
-            throw new ImporterException("Property " + propertyName + " definition is invalid");
         }
         
         if (logger.isDebugEnabled())

@@ -101,6 +101,7 @@
            <f:facet name="header">
                <h:outputText value="Value"/>
            </f:facet>
+           <h:outputText styleClass="errorMessage" value="--collection--" rendered="#{property.collection == true}"/>
            <h:dataTable id="values" border="0" cellspacing="0" value="#{property.values}" var="value" rendered="#{property.values.rowCount > 0}">
                 <h:column>
                     <h:outputLink value="#{value.url}" target="_blank" rendered="#{value.content}">
@@ -110,10 +111,9 @@
                         <h:outputText value="#{value.value}"/>
                     </h:commandLink>
                     <h:outputText value="#{value.value}" rendered="#{value.content == false && value.nodeRef == false && value.nullValue == false}"/>
-                    <h:outputText styleClass="errorMessage" value="<<null value>>" rendered="#{value.nullValue}"/>
+                    <h:outputText styleClass="errorMessage" value="--null--" rendered="#{value.nullValue}"/>
                </h:column>
            </h:dataTable>
-           <h:outputText styleClass="errorMessage" value="<<empty collection>>" rendered="#{property.values.rowCount == 0}"/>
        </h:column>
        <h:column>
            <f:facet name="header">

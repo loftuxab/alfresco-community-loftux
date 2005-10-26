@@ -419,17 +419,14 @@ public class ExporterComponent
                     {
                         continue;
                     }
-
                     if (i == 0 || childAssocs.get(i - 1).getTypeQName().equals(childAssocType) == false)
                     {
                         exporter.startAssoc(nodeRef, childAssocType);
                     }
-                    
                     if (!isExcludedURI(parameters.getExcludeNamespaceURIs(), childAssoc.getQName().getNamespaceURI()))
                     {
                         walkNode(childAssoc.getChildRef(), parameters, exporter);
                     }
-                    
                     if (i == childAssocs.size() - 1 || childAssocs.get(i + 1).getTypeQName().equals(childAssocType) == false)
                     {
                         exporter.endAssoc(nodeRef, childAssocType);
