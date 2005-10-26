@@ -86,7 +86,7 @@
                   </td>
                   <td>
                      <%-- language selection drop-down --%>
-                     <h:selectOneMenu value="#{LoginBean.language}" style="width:150px">
+                     <h:selectOneMenu value="#{LoginBean.language}" style="width:150px" onchange="document.forms['loginForm'].submit(); return true;">
                         <f:selectItems value="#{LoginBean.languages}" />
                      </h:selectOneMenu>
                   </td>
