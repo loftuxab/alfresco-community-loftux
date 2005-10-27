@@ -39,6 +39,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.web.app.Application;
@@ -78,6 +79,9 @@ public class UserMembersBean implements IContextListener
    
    /** NavigationBean bean refernce */
    private NavigationBean navigator;
+   
+   /** OwnableService bean reference */
+   private OwnableService ownableService;
    
    /** Component reference for Users RichList control */
    private UIRichList usersRichList;
@@ -132,6 +136,14 @@ public class UserMembersBean implements IContextListener
    public void setPermissionService(PermissionService permissionService)
    {
       this.permissionService = permissionService;
+   }
+   
+   /**
+    * @param ownableService         The ownableService to set.
+    */
+   public void setOwnableService(OwnableService ownableService)
+   {
+      this.ownableService = ownableService;
    }
    
    /**
@@ -261,9 +273,6 @@ public class UserMembersBean implements IContextListener
             }
          }
          
-         // filter invalid users e.g. current user
-         permissionMap.remove(Application.getCurrentUser(context).getUserName());
-         
          // for each authentication (username key) found we get the Person
          // node represented by it and use that for our list databinding object
          personNodes = new ArrayList<Map>(permissionMap.size());
@@ -340,6 +349,14 @@ public class UserMembersBean implements IContextListener
       }
       
       return buf.toString();
+   }
+   
+   /**
+    * Return the owner username
+    */
+   public String getOwner()
+   {
+      return this.ownableService.getOwner(this.navigator.getCurrentNode().getNodeRef());
    }
    
    /**

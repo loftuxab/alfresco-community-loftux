@@ -311,6 +311,9 @@ public class LoginBean
                   if (logger.isDebugEnabled())
                      logger.debug("Redirect URL found: " + redirectURL);
                   
+                  // remove URL from session
+                  fc.getExternalContext().getSessionMap().remove(LOGIN_REDIRECT_KEY);
+                  
                   try
                   {
                      fc.getExternalContext().redirect(redirectURL);

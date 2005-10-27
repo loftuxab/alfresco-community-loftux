@@ -16,8 +16,8 @@
  */
 package org.alfresco.repo.ownable.noop;
 
-import org.alfresco.repo.ownable.OwnableService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.OwnableService;
 
 /**
  * A simple implementation that does not support ownership.

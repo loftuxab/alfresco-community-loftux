@@ -681,6 +681,7 @@
     	</property>
     </bean>
     
+    
     <!-- Authority Service -->
     
     <bean id="AuthorityService" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -715,6 +716,44 @@
     	</property>
     	<property name="description">
     		<value>Authority Service</value>
+    	</property>
+    </bean>
+    
+    
+    <!-- Ownable Service -->
+    
+    <bean id="OwnableService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.security.OwnableService</value>
+    	</property>
+    	<property name="target"><ref bean="ownableService"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    		    <idref local="OwnableService_transaction" />
+                <idref local="exceptionTranslator" />
+                <idref bean="OwnableService_security" />
+    			<idref local="OwnableService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="OwnableService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="OwnableService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.security.OwnableService</value>
+    	</property>
+    	<property name="description">
+    		<value>OwnableService Service</value>
     	</property>
     </bean>
       

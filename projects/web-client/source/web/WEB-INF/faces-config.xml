@@ -527,7 +527,7 @@
       </managed-property>
       <managed-property>
          <property-name>ownableService</property-name>
-         <value>#{ownableService}</value>
+         <value>#{OwnableService}</value>
       </managed-property>
    </managed-bean>
    
@@ -553,6 +553,10 @@
       <managed-property>
          <property-name>permissionService</property-name>
          <value>#{PermissionService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>ownableService</property-name>
+         <value>#{OwnableService}</value>
       </managed-property>
       <managed-property>
          <property-name>personService</property-name>
@@ -672,7 +676,7 @@
       </managed-property>
       <managed-property>
          <property-name>ownableService</property-name>
-         <value>#{ownableService}</value>
+         <value>#{OwnableService}</value>
       </managed-property>
       <managed-property>
          <property-name>navigator</property-name>

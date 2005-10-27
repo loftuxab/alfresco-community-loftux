@@ -71,6 +71,11 @@
                            <td>
                               <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
                               <div class="mainTitle"><h:outputText value="#{msg.manage_invited_users}" /></div>
+                              <div class="mainSubText">
+                                 <h:outputFormat value="#{msg.space_owner}" rendered="#{UserMembersBean.owner != null}">
+                                    <f:param value="#{UserMembersBean.owner}" />
+                                 </h:outputFormat>
+                              </div>
                               <div class="mainSubText"><h:outputText value="#{msg.manage_invited_users_description}" /></div>
                            </td>
                            <td bgcolor="#465F7D" width=1></td>
