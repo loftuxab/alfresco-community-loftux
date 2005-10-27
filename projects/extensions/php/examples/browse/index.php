@@ -16,18 +16,18 @@
   language governing permissions and limitations under the
   License.
 */
-
    // Start the session
    session_start();
 
-   require_once('alfresco/Common.php');
    require_once('alfresco/RepositoryService.php');
    require_once('alfresco/ContentService.php');
    require_once('alfresco/AuthenticationService.php');
    require_once('alfresco/Store.php');
+   require_once('alfresco/Reference.php');
    require_once('alfresco/tag/TagFramework.php');
    require_once('alfresco/tag/CommonTags.php');
-   
+
+
    $authentication_service = new AuthenticationService();
    if ($authentication_service->isUserAuthenticated() == false)
    {
@@ -67,20 +67,14 @@
       $error_message = $e->getMessage();
    }
    
-   start_tags();
-   
-   function getValue($columns, $prop_name)
+   set_exception_handler("exception_handler");
+   function exception_handler($exception)
    {
-      $value = null;
-      foreach($columns as $column)
-      {
-         if ($column->name == $prop_name)
-         {
-            $value = $column->value;
-         }
-      }
-      return $value;
+      print "Error: ".$exception->getMessage();
+      print "<br>Stack trace: ".$exception->getTraceAsString();
    }
+
+   start_tags();
 
    function getURL($current_id, $current_name, $path, $current_type="{http://www.alfresco.org/model/content/1.0}folder")
    {
@@ -103,78 +97,45 @@
       return $result;
    }
 
-   function outputTR($current_id, $current_type, $rows)
+   function outputRow($row)
    {
-       global $path;
+      global $path;
 
-       print('<tr>');
-       if (isset($rows->columns))
-       {
-          $current_name = getValue($rows->columns, '{http://www.alfresco.org/model/content/1.0}name');
+      $name = $row->getValue('{http://www.alfresco.org/model/content/1.0}name');
+      $uuid = $row->uuid();
+      $type = $row->type();
 
-          print('<td>');
-
-          print("<a href='");
-          print(getURL($current_id, $current_name, $path, $current_type));
-          print("'>");
-          print($current_name);
-          print("</a>");
-
-          print('</td>');
-       }
-       else
-       {
-          print '<td>&nbsp;</td>';
-       }
-       print('</tr>');
+      print("<tr><td><a href='");
+      print(getURL($uuid, $name, $path, $type));
+      print("'>");
+      print($name);
+      print("</a></td></tr>");
    }
    
    function outputTable($title, $query_results, $type_filter, $empty_message)
    {
-       if (isset($query_results->resultSet->size) && $query_results->resultSet->size == 0)
-       {
-          print $empty_message;
-       }
-       else
-       {
-          print(
-                '<table border="0" width="95%" align="center">'.
-                '   <tr style="{background-color: #D3E6FE}">'.
-                '      <td>'.$title.'</td>'.
-                '   </tr>'.
-                '   <tr>'.
-                '      <td>'.
-                '         <table border="0" width="100%">');
+      print(
+          '<table border="0" width="95%" align="center">'.
+          '   <tr style="{background-color: #D3E6FE}">'.
+          '      <td>'.$title.'</td>'.
+          '   </tr>'.
+          '   <tr>'.
+          '      <td>'.
+          '         <table border="0" width="100%">');
 
-          if (isset($query_results->resultSet->rows))
-          {
-             $row = $query_results->resultSet->rows;
-             $current_id = $row->node->id;
-             $current_type = $row->node->type;
-             if ($current_type == $type_filter)
-             {
-                outputTR($current_id, $current_type, $row);
-             }
-          }
-          else
-          {
-            for ($i = 0; $i < count($query_results->resultSet)-1; $i++)
-            {
-               $current_id = $query_results->resultSet[$i]->node->id;
-               $current_type = $query_results->resultSet[$i]->node->type;
-               if ($current_type == $type_filter)
-               {
-                  outputTR($current_id, $current_type, $query_results->resultSet[$i]);
-               }
-             }
-          }
+      foreach ($query_results->rows() as $row)
+      {
+         if ($row->type() == $type_filter)
+         {
+            outputRow($row);
+         }
+      }
 
-          print(
-                '         </table>'.
-                '      </td>'.
-                '   </tr>'.
-                '</table>');
-       }
+      print(
+          '         </table>'.
+          '      </td>'.
+          '   </tr>'.
+          '</table>');
    }
    
    function outputBreadcrumb($path)

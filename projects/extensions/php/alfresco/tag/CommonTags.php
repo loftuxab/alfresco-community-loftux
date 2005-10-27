@@ -56,7 +56,14 @@
 
       public function do_tag()
       {
-         $value = $_REQUEST[$this->attributes["name"]];
+         var_dump($this->attributes);
+
+         $value = "";
+         if (isset($_REQUEST[$this->attributes["name"]]) == true)
+         {
+            $value = $_REQUEST[$this->attributes["name"]];
+         }
+
          return "
             <input name='".$this->attributes["name"]."'
                    type='".$this->attributes["type"]."'

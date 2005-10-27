@@ -17,7 +17,9 @@
   License.
 */
 
-require_once('alfresco/Common.php');
+require_once('alfresco/BaseService.php');
+require_once('alfresco/Store.php');
+require_once('alfresco/ResultSet.php');
 require_once('alfresco/webservice/WebServiceUtils.php');
 require_once('alfresco/webservice/RepositoryWebService.php');
 
@@ -48,18 +50,16 @@ class RepositoryService extends BaseService
       return $stores;
    }
 
-   public function query($store, $query, $include_meta_data = false)
+   public function query($store, $statement, $language = 'lucene', $include_meta_data = false)
    {
-     // Make the web service call
+      // Make the web service call
       $this->addSecurityHeader();
       $store_value = getStoreSOAPValue($store);
-      $query_value = getQuerySOAPValue($query);
+      $query_value = getQuerySOAPValue($statement, $language);
       $result = $this->web_service->query($store_value, $query_value, $include_meta_data);
       $this->checkForError($result);
 
-      // TODO marshal the returned object back into a helpful object
-      
-      return $result;
+      return ResultSet::createResultSet($result);
    }
 
    public function queryChildren($reference)
@@ -68,14 +68,41 @@ class RepositoryService extends BaseService
       $result = $this->web_service->queryChildren(getReferenceSOAPValue($reference));
       $this->checkForError($result);
 
-      // TODO marshal the returned object back into a helpful object
-      
-      return $result;
+      return ResultSet::createResultSet($result);
+   }
+
+   public function queryParents($reference)
+   {
+      $this->addSecurityHeader();
+      $result = $this->web_service->queryParents(getReferenceSOAPValue($reference));
+      $this->checkForError($result);
+
+      return ResultSet::createResultSet($result);
+   }
+
+   public function queryAssociated($reference, $association_type, $direction='target')
+   {
+      // TODO
+   }
+
+   public function fetchMore($querySession)
+   {
+      // TODO
+   }
+
+   public function update($statements)
+   {
+      // TODO
+   }
+
+   public function describe($items)
+   {
+      // TODO
    }
 
    public function get($references)
    {
-
+      // TODO
    }
 }
 

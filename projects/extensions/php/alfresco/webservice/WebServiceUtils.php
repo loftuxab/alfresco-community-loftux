@@ -45,10 +45,10 @@
       return new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}store', false, $v=array($scheme, $address));
    }
 
-   function getQuerySOAPValue($query)
+   function getQuerySOAPValue($statement, $language)
    {
-      $language =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}language', '{http://www.alfresco.org/ws/model/content/1.0}QueryLanguageEnum', $query->language);
-      $statement =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}statement', false, $query->statement);
+      $language =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}language', '{http://www.alfresco.org/ws/model/content/1.0}QueryLanguageEnum', $language);
+      $statement =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}statement', false, $statement);
       return new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}query', false, $v=array($language, $statement));
    }
 

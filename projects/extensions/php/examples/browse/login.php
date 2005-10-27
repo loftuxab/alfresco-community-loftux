@@ -26,12 +26,12 @@
 
    $error_message = "";
 
-   if (isset($_POST["username"]) == true && isset($_POST["password"]) == true)
+   if (isset($_REQUEST["username"]) == true && isset($_REQUEST["password"]) == true)
    {
       try
       {
          $authentication_service = new AuthenticationService();
-         $authentication_service->startSession($_POST["username"], $_POST["password"]);
+         $authentication_service->startSession($_REQUEST["username"], $_REQUEST["password"]);
       
          header("Location: index.php");
          exit;

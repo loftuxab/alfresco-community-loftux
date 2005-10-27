@@ -17,7 +17,7 @@
   License.
 */
 
-require_once('alfresco/Common.php');
+require_once('alfresco/BaseService.php');
 require_once('alfresco/webservice/WebServiceUtils.php');
 require_once('alfresco/webservice/ContentWebService.php');
 
