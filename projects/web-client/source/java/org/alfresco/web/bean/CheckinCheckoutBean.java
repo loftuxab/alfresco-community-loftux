@@ -363,7 +363,8 @@ public class CheckinCheckoutBean
          // the myfile part will be ignored by the servlet but gives the browser a hint
          String url = DownloadContentServlet.generateDownloadURL(ref, node.getName());
          node.getProperties().put("url", url);
-         node.getProperties().put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));            
+         node.getProperties().put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));
+         node.getProperties().put("fileType32", Repository.getFileTypeImage(node, false)); 
          
          // remember the document
          setDocument(node);
@@ -431,6 +432,7 @@ public class CheckinCheckoutBean
             String url = DownloadContentServlet.generateDownloadURL(workingCopyRef, workingCopy.getName());
             
             workingCopy.getProperties().put("url", url);
+            workingCopy.getProperties().put("fileType32", Repository.getFileTypeImage(workingCopy, false)); 
             
             // commit the transaction
             tx.commit();
