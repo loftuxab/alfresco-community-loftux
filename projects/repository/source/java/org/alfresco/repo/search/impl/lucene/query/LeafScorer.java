@@ -236,15 +236,17 @@ public class LeafScorer extends Scorer
                         for(int j = 0; j < counter.count; j++)
                         {
                            parents[position++] = tp.doc();
+                           if (position == parents.length)
+                           {
+                               int[] old = parents;
+                               parents = new int[old.length * 2];
+                               System.arraycopy(old, 0, parents, 0, old.length);
+                           }
                         }
+                       
                     }
                 }
-                if (position == parents.length)
-                {
-                    int[] old = parents;
-                    parents = new int[old.length * 2];
-                    System.arraycopy(old, 0, parents, 0, old.length);
-                }
+                
             }
             int[] old = parents;
             parents = new int[position];
@@ -262,14 +264,15 @@ public class LeafScorer extends Scorer
                     for(int i = 0; i < counter.count; i++)
                     {
                        self[position++] = tp.doc();
+                       if (position == self.length)
+                       {
+                           old = self;
+                           self = new int[old.length * 2];
+                           System.arraycopy(old, 0, self, 0, old.length);
+                       }
                     }
                 }
-                if (position == self.length)
-                {
-                    old = self;
-                    self = new int[old.length * 2];
-                    System.arraycopy(old, 0, self, 0, old.length);
-                }
+                
             }
             old = self;
             self = new int[position];
@@ -295,14 +298,15 @@ public class LeafScorer extends Scorer
                                     for (int i = 0, l = tp.freq(); i < l; i++)
                                     {
                                         cats[position++] = tp.doc();
+                                        if (position == cats.length)
+                                        {
+                                            old = cats;
+                                            cats = new int[old.length * 2];
+                                            System.arraycopy(old, 0, cats, 0, old.length);
+                                        }
                                     }
                                 }
-                                if (position == cats.length)
-                                {
-                                    old = cats;
-                                    cats = new int[old.length * 2];
-                                    System.arraycopy(old, 0, cats, 0, old.length);
-                                }
+                               
                             }
                         }
                     }

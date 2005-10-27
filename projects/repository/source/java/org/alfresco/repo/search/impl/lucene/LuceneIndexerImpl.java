@@ -786,6 +786,14 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void addCommand(Command command)
     {
+        if(commandList.size() > 0)
+        {
+            Command last = commandList.get(commandList.size() -1);
+            if ((last.action == command.action) && (last.nodeRef.equals(command.nodeRef)))
+            {
+                return;
+            }
+        }
         purgeCommandList(command);
         commandList.add(command);
 
