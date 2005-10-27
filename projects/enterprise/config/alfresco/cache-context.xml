@@ -11,7 +11,7 @@
    </bean>
    
    <!-- The cross-transaction shared cache for Null Node Permissions -->
-   <bean name="nullPermissionCache" class="org.alfresco.repo.cache.EhCacheAdapter">
+   <bean name="nullPermissionSharedCache" class="org.alfresco.repo.cache.EhCacheAdapter">
       <property name="cache">
          <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
             <property name="cacheName">
@@ -24,7 +24,7 @@
    <!-- The transactional cache for Null Node Permissions -->
    <bean name="nullPermissionCache" class="org.alfresco.repo.cache.TransactionalCache">
       <property name="sharedCache">
-         <ref bean="nullPermissionCache" />
+         <ref bean="nullPermissionSharedCache" />
       </property>
       <property name="cacheManager" >
          <ref bean="ehCacheManager" />
