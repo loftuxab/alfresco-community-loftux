@@ -1,27 +1,24 @@
-========================
-Alfresco Preview Release
-========================
+====================
+Alfresco 1.0 Release
+====================
 
-Welcome to the Alfresco Preview Release.  This is provided as a
-snapshot of where we are currently in the development of the Alfresco
-system.  It is intended for preview use only and should not be used for
-any other purpose.  Not all functionality is available or complete.
+Welcome to the Alfresco 1.0 Release.
 
 
-===================================
-Installing Alfresco Preview Release
-===================================
+===================
+Installing Alfresco
+===================
 
-The Alfresco Preview Release is intended for evaluation purposes only.
+The following is a guide to installing Alfresco.
 
 
-====================================
-Alfresco Tomcat Bundled Installation
-====================================
+=========================
+Alfresco WAR Installation
+=========================
 
 Requirements:
 - Java Development Kit available from http://java.sun.com
-- MySQL Database available from http://www.mysql.com
+- MySQL Database available from http://www.mysql.com (other databases are supported)
 - Alfresco available from http://www.alfresco.org
 
 Optional:
@@ -46,6 +43,8 @@ Install JDK 5.0
 Install MySQL
 -------------
 
+- If you wish to use other databases, please visit the forums and wiki at
+  www.alfresco.org for guidelines
 - If you already have MySQL 4.1 installed, skip to "Install Alfresco"
 
 - Browse to http://dev.mysql.com/downloads/mysql/4.1.html
@@ -88,11 +87,11 @@ Optional Install of OpenOffice
 ------------------------------
 
 If you would like to have a range of document transformations available from within
-Alfresco, you need to install OpenOffice 1.1.5.  This is entirely optional and can be
-done at any point after Alfresco has been installed.  OpenOffice should be installed
-in C:\Program Files\OpenOffice.org1.1.5
+Alfresco, you need to install OpenOffice.  This is entirely optional and can be
+done at any point after Alfresco has been installed.
 
-- Browse to http://download.openoffice.org/1.1.5/index.html
+- Browse to http://download.openoffice.org
+- Download the appropriate version
 - OpenOffice needs to be started in a specific way to work with Alfresco:
 
   soffice "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
@@ -127,10 +126,9 @@ the command for this depends on your platform.
 Using the CIFS Server
 =====================
 
-The Preview release with CIFS is configured for ease of deployment.  To enable the CIFS
-server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' needs to be copied
-into a folder on the system path, such as 'c:\windows\system32'.  The Alfresco server will 
-need to be re-started once the dll has been copied.
+To enable the CIFS server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' 
+needs to be copied into a folder on the system path, such as 'c:\windows\system32'.  The 
+Alfresco server will need to be re-started once the dll has been copied.
 
 Once the Alfresco server is running, it should be possible to connect to it by mapping a
 drive to it.  The name to use for the mapping is based on the name of the server on which
@@ -182,18 +180,14 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
   and in this forum generally:
   http://www.alfresco.org/forums/viewforum.php?f=8
 
-- WAR file name is now called alfresco.war
+- WAR file name is called alfresco.war
   NOTE: If you deployed the war previously then you must clear out the web-client files 
   before deploying the new WAR file, having first copied any configurations made:
 
   Previous release was PR6 or later:
   Delete <tomcat-home>/webapps/alfresco.war
-  Delete <tomcat-home>/webapps/alfresco
+  Delete <tomcat-home>/webapps/alfresco  <-- make sure any configurations are copied
   Delete <tomcat-home>/work/alfresco
-  Previous release was PR5 or earlier:
-  Delete <tomcat-home>/webapps/web-client.war
-  Delete <tomcat-home>/webapps/web-client
-  Delete <tomcat-home>/work/web-client
 
 - If the following errors are reported on the console:
   ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
@@ -218,4 +212,4 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
   Alfresco FireFox Extension from here:
   http://sourceforge.net/projects/alfresco
   
-  Internet Explorer does not require the extension to see display CIFS folders directly.
+  Internet Explorer does not require the extension to open CIFS folders directly.

@@ -1,18 +1,15 @@
-========================
-Alfresco Preview Release
-========================
+====================
+Alfresco 1.0 Release
+====================
 
-Welcome to the Alfresco Preview Release.  This is provided as a
-snapshot of where we are currently in the development of the Alfresco
-system.  It is intended for preview use only and should not be used for
-any other purpose.  Not all functionality is available or complete.
+Welcome to the Alfresco 1.0 Release.
 
 
-===================================
-Installing Alfresco Preview Release
-===================================
+===================
+Installing Alfresco
+===================
 
-The Alfresco Preview Release is intended for evaluation purposes only.
+The following is a guide to installing Alfresco.
 
 
 ===================================
@@ -22,7 +19,7 @@ Alfresco JBoss Bundled Installation
 Requirements:
 - Mac OS X 10.4 or above
 - Java Development Kit available from http://www.apple.com
-- MySQL Database available from http://www.mysql.com
+- MySQL Database available from http://www.mysql.com (other databases are supported)
 - Alfresco available from http://www.alfresco.org
 
 Optional:
@@ -51,6 +48,8 @@ Install JDK 5.0
 Install MySQL
 -------------
 
+- If you wish to use other databases, please visit the forums and wiki at
+  www.alfresco.org for guidelines
 - If you already have MySQL 4.1 installed, skip to "Create Database"
 
 - Browse to http://dev.mysql.com/downloads/mysql/4.1.html
@@ -92,11 +91,11 @@ Optional Install of OpenOffice
 ------------------------------
 
 If you would like to have a range of document transformations available from within
-Alfresco, you need to install OpenOffice 1.1.5.  This is entirely optional and can be
-done at any point after Alfresco has been installed.  
+Alfresco, you need to install OpenOffice.  This is entirely optional and can be
+done at any point after Alfresco has been installed.
 
-- Browse to http://download.openoffice.org/1.1.5/index.html
-- Download the OS X version (currently NeoOffice/J release)
+- Browse to http://download.openoffice.org
+- Download the OS X version (1.1.4 or above)
 - Install OpenOffice
 - Start one of the OpenOffice programs to go through initial registration, then close it
 - Rename '/opt/alfresco/zstart_oo.sh' to '/opt/alfresco/start_oo.sh'
@@ -140,7 +139,6 @@ Navigate to the '/opt/alfresco' folder and run 'alfresco.sh stop'.
 Using the CIFS Server
 =====================
 
-The Preview release with CIFS is configured for ease of deployment.
 Once the Alfresco server is running, it should be possible to connect to it by mapping a
 drive to it.  The name to use for the mapping is based on the name of the server on which
 Alfresco is running, with '_A' on the end.  For example, if the PC name is 'MYPC01', then 
@@ -203,8 +201,6 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
 
   Previous release was PR6 or later:
   Delete <jboss-home>/server/default/deploy/alfresco.war
-  Previous release was PR5 or earlier:
-  Delete <jboss-home>/server/default/deploy/web-client.war
 
 - If the following errors are reported on the console:
   ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
@@ -229,5 +225,5 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
   Alfresco FireFox Extension from here:
   http://sourceforge.net/projects/alfresco
   
-  Internet Explorer does not require the extension to see display CIFS folders directly.
+  Internet Explorer does not require the extension to open CIFS folders directly.
 

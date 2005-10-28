@@ -1,18 +1,15 @@
-========================
-Alfresco Preview Release
-========================
+====================
+Alfresco 1.0 Release
+====================
 
-Welcome to the Alfresco Preview Release.  This is provided as a
-snapshot of where we are currently in the development of the Alfresco
-system.  It is intended for preview use only and should not be used for
-any other purpose.  Not all functionality is available or complete.
+Welcome to the Alfresco 1.0 Release.
 
 
-===================================
-Installing Alfresco Preview Release
-===================================
+===================
+Installing Alfresco
+===================
 
-The Alfresco Preview Release is intended for evaluation purposes only.
+The following is a guide to installing Alfresco.
 
 
 ===================================
@@ -21,7 +18,7 @@ Alfresco JBoss Bundled Installation
 
 Requirements:
 - Java Development Kit available from http://java.sun.com
-- MySQL Database available from http://www.mysql.com
+- MySQL Database available from http://www.mysql.com (other databases are supported)
 - Alfresco available from http://www.alfresco.org
 
 Optional:
@@ -46,6 +43,8 @@ Install JDK 5.0
 Install MySQL
 -------------
 
+- If you wish to use other databases, please visit the forums and wiki at
+  www.alfresco.org for guidelines
 - If you already have MySQL 4.1 installed, skip to "Install Alfresco"
 
 - Browse to http://dev.mysql.com/downloads/mysql/4.1.html
@@ -75,10 +74,9 @@ Install Alfresco JBoss Bundle
 Set Paths
 ---------
 
-Edit 'alfresco.bat' and set the variables to the locations where Java and JBoss
-are installed:
+Edit 'alfresco.bat' and check the variable is set to the location where JBoss is
+installed:
 - For the JBoss bundle, this will be 'C:\alfresco\jboss
-- For Java, the default is 'C:\Program Files\Java\jdk1.5.0_04'
 
 
 Create Database
@@ -92,6 +90,7 @@ running or that the mysql command cannot be found.  Either correct this or setup
 the Alfresco database and user manually by loading the 'db_setup.sql' file into
 MySQL, for example, 'mysql -u root -p <db_setup.sql'.
 
+
 You have now installed all the components needed to run the Alfresco server.
 
 
@@ -99,11 +98,10 @@ Optional Install of OpenOffice
 ------------------------------
 
 If you would like to have a range of document transformations available from within
-Alfresco, you need to install OpenOffice 1.1.5.  This is entirely optional and can be
-done at any point after Alfresco has been installed.  OpenOffice should be installed
-in C:\Program Files\OpenOffice.org1.1.5
+Alfresco, you need to install OpenOffice.  This is entirely optional and can be
+done at any point after Alfresco has been installed.
 
-- Browse to http://download.openoffice.org/1.1.5/index.html
+- Browse to http://download.openoffice.org
 - Download the Windows version
 - Install OpenOffice with defaults (except file associations, unless you wish to)
 - Start one of the OpenOffice programs to go through initial registration, then close it
@@ -147,10 +145,9 @@ Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 Using the CIFS Server
 =====================
 
-The Preview release with CIFS is configured for ease of deployment.  To enable the CIFS
-server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' needs to be copied
-into a folder on the system path, such as 'C:\windows\system32'.  The Alfresco server will 
-need to be re-started once the dll has been copied.
+To enable the CIFS server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' 
+needs to be copied into a folder on the system path, such as 'c:\windows\system32'.  The 
+Alfresco server will need to be re-started once the dll has been copied.
 
 Once the Alfresco server is running, it should be possible to connect to it by mapping a
 drive to it.  The name to use for the mapping is based on the name of the server on which
@@ -207,8 +204,6 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
 
   Previous release was PR6 or later:
   Delete <jboss-home>/server/default/deploy/alfresco.war
-  Previous release was PR5 or earlier:
-  Delete <jboss-home>/server/default/deploy/web-client.war
 
 - If the following errors are reported on the console:
   ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
@@ -233,4 +228,4 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
   Alfresco FireFox Extension from here:
   http://sourceforge.net/projects/alfresco
   
-  Internet Explorer does not require the extension to see display CIFS folders directly.
+  Internet Explorer does not require the extension to open CIFS folders directly.
