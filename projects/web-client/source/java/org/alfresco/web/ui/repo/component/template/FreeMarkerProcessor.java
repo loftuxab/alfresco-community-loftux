@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import freemarker.cache.MruCacheStorage;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import freemarker.template.TemplateExceptionHandler;
 
 /**
  * FreeMarker implementation the template processor interface
@@ -63,6 +64,9 @@ public class FreeMarkerProcessor implements ITemplateProcessor
       
       // use our custom object wrapper that can deal with QNameMap objects directly
       config.setObjectWrapper(new QNameAwareObjectWrapper());
+      
+      // rethrow any exception so we can deal with them
+      config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
       
       this.config = config;
    }
@@ -108,7 +112,7 @@ public class FreeMarkerProcessor implements ITemplateProcessor
             catch (Throwable err)
             {
                Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
-               FacesContext.getCurrentInstance(), MSG_ERROR_TEMPLATE_FAIL), new Object[] {template}), err);
+               FacesContext.getCurrentInstance(), MSG_ERROR_TEMPLATE_FAIL), new Object[] {err.getMessage()}), err);
                try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
             }
          }
