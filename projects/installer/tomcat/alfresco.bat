@@ -4,9 +4,19 @@ rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
 set CATALINA_HOME=C:\alfresco\tomcat
-set JAVA_HOME=C:\Program Files\Java\jdk1.5.0_04
-set PATH=%JAVA_HOME%/bin:%PATH%
 
+rem --- If SetPaths.bat already exists - assume set by hand and use as is
+if not exist "SetPaths.bat" goto getpaths 
+call SetPaths.bat
+goto start
+
+:getpaths
+call RegPaths.exe
+call SetPaths.bat
+del SetPaths.bat
+
+:start
+set PATH=%JAVA_HOME%/bin:%PATH%
 rem ---------------------------------------
 rem Start Components
 rem ---------------------------------------
@@ -40,6 +50,6 @@ call %CATALINA_HOME%\bin\shutdown.bat
 rem ---------------------------------------
 rem Stop OpenOffice for transformations
 rem ---------------------------------------
-if exist "start_oo.bat" c:\windows\system32\taskkill /f /im soffice.exe
+if exist "start_oo.bat" c:\windows\system32\taskkill /f /im soffice.bin
 
 :nostop
