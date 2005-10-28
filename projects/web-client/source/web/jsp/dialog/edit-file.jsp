@@ -98,6 +98,11 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
+                                    <td class="mainSubTitle">
+                                       <h:outputText value="#{msg.edit_file_title}" />
+                                    </td>
+                                 </tr>
+                                 <tr>
                                     <td class="mainSubText">
                                        <h:outputFormat value="#{msg.edit_file_prompt}">
                                           <f:param value="#{CheckinCheckoutBean.document.name}" />
@@ -118,20 +123,22 @@
                                  
                                  <%-- Hide the checkout info if this document is already checked out --%>
                                  <a:panel id="checkout-panel" rendered="#{CheckinCheckoutBean.document.properties.workingCopy == false}">
+                                    <tr><td class="paddingRow"></td></tr>
                                     <tr>
-                                       <td style="padding-top:8px"></td>
+                                       <td class="mainSubTitle">
+                                          <h:outputText value="#{msg.checkout_file_title}" />
+                                       </td>
                                     </tr>
-                                    
                                     <tr>
-                                       <td class="mainSubText">
-                                          <h:outputText value="#{msg.you_may_want}" />:
-                                          <div style="padding-top:6px"></div>
-                                          &nbsp;&nbsp;
-                                          <a:actionLink value="#{msg.checkout_document}" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
-                                             <f:param name="id" value="#{CheckinCheckoutBean.document.id}" />
-                                          </a:actionLink>
-                                          <div style="padding-top:6px"></div>
-                                          <h:outputText value="#{msg.checkout_hint}" />
+                                       <td>
+                                          <h:outputText value="#{msg.checkout_you_may_want}" />
+                                          <div class="mainSubText" style="padding-top:6px;padding-left:2px">
+                                             <a:actionLink value="#{msg.checkout}" image="/images/icons/CheckOut_icon.gif" actionListener="#{CheckinCheckoutBean.setupContentAction}" action="checkoutFile">
+                                                <f:param name="id" value="#{CheckinCheckoutBean.document.id}" />
+                                             </a:actionLink>
+                                          </div>
+                                          <div class="mainSubText" style="padding-top:6px"><h:outputText value="#{msg.checkout_hint1}" /></div>
+                                          <div class="mainSubText"><h:outputText value="#{msg.checkout_hint2}" /></div>
                                        </td>
                                     </tr>
                                  </a:panel>

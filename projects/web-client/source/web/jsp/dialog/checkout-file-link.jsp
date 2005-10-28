@@ -103,10 +103,6 @@
                                        <h:outputFormat value="#{msg.copy_file_checkedout}">
                                           <f:param value="#{CheckinCheckoutBean.document.name}" />
                                        </h:outputFormat>
-                                       <br>
-                                       <h:outputText value="#{msg.copy_edit_info}" />
-                                       <br>
-                                       <h:outputText value="#{msg.copy_undo_checkout}" />
                                     </td>
                                  </tr>
                               </table>
@@ -137,6 +133,11 @@
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
+                                    <td class="mainSubTitle">
+                                       <h:outputText value="#{msg.edit_workingcopy_title}" />
+                                    </td>
+                                 </tr>
+                                 <tr>
                                     <td class="mainSubText">
                                        <h:outputText value="#{msg.edit_workingcopy_info}" />
                                     </td>
@@ -150,6 +151,22 @@
                                  <tr>
                                     <td>
                                        <h:outputText value="#{msg.download_complete}" />
+                                    </td>
+                                 </tr>
+                                 <tr><td colspan="2" class="paddingRow"></td></tr>
+                                 <tr>
+                                    <td class="mainSubTitle">
+                                       <h:outputText value="#{msg.continue_working_title}" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td class="mainSubText">
+                                       <h:outputText value="#{msg.continue_working_info1}" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td class="mainSubText">
+                                       <h:outputText value="#{msg.continue_working_info2}" /> <img src="<%=request.getContextPath()%>/images/icons/edit_icon.gif" align="absmiddle" width="12" height="16">
                                     </td>
                                  </tr>
                               </table>
