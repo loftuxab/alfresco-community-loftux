@@ -83,12 +83,9 @@
                               <td>
                                  <%-- Summary --%>
                                  <div class="mainSubTitle"><h:outputText value="#{msg.product_name}" id="msg1" /></div>
-                                 <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg2" /></div>
+                                 <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg2" />&nbsp;<a:actionLink image="/images/icons/opennetwork.gif" value="#{msg.network_folder} #{NavigationBean.nodeProperties.cifsPathLabel}" showLink="false" href="#{NavigationBean.nodeProperties.cifsPath}" rendered="#{NavigationBean.nodeProperties.cifsPath != null}" target="new" id="cifs" /></div>
                                  <div class="mainSubText"><h:outputText value="#{msg.view_description}" id="msg3" /></div>
                                  <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
-                                 <div class="mainSubText">
-                                    <a:actionLink value="#{msg.network_folder}" tooltip="#{NavigationBean.nodeProperties.cifsPathLabel}" href="#{NavigationBean.nodeProperties.cifsPath}" rendered="#{NavigationBean.nodeProperties.cifsPath != null}" target="new" id="cifs" />
-                                 </div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
                               <td width=110 style="padding-left:2px">
