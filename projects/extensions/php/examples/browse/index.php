@@ -47,7 +47,7 @@
 
    if (isset($_REQUEST['uuid']) == false)
    {
-      $reference = new Reference($store, null, "//*[@cm:name=\"Company Home\"]");
+      $reference = new Reference($store, null, "/app:company_home");
       $path = 'Company Home';
 
    }
