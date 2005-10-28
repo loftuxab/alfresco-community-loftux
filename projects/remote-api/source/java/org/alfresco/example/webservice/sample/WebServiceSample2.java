@@ -135,7 +135,7 @@ public class WebServiceSample2
      * 
      * @param rows  an array of rows
      */
-    private static void outputResultSet(ResultSetRow[] rows)
+    public static void outputResultSet(ResultSetRow[] rows)
     {
         for (int x = 0; x < rows.length; x++)
         {
