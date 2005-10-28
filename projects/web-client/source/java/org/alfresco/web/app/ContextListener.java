@@ -173,10 +173,12 @@ public class ContextListener implements ServletContextListener, HttpSessionListe
           
             personService.createPerson(props);
          }
-         PermissionService permissionService = (PermissionService) ctx.getBean("permissionService");
-         permissionService.setPermission(rootNodeRef, PermissionService.ADMINISTRATOR_AUTHORITY, permissionService.getAllPermission(), true);
-         permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), PermissionService.GUEST, true);
-         permissionService.setPermission(rootNodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
+         // set the store's GUEST access if we are allowed to modify permissions
+         if (!transactionService.isReadOnly())
+         {
+             PermissionService permissionService = (PermissionService) ctx.getBean("permissionService");
+             permissionService.setPermission(rootNodeRef, permissionService.getAllAuthorities(), PermissionService.GUEST, true);
+         }
          
          // commit the transaction
          tx.commit();

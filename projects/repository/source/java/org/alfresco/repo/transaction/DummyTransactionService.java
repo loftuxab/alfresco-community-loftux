@@ -40,6 +40,11 @@ public class DummyTransactionService implements TransactionService
         public void setTransactionTimeout(int arg0) {};
     };
 
+    public boolean isReadOnly()
+    {
+        return false;
+    }
+
     public UserTransaction getNonPropagatingUserTransaction()
     {
         return txn;

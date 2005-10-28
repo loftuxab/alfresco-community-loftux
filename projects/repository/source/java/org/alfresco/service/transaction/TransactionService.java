@@ -26,6 +26,13 @@ import javax.transaction.UserTransaction;
 public interface TransactionService
 {
     /**
+     * Determine if ALL user transactions will be read-only.
+     * 
+     * @return Returns true if all transactions are read-only.
+     */
+    public boolean isReadOnly();
+    
+    /**
      * Gets a user transaction that supports transaction gation.
      * This is like the EJB <b>REQUIRED</b> transaction attribute.
      * 

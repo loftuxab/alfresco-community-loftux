@@ -52,6 +52,11 @@ public class TransactionComponent implements TransactionService
     {
         this.readOnly = !allowWrite;
     }
+    
+    public boolean isReadOnly()
+    {
+        return readOnly;
+    }
 
     /**
      * @see org.springframework.transaction.TransactionDefinition#PROPAGATION_REQUIRED
