@@ -359,6 +359,8 @@ public class LoginBean
       Map session = context.getExternalContext().getSessionMap();
       User user = (User) session.get(AuthenticationHelper.AUTHENTICATION_USER);
       
+      boolean alfrescoAuth = (session.get(LOGIN_EXTERNAL_AUTH) == null);
+      
       // invalidate Session for this user
       if (Application.inPortalServer() == false)
       {
@@ -382,8 +384,8 @@ public class LoginBean
       {
          Application.setLanguage(context, this.language);
       }
-
-      return "logout";
+      
+      return alfrescoAuth ? "logout" : "relogin";
    }
 
    
@@ -403,6 +405,7 @@ public class LoginBean
    public static final String LOGIN_REDIRECT_KEY = "_alfRedirect";
    public static final String LOGIN_OUTCOME_KEY  = "_alfOutcome";
    public static final String LOGIN_OUTCOME_ARGS = "_alfOutcomeArgs";
+   public static final String LOGIN_EXTERNAL_AUTH= "_alfExternalAuth";
 
    public final static String OUTCOME_DOCDETAILS   = "showDocDetails";
    public final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";

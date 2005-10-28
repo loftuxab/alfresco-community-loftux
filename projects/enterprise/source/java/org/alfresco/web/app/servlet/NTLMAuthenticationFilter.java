@@ -78,6 +78,7 @@ import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.LoginBean;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ClientConfigElement;
 import org.apache.commons.codec.binary.Base64;
@@ -802,6 +803,7 @@ public class NTLMAuthenticationFilter implements Filter
                 // Store the user
                 
                 httpSess.setAttribute(AuthenticationHelper.AUTHENTICATION_USER, user);
+                httpSess.setAttribute(LoginBean.LOGIN_EXTERNAL_AUTH, Boolean.TRUE);
 
                 // Set the current locale from the Accept-Lanaguage header if available
                 

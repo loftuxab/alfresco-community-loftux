@@ -67,6 +67,10 @@
          <from-outcome>logout</from-outcome>
          <to-view-id>/jsp/login.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>relogin</from-outcome>
+         <to-view-id>/jsp/relogin.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <!-- rule to get back to the Admin Console from anywhere -->
