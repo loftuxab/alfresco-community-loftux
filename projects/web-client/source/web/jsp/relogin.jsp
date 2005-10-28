@@ -33,7 +33,7 @@
    
    <h:form acceptCharset="UTF-8" id="loggedOutForm" >
    
-   <table width=100% height=98% align=center>
+   <table width=100% height=90% align=center>
       <tr width=100% align=center>
          <td valign=middle align=center width=100%>
             
