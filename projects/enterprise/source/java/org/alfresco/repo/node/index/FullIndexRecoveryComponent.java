@@ -33,6 +33,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.search.Indexer;
+import org.alfresco.repo.search.impl.lucene.LuceneIndexerImpl;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
@@ -300,7 +301,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     /**
      * Stateful thread runnable that executes reindex calls.
      * 
-     * @see FullIndexRecoveryComponent#reindexImpl()
+     * @see FullIndexRecoveryComponent#reindexNodes()
      * 
      * @author Derek Hulley
      */
@@ -313,9 +314,12 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             {
                 try
                 {
-                    List<String> txnsIndexed = FullIndexRecoveryComponent.this.reindexImpl();
+                    // reindex nodes
+                    List<String> txnsIndexed = FullIndexRecoveryComponent.this.reindexNodes();
+                    // reindex missing content
+                    int missingContentCount = FullIndexRecoveryComponent.this.reindexMissingContent();
                     // check if the process should terminate
-                    if (txnsIndexed.size() == 0 && !runContinuously)
+                    if (missingContentCount == 0 && txnsIndexed.size() == 0 && !runContinuously)
                     {
                         // the thread has caught up with all the available work and should not
                         // run continuously
@@ -344,11 +348,78 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             }
         }
     }
+
+    /**
+     * @return Returns the number of documents reindexed
+     */
+    private int reindexMissingContent()
+    {
+        int count = 0;
+        for (StoreRef storeRef : storeRefs)
+        {
+            count += reindexMissingContent(storeRef);
+        }
+        return count;
+    }
+    
+    /**
+     * @param storeRef the store to check for missing content
+     * @return Returns the number of documents reindexed
+     */
+    private int reindexMissingContent(StoreRef storeRef)
+    {
+        SearchParameters sp = new SearchParameters();
+        sp.addStore(storeRef);
+
+        // search for it in the index
+        String query = "TEXT:" + LuceneIndexerImpl.NOT_INDEXED_CONTENT_MISSING;
+        sp.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp.setQuery(query);
+        ResultSet results = null;
+        try
+        {
+            results = searcher.query(sp);
+            
+            int count = 0;
+            // loop over the results and get the details of the nodes that have missing content
+            List<ChildAssociationRef> assocRefs = results.getChildAssocRefs();
+            for (ChildAssociationRef assocRef : assocRefs)
+            {
+                final NodeRef childNodeRef = assocRef.getChildRef();
+                // prompt for a reindex - it might fail again, but we just keep plugging away
+                TransactionWork<Object> reindexWork = new TransactionWork<Object>()
+                {
+                    public Object doWork()
+                    {
+                        indexer.updateNode(childNodeRef);
+                        return null;
+                    }
+                };
+                TransactionUtil.executeInNonPropagatingUserTransaction(transactionService, reindexWork);
+                count++;
+            }
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Reindexed missing content: \n" +
+                        "   store: " + storeRef + "\n" +
+                        "   node count: " + count);
+            }
+            return count;
+        }
+        finally
+        {
+            if (results != null)
+            {
+                results.close();
+            }
+        }
+    }
     
     /**
      * @return Returns the transaction ID just reindexed, i.e. where some work was performed
      */
-    private List<String> reindexImpl()
+    private List<String> reindexNodes()
     {
         // get a list of all transactions still requiring a check
         List<String> txnsToCheck = getNextChangeTxnIds(FullIndexRecoveryComponent.currentTxnId);
@@ -356,18 +427,19 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         // loop over each transaction
         for (String changeTxnId : txnsToCheck)
         {
-            reindex(changeTxnId);
+            reindexNodes(changeTxnId);
         }
+        
         // done
         return txnsToCheck;
     }
-
+    
     /**
      * Reindexes changes specific to the change transaction ID.
      * <p>
      * <b>All exceptions are absorbed.</b>
      */
-    private void reindex(String changeTxnId)
+    private void reindexNodes(String changeTxnId)
     {
         /*
          * This must execute each within its own transaction.
@@ -432,7 +504,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         /**
          * Changes the L2 cache usage before reindexing for each store
          * 
-         * @see #reindex(StoreRef, String)
+         * @see #reindexNodes(StoreRef, String)
          */
         public Object doInHibernate(Session session)
         {
@@ -448,13 +520,13 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
                     continue;
                 }
                 // reindex for store
-                reindex(storeRef, changeTxnId);
+                reindexNodes(storeRef, changeTxnId);
             }
             // done
             return null;
         }
         
-        private void reindex(StoreRef storeRef, String changeTxnId)
+        private void reindexNodes(StoreRef storeRef, String changeTxnId)
         {
             // check if we need to perform this operation
             SearchParameters sp = new SearchParameters();
