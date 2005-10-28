@@ -98,8 +98,10 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     
     /** ensures that this process is kicked off once per VM */
     private static boolean started = false;
-    /**The current transaction ID being processed */
+    /** The current transaction ID being processed */
     private static String currentTxnId = null;
+    /** kept to notify the thread that it should quite */
+    private boolean killThread = false;
     
     /** provides transactions to atomically index each missed transaction */
     private TransactionService transactionService;
@@ -130,8 +132,20 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     {
         this.storeRefs = new ArrayList<StoreRef>(2);
         
+        this.killThread = false;
         this.runContinuously = false;
         this.l2CacheMode = CacheMode.REFRESH;
+
+        // ensure that we kill the thread when the VM is shutting down
+        Runnable shutdownRunnable = new Runnable()
+        {
+            public void run()
+            {
+                killThread = true;
+            };  
+        };
+        Thread shutdownThread = new Thread(shutdownRunnable);
+        Runtime.getRuntime().addShutdownHook(shutdownThread);
     }
     
     /**
@@ -310,7 +324,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         public void run()
         {
             // keep this thread going permanently
-            while (true)
+            while (!killThread)
             {
                 try
                 {
@@ -342,8 +356,15 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
                 }
                 catch (Throwable e)
                 {
-                    // report
-                    logger.error("Reindex failure", e);
+                    if (killThread)
+                    {
+                        // the shutdown may have caused the exception - ignore it
+                    }
+                    else
+                    {
+                        // we are still a go; report it
+                        logger.error("Reindex failure", e);
+                    }
                 }
             }
         }
