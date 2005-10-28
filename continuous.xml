@@ -116,7 +116,7 @@
       <mkdir dir="${dir.dist}" />
       <zip destfile="${dir.dist}/${file.name.dist.bin.jboss}.zip">
          <zipfileset dir="${dir.project.installer}"
-                     includes="alf_start.bat,alf_stop.bat,db_remove.bat,db_setup.bat,zstart_oo.bat
+                     includes="alf_start.bat,alf_stop.bat,db_remove.bat,db_setup.bat,zstart_oo.bat, RegPaths.exe,
                                *.sql,licenses/**,AlfrescoTest.pdf" />
          <zipfileset dir="${dir.project.installer}" includes="jboss/alfresco.bat" fullpath="alfresco.bat" />
          <zipfileset dir="${dir.project.installer}" includes="jboss/README_win.txt" fullpath="README.txt" />
@@ -139,7 +139,7 @@
          <mkdir dir="${dir.dist}" />
          <zip destfile="${dir.dist}/${file.name.dist.bin.jboss}.zip" duplicate="preserve">
             <zipfileset dir="${dir.project.installer}"
-                        includes="alf_start.bat,alf_stop.bat,db_remove.bat,db_setup.bat,zstart_oo.bat
+                        includes="alf_start.bat,alf_stop.bat,db_remove.bat,db_setup.bat,zstart_oo.bat, RegPaths.exe,
                                   *.sql,licenses/**,AlfrescoTest.pdf" />
             <zipfileset dir="${dir.project.installer}" includes="jboss/alfresco.bat" fullpath="alfresco.bat" />
             <zipfileset dir="${dir.project.installer}" includes="jboss/README_win.txt" fullpath="README.txt" />
@@ -215,7 +215,7 @@
       <mkdir dir="${dir.dist}" />
       <zip destfile="${dir.dist}/${file.name.dist.bin.tomcat}.zip">
          <zipfileset dir="${dir.project.installer}"
-                     includes="alf_start.bat,alf_stop.bat,db_remove.bat,db_setup.bat,zstart_oo.bat
+                     includes="alf_start.bat,alf_stop.bat,db_remove.bat,db_setup.bat,zstart_oo.bat, RegPaths.exe,
                                *.sql,licenses/**,AlfrescoTest.pdf" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/alfresco.bat" fullpath="alfresco.bat" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/README_win.txt" fullpath="README.txt" />
