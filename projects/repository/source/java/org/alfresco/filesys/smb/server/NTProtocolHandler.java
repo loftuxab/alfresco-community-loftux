@@ -4159,6 +4159,16 @@ public class NTProtocolHandler extends CoreProtocolHandler
                 streams = ntfsStreams.hasStreamsEnabled(m_sess, conn);
             }
 
+            // Check if the path is for an NTFS stream, return an error if streams are not supported or not enabled
+            
+            if ( streams == false && path.indexOf(FileOpenParams.StreamSeparator) != -1)
+            {
+                // NTFS streams not supported, return an error status
+                
+                m_sess.sendErrorResponseSMB(SMBStatus.NTObjectNameInvalid, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
+                return;
+            }
+            
             // Check for the file streams information level
 
             int dataLen = 0;
@@ -4197,8 +4207,7 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
                 if (fileInfo == null)
                 {
-                    m_sess
-                            .sendErrorResponseSMB(SMBStatus.NTObjectNotFound, SMBStatus.DOSFileNotFound,
+                    m_sess.sendErrorResponseSMB(SMBStatus.NTObjectNotFound, SMBStatus.DOSFileNotFound,
                                     SMBStatus.ErrDos);
                     return;
                 }
@@ -5449,8 +5458,7 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
                 // Return a file not found error
 
-//                m_sess.sendErrorResponseSMB(SMBStatus.NTObjectNotFound, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
-                m_sess.sendErrorResponseSMB(SMBStatus.NTObjectPathNotFound, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
+                m_sess.sendErrorResponseSMB(SMBStatus.NTObjectNameInvalid, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
                 return;
             }
         }
