@@ -39,4 +39,10 @@ public class WebResources
    
    public static final String IMAGE_EXPANDED   = "/images/icons/expanded.gif";
    public static final String IMAGE_COLLAPSED  = "/images/icons/collapsed.gif";
+   
+   public static final String IMAGE_MOVELEFT   = "/images/icons/move_left.gif";
+   public static final String IMAGE_MOVERIGHT  = "/images/icons/move_right.gif";
+   public static final String IMAGE_GO_UP      = "/images/icons/up.gif";
+   
+   public static final String IMAGE_INFO       = "/images/icons/info_icon.gif";
 }

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
@@ -58,6 +59,7 @@ import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
+import org.alfresco.web.ui.common.component.UIStatusMessage;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
@@ -259,6 +261,22 @@ public class BrowseBean implements IContextListener
    public UIRichList getSpacesRichList()
    {
       return this.spacesRichList;
+   }
+   
+   /**
+    * @return Returns the statusMessage component.
+    */
+   public UIStatusMessage getStatusMessage()
+   {
+      return this.statusMessage;
+   }
+
+   /**
+    * @param statusMessage The statusMessage component to set.
+    */
+   public void setStatusMessage(UIStatusMessage statusMessage)
+   {
+      this.statusMessage = statusMessage;
    }
    
    /**
@@ -1085,6 +1103,8 @@ public class BrowseBean implements IContextListener
                }
             }
             
+            Utils.addStatusMessage(FacesMessage.SEVERITY_WARN, "Successfully deleted space '" + node.getName() + "'");
+            
             // clear action context
             setActionSpace(null);
             
@@ -1400,6 +1420,7 @@ public class BrowseBean implements IContextListener
    /** Component references */
    private UIRichList spacesRichList;
    private UIRichList contentRichList;
+   private UIStatusMessage statusMessage;
    
    /** Transient lists of container and content nodes for display */
    private List<Node> containerNodes = null;

@@ -59,25 +59,4 @@ public class UIOutputText extends UIOutput
       ResponseWriter out = context.getResponseWriter();
       out.write((String)getValue());
    }
-   
-   /**
-    * @see javax.faces.component.StateHolder#restoreState(javax.faces.context.FacesContext, java.lang.Object)
-    */
-   public void restoreState(FacesContext context, Object state)
-   {
-      Object values[] = (Object[])state;
-      // standard component attributes are restored by the super class
-      super.restoreState(context, values[0]);
-   }
-   
-   /**
-    * @see javax.faces.component.StateHolder#saveState(javax.faces.context.FacesContext)
-    */
-   public Object saveState(FacesContext context)
-   {
-      Object values[] = new Object[13];
-      // standard component attributes are saved by the super class
-      values[0] = super.saveState(context);
-      return values;
-   }
 }

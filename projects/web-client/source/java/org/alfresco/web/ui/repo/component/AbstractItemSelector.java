@@ -36,11 +36,10 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
-import org.alfresco.web.ui.repo.WebResources;
+import org.alfresco.web.ui.common.WebResources;
 
 /**
  * Abstract component to allow the selection of a hierarchical item

@@ -239,6 +239,23 @@ a.headbarLink
    color: #1B3557;
 }
 
+.statusInfoText
+{
+   font-size: 11px;
+}
+
+.statusWarningText
+{
+   font-size: 11px;
+   color: #4272B4;
+}
+
+.statusErrorText
+{
+   font-size: 11px;
+   color: #e00028;
+}
+
 .recordSet
 {
    padding: 2px;

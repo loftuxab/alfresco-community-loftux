@@ -32,5 +32,4 @@ public class WebResources extends org.alfresco.web.ui.common.WebResources
    public static final String IMAGE_PASTE       = "/images/icons/paste.gif";
    public static final String IMAGE_LOCK        = "/images/icons/locked.gif";
    public static final String IMAGE_LOCK_OWNER  = "/images/icons/locked_owner.gif";
-   public static final String IMAGE_GO_UP       = "/images/icons/up.gif";
 }

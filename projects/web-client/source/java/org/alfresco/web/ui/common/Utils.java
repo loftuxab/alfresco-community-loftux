@@ -17,6 +17,9 @@
 package org.alfresco.web.ui.common;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -31,9 +34,12 @@ import javax.faces.el.MethodBinding;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.data.IDataContainer;
+import org.alfresco.web.ui.common.component.UIStatusMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
@@ -702,7 +708,7 @@ public final class Utils
    /**
     * Adds a global error message
     * 
-    * @param msg The error message
+    * @param msg        The error message
     */
    public static void addErrorMessage(String msg)
    {
@@ -712,8 +718,8 @@ public final class Utils
    /**
     * Adds a global error message and logs exception details
     * 
-    * @param msg     The error message
-    * @param err     The exceptio
+    * @param msg        The error message
+    * @param err        The exception to log
     */
    public static void addErrorMessage(String msg, Throwable err)
    {
@@ -729,6 +735,67 @@ public final class Utils
          }
       }
    }
+   
+   /**
+    * Adds a global status message that will be displayed by a Status Message UI component
+    * 
+    * @param severity   Severity of the message
+    * @param msg        Text of the message
+    */
+   public static void addStatusMessage(FacesMessage.Severity severity, String msg)
+   {
+      FacesContext fc = FacesContext.getCurrentInstance();
+      String time = getTimeFormat(fc).format(new Date(System.currentTimeMillis()));
+      FacesMessage fm = new FacesMessage(severity, time, msg);
+      fc.addMessage(UIStatusMessage.STATUS_MESSAGE, fm);
+   }
+   
+   /**
+    * @return the formatter for locale sensitive Time formatting
+    */
+   public static DateFormat getTimeFormat(FacesContext fc)
+   {
+      return getDateFormatFromPattern(fc, Application.getMessage(fc, MSG_TIME_PATTERN));
+   }
+   
+   /**
+    * @return the formatter for locale sensitive Date formatting
+    */
+   public static DateFormat getDateFormat(FacesContext fc)
+   {
+      return getDateFormatFromPattern(fc, Application.getMessage(fc, MSG_DATE_PATTERN));
+   }
+   
+   /**
+    * @return the formatter for locale sensitive Date & Time formatting
+    */
+   public static DateFormat getDateTimeFormat(FacesContext fc)
+   {
+      return getDateFormatFromPattern(fc, Application.getMessage(fc, MSG_DATE_TIME_PATTERN));
+   }
+   
+   /**
+    * @return DataFormat object for the specified pattern
+    */
+   private static DateFormat getDateFormatFromPattern(FacesContext fc, String pattern)
+   {
+      if (pattern == null)
+      {
+         throw new IllegalArgumentException("DateTime pattern is mandatory.");
+      }
+      try
+      {
+         return new SimpleDateFormat(pattern, Application.getLanguage(fc));
+      }
+      catch (IllegalArgumentException err)
+      {
+         throw new AlfrescoRuntimeException("Invalid DateTime pattern", err);
+      }
+   }
+   
+   private static final String MSG_TIME_PATTERN = "time_pattern";
+   private static final String MSG_DATE_PATTERN = "date_pattern";
+   private static final String MSG_DATE_TIME_PATTERN = "date_time_pattern";
    
    private static Log logger = LogFactory.getLog(Utils.class);
 }

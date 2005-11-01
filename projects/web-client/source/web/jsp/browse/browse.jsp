@@ -86,6 +86,7 @@
                                  <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg2" />&nbsp;<a:actionLink image="/images/icons/opennetwork.gif" value="#{msg.network_folder} #{NavigationBean.nodeProperties.cifsPathLabel}" showLink="false" href="#{NavigationBean.nodeProperties.cifsPath}" rendered="#{NavigationBean.nodeProperties.cifsPath != null}" target="new" id="cifs" /></div>
                                  <div class="mainSubText"><h:outputText value="#{msg.view_description}" id="msg3" /></div>
                                  <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
+                                 <div style="padding-top:2px"><a:statusMessage border="yellowInner" bgcolor="#ffffcc" binding="#{BrowseBean.statusMessage}" /></div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
                               <td width=110 style="padding-left:2px">
