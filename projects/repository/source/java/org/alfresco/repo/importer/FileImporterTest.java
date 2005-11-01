@@ -31,6 +31,7 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -39,11 +40,14 @@ import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
+import org.alfresco.util.TempFileProvider;
 import org.springframework.context.ApplicationContext;
 
 public class FileImporterTest extends TestCase
@@ -183,6 +187,10 @@ public class FileImporterTest extends TestCase
         int target = 1000;
         while (count < target)
         {
+            File directory = TempFileProvider.getTempDir();
+            File[] files = directory.listFiles();
+            System.out.println("Start temp file count = " + files.length);
+            
             count++;
             FileImporterTest test = new FileImporterTest();
             test.setUp();
@@ -216,7 +224,7 @@ public class FileImporterTest extends TestCase
                 }
 
                 long start = System.nanoTime();
-                int importCount = test.createFileImporter().loadNamedFile(location.get(0), new File(args[2]), true, "import-"+count);
+                int importCount = test.createFileImporter().loadNamedFile(location.get(0), new File(args[2]), true, "import-1-"+count);
                 grandTotal += importCount;
                 long end = System.nanoTime();
                 long first = end-start;
@@ -232,6 +240,60 @@ public class FileImporterTest extends TestCase
                 System.out.println("Count: "+ count + "ms");
                 System.out.println("Imported: " + importCount + " files or directories");
                 System.out.println("Average: " + (importCount / (total / 1000.0)) + " files per second");
+                
+                directory = TempFileProvider.getTempDir();
+                files = directory.listFiles();
+                System.out.println("End temp file count = " + files.length);
+                
+                
+                tx = transactionService.getUserTransaction(); 
+                tx.begin();
+                SearchParameters sp = new SearchParameters();
+                sp.setLanguage("lucene");
+                sp.setQuery("ISNODE:T");
+                sp.addStore(spacesStore);
+                start = System.nanoTime();
+                ResultSet rs = test.searchService.query(sp);
+                end = System.nanoTime();
+                System.out.println("Find all in: " + ((end - start) / 1000000.0) + "ms");
+                System.out.println("     = "+rs.length() +"\n\n");
+                rs.close();
+                
+                sp = new SearchParameters();
+                sp.setLanguage("lucene");
+                sp.setQuery("TEXT:\"andy\"");
+                sp.addStore(spacesStore);
+                start = System.nanoTime();
+                rs = test.searchService.query(sp);
+                end = System.nanoTime();
+                System.out.println("Find andy in: " + ((end - start) / 1000000.0) + "ms");
+                System.out.println("     = "+rs.length() +"\n\n");
+                rs.close();
+                
+                sp = new SearchParameters();
+                sp.setLanguage("lucene");
+                sp.setQuery("TYPE:\"" + ContentModel.TYPE_CONTENT.toString()  + "\"");
+                sp.addStore(spacesStore);
+                start = System.nanoTime();
+                rs = test.searchService.query(sp);
+                end = System.nanoTime();
+                System.out.println("Find content in: " + ((end - start) / 1000000.0) + "ms");
+                System.out.println("     = "+rs.length() +"\n\n");
+                rs.close();
+                
+                sp = new SearchParameters();
+                sp.setLanguage("lucene");
+                sp.setQuery("PATH:\"/*/*/*\"");
+                sp.addStore(spacesStore);
+                start = System.nanoTime();
+                rs = test.searchService.query(sp);
+                end = System.nanoTime();
+                System.out.println("Find /*/*/* in: " + ((end - start) / 1000000.0) + "ms");
+                System.out.println("     = "+rs.length() +"\n\n");
+                rs.close();
+                
+                tx.commit();
+                
             }
             catch (Throwable e)
             {

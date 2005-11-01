@@ -82,7 +82,6 @@ import org.apache.lucene.search.TermQuery;
  */
 public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
-
     public static final String NOT_INDEXED_NO_TRANSFORMATION = "nint";
 
     public static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nift";
@@ -786,9 +785,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
     private void addCommand(Command command)
     {
-        if(commandList.size() > 0)
+        if (commandList.size() > 0)
         {
-            Command last = commandList.get(commandList.size() -1);
+            Command last = commandList.get(commandList.size() - 1);
             if ((last.action == command.action) && (last.nodeRef.equals(command.nodeRef)))
             {
                 return;
@@ -1163,7 +1162,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         for (QName propertyName : properties.keySet())
         {
             Serializable value = properties.get(propertyName);
-            isAtomic = indexProperty(nodeRef, propertyName, value, xdoc, isAtomic);
+            isAtomic = indexProperty(nodeRef, propertyName, value, xdoc, isAtomic, true);
         }
 
         boolean isRoot = nodeRef.equals(nodeService.getRootNode(nodeRef.getStoreRef()));
@@ -1340,8 +1339,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     }
 
     private boolean indexProperty(NodeRef nodeRef, QName propertyName, Serializable value, Document doc,
-            boolean isAtomic)
+            boolean isAtomic, boolean indexAtomicProperties)
     {
+        String attributeName = "@"
+                + QName.createQName(propertyName.getNamespaceURI(), ISO9075.encode(propertyName.getLocalName()));
+
         boolean store = true;
         boolean index = true;
         boolean tokenise = true;
@@ -1361,98 +1363,124 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         if (value != null)
         {
-            // convert value to String
-            for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
+            if (indexAtomicProperties == atomic)
             {
-                if (strValue != null)
+                if(!indexAtomicProperties)
                 {
-                    // String strValue = ValueConverter.convert(String.class,
-                    // value);
-                    // TODO: Need to add with the correct language based
-                    // analyser
-                    if (index && atomic)
+                   doc.removeFields(propertyName.toString());
+                }
+                // convert value to String
+                for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
+                {
+                    if (strValue != null)
                     {
+                        // String strValue =
+                        // ValueConverter.convert(String.class,
+                        // value);
+                        // TODO: Need to add with the correct language based
+                        // analyser
+
                         if (isContent)
                         {
-                            ContentReader reader = contentService.getReader(nodeRef, propertyName);
-                            if (reader != null && reader.exists())
+                            if (index)
                             {
-                                boolean readerReady = true;
-                                // transform if necessary (it is not a UTF-8
-                                // text document)
-                                if (!EqualsHelper.nullSafeEquals(reader.getMimetype(), MimetypeMap.MIMETYPE_TEXT_PLAIN)
-                                        || !EqualsHelper.nullSafeEquals(reader.getEncoding(), "UTF-8"))
+                                ContentReader reader = contentService.getReader(nodeRef, propertyName);
+                                if (reader != null && reader.exists())
                                 {
-                                    ContentWriter writer = contentService.getTempWriter();
-                                    writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-                                    writer.setEncoding("UTF-8"); // this is
-                                    // what the
-                                    // analyzers
-                                    // expect on
+                                    boolean readerReady = true;
+                                    // transform if necessary (it is not a UTF-8
+                                    // text document)
+                                    if (!EqualsHelper.nullSafeEquals(reader.getMimetype(),
+                                            MimetypeMap.MIMETYPE_TEXT_PLAIN)
+                                            || !EqualsHelper.nullSafeEquals(reader.getEncoding(), "UTF-8"))
+                                    {
+                                        ContentWriter writer = contentService.getTempWriter();
+                                        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                                        writer.setEncoding("UTF-8"); // this
+                                        // is
+                                        // what the
+                                        // analyzers
+                                        // expect on
+                                        // the
+                                        // stream
+                                        try
+                                        {
+                                            contentService.transform(reader, writer);
+                                            // point the reader to the
+                                            // new-written
+                                            // content
+                                            reader = writer.getReader();
+                                        }
+                                        catch (NoTransformerException e)
+                                        {
+                                            // log it
+                                            if (s_logger.isDebugEnabled())
+                                            {
+                                                s_logger.debug("Not indexed: No transformation", e);
+                                            }
+                                            // don't index from the reader
+                                            readerReady = false;
+                                            // not indexed: no transformation
+                                            doc.add(Field.Text("TEXT", NOT_INDEXED_NO_TRANSFORMATION));
+                                            doc.add(Field.Text(attributeName, NOT_INDEXED_NO_TRANSFORMATION));
+                                        }
+                                        catch (ContentIOException e)
+                                        {
+                                            // log it
+                                            if (s_logger.isDebugEnabled())
+                                            {
+                                                s_logger.debug("Not indexed: Transformation failed", e);
+                                            }
+                                            // don't index from the reader
+                                            readerReady = false;
+                                            // not indexed: transformation
+                                            // failed
+                                            doc.add(Field.Text("TEXT", NOT_INDEXED_TRANSFORMATION_FAILED));
+                                            doc.add(Field.Text(attributeName, NOT_INDEXED_TRANSFORMATION_FAILED));
+                                        }
+                                    }
+                                    // add the text field using the stream from
                                     // the
-                                    // stream
-                                    try
+                                    // reader, but only if the reader is valid
+                                    if (readerReady)
                                     {
-                                        contentService.transform(reader, writer);
-                                        // point the reader to the new-written
-                                        // content
-                                        reader = writer.getReader();
-                                    }
-                                    catch (NoTransformerException e)
-                                    {
-                                        // log it
-                                        if (s_logger.isDebugEnabled())
-                                        {
-                                            s_logger.debug("Not indexed: No transformation", e);
-                                        }
-                                        // don't index from the reader
-                                        readerReady = false;
-                                        // not indexed: no transformation
-                                        doc.add(Field.Text("TEXT", NOT_INDEXED_NO_TRANSFORMATION));
-                                    }
-                                    catch (ContentIOException e)
-                                    {
-                                        // log it
-                                        if (s_logger.isDebugEnabled())
-                                        {
-                                            s_logger.debug("Not indexed: Transformation failed", e);
-                                        }
-                                        // don't index from the reader
-                                        readerReady = false;
-                                        // not indexed: transformation failed
-                                        doc.add(Field.Text("TEXT", NOT_INDEXED_TRANSFORMATION_FAILED));
+                                        doc.add(Field.Text("TEXT",
+                                                new InputStreamReader(reader.getContentInputStream())));
+                                        doc.add(Field.Text("@"
+                                                + QName.createQName(propertyName.getNamespaceURI(), ISO9075
+                                                        .encode(propertyName.getLocalName())), new InputStreamReader(
+                                                reader.getReader().getContentInputStream())));
                                     }
                                 }
-                                // add the text field using the stream from the
-                                // reader, but only if the reader is valid
-                                if (readerReady)
+
+                                else
+                                // URL not present (null reader) or no content
+                                // at
+                                // the URL (file missing)
                                 {
-                                    doc.add(Field.Text("TEXT", new InputStreamReader(reader.getContentInputStream())));
+                                    // log it
+                                    if (s_logger.isDebugEnabled())
+                                    {
+                                        s_logger.debug("Not indexed: Content Missing \n"
+                                                + "   node: " + nodeRef + "\n" + "   reader: " + reader + "\n"
+                                                + "   content exists: "
+                                                + (reader == null ? " --- " : Boolean.toString(reader.exists())));
+                                    }
+                                    // not indexed: content missing
+                                    doc.add(Field.Text("TEXT", NOT_INDEXED_CONTENT_MISSING));
+                                    doc.add(Field.Text(attributeName, NOT_INDEXED_CONTENT_MISSING));
                                 }
-                            }
-                            else
-                            // URL not present (null reader) or no content at
-                            // the URL (file missing)
-                            {
-                                // log it
-                                if (s_logger.isDebugEnabled())
-                                {
-                                    s_logger.debug("Not indexed: Content Missing \n"
-                                            + "   node: " + nodeRef + "\n" + "   reader: " + reader + "\n"
-                                            + "   content exists: "
-                                            + (reader == null ? " --- " : Boolean.toString(reader.exists())));
-                                }
-                                // not indexed: content missing
-                                doc.add(Field.Text("TEXT", NOT_INDEXED_CONTENT_MISSING));
                             }
                         }
-                        doc.add(new Field("@"
-                                + QName.createQName(propertyName.getNamespaceURI(), ISO9075.encode(propertyName
-                                        .getLocalName())), strValue, store, index, tokenise));
+                        else
+                        {
+                            doc.add(new Field(attributeName, strValue, store, index, tokenise));
+                        }
                     }
                 }
             }
         }
+
         return isAtomic;
     }
 
@@ -1666,78 +1694,12 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         NodeRef ref = helper.nodeRef;
                         Map<QName, Serializable> properties = nodeService.getProperties(ref);
 
-                        for (QName propertyQName : properties.keySet())
+                        for (QName propertyName : properties.keySet())
                         {
-                            boolean store = true;
-                            boolean index = true;
-                            boolean tokenise = true;
-                            boolean atomic = true;
-                            boolean isContent = false;
-
-                            PropertyDefinition propertyDefinition = getDictionaryService().getProperty(propertyQName);
-                            if (propertyDefinition != null)
-                            {
-                                index = propertyDefinition.isIndexed();
-                                store = propertyDefinition.isStoredInIndex();
-                                tokenise = propertyDefinition.isTokenisedInIndex();
-                                atomic = propertyDefinition.isIndexedAtomically();
-                                isContent = propertyDefinition.getDataType().getName().equals(
-                                        DataTypeDefinition.CONTENT);
-                            }
-
-                            Serializable value = properties.get(propertyQName);
-                            if (value != null)
-                            {
-                                // convert value to String
-                                for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
-                                {
-
-                                    // TODO: Need converter here
-                                    // Conversion should be done in the anlyser
-                                    // as
-                                    // we
-                                    // may
-                                    // take
-                                    // advantage of tokenisation
-
-                                    // Need to add with the correct language
-                                    // based
-                                    // analyser
-                                    if (index && !atomic)
-                                    {
-                                        document.removeFields(propertyQName.toString());
-                                        if (isContent)
-                                        {
-                                            ContentReader reader = contentService.getReader(ref, propertyQName);
-                                            if (reader != null)
-                                            {
-                                                ContentWriter cwriter = contentService.getTempWriter();
-                                                cwriter.setMimetype("text/plain");
-                                                try
-                                                {
-                                                    contentService.transform(reader, cwriter);
-                                                    document.add(Field.Text("TEXT", new InputStreamReader(cwriter
-                                                            .getReader().getContentInputStream())));
-                                                }
-                                                catch (NoTransformerException e)
-                                                {
-                                                    // if it does not convert we
-                                                    // did
-                                                    // not
-                                                    // write and text
-                                                }
-                                            }
-                                        }
-
-                                        document.add(new Field("@"
-                                                + QName.createQName(propertyQName.getNamespaceURI(), ISO9075
-                                                        .encode(propertyQName.getLocalName())), strValue, store, index,
-                                                tokenise));
-                                    }
-                                }
-                            }
+                            Serializable value = properties.get(propertyName);
+                            indexProperty(ref, propertyName, value, document, false, false);
                         }
-
+                        
                         document.removeField("FTSSTATUS");
                         document.add(new Field("FTSSTATUS", "Clean", true, true, false));
 
