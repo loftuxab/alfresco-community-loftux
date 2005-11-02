@@ -250,6 +250,26 @@
          org.alfresco.repo.domain.hibernate.StoreImpl as store
    </query>
    
+   <!-- Fetches all the children of a given parent node -->
+   <query name="node.GetAllChildAssocs">
+      select
+         assoc.typeQName as TYPE_QNAME,
+         assoc.qname as QNAME,
+         assoc.isPrimary as IS_PRIMARY,
+         assoc.index as INDEX,
+         assoc.child.key.protocol as CHILD_PROTOCOL,
+         assoc.child.key.identifier as CHILD_IDENTIFIER,
+         assoc.child.key.guid as CHILD_GUID
+      from
+         org.alfresco.repo.domain.hibernate.ChildAssocImpl as assoc
+      where
+         assoc.parent.key.protocol = :parentKeyProtocol and
+         assoc.parent.key.identifier = :parentKeyIdentifier and
+         assoc.parent.key.guid = :parentKeyGuid
+      order by
+         assoc.index
+   </query>
+   
    <query name="node.GetNodeAssoc">
       select
          assoc

@@ -881,41 +881,52 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         // done
         return results;
     }
-
+    
+    /**
+     * Fast implementation to fetch all children associations of a parent node.
+     */
+    @Override
+    public final List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef)
+    {
+        // query
+        List<ChildAssociationRef> results = nodeDaoService.getAllChildAssocs(nodeRef);
+        // if no results were found, we need to double check that the node is valid
+        if (results.size() == 0)
+        {
+            Node node = getNodeNotNull(nodeRef);
+        }
+        // done
+        return results;
+    }
+    
     /**
      * Filters out any associations if their qname is not a match to the given pattern.
+     * 
+     * TODO: Add an optimization here if the QNamePattern instances are actually QNames.
+     *       A query can be run to do the filtering.
      */
     public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef, QNamePattern typeQNamePattern, QNamePattern qnamePattern)
     {
-        Node node = getNodeNotNull(nodeRef);
-        // get the assocs pointing from it
-        Collection<ChildAssoc> childAssocs = node.getChildAssocs();
-        // shortcut if there are no assocs
-        if (childAssocs.size() == 0)
-        {
-            return Collections.emptyList();
-        }
-        // sort results
-        ArrayList<ChildAssoc> orderedList = new ArrayList<ChildAssoc>(childAssocs);
-        Collections.sort(orderedList);
+        // get all the children in the correct order
+        List<ChildAssociationRef> orderedList = getChildAssocs(nodeRef);
         
-        // list of results
-        List<ChildAssociationRef> results = new ArrayList<ChildAssociationRef>(childAssocs.size());
+        // filter out non-matching children
+        List<ChildAssociationRef> results = new ArrayList<ChildAssociationRef>(orderedList.size());
         int nthSibling = 0;
-        for (ChildAssoc assoc : orderedList)
+        
+        for (ChildAssociationRef assocRef : orderedList)
         {
             // does the qname match the pattern?
-            if (!qnamePattern.isMatch(assoc.getQname()) || !typeQNamePattern.isMatch(assoc.getTypeQName()))
+            if (!typeQNamePattern.isMatch(assocRef.getTypeQName()) || !qnamePattern.isMatch(assocRef.getQName()))
             {
                 // no match - ignore
                 continue;
             }
-            ChildAssociationRef assocRef = assoc.getChildAssocRef();
             // slot the value in the right spot
             assocRef.setNthSibling(nthSibling);
             nthSibling++;
             // get the child
-            results.add(assoc.getChildAssocRef());
+            results.add(assocRef);
         }
         // done
         return results;

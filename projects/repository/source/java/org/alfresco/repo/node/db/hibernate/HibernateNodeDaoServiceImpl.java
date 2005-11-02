@@ -37,6 +37,8 @@ import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
 import org.hibernate.ObjectDeletedException;
@@ -55,7 +57,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements NodeDaoService
 {
     public static final String QUERY_GET_ALL_STORES = "store.GetAllStores";
-    public static final String QUERY_GET_CHILD_ASSOC = "node.GetChildAssoc";
+    public static final String QUERY_GET_ALL_CHILD_ASSOCS = "node.GetAllChildAssocs";
     public static final String QUERY_GET_NODE_ASSOC = "node.GetNodeAssoc";
     public static final String QUERY_GET_NODE_ASSOC_TARGETS = "node.GetNodeAssocTargets";
     public static final String QUERY_GET_NODE_ASSOC_SOURCES = "node.GetNodeAssocSources";
@@ -338,6 +340,55 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
         }
         // not found
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ChildAssociationRef> getAllChildAssocs(final NodeRef parentNodeRef)
+    {
+        HibernateCallback callback = new HibernateCallback()
+        {
+            public Object doInHibernate(Session session)
+            {
+                Query query = session.getNamedQuery(HibernateNodeDaoServiceImpl.QUERY_GET_ALL_CHILD_ASSOCS);
+                query.setString("parentKeyProtocol", parentNodeRef.getStoreRef().getProtocol())
+                     .setString("parentKeyIdentifier", parentNodeRef.getStoreRef().getIdentifier())
+                     .setString("parentKeyGuid", parentNodeRef.getId());
+                return query.list();
+            }
+        };
+        List<Object[]> resultSet = (List<Object[]>) getHibernateTemplate().execute(callback);
+        List<ChildAssociationRef> results = new ArrayList<ChildAssociationRef>(resultSet.size());
+        int nthSibling = -1;
+        for (Object[] row : resultSet)
+        {
+            // assoc.typeQName as TYPE_QNAME,
+            QName assocTypeQName = (QName) row[0];
+            // assoc.qname as QNAME,
+            QName assocQName = (QName) row[1];
+            // assoc.isPrimary as IS_PRIMARY,
+            Boolean isPrimary = (Boolean) row[2];
+            // assoc.index as INDEX,
+            nthSibling++;
+            // assoc.child.key.protocol = CHILD_PROTOCOL,
+            String childProtocol = (String) row[4];
+            // assoc.child.key.identifier = CHILD_IDENTIFIER,
+            String childIdentifier = (String) row[5];
+            // assoc.child.key.guid = CHILD_GUID
+            String childGuid = (String) row[6];
+            
+            // construct the assoc ref
+            ChildAssociationRef assocRef = new ChildAssociationRef(
+                    assocTypeQName,
+                    parentNodeRef,
+                    assocQName,
+                    new NodeRef(new StoreRef(childProtocol, childIdentifier), childGuid),
+                    isPrimary.booleanValue(),
+                    nthSibling);
+            // add to the results
+            results.add(assocRef);
+        }
+        // done
+        return results;
     }
 
     /**
