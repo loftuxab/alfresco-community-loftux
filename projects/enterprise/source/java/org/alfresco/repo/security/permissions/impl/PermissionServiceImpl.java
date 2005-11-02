@@ -47,7 +47,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
-import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
 import org.apache.commons.logging.Log;
@@ -689,10 +688,10 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             }
 
             // Check permissions required of children
-
+            List<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
             for (PermissionReference pr : childrenRequirements)
             {
-                for (ChildAssociationRef child : nodeService.getChildAssocs(nodeRef))
+                for (ChildAssociationRef child : childAssocRefs)
                 {
                     success &= (hasPermission(child.getChildRef(), pr) == AccessStatus.ALLOWED);
                     if (!success)
