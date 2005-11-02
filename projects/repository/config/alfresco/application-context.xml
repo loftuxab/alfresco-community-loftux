@@ -726,7 +726,7 @@
                   <ref bean="searchService" />
               </property>
               <property name="userNamesAreCaseSensitive">
-                 <value>false</value>
+                 <value>${user.name.caseSensitive}</value>
               </property>           
            </bean>
         </property>
@@ -823,7 +823,7 @@
                  <value>${server.transaction.allow-writes}</value>
               </property>
               <property name="userNamesAreCaseSensitive">
-                 <value>false</value>
+                 <value>${user.name.caseSensitive}</value>
               </property>
            </bean>
         </property>

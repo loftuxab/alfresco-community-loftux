@@ -891,7 +891,7 @@ public abstract class LuceneBase implements Lockable
             throw new LuceneIndexException("Write lock failed to check or clear any existing lucene locks", e);
         }
     }
-
+    
     public void releaseReadLock()
     {
         getLuceneIndexLock().releaseReadLock(store);

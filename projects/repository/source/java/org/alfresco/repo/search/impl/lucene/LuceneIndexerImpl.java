@@ -1622,6 +1622,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     public void updateFullTextSearch(int size) throws LuceneIndexException
     {
         checkAbleToDoWork(true, false);
+        if(!mainIndexExists())
+        {
+            return;
+        }
         try
         {
             String lastId = null;
