@@ -17,11 +17,12 @@
 package org.alfresco.repo.search;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.search.impl.JCR170Searcher;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -86,6 +87,29 @@ public class NodeServiceXPath extends BaseXPath
     private static final long serialVersionUID = 3834032441789592882L;
 
     private boolean followAllParentLinks;
+
+    /**
+     * Jaxen has some magic with its IdentitySet, which means that we can get different results
+     * depending on whether we cache {@link ChildAssociationRef } instances or not.
+     * <p>
+     * So, duplicates are eliminated here before the results are returned.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List selectNodes(Object arg0) throws JaxenException
+    {
+        List<Object> resultsWithDuplicates = super.selectNodes(arg0);
+        
+        Set<Object> set = new HashSet<Object>(resultsWithDuplicates);
+        
+        // now return as a list again
+        List<Object> results = resultsWithDuplicates;
+        results.clear();
+        results.addAll(set);
+        
+        // done
+        return results;
+    }
 
     /**
      * 
