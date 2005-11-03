@@ -16,17 +16,17 @@
  */
 package org.alfresco.example;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.transaction.UserTransaction;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.transaction.TransactionUtil;
+import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -37,6 +37,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.GUID;
+import org.alfresco.util.TempFileProvider;
 import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.context.ApplicationContext;
 
@@ -72,25 +73,22 @@ public class SimpleExampleWithContent
         // initialise app content 
         ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
         // get registry of services
-        ServiceRegistry serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
+        final ServiceRegistry serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         
         // begin a UserTransaction
         // All the services are set to create or propogate the transaction.
         // This transaction will be recognised and propogated
-        // The usual try-catch-finally code has been ommitted
-        TransactionService transactionService = serviceRegistry.getTransactionService(); 
-        UserTransaction txn = transactionService.getUserTransaction();
-        try
+        // The TransactionUtil takes care of the catching and rollback, etc
+        TransactionService transactionService = serviceRegistry.getTransactionService();
+        TransactionWork<Object> exampleWork = new TransactionWork<Object>()
         {
-            txn.begin();
-            doExample(serviceRegistry);
-            txn.commit();
-        }
-        catch (Throwable e)
-        {
-            e.printStackTrace();
-            try { txn.rollback(); } catch (Exception ee) { ee.printStackTrace(); }
-        }
+            public Object doWork() throws Exception
+            {
+                doExample(serviceRegistry);
+                return null;
+            }
+        };
+        TransactionUtil.executeInUserTransaction(transactionService, exampleWork);
         System.exit(0);
     }
 
@@ -149,20 +147,17 @@ public class SimpleExampleWithContent
         // but for now we'll just upload a string
         // The writer, being updating, will take care of updating the node once the stream
         // closes.
+        String content = "The quick brown fox jumps over the lazy dog";
+        writer.putContent(content);
+        
+        // dump the content to a file
+        File file = TempFileProvider.createTempFile("sample", ".txt");
+        ContentReader reader = contentService.getReader(fileRef, ContentModel.PROP_CONTENT);
+        reader.getContent(file);
+        
         // just to demonstrate the node structure, dump it to the file
         String dump = NodeStoreInspector.dumpNodeStore(nodeService, storeRef);
-        writer.putContent(dump);
-        
-        // get the URL.  It is also available directly from the writer
-        ContentData contentData = (ContentData) nodeService.getProperty(fileRef, ContentModel.PROP_CONTENT);
-        System.out.println("Node store dumped to: " + contentData);
-        
-        // get a reader
-        ContentReader reader = contentService.getReader(fileRef, ContentModel.PROP_CONTENT);
-        if (reader.exists())
-        {
-            System.out.println("Node Store: \n" + reader.getContentString());
-        }
+        System.out.println("Node Store: \n" + dump);
         
         // and much, much more ...
     }

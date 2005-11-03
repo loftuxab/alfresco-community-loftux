@@ -46,7 +46,7 @@ public class TransactionUtil
          * 
          * @return Return the result of the operation
          */
-        Result doWork();
+        Result doWork() throws Exception;
     }
 
     /**
