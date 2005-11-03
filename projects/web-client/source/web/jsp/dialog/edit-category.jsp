@@ -103,6 +103,7 @@
                                        <r:multiValueListEditor value="#{DocumentDetailsBean.categories}"
                                                                lastItemAdded="#{DocumentDetailsBean.addedCategory}" 
                                                                selectItemMsg="#{msg.select_category}"
+                                                               selectedItemsMsg="#{msg.selected_categories}"
                                                                noSelectedItemsMsg="#{msg.no_selected_categories}"
                                                                styleClass="selector">
                                           <r:categorySelector label="#{msg.select_category_prompt}" styleClass="selector"

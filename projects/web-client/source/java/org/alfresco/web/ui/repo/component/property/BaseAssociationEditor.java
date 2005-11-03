@@ -328,9 +328,9 @@ public abstract class BaseAssociationEditor extends UIInput
                // add some padding
                out.write("<tr><td height='6'></td></tr>");
                
-//               out.write("<tr><td colspan='2'>");
-//               out.write(getSelectedItemsMsg());
-//               out.write(":</td></tr>");
+               out.write("<tr><td colspan='2'>");
+               out.write(getSelectedItemsMsg());
+               out.write("</td></tr>");
                
                // show all the current associations
                out.write("<tr><td colspan='2'><table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>");

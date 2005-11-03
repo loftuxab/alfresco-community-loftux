@@ -180,8 +180,16 @@
                                                            rendered='#{row.conditionName != "no-condition"}'/>
                                           </h:column>
                                        </h:dataTable>
-                                       <h:outputText value="<#{msg.none}>"
-                                                     rendered="#{NewRuleWizard.allConditionsDataModel.rowCount == 0}" />
+                                       <a:panel id="no-items" rendered="#{NewRuleWizard.allConditionsDataModel.rowCount == 0}">
+                                          <table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>
+                                             <tr>
+                                                <td colspan='2' class='selectedItemsHeader'><h:outputText id="no-items-name" value="#{msg.summary}" /></td>
+                                             </tr>
+                                             <tr>
+                                                <td class='selectedItemsRow'><h:outputText id="no-items-msg" value="#{msg.no_selected_items}" /></td>
+                                             </tr>
+                                          </table>
+                                       </a:panel>
                                     </td>
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>

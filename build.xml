@@ -119,7 +119,7 @@
       </war>
    </target>
 
-   <target name="deploy-exploded-web-client-jboss" depends="init">
+   <target name="deploy-exploded-jboss" depends="init">
       <input message="Enter name of temporary JBoss folder" addproperty="dir.name.jboss.tmp" />
       <property name="dir.jboss.tmp" value="${dir.deploy.jboss}/../tmp/deploy/${dir.name.jboss.tmp}" />
       <available file="${dir.jboss.tmp}" type="dir" property="present.dir.jboss.tmp" />
@@ -130,7 +130,7 @@
       </copy>
    </target>
 
-   <target name="deploy-exploded-web-client-tomcat" depends="init">
+   <target name="deploy-exploded-tomcat" depends="init">
       <copy todir="${dir.deploy.tomcat}/alfresco" verbose="true">
          <fileset dir="${dir.project.webclient}/source/web" excludes="WEB-INF/**" />
       </copy>

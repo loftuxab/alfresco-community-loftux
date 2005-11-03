@@ -171,8 +171,17 @@
                                                            value="#{msg.remove}" showLink="false"/>
                                           </h:column>
                                        </h:dataTable>
-                                       <h:outputText value="<#{msg.none}>"
-                                                     rendered="#{InviteUsersWizard.userRolesDataModel.rowCount == 0}" />
+                                       
+                                       <a:panel id="no-items" rendered="#{InviteUsersWizard.userRolesDataModel.rowCount == 0}">
+                                          <table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>
+                                             <tr>
+                                                <td colspan='2' class='selectedItemsHeader'><h:outputText id="no-items-name" value="#{msg.name}" /></td>
+                                             </tr>
+                                             <tr>
+                                                <td class='selectedItemsRow'><h:outputText id="no-items-msg" value="#{msg.no_selected_items}" /></td>
+                                             </tr>
+                                          </table>
+                                       </a:panel>
                                     </td>
                                  </tr>
                                  

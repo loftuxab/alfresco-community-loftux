@@ -18,10 +18,9 @@ table.moduletable td
 
 td,tr,p,div
 {
-   color: #465F7D;
+   color: #003366;
 	font-family: Tahoma, Arial, Helvetica, sans-serif;
 	font-size: 11px;
-	color: #465F7D;
 }
 
 th
@@ -42,7 +41,7 @@ p.status
 a:link, a:visited
 {
 	font-size: 11px;
-	color: #465F7D;
+	color: #003366;
 	text-decoration: none;
 	font-family: Tahoma, Arial, Helvetica, sans-serif;
 	font-weight: normal;
@@ -58,7 +57,7 @@ a:hover
 a.path:link, a.path:visited
 {
 	font-size: 14px;
-	color: #465F7D;
+	color: #003366;
 	text-decoration: none;
 	font-weight: normal;
 }
@@ -109,7 +108,7 @@ a.small:link, a.small:visited
 {
    font-size: 11px;
    font-weight: normal;
-   color: #465F7D;
+   color: #003366;
 }
 
 a.small:hover
@@ -121,19 +120,19 @@ a.small:hover
 
 .pageTitle
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 14px;
 }
 
 .main
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 11px;
 }
 
 .mainTitle
 {
-   color: #465F7D;
+   color: #003366;
    font-family: Arial, Helvetica, sans-serif;
    font-size: 16px;
    font-weight: bold;
@@ -142,7 +141,7 @@ a.small:hover
 
 .mainSubTitle
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 11px;
    font-weight: bold;
    padding: 2px;
@@ -150,28 +149,28 @@ a.small:hover
 
 .mainSubText
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 11px;
    padding: 2px;
 }
 
 .summary
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 11px;
    padding-left: 8px;
 }
 
 a.headbarLink
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 11px;
    font-weight: normal;
 }
 
 .headbarTitle
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 11px;
    font-weight: bold;
    margin-bottom: 5px;
@@ -179,7 +178,7 @@ a.headbarLink
 
 .mainSubTextSmall
 {
-   color: #465F7D;
+   color: #003366;
    font-size: 10px;
 }
 
@@ -395,7 +394,7 @@ a.topToolbarLinkHighlight, a.topToolbarLinkHighlight:link, a.topToolbarLinkHighl
 .selectedItemsHeader
 {
    padding: 4px;
-   background-color: #e9f0f4;
+   background-color: #c6d8eb;
    font-weight: bold;
    text-align: left;
 }

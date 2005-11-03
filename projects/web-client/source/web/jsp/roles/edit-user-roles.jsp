@@ -104,7 +104,7 @@
                                  </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
-                                    <td>1.&nbsp;<h:outputText value="#{msg.select_role}" />:</td>
+                                    <td>1.&nbsp;<h:outputText value="#{msg.select_role}" /></td>
                                  </tr>
                                  <tr>
                                     <td>
@@ -141,8 +141,16 @@
                                                            value="#{msg.remove}" showLink="false"/>
                                           </h:column>
                                        </h:dataTable>
-                                       <h:outputText value="<#{msg.none}>"
-                                                     rendered="#{UserMembersBean.personRolesDataModel.rowCount == 0}" />
+                                       <a:panel id="no-items" rendered="#{UserMembersBean.personRolesDataModel.rowCount == 0}">
+                                          <table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>
+                                             <tr>
+                                                <td colspan='2' class='selectedItemsHeader'><h:outputText id="no-items-name" value="#{msg.name}" /></td>
+                                             </tr>
+                                             <tr>
+                                                <td class='selectedItemsRow'><h:outputText id="no-items-msg" value="#{msg.no_selected_items}" /></td>
+                                             </tr>
+                                          </table>
+                                       </a:panel>
                                     </td>
                                  </tr>
                                  <tr><td colspan=2 class="paddingRow"></td></tr>

@@ -110,6 +110,10 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
+                           
+                              <%-- Rules List --%>
+                              <a:panel id="rules-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.rules}">
+                              
                               <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
                                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
                                           altRowStyleClass="recordSetRowAlt" width="100%" pageSize="10"
@@ -205,6 +209,8 @@
                                  
                                  <a:dataPager/>
                               </a:richList>
+                              
+                              </a:panel>
                            </td>
                            
                            <td valign="top">

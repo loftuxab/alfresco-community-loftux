@@ -304,11 +304,10 @@ public class UIGenericPicker extends UICommand
          out.write(clientId + FIELD_CONTAINS);
          out.write("' type='text' maxlength='256' style='width:120px' value=\"");
          out.write(Utils.replace(this.contains, "\"", "&quot;"));
-         out.write("\">");
+         out.write("\">&nbsp;");
       }
       
       // Search button
-      out.write("</td><td rowspan=4>");
       out.write("<input type='submit' value='");
       out.write(Utils.encode(bundle.getString(MSG_SEARCH)));
       out.write("' onclick=\"");

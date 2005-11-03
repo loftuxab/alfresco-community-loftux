@@ -121,7 +121,7 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          out.write("<tr><td>");
          out.write("1. ");
          out.write(editor.getSelectItemMsg());
-         out.write(":</td></tr>");
+         out.write("</td></tr>");
          
          if (editor.getAddingNewItem())
          {
@@ -169,9 +169,9 @@ public class MultiValueListEditorRenderer extends BaseRenderer
          out.write(generateFormSubmit(context, component, Integer.toString(UIMultiValueEditor.ACTION_ADD)));
          out.write("\"/></td></tr>");
          
-//         out.write("<tr><td style='padding-top:8px'>");
-//         out.write(editor.getSelectedItemsMsg());
-//         out.write(":</td></tr>");
+         out.write("<tr><td style='padding-top:8px'>");
+         out.write(editor.getSelectedItemsMsg());
+         out.write("</td></tr>");
          
          // show the current items
          out.write("<tr><td><table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>");
