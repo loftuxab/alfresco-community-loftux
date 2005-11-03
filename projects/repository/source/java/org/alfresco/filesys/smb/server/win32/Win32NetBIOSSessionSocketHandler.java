@@ -183,6 +183,45 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler imple
     }
 
     /**
+     * Class constructor
+     * 
+     * @param srv SMBServer
+     * @param nbName String
+     * @param debug boolean
+     */
+    public Win32NetBIOSSessionSocketHandler(SMBServer srv, String nbName, boolean debug)
+    {
+        super("Win32 NetBIOS", srv, debug);
+
+        // Set the Win32 NetBIOS file server name
+
+        m_srvName = nbName;
+
+        // Get the accepted client string, defaults to '*' to accept any client connection
+
+        NetBIOSName accName = new NetBIOSName("*", NetBIOSName.WorkStation, false);
+        m_acceptClient = accName.getNetBIOSName();
+
+        // Set the LANA to use, or -1 to use the first available
+
+        m_lana = srv.getConfiguration().getWin32LANA();
+
+        // Set the Win32 NetBIOS code to use either the Netbios() API call or Winsock NetBIOS calls
+        
+        m_useWinsock = srv.getConfiguration().useWinsockNetBIOS();
+        
+        // Debug
+
+        if (logger.isDebugEnabled() && hasDebug())
+            logger.debug("[SMB] Win32 NetBIOS server " + m_srvName + " (using " + 
+                    (isUsingWinsock() ? "Winsock" : "Netbios() API") + ")");
+
+        // Set the LANA offline polling interval
+
+        m_lanaPoll = LANAPollingInterval;
+    }
+
+    /**
      * Return the LANA number that is being used
      * 
      * @return int
@@ -243,8 +282,8 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler imple
         // Enumerate the LAN adapters, use the first available if the LANA has not been specified in
         // the configuration
 
-        int[] lanas = Win32NetBIOS.LanaEnum();
-        if (lanas.length > 0)
+        int[] lanas = Win32NetBIOS.LanaEnumerate();
+        if (lanas != null && lanas.length > 0)
         {
 
             // Check if the LANA has been specified via the configuration, if not then use the first
@@ -742,7 +781,7 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler imple
 
         if (logger.isDebugEnabled() && sockDbg)
         {
-            int[] lanas = Win32NetBIOS.LanaEnum();
+            int[] lanas = Win32NetBIOS.LanaEnumerate();
 
             StringBuilder lanaStr = new StringBuilder();
             if (lanas != null && lanas.length > 0)
@@ -833,7 +872,7 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler imple
 
             // Get a list of the available LANAs
 
-            int[] lanas = Win32NetBIOS.LanaEnum();
+            int[] lanas = Win32NetBIOS.LanaEnumerate();
 
             if (lanas != null && lanas.length > 0)
             {
@@ -939,7 +978,7 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler imple
     {
         // Get a list of the available LANAs
 
-        int[] lanas = Win32NetBIOS.LanaEnum();
+        int[] lanas = Win32NetBIOS.LanaEnumerate();
 
         if (lanas != null && lanas.length > 0)
         {

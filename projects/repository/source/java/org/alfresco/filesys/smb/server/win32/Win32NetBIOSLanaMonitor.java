@@ -108,7 +108,7 @@ public class Win32NetBIOSLanaMonitor extends Thread
 
         // Initialize the online LANA status list
         
-        int[] curLanas = Win32NetBIOS.LanaEnum();
+        int[] curLanas = Win32NetBIOS.LanaEnumerate();
         
         if ( curLanas != null)
         {
@@ -251,7 +251,7 @@ public class Win32NetBIOSLanaMonitor extends Thread
             
             // Get the available LANA list
 
-            int[] lanas = Win32NetBIOS.LanaEnum();
+            int[] lanas = Win32NetBIOS.LanaEnumerate();
             if (lanas != null)
             {
 

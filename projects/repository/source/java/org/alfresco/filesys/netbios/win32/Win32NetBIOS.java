@@ -18,6 +18,7 @@ package org.alfresco.filesys.netbios.win32;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -203,7 +204,54 @@ public class Win32NetBIOS
      * 
      * @return int[]
      */
-    public static native int[] LanaEnum();
+    public static int[] LanaEnumerate()
+    {
+        // Make sure that there is an active network adapter as making calls to the LanaEnum native call
+        // causes problems when there are no active network adapters.
+        
+        boolean adapterAvail = false;
+        
+        try
+        {
+            // Enumerate the available network adapters and check for an active adapter, not including
+            // the loopback adapter
+            
+            Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
+            
+            while ( nis.hasMoreElements() && adapterAvail == false)
+            {
+                NetworkInterface ni = nis.nextElement();
+                if ( ni.getName().equals("lo") == false)
+                {
+                    // Make sure the adapter has a valid IP address
+                    
+                    Enumeration<InetAddress> addrs = ni.getInetAddresses();
+                    if ( addrs.hasMoreElements())
+                        adapterAvail = true;
+                }
+            }
+            
+        }
+        catch ( SocketException ex)
+        {
+        }
+        
+        // Check if there are network adapter(s) available
+        
+        if ( adapterAvail == false)
+            return null;
+        
+        // Call the native code to return the available LANA list
+        
+        return LanaEnum();
+    }
+    
+    /**
+     * Enumerate the available LANAs
+     * 
+     * @return int[]
+     */
+    private static native int[] LanaEnum();
 
     /**
      * Reset the NetBIOS environment

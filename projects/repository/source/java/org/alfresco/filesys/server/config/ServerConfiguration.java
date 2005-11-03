@@ -842,11 +842,16 @@ public class ServerConfiguration
 
                 // Call the Win32NetBIOS native code to make sure it is initialized
 
-                Win32NetBIOS.LanaEnum();
-
-                // Enable Win32 NetBIOS
-
-                setWin32NetBIOS(true);
+                if ( Win32NetBIOS.LanaEnumerate() != null)
+                {
+                    // Enable Win32 NetBIOS
+    
+                    setWin32NetBIOS(true);
+                }
+                else
+                {
+                    logger.warn("No NetBIOS LANAs available");
+                }
             }
             else
             {
