@@ -14,14 +14,10 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.repo.component.template;
+package org.alfresco.repo.template;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 
-import freemarker.cache.TemplateLoader;
 import freemarker.cache.URLTemplateLoader;
 
 /**
@@ -31,11 +27,11 @@ import freemarker.cache.URLTemplateLoader;
  */
 public class ClassPathTemplateLoader extends URLTemplateLoader
 {
-   /**
-    * @see freemarker.cache.URLTemplateLoader#getURL(java.lang.String)
-    */
-   protected URL getURL(String name)
-   {
-      return this.getClass().getClassLoader().getResource(name);
-   }
+    /**
+     * @see freemarker.cache.URLTemplateLoader#getURL(java.lang.String)
+     */
+    protected URL getURL(String name)
+    {
+        return this.getClass().getClassLoader().getResource(name);
+    }
 }

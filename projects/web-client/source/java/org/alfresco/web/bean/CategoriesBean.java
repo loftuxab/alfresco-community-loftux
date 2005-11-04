@@ -218,7 +218,7 @@ public class CategoriesBean implements IContextListener
       {
          if (this.categoryRef != null)
          {
-            this.category = new Node(this.categoryRef, this.nodeService);
+            this.category = new Node(this.categoryRef);
          }
       }
       
@@ -315,7 +315,7 @@ public class CategoriesBean implements IContextListener
          categories = new ArrayList<Node>(refs.size());
          for (ChildAssociationRef child : refs)
          {
-            Node categoryNode = new Node(child.getChildRef(), this.nodeService);
+            Node categoryNode = new Node(child.getChildRef());
             // force early props init within transaction
             categoryNode.getProperties();
             categories.add(categoryNode);
@@ -359,7 +359,7 @@ public class CategoriesBean implements IContextListener
          {
             // create the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
+            Node node = new Node(ref);
             
             // prepare a node for the action context
             setActionCategory(node);

@@ -187,7 +187,7 @@ public class UIShortcutsShelfItem extends UIShelfItem
             }
             else if (dd.isSubClass(item.getType(), ContentModel.TYPE_CONTENT))
             {
-               String image = Repository.getFileTypeImage(item, true);
+               String image = Utils.getFileTypeImage(item.getName(), true);
                out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
             }
             

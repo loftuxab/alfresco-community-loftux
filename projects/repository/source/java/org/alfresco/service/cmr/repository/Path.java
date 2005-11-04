@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.ISO9075;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -175,6 +176,53 @@ public final class Path implements Iterable<Path.Element>, Serializable
             sb.append(element.getPrefixedString(resolver));
         }
         return sb.toString();
+    }
+    
+    /**
+     * Return the human readable form of the specified node Path. Slow version of the method
+     * that extracts the name of each node in the Path from the supplied NodeService.
+     * 
+     * @return human readable form of the Path excluding the final element
+     */
+    public String toDisplayPath(NodeService nodeService)
+    {
+        StringBuilder buf = new StringBuilder(64);
+        
+        for (int i=0; i<elements.size()-1; i++)
+        {
+            String elementString = null;
+            Element element = elements.get(i);
+            if (element instanceof ChildAssocElement)
+            {
+                ChildAssociationRef elementRef = ((ChildAssocElement)element).getRef();
+                if (elementRef.getParentRef() != null)
+                {
+                    Serializable nameProp = nodeService.getProperty(elementRef.getChildRef(), ContentModel.PROP_NAME);
+                    if (nameProp != null)
+                    {
+                        // use the name property if we find it
+                        elementString = nameProp.toString();
+                    }
+                    else
+                    {
+                        // revert to using QName if not found
+                        elementString = elementRef.getQName().getLocalName();
+                    }
+                }
+            }
+            else
+            {
+                elementString = element.getElementString();
+            }
+            
+            if (elementString != null)
+            {
+                buf.append("/");
+                buf.append(elementString);
+            }
+        }
+        
+        return buf.toString();
     }
     
     /**

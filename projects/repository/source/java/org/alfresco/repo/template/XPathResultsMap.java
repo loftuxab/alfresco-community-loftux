@@ -14,25 +14,10 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.repo.component.template;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import javax.faces.context.FacesContext;
+package org.alfresco.repo.template;
 
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.web.bean.repository.Repository;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.alfresco.service.cmr.repository.TemplateNode;
 
 /**
  * A special Map that executes an XPath against the parent Node as part of the get()
@@ -45,12 +30,12 @@ public final class XPathResultsMap extends BasePathResultsMap implements Cloneab
    /**
     * Constructor
     * 
-    * @param nodeService   The NodeService to use
-    * @param parent        The parent NodeRef to execute searches from 
+     * @param parent         The parent TemplateNode to execute searches from 
+     * @param services       The ServiceRegistry to use
     */
-   public XPathResultsMap(NodeService nodeService, NodeRef parent)
+   public XPathResultsMap(TemplateNode parent, ServiceRegistry services)
    {
-      super(nodeService, parent);
+      super(parent, services);
    }
    
    /**

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.component.UIStatusMessage;
 import org.apache.commons.logging.Log;
@@ -51,6 +53,20 @@ import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
  */
 public final class Utils
 {
+   private static final String MSG_TIME_PATTERN = "time_pattern";
+   private static final String MSG_DATE_PATTERN = "date_pattern";
+   private static final String MSG_DATE_TIME_PATTERN = "date_time_pattern";
+   
+   private static final String IMAGE_PREFIX16 = "/images/filetypes/";
+   private static final String IMAGE_PREFIX32 = "/images/filetypes32/";
+   private static final String IMAGE_POSTFIX = ".gif";
+   private static final String DEFAULT_FILE_IMAGE16 = IMAGE_PREFIX16 + "_default" + IMAGE_POSTFIX;
+   private static final String DEFAULT_FILE_IMAGE32 = IMAGE_PREFIX32 + "_default" + IMAGE_POSTFIX;
+   
+   private static final Map<String, String> s_fileExtensionMap = new HashMap<String, String>(89, 1.0f);
+   
+   private static Log logger = LogFactory.getLog(Utils.class);
+   
    /**
     * Private constructor
     */
@@ -792,10 +808,50 @@ public final class Utils
          throw new AlfrescoRuntimeException("Invalid DateTime pattern", err);
       }
    }
-   
-   private static final String MSG_TIME_PATTERN = "time_pattern";
-   private static final String MSG_DATE_PATTERN = "date_pattern";
-   private static final String MSG_DATE_TIME_PATTERN = "date_time_pattern";
-   
-   private static Log logger = LogFactory.getLog(Utils.class);
+
+   /**
+    * Return the image path to the filetype icon for the specified file name string
+    * 
+    * @param name       File name to build filetype icon path for
+    * @param small      True for the small 16x16 icon or false for the large 32x32 
+    * 
+    * @return the image path for the specified node type or the default icon if not found
+    */
+   public static String getFileTypeImage(String name, boolean small)
+   {
+      String image = (small ? DEFAULT_FILE_IMAGE16 : DEFAULT_FILE_IMAGE32);
+      
+      int extIndex = name.lastIndexOf('.');
+      if (extIndex != -1 && name.length() > extIndex + 1)
+      {
+         String ext = name.substring(extIndex + 1).toLowerCase();
+         String key = ext + ' ' + (small ? "16" : "32");
+         
+         // found file extension for appropriate size image
+         synchronized (s_fileExtensionMap)
+         {
+            image = s_fileExtensionMap.get(key);
+            if (image == null)
+            {
+               // not found create for first time
+               image = (small ? IMAGE_PREFIX16 : IMAGE_PREFIX32) + ext + IMAGE_POSTFIX;
+               
+               // does this image exist on the web-server?
+               if (FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(image) != null)
+               {
+                  // found the image for this extension - save it for later
+                  s_fileExtensionMap.put(key, image);
+               }
+               else
+               {
+                  // not found, save the default image for this extension instead
+                  image = (small ? DEFAULT_FILE_IMAGE16 : DEFAULT_FILE_IMAGE32);
+                  s_fileExtensionMap.put(key, image);
+               }
+            }
+         }
+      }
+      
+      return image;
+   }
 }

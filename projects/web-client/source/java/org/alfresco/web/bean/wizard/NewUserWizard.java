@@ -545,7 +545,7 @@ public class NewUserWizard extends AbstractWizardBean
          {
             // create the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
+            Node node = new Node(ref);
 
             // remember the Person node
             setPerson(node);

@@ -17,7 +17,6 @@
 package org.alfresco.web.bean.repository;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,11 +40,10 @@ public class MapNode extends Node implements Map<String, Object>
     * Constructor
     * 
     * @param nodeRef        The NodeRef this Node wrapper represents
-    * @param nodeService    The node service to use to retrieve data for this node 
     */
-   public MapNode(NodeRef nodeRef, NodeService nodeService)
+   public MapNode(NodeRef nodeRef)
    {
-      super(nodeRef, nodeService);
+      super(nodeRef);
    }
    
    /**
@@ -57,7 +55,7 @@ public class MapNode extends Node implements Map<String, Object>
     */
    public MapNode(NodeRef nodeRef, NodeService nodeService, boolean initProps)
    {
-      super(nodeRef, nodeService);
+      super(nodeRef);
       if (initProps == true)
       {
          getProperties();

@@ -89,7 +89,7 @@ public class UICategorySelector extends AbstractItemSelector
       {
          ChildAssociationRef parentRef = getNodeService(context).getPrimaryParent(
                new NodeRef(Repository.getStoreRef(), this.navigationId));
-         Node parentNode = new Node(parentRef.getParentRef(), getNodeService(context));
+         Node parentNode = new Node(parentRef.getParentRef());
          
          DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
          

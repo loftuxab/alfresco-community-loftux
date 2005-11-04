@@ -557,7 +557,7 @@
     <!-- ===================== -->
    
     <!-- This service currently has no restrictions.                                     -->
-   
+
     <bean id="AuthorityService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
    
     <!-- =================== -->
@@ -568,5 +568,13 @@
     <!-- TODO: respect the permissions on the ownable service                            -->
    
     <bean id="OwnableService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+    <!-- ==================== -->
+    <!-- The Template Service -->
+    <!-- ==================== -->
    
+    <!-- This service currently has no restrictions.                                     -->
+    
+    <bean id="TemplateService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
 </beans>

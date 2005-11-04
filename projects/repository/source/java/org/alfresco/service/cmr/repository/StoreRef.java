@@ -31,7 +31,7 @@ public final class StoreRef implements EntityRef, Serializable
 
     public static final String PROTOCOL_WORKSPACE = "workspace";
     
-    private static final String URI_FILLER = "://";
+    public static final String URI_FILLER = "://";
 
     private final String protocol;
     private final String identifier;
@@ -60,10 +60,10 @@ public final class StoreRef implements EntityRef, Serializable
 
     public StoreRef(String string)
     {
-        int dividerPatternPosition = string.indexOf("://");
+        int dividerPatternPosition = string.indexOf(URI_FILLER);
         if(dividerPatternPosition == -1)
         {
-            throw new AlfrescoRuntimeException("Invalid store ref: Does not contain ://    " + string);
+            throw new AlfrescoRuntimeException("Invalid store ref: Does not contain " + URI_FILLER + "   " + string);
         }
         this.protocol = string.substring(0, dividerPatternPosition);
         this.identifier = string.substring(dividerPatternPosition+3);

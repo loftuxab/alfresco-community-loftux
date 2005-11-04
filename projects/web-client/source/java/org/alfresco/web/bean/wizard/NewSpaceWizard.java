@@ -458,7 +458,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          {
             for (NodeRef assocRef : results)
             {
-               Node childNode = new Node(assocRef, this.nodeService);
+               Node childNode = new Node(assocRef);
                this.templates.add(new SelectItem(childNode.getId(), childNode.getName()));
             }
             

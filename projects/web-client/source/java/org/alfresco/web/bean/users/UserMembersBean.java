@@ -285,7 +285,7 @@ public class UserMembersBean implements IContextListener
                if (nodeRef != null)
                {
                   // create our Node representation
-                  MapNode node = new MapNode(nodeRef, nodeService);
+                  MapNode node = new MapNode(nodeRef);
                   
                   // set data binding properties
                   // this will also force initialisation of the props now during the UserTransaction
@@ -380,7 +380,7 @@ public class UserMembersBean implements IContextListener
             {
                // create the node ref, then our node representation
                NodeRef ref = personService.getPerson(authority);
-               Node node = new Node(ref, this.nodeService);
+               Node node = new Node(ref);
                
                // setup convience function for current user full name
                setPersonName((String)node.getProperties().get(ContentModel.PROP_FIRSTNAME) + ' ' +

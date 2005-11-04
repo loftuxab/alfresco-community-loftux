@@ -14,13 +14,11 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.repo.component.template;
+package org.alfresco.repo.template;
 
 import java.util.List;
 
-import javax.faces.context.FacesContext;
-
-import org.alfresco.web.app.Application;
+import org.alfresco.i18n.I18NUtil;
 
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
@@ -37,23 +35,23 @@ import freemarker.template.TemplateScalarModel;
  */
 public final class I18NMessageMethod implements TemplateMethodModelEx
 {
-   /**
-    * @see freemarker.template.TemplateMethodModel#exec(java.util.List)
-    */
-   public Object exec(List args) throws TemplateModelException
-   {
-      String result = "";
-      
-      if (args.size() == 1)
-      {
-         Object arg0 = args.get(0);
-         if (arg0 instanceof TemplateScalarModel)
-         {
-            String id = ((TemplateScalarModel)arg0).getAsString();
-            result = Application.getMessage(FacesContext.getCurrentInstance(), id);
-         }
-      }
-      
-      return result;
-   }
+    /**
+     * @see freemarker.template.TemplateMethodModel#exec(java.util.List)
+     */
+    public Object exec(List args) throws TemplateModelException
+    {
+        String result = "";
+        
+        if (args.size() == 1)
+        {
+            Object arg0 = args.get(0);
+            if (arg0 instanceof TemplateScalarModel)
+            {
+                String id = ((TemplateScalarModel)arg0).getAsString();
+                result = I18NUtil.getMessage(id);
+            }
+        }
+        
+        return result;
+    }
 }

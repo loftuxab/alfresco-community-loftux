@@ -176,7 +176,7 @@ public class UIClipboardShelfItem extends UIShelfItem
             }
             else if (dd.isSubClass(item.Node.getType(), ContentModel.TYPE_CONTENT))
             {
-               String image = Repository.getFileTypeImage(item.Node, true);
+               String image = Utils.getFileTypeImage(item.Node.getName(), true);
                out.write(Utils.buildImageTag(context, image, 16, 16, null, null, "absmiddle"));
             }
             

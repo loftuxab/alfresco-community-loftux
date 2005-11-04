@@ -685,7 +685,7 @@ public class InviteUsersWizard extends AbstractWizardBean
          String personName = Application.getCurrentUser(context).getFullName(getNodeService());
          String msgInvite = Application.getMessage(context, MSG_INVITED_SPACE);
          Node node = getNavigator().getCurrentNode();
-         String path = Repository.getDisplayPath(this.nodeService.getPath(node.getNodeRef()), this.nodeService);
+         String path = this.nodeService.getPath(node.getNodeRef()).toDisplayPath(this.nodeService);
          buf.append(MessageFormat.format(msgInvite, new Object[] {
                path + '/' + node.getName(),
                personName}) );

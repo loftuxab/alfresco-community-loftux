@@ -12,15 +12,16 @@
     <import resource="classpath:alfresco/content-services-context.xml" />
     <import resource="classpath:alfresco/hibernate-context.xml" />
     <import resource="classpath:alfresco/ownable-services-context.xml" />
+    <import resource="classpath:alfresco/template-services-context.xml" />
     <import resource="classpath:alfresco/index-recovery-context.xml" />
     <import resource="classpath:alfresco/extension/extension-context.xml" />
-    
-    
-	<!-- Descriptor Service -->
-	
+
+
+	 <!-- Descriptor Service -->
+
     <bean id="descriptorComponent" class="org.alfresco.repo.descriptor.DescriptorServiceImpl">
        <property name="serverDescriptor">
-	       <value>classpath:alfresco/version.properties</value> 
+	       <value>classpath:alfresco/version.properties</value>
        </property>
        <property name="systemBootstrap">
            <ref local="systemBootstrap"/>
@@ -85,22 +86,23 @@
 
     <!-- use around method calls to debug - see class comments for details -->
     <bean id="methodCallLogAdvice" class="org.alfresco.util.debug.MethodCallLogAdvice" />
-    
+
     <!--                        -->
     <!-- I18N                   -->
     <!--                        -->
-   
+
     <bean id="resourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
     	<property name="resourceBundles">
     		<list>
     			<value>alfresco.messages.version-service</value>
     			<value>alfresco.messages.permissions-service</value>
     			<value>alfresco.messages.content-service</value>
-    			<value>alfresco.messages.coci-service</value>    			
+    			<value>alfresco.messages.coci-service</value>
+    			<value>alfresco.messages.template-service</value>
     		</list>
     	</property>
     </bean>
-   
+
 
     <!--                        -->
     <!-- MAIL SERVICE           -->
@@ -362,7 +364,7 @@
             <ref bean="permissionService" />
         </property>
     </bean>
-    
+
     <bean id="versionableAspect" class="org.alfresco.repo.version.VersionableAspect" init-method="init">
         <property name="policyComponent">
             <ref bean="policyComponent" />
@@ -431,7 +433,7 @@
     <!--                 -->
     <!-- Copy Service    -->
     <!--                 -->
-    
+
     <!-- Note this uses the node service that enforces permissions so you can only copy what you can see -->
 
     <bean id="copyService" class="org.alfresco.repo.copy.CopyServiceImpl" init-method="init">
@@ -473,7 +475,7 @@
             <ref bean="searchService" />
         </property>
     </bean>
-    
+
     <bean id="workingCopyAspect" class="org.alfresco.repo.coci.WorkingCopyAspect" init-method="init">
         <property name="policyComponent">
             <ref bean="policyComponent" />
@@ -699,7 +701,7 @@
 
     <bean id="authenticatedAuthenticationPassthroughProvider" class="org.alfresco.repo.security.authentication.AuthenticatedAuthenticationPassthroughProvider" />
 
-    <alias alias="saltSource" name="alfDaoImpl"/> 
+    <alias alias="saltSource" name="alfDaoImpl"/>
 
     <bean id="alfDaoImpl" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
@@ -727,7 +729,7 @@
               </property>
               <property name="userNamesAreCaseSensitive">
                  <value>${user.name.caseSensitive}</value>
-              </property>           
+              </property>
            </bean>
         </property>
         <property name="transactionAttributes">
@@ -767,7 +769,7 @@
             </props>
         </property>
     </bean>
-     
+
     <bean id="authenticationComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
             <value>org.alfresco.repo.security.authentication.AuthenticationComponent</value>
@@ -863,7 +865,7 @@
             <value>false</value>
         </property>
     </bean>
-    
+
     <!-- Importer -->
 
     <bean id="viewParser" class="org.alfresco.repo.importer.view.ViewParser">
@@ -902,7 +904,7 @@
             <ref bean="ruleService" />
         </property>
     </bean>
-    
+
     <bean id="systemBootstrap" class="org.alfresco.repo.importer.ImporterBootstrap" init-method="bootstrap" depends-on="nodeIndexer, auditableAspect">
         <property name="transactionService">
             <ref bean="transactionComponent"/>

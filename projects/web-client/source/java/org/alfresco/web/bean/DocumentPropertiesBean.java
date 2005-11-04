@@ -88,7 +88,7 @@ public class DocumentPropertiesBean
     */
    public void setupDocumentForAction(ActionEvent event)
    {
-      this.editableNode = new Node(this.browseBean.getDocument().getNodeRef(), this.nodeService);
+      this.editableNode = new Node(this.browseBean.getDocument().getNodeRef());
       
       // special case for Mimetype - since this is a sub-property of the ContentData object
       // we must extract it so it can be edited in the client, then we check for it later

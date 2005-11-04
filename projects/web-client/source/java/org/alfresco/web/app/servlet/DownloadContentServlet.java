@@ -223,9 +223,6 @@ public class DownloadContentServlet extends HttpServlet
       }
    }
    
-   
-   
-   
    /**
     * Helper to generate a URL to a content node for downloading content from the server.
     * The content is supplied as an HTTP1.1 attachment to the response. This generally means

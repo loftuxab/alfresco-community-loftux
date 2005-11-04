@@ -384,5 +384,93 @@ public final class QName implements QNamePattern, Serializable, Cloneable
             return prefix + NAMESPACE_PREFIX + localName;
         }
     }
-    
+
+
+    /**
+     * Creates a QName representation for the given String. If the String has no namespace the Alfresco namespace is
+     * added. If the String has a prefix an attempt to resolve the prefix to the full URI will be made.
+     * 
+     * @param str The string to convert
+     * @return A QName representation of the given string
+     */
+    public static QName resolveToQName(NamespacePrefixResolver prefixResolver, String str)
+    {
+        QName qname = null;
+
+        if (str == null && str.length() == 0)
+        {
+            throw new IllegalArgumentException("str parameter is mandatory");
+        }
+
+        if (str.charAt(0) == (NAMESPACE_BEGIN))
+        {
+            // create QName directly
+            qname = createQName(str);
+        }
+        else if (str.indexOf(NAMESPACE_PREFIX) != -1)
+        {
+            // extract the prefix and try and resolve using the
+            // namespace service
+            int end = str.indexOf(NAMESPACE_PREFIX);
+            String prefix = str.substring(0, end);
+            String localName = str.substring(end + 1);
+            String uri = prefixResolver.getNamespaceURI(prefix);
+
+            if (uri != null)
+            {
+                qname = createQName(uri, localName);
+            }
+        }
+        else
+        {
+            // there's no namespace so prefix with Alfresco's Content Model
+            qname = createQName(NamespaceService.CONTENT_MODEL_1_0_URI, str);
+        }
+
+        return qname;
+    }
+
+
+    /**
+     * Creates a string representation of a QName for the given string. If the given string already has a namespace,
+     * either a URL or a prefix, nothing the given string is returned. If it does not have a namespace the Alfresco
+     * namespace is added.
+     * 
+     * @param str
+     *            The string to convert
+     * 
+     * @return A QName String representation of the given string
+     */
+    public static String resolveToQNameString(NamespacePrefixResolver prefixResolver, String str)
+    {
+        String result = str;
+
+        if (str == null && str.length() == 0)
+        {
+            throw new IllegalArgumentException("str parameter is mandatory");
+        }
+
+        if (str.charAt(0) != NAMESPACE_BEGIN && str.indexOf(NAMESPACE_PREFIX) != -1)
+        {
+            // get the prefix and resolve to the uri
+            int end = str.indexOf(NAMESPACE_PREFIX);
+            String prefix = str.substring(0, end);
+            String localName = str.substring(end + 1);
+            String uri = prefixResolver.getNamespaceURI(prefix);
+
+            if (uri != null)
+            {
+                result = new StringBuilder(64).append(NAMESPACE_BEGIN).append(uri).append(NAMESPACE_END).append(
+                        localName).toString();
+            }
+        }
+        else if (str.charAt(0) != NAMESPACE_BEGIN)
+        {
+            // there's no namespace so prefix with Alfresco's Content Model
+            result = new StringBuilder(64).append(NAMESPACE_BEGIN).append(NamespaceService.CONTENT_MODEL_1_0_URI)
+                    .append(NAMESPACE_END).append(str).toString();
+        }
+
+        return result;
+    }
 }

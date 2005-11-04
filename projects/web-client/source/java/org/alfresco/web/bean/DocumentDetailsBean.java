@@ -38,6 +38,8 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.TemplateImageResolver;
+import org.alfresco.service.cmr.repository.TemplateNode;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionHistory;
@@ -54,7 +56,6 @@ import org.alfresco.web.bean.wizard.NewRuleWizard;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
-import org.alfresco.web.ui.repo.component.template.TemplateNode;
 import org.apache.log4j.Logger;
 
 /**
@@ -193,7 +194,7 @@ public class DocumentDetailsBean
             for (Version version : history.getAllVersions())
             {
                // create a map node representation of the version
-               MapNode clientVersion = new MapNode(version.getFrozenStateNodeRef(), this.nodeService);
+               MapNode clientVersion = new MapNode(version.getFrozenStateNodeRef());
                clientVersion.put("versionLabel", version.getVersionLabel());
                clientVersion.put("author", clientVersion.get("creator"));
                clientVersion.put("versionDate", version.getCreatedDate());
@@ -399,14 +400,14 @@ public class DocumentDetailsBean
          // get the approve folder name
          if (approveFolder != null)
          {
-            Node node = new Node(approveFolder, this.nodeService);
+            Node node = new Node(approveFolder);
             approveFolderName = node.getName();
          }
          
          // get the reject folder name
          if (rejectFolder != null)
          {
-            Node node = new Node(rejectFolder, this.nodeService);
+            Node node = new Node(rejectFolder);
             rejectFolderName = node.getName();
          }
          
@@ -654,7 +655,7 @@ public class DocumentDetailsBean
       }
       
       NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(), id);
-      Node docNode = new Node(docNodeRef, this.nodeService);
+      Node docNode = new Node(docNodeRef);
       
       if (docNode.hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)
       {
@@ -753,7 +754,7 @@ public class DocumentDetailsBean
       }
       
       NodeRef docNodeRef = new NodeRef(Repository.getStoreRef(), id);
-      Node docNode = new Node(docNodeRef, this.nodeService);
+      Node docNode = new Node(docNodeRef);
       
       if (docNode.hasAspect(ContentModel.ASPECT_SIMPLE_WORKFLOW) == false)
       {
@@ -1073,13 +1074,25 @@ public class DocumentDetailsBean
    {
       HashMap model = new HashMap(3, 1.0f);
       
-      TemplateNode documentNode = new TemplateNode(getDocument().getNodeRef(), this.nodeService);
+      FacesContext fc = FacesContext.getCurrentInstance();
+      TemplateNode documentNode = new TemplateNode(getDocument().getNodeRef(),
+              Repository.getServiceRegistry(fc), imageResolver);
       model.put("document", documentNode);
-      TemplateNode spaceNode = new TemplateNode(this.navigator.getCurrentNode().getNodeRef(), this.nodeService);
+      TemplateNode spaceNode = new TemplateNode(this.navigator.getCurrentNode().getNodeRef(),
+              Repository.getServiceRegistry(fc), imageResolver);
       model.put("space", spaceNode);
       
       return model;
    }
+   
+   /** Template Image resolver helper */
+   private TemplateImageResolver imageResolver = new TemplateImageResolver()
+   {
+       public String resolveImagePathForName(String filename, boolean small)
+       {
+           return Utils.getFileTypeImage(filename, small);
+       }
+   };
    
    /**
     * Returns whether the current document is locked

@@ -24,12 +24,16 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.config.ConfigService;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.TemplateImageResolver;
+import org.alfresco.service.cmr.repository.TemplateNode;
+import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ClientConfigElement;
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 import org.apache.log4j.Logger;
 
@@ -114,75 +118,25 @@ public class UITemplate extends SelfRenderingComponent
       if (template != null && template.length() != 0)
       {
          // get the class name of the processor to instantiate
-         String procName = clientConfig.getTemplateProcessor(getEngine());
-         if (procName != null && procName.length() != 0)
+         String engine = getEngine();
+         
+         long startTime = 0;
+         if (logger.isDebugEnabled())
          {
-            long startTime = 0;
-            if (logger.isDebugEnabled())
-            {
-               logger.debug("Using template processor name: " + procName);
-               startTime = System.currentTimeMillis();
-            }
-            
-            // process the template against the model
-            getTemplateProcessor(procName).process(getTemplate(), model, context.getResponseWriter());
-            
-            if (logger.isDebugEnabled())
-            {
-               long endTime = System.currentTimeMillis();
-               logger.debug("Time to process template: " + (endTime - startTime) + "ms");
-            }
-         }
-      }
-   }
-   
-   /**
-    * Get the named template processor instance
-    * 
-    * @param name       Name of the processor instance to create
-    * 
-    * @return ITemplateProcessor
-    */
-   private ITemplateProcessor getTemplateProcessor(String name)
-   {
-      // we use the session as a cache for the template processor
-      // the processor is not thread safe, so we don't want to share it with other users
-      // but we don't want to create one everytime we need it either 
-      FacesContext context = FacesContext.getCurrentInstance();
-      ITemplateProcessor proc = (ITemplateProcessor)context.getExternalContext().getSessionMap().get(TEMPLATE_KEY + name);
-      if (proc == null)
-      {
-         try
-         {
-            // instantiate as required
-            Object obj = Class.forName(name).newInstance();
-            if (obj instanceof ITemplateProcessor)
-            {
-               proc = (ITemplateProcessor)obj;
-            }
-            else
-            {
-               logger.error("Supplied template processor does not implement ITemplateProcessor: " + name);
-            }
-         }
-         catch (ClassNotFoundException err1)
-         {
-            logger.error("Unable to load class for supplied template processor: " + name);
-         }
-         catch (IllegalAccessException err2)
-         {
-            logger.error("Unable to load class for supplied template processor: " + name);
-         }
-         catch (InstantiationException err3)
-         {
-            logger.error("Unable to instantiate class for supplied template processor: " + name);
+            logger.debug("Using template processor name: " + engine);
+            startTime = System.currentTimeMillis();
          }
          
-         // cache processor instance in the session
-         context.getExternalContext().getSessionMap().put(TEMPLATE_KEY + name, proc);
+         // process the template against the model
+         TemplateService templateService = Repository.getServiceRegistry(context).getTemplateService();
+         templateService.processTemplate(engine, getTemplate(), model, context.getResponseWriter());
+         
+         if (logger.isDebugEnabled())
+         {
+            long endTime = System.currentTimeMillis();
+            logger.debug("Time to process template: " + (endTime - startTime) + "ms");
+         }
       }
-      
-      return proc;
    }
    
    
@@ -234,25 +188,21 @@ public class UITemplate extends SelfRenderingComponent
          Map root = new HashMap(3, 1.0f);
          
          FacesContext context = FacesContext.getCurrentInstance();
-         NodeService nodeService = getNodeService(context);
+         ServiceRegistry services = Repository.getServiceRegistry(context);
          
          // supply the CompanyHome space as "companyhome"
          NodeRef companyRootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
-         TemplateNode companyRootNode = new TemplateNode(companyRootRef, nodeService);
+         TemplateNode companyRootNode = new TemplateNode(companyRootRef, services, imageResolver);
          root.put("companyhome", companyRootNode);
          
          // supply the users Home Space as "userhome"
          User user = Application.getCurrentUser(context);
          NodeRef userRootRef = new NodeRef(Repository.getStoreRef(), user.getHomeSpaceId());
-         TemplateNode userRootNode = new TemplateNode(userRootRef, nodeService);
+         TemplateNode userRootNode = new TemplateNode(userRootRef, services, imageResolver);
          root.put("userhome", userRootNode);
          
          // supply the current user Node as "person"
-         root.put("person", new TemplateNode(user.getPerson(), nodeService));
-         
-         // add custom method objects
-         root.put("hasAspect", new HasAspectMethod());
-         root.put("message", new I18NMessageMethod());
+         root.put("person", new TemplateNode(user.getPerson(), services, imageResolver));
          
          // merge models
          if (model instanceof Map)
@@ -306,22 +256,12 @@ public class UITemplate extends SelfRenderingComponent
       this.template = template;
    }
    
-   
-   /**
-    * Use Spring JSF integration to return the Node Service bean instance
-    * 
-    * @param context    FacesContext
-    * 
-    * @return Node Service bean instance or throws exception if not found
-    */
-   private static NodeService getNodeService(FacesContext context)
+   /** Template Image resolver helper */
+   private TemplateImageResolver imageResolver = new TemplateImageResolver()
    {
-      NodeService service = Repository.getServiceRegistry(context).getNodeService();
-      if (service == null)
-      {
-         throw new IllegalStateException("Unable to obtain NodeService bean reference.");
-      }
-      
-      return service;
-   }
+       public String resolveImagePathForName(String filename, boolean small)
+       {
+           return Utils.getFileTypeImage(filename, small);
+       }
+   };
 }

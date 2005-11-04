@@ -357,14 +357,14 @@ public class CheckinCheckoutBean
       {
          // create the node ref, then our node representation
          NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-         node = new Node(ref, this.nodeService);
+         node = new Node(ref);
          
          // create content URL to the content download servlet with ID and expected filename
          // the myfile part will be ignored by the servlet but gives the browser a hint
          String url = DownloadContentServlet.generateDownloadURL(ref, node.getName());
          node.getProperties().put("url", url);
          node.getProperties().put("workingCopy", node.hasAspect(ContentModel.ASPECT_WORKING_COPY));
-         node.getProperties().put("fileType32", Repository.getFileTypeImage(node, false)); 
+         node.getProperties().put("fileType32", Utils.getFileTypeImage(node.getName(), false)); 
          
          // remember the document
          setDocument(node);
@@ -424,7 +424,7 @@ public class CheckinCheckoutBean
             }
             
             // set the working copy Node instance
-            Node workingCopy = new Node(workingCopyRef, this.nodeService);
+            Node workingCopy = new Node(workingCopyRef);
             setWorkingDocument(workingCopy);
             
             // create content URL to the content download servlet with ID and expected filename
@@ -432,7 +432,7 @@ public class CheckinCheckoutBean
             String url = DownloadContentServlet.generateDownloadURL(workingCopyRef, workingCopy.getName());
             
             workingCopy.getProperties().put("url", url);
-            workingCopy.getProperties().put("fileType32", Repository.getFileTypeImage(workingCopy, false)); 
+            workingCopy.getProperties().put("fileType32", Utils.getFileTypeImage(workingCopy.getName(), false)); 
             
             // commit the transaction
             tx.commit();

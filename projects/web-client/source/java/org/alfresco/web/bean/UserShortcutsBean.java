@@ -107,7 +107,7 @@ public class UserShortcutsBean
                   NodeRef ref = new NodeRef(Repository.getStoreRef(), shortcuts.get(i));
                   if (this.nodeService.exists(ref) == true)
                   {
-                     Node node = new Node(ref, this.nodeService);
+                     Node node = new Node(ref);
                      
                      // quick init properties while in the usertransaction
                      node.getProperties();
@@ -180,7 +180,7 @@ public class UserShortcutsBean
          try
          {
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
+            Node node = new Node(ref);
             
             boolean foundShortcut = false;
             for (int i=0; i<getShortcuts().size(); i++)

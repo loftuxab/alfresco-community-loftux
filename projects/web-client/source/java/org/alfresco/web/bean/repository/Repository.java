@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,6 @@ import org.alfresco.repo.configuration.ConfigurableService;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.metadata.MetadataExtracter;
 import org.alfresco.repo.content.metadata.MetadataExtracterRegistry;
-import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
@@ -48,7 +46,6 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -59,7 +56,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.jsf.FacesContextUtils;
 
 /**
- * Helper class for accessing repository objects, convert values, escape values and filetype icons.
+ * Helper class for accessing repository objects, convert values, escape values and service utilities.
  * 
  * @author gavinc
  * @author kevinr
@@ -72,16 +69,9 @@ public final class Repository
    public static final String ERROR_NOHOME  = "error_homespace";
    public static final String ERROR_SEARCH  = "error_search";
    
-   private static final String IMAGE_PREFIX16 = "/images/filetypes/";
-   private static final String IMAGE_PREFIX32 = "/images/filetypes32/";
-   private static final String IMAGE_POSTFIX = ".gif";
-   private static final String DEFAULT_FILE_IMAGE16 = IMAGE_PREFIX16 + "_default" + IMAGE_POSTFIX;
-   private static final String DEFAULT_FILE_IMAGE32 = IMAGE_PREFIX32 + "_default" + IMAGE_POSTFIX;
-   
    private static final String METADATA_EXTACTER_REGISTRY = "metadataExtracterRegistry";  
 
    private static Logger logger = Logger.getLogger(Repository.class);
-   private static final Map<String, String> s_fileExtensionMap = new HashMap<String, String>(89, 1.0f);
    
    /** cache of client StoreRef */
    private static StoreRef storeRef = null;
@@ -275,57 +265,7 @@ public final class Repository
             ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
             if (elementRef.getParentRef() != null)
             {
-               elementString = elementRef.getQName().getLocalName().replace('_', ' ');
-            }
-         }
-         else
-         {
-            elementString = element.getElementString();
-         }
-         
-         if (elementString != null)
-         {
-            buf.append("/");
-            buf.append(elementString);
-         }
-      }
-      
-      return buf.toString();
-   }
-   
-   /**
-    * Return the human readable form of the specified node Path. Slow version of the method
-    * that extracts the name of each node in the Path from the supplied NodeService.
-    * 
-    * @param path    Path to extract readable form from, excluding the final element
-    * 
-    * @return human readable form of the Path excluding the final element
-    */
-   public static String getDisplayPath(Path path, NodeService nodeService)
-   {
-      StringBuilder buf = new StringBuilder(64);
-      
-      for (int i=0; i<path.size()-1; i++)
-      {
-         String elementString = null;
-         Path.Element element = path.get(i);
-         if (element instanceof Path.ChildAssocElement)
-         {
-            ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
-            if (elementRef.getParentRef() != null)
-            {
-               elementString = Repository.getNameForNode(nodeService, elementRef.getChildRef());
-               Serializable nameProp = nodeService.getProperty(elementRef.getChildRef(), ContentModel.PROP_NAME);
-               if (nameProp != null)
-               {
-                  // use the name property if we find it
-                  elementString = nameProp.toString();
-               }
-               else
-               {
-                  // revert to using QName replacement if not found
-                  elementString = elementRef.getQName().getLocalName().replace('_', ' ');
-               }
+               elementString = elementRef.getQName().getLocalName();
             }
          }
          else
@@ -403,53 +343,6 @@ public final class Repository
       }
       
       return buf.toString();
-   }
-
-   /**
-    * Return the image path to the filetype icon for the specified node
-    * 
-    * @param node       Node to build filetype icon path for
-    * @param small      True for the small 16x16 icon or false for the large 32x32 
-    * 
-    * @return the image path for the specified node type or the default icon if not found
-    */
-   public static String getFileTypeImage(Node node, boolean small)
-   {
-      String image = (small ? DEFAULT_FILE_IMAGE16 : DEFAULT_FILE_IMAGE32);
-      
-      String name = node.getName();
-      int extIndex = name.lastIndexOf('.');
-      if (extIndex != -1 && name.length() > extIndex + 1)
-      {
-         String ext = name.substring(extIndex + 1).toLowerCase();
-         String key = ext + ' ' + (small ? "16" : "32");
-         
-         // found file extension for appropriate size image
-         synchronized (s_fileExtensionMap)
-         {
-            image = s_fileExtensionMap.get(key);
-            if (image == null)
-            {
-               // not found create for first time
-               image = (small ? IMAGE_PREFIX16 : IMAGE_PREFIX32) + ext + IMAGE_POSTFIX;
-               
-               // does this image exist on the web-server?
-               if (FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(image) != null)
-               {
-                  // found the image for this extension - save it for later
-                  s_fileExtensionMap.put(key, image);
-               }
-               else
-               {
-                  // not found, save the default image for this extension instead
-                  image = (small ? DEFAULT_FILE_IMAGE16 : DEFAULT_FILE_IMAGE32);
-                  s_fileExtensionMap.put(key, image);
-               }
-            }
-         }
-      }
-      
-      return image;
    }
 
    /**
@@ -605,7 +498,7 @@ public final class Repository
             if (nodeService.getType(nodeRef).equals(ContentModel.TYPE_PERSON))
             {
                // create our Node representation
-               MapNode node = new MapNode(nodeRef, nodeService);
+               MapNode node = new MapNode(nodeRef);
                
                // set data binding properties
                // this will also force initialisation of the props now during the UserTransaction
@@ -644,112 +537,6 @@ public final class Repository
    }
    
    /**
-    * Creates a QName representation for the given String.
-    * If the String has no namespace the Alfresco namespace is added.
-    * If the String has a prefix an attempt to resolve the prefix to the
-    * full URI will be made. 
-    * 
-    * @param str The string to convert
-    * @return A QName representation of the given string 
-    */
-   public static QName resolveToQName(String str)
-   {
-      QName qname = null;
-      
-      if (str == null && str.length() == 0)
-      {
-         throw new IllegalArgumentException("str parameter is mandatory");
-      }
-      
-      if (str.charAt(0) == (QName.NAMESPACE_BEGIN))
-      {
-         // create QName directly
-         qname = QName.createQName(str);
-      }
-      else if (str.indexOf(QName.NAMESPACE_PREFIX) != -1)
-      {
-         // extract the prefix and try and resolve using the 
-         // namespace service
-         int end = str.indexOf(QName.NAMESPACE_PREFIX);
-         String prefix = str.substring(0, end);
-         String localName = str.substring(end + 1);
-         NamespaceService nameSpcSvc = getNamespaceService();
-         String uri = nameSpcSvc.getNamespaceURI(prefix);
-         
-         if (uri != null)
-         {
-            qname = QName.createQName(uri, localName);
-         }
-         else
-         {
-            logger.warn("Failed to resolve prefix " + prefix);
-         }
-      }
-      else
-      {
-         // there's no namespace so prefix with Alfresco's Content Model
-         qname = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, str);
-      }
-      
-      return qname;
-   }
-   
-   /**
-    * Creates a string representation of a QName for the given string.
-    * If the given string already has a namespace, either a URL or a prefix,
-    * nothing the given string is returned. If it does not have a namespace
-    * the Alfresco namespace is added.
-    * 
-    * @param str The string to convert
-    * @return A QName String representation of the given string 
-    */
-   public static String resolveToQNameString(String str)
-   {
-      String result = str;
-      
-      if (str == null && str.length() == 0)
-      {
-         throw new IllegalArgumentException("str parameter is mandatory");
-      }
-      
-      if (str.charAt(0) != QName.NAMESPACE_BEGIN && str.indexOf(QName.NAMESPACE_PREFIX) != -1)
-      {
-         // get the prefix and resolve to the uri
-         int end = str.indexOf(QName.NAMESPACE_PREFIX);
-         String prefix = str.substring(0, end);
-         String localName = str.substring(end + 1);
-         NamespaceService nameSpcSvc = getNamespaceService();
-         String uri = nameSpcSvc.getNamespaceURI(prefix);
-         
-         if (uri != null)
-         {
-            result = new StringBuilder(64)
-                        .append(QName.NAMESPACE_BEGIN)
-                        .append(uri)
-                        .append(QName.NAMESPACE_END)
-                        .append(localName)
-                        .toString();
-         }
-         else
-         {
-            logger.warn("Failed to resolve prefix " + prefix);
-         }
-      }
-      else if (str.charAt(0) != QName.NAMESPACE_BEGIN)
-      {
-         // there's no namespace so prefix with Alfresco's Content Model
-         result = new StringBuilder(64)
-                        .append(QName.NAMESPACE_BEGIN)
-                        .append(NamespaceService.CONTENT_MODEL_1_0_URI)
-                        .append(QName.NAMESPACE_END)
-                        .append(str)
-                        .toString();
-      }
-      
-      return result;
-   }
-   
-   /**
     * Convert a property of unknown type to a String value. A native String value will be
     * returned directly, else toString() will be executed, null is returned as null. 
     * 
@@ -771,6 +558,34 @@ public final class Repository
       {
          return value.toString();
       }
+   }
+   
+   /**
+    * Creates a QName representation for the given String.
+    * If the String has no namespace the Alfresco namespace is added.
+    * If the String has a prefix an attempt to resolve the prefix to the
+    * full URI will be made. 
+    * 
+    * @param str The string to convert
+    * @return A QName representation of the given string 
+    */
+   public static QName resolveToQName(String str)
+   {
+      return QName.resolveToQName(getNamespaceService(), str);
+   }
+   
+   /**
+    * Creates a string representation of a QName for the given string.
+    * If the given string already has a namespace, either a URL or a prefix,
+    * nothing the given string is returned. If it does not have a namespace
+    * the Alfresco namespace is added.
+    * 
+    * @param str The string to convert
+    * @return A QName String representation of the given string 
+    */
+   public static String resolveToQNameString(String str)
+   {
+      return QName.resolveToQNameString(getNamespaceService(), str);
    }
    
    /**

@@ -288,7 +288,7 @@ public class ClipboardBean
          NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
          
          // check for duplicates first
-         ClipboardItem item = new ClipboardItem(new Node(ref, this.nodeService), mode);
+         ClipboardItem item = new ClipboardItem(new Node(ref), mode);
          boolean foundDuplicate = false;
          for (int i=0; i<items.size(); i++)
          {

@@ -32,6 +32,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
@@ -278,4 +279,11 @@ public class ServiceDescriptorRegistry
         return (AuthorityService)getService(AUTHORITY_SERVICE);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getTemplateService()
+     */
+    public TemplateService getTemplateService()
+    {
+        return (TemplateService)getService(TEMPLATE_SERVICE);
+    }
 }

@@ -26,6 +26,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
@@ -73,6 +74,7 @@ public interface ServiceRegistry
     static final QName ACTION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ActionService");
     static final QName PERMISSIONS_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "PermissionService");
     static final QName AUTHORITY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "AuthorityService");
+    static final QName TEMPLATE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "TemplateService");
     
     /**
      * Get the list of services provided by the Repository
@@ -199,4 +201,9 @@ public interface ServiceRegistry
      * @return the authority service (or null if one is not provided)
      */
     AuthorityService getAuthorityService();
+    
+    /**
+     * @return the template service (or null if one is not provided)
+     */
+    TemplateService getTemplateService();
 }

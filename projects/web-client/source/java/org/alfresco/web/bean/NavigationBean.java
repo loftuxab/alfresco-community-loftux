@@ -281,7 +281,7 @@ public class NavigationBean
          {
             // build a node which components on the JSP page can bind too
             nodeRef = new NodeRef(Repository.getStoreRef(), this.currentNodeId);
-            node = new Node(nodeRef, this.nodeService);
+            node = new Node(nodeRef);
             
             // early init properties for this node (by getProperties() call)
             // resolve icon in-case one has not been set
@@ -293,7 +293,7 @@ public class NavigationBean
                   FacesContext.getCurrentInstance(), ERROR_DELETED_FOLDER), new Object[] {this.currentNodeId}) );
             
             nodeRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
-            node = new Node(nodeRef, this.nodeService);
+            node = new Node(nodeRef);
             props = node.getProperties();
          }
          String icon = (String)props.get("app:icon");

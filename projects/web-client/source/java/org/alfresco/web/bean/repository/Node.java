@@ -25,10 +25,10 @@ import java.util.Set;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
@@ -54,17 +54,17 @@ public class Node implements Serializable
    private String id;
    private Set<QName> aspects = null;
    private Map<String, Boolean> permissions;
-   protected QNameMap<String, Object> properties;
+   protected QNameNodeMap<String, Object> properties;
    protected boolean propsRetrieved = false;
-   protected NodeService nodeService;
+   protected ServiceRegistry services = null;
    
    private boolean childAssocsRetrieved = false;
-   private QNameMap childAssociations;
+   private QNameNodeMap childAssociations;
    private Map<String, Map<String, ChildAssociationRef>> childAssociationsAdded;
    private Map<String, Map<String, ChildAssociationRef>> childAssociationsRemoved;
    
    private boolean assocsRetrieved = false;
-   private QNameMap associations;
+   private QNameNodeMap associations;
    private Map<String, Map<String, AssociationRef>> associationsAdded;
    private Map<String, Map<String, AssociationRef>> associationsRemoved;
    
@@ -72,25 +72,18 @@ public class Node implements Serializable
     * Constructor
     * 
     * @param nodeRef The NodeRef this Node wrapper represents
-    * @param nodeService The node service to use to retrieve data for this node 
     */
-   public Node(NodeRef nodeRef, NodeService nodeService)
+   public Node(NodeRef nodeRef)
    {
       if (nodeRef == null)
       {
          throw new IllegalArgumentException("NodeRef must be supplied for creation of a Node.");
       }
       
-      if (nodeService == null)
-      {
-         throw new IllegalArgumentException("The NodeService must be supplied for creation of a Node.");
-      }
-      
       this.nodeRef = nodeRef;
       this.id = nodeRef.getId();
-      this.nodeService = nodeService;
       
-      this.properties = new QNameMap<String, Object>(this);
+      this.properties = new QNameNodeMap<String, Object>(getServiceRegistry().getNamespaceService(), this);
    }
 
    /**
@@ -100,7 +93,7 @@ public class Node implements Serializable
    {
       if (this.propsRetrieved == false)
       {
-         Map<QName, Serializable> props = this.nodeService.getProperties(this.nodeRef);
+         Map<QName, Serializable> props = getServiceRegistry().getNodeService().getProperties(this.nodeRef);
          
          for (QName qname: props.keySet())
          {
@@ -122,9 +115,9 @@ public class Node implements Serializable
    {
       if (this.assocsRetrieved == false)
       {
-         associations = new QNameMap(this);
+         associations = new QNameNodeMap(getServiceRegistry().getNamespaceService(), this);
          
-         List<AssociationRef> assocs = this.nodeService.getTargetAssocs(this.nodeRef, RegexQNamePattern.MATCH_ALL);
+         List<AssociationRef> assocs = getServiceRegistry().getNodeService().getTargetAssocs(this.nodeRef, RegexQNamePattern.MATCH_ALL);
          
          for (AssociationRef assocRef: assocs)
          {
@@ -184,9 +177,9 @@ public class Node implements Serializable
    {
       if (this.childAssocsRetrieved == false)
       {
-         this.childAssociations = new QNameMap(this);
+         this.childAssociations = new QNameNodeMap(getServiceRegistry().getNamespaceService(), this);
          
-         List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(this.nodeRef);
+         List<ChildAssociationRef> assocs = getServiceRegistry().getNodeService().getChildAssocs(this.nodeRef);
          
          for (ChildAssociationRef assocRef: assocs)
          {
@@ -275,7 +268,7 @@ public class Node implements Serializable
    {
       if (this.type == null)
       {
-         this.type = this.nodeService.getType(this.nodeRef);
+         this.type = getServiceRegistry().getNodeService().getType(this.nodeRef);
       }
       
       return type;
@@ -294,7 +287,7 @@ public class Node implements Serializable
          // if we didn't find it as a property get the name from the association name
          if (this.name == null)
          {
-            this.name = this.nodeService.getPrimaryParent(this.nodeRef).getQName().getLocalName(); 
+            this.name = getServiceRegistry().getNodeService().getPrimaryParent(this.nodeRef).getQName().getLocalName(); 
          }
       }
       
@@ -308,7 +301,7 @@ public class Node implements Serializable
    {
       if (this.aspects == null)
       {
-         this.aspects = this.nodeService.getAspects(this.nodeRef);
+         this.aspects = getServiceRegistry().getNodeService().getAspects(this.nodeRef);
       }
       
       return this.aspects;
@@ -368,7 +361,7 @@ public class Node implements Serializable
    {
       if (this.path == null)
       {
-         this.path = this.nodeService.getPath(this.nodeRef).toString();
+         this.path = getServiceRegistry().getNodeService().getPath(this.nodeRef).toString();
       }
       
       return this.path;
@@ -403,9 +396,9 @@ public class Node implements Serializable
     */
    public String toString()
    {
-      if (this.nodeService != null)
+      if (getServiceRegistry().getNodeService() != null)
       {
-         if (this.nodeService.exists(nodeRef))
+         if (getServiceRegistry().getNodeService().exists(nodeRef))
          {
             return "Node Type: " + getType() + 
                    "\nNode Properties: " + this.getProperties().toString() + 
@@ -420,5 +413,14 @@ public class Node implements Serializable
       {
          return super.toString();
       }
+   }
+   
+   protected ServiceRegistry getServiceRegistry()
+   {
+      if (this.services == null)
+      {
+          this.services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
+      }
+      return this.services;
    }
 }

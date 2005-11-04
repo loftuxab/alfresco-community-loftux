@@ -50,7 +50,7 @@ import org.alfresco.web.app.servlet.DownloadContentServlet;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.NodePropertyResolver;
-import org.alfresco.web.bean.repository.QNameMap;
+import org.alfresco.web.bean.repository.QNameNodeMap;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewSpaceWizard;
 import org.alfresco.web.config.ClientConfigElement;
@@ -735,13 +735,13 @@ public class BrowseBean implements IContextListener
    
    private NodePropertyResolver resolverFileType16 = new NodePropertyResolver() {
       public Object get(Node node) {
-         return Repository.getFileTypeImage(node, true);
+         return Utils.getFileTypeImage(node.getName(), true);
       }
    };
    
    private NodePropertyResolver resolverFileType32 = new NodePropertyResolver() {
       public Object get(Node node) {
-         return Repository.getFileTypeImage(node, false);
+         return Utils.getFileTypeImage(node.getName(), false);
       }
    };
    
@@ -760,7 +760,7 @@ public class BrowseBean implements IContextListener
    
    private NodePropertyResolver resolverSpaceIcon = new NodePropertyResolver() {
       public Object get(Node node) {
-         QNameMap props = (QNameMap)node.getProperties();
+         QNameNodeMap props = (QNameNodeMap)node.getProperties();
          String icon = (String)props.getRaw("app:icon");
          return (icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
       }
@@ -940,7 +940,7 @@ public class BrowseBean implements IContextListener
          {
             // create the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
+            Node node = new Node(ref);
             
             // resolve icon in-case one has not been set
             node.addPropertyResolver("icon", this.resolverSpaceIcon);
@@ -1017,7 +1017,7 @@ public class BrowseBean implements IContextListener
          {
             // create the node ref, then our node representation
             NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-            Node node = new Node(ref, this.nodeService);
+            Node node = new Node(ref);
             
             // store the URL to for downloading the content
             node.addPropertyResolver("url", this.resolverDownload);
@@ -1103,7 +1103,8 @@ public class BrowseBean implements IContextListener
                }
             }
             
-            Utils.addStatusMessage(FacesMessage.SEVERITY_WARN, "Successfully deleted space '" + node.getName() + "'");
+            // add a message to inform the user that the delete was OK 
+            Utils.addStatusMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted space '" + node.getName() + "'");
             
             // clear action context
             setActionSpace(null);

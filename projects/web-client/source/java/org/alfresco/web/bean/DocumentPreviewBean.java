@@ -28,6 +28,8 @@ import javax.faces.model.SelectItem;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.TemplateImageResolver;
+import org.alfresco.service.cmr.repository.TemplateNode;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -36,8 +38,8 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.repo.component.template.TemplateNode;
 
 /**
  * @author Kevin Roast
@@ -54,6 +56,9 @@ public class DocumentPreviewBean
    
    /** The SearchService instance */
    private SearchService searchService;
+   
+   /** The NavigationBean bean reference */
+   private NavigationBean navigator;
    
    private NodeRef template;
    
@@ -80,6 +85,14 @@ public class DocumentPreviewBean
    public void setSearchService(SearchService searchService)
    {
       this.searchService = searchService;
+   }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
    }
    
    /**
@@ -133,7 +146,7 @@ public class DocumentPreviewBean
       {
          for (NodeRef assocRef : results)
          {
-            Node childNode = new Node(assocRef, this.nodeService);
+            Node childNode = new Node(assocRef);
             templates.add(new SelectItem(childNode.getId(), childNode.getName()));
          }
          
@@ -282,11 +295,25 @@ public class DocumentPreviewBean
    {
       HashMap model = new HashMap(3, 1.0f);
       
-      TemplateNode documentNode = new TemplateNode(getDocument().getNodeRef(), this.nodeService);
+      FacesContext fc = FacesContext.getCurrentInstance();
+      TemplateNode documentNode = new TemplateNode(getDocument().getNodeRef(),
+              Repository.getServiceRegistry(fc), imageResolver);
       model.put("document", documentNode);
+      TemplateNode spaceNode = new TemplateNode(this.navigator.getCurrentNode().getNodeRef(),
+              Repository.getServiceRegistry(fc), imageResolver);
+      model.put("space", spaceNode);
       
       return model;
    }
+   
+   /** Template Image resolver helper */
+   private TemplateImageResolver imageResolver = new TemplateImageResolver()
+   {
+       public String resolveImagePathForName(String filename, boolean small)
+       {
+           return Utils.getFileTypeImage(filename, small);
+       }
+   };
 
    /**
     * @return the current template as a full NodeRef

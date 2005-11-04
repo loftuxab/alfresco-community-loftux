@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.web.ui.repo.component.template;
+package org.alfresco.service.cmr.repository;
 
 import java.io.Writer;
 
@@ -25,14 +25,14 @@ import java.io.Writer;
  * 
  * @author Kevin Roast
  */
-public interface ITemplateProcessor
+public interface TemplateProcessor
 {
-   /**
-    * Process a template against the supplied data model and write to the out.
-    * 
-    * @param template       Template name/path
-    * @param model          Object model to process template against
-    * @param out            Writer object to send output too
-    */
-   public void process(String template, Object model, Writer out);
+    /**
+     * Process a template against the supplied data model and write to the out.
+     * 
+     * @param template       Template name/path
+     * @param model          Object model to process template against
+     * @param out            Writer object to send output too
+     */
+    public void process(String template, Object model, Writer out);
 }
