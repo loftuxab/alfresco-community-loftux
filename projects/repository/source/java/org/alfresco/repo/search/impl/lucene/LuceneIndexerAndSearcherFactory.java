@@ -17,7 +17,9 @@
 package org.alfresco.repo.search.impl.lucene;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.transaction.RollbackException;
@@ -27,6 +29,7 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.QueryRegisterComponent;
 import org.alfresco.repo.search.SearcherException;
@@ -35,13 +38,23 @@ import org.alfresco.repo.search.transaction.LuceneIndexLock;
 import org.alfresco.repo.search.transaction.SimpleTransaction;
 import org.alfresco.repo.search.transaction.SimpleTransactionManager;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.repo.transaction.TransactionUtil;
+import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.GUID;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.BooleanQuery;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
  * This class is resource manager LuceneIndexers and LuceneSearchers.
@@ -850,5 +863,210 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
         this.indexerMaxFieldLength = indexerMaxFieldLength;
         System.setProperty("org.apache.lucene.maxFieldLength", "" + indexerMaxFieldLength);
     }
+    
+    /**
+     * This component is able to <i>safely</i> perform backups of the Lucene indexes while
+     * the server is running.
+     * <p>
+     * It can be run directly by calling the {@link #backup() } method, but the convenience
+     * {@link LuceneIndexBackupJob} can be used to call it as well.
+     * 
+     * @author Derek Hulley
+     */
+    public static class LuceneIndexBackupComponent
+    {
+        private static Log logger = LogFactory.getLog(LuceneIndexerAndSearcherFactory.class);
+        
+        private TransactionService transactionService;
+        private LuceneIndexerAndSearcherFactory factory;
+        private NodeService nodeService;
+        private String targetLocation;
+        
+        public LuceneIndexBackupComponent()
+        {
+        }
 
+        /**
+         * Provides transactions in which to perform the work
+         * 
+         * @param transactionService
+         */
+        public void setTransactionService(TransactionService transactionService)
+        {
+            this.transactionService = transactionService;
+        }
+
+        /**
+         * Set the Lucene index factory that will be used to control the index locks
+         * 
+         * @param factory the index factory
+         */
+        public void setFactory(LuceneIndexerAndSearcherFactory factory)
+        {
+            this.factory = factory;
+        }
+
+        /**
+         * Used to retrieve the stores
+         * 
+         * @param nodeService the node service
+         */
+        public void setNodeService(NodeService nodeService)
+        {
+            this.nodeService = nodeService;
+        }
+
+        /**
+         * Set the directory to which the backup will be copied
+         * 
+         * @param targetLocation the backup directory
+         */
+        public void setTargetLocation(String targetLocation)
+        {
+            this.targetLocation = targetLocation;
+        }
+        
+        /**
+         * Backup the Lucene indexes
+         */
+        public void backup()
+        {
+            TransactionWork<Object> backupWork = new TransactionWork<Object>()
+            {
+                public Object doWork() throws Exception
+                {
+                    backupImpl();
+                    return null;
+                }
+            };
+            TransactionUtil.executeInUserTransaction(transactionService, backupWork);
+        }
+
+        private void backupImpl()
+        {
+            // create the location to copy to
+            File targetDir = new File(targetLocation);
+            if (targetDir.exists() && !targetDir.isDirectory())
+            {
+                throw new AlfrescoRuntimeException("Target location is a file and not a directory: " + targetDir);
+            }
+            File targetParentDir = targetDir.getParentFile();
+            if (targetParentDir == null)
+            {
+                throw new AlfrescoRuntimeException("Target location may not be a root directory: " + targetDir);
+            }
+            File tempDir = new File(targetParentDir, "indexbackup_temp");
+
+            // get all the available stores
+            List<StoreRef> storeRefs = nodeService.getStores();
+            
+            // lock all the stores
+            List<StoreRef> lockedStores = new ArrayList<StoreRef>(storeRefs.size());
+            try
+            {
+                for (StoreRef storeRef : storeRefs)
+                {
+                    factory.luceneIndexLock.getWriteock(storeRef);
+                    lockedStores.add(storeRef);
+                }
+                File indexRootDir = new File(factory.indexRootLocation);
+                // perform the copy
+                backupDirectory(indexRootDir, tempDir, targetDir);
+            }
+            catch (Throwable e)
+            {
+                throw new AlfrescoRuntimeException("Failed to copy Lucene index root: \n" +
+                        "   Index root: " + factory.indexRootLocation + "\n" +
+                        "   Target: " + targetDir,
+                        e);
+            }
+            finally
+            {
+                for (StoreRef storeRef : lockedStores)
+                {
+                    try
+                    {
+                        factory.luceneIndexLock.releaseWriteLock(storeRef);
+                    }
+                    catch (Throwable e)
+                    {
+                        logger.error("Failed to release index lock for store " + storeRef, e);
+                    }
+                }
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Backed up Lucene indexes: \n" +
+                        "   Target directory: " + targetDir);
+            }
+        }
+        
+        /**
+         * Makes a backup of the source directory via a temporary folder
+         * @param storeRef
+         */
+        private void backupDirectory(File sourceDir, File tempDir, File targetDir) throws Exception
+        {
+            if (!sourceDir.exists())
+            {
+                // there is nothing to copy
+                return;
+            }
+            // delete the files from the temp directory
+            if (tempDir.exists())
+            {
+                FileUtils.deleteDirectory(tempDir);
+                if (tempDir.exists())
+                {
+                    throw new AlfrescoRuntimeException("Temp directory exists and cannot be deleted: " + tempDir);
+                }
+            }
+            // copy to the temp directory
+            FileUtils.copyDirectory(sourceDir, tempDir, true);
+            // check that the temp directory was created
+            if (!tempDir.exists())
+            {
+                throw new AlfrescoRuntimeException("Copy to temp location failed");
+            }
+            // delete the target directory
+            FileUtils.deleteDirectory(targetDir);
+            if (targetDir.exists())
+            {
+                throw new AlfrescoRuntimeException("Failed to delete older files from target location");
+            }
+            // rename the temp to be the target
+            tempDir.renameTo(targetDir);
+            // make sure the rename worked
+            if (!targetDir.exists())
+            {
+                throw new AlfrescoRuntimeException("Failed to rename temporary directory to target backup directory");
+            }
+        }
+    }
+
+    /**
+     * Job that lock uses the {@link LuceneIndexBackupComponent} to perform safe backups of the Lucene indexes.
+     * 
+     * @author Derek Hulley
+     */
+    public static class LuceneIndexBackupJob implements Job
+    {
+        /** KEY_LUCENE_INDEX_BACKUP_COMPONENT = 'luceneIndexBackupComponent' */
+        public static final String KEY_LUCENE_INDEX_BACKUP_COMPONENT = "luceneIndexBackupComponent";
+        
+        /**
+         * Locks the Lucene indexes and copies them to a backup location
+         */
+        public void execute(JobExecutionContext context) throws JobExecutionException
+        {
+            JobDataMap jobData = context.getJobDetail().getJobDataMap();
+            LuceneIndexBackupComponent backupComponent = (LuceneIndexBackupComponent) jobData.get(KEY_LUCENE_INDEX_BACKUP_COMPONENT);
+            if (backupComponent == null)
+            {
+                throw new JobExecutionException("Missing job data: " + KEY_LUCENE_INDEX_BACKUP_COMPONENT);
+            }
+            // perform the backup
+            backupComponent.backup();
+        }
+    }
 }

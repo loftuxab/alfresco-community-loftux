@@ -41,7 +41,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/xpp3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-bind.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bcel.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-2.5.1.jar"/>
 	<classpathentry exported="true" sourcepath="W:/acegi-security-0.8.2" kind="lib" path="lib/acegi-security-0.8.2.jar"/>
@@ -78,5 +77,6 @@
 	<classpathentry exported="true" sourcepath="/Jaxen" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.1.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
