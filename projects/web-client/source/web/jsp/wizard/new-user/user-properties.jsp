@@ -32,7 +32,15 @@
    
    function pageLoaded()
    {
-      document.getElementById("user-props:userName").focus();
+      if (document.getElementById("user-props:userName") != null &&
+          document.getElementById("user-props:userName").disabled == false)
+      {
+         document.getElementById("user-props:userName").focus();
+      }
+      else
+      {
+         document.getElementById("user-props:homeSpaceName").focus();
+      }   
       updateButtonState();
    }
 
