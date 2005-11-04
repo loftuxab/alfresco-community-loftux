@@ -113,7 +113,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     private SearchService searcher;
     /** the component giving direct access to <b>node</b> instances */
     private NodeService nodeService;
-    /** the workspaces to reindex */
+    /** the stores to reindex */
     private List<StoreRef> storeRefs;
     /** set this on to keep checking for new transactions and never stop */
     private boolean runContinuously;
@@ -189,7 +189,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     }
     
     /**
-     * Set the workspaces that need reindexing
+     * Set the stores that need reindexing
      * 
      * @param storeRefStrings a list of strings representing store references
      */

@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.search.impl.lucene;
 
-
 import java.util.Set;
 
 import org.alfresco.repo.search.Indexer;
@@ -26,6 +25,9 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 
+/**
+ * @author Andy Hind
+ */
 public interface LuceneIndexer extends Indexer, Lockable
 {
 
