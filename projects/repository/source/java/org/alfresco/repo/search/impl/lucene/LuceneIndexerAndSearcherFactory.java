@@ -966,7 +966,7 @@ public class LuceneIndexerAndSearcherFactory implements LuceneIndexerAndSearcher
             {
                 for (StoreRef storeRef : storeRefs)
                 {
-                    factory.luceneIndexLock.getWriteock(storeRef);
+                    factory.luceneIndexLock.getWriteLock(storeRef);
                     lockedStores.add(storeRef);
                 }
                 File indexRootDir = new File(factory.indexRootLocation);
