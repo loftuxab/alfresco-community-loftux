@@ -65,7 +65,6 @@
 	<classpathentry exported="true" sourcepath="/Jaxen" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/swarmcache/swarmcache-1.0RC2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-beanutils-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-codec-1.2.jar"/>
@@ -79,5 +78,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-pool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-validator.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups-2.2.8.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
