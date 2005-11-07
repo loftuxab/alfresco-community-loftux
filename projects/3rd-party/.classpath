@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-dbcp.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-pool.jar"/>
 	<classpathentry exported="true" sourcepath="src/hibernate-3.1-beta2_src.zip" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
@@ -21,15 +18,8 @@
 	<classpathentry exported="true" sourcepath="src/spring-1.2-mod-src.zip" kind="lib" path="lib/spring.jar"/>
 	<classpathentry exported="true" sourcepath="src/spring-mock_src.zip" kind="lib" path="lib/spring-mock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.6.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-digester-1.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-el.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-validator.jar"/>
 	<classpathentry exported="true" sourcepath="src/myfaces_src.zip" kind="lib" path="lib/myfaces-all.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/portlet-api-lib.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.1-dev.jar"/>
 	<classpathentry exported="true" sourcepath="src/jooconverter_src.zip" kind="lib" path="lib/jooconverter.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/jurt.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/jut.jar"/>
@@ -50,7 +40,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/cryptix-jce-provider.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.5H3.jar"/>
 	<classpathentry exported="true" sourcepath="src/axis_src.zip" kind="lib" path="lib/axis.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tlddoc.jar"/>
@@ -67,7 +56,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-common.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-jmx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-system.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/treecache/jgroups.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.10-bin.jar"/>
 	<classpathentry exported="true" sourcepath="src/jcr_src.zip" kind="lib" path="lib/jcr-1.0.jar"/>
@@ -77,6 +65,19 @@
 	<classpathentry exported="true" sourcepath="/Jaxen" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/jgroups/jgroups.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/swarmcache/swarmcache-1.0RC2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-beanutils-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-codec-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-collections-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-dbcp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-digester-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-discovery-0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-el.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-fileupload-1.1-dev.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-io-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-logging.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-pool.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons/commons-validator.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
