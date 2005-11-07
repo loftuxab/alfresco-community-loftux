@@ -150,6 +150,11 @@ public class TemplateServiceImpl implements TemplateService, ApplicationContextA
             processors.set(procMap);
         }
         
+        if (name == null)
+        {
+            name = defaultTemplateEngine;
+        }
+        
         // find the impl for the named processor
         TemplateProcessor processor = procMap.get(name);
         if (processor == null)

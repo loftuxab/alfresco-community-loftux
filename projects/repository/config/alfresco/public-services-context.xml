@@ -767,8 +767,8 @@
     	<property name="interceptorNames">
     		<list>
     		    <idref local="TemplateService_transaction" />
-                <idref local="exceptionTranslator" />
-                <idref bean="TemplateService_security" />
+             <idref local="exceptionTranslator" />
+             <idref bean="TemplateService_security" />
     			 <idref local="TemplateService_descriptor" />
     		</list>
     	</property>

@@ -19,6 +19,15 @@ package org.alfresco.service.cmr.repository;
 import java.io.Writer;
 
 /**
+ * Template Service.
+ * <p>
+ * Provides an interface to services for executing template engine against a template file
+ * and data model.
+ * <p>
+ * The service provides a configured list of available template engines. The template file
+ * can either be in the repository (passed as NodeRef string) or on the classpath. The data
+ * model is specified to the template engine. The FreeMarker template engine is used by default.
+ * 
  * @author Kevin Roast
  */
 public interface TemplateService
