@@ -99,7 +99,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     /** ensures that this process is kicked off once per VM */
     private static boolean started = false;
     /** The current transaction ID being processed */
-    private static String currentTxnId = null;
+    private static String currentTxnId = START_TXN_ID;
     /** kept to notify the thread that it should quite */
     private boolean killThread = false;
     
@@ -115,8 +115,12 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     private NodeService nodeService;
     /** the stores to reindex */
     private List<StoreRef> storeRefs;
+    /** set this to run the index recovery component */
+    private boolean executeFullRecovery;
     /** set this on to keep checking for new transactions and never stop */
     private boolean runContinuously;
+    /** set the time to wait between checking indexes */
+    private long waitTime;
     /** controls how the L2 cache is used */
     private CacheMode l2CacheMode;
     
@@ -133,7 +137,9 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         this.storeRefs = new ArrayList<StoreRef>(2);
         
         this.killThread = false;
+        this.executeFullRecovery = false;
         this.runContinuously = false;
+        this.waitTime = 1000L;
         this.l2CacheMode = CacheMode.REFRESH;
 
         // ensure that we kill the thread when the VM is shutting down
@@ -204,7 +210,21 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     }
 
     /**
-     * Set this to ensure that the process continously checks for new transactions.
+     * Set this to <code>true</code> to initiate the full index recovery.
+     * <p>
+     * This used to default to <code>true</code> but is now false.  Set this
+     * if the potentially long-running process of checking and fixing the
+     * indexes must be started.
+     * 
+     * @param executeFullRecovery
+     */
+    public void setExecuteFullRecovery(boolean executeFullRecovery)
+    {
+        this.executeFullRecovery = executeFullRecovery;
+    }
+
+    /**
+     * Set this to ensure that the process continuously checks for new transactions.
      * If not, it will permanently terminate once it catches up with the current
      * transactions.
      * 
@@ -214,7 +234,17 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
     {
         this.runContinuously = runContinuously;
     }
-    
+
+    /**
+     * Set the time to wait between checking for new transaction changes in the database.
+     * 
+     * @param waitTime the time to wait in milliseconds
+     */
+    public void setWaitTime(long waitTime)
+    {
+        this.waitTime = waitTime;
+    }
+
     /**
      * Set the hibernate cache mode by name
      * 
@@ -261,21 +291,8 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             throw new AlfrescoRuntimeException
                     ("Only one FullIndexRecoveryComponent may be used per VM and it may only be called once");
         }
-        // check that no attempt is made to reuse this component
-        // set the state of the reindex
-        FullIndexRecoveryComponent.currentTxnId = START_TXN_ID;
         
-        // start a stateful thread that will begin processing the reindexing the transactions
-        Runnable runnable = new ReindexRunner();
-        Thread reindexThread = new Thread(runnable);
-        // make it a daemon thread
-        reindexThread.setDaemon(true);
-        // it should not be a high priority
-        reindexThread.setPriority(Thread.MIN_PRIORITY);
-        // start it
-        reindexThread.start();
-        
-        // ensure that we mark the txn as started
+        // ensure that we don't redo this work
         FullIndexRecoveryComponent.started = true;
         
         // work to mark the stores for full text reindexing
@@ -309,7 +326,37 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
             }
         };
         TransactionUtil.executeInNonPropagatingUserTransaction(transactionService, ftsReindexWork);
-        // all further FTS indexing will be done by individual node index changes
+
+        // start full index recovery, if necessary
+        if (!this.executeFullRecovery)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Full index recovery is off - quitting");
+            }
+        }
+        else
+        {
+            // set the state of the reindex
+            FullIndexRecoveryComponent.currentTxnId = START_TXN_ID;
+            
+            // start a stateful thread that will begin processing the reindexing the transactions
+            Runnable runnable = new ReindexRunner();
+            Thread reindexThread = new Thread(runnable);
+            // make it a daemon thread
+            reindexThread.setDaemon(true);
+            // it should not be a high priority
+            reindexThread.setPriority(Thread.MIN_PRIORITY);
+            // start it
+            reindexThread.start();
+            
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Full index recovery thread started: \n" +
+                        "   continuous: " + runContinuously + "\n" +
+                        "   stores: " + storeRefs);
+            }
+        }
     }
     
     /**
@@ -333,7 +380,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
                     // reindex missing content
                     int missingContentCount = FullIndexRecoveryComponent.this.reindexMissingContent();
                     // check if the process should terminate
-                    if (missingContentCount == 0 && txnsIndexed.size() == 0 && !runContinuously)
+                    if (txnsIndexed.size() == 0 && !runContinuously)
                     {
                         // the thread has caught up with all the available work and should not
                         // run continuously
@@ -347,7 +394,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
                     // brief pause
                     synchronized(FullIndexRecoveryComponent.this)
                     {
-                        FullIndexRecoveryComponent.this.wait(1000L);
+                        FullIndexRecoveryComponent.this.wait(waitTime);
                     }
                 }
                 catch (InterruptedException e)

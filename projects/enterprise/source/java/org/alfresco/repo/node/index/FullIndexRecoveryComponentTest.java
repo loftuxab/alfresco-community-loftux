@@ -52,14 +52,14 @@ public class FullIndexRecoveryComponentTest extends TestCase
 {
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     
-    private IndexRecovery indexRecoverer;
+    private FullIndexRecoveryComponent indexRecoverer;
     private NodeService nodeService;
     private TransactionService txnService;
     private Indexer indexer;
     
     public void setUp() throws Exception
     {
-        indexRecoverer = (IndexRecovery) ctx.getBean("indexRecoveryComponent");
+        indexRecoverer = (FullIndexRecoveryComponent) ctx.getBean("indexRecoveryComponent");
         txnService = (TransactionService) ctx.getBean("transactionComponent");
         nodeService = (NodeService) ctx.getBean("nodeService");
         indexer = (Indexer) ctx.getBean("indexerComponent");
@@ -99,6 +99,7 @@ public class FullIndexRecoveryComponentTest extends TestCase
         // create un-indexed nodes
         String txnId = TransactionUtil.executeInNonPropagatingUserTransaction(txnService, dropNodeIndexWork);
         
+        indexRecoverer.setExecuteFullRecovery(true);
         // reindex
         indexRecoverer.reindex();
 
@@ -114,9 +115,10 @@ public class FullIndexRecoveryComponentTest extends TestCase
         }
         
         // loop for some time, giving it a chance to do its thing
-        for (int i = 0; i < 60; i++)
+        String lastProcessedTxnId = null;
+        for (int i = 0; i < 10; i++)
         {
-            String lastProcessedTxnId = FullIndexRecoveryComponent.getCurrentTransactionId();
+            lastProcessedTxnId = FullIndexRecoveryComponent.getCurrentTransactionId();
             if (lastProcessedTxnId.equals(txnId))
             {
                 break;
@@ -127,5 +129,7 @@ public class FullIndexRecoveryComponentTest extends TestCase
                 this.wait(1000L);
             }
         }
+        // check that the index was recovered
+        assertEquals("Index transaction not up to date", txnId, lastProcessedTxnId);
     }
 }
