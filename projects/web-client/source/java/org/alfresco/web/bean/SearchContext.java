@@ -97,8 +97,8 @@ public final class SearchContext implements Serializable
          if (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"')
          {
             // as quoted phrase
-            fullTextQuery = " TEXT:\"" + safeText + '"';
-            nameAttrQuery = " +@" + nameAttr + ":\"" + safeText + "\"";
+            fullTextQuery = " TEXT:" + text;
+            nameAttrQuery = " +@" + nameAttr + ":" + text;
          }
          else
          {
