@@ -148,7 +148,15 @@ public final class TemplateNode implements Serializable
             // if we didn't find it as a property get the name from the association name
             if (this.name == null)
             {
-                this.name = this.services.getNodeService().getPrimaryParent(this.nodeRef).getQName().getLocalName(); 
+                ChildAssociationRef parentRef = this.services.getNodeService().getPrimaryParent(this.nodeRef);
+                if (parentRef != null && parentRef.getQName() != null)
+                {
+                    this.name = parentRef.getQName().getLocalName();
+                }
+                else
+                {
+                    this.name = "";
+                }
             }
         }
         
