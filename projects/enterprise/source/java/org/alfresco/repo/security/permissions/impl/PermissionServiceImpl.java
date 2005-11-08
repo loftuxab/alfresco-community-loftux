@@ -688,15 +688,18 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             }
 
             // Check permissions required of children
-            List<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
-            for (PermissionReference pr : childrenRequirements)
+            if (childrenRequirements.size() > 0)
             {
-                for (ChildAssociationRef child : childAssocRefs)
+                List<ChildAssociationRef> childAssocRefs = nodeService.getChildAssocs(nodeRef);
+                for (PermissionReference pr : childrenRequirements)
                 {
-                    success &= (hasPermission(child.getChildRef(), pr) == AccessStatus.ALLOWED);
-                    if (!success)
+                    for (ChildAssociationRef child : childAssocRefs)
                     {
-                        return false;
+                        success &= (hasPermission(child.getChildRef(), pr) == AccessStatus.ALLOWED);
+                        if (!success)
+                        {
+                            return false;
+                        }
                     }
                 }
             }
