@@ -507,7 +507,7 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * @see RegexQNamePattern#MATCH_ALL
      * @see NodeService#getChildAssocs(NodeRef, QNamePattern, QNamePattern)
      */
-    public List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
+    public final List<ChildAssociationRef> getChildAssocs(NodeRef nodeRef) throws InvalidNodeRefException
     {
         return getChildAssocs(nodeRef, RegexQNamePattern.MATCH_ALL, RegexQNamePattern.MATCH_ALL);
     }

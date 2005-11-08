@@ -25,8 +25,6 @@ import org.alfresco.repo.domain.NodeAssoc;
 import org.alfresco.repo.domain.NodeStatus;
 import org.alfresco.repo.domain.Store;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -127,14 +125,7 @@ public interface NodeDaoService
             Node childNode,
             QName assocTypeQName,
             QName qname);
-
-    /**
-     * Fast, non-hydrating query to retrieve the children of a given node.
-     * 
-     * @param parentNodeRef the parent node
-     * @return Returns an ordered list of child associations
-     */
-    public List<ChildAssociationRef> getAllChildAssocs(NodeRef parentNodeRef);
+            
     
     /**
      * @param assoc the child association to remove
