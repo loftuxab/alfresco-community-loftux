@@ -120,7 +120,6 @@
                                  <tr>
                                     <td><h:outputText value="#{AddContentWizard.summary}" escape="false" /></td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><h:outputText value="#{AddContentWizard.stepInstructions}" escape="false" /></td>
                                  </tr>

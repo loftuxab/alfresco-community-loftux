@@ -165,6 +165,14 @@
                                        </tr></table>
                                     </td>
                                  </tr>
+                                 <tr>
+                                    <td colspan="2">
+                                       <div id="rule-info" style="padding-left: 26px;">
+                                          <h:graphicImage alt="" value="/images/icons/info_icon.gif" style="vertical-align: middle;" />&nbsp;
+                                          <h:outputText value="#{msg.rule_background_info}" />
+                                       </div>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td colspan="2"><h:outputText value="#{NewRuleWizard.stepInstructions}" /></td>

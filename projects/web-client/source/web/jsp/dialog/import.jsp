@@ -31,20 +31,6 @@
 
 <r:page titleId="title_import">
 
-<script language="JavaScript1.2">
-   function toggleErrorInfo(runInBg)
-   {
-      if (runInBg.checked)
-      {
-         document.getElementById("error-info").style.display = "inline";
-      }
-      else
-      {
-         document.getElementById("error-info").style.display = "none";
-      }
-   }
-</script>
-
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
@@ -162,14 +148,13 @@
                                  <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td>
-                                       <h:selectBooleanCheckbox value="#{ImportDialog.runInBackground}" 
-                                                                onchange="javascript:toggleErrorInfo(this);"/>&nbsp;
+                                       <h:selectBooleanCheckbox value="#{ImportDialog.runInBackground}" />&nbsp;
                                        <span style="vertical-align:20%">3. <h:outputText value="#{msg.run_import_in_background}"/></span>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       <div id="error-info" style="display: inline; padding-left: 24px;">
+                                       <div id="error-info" style="padding-left: 24px;">
                                           <h:graphicImage alt="" value="/images/icons/info_icon.gif" style="vertical-align: middle;"/>&nbsp;
                                           <h:outputText value="#{msg.import_error_info}"/>
                                        </div>

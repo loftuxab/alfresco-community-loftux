@@ -118,8 +118,6 @@
                                  <tr>
                                     <td class="mainSubText"><h:outputText value="#{NewUserWizard.stepDescription}" /></td>
                                  </tr>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
                                  <tr>
                                     <td><h:outputText value="#{NewUserWizard.summary}" escape="false" /></td>
                                  </tr>

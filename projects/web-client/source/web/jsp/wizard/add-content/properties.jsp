@@ -193,13 +193,15 @@
                                     <td></td>
                                     <td><table cellspacing=0 cellpadding=0>
                                           <tr>
-                                             <td><nobr><h:outputText value="#{msg.inline_editable}"/>:&nbsp;</nobr></td>
-                                             <td width=100%><h:selectBooleanCheckbox value="#{AddContentWizard.inlineEdit}" /></td>
+                                             <td><h:selectBooleanCheckbox value="#{AddContentWizard.inlineEdit}" /></td>
+                                             <td width=100%><nobr>&nbsp;<h:outputText value="#{msg.inline_editable}"/></nobr></td>
                                           </tr>
                                           <tr>
                                              <td colspan=2>
-                                                <img alt="" align="absmiddle" src="<%=request.getContextPath()%>/images/icons/info_icon.gif" />
-                                                <h:outputText value="#{msg.warning_inline}" />
+                                                <div id="info" style="padding-left: 2px; padding-top: 2px;">
+                                                   <h:graphicImage alt="" value="/images/icons/info_icon.gif" style="vertical-align: middle;" />&nbsp;
+                                                   <h:outputText value="#{msg.warning_inline}" />
+                                                </div>
                                              </td>
                                           </tr>
                                        </table></td>

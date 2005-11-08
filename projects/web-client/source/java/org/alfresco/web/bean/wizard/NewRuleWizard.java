@@ -599,18 +599,6 @@ public class NewRuleWizard extends BaseActionWizard
       
       switch (this.currentStep)
       {
-         case 3:
-         {
-            if (this.editMode)
-            {
-               stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_EDIT_ID);
-            }
-            else
-            {
-               stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
-            }
-            break;
-         }
          case 4:
          {
             if (this.editMode)

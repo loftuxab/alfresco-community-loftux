@@ -47,18 +47,6 @@
          document.getElementById("export-form:ok-button").disabled = false;
       }
    }
-   
-   function toggleErrorInfo(runInBg)
-   {
-      if (runInBg.checked)
-      {
-         document.getElementById("error-info").style.display = "inline";
-      }
-      else
-      {
-         document.getElementById("error-info").style.display = "none";
-      }
-   }
 </script>
 
 <f:view>
@@ -188,15 +176,14 @@
                                  <tr>
                                     <td>&nbsp;</td>
                                     <td>
-                                       <h:selectBooleanCheckbox value="#{ExportDialog.runInBackground}" 
-                                                                onchange="javascript:toggleErrorInfo(this);"/>&nbsp;
+                                       <h:selectBooleanCheckbox value="#{ExportDialog.runInBackground}" />&nbsp;
                                        <span style="vertical-align:20%"><h:outputText value="#{msg.run_export_in_background}"/></span>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>&nbsp;</td>
                                     <td>
-                                       <div id="error-info" style="display: inline; padding-left: 24px;">
+                                       <div id="error-info" style="padding-left: 24px;">
                                           <h:graphicImage alt="" value="/images/icons/info_icon.gif" style="vertical-align: middle;"/>&nbsp;
                                           <h:outputText value="#{msg.export_error_info}"/>
                                        </div>

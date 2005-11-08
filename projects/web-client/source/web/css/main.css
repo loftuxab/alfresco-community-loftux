@@ -159,6 +159,9 @@ a.small:hover
    color: #003366;
    font-size: 11px;
    padding-left: 8px;
+   padding-right: 8px;
+   margin-top: 4px;
+   border: 1px solid #dddddd;
 }
 
 a.headbarLink

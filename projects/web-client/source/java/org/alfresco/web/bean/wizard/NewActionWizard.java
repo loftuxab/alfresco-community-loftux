@@ -166,7 +166,6 @@ public class NewActionWizard extends BaseActionWizard
       
       switch (this.currentStep)
       {
-         case 2:
          case 3:
          {
             stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);

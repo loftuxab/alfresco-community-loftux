@@ -118,6 +118,29 @@ public class CreateContentWizard extends BaseContentWizard
    }
 
    /**
+    * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getStepInstructions()
+    */
+   public String getStepInstructions()
+   {
+      String stepInstruction = null;
+      
+      switch (this.currentStep)
+      {
+         case 4:
+         {
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), FINISH_INSTRUCTION_ID);
+            break;
+         }
+         default:
+         {
+            stepInstruction = Application.getMessage(FacesContext.getCurrentInstance(), DEFAULT_INSTRUCTION_ID);
+         }
+      }
+      
+      return stepInstruction;
+   }
+   
+   /**
     * @see org.alfresco.web.bean.wizard.AbstractWizardBean#getStepTitle()
     */
    public String getStepTitle()

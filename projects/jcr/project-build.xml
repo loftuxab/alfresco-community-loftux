@@ -7,11 +7,14 @@
    <target name="package" depends="package-war" />
 
    <target name="package-war" depends="package-jar" description="Packages the WAR file for the current server">
+
+      <echo>webinf.lib.excludes.tck = ${webinf.lib.excludes.tck}</echo>
+
       <war warfile="${dir.dist}/${file.name.war.tck}" webxml="${dir.src.webinf}\web.xml">
          <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
          <webinf dir="${dir.project.installer}" includes="licenses/**"/>
          <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes}"/>   
-         <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" />
+         <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes.tck}" />
          <lib dir="${dir.common.lib}/jibx" includes="*.jar" />
          <lib dir="${dir.common.lib}/openoffice" includes="*.jar" />
          <lib dir="${dir.common.lib}/jmagick" includes="*.jar" />
