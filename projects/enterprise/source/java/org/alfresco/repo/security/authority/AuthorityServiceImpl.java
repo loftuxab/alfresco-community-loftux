@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.cache.SimpleCache;
+import org.alfresco.repo.security.permissions.impl.SimpleNodePermissionEntry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
@@ -54,7 +56,7 @@ public class AuthorityServiceImpl implements AuthorityService
     private Set<String> adminUsers;
 
     private AuthenticationService authenticationService;
-
+    
     public AuthorityServiceImpl()
     {
         super();
@@ -75,7 +77,6 @@ public class AuthorityServiceImpl implements AuthorityService
         this.authorityDAO = authorityDAO;
     }
     
-
     /**
      * Currently the admin authority is granted only to the ALFRESCO_ADMIN_USER
      * user.

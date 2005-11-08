@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<!-- Beans pertinent to node persistence and services --> 
+<beans>
+    <bean id="authorityService" class="org.alfresco.repo.security.authority.SimpleAuthorityServiceImpl">
+        <property name="authenticationService">
+            <ref bean="authenticationService" />
+        </property>
+        <property name="personService">
+            <ref bean="personService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="adminUsers">
+            <set>
+    			<value>admin</value>
+    			<value>administrator</value>
+    		</set>
+        </property>
+    </bean>
+</beans>

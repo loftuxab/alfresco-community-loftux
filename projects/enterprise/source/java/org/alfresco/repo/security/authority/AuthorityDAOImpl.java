@@ -17,6 +17,7 @@
 package org.alfresco.repo.security.authority;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,10 +26,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.impl.lucene.QueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
+import org.alfresco.repo.security.permissions.impl.SimpleNodePermissionEntry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -57,6 +60,8 @@ public class AuthorityDAOImpl implements AuthorityDAO
     private DictionaryService dictionaryService;
 
     private MutableAuthenticationDao authenticationDao;
+
+    private SimpleCache<String, ArrayList<NodeRef>> userToAuthorityCache;
 
     public AuthorityDAOImpl()
     {
@@ -88,6 +93,11 @@ public class AuthorityDAOImpl implements AuthorityDAO
         this.authenticationDao = authenticationDao;
     }
 
+    public void setUserToAuthorityCache(SimpleCache<String, ArrayList<NodeRef>> userToAuthorityCache)
+    {
+        this.userToAuthorityCache = userToAuthorityCache;
+    }
+
     public void addAuthority(String parentName, String childName)
     {
         NodeRef parentRef = getAuthorityOrNull(parentName);
@@ -103,6 +113,7 @@ public class AuthorityDAOImpl implements AuthorityDAO
             members.addAll(memberCollection);
             members.add(childName);
             nodeService.setProperty(parentRef, ContentModel.PROP_MEMBERS, members);
+            userToAuthorityCache.remove(childName);
         }
         else
         {
@@ -198,6 +209,7 @@ public class AuthorityDAOImpl implements AuthorityDAO
             members.addAll(memberCollection);
             members.remove(childName);
             nodeService.setProperty(parentRef, ContentModel.PROP_MEMBERS, members);
+            userToAuthorityCache.remove(childName);
         }
         else
         {
@@ -223,45 +235,68 @@ public class AuthorityDAOImpl implements AuthorityDAO
     {
         if (AuthorityType.getAuthorityType(name).equals(AuthorityType.USER))
         {
-            SearchParameters sp = new SearchParameters();
-            sp.addStore(getUserStoreRef());
-            sp.setLanguage("lucene");
-            sp.setQuery("+TYPE:\""
-                    + ContentModel.TYPE_AUTHORITY_CONTAINER
-                    + "\""
-                    + " +@"
-                    + QueryParser.escape("{"
-                            + ContentModel.PROP_MEMBERS.getNamespaceURI() + "}"
-                            + ISO9075.encode(ContentModel.PROP_MEMBERS.getLocalName())) + ":\"" + name + "\"");
-            ResultSet rs = null;
-            try
+            for (NodeRef ref : getUserContainers(name))
             {
-                rs = searchService.query(sp);
-                for (ResultSetRow row : rs)
-                {
-                    findAuthorities(type, row.getNodeRef(), authorities, parents, recursive, true);
-                }
+                findAuthorities(type, ref, authorities, parents, recursive, true);
             }
-            finally
-            {
-                if (rs != null)
-                {
-                    rs.close();
-                }
-            }
+
         }
         else
         {
             NodeRef ref = getAuthorityOrNull(name);
-            
+
             if (ref == null)
             {
                 throw new UnknownAuthorityException("An authority was not found for " + name);
             }
-            
+
             findAuthorities(type, ref, authorities, parents, recursive, false);
-            
+
         }
+    }
+
+    private ArrayList<NodeRef> getUserContainers(String name)
+    {
+        ArrayList<NodeRef> containers = userToAuthorityCache.get(name);
+        if (containers == null)
+        {
+            containers = findUserContainers(name);
+            userToAuthorityCache.put(name, containers);
+        }
+        return containers;
+    }
+
+    private ArrayList<NodeRef> findUserContainers(String name)
+    {
+        SearchParameters sp = new SearchParameters();
+        sp.addStore(getUserStoreRef());
+        sp.setLanguage("lucene");
+        sp.setQuery("+TYPE:\""
+                + ContentModel.TYPE_AUTHORITY_CONTAINER
+                + "\""
+                + " +@"
+                + QueryParser.escape("{"
+                        + ContentModel.PROP_MEMBERS.getNamespaceURI() + "}"
+                        + ISO9075.encode(ContentModel.PROP_MEMBERS.getLocalName())) + ":\"" + name + "\"");
+        ResultSet rs = null;
+        try
+        {
+            rs = searchService.query(sp);
+            ArrayList<NodeRef> answer = new ArrayList<NodeRef>(rs.length());
+            for (ResultSetRow row : rs)
+            {
+                answer.add(row.getNodeRef());
+            }
+            return answer;
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                rs.close();
+            }
+        }
+
     }
 
     private void findAuthorities(AuthorityType type, NodeRef nodeRef, Set<String> authorities, boolean parents,
