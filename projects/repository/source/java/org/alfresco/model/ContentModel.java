@@ -171,10 +171,12 @@ public interface ContentModel
     static final QName PROP_ACCOUNT_LOCKED = QName.createQName(USER_MODEL_URI, "accountLocked");
     static final QName PROP_SALT = QName.createQName(USER_MODEL_URI, "salt");
 
-    static final QName TYPE_GROUP = QName.createQName(USER_MODEL_URI, "group");
-    static final QName PROP_GROUP_NAME = QName.createQName(USER_MODEL_URI, "groupName");
-    static final QName ASSOC_MEMBERS = QName.createQName(USER_MODEL_URI, "members");
-    static final QName ASSOC_SUB_GROUPS = QName.createQName(USER_MODEL_URI, "subGroups");
+    static final QName TYPE_AUTHORITY = QName.createQName(USER_MODEL_URI, "authority");
+    
+    static final QName TYPE_AUTHORITY_CONTAINER = QName.createQName(USER_MODEL_URI, "authorityContainer");
+    static final QName PROP_AUTHORITY_NAME = QName.createQName(USER_MODEL_URI, "authorityName");
+    static final QName ASSOC_MEMBER = QName.createQName(USER_MODEL_URI, "member");
+    static final QName PROP_MEMBERS = QName.createQName(USER_MODEL_URI, "members");
     
     //
     // Version Model Definitions

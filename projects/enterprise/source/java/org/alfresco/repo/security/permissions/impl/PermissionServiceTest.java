@@ -36,6 +36,7 @@ import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -62,6 +63,8 @@ public class PermissionServiceTest extends AbstractPermissionTest
         fail("Missing role ROLE_AUTHENTICATED ");
     }
 
+ 
+    
     public void testSetInheritFalse()
     {
         runAs("andy");
@@ -1032,9 +1035,9 @@ public class PermissionServiceTest extends AbstractPermissionTest
     {
         runAs("admin");
 
-        TransactionService transactionService = serviceRegistry.getTransactionService();
-        UserTransaction tx = transactionService.getUserTransaction();
-        tx.begin();
+        //TransactionService transactionService = serviceRegistry.getTransactionService();
+        //UserTransaction tx = transactionService.getUserTransaction();
+        //tx.begin();
 
         NodeRef n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{namespace}one"), ContentModel.TYPE_FOLDER).getChildRef();
@@ -1072,7 +1075,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         for (int i = 0; i < 1000; i++)
         {
             getSession().flush();
-            getSession().clear();
+            //getSession().clear();
             start = System.nanoTime();
             assertTrue(permissionService.hasPermission(n10, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
             end = System.nanoTime();
@@ -1092,7 +1095,7 @@ public class PermissionServiceTest extends AbstractPermissionTest
         System.out.println("Time is " + (time / 1000000000.0));
         // assertTrue((time / 1000000000.0) < 2.0);
 
-        tx.rollback();
+        //tx.rollback();
     }
 
     public void testAllPermissions()
@@ -1827,6 +1830,21 @@ public class PermissionServiceTest extends AbstractPermissionTest
 
     }
 
+    public void testGroupPermission()
+    {
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ),
+                "GROUP_test", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        authorityService.createAuthority(AuthorityType.GROUP, null, "test");
+        authorityService.addAuthority("GROUP_test", "andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        authorityService.removeAuthority("GROUP_test", "andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        permissionService.clearPermission(rootNodeRef, "andy");
+    }
+    
     // TODO: Test permissions on missing nodes
     
    

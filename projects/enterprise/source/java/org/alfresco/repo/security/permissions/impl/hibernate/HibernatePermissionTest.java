@@ -208,6 +208,9 @@ public class HibernatePermissionTest extends BaseSpringTest
         getSession().delete(permissionEntry);
         
         nodePermission = (NodePermissionEntry) getSession().load(NodePermissionEntryImpl.class, idNodePermision);
-        assertEquals(0, nodePermission.getPermissionEntries().size());   
+        assertEquals(0, nodePermission.getPermissionEntries().size());  
+        
+        
     }
+    
 }

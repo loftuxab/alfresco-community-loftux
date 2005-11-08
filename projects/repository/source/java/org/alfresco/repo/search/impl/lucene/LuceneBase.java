@@ -293,19 +293,34 @@ public abstract class LuceneBase implements Lockable
         // If we know the delta id we should do better
         try
         {
-            if (luceneIndexer == null)
+            if (mainIndexExists())
             {
-                return new IndexSearcher(getMainPath());
+                if (luceneIndexer == null)
+                {
+                    return new IndexSearcher(getMainPath());
+                }
+                else
+                {
+                    // TODO: Create appropriate reader that lies about deletions
+                    // from the first
+                    //
+                    luceneIndexer.flushPending();
+                    return new ClosingIndexSearcher(new MultiReader(new IndexReader[] {
+                            new FilterIndexReaderByNodeRefs(IndexReader.open(getMainPath()), luceneIndexer
+                                    .getDeletions()), IndexReader.open(getDeltaPath()) }));
+                }
             }
             else
             {
-                // TODO: Create appropriate reader that lies about deletions
-                // from the first
-                //
-                luceneIndexer.flushPending();
-                return new ClosingIndexSearcher(new MultiReader(new IndexReader[] {
-                        new FilterIndexReaderByNodeRefs(IndexReader.open(getMainPath()), luceneIndexer.getDeletions()),
-                        IndexReader.open(getDeltaPath()) }));
+                if (luceneIndexer == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    luceneIndexer.flushPending();
+                    return new IndexSearcher(getDeltaPath());
+                }
             }
         }
         catch (IOException e)
@@ -891,7 +906,7 @@ public abstract class LuceneBase implements Lockable
             throw new LuceneIndexException("Write lock failed to check or clear any existing lucene locks", e);
         }
     }
-    
+
     public void releaseReadLock()
     {
         getLuceneIndexLock().releaseReadLock(store);

@@ -122,7 +122,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         return ud;
     }
 
-    /* package for testing */NodeRef getUserOrNull(String caseSensitiveUserName)
+    public NodeRef getUserOrNull(String caseSensitiveUserName)
     {
         String userName = userNamesAreCaseSensitive ? caseSensitiveUserName: caseSensitiveUserName.toLowerCase();
         NodeRef rootNode = nodeService.getRootNode(getUserStoreRef());

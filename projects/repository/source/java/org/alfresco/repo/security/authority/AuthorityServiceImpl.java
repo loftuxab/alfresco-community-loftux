@@ -41,6 +41,8 @@ public class AuthorityServiceImpl implements AuthorityService
 
     private NodeService nodeService;
 
+    private AuthorityDAO authorityDAO;
+
     private Set<String> emptySet = Collections.<String> emptySet();
 
     private Set<String> adminSet = Collections.singleton(PermissionService.ADMINISTRATOR_AUTHORITY);
@@ -58,21 +60,21 @@ public class AuthorityServiceImpl implements AuthorityService
         super();
     }
 
-    
-    
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
-
-
 
     public void setPersonService(PersonService personService)
     {
         this.personService = personService;
     }
 
-
+    public void setAuthorityDAO(AuthorityDAO authorityDAO)
+    {
+        this.authorityDAO = authorityDAO;
+    }
+    
 
     /**
      * Currently the admin authority is granted only to the ALFRESCO_ADMIN_USER
@@ -98,36 +100,136 @@ public class AuthorityServiceImpl implements AuthorityService
 
     public Set<String> getAuthorities()
     {
+        Set<String> authorities = new HashSet<String>();
         String currentUserName = authenticationService.getCurrentUserName();
-        return adminUsers.contains(currentUserName) ? adminSet : emptySet;
+        if (adminUsers.contains(currentUserName))
+        {
+            authorities.addAll(adminSet);
+        }
+        authorities.addAll(getContainingAuthorities(null, currentUserName, false));
+        return authorities;
     }
 
     public Set<String> getAllAuthorities(AuthorityType type)
     {
+        Set<String> authorities = new HashSet<String>();
         switch (type)
         {
         case ADMIN:
-            return adminSet;
+            authorities.addAll(adminSet);
+            break;
         case EVERYONE:
-            return allSet;
+            authorities.addAll(allSet);
+            break;
         case GUEST:
-            return guestSet;
+            authorities.addAll(guestSet);
+            break;
         case GROUP:
-            return allSet;
+            authorities.addAll(allSet);
+            authorities.addAll(authorityDAO.getAllAuthorities(type));
+            break;
         case OWNER:
-            return emptySet;
+             break;
         case ROLE:
-            return emptySet;
+            authorities.addAll(authorityDAO.getAllAuthorities(type));
+            break;
         case USER:
-            HashSet<String> userNames = new HashSet<String>();
             for (NodeRef personRef : personService.getAllPeople())
             {
-                userNames.add(DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(personRef, ContentModel.PROP_USERNAME)));
+                authorities.add(DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(personRef,
+                        ContentModel.PROP_USERNAME)));
             }
-            return userNames;
+            break;
         default:
-            return emptySet;
+            break;
         }
+        return authorities;
+    }
+
+    public void addAuthority(String parentName, String childName)
+    {
+        authorityDAO.addAuthority(parentName, childName);
+    }
+
+    private void checkTypeIsMutable(AuthorityType type)
+    {
+        if((type == AuthorityType.GROUP) || (type == AuthorityType.ROLE))
+        {
+            return;
+        }
+        else
+        {
+            throw new AuthorityException("Trying to modify a fixed authority");
+        }
+    }
+    
+    public String createAuthority(AuthorityType type, String parentName, String shortName)
+    {
+        checkTypeIsMutable(type);
+        String name = getName(type, shortName);
+        authorityDAO.createAuthority(parentName, name);
+        return name;
+    }
+
+    public void deleteAuthority(String name)
+    {
+        AuthorityType type = AuthorityType.getAuthorityType(name);
+        checkTypeIsMutable(type);
+        authorityDAO.deleteAuthority(name);
+    }
+
+    public Set<String> getAllRootAuthorities(AuthorityType type)
+    {
+        return authorityDAO.getAllRootAuthorities(type);
+    }
+
+    public Set<String> getContainedAuthorities(AuthorityType type, String name, boolean immediate)
+    {
+        return authorityDAO.getContainedAuthorities(type, name, immediate);
+    }
+
+    public Set<String> getContainingAuthorities(AuthorityType type, String name, boolean immediate)
+    {
+        return authorityDAO.getContainingAuthorities(type, name, immediate);
+    }
+
+    public String getName(AuthorityType type, String shortName)
+    {
+        if (type.isFixedString())
+        {
+            return type.getFixedString();
+        }
+        else if (type.isPrefixed())
+        {
+            return type.getPrefixString() + shortName;
+        }
+        else
+        {
+            return shortName;
+        }
+    }
+
+    public String getShortName(String name)
+    {
+        AuthorityType type = AuthorityType.getAuthorityType(name);
+        if (type.isFixedString())
+        {
+            return "";
+        }
+        else if (type.isPrefixed())
+        {
+            return name.substring(type.getPrefixString().length());
+        }
+        else
+        {
+            return name;
+        }
+
+    }
+
+    public void removeAuthority(String parentName, String childName)
+    {
+        authorityDAO.removeAuthority(parentName, childName);
     }
 
 }

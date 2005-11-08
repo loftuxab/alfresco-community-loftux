@@ -741,17 +741,39 @@
         <property name="authenticationService">
             <ref bean="authenticationService" />
         </property>
-          <property name="personService">
+        <property name="personService">
             <ref bean="personService" />
         </property>
-          <property name="nodeService">
+        <property name="nodeService">
             <ref bean="nodeService" />
+        </property>
+        <property name="authorityDAO">
+            <ref bean="authorityDAO" />
         </property>
         <property name="adminUsers">
             <set>
     			<value>admin</value>
     			<value>administrator</value>
     		</set>
+        </property>
+    </bean>
+    
+    
+    <bean id="authorityDAO" class="org.alfresco.repo.security.authority.AuthorityDAOImpl">   
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="namespacePrefixResolver">
+            <ref bean="namespaceService" />
+        </property>
+        <property name="searchService">
+            <ref bean="searchService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+        <property name="authenticationDao">
+            <ref bean="alfDaoImpl" />
         </property>
     </bean>
 

@@ -37,6 +37,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.NamespaceService;
@@ -72,6 +73,8 @@ public class AbstractPermissionTest extends BaseSpringTest
     protected ModelDAO permissionModelDAO;
     
     protected PersonService personService;
+    
+    protected AuthorityService authorityService;
 
     public AbstractPermissionTest()
     {
@@ -92,10 +95,11 @@ public class AbstractPermissionTest extends BaseSpringTest
         serviceRegistry = (ServiceRegistry) applicationContext.getBean(ServiceRegistry.SERVICE_REGISTRY);
         permissionModelDAO = (ModelDAO) applicationContext.getBean("permissionsModelDAO");
         personService = (PersonService) applicationContext.getBean("personService");
+        authorityService = (AuthorityService) applicationContext.getBean("authorityService");
         
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
 
-        StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.nanoTime());
         rootNodeRef = nodeService.getRootNode(storeRef);
 
         QName children = ContentModel.ASSOC_CHILDREN;
@@ -134,8 +138,8 @@ public class AbstractPermissionTest extends BaseSpringTest
 
     protected void onTearDownInTransaction()
     {
-        super.onTearDownInTransaction();
         flushAndClear();
+        super.onTearDownInTransaction();
     }
 
     protected void runAs(String userName)
