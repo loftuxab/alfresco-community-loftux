@@ -106,8 +106,19 @@ public class AlfrescoFacesPortlet extends MyFacesGenericPortlet
                String filename = item.getName();
                if(item.isFormField() == false)
                {
+                  if (logger.isDebugEnabled())
+                     logger.debug("Processing uploaded file: " + filename);
+                  
                   // workaround a bug in IE where the full path is returned
-                  int idx = filename.lastIndexOf(File.separator);
+                  // IE is only available for Windows so only check for the Windows path separator
+                  int idx = filename.lastIndexOf('\\');
+                  
+                  if (idx == -1)
+                  {
+                     // if there is no windows path separator check for *nix
+                     idx = filename.lastIndexOf('/');
+                  }
+                  
                   if (idx != -1)
                   {
                      filename = filename.substring(idx + File.separator.length());

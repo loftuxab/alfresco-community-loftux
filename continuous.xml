@@ -76,7 +76,7 @@
       <move file="${dir.dist}/${file.name.dist.src}.tar.gz" tofile="${dir.dist}/${file.name.dist.src.nightly}.tar.gz"/>
       
       <ant antfile="${file.name.build}" target="compile-docs"/>
-      <antcall target="generate-checksums"/>
+      <!--<antcall target="generate-checksums"/>-->
    </target>
 
    <!-- ************************** -->
