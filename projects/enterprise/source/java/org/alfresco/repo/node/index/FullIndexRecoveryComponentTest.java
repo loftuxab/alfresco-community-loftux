@@ -83,7 +83,7 @@ public class FullIndexRecoveryComponentTest extends TestCase
         storeRefs = TransactionUtil.executeInUserTransaction(transactionService, createStoresWork);
     }
     
-    public void testReindexing() throws Exception
+    public void xtestReindexing() throws Exception
     {
         // don't do anything if the component has already started
         if (FullIndexRecoveryComponent.isStarted())
