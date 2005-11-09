@@ -17,6 +17,7 @@
 package org.alfresco.service.cmr.repository;
 
 import java.io.Serializable;
+import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,9 @@ import org.alfresco.service.namespace.QNameMap;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.InputSource;
+
+import freemarker.ext.dom.NodeModel;
 
 /**
  * Node class specific for use by Template pages.
@@ -88,22 +92,22 @@ public final class TemplateNode implements Serializable
      */
     public TemplateNode(NodeRef nodeRef, ServiceRegistry services, TemplateImageResolver resolver)
     {
-      if (nodeRef == null)
-      {
-         throw new IllegalArgumentException("NodeRef must be supplied.");
-      }
+        if (nodeRef == null)
+        {
+            throw new IllegalArgumentException("NodeRef must be supplied.");
+        }
       
-      if (services == null)
-      {
-         throw new IllegalArgumentException("The ServiceRegistry must be supplied.");
-      }
-      
-      this.nodeRef = nodeRef;
-      this.id = nodeRef.getId();
-      this.services = services;
-      this.imageResolver = resolver;
-      
-      this.properties = new QNameMap<String, Object>(this.services.getNamespaceService());
+        if (services == null)
+        {
+            throw new IllegalArgumentException("The ServiceRegistry must be supplied.");
+        }
+        
+        this.nodeRef = nodeRef;
+        this.id = nodeRef.getId();
+        this.services = services;
+        this.imageResolver = resolver;
+        
+        this.properties = new QNameMap<String, Object>(this.services.getNamespaceService());
     }
     
     /**
@@ -346,6 +350,24 @@ public final class TemplateNode implements Serializable
             nodeRef.getStoreRef().getIdentifier(),
             nodeRef.getId(),
             name} );
+    }
+    
+    /**
+     * @return FreeMarker NodeModel for the XML content of this node, or null if no parsable XML found
+     */
+    public NodeModel getXmlNodeModel()
+    {
+       try
+       {
+          return NodeModel.parse(new InputSource(new StringReader(getContent())));
+       }
+       catch (Throwable err)
+       {
+          if (logger.isDebugEnabled())
+             logger.debug(err.getMessage(), err);
+          
+          return null;
+       }
     }
     
     /**

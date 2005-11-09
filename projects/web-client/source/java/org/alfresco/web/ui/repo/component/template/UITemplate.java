@@ -134,7 +134,7 @@ public class UITemplate extends SelfRenderingComponent
             TemplateService templateService = Repository.getServiceRegistry(context).getTemplateService();
             templateService.processTemplate(engine, getTemplate(), model, context.getResponseWriter());
          }
-         catch (Throwable err)
+         catch (TemplateException err)
          {
             Utils.addErrorMessage(err.getMessage(), err);
          }

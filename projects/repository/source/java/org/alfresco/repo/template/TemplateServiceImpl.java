@@ -100,25 +100,36 @@ public class TemplateServiceImpl implements TemplateService, ApplicationContextA
     public void processTemplate(String engine, String template, Object model, Writer out)
         throws TemplateException
     {
-        if (model instanceof Map)
+        try
         {
-            // create default model and merge with supplied model
-            Map root = new HashMap(7, 1.0f);
-            
-            // TODO: should we be doing this here? e.g. this is FreeMarker specific...
-            // add custom method objects
-            root.put("hasAspect", new HasAspectMethod());
-            root.put("message", new I18NMessageMethod());
-            
-            // merge models
-            root.putAll((Map)model);
-            
-            model = root;
+           if (model instanceof Map)
+           {
+               // create default model and merge with supplied model
+               Map root = new HashMap(7, 1.0f);
+               
+               // TODO: should we be doing this here? e.g. this is FreeMarker specific...
+               // add custom method objects
+               root.put("hasAspect", new HasAspectMethod());
+               root.put("message", new I18NMessageMethod());
+               
+               // merge models
+               root.putAll((Map)model);
+               
+               model = root;
+           }
+           
+           // execute template processor
+           TemplateProcessor processor = getTemplateProcessorImpl(engine);
+           processor.process(template, model, out);
         }
-        
-        // execute template processor
-        TemplateProcessor processor = getTemplateProcessorImpl(engine);
-        processor.process(template, model, out);
+        catch (TemplateException terr)
+        {
+           throw terr;
+        }
+        catch (Throwable err)
+        {
+           throw new TemplateException(err.getMessage(), err);
+        }
     }
 
     /**
