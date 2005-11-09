@@ -32,7 +32,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -57,8 +56,6 @@ public class LockOwnerDynamicAuthorityTest extends TestCase
 
     private LockOwnerDynamicAuthority dynamicAuthority;
 
-    private NamespacePrefixResolver namespacePrefixResolver;
-
     public LockOwnerDynamicAuthorityTest()
     {
         super();
@@ -76,9 +73,6 @@ public class LockOwnerDynamicAuthorityTest extends TestCase
         authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
         lockService = (LockService) ctx.getBean("lockService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
-
-        namespacePrefixResolver = (NamespacePrefixResolver) ctx.getBean(ServiceRegistry.NAMESPACE_SERVICE
-                .getLocalName());
 
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
 
@@ -142,6 +136,7 @@ public class LockOwnerDynamicAuthorityTest extends TestCase
         authenticationService.authenticate("andy", "andy".toCharArray());
         NodeRef testNode = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_PERSON,
                 ContentModel.TYPE_CMOBJECT, null).getChildRef();
+        assertNotNull(testNode);
         permissionService.setPermission(rootNodeRef, "andy", PermissionService.ALL_PERMISSIONS, true);
      
         assertEquals(AccessStatus.ALLOWED, permissionService.hasPermission(rootNodeRef,

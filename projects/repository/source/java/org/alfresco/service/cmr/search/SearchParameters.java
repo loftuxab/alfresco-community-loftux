@@ -22,13 +22,17 @@ import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 
 /**
- * This class provides parameters to define a lucene search
- * 
+ * This class provides parameters to define a search.
  * 
  * @author Andy Hind
  */
 public class SearchParameters extends SearchStatement
 {
+    public static final SortDefinition SORT_IN_DOCUMENT_ORDER_ASCENDING = new SortDefinition(SortDefinition.SortType.DOCUMENT, null, true);
+    public static final SortDefinition SORT_IN_DOCUMENT_ORDER_DESCENDING = new SortDefinition(SortDefinition.SortType.DOCUMENT, null, false);
+    public static final SortDefinition SORT_IN_SCORE_ORDER_ASCENDING = new SortDefinition(SortDefinition.SortType.SCORE, null, false);
+    public static final SortDefinition SORT_IN_SCORE_ORDER_DESCENDING = new SortDefinition(SortDefinition.SortType.SCORE, null, true);
+    
     public enum Operator
     {
         OR, AND
@@ -74,7 +78,7 @@ public class SearchParameters extends SearchStatement
     }
     
     /**
-     * Add parameter defintions for te query - used to parameteris the query string
+     * Add parameter definitions for the query - used to parameterise the query string
      * 
      * @param queryParameterDefinition
      */
@@ -105,10 +109,13 @@ public class SearchParameters extends SearchStatement
      */
     public void addSort(String field, boolean ascending)
     {
-        sortDefinitions.add(new SortDefinition(field, ascending));
+        addSort(new SortDefinition(SortDefinition.SortType.FIELD,  field, ascending));
     }
     
-    
+    public void addSort(SortDefinition sortDefinition)
+    {
+        sortDefinitions.add(sortDefinition);
+    }
     
     /**
      * A helper class for sort definition
@@ -119,11 +126,16 @@ public class SearchParameters extends SearchStatement
      */
     public static class SortDefinition
     {
+        
+        public enum SortType {FIELD, DOCUMENT, SCORE};
+        
+        SortType sortType;
         String field;
         boolean ascending;
-        
-        SortDefinition(String field, boolean ascending)
+                
+        SortDefinition(SortType sortType, String field, boolean ascending)
         {
+            this.sortType = sortType;
             this.field = field;
             this.ascending = ascending;
         }
@@ -138,6 +150,10 @@ public class SearchParameters extends SearchStatement
             return field;
         }
         
+        public SortType getSortType()
+        {
+            return sortType;
+        }
         
     }
 

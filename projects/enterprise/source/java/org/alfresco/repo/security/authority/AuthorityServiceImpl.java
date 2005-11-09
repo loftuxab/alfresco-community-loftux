@@ -21,8 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.cache.SimpleCache;
-import org.alfresco.repo.security.permissions.impl.SimpleNodePermissionEntry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
@@ -44,8 +42,6 @@ public class AuthorityServiceImpl implements AuthorityService
     private NodeService nodeService;
 
     private AuthorityDAO authorityDAO;
-
-    private Set<String> emptySet = Collections.<String> emptySet();
 
     private Set<String> adminSet = Collections.singleton(PermissionService.ADMINISTRATOR_AUTHORITY);
 

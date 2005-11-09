@@ -29,9 +29,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.impl.lucene.QueryParser;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
-import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
-import org.alfresco.repo.security.permissions.impl.SimpleNodePermissionEntry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -59,8 +56,6 @@ public class AuthorityDAOImpl implements AuthorityDAO
 
     private DictionaryService dictionaryService;
 
-    private MutableAuthenticationDao authenticationDao;
-
     private SimpleCache<String, ArrayList<NodeRef>> userToAuthorityCache;
 
     public AuthorityDAOImpl()
@@ -86,11 +81,6 @@ public class AuthorityDAOImpl implements AuthorityDAO
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
-    }
-
-    public void setAuthenticationDao(MutableAuthenticationDao authenticationDao)
-    {
-        this.authenticationDao = authenticationDao;
     }
 
     public void setUserToAuthorityCache(SimpleCache<String, ArrayList<NodeRef>> userToAuthorityCache)

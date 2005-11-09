@@ -86,8 +86,6 @@ public class NodeServiceXPath extends BaseXPath
 
     private static final long serialVersionUID = 3834032441789592882L;
 
-    private boolean followAllParentLinks;
-
     /**
      * Jaxen has some magic with its IdentitySet, which means that we can get different results
      * depending on whether we cache {@link ChildAssociationRef } instances or not.

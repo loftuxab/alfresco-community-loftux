@@ -39,9 +39,6 @@
         <property name="dictionaryService">
             <ref bean="dictionaryService" />
         </property>
-        <property name="authenticationDao">
-            <ref bean="alfDaoImpl" />
-        </property>
         <property name="userToAuthorityCache">
             <ref bean="userToAuthorityCache" />
         </property>

@@ -26,8 +26,6 @@ package org.alfresco.repo.security.permissions.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.transaction.UserTransaction;
-
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.GrantedAuthority;
 
@@ -39,7 +37,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.service.transaction.TransactionService;
 
 public class PermissionServiceTest extends AbstractPermissionTest
 {

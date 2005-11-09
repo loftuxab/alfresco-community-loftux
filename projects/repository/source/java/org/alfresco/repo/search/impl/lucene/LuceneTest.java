@@ -150,6 +150,8 @@ public class LuceneTest extends TestCase
     private ServiceRegistry serviceRegistry;
 
     private UserTransaction testTX;
+    
+    private NodeRef[] documentOrder;
 
     public LuceneTest()
     {
@@ -187,14 +189,17 @@ public class LuceneTest extends TestCase
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
+      
 
         n1 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}one"),
                 testSuperType).getChildRef();
         nodeService.setProperty(n1, QName.createQName("{namespace}property-1"), "ValueOne");
+        
         n2 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}two"),
                 testSuperType).getChildRef();
         nodeService.setProperty(n2, QName.createQName("{namespace}property-1"), "valueone");
         nodeService.setProperty(n2, QName.createQName("{namespace}property-2"), "valuetwo");
+       
 
         n3 = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{namespace}three"),
                 testSuperType).getChildRef();
@@ -297,6 +302,8 @@ public class LuceneTest extends TestCase
         nodeService.addChild(n6, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n12, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
         nodeService.addChild(n13, n14, ASSOC_TYPE_QNAME, QName.createQName("{namespace}common"));
+        
+        documentOrder= new NodeRef[]{rootNodeRef, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, n14};
 
     }
 
@@ -710,6 +717,68 @@ public class LuceneTest extends TestCase
         }
         results.close();
 
+        luceneFTS.resume();
+        
+        
+        
+        SearchParameters sp3 = new SearchParameters();
+        sp3.addStore(rootNodeRef.getStoreRef());
+        sp3.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp3.setQuery("PATH:\"//.\"");
+        sp3.addSort(SearchParameters.SORT_IN_DOCUMENT_ORDER_ASCENDING);
+        results = searcher.query(sp3);
+
+        int count = 0;
+        for (ResultSetRow row : results)
+        {
+            assertEquals(documentOrder[count++], row.getNodeRef());
+        }
+        results.close();
+        
+        SearchParameters sp4 = new SearchParameters();
+        sp4.addStore(rootNodeRef.getStoreRef());
+        sp4.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp4.setQuery("PATH:\"//.\"");
+        sp4.addSort(SearchParameters.SORT_IN_DOCUMENT_ORDER_DESCENDING);
+        results = searcher.query(sp4);
+
+        count = 1;
+        for (ResultSetRow row : results)
+        {
+            assertEquals(documentOrder[documentOrder.length - (count++)], row.getNodeRef());
+        }
+        results.close();
+
+        SearchParameters sp5 = new SearchParameters();
+        sp5.addStore(rootNodeRef.getStoreRef());
+        sp5.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp5.setQuery("PATH:\"//.\"");
+        sp5.addSort(SearchParameters.SORT_IN_SCORE_ORDER_ASCENDING);
+        results = searcher.query(sp5);
+
+        float score = 0;
+        for (ResultSetRow row : results)
+        {
+            assertTrue(score <= row.getScore());
+            score = row.getScore();
+        }
+        results.close();
+        
+        SearchParameters sp6 = new SearchParameters();
+        sp6.addStore(rootNodeRef.getStoreRef());
+        sp6.setLanguage(SearchService.LANGUAGE_LUCENE);
+        sp6.setQuery("PATH:\"//.\"");
+        sp6.addSort(SearchParameters.SORT_IN_SCORE_ORDER_DESCENDING);
+        results = searcher.query(sp6);
+
+        score = 1.0f;
+        for (ResultSetRow row : results)
+        {
+            assertTrue(score >= row.getScore());
+            score = row.getScore();
+        }
+        results.close();
+        
         luceneFTS.resume();
     }
 

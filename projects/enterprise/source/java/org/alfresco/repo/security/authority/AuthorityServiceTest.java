@@ -136,7 +136,7 @@ public class AuthorityServiceTest extends TestCase
         try
         {
             pubAuthorityService.createAuthority(AuthorityType.ADMIN, null, "woof");
-            fail("Should not be able to create an adnin authority");
+            fail("Should not be able to create an admin authority");
         }
         catch (AuthorityException ae)
         {
@@ -307,18 +307,23 @@ public class AuthorityServiceTest extends TestCase
         assertEquals(1, pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).size());
         assertEquals(0, pubAuthorityService.getAllRootAuthorities(AuthorityType.GROUP).size());
         auth1 = pubAuthorityService.createAuthority(AuthorityType.GROUP, null, "one");
+        assertEquals("GROUP_one", auth1);
         assertEquals(2, pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).size());
         assertEquals(1, pubAuthorityService.getAllRootAuthorities(AuthorityType.GROUP).size());
         auth2 = pubAuthorityService.createAuthority(AuthorityType.GROUP, null, "two");
+        assertEquals("GROUP_two", auth2);
         assertEquals(3, pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).size());
         assertEquals(2, pubAuthorityService.getAllRootAuthorities(AuthorityType.GROUP).size());
         auth3 = pubAuthorityService.createAuthority(AuthorityType.GROUP, auth1, "three");
+        assertEquals("GROUP_three", auth3);
         assertEquals(4, pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).size());
         assertEquals(2, pubAuthorityService.getAllRootAuthorities(AuthorityType.GROUP).size());
         auth4 = pubAuthorityService.createAuthority(AuthorityType.GROUP, auth1, "four");
+        assertEquals("GROUP_four", auth4);
         assertEquals(5, pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).size());
         assertEquals(2, pubAuthorityService.getAllRootAuthorities(AuthorityType.GROUP).size());
         auth5 = pubAuthorityService.createAuthority(AuthorityType.GROUP, auth2, "five");
+        assertEquals("GROUP_five", auth5);
         assertEquals(6, pubAuthorityService.getAllAuthorities(AuthorityType.GROUP).size());
         assertEquals(2, pubAuthorityService.getAllRootAuthorities(AuthorityType.GROUP).size());
 

@@ -37,7 +37,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -61,9 +60,6 @@ public class OwnableServiceTest extends TestCase
     private PermissionService permissionService;
     
     private OwnerDynamicAuthority dynamicAuthority;
-
-    private NamespacePrefixResolver namespacePrefixResolver;
-
     
     public OwnableServiceTest()
     {
@@ -82,9 +78,6 @@ public class OwnableServiceTest extends TestCase
         authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
         ownableService = (OwnableService) ctx.getBean("ownableService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
-        
-        namespacePrefixResolver = (NamespacePrefixResolver) ctx
-        .getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName());
     
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
         

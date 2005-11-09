@@ -233,7 +233,19 @@ public class LuceneSearcherImpl extends LuceneBase implements LuceneSearcher
                     SortField[] fields = new SortField[searchParameters.getSortDefinitions().size()];
                     for (SearchParameters.SortDefinition sd : searchParameters.getSortDefinitions())
                     {
-                        fields[index++] = new SortField(sd.getField(), !sd.isAscending());
+                        switch (sd.getSortType())
+                        {
+                        case FIELD:
+                            fields[index++] = new SortField(sd.getField(), !sd.isAscending());
+                            break;
+                        case DOCUMENT:
+                            fields[index++] = new SortField(null, SortField.DOC, !sd.isAscending());
+                            break;
+                        case SCORE:
+                            fields[index++] = new SortField(null, SortField.SCORE, !sd.isAscending());
+                            break;
+                        }
+
                     }
                     hits = searcher.search(query, new Sort(fields));
                 }

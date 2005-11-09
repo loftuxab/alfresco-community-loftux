@@ -29,8 +29,8 @@ import junit.framework.TestCase;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -405,7 +405,7 @@ public class SearcherComponentTest extends TestCase
     public void testJCRRoot() throws Exception
     {
         
-        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
         
@@ -440,7 +440,7 @@ public class SearcherComponentTest extends TestCase
     
     public void testBooleanFunctions() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
         
@@ -479,7 +479,7 @@ public class SearcherComponentTest extends TestCase
     
     public void testMutiValueProperties() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
         
@@ -559,7 +559,7 @@ public class SearcherComponentTest extends TestCase
     
     public void testElementNodeTest() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
         
@@ -612,26 +612,23 @@ public class SearcherComponentTest extends TestCase
     
     public void testJCRLike() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
         
         txn = transactionService.getUserTransaction();
         txn.begin();
         
-        NodeServiceXPath xpath;
-        List list;
-        
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
         namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         // create the document navigator
-        DocumentNavigator documentNavigator = new DocumentNavigator(
-                dictionaryService,
-                nodeService,
-                searcher,
-                namespacePrefixResolver,
-                false, true);
+//        DocumentNavigator documentNavigator = new DocumentNavigator(
+//                dictionaryService,
+//                nodeService,
+//                searcher,
+//                namespacePrefixResolver,
+//                false, true);
         
         
         List<NodeRef> answer =  searcher.selectNodes(
@@ -644,26 +641,23 @@ public class SearcherComponentTest extends TestCase
     
     public void testJCRScore() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
         
         txn = transactionService.getUserTransaction();
         txn.begin();
         
-        NodeServiceXPath xpath;
-        List list;
-        
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
         namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         // create the document navigator
-        DocumentNavigator documentNavigator = new DocumentNavigator(
-                dictionaryService,
-                nodeService,
-                searcher,
-                namespacePrefixResolver,
-                false, true);
+//        DocumentNavigator documentNavigator = new DocumentNavigator(
+//                dictionaryService,
+//                nodeService,
+//                searcher,
+//                namespacePrefixResolver,
+//                false, true);
         
         List<NodeRef> answer;
         
@@ -684,26 +678,24 @@ public class SearcherComponentTest extends TestCase
     
     public void testJCRContains() throws Exception
     {
-        Map<QName, ChildAssociationRef> assocRefs = BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
+        BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);
         // commit the node graph
         txn.commit();
         
         txn = transactionService.getUserTransaction();
         txn.begin();
         
-        NodeServiceXPath xpath;
-        List list;
         
         DynamicNamespacePrefixResolver namespacePrefixResolver = new DynamicNamespacePrefixResolver(null);
         namespacePrefixResolver.registerNamespace("jcr", "http://www.jcp.org/jcr/1.0");
         namespacePrefixResolver.registerNamespace(BaseNodeServiceTest.TEST_PREFIX, BaseNodeServiceTest.NAMESPACE);
         // create the document navigator
-        DocumentNavigator documentNavigator = new DocumentNavigator(
-                dictionaryService,
-                nodeService,
-                searcher,
-                namespacePrefixResolver,
-                false, true);
+//        DocumentNavigator documentNavigator = new DocumentNavigator(
+//                dictionaryService,
+//                nodeService,
+//                searcher,
+//                namespacePrefixResolver,
+//                false, true);
         
         List<NodeRef> answer;
         
