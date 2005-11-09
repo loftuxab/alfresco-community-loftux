@@ -163,15 +163,22 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
                 false);
 		
         
-        // Get the content reader and writer
+        // Get the content reader
         ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef, ContentModel.PROP_CONTENT);
+        if (contentReader == null)
+        {
+            // for some reason, this action is premature
+            throw new AlfrescoRuntimeException(
+                    "Attempting to execute content transformation rule " +
+                    "but content has not finished writing, i.e. no URL is available.");
+        }
+        String originalMimetype = contentReader.getMimetype();
+
+        // get the writer and set it up
         ContentWriter contentWriter = this.contentService.getWriter(copyNodeRef, ContentModel.PROP_CONTENT, true);
-        // set up the writer
         contentWriter.setMimetype(mimeType);                        // new mimetype
         contentWriter.setEncoding(contentReader.getEncoding());     // original encoding
 
-        String originalMimetype = contentReader.getMimetype();
-        
         // Adjust the name of the copy
         String originalName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
         String newName = transformName(originalName, originalMimetype, mimeType);
@@ -183,13 +190,6 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
             nodeService.setProperty(copyNodeRef, ContentModel.PROP_TITLE, newTitle);
         }
 		
-        if (contentReader == null)
-        {
-            throw new AlfrescoRuntimeException(
-                    "Attempting to execute content transformation rule " +
-                    "but content has not finished writing, i.e. no URL is available.");
-        }
-        
 		// Try and transform the content
         try
         {
