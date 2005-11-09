@@ -31,6 +31,8 @@ import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jaxen.BaseXPath;
 import org.jaxen.Context;
 import org.jaxen.Function;
@@ -82,32 +84,11 @@ import org.jaxen.function.xslt.DocumentFunction;
  */
 public class NodeServiceXPath extends BaseXPath
 {
-    private static String JCR_URI = "http://www.jcp.org/jcr/1.0";
-
     private static final long serialVersionUID = 3834032441789592882L;
 
-    /**
-     * Jaxen has some magic with its IdentitySet, which means that we can get different results
-     * depending on whether we cache {@link ChildAssociationRef } instances or not.
-     * <p>
-     * So, duplicates are eliminated here before the results are returned.
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public List selectNodes(Object arg0) throws JaxenException
-    {
-        List<Object> resultsWithDuplicates = super.selectNodes(arg0);
-        
-        Set<Object> set = new HashSet<Object>(resultsWithDuplicates);
-        
-        // now return as a list again
-        List<Object> results = resultsWithDuplicates;
-        results.clear();
-        results.addAll(set);
-        
-        // done
-        return results;
-    }
+    private static String JCR_URI = "http://www.jcp.org/jcr/1.0";
+    
+    private static Log logger = LogFactory.getLog(NodeServiceXPath.class);
 
     /**
      * 
@@ -124,6 +105,21 @@ public class NodeServiceXPath extends BaseXPath
     {
         super(xpath, documentNavigator);
 
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Created XPath: \n")
+              .append("   XPath: ").append(xpath).append("\n")
+              .append("   Parameters: \n");
+            for (int i = 0; paramDefs != null && i < paramDefs.length; i++)
+            {
+                sb.append("      Parameter: \n")
+                  .append("         name: ").append(paramDefs[i].getQName()).append("\n")
+                  .append("         value: ").append(paramDefs[i].getDefault()).append("\n");
+            }
+            logger.debug(sb.toString());
+        }
+        
         // Add support for parameters
         if (paramDefs != null)
         {
@@ -168,6 +164,36 @@ public class NodeServiceXPath extends BaseXPath
         {
             addNamespace(prefix, documentNavigator.getNamespacePrefixResolver().getNamespaceURI(prefix));
         }
+    }
+    
+    /**
+     * Jaxen has some magic with its IdentitySet, which means that we can get different results
+     * depending on whether we cache {@link ChildAssociationRef } instances or not.
+     * <p>
+     * So, duplicates are eliminated here before the results are returned.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List selectNodes(Object arg0) throws JaxenException
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Selecting using XPath: \n" +
+                    "   XPath: " + this + "\n" +
+                    "   starting at: " + arg0);
+        }
+        
+        List<Object> resultsWithDuplicates = super.selectNodes(arg0);
+        
+        Set<Object> set = new HashSet<Object>(resultsWithDuplicates);
+        
+        // now return as a list again
+        List<Object> results = resultsWithDuplicates;
+        results.clear();
+        results.addAll(set);
+        
+        // done
+        return results;
     }
 
     public static class FirstFunction implements Function

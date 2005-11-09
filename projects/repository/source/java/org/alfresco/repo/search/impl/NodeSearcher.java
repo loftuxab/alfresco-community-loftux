@@ -185,6 +185,7 @@ public class NodeSearcher
             this.order = order;
         }
         
+        @SuppressWarnings("unchecked")
         public int compare(NodeRef n1, NodeRef n2)
         {
             for (AttributeOrder attributeOrder : order)
