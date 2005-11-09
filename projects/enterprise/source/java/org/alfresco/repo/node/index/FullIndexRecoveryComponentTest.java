@@ -23,6 +23,7 @@
  */
 package org.alfresco.repo.node.index;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -52,28 +53,45 @@ public class FullIndexRecoveryComponentTest extends TestCase
 {
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     
+    private TransactionService transactionService;
     private FullIndexRecoveryComponent indexRecoverer;
     private NodeService nodeService;
     private TransactionService txnService;
     private Indexer indexer;
     
+    private List<StoreRef> storeRefs;
+    
     public void setUp() throws Exception
     {
+        transactionService = (TransactionService) ctx.getBean("transactionComponent");
         indexRecoverer = (FullIndexRecoveryComponent) ctx.getBean("indexRecoveryComponent");
         txnService = (TransactionService) ctx.getBean("transactionComponent");
         nodeService = (NodeService) ctx.getBean("nodeService");
         indexer = (Indexer) ctx.getBean("indexerComponent");
+        
+        // create 2 stores
+        TransactionWork<List<StoreRef>> createStoresWork = new TransactionWork<List<StoreRef>>()
+        {
+            public List<StoreRef> doWork() throws Exception
+            {
+                List<StoreRef> storeRefs = new ArrayList<StoreRef>(2);
+                storeRefs.add(nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, getName() + System.nanoTime()));
+                storeRefs.add(nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, getName() + System.nanoTime()));
+                return storeRefs;
+            }
+        };
+        storeRefs = TransactionUtil.executeInUserTransaction(transactionService, createStoresWork);
     }
     
     public void testReindexing() throws Exception
     {
         // deletes a content node from the index
+        final List<String> storeRefStrings = new ArrayList<String>(2);
         TransactionWork<String> dropNodeIndexWork = new TransactionWork<String>()
         {
             public String doWork()
             {
                 // create a node in each store and drop it from the index
-                List<StoreRef> storeRefs = nodeService.getStores();
                 for (StoreRef storeRef : storeRefs)
                 {
                     try
@@ -86,6 +104,8 @@ public class FullIndexRecoveryComponentTest extends TestCase
                                 ContentModel.TYPE_BASE);
                         // this will have indexed it, so remove it from the index
                         indexer.deleteNode(assocRef);
+                        // make the string version of the storeRef
+                        storeRefStrings.add(storeRef.toString());
                     }
                     catch (InvalidStoreRefException e)
                     {
@@ -100,6 +120,7 @@ public class FullIndexRecoveryComponentTest extends TestCase
         String txnId = TransactionUtil.executeInNonPropagatingUserTransaction(txnService, dropNodeIndexWork);
         
         indexRecoverer.setExecuteFullRecovery(true);
+        indexRecoverer.setStores(storeRefStrings);
         // reindex
         indexRecoverer.reindex();
 
@@ -116,7 +137,7 @@ public class FullIndexRecoveryComponentTest extends TestCase
         
         // loop for some time, giving it a chance to do its thing
         String lastProcessedTxnId = null;
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 60; i++)
         {
             lastProcessedTxnId = FullIndexRecoveryComponent.getCurrentTransactionId();
             if (lastProcessedTxnId.equals(txnId))
