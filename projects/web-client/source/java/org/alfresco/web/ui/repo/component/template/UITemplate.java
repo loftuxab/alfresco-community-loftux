@@ -26,6 +26,7 @@ import javax.faces.el.ValueBinding;
 import org.alfresco.config.ConfigService;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.TemplateException;
 import org.alfresco.service.cmr.repository.TemplateImageResolver;
 import org.alfresco.service.cmr.repository.TemplateNode;
 import org.alfresco.service.cmr.repository.TemplateService;
@@ -128,8 +129,15 @@ public class UITemplate extends SelfRenderingComponent
          }
          
          // process the template against the model
-         TemplateService templateService = Repository.getServiceRegistry(context).getTemplateService();
-         templateService.processTemplate(engine, getTemplate(), model, context.getResponseWriter());
+         try
+         {
+            TemplateService templateService = Repository.getServiceRegistry(context).getTemplateService();
+            templateService.processTemplate(engine, getTemplate(), model, context.getResponseWriter());
+         }
+         catch (Throwable err)
+         {
+            Utils.addErrorMessage(err.getMessage(), err);
+         }
          
          if (logger.isDebugEnabled())
          {
