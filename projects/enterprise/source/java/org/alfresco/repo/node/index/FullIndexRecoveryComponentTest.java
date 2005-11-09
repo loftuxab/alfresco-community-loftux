@@ -85,6 +85,11 @@ public class FullIndexRecoveryComponentTest extends TestCase
     
     public void testReindexing() throws Exception
     {
+        // don't do anything if the component has already started
+        if (FullIndexRecoveryComponent.isStarted())
+        {
+            return;
+        }
         // deletes a content node from the index
         final List<String> storeRefStrings = new ArrayList<String>(2);
         TransactionWork<String> dropNodeIndexWork = new TransactionWork<String>()

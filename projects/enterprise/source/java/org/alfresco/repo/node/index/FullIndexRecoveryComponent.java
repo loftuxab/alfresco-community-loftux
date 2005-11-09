@@ -153,7 +153,15 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         Thread shutdownThread = new Thread(shutdownRunnable);
         Runtime.getRuntime().addShutdownHook(shutdownThread);
     }
-    
+
+    /**
+     * @return Returns true if the component has already been started
+     */
+    public static boolean isStarted()
+    {
+        return started;
+    }
+
     /**
      * @param transactionService provide transactions to index each missed transaction
      */
