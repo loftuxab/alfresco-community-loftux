@@ -450,8 +450,14 @@ public class CifsHelper
      */
     private List<NodeRef> getDirectDescendents(NodeRef pathRootNodeRef, String pathElement)
     {
-        // First check the cache to see if there are any results for this path query
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Getting direct descendents: \n" +
+                    "   Path Root: " + pathRootNodeRef + "\n" +
+                    "   Path Element: " + pathElement);
+        }
         
+        // First check the cache to see if there are any results for this path query
         List<NodeRef> cachedResults = (filePathCache == null) ? null : filePathCache.getPathResults(pathRootNodeRef, pathElement);
         if (cachedResults != null)
         {
