@@ -84,7 +84,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 {
     public static final String NOT_INDEXED_NO_TRANSFORMATION = "nint";
 
-    public static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nift";
+    public static final String NOT_INDEXED_TRANSFORMATION_FAILED = "nitf";
 
     public static final String NOT_INDEXED_CONTENT_MISSING = "nicm";
 
