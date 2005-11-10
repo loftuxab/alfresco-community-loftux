@@ -102,9 +102,6 @@
                                        <td><a:actionLink value="#{msg.manage_users}" image="/images/icons/people.gif" action="manageUsers" styleClass="title" actionListener="#{NewUserWizard.setupUsers}" /></td>
                                     </tr>
                                     <tr>
-                                       <td><a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" styleClass="title" /></td>
-                                    </tr>
-                                    <tr>
                                        <td><a:actionLink value="#{msg.category_management}" image="/images/icons/categories.gif" action="manageCategories" styleClass="title" /></td>
                                     </tr>
                                     <tr>
@@ -120,6 +117,12 @@
                                              <f:param name="id" value="#{NavigationBean.currentNodeId}" />
                                           </a:actionLink>
                                        </td>
+                                    </tr>
+                                    <tr>
+                                       <td><a:actionLink value="#{msg.system_info}" image="/images/icons/info_icon.gif" action="showSystemInfo" styleClass="title" /></td>
+                                    </tr>
+                                    <tr>
+                                       <td><a:actionLink value="#{msg.node_browser}" image="/images/icons/node_browser.gif" action="showNodeBrowser" styleClass="title" /></td>
                                     </tr>
                                  </table>
                                  <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "ballongrey"); %>

@@ -944,6 +944,10 @@ public class NewRuleWizard extends BaseActionWizard
                      {
                         label = typeDef.getTitle();
                      }
+                     else
+                     {
+                        label = idQName.getLocalName();
+                     }
                   }
                   
                   this.modelTypes.add(new SelectItem(idQName.toString(), label));

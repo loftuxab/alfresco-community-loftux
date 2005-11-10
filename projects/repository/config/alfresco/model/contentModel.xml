@@ -559,6 +559,23 @@
          </properties>
       </aspect>
       
+      <aspect name="cm:attachable">
+         <title>Attachable</title>
+         <associations>
+            <association name="cm:attachments">
+               <source>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </source>
+               <target>
+                  <class>cm:cmobject</class>
+                  <mandatory>false</mandatory>
+                  <many>true</many>
+               </target>
+            </association>
+         </associations>
+      </aspect>
+      
    </aspects>
 
 </model>

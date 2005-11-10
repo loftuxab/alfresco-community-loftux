@@ -131,14 +131,7 @@
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                                        <a:imagePickerRadio columns="4" spacing="4" value="#{NewSpaceWizard.spaceType}"
                                                              onclick="javascript:itemSelected(this);">
-                                          <a:listItem value="container" label="#{msg.container}" tooltip="#{msg.container}"
-                                                            image="/images/icons/space.gif" />
-                                          <%-- TBD
-                                          <a:listItem value="wiki" label="Wiki" tooltip="Wiki"
-                                                            image="/images/icons/wiki.gif" />
-                                          <a:listItem value="discussion" label="Discussion" tooltip="Discussion"
-                                                            image="/images/icons/discussion.gif" />
-                                          --%>
+                                          <a:listItems value="#{NewSpaceWizard.folderTypes}" />
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>
@@ -153,14 +146,7 @@
                                              </td>
                                              <td valign='top' align='left'>
                                                 <a:dynamicDescription selected="#{NewSpaceWizard.spaceType}">
-                                                   <a:description controlValue="container" 
-                                                      text="#{msg.container_desc}" />
-                                                   <%-- TBD
-                                                   <a:description controlValue="discussion" 
-                                                      text="A place for discussing the subject of this space." />
-                                                   <a:description controlValue="wiki" 
-                                                      text="A place to store wiki pages." />
-                                                   --%>
+                                                   <a:descriptions value="#{NewSpaceWizard.folderTypeDescriptions}" />
                                                 </a:dynamicDescription>
                                              </td>
                                           </tr>

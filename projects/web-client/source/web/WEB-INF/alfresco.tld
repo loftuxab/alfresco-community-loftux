@@ -1067,6 +1067,32 @@
          <rtexprvalue>true</rtexprvalue>
       </attribute>
    </tag>
+   
+   <tag>
+      <name>listItems</name>
+      <tag-class>org.alfresco.web.ui.common.tag.ListItemsTag</tag-class>
+      <body-content>JSP</body-content>
+      
+      <description>Represents listItem components held in a Map or List object</description>
+      
+      <attribute>
+         <name>id</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>rendered</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>value</name>
+         <required>true</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+   </tag>
 
    <tag>
       <name>imagePickerRadio</name>

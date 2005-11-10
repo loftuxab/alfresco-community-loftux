@@ -39,6 +39,7 @@
 	        <h:outputText value="Stores"/>
 	     </h:commandLink>
 	  </td>
+	  <td>&nbsp;|&nbsp;</td>
 	  <td>
          <h:commandLink action="nodeBrowser">
             <h:outputText value="Node Browser"/>

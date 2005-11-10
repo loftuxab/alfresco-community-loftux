@@ -758,6 +758,10 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                      {
                         label = aspectDef.getTitle();
                      }
+                     else
+                     {
+                        label = idQName.getLocalName();
+                     }
                   }
                   
                   this.aspects.add(new SelectItem(idQName.toString(), label));

@@ -79,6 +79,14 @@
          <show-property name="description"/>
       </property-sheet>
    </config>
+   
+   <config evaluator="node-type" condition="fm:forum">
+      <property-sheet>
+         <show-property name="name"/>
+         <show-property name="description"/>
+         <show-property name="fm:status"/>
+      </property-sheet>
+   </config>
 
    <!-- Example client config for type defined in exampleModel.xml -->   
    <config evaluator="node-type" condition="my:sop">
@@ -207,8 +215,14 @@
    
    <config evaluator="string-compare" condition="Custom Content Types">
       <content-types>
-         <!-- <type name="my:sop"/> -->
+         <type name="fm:post" />
       </content-types>
+   </config>
+   
+   <config evaluator="string-compare" condition="Custom Folder Types">
+      <folder-types>
+         <type name="fm:forum" icon="/images/icons/forum_large.gif" descriptionMsgId="forum_desc" />
+      </folder-types>
    </config>
       
 </alfresco-config>

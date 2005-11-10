@@ -26,11 +26,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -44,8 +50,12 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.component.UIListItem;
+import org.alfresco.web.ui.common.component.UIListItems;
+import org.alfresco.web.ui.common.component.description.UIDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Handler class used by the New Space Wizard 
@@ -70,10 +80,13 @@ public class NewSpaceWizard extends AbstractWizardBean
    private static final String FINISH_INSTRUCTION_ID = "new_space_finish_instruction";
    
    private static final String ERROR = "error_space";
+   private static final String DEFAULT_SPACE_TYPE_ICON = "/images/icons/space.gif";
    
    // new space wizard specific properties
    private SearchService searchService;
    private CopyService nodeOperationsService;
+   private DictionaryService dictionaryService;
+   
    private String createFrom;
    private String spaceType;
    private NodeRef existingSpaceId;
@@ -85,6 +98,8 @@ public class NewSpaceWizard extends AbstractWizardBean
    private String templateName;
    private boolean saveAsTemplate;
    private List<SelectItem> templates;
+   private List<UIListItem> folderTypes;
+   private List<UIDescription> folderTypeDescriptions;
    
    /**
     * Deals with the finish button being pressed
@@ -138,7 +153,7 @@ public class NewSpaceWizard extends AbstractWizardBean
                      parentNodeRef,
                      ContentModel.ASSOC_CONTAINS,
                      QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname),
-                     ContentModel.TYPE_FOLDER);
+                     Repository.resolveToQName(this.spaceType));
                
                NodeRef nodeRef = assocRef.getChildRef();
                newSpaceId = nodeRef.getId();
@@ -234,10 +249,22 @@ public class NewSpaceWizard extends AbstractWizardBean
          
          // now we know the new details are in the repository, reset the
          // client side node representation so the new details are retrieved
+         String statusMsg = null;
          if (this.editMode)
          {
             this.browseBean.getActionSpace().reset();
+            statusMsg = MessageFormat.format(Application.getMessage(context, "status_space_updated"), 
+                  new Object[]{this.name});
          }
+         else
+         {
+            // add a message to inform the user that the creation was OK
+            statusMsg = MessageFormat.format(Application.getMessage(context, "status_space_created"), 
+                  new Object[]{this.name});
+         }
+         
+         // add the status message
+         Utils.addStatusMessage(FacesMessage.SEVERITY_INFO, statusMsg);
       }
       catch (Exception e)
       {
@@ -382,7 +409,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       
       // reset all variables
       this.createFrom = "scratch";
-      this.spaceType = "container";
+      this.spaceType = ContentModel.TYPE_FOLDER.toString();
       this.icon = SPACE_ICON_DEFAULT;
       this.copyPolicy = "contents";
       this.existingSpaceId = null;
@@ -475,6 +502,148 @@ public class NewSpaceWizard extends AbstractWizardBean
    }
 
    /**
+    * Returns a list of UIListItem objects representing the folder types 
+    * and also constructs the list of descriptions for each type
+    * 
+    * @return List of UIListItem components
+    */
+   public List getFolderTypes()
+   {
+      if (this.folderTypes == null)
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         this.folderTypes = new ArrayList<UIListItem>(2);
+         this.folderTypeDescriptions = new ArrayList<UIDescription>(2);
+         
+         // add the well known 'container space' type to start with
+         UIListItem defaultItem = new UIListItem();
+         String defaultLabel = Application.getMessage(context, "container");
+         defaultItem.setValue(ContentModel.TYPE_FOLDER.toString());
+         defaultItem.setLabel(defaultLabel);
+         defaultItem.setTooltip(defaultLabel);
+         defaultItem.getAttributes().put("image", DEFAULT_SPACE_TYPE_ICON);
+         this.folderTypes.add(defaultItem);
+         
+         UIDescription defaultDesc = new UIDescription();
+         defaultDesc.setControlValue(ContentModel.TYPE_FOLDER.toString());
+         defaultDesc.setText(Application.getMessage(context, "container_desc"));
+         this.folderTypeDescriptions.add(defaultDesc);
+         
+         // add any configured content sub-types to the list
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("Custom Folder Types");
+         if (wizardCfg != null)
+         {
+            ConfigElement typesCfg = wizardCfg.getConfigElement("folder-types");
+            if (typesCfg != null)
+            {               
+               for (ConfigElement child : typesCfg.getChildren())
+               {
+                  QName idQName = Repository.resolveToQName(child.getAttribute("name"));
+                  TypeDefinition typeDef = this.dictionaryService.getType(idQName);
+                  
+                  if (typeDef != null &&
+                      this.dictionaryService.isSubClass(typeDef.getName(), ContentModel.TYPE_FOLDER))
+                  {
+                     // look for a client localized string
+                     String label = null;
+                     String msgId = child.getAttribute("displayLabelId");
+                     if (msgId != null)
+                     {
+                        label = Application.getMessage(context, msgId);
+                     }
+                     
+                     // if there wasn't an externalized string look for one in the config
+                     if (label == null)
+                     {
+                        label = child.getAttribute("displayLabel");
+                     }
+   
+                     // if there wasn't a client based label try and get it from the dictionary
+                     if (label == null)
+                     {
+                        label = typeDef.getTitle();
+                     }
+                     
+                     // finally use the localname if we still haven't found a label
+                     if (label == null)
+                     {
+                        label = idQName.getLocalName();
+                     }
+                     
+                     // resolve a description string for the type
+                     String description = null;
+                     msgId = child.getAttribute("descriptionMsgId");
+                     if (msgId != null)
+                     {
+                        description = Application.getMessage(context, msgId);
+                     }
+                     
+                     if (description == null)
+                     {
+                        description = child.getAttribute("description");
+                     }
+                     
+                     // if we don't have a local description just use the label
+                     if (description == null)
+                     {
+                        description = label;
+                     }
+                     
+                     // extract the icon to use from the config
+                     String icon = child.getAttribute("icon");
+                     if (icon == null || icon.length() == 0)
+                     {
+                        icon = DEFAULT_SPACE_TYPE_ICON;
+                     }
+                     
+                     UIListItem item = new UIListItem();
+                     item.getAttributes().put("value", idQName.toString());
+                     item.getAttributes().put("label", label);
+                     item.getAttributes().put("tooltip", label);
+                     item.getAttributes().put("image", icon);
+                     this.folderTypes.add(item);
+                     
+                     UIDescription desc = new UIDescription();
+                     desc.setControlValue(idQName.toString());
+                     desc.setText(description);
+                     this.folderTypeDescriptions.add(desc);
+                  }
+               }
+            }
+            else
+            {
+               logger.warn("Could not find 'folder-types' configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find 'Custom Folder Types' configuration section");
+         }
+         
+      }
+      
+      return this.folderTypes;
+   }
+   
+   /**
+    * Returns a list of UIDescription objects for the folder types
+    * 
+    * @return A list of UIDescription objects
+    */
+   public List<UIDescription> getFolderTypeDescriptions()
+   {
+      if (this.folderTypeDescriptions == null)
+      {
+         // call the getFolderType method to construct the list
+         getFolderTypes();
+      }
+      
+      return this.folderTypeDescriptions;
+   }
+   
+   /**
     * @return Returns the searchService.
     */
    public SearchService getSearchService()
@@ -488,6 +657,16 @@ public class NewSpaceWizard extends AbstractWizardBean
    public void setSearchService(SearchService searchService)
    {
       this.searchService = searchService;
+   }
+   
+   /**
+    * Sets the dictionary service
+    * 
+    * @param dictionaryService  the dictionary service
+    */
+   public void setDictionaryService(DictionaryService dictionaryService)
+   {
+      this.dictionaryService = dictionaryService;
    }
    
    /**

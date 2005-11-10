@@ -1104,7 +1104,10 @@ public class BrowseBean implements IContextListener
             }
             
             // add a message to inform the user that the delete was OK 
-            Utils.addStatusMessage(FacesMessage.SEVERITY_INFO, "Successfully deleted space '" + node.getName() + "'");
+            String statusMsg = MessageFormat.format(
+                  Application.getMessage(FacesContext.getCurrentInstance(), "status_space_deleted"), 
+                  new Object[]{node.getName()});
+            Utils.addStatusMessage(FacesMessage.SEVERITY_INFO, statusMsg);
             
             // clear action context
             setActionSpace(null);

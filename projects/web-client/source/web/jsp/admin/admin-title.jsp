@@ -15,10 +15,22 @@
   License.
 --%>
 
-<table>
-   <tr>
-      <td><h:graphicImage value="/images/logo/AlfrescoLogo32.png" alt="Alfresco" /></td>
-      <td><h:outputText styleClass="mainTitle" value="Alfresco Node Browser"/></td>
-   </tr>
-</table>
+<h:form id="node-browser-titlebar">
+
+   <table width="100%">
+      <tr>
+         <td>
+            <h:graphicImage value="/images/logo/AlfrescoLogo32.png" alt="Alfresco" />
+         </td>
+         <td>
+            <nobr><h:outputText styleClass="mainTitle" value="#{msg.title_admin_node_browser}"/></nobr>
+         </td>
+         <td width="100%" align="right">
+            <h:commandButton value="#{msg.close}" action="adminConsole" />
+         </td>
+      </tr>
+   </table>
+
+</h:form>
+
 <br>

@@ -17,6 +17,7 @@
 package org.alfresco.web.ui.common.component.description;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -252,6 +253,15 @@ public class UIDynamicDescription extends SelfRenderingComponent
          for (String id : items.keySet())
          {
             renderDescription(context, id, items.get(id));
+         }
+      }
+      else if (obj instanceof List)
+      {
+         Iterator iter = ((List)obj).iterator();
+         while (iter.hasNext())
+         {
+            UIDescription desc = (UIDescription)iter.next();
+            renderDescription(context, desc.getControlValue(), desc.getText());
          }
       }
    }

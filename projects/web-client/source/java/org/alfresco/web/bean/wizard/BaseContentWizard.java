@@ -501,6 +501,12 @@ public abstract class BaseContentWizard extends AbstractWizardBean
                         label = typeDef.getTitle();
                      }
                      
+                     // finally, just use the localname
+                     if (label == null)
+                     {
+                        label = idQName.getLocalName();
+                     }
+                     
                      this.objectTypes.add(new SelectItem(idQName.toString(), label));
                   }
                }
@@ -511,12 +517,12 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             }
             else
             {
-               logger.warn("Could not find types configuration element");
+               logger.warn("Could not find 'content-types' configuration element");
             }
          }
          else
          {
-            logger.warn("Could not find Action Wizards configuration section");
+            logger.warn("Could not find 'Custom Content Types' configuration section");
          }
          
       }
