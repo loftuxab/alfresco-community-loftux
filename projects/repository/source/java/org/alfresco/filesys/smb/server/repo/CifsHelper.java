@@ -66,26 +66,16 @@ public class CifsHelper
     //
     // XPath query strings for wildcard and specific file/folder searches
     
-    private final String xpathQueryWildcard     = "./*[like(@cm:name, $cm:name, false) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
-    private final String xpathQueryFile         = "./*[lower-case(@cm:name) = lower-case($cm:name) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
-    private final String xpathQueryFilesFolders = "./*[(subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
+    private final String xpathQueryWildcard = "./*[like(@cm:name, $cm:name, false) and not (subtypeOf($cm:systemfoldertype)) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
+    private final String xpathQueryFile = "./*[lower-case(@cm:name) = lower-case($cm:name) and not (subtypeOf($cm:systemfoldertype)) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
         
-    // Query parameter names
-    
-    private final String xpathParamName         = "cm:name";
-    private final String xpathParamFileType     = "cm:filetype";
-    private final String xpathParamFolderType   = "cm:foldertype";
-    
     // Logging
-    
     private static Log logger = LogFactory.getLog(CifsHelper.class);
     
     // File state caching
-    
     private FilePathCache filePathCache;
 
     // Services
-    
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
@@ -94,13 +84,14 @@ public class CifsHelper
     private PermissionService permissionService;
     
     // Query data types and fixed parameter types
-    
     private DataTypeDefinition dataType;
     
     private QName cmName;
+    private QName cmSystemFolderType;
     private QName cmFolderType;
     private QName cmFileType;
     
+    private QueryParameterDefinition systemFolderType;
     private QueryParameterDefinition fileType;
     private QueryParameterDefinition folderType;
     
@@ -116,17 +107,16 @@ public class CifsHelper
         this.namespaceService  = namespaceService;
         
         // Get the text data type
-        
         dataType = dictionaryService.getDataType(DataTypeDefinition.TEXT);
         
         // Generate the parameter names for searches
-        
-        cmName       = QName.createQName("cm:name", namespaceService);
+        cmName = QName.createQName("cm:name", namespaceService);
+        cmSystemFolderType = QName.createQName("cm:systemfoldertype", namespaceService);
+        cmFileType = QName.createQName("cm:filetype", namespaceService);
         cmFolderType = QName.createQName("cm:foldertype", namespaceService);
-        cmFileType   = QName.createQName("cm:filetype", namespaceService);
         
         // Create the fixed search parameter definitions
-        
+        systemFolderType = new QueryParameterDefImpl( cmSystemFolderType, dataType, true, ContentModel.TYPE_SYSTEM_FOLDER.toString());
         fileType   = new QueryParameterDefImpl( cmFileType, dataType, true, ContentModel.TYPE_CONTENT.toString());
         folderType = new QueryParameterDefImpl( cmFolderType, dataType, true, ContentModel.TYPE_FOLDER.toString());
     }
@@ -487,14 +477,15 @@ public class CifsHelper
         }
 
         // create the query parameters
-        QueryParameterDefinition[] params = new QueryParameterDefinition[3];
+        QueryParameterDefinition[] params = new QueryParameterDefinition[4];
         params[0] = new QueryParameterDefImpl(
-                QName.createQName(xpathParamName, namespaceService),
+                cmName,
                 dictionaryService.getDataType(DataTypeDefinition.TEXT),
                 true,
                 pathElement);
-        params[1] = folderType;
-        params[2] = fileType; 
+        params[1] = systemFolderType;
+        params[2] = folderType;
+        params[3] = fileType; 
     
         // execute the query
         List<NodeRef> nodes = searchService.selectNodes(
