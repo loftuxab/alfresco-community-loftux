@@ -24,6 +24,7 @@
             <property name="cm:name">
                <title>Name</title>
                <type>d:text</type>
+               <mandatory>true</mandatory>
             </property>
          </properties>
          <mandatory-aspects>

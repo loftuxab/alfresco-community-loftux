@@ -783,6 +783,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     
     public void testProperties() throws Exception
     {
+        // create a node to play with
+        ChildAssociationRef assocRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("playThing"),
+                ContentModel.TYPE_CONTAINER);
+        NodeRef nodeRef = assocRef.getChildRef();
+
         QName qnameProperty1 = QName.createQName("PROPERTY1");
         String valueProperty1 = "VALUE1";
         QName qnameProperty2 = QName.createQName("PROPERTY2");
@@ -793,13 +801,13 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
         properties.put(qnameProperty1, valueProperty1);
         // add some properties to the root node
-        nodeService.setProperties(rootNodeRef, properties);
+        nodeService.setProperties(nodeRef, properties);
         // set a single property
-        nodeService.setProperty(rootNodeRef, qnameProperty2, valueProperty2);
+        nodeService.setProperty(nodeRef, qnameProperty2, valueProperty2);
         // set a null property
-        nodeService.setProperty(rootNodeRef, qnameProperty3, null);
+        nodeService.setProperty(nodeRef, qnameProperty3, null);
         // set an enum property
-        nodeService.setProperty(rootNodeRef, qnameProperty4, TestEnum.TEST_ONE);
+        nodeService.setProperty(nodeRef, qnameProperty4, TestEnum.TEST_ONE);
         
         // force a flush
         getSession().flush();
@@ -809,8 +817,10 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         AlfrescoTransactionSupport.flush();
         
         // now get them back
-        Map<QName, Serializable> checkMap = nodeService.getProperties(rootNodeRef);
+        Map<QName, Serializable> checkMap = nodeService.getProperties(nodeRef);
         assertNotNull("Properties were not set/retrieved", checkMap);
+        assertNotNull("Name property not set automatically", checkMap.get(ContentModel.PROP_NAME));
+        assertEquals("Name property to set to ID of node", nodeRef.getId(), checkMap.get(ContentModel.PROP_NAME));
         assertEquals("Property value incorrect", valueProperty1, checkMap.get(qnameProperty1));
         assertEquals("Property value incorrect", valueProperty2, checkMap.get(qnameProperty2));
         assertTrue("Null property not persisted", checkMap.containsKey(qnameProperty3));
@@ -818,14 +828,14 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         assertEquals("Enum property not retrieved", TestEnum.TEST_ONE, checkMap.get(qnameProperty4));
         
         // get a single property direct from the node
-        Serializable valueCheck = nodeService.getProperty(rootNodeRef, qnameProperty2);
+        Serializable valueCheck = nodeService.getProperty(nodeRef, qnameProperty2);
         assertNotNull("Property value not set", valueCheck);
         assertEquals("Property value incorrect", "VALUE2", valueCheck);
         
         // set the property value to null
         try
         {
-            nodeService.setProperty(rootNodeRef, qnameProperty2, null);            
+            nodeService.setProperty(nodeRef, qnameProperty2, null);            
         }
         catch (IllegalArgumentException e)
         {
@@ -834,9 +844,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // try setting null value as part of complete set
         try
         {
-            properties = nodeService.getProperties(rootNodeRef);
+            properties = nodeService.getProperties(nodeRef);
             properties.put(qnameProperty1, null);
-            nodeService.setProperties(rootNodeRef, properties);
+            nodeService.setProperties(nodeRef, properties);
         }
         catch (IllegalArgumentException e)
         {

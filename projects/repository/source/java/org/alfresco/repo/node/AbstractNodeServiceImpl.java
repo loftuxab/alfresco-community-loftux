@@ -479,6 +479,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
      * <p>
      * This method can be used to ensure that the values used by the aspect
      * are present as node properties.
+     * <p>
+     * This method also ensures that the {@link ContentModel#PROP_NAME name property}
+     * is always present as a property on a node.
      * 
      * @param nodeRef the node reference containing the values required
      * @param properties the node properties
@@ -488,6 +491,11 @@ public abstract class AbstractNodeServiceImpl implements NodeService
         properties.put(ContentModel.PROP_STORE_PROTOCOL, nodeRef.getStoreRef().getProtocol());
         properties.put(ContentModel.PROP_STORE_IDENTIFIER, nodeRef.getStoreRef().getIdentifier());
         properties.put(ContentModel.PROP_NODE_UUID, nodeRef.getId());
+        // add the ID as the name, if required
+        if (properties.get(ContentModel.PROP_NAME) == null)
+        {
+            properties.put(ContentModel.PROP_NAME, nodeRef.getId());
+        }
     }
     
     /**
