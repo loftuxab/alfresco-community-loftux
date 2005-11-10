@@ -67,7 +67,7 @@ public class CifsHelper
     // XPath query strings for wildcard and specific file/folder searches
     
     private final String xpathQueryWildcard     = "./*[like(@cm:name, $cm:name, false) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
-    private final String xpathQueryFile         = "./*[@cm:name = $cm:name and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
+    private final String xpathQueryFile         = "./*[lower-case(@cm:name) = lower-case($cm:name) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
     private final String xpathQueryFilesFolders = "./*[(subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
         
     // Query parameter names
@@ -523,8 +523,6 @@ public class CifsHelper
             // the cache had results for good or bad
             return cachedResults;
         }
-        
-        
         
         // tokenize the path and push into a stack in reverse order so that
         // the root directory gets popped first

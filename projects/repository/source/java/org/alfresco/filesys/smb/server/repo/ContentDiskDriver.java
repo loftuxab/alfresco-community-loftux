@@ -30,6 +30,7 @@ import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.filesys.AccessDeniedException;
 import org.alfresco.filesys.server.filesys.AccessMode;
 import org.alfresco.filesys.server.filesys.DiskDeviceContext;
+import org.alfresco.filesys.server.filesys.FileExistsException;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
@@ -505,7 +506,7 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
     
     /**
-     * @see #createNode(NodeRef, String, String)
+     * @see CifsHelper#createNode(NodeRef, String, boolean)
      */
     public NetworkFile createFile(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
@@ -513,7 +514,7 @@ public class ContentDiskDriver implements ContentDiskInterface
         {
             // get the device root
             NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-            
+
             String path = params.getPath(); 
             boolean isFile = !params.isDirectory();
             
@@ -765,11 +766,28 @@ public class ContentDiskDriver implements ContentDiskInterface
      */
     public void renameFile(SrvSession sess, TreeConnection tree, String oldName, String newName) throws IOException
     {
+        // get the device root
+        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+        
+        // check that the target node doesn't exist
         try
         {
-            // get the device root
-            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-            
+            NodeRef existingNodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, newName);
+            // we found a node with a conflicting name - check for the type of the old name
+            NodeRef oldNodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, oldName);
+            if (cifsHelper.isDirectory(existingNodeRef) == cifsHelper.isDirectory(oldNodeRef))
+            {
+                // name clash and both are of the same type
+                throw new FileExistsException();
+            }
+        }
+        catch (FileNotFoundException e)
+        {
+            // good - the file doesn't exist
+        }
+        
+        try
+        {
             // get the file/folder to move
             NodeRef nodeToMoveRef = cifsHelper.getNodeRef(deviceRootNodeRef, oldName);
             ChildAssociationRef nodeToMoveAssoc = nodeService.getPrimaryParent(nodeToMoveRef);
@@ -787,7 +805,9 @@ public class ContentDiskDriver implements ContentDiskInterface
             
             // we escape the local name of the path so that it conforms to the general standard of being
             // an escaped version of the name property
-            QName newAssocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(splitPaths[1]));
+            QName newAssocQName = QName.createQName(
+                    NamespaceService.CONTENT_MODEL_1_0_URI,
+                    QName.createValidLocalName(splitPaths[1]));
             
             // move it
             nodeService.moveNode(nodeToMoveRef, targetFolderRef, nodeToMoveAssoc.getTypeQName(), newAssocQName);
