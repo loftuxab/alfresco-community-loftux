@@ -459,16 +459,26 @@ public class NewSpaceWizard extends AbstractWizardBean
 //      bundle.getString("save_as_template"), bundle.getString("template_name")},
 //      summarySaveAsTemplate, this.templateName
       
+      String spaceTypeLabel = null;
+      for (UIListItem item : this.getFolderTypes())
+      {
+         if (item.getValue().equals(this.spaceType))
+         {
+            spaceTypeLabel = item.getLabel();
+            break;
+         }
+      }
+      
       return buildSummary(
-            new String[] {bundle.getString("name"), bundle.getString("description"), 
-                          bundle.getString("creating_from")},
-            new String[] {this.name, this.description, summaryCreateType});
+            new String[] {bundle.getString("space_type"), bundle.getString("name"), 
+                          bundle.getString("description"), bundle.getString("creating_from")},
+            new String[] {spaceTypeLabel, this.name, this.description, summaryCreateType});
    }
    
    /**
     * @return Returns a list of template spaces currently in the system
     */
-   public List getTemplateSpaces()
+   public List<SelectItem> getTemplateSpaces()
    {      
       if (this.templates == null)
       {
@@ -507,7 +517,7 @@ public class NewSpaceWizard extends AbstractWizardBean
     * 
     * @return List of UIListItem components
     */
-   public List getFolderTypes()
+   public List<UIListItem> getFolderTypes()
    {
       if (this.folderTypes == null)
       {
