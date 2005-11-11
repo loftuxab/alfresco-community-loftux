@@ -135,10 +135,7 @@ public class SimpleExampleWithContent
         NodeRef fileRef = assocRef.getChildRef();
         
         ContentWriter writer = contentService.getWriter(fileRef, ContentModel.PROP_CONTENT, true);
-        // the file is of type content, with mandatory property 'mimetype'
-        // this need only be set before the end of the transaction to satisfy the node,
-        // but the content services require the mimetype set before content can be
-        // written or read
+        // the mimetype will up pushed onto the node automatically once the stream closes
         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         // store string content as UTF-8
         writer.setEncoding("UTF-8");
