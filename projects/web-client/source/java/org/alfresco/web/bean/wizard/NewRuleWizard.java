@@ -390,7 +390,6 @@ public class NewRuleWizard extends BaseActionWizard
     */
    public String promptForActionValues()
    {
-      String outcome = this.action;
       
       // set the flag to show we are creating a new action
       this.editingAction = false;
@@ -399,17 +398,30 @@ public class NewRuleWizard extends BaseActionWizard
       actionProps.put(PROP_ACTION_NAME, this.action);
       this.currentActionProperties = actionProps;
       
+      String outcome = null;
       if ("simple-workflow".equals(this.action))
       {
          this.currentActionProperties.put("approveAction", "move");
          this.currentActionProperties.put("rejectStepPresent", "yes");
          this.currentActionProperties.put("rejectAction", "move");
       }
+      else if ("extract-metadata".equals(this.action))
+      {
+         // This one (currently) has no parameters, so just add it...
+         actionProps.put(PROP_ACTION_SUMMARY, buildActionSummary(actionProps));
+         this.allActionsProperties.add(actionProps);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Added 'extract-metadata' action to list");
+      }
+      else
+      {
+         outcome = this.action;
+         if (logger.isDebugEnabled())
+            logger.debug("Added '" + this.action + "' action to list");
+      }
       
-      if (logger.isDebugEnabled())
-         logger.debug("Added '" + this.action + "' action to list");
-      
-      // reset the selected condition drop down
+      // reset the selected action drop down
       this.action = null;
       
       return outcome;

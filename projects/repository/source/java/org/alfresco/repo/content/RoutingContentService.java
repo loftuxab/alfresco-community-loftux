@@ -163,9 +163,13 @@ public class RoutingContentService implements ContentService
                 continue;
             }
             
-            Serializable beforeValue = before.get(propertyQName);
-            Serializable afterValue = after.get(propertyQName);
-            if (!EqualsHelper.nullSafeEquals(beforeValue, afterValue))
+            ContentData beforeValue = (ContentData) before.get(propertyQName);
+            ContentData afterValue = (ContentData) after.get(propertyQName);
+            if (afterValue != null && afterValue.getContentUrl() == null)
+            {
+                // no URL - ignore
+            }
+            else if (!EqualsHelper.nullSafeEquals(beforeValue, afterValue))
             {
                 // the content changed
                 // at the moment, we are only interested in this one change

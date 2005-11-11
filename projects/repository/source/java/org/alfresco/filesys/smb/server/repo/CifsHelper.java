@@ -382,10 +382,8 @@ public class CifsHelper
                         properties);
                 currentNodeRef = assocRef.getChildRef();
                 
-                Map<QName, Serializable> uiproperties = new HashMap<QName, Serializable>(2);
-                uiproperties.put(ContentModel.PROP_TITLE, pathElement);
-                uiproperties.put(ContentModel.PROP_DESCRIPTION, pathElement);
-                nodeService.addAspect(currentNodeRef, ContentModel.ASPECT_UIFACETS, uiproperties);
+                // the title and description will be set automatically
+                nodeService.addAspect(currentNodeRef, ContentModel.ASPECT_UIFACETS, null);
             }
         }
         // done

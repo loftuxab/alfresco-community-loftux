@@ -243,6 +243,18 @@
         </property>
     </bean>
     
+    <bean id="extract-metadata" class="org.alfresco.repo.action.executer.ContentMetadataExtracter" parent="action-executer">
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="contentService">
+            <ref bean="contentService" />
+        </property>
+        <property name="metadataExtracterRegistry">
+            <ref bean="metadataExtracterRegistry" />
+        </property>
+    </bean>
+
     <bean id="import" class="org.alfresco.repo.action.executer.ImporterActionExecuter" parent="action-executer">
         <property name="importerService">
             <ref bean="ImporterService"/>
