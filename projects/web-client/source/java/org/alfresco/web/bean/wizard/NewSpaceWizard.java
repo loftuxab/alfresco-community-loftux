@@ -19,8 +19,7 @@ package org.alfresco.web.bean.wizard;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,6 @@ import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIListItem;
-import org.alfresco.web.ui.common.component.UIListItems;
 import org.alfresco.web.ui.common.component.description.UIDescription;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -117,18 +115,36 @@ public class NewSpaceWizard extends AbstractWizardBean
          FacesContext context = FacesContext.getCurrentInstance();
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
-         
+
+         // some common resources
+         QName qname = QName.createQName(
+               NamespaceService.CONTENT_MODEL_1_0_URI,
+               QName.createValidLocalName(this.name));
+
          if (this.editMode)
          {
             // update the existing node in the repository
             Node currentSpace = this.browseBean.getActionSpace();
             NodeRef nodeRef = currentSpace.getNodeRef();
-            Date now = new Date( Calendar.getInstance().getTimeInMillis() );
             
-            // update the modified timestamp
-            this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, this.name);
-            this.nodeService.setProperty(nodeRef, ContentModel.PROP_ICON, this.icon);
-            this.nodeService.setProperty(nodeRef, ContentModel.PROP_DESCRIPTION, this.description);
+            Map<QName, Serializable> properties = this.nodeService.getProperties(nodeRef);
+            // if the name has changed, the node must move
+            if (!this.name.equals(properties.get(ContentModel.PROP_NAME)))
+            {
+               ChildAssociationRef assocRef = this.nodeService.getPrimaryParent(nodeRef);
+               // the name has changed
+               this.nodeService.moveNode(
+                     nodeRef,
+                     assocRef.getParentRef(),
+                     assocRef.getTypeQName(),
+                     qname);
+            }
+            // update the properties
+            properties.put(ContentModel.PROP_NAME, this.name);
+            properties.put(ContentModel.PROP_ICON, this.icon);
+            properties.put(ContentModel.PROP_DESCRIPTION, this.description);
+            // apply properties
+            this.nodeService.setProperties(nodeRef, properties);
          }
          else
          {
@@ -148,18 +164,18 @@ public class NewSpaceWizard extends AbstractWizardBean
                   parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
                }
                
-               String qname = QName.createValidLocalName(this.name);
+               Map<QName, Serializable> properties = Collections.singletonMap(
+                       ContentModel.PROP_NAME,
+                       (Serializable) this.name);
                ChildAssociationRef assocRef = this.nodeService.createNode(
                      parentNodeRef,
                      ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, qname),
-                     Repository.resolveToQName(this.spaceType));
+                     qname,
+                     Repository.resolveToQName(this.spaceType),
+                     properties);
                
                NodeRef nodeRef = assocRef.getChildRef();
                newSpaceId = nodeRef.getId();
-               
-               // set the name property on the node
-               this.nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, this.name);
                
                if (logger.isDebugEnabled())
                   logger.debug("Created folder node with name: " + this.name);
@@ -517,7 +533,8 @@ public class NewSpaceWizard extends AbstractWizardBean
     * 
     * @return List of UIListItem components
     */
-   public List<UIListItem> getFolderTypes()
+   @SuppressWarnings("unchecked")
+public List<UIListItem> getFolderTypes()
    {
       if (this.folderTypes == null)
       {
