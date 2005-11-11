@@ -72,6 +72,38 @@
             </property>
          </properties>
       </type>
+      
+  	 <type name="cm:dictionaryModel">
+		 <title>Dictionary Model</title>
+		 <parent>cm:content</parent>
+		 <properties>
+	         <property name="cm:modelName">
+	            <title>Model name</title>
+	            <type>d:qname</type>
+	         </property>
+	         <property name="cm:modelDescription">
+	            <title>Description</title>
+	            <type>d:text</type>
+	         </property>
+	         <property name="cm:modelAuthor">
+	            <title>Author</title>
+	            <type>d:text</type>
+	         </property>
+	         <property name="cm:modelPublishedDate">
+	            <title>Published Date</title>
+	            <type>d:date</type>
+	         </property>
+	         <property name="cm:modelVersion">
+	            <title>Version</title>
+	            <type>d:text</type>
+	         </property>
+	         <property name="cm:modelActive">
+	         	<title>Model Active</title>
+	         	<type>d:boolean</type>
+	         	<default>true</default>
+	         </property>	          
+	 	 </properties>
+	 </type>
 
       <type name="cm:linkfile">
          <title>Link File</title>

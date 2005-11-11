@@ -385,6 +385,24 @@
 
     <bean id="namespaceDAO" class="org.alfresco.repo.dictionary.NamespaceDAOImpl" />
 
+	<bean id="dictionaryModelType" class="org.alfresco.repo.dictionary.DictionaryModelType" init-method="init">
+		<property name="dictionaryDAO">
+            <ref bean="dictionaryDAO" />
+        </property>	
+        <property name="namespaceDAO">
+            <ref bean="namespaceDAO" />
+        </property>
+        <property name="nodeService">
+        	<ref bean="nodeService"/>
+        </property>        
+        <property name="contentService">
+        	<ref bean="contentService"/>
+        </property>
+        <property name="policyComponent">
+        	<ref bean="policyComponent"/>
+        </property>
+	</bean>
+
     <bean id="dictionaryDAO" class="org.alfresco.repo.dictionary.DictionaryDAOImpl">
         <constructor-arg index="0">
             <ref bean="namespaceDAO" />
@@ -433,6 +451,23 @@
         </property>
     </bean>
 
+	<bean id="dictionaryRepositoryBootstrap" class="org.alfresco.repo.dictionary.DictionaryRepositoryBootstrap" init-method="bootstrap">
+		<property name="dictionaryDAO">
+			<ref local="dictionaryDAO"/>
+		</property>
+		<property name="contentService">
+			<ref bean="contentService"/>
+		</property>
+		<property name="searchService">
+			<ref bean="searchService"/>
+		</property>
+        <property name="transactionService">
+            <ref bean="transactionComponent"/>
+        </property>
+		<property name="authenticationComponent">
+			<ref bean="authenticationComponent"/>
+		</property>
+	</bean>
 
     <!--                 -->
     <!-- Copy Service    -->

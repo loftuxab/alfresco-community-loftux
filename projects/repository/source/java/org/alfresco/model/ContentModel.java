@@ -126,6 +126,17 @@ public interface ContentModel
     static final QName ASPECT_TEMPLATABLE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "templatable");
     static final QName PROP_TEMPLATE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "template");
     
+    // Dictionary model content type
+    
+    public static final QName TYPE_DICTIONARY_MODEL = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "dictionaryModel");
+    
+    public static final QName PROP_MODEL_NAME = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "modelName");
+    public static final QName PROP_MODEL_DESCRIPTION = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "modelDescription");
+    public static final QName PROP_MODEL_AUTHOR = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "modelAuthor");
+    public static final QName PROP_MODEL_PUBLISHED_DATE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "modelPublishedDate");
+    public static final QName PROP_MODEL_VERSION = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "modelVersion");
+    public static final QName PROP_MODEL_ACTIVE = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "modelActive");
+    
     //
     // Application Model Definitions
     //

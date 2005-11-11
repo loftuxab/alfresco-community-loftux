@@ -102,6 +102,8 @@ public class WebServiceSample6
         // Now build a path query 
         StringBuilder pathQuery = new StringBuilder(128);
         
+        //pathQuery.append("PATH:\"cm:generalclassifiable/cm:MyTestCategory/cm:One/member\"");
+        
         // Encode the root category name
         String encodedRoot = ISO9075.encode(classification.getRootCategory().getTitle());
     
