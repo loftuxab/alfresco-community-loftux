@@ -11,7 +11,7 @@
         <property name="defaultWorkspace"><value>SpacesStore</value></property>
     </bean>
     
-    <bean id="JCR.DictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap" depends-on="dictionaryBootstrap">
+    <bean id="JCR.DictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap" depends-on="extension.dictionaryBootstrap">
         <property name="dictionaryDAO"><ref bean="dictionaryDAO"/></property>
         <property name="models">
             <list>
