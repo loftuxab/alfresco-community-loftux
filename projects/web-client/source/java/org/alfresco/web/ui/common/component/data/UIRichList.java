@@ -462,17 +462,22 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          }
          
          // sort first time on initially sorted column if set
-         String initialSortColumn = getInitialSortColumn();
-         if (initialSortColumn != null && initialSortColumn.length() != 0)
+         if (this.sortColumn == null)
          {
-            boolean descending = isInitialSortDescending();
-            
-            // TODO: add support for retrieving correct column sort mode here
-            this.sortColumn = initialSortColumn;
-            this.sortDescending = descending;
-            
+            String initialSortColumn = getInitialSortColumn();
+            if (initialSortColumn != null && initialSortColumn.length() != 0)
+            {
+               boolean descending = isInitialSortDescending();
+               
+               // TODO: add support for retrieving correct column sort mode here
+               this.sortColumn = initialSortColumn;
+               this.sortDescending = descending;
+            }
+         }
+         if (this.sortColumn != null)
+         {
             // delegate to the data model to sort its contents
-            this.dataModel.sort(initialSortColumn, descending, IDataContainer.SORT_CASEINSENSITIVE);
+            this.dataModel.sort(this.sortColumn, this.sortDescending, IDataContainer.SORT_CASEINSENSITIVE);
          }
          
          // reset current page
