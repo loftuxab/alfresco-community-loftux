@@ -163,18 +163,26 @@ public class RoutingContentService implements ContentService
                 continue;
             }
             
-            ContentData beforeValue = (ContentData) before.get(propertyQName);
-            ContentData afterValue = (ContentData) after.get(propertyQName);
-            if (afterValue != null && afterValue.getContentUrl() == null)
+            try
             {
-                // no URL - ignore
+                ContentData beforeValue = (ContentData) before.get(propertyQName);
+                ContentData afterValue = (ContentData) after.get(propertyQName);
+                if (afterValue != null && afterValue.getContentUrl() == null)
+                {
+                    // no URL - ignore
+                }
+                else if (!EqualsHelper.nullSafeEquals(beforeValue, afterValue))
+                {
+                    // the content changed
+                    // at the moment, we are only interested in this one change
+                    fire = true;
+                    break;
+                }
             }
-            else if (!EqualsHelper.nullSafeEquals(beforeValue, afterValue))
+            catch (ClassCastException e)
             {
-                // the content changed
-                // at the moment, we are only interested in this one change
-                fire = true;
-                break;
+                // properties don't conform to model
+                continue;
             }
         }
         // fire?
