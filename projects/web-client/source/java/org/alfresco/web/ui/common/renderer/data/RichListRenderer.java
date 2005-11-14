@@ -247,6 +247,7 @@ public class RichListRenderer extends BaseRenderer
          }
          
          // output each column in turn and render all children
+         boolean renderedFirst = false;
          for (int i=0; i<columns.length; i++)
          {
             UIColumn column = columns[i];
@@ -259,7 +260,7 @@ public class RichListRenderer extends BaseRenderer
                out.write('>');
                
                // for details view, we show the small column icon for the first column
-               if (i == 0)
+               if (renderedFirst == false)
                {
                   UIComponent smallIcon = column.getSmallIcon();
                   if (smallIcon != null)
@@ -269,6 +270,7 @@ public class RichListRenderer extends BaseRenderer
                      smallIcon.encodeEnd(context);
                      out.write("&nbsp;");
                   }
+                  renderedFirst = true;
                }
                
                if (column.getChildCount() != 0)
