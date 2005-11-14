@@ -198,6 +198,15 @@
                               </td>
                            </tr>
                            <tr>
+                              <td width=50% align=right>
+                                 Open Document Format meta data extraction.
+                              </td>
+                              <td>&nbsp;&#8226;&nbsp;</td>
+                              <td width=50%>
+                                 Antti Jokipii
+                              </td>
+                           </tr>
+                           <tr>
                               <td align=right width=50%>
                                  Language and translation packs.
                               </td>

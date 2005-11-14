@@ -80,4 +80,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups-2.2.8.jar"/>
 	<classpathentry kind="output" path=""/>
+	<classpathentry exported="true" kind="lib" path="lib/odf_utils.jar"/>
 </classpath>
