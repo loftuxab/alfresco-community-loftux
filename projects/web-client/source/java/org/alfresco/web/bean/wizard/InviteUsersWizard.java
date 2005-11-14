@@ -216,9 +216,26 @@ public class InviteUsersWizard extends AbstractWizardBean
             // Create the mail message for sending to each User
             if (NOTIFY_YES.equals(this.notify))
             {
-               if (this.personService.personExists(authority) == true)
+               // if User, email then, else if Group get all members and email them
+               AuthorityType authType = AuthorityType.getAuthorityType(authority);
+               if (authType.equals(AuthorityType.USER))
                {
-                  notifyUser(this.personService.getPerson(authority), folderNodeRef, from, userGroupRole.getRole());
+                  if (this.personService.personExists(authority) == true)
+                  {
+                     notifyUser(this.personService.getPerson(authority), folderNodeRef, from, userGroupRole.getRole());
+                  }
+               }
+               else
+               {
+                  // else notify all members of the group
+                  Set<String> users = this.authorityService.getContainedAuthorities(AuthorityType.USER, authority, false);
+                  for (String userAuth : users)
+                  {
+                     if (this.personService.personExists(userAuth) == true)
+                     {
+                        notifyUser(this.personService.getPerson(userAuth), folderNodeRef, from, userGroupRole.getRole());
+                     }
+                  }
                }
             }
          }
@@ -241,7 +258,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
-    * Send an email notification to the specified user
+    * Send an email notification to the specified User authority
     * 
     * @param person     Person node representing the user
     * @param folder     Folder node they are invited too
@@ -436,24 +453,28 @@ public class InviteUsersWizard extends AbstractWizardBean
                   StringBuilder label = new StringBuilder(64);
                   
                   // build a display label showing the user and their role for the space
-                  if (this.personService.personExists(authority) == true)
+                  AuthorityType authType = AuthorityType.getAuthorityType(authority);
+                  if (authType.equals(AuthorityType.USER))
                   {
-                     // found a User authority
-                     NodeRef ref = this.personService.getPerson(authority);
-                     String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
-                     String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
-                     
-                     label.append(firstName)
-                          .append(" ")
-                          .append(lastName)
-                          .append(" (")
-                          .append(Application.getMessage(FacesContext.getCurrentInstance(), role))
-                          .append(")");
+                     if (this.personService.personExists(authority) == true)
+                     {
+                        // found a User authority
+                        NodeRef ref = this.personService.getPerson(authority);
+                        String firstName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_FIRSTNAME);
+                        String lastName = (String)this.nodeService.getProperty(ref, ContentModel.PROP_LASTNAME);
+                        
+                        label.append(firstName)
+                             .append(" ")
+                             .append(lastName)
+                             .append(" (")
+                             .append(Application.getMessage(FacesContext.getCurrentInstance(), role))
+                             .append(")");
+                     }
                   }
                   else
                   {
                      // found a group authority
-                     label.append(authority);
+                     label.append(authority.substring(PermissionService.GROUP_PREFIX.length()));
                   }
                   
                   this.userGroupRoles.add(new UserGroupRole(authority, role, label.toString()));
