@@ -115,7 +115,7 @@
                         <tr>
                            <td width="100%" valign="top">
                               
-                              <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.users}">
+                              <a:panel id="users-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.users_and_groups}">
                               
                               <a:richList id="users-list" binding="#{UserMembersBean.usersRichList}" viewMode="details" pageSize="10"
                                     styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
@@ -127,7 +127,7 @@
                                        <a:sortLink label="#{msg.name}" value="fullName" mode="case-insensitive" styleClass="header"/>
                                     </f:facet>
                                     <f:facet name="small-icon">
-                                       <h:graphicImage url="/images/icons/person.gif" />
+                                       <h:graphicImage url="#{r.icon}" />
                                     </f:facet>
                                     <h:outputText value="#{r.fullName}" />
                                  </a:column>
@@ -135,7 +135,7 @@
                                  <%-- Username column --%>
                                  <a:column width="120" style="text-align:left">
                                     <f:facet name="header">
-                                       <a:sortLink label="#{msg.username}" value="userName" styleClass="header"/>
+                                       <a:sortLink label="#{msg.authority}" value="userName" styleClass="header"/>
                                     </f:facet>
                                     <h:outputText value="#{r.userName}" />
                                  </a:column>

@@ -78,7 +78,7 @@
       <from-view-id>/jsp/*</from-view-id>
          <navigation-case>
          <from-outcome>adminConsole</from-outcome>
-         <to-view-id>/jsp/dialog/admin-console.jsp</to-view-id>
+         <to-view-id>/jsp/admin/admin-console.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    
@@ -154,7 +154,7 @@
    
    <!-- Admin Console rules -->
    <navigation-rule>
-      <from-view-id>/jsp/dialog/admin-console.jsp</from-view-id>
+      <from-view-id>/jsp/admin/admin-console.jsp</from-view-id>
       <navigation-case>
          <from-outcome>manageCategories</from-outcome>
          <to-view-id>/jsp/categories/categories.jsp</to-view-id>

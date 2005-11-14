@@ -96,8 +96,10 @@
                            <td width=100 style="padding-left:2px">
                               <%-- View mode settings --%>
                               <h:outputText style="padding-left:26px" styleClass="mainSubTitle" value="#{msg.view}"/><br>
-                              <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif" value="0">
-                                 <a:listItem value="0" label="#{msg.category_icons}" />
+                              <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif"
+                                    value="#{CategoriesBean.viewMode}" actionListener="#{CategoriesBean.viewModeChanged}">
+                                 <a:listItem value="icons" label="#{msg.category_icons}" />
+                                 <a:listItem value="details" label="#{msg.category_details}" />
                               </a:modeList>
                            </td>
                         </tr>
@@ -131,14 +133,22 @@
                               
                               <a:panel id="categories-panel" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" styleClass="mainSubTitle" label="#{msg.items}">
                               
-                              <a:richList id="categories-list" binding="#{CategoriesBean.categoriesRichList}" viewMode="icons" pageSize="15"
+                              <a:richList id="categories-list" binding="#{CategoriesBean.categoriesRichList}" viewMode="#{CategoriesBean.viewMode}" pageSize="15"
                                     styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" altRowStyleClass="recordSetRowAlt" width="100%"
                                     value="#{CategoriesBean.categories}" var="r" initialSortColumn="name" initialSortDescending="true">
                                  
                                  <%-- Primary column for icons view mode --%>
                                  <a:column primary="true" style="padding:2px;text-align:left;vertical-align:top;">
+                                    <f:facet name="header">
+                                       <a:sortLink label="#{msg.name}" value="name" mode="case-insensitive" styleClass="header"/>
+                                    </f:facet>
                                     <f:facet name="large-icon">
                                        <a:actionLink value="#{r.name}" image="/images/icons/category.gif" actionListener="#{CategoriesBean.clickCategory}" showLink="false">
+                                          <f:param name="id" value="#{r.id}" />
+                                       </a:actionLink>
+                                    </f:facet>
+                                    <f:facet name="small-icon">
+                                       <a:actionLink value="#{r.name}" image="/images/icons/category_small.gif" actionListener="#{CategoriesBean.clickCategory}" showLink="false">
                                           <f:param name="id" value="#{r.id}" />
                                        </a:actionLink>
                                     </f:facet>

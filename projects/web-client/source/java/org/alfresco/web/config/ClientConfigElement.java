@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.element.ConfigElementAdapter;
@@ -44,7 +43,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    private String helpUrl = null;
    private Map<String, String> localeMap = new HashMap<String, String>();
    private List<String> languages = new ArrayList<String>(8);
-   private Map<String, String> processors = new HashMap<String, String>();
+   private String homeSpacePermission = null;
    
    /**
     * Default Constructor
@@ -181,29 +180,6 @@ public class ClientConfigElement extends ConfigElementAdapter
    {
       return this.localeMap.get(locale);
    }
-   
-   /**
-    * Add a template processor to the map.
-    * 
-    * @param name       Unique name of the template processor
-    * @param processor  Fully qualified class name of the template processor
-    */
-   /*package*/ void addTemplateProcessor(String name, String processor)
-   {
-      this.processors.put(name, processor);
-   }
-   
-   /**
-    * Return the template processor with the specified name
-    * 
-    * @param name   Unique name of the template processor
-    * 
-    * @return Template processor or null if not found
-    */
-   public String getTemplateProcessor(String name)
-   {
-      return this.processors.get(name);
-   }
 
    /**
     * @return Returns the help Url.
@@ -236,6 +212,20 @@ public class ClientConfigElement extends ConfigElementAdapter
    {
       this.searchMinimum = searchMinimum;
    }
-   
-   
+
+   /**
+    * @return Returns the default Home Space permissions.
+    */
+   public String getHomeSpacePermission()
+   {
+      return this.homeSpacePermission;
+   }
+
+   /**
+    * @param homeSpacePermission The default Home Space permission to set.
+    */
+   /*package*/ void setHomeSpacePermission(String homeSpacePermission)
+   {
+      this.homeSpacePermission = homeSpacePermission;
+   }
 }

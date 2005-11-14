@@ -164,11 +164,10 @@
                                                 <h:outputText value="#{msg.name}" />
                                              </f:facet>
                                              <h:outputText value="#{row.label}" />
-                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
                                           <h:column>
                                              <a:actionLink actionListener="#{InviteUsersWizard.removeSelection}" image="/images/icons/delete.gif"
-                                                           value="#{msg.remove}" showLink="false"/>
+                                                           value="#{msg.remove}" showLink="false" style="padding-left:6px" />
                                           </h:column>
                                        </h:dataTable>
                                        

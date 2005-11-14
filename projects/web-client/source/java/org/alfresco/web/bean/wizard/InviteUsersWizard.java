@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.faces.component.UISelectMany;
 import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -44,7 +43,7 @@ import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
-import org.alfresco.web.bean.users.UserMembersBean.PermissionWrapper;
+import org.alfresco.web.ui.common.SortableSelectItem;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIGenericPicker;
 import org.apache.commons.logging.Log;
@@ -86,7 +85,7 @@ public class InviteUsersWizard extends AbstractWizardBean
    /** PermissionService bean reference */
    private PermissionService permissionService;
    
-   /** PermissionService bean reference */
+   /** personService bean reference */
    private PersonService personService;
    
    /** datamodel for table of roles for users */
@@ -367,15 +366,16 @@ public class InviteUsersWizard extends AbstractWizardBean
          }
          else
          {
-            // groups
+            // groups - simple text based match on name
             Set<String> groups = authorityService.getAllAuthorities(AuthorityType.GROUP);
             List<SelectItem> results = new ArrayList<SelectItem>(groups.size());
             String containsLower = contains.toLowerCase();
+            int offset = PermissionService.GROUP_PREFIX.length();
             for (String group : groups)
             {
                if (group.toLowerCase().indexOf(containsLower) != -1)
                {
-                  results.add(new SortableSelectItem(group, group, group));
+                  results.add(new SortableSelectItem(group, group.substring(offset), group));
                }
             }
             items = new SelectItem[results.size()];
@@ -786,27 +786,5 @@ public class InviteUsersWizard extends AbstractWizardBean
       private String authority;
       private String role;
       private String label;
-   }
-   
-   /**
-    * Wrapper class to facilitate specific sorting functionality against our SelectItem objects
-    */
-   private static class SortableSelectItem extends SelectItem implements Comparable
-   {
-      public SortableSelectItem(String value, String label, String sort)
-      {
-         super(value, label);
-         this.sort = sort;
-      }
-      
-      public int compareTo(Object obj2)
-      {
-         if (this.sort == null && obj2 == null) return 0;
-         if (this.sort == null) return -1;
-         if (obj2 == null) return 1;
-         return this.sort.compareToIgnoreCase( ((SortableSelectItem)obj2).sort );
-      }
-      
-      private String sort;
    }
 }

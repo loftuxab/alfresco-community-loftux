@@ -55,6 +55,7 @@ import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIGenericPicker;
 import org.alfresco.web.ui.common.component.data.UIRichList;
+import org.alfresco.web.ui.repo.WebResources;
 
 /**
  * @author Kevin Roast
@@ -296,6 +297,8 @@ public class UserMembersBean implements IContextListener
                   String userName = (String)props.get("userName");
                   props.put("roles", listToString(context, permissionMap.get(authority)));
                   
+                  props.put("icon", WebResources.IMAGE_PERSON);
+                  
                   personNodes.add(node);
                }
             }
@@ -303,10 +306,11 @@ public class UserMembersBean implements IContextListener
             {
                // need a map (dummy node) to represent props for this Group Authority
                Map<String, Object> node = new HashMap<String, Object>(5, 1.0f);
-               node.put("fullName", authority);
+               node.put("fullName", authority.substring(PermissionService.GROUP_PREFIX.length()));
                node.put("userName", authority);
                node.put("id", authority);
                node.put("roles", listToString(context, permissionMap.get(authority)));
+               node.put("icon", WebResources.IMAGE_GROUP);
                personNodes.add(node);
             }
          }

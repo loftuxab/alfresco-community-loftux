@@ -7,7 +7,13 @@
    <!-- we want to build a WAR file in this project -->
    <target name="package" depends="package-war" />
 
-   <target name="package-war" depends="package-jar" description="Packages the WAR file for the current server">
+   <!-- copy the template web.xml and replace the "@facesconfig@" token with list of faces config files -->
+   <target name="generate-webxml" depends="init">
+      <copy file="${dir.src.webinf}/web_TEMPLATE.xml" tofile="${dir.src.webinf}/web.xml" overwrite="yes" />
+      <replace file="${dir.src.webinf}/web.xml" token="@facesconfig@" value="${files.faces.config}" />
+   </target>
+
+   <target name="package-war" depends="package-jar,generate-webxml" description="Packages the WAR file for the current server">
       <fail unless="server" message="You must supply a value for the 'server' property to indicate which WAR to build" />  
       <package-specific-war for="${server}" />
    </target>

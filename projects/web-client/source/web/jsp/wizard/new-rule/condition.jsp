@@ -169,12 +169,10 @@
                                                 <h:outputText value="#{msg.summary}" />
                                              </f:facet>
                                              <h:outputText value="#{row.conditionSummary}"/>
-                                             <h:outputText value="&nbsp;&nbsp;" escape="false"/>
                                           </h:column>
                                           <h:column>
                                              <a:actionLink action="#{NewRuleWizard.removeCondition}" image="/images/icons/delete.gif"
-                                                           value="#{msg.remove}" showLink="false"/>
-                                             <h:outputText value="&nbsp;" escape="false"/>
+                                                           value="#{msg.remove}" showLink="false" style="padding-left:6px;padding-right:2px" />
                                              <a:actionLink action="#{NewRuleWizard.editCondition}" image="/images/icons/edit_icon.gif"
                                                            value="#{msg.change}" showLink="false" 
                                                            rendered='#{row.conditionName != "no-condition"}'/>

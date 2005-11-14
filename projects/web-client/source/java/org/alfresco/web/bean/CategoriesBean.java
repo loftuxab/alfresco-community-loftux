@@ -47,6 +47,7 @@ import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
+import org.alfresco.web.ui.common.component.UIModeList;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.apache.log4j.Logger;
@@ -87,6 +88,9 @@ public class CategoriesBean implements IContextListener
    /** Dialog properties */
    private String name = null;
    private String description = null;
+   
+   /** RichList view mode */
+   private String viewMode = "icons"; 
    
    /** Category path breadcrumb location */
    private List<IBreadcrumbHandler> location = null;
@@ -153,6 +157,22 @@ public class CategoriesBean implements IContextListener
    public void setDescription(String description)
    {
       this.description = description;
+   }
+   
+   /**
+    * @return Returns the viewMode.
+    */
+   public String getViewMode()
+   {
+      return this.viewMode;
+   }
+
+   /**
+    * @param viewMode The viewMode to set.
+    */
+   public void setViewMode(String viewMode)
+   {
+      this.viewMode = viewMode;
    }
 
    /**
@@ -569,6 +589,19 @@ public class CategoriesBean implements IContextListener
       }
       
       return outcome;
+   }
+   
+   /**
+    * Change the current view mode based on user selection
+    * 
+    * @param event      ActionEvent
+    */
+   public void viewModeChanged(ActionEvent event)
+   {
+      UIModeList viewList = (UIModeList)event.getComponent();
+      
+      // get the view mode ID
+      setViewMode(viewList.getValue().toString());
    }
    
    /**

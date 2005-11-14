@@ -40,11 +40,10 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_LANGUAGES = "languages";
    public static final String ELEMENT_LANGUAGE = "language";
    public static final String ATTRIBUTE_LOCALE = "locale";
-   public static final String ELEMENT_TEMPLATES = "templates";
-   public static final String ELEMENT_ENGINE = "engine";
    public static final String ATTRIBUTE_NAME = "name";
    public static final String ELEMENT_HELPURL = "help-url";
    public static final String ELEMENT_SEARCHMINIMUM = "search-minimum";
+   public static final String ELEMENT_HOMESPACEPERMISSION = "home-space-permission";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -111,26 +110,6 @@ public class ClientElementReader implements ConfigElementReader
             }
          }
          
-         // get the template sub-element
-         Element templates = element.element(ELEMENT_TEMPLATES);
-         if (templates != null)
-         {
-            Iterator<Element> tempItr = templates.elementIterator(ELEMENT_ENGINE);
-            while (tempItr.hasNext())
-            {
-               Element engine = tempItr.next();
-               String templateName = engine.attributeValue(ATTRIBUTE_NAME);
-               String templateEngine = engine.getTextTrim();
-               
-               if (templateName != null && templateName.length() != 0 &&
-                   templateEngine != null && templateEngine.length() != 0)
-               {
-                  // store the template processor class name against the unique name
-                  configElement.addTemplateProcessor(templateName, templateEngine);
-               }
-            }
-         }
-         
          // get the default view mode
          Element defaultView = element.element(ELEMENT_DEFAULTVIEW);
          if (defaultView != null)
@@ -157,6 +136,13 @@ public class ClientElementReader implements ConfigElementReader
          if (searchMin != null)
          {
             configElement.setSearchMinimum(Integer.parseInt(searchMin.getTextTrim()));
+         }
+         
+         // get the default permission for newly created users Home Spaces
+         Element permission = element.element(ELEMENT_HOMESPACEPERMISSION);
+         if (permission != null)
+         {
+            configElement.setHomeSpacePermission(permission.getTextTrim());
          }
       }
       

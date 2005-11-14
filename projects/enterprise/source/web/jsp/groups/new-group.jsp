@@ -24,14 +24,38 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_change_user_roles">
+<r:page titleId="title_create_group">
+
+<script language="JavaScript1.2">
+
+   window.onload = pageLoaded;
+   
+   function pageLoaded()
+   {
+      document.getElementById("new-group:name").focus();
+      checkButtonState();
+   }
+   
+   function checkButtonState()
+   {
+      if (document.getElementById("new-group:name").value.length == 0 )
+      {
+         document.getElementById("new-group:ok-button").disabled = true;
+      }
+      else
+      {
+         document.getElementById("new-group:ok-button").disabled = false;
+      }
+   }
+
+</script>
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="invite-users">
+   <h:form acceptCharset="UTF-8" id="new-group">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -66,15 +90,15 @@
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/edituser_large.gif" />
+                              <h:graphicImage id="logo" url="/images/icons/create_group_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle">
-                                 <h:outputText value="#{msg.modify_user_roles}" />
-                                 '<h:outputText value="#{UserMembersBean.personName}" />'
+                              <div class="mainSubTitle">
+                                 <h:outputText value="#{GroupsBean.groupName}" rendered="#{GroupsBean.actionGroup == null}" />
+                                 <h:outputText value="#{GroupsBean.actionGroupName}" rendered="#{GroupsBean.actionGroup != null}" />
                               </div>
-                              <div class="mainSubText"><h:outputText value="#{msg.modify_user_roles_description}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.new_group}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.new_group_description}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -91,68 +115,41 @@
                </tr>
                
                <%-- Details --%>
-               <tr valign=top>
+               <tr valign=top>                  
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
+                              
+                              <a:errors message="#{msg.error_create_group_dialog}" styleClass="errorMessage" />
+                              
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
                               <table cellpadding="2" cellspacing="2" border="0" width="100%">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{msg.change_user_roles}" /></td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td>1.&nbsp;<h:outputText value="#{msg.select_role}" /></td>
+                                    <td colspan="2" class="wizardSectionHeading"><h:outputText value="#{msg.group_props}" /></td>
                                  </tr>
                                  <tr>
-                                    <td>
-                                       <h:selectOneListbox id="roles" style="width:250px" size="5">
-                                          <f:selectItems value="#{InviteUsersWizard.roles}" />
-                                       </h:selectOneListbox>
+                                    <td colspan="2" width="100%" valign="top">
+                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
+                                       <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                          <tr>
+                                             <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="16" height="16"/></td>
+                                             <td class="mainSubText">
+                                                <h:outputText value="#{msg.create_group_warning}" />
+                                             </td>
+                                          </tr>
+                                       </table>
+                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
                                     </td>
                                  </tr>
                                  <tr>
-                                    <td>
-                                       2.&nbsp;<h:commandButton value="#{msg.add_to_list_button}" actionListener="#{UserMembersBean.addRole}" />
+                                    <td><h:outputText value="#{msg.identifier}" />:</td>
+                                    <td width="100%">
+                                       <h:inputText id="name" value="#{GroupsBean.name}" size="35" maxlength="1024" 
+                                                    onkeyup="javascript:checkButtonState();" onchange="javascript:checkButtonState();"/>&nbsp;*
                                     </td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.selected_roles}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <h:dataTable value="#{UserMembersBean.personRolesDataModel}" var="row"
-                                                    rowClasses="selectedItemsRow,selectedItemsRowAlt"
-                                                    styleClass="selectedItems" headerClass="selectedItemsHeader"
-                                                    cellspacing="0" cellpadding="4" 
-                                                    rendered="#{UserMembersBean.personRolesDataModel.rowCount != 0}">
-                                          <h:column>
-                                             <f:facet name="header">
-                                                <h:outputText value="#{msg.name}" />
-                                             </f:facet>
-                                             <h:outputText value="#{row.role}" />
-                                          </h:column>
-                                          <h:column>
-                                             <a:actionLink actionListener="#{UserMembersBean.removeRole}" image="/images/icons/delete.gif"
-                                                           value="#{msg.remove}" showLink="false" style="padding-left:6px" />
-                                          </h:column>
-                                       </h:dataTable>
-                                       <a:panel id="no-items" rendered="#{UserMembersBean.personRolesDataModel.rowCount == 0}">
-                                          <table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>
-                                             <tr>
-                                                <td colspan='2' class='selectedItemsHeader'><h:outputText id="no-items-name" value="#{msg.name}" /></td>
-                                             </tr>
-                                             <tr>
-                                                <td class='selectedItemsRow'><h:outputText id="no-items-msg" value="#{msg.no_selected_items}" /></td>
-                                             </tr>
-                                          </table>
-                                       </a:panel>
-                                    </td>
-                                 </tr>
-                                 <tr><td colspan=2 class="paddingRow"></td></tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
@@ -162,12 +159,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.ok}" action="#{UserMembersBean.finishOK}" styleClass="wizardButton" />
+                                       <h:commandButton id="ok-button" value="#{msg.new_group}" action="#{GroupsBean.finishCreate}"
+                                                        styleClass="wizardButton" disabled="true" />
                                     </td>
                                  </tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel_button}" action="cancel" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="cancel" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -175,16 +173,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

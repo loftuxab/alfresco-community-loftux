@@ -187,8 +187,7 @@
                                           </h:column>
                                           <h:column>
                                              <a:actionLink action="#{NewRuleWizard.removeAction}" image="/images/icons/delete.gif"
-                                                           value="#{msg.remove}" showLink="false"/>
-                                             <h:outputText value="&nbsp;" escape="false"/>
+                                                           value="#{msg.remove}" showLink="false" style="padding-left:6px;padding-right:2px" />
                                              <a:actionLink action="#{NewRuleWizard.editAction}" image="/images/icons/edit_icon.gif"
                                                            value="#{msg.change}" showLink="false" />
                                           </h:column>

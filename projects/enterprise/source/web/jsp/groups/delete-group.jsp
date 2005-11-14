@@ -24,14 +24,15 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_change_user_roles">
+<r:page titleId="title_delete_group">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="invite-users">
+   <%-- set the form name here --%>
+   <h:form acceptCharset="UTF-8" id="delete-group">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -60,21 +61,18 @@
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
                   <td bgcolor="#EEEEEE">
-                  
+                     
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <h:graphicImage id="wizard-logo" url="/images/icons/edituser_large.gif" />
+                              <h:graphicImage url="/images/icons/delete_group_large.gif"/>
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
-                              <div class="mainTitle">
-                                 <h:outputText value="#{msg.modify_user_roles}" />
-                                 '<h:outputText value="#{UserMembersBean.personName}" />'
-                              </div>
-                              <div class="mainSubText"><h:outputText value="#{msg.modify_user_roles_description}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.delete_group}" /> '<h:outputText value="#{GroupsBean.actionGroupName}" />'</div>
+                              <div class="mainSubText"><h:outputText value="#{msg.delete_group_info}" /></div>
                            </td>
                         </tr>
                      </table>
@@ -94,65 +92,44 @@
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
-                     <table cellspacing="0" cellpadding="3" border="0" width="100%">
+                     <table cellspacing="0" cellpadding="4" border="0" width="100%">
                         <tr>
+                           
                            <td width="100%" valign="top">
                               <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
-                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                              <table cellpadding="2" cellspacing="2" border="0">
+                                 <a:panel id="delete-panel" rendered="#{GroupsBean.actionGroupItems != 0}">
                                  <tr>
-                                    <td class="mainSubTitle"><h:outputText value="#{msg.change_user_roles}" /></td>
+                                    <td width="100%" valign="top">
+                                       <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "yellowInner", "#ffffcc"); %>
+                                       <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                          <tr>
+                                             <td valign=top style="padding-top:2px" width=20><h:graphicImage url="/images/icons/info_icon.gif" width="16" height="16"/></td>
+                                             <td class="mainSubText">
+                                                <h:outputFormat value="#{msg.delete_group_warning}">
+                                                   <f:param value="#{GroupsBean.actionGroupItems}" />
+                                                </h:outputFormat>
+                                             </td>
+                                          </tr>
+                                       </table>
+                                       <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "yellowInner"); %>
+                                    </td>
                                  </tr>
-                                 <tr><td class="paddingRow"></td></tr>
+                                 </a:panel>
                                  <tr>
-                                    <td>1.&nbsp;<h:outputText value="#{msg.select_role}" /></td>
-                                 </tr>
-                                 <tr>
-                                    <td>
-                                       <h:selectOneListbox id="roles" style="width:250px" size="5">
-                                          <f:selectItems value="#{InviteUsersWizard.roles}" />
-                                       </h:selectOneListbox>
+                                    <td class="mainSubTitle">
+                                       <h:outputFormat value="#{msg.delete_group_confirm}">
+                                          <f:param value="#{GroupsBean.actionGroupName}"/>
+                                       </h:outputFormat>
                                     </td>
                                  </tr>
                                  <tr>
                                     <td>
-                                       2.&nbsp;<h:commandButton value="#{msg.add_to_list_button}" actionListener="#{UserMembersBean.addRole}" />
-                                    </td>
-                                 </tr>
-                                 <tr><td class="paddingRow"></td></tr>
-                                 <tr>
-                                    <td><h:outputText value="#{msg.selected_roles}" /></td>
-                                 </tr>
-                                 <tr>
+                                       <%-- Error Messages --%>
+                                       <%-- messages tag to show messages not handled by other specific message tags --%>
+                                       <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                                     <td>
-                                       <h:dataTable value="#{UserMembersBean.personRolesDataModel}" var="row"
-                                                    rowClasses="selectedItemsRow,selectedItemsRowAlt"
-                                                    styleClass="selectedItems" headerClass="selectedItemsHeader"
-                                                    cellspacing="0" cellpadding="4" 
-                                                    rendered="#{UserMembersBean.personRolesDataModel.rowCount != 0}">
-                                          <h:column>
-                                             <f:facet name="header">
-                                                <h:outputText value="#{msg.name}" />
-                                             </f:facet>
-                                             <h:outputText value="#{row.role}" />
-                                          </h:column>
-                                          <h:column>
-                                             <a:actionLink actionListener="#{UserMembersBean.removeRole}" image="/images/icons/delete.gif"
-                                                           value="#{msg.remove}" showLink="false" style="padding-left:6px" />
-                                          </h:column>
-                                       </h:dataTable>
-                                       <a:panel id="no-items" rendered="#{UserMembersBean.personRolesDataModel.rowCount == 0}">
-                                          <table cellspacing='0' cellpadding='2' border='0' class='selectedItems'>
-                                             <tr>
-                                                <td colspan='2' class='selectedItemsHeader'><h:outputText id="no-items-name" value="#{msg.name}" /></td>
-                                             </tr>
-                                             <tr>
-                                                <td class='selectedItemsRow'><h:outputText id="no-items-msg" value="#{msg.no_selected_items}" /></td>
-                                             </tr>
-                                          </table>
-                                       </a:panel>
-                                    </td>
                                  </tr>
-                                 <tr><td colspan=2 class="paddingRow"></td></tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
@@ -162,12 +139,13 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.ok}" action="#{UserMembersBean.finishOK}" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.delete}" action="#{GroupsBean.finishDelete}" styleClass="dialogControls" />
                                     </td>
                                  </tr>
+                                 <tr><td class="dialogButtonSpacing"></td></tr>
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.cancel_button}" action="cancel" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.cancel}" action="cancel" styleClass="dialogControls" />
                                     </td>
                                  </tr>
                               </table>
@@ -175,16 +153,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

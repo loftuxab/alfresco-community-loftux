@@ -30,6 +30,7 @@ import javax.faces.event.ActionEvent;
 import javax.faces.validator.ValidatorException;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -48,6 +49,7 @@ import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.users.UsersBean;
+import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.log4j.Logger;
@@ -95,6 +97,9 @@ public class NewUserWizard extends AbstractWizardBean
 
    /** OwnableService bean reference */
    private OwnableService ownableService;
+   
+   /** ConfigService bean reference */
+   private ConfigService configService;
 
    /** action context */
    private Node person = null;
@@ -144,6 +149,14 @@ public class NewUserWizard extends AbstractWizardBean
    public void setOwnableService(OwnableService ownableService)
    {
       this.ownableService = ownableService;
+   }
+   
+   /**
+    * @param configService The ConfigService to set.
+    */
+   public void setConfigService(ConfigService configService)
+   {
+      this.configService = configService;
    }
 
    /**
@@ -888,7 +901,11 @@ public class NewUserWizard extends AbstractWizardBean
          this.permissionService.setPermission(nodeRef, this.userName, permissionService.getAllPermission(), true);
          
          // by default other users will only have GUEST access to the space contents
-         this.permissionService.setPermission(nodeRef, permissionService.getAllAuthorities(), permissionService.GUEST, true);
+         String permission = getDefaultPermission();
+         if (permission != null && permission.length() != 0)
+         {
+            this.permissionService.setPermission(nodeRef, permissionService.getAllAuthorities(), permission, true);
+         }
          
          // the new user is the OWNER of their own space and has full permissions
          this.ownableService.setOwner(nodeRef, this.userName);
@@ -903,6 +920,17 @@ public class NewUserWizard extends AbstractWizardBean
       }
       
       return homeSpaceNodeRef;
+   }
+   
+   /**
+    * @return default permission string to set for other users for a new Home Space
+    */
+   private String getDefaultPermission()
+   {
+      ClientConfigElement config = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
+            ClientConfigElement.CONFIG_ELEMENT_ID);
+      
+      return config.getHomeSpacePermission();
    }
 
    private void invalidateUserList()
