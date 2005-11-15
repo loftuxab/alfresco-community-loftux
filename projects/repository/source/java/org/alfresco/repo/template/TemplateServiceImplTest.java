@@ -92,34 +92,27 @@ public class TemplateServiceImplTest extends TestCase
             transactionService,
             new TransactionUtil.TransactionWork<Object>()
             {
-                public Object doWork()
+                public Object doWork() throws Exception
                 {
-                    try
-                    {
-                        StoreRef store = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "template_" + System.currentTimeMillis());
-                        NodeRef root = nodeService.getRootNode(store);
-                        BaseNodeServiceTest.buildNodeGraph(nodeService, root);
-                        
-                        // check the default template engine exists
-                        assertNotNull(templateService.getTemplateProcessor("freemarker"));
-                        
-                        // create test model
-                        Map model = new HashMap(7, 1.0f);
-                        
-                        model.put("root", new TemplateNode(root, serviceRegistry, null));
-                        
-                        // execute on test template
-                        String output = templateService.processTemplate("freemarker", TEMPLATE_1, model);
-                        
-                        // check template contains the expected output
-                        assertTrue( (output.indexOf(root.getId()) != -1) );
-                        
-                        System.out.print(output);
-                    }
-                    catch (Exception err)
-                    {
-                        fail(err.getMessage());
-                    }
+                    StoreRef store = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "template_" + System.currentTimeMillis());
+                    NodeRef root = nodeService.getRootNode(store);
+                    BaseNodeServiceTest.buildNodeGraph(nodeService, root);
+                    
+                    // check the default template engine exists
+                    assertNotNull(templateService.getTemplateProcessor("freemarker"));
+                    
+                    // create test model
+                    Map model = new HashMap(7, 1.0f);
+                    
+                    model.put("root", new TemplateNode(root, serviceRegistry, null));
+                    
+                    // execute on test template
+                    String output = templateService.processTemplate("freemarker", TEMPLATE_1, model);
+                    
+                    // check template contains the expected output
+                    assertTrue( (output.indexOf(root.getId()) != -1) );
+                    
+                    System.out.print(output);
                     
                     return null;
                 }                
