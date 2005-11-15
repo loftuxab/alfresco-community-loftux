@@ -16,6 +16,7 @@
  */
 package org.alfresco.web.bean;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
@@ -28,6 +29,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.util.CachingDateFormat;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.bean.repository.Repository;
 
@@ -393,15 +395,17 @@ public class AdvancedSearchBean
          }
          if (this.createdDateChecked == true)
          {
-            String strCreatedDate = ISO8601DateFormat.format(this.createdDateFrom).substring(0, 10);
-            String strCreatedDateTo = ISO8601DateFormat.format(this.createdDateTo).substring(0, 10);
-            search.addAdditionalAttribute(ContentModel.PROP_CREATED, "[" + strCreatedDate + " TO " + strCreatedDateTo + "]");
+            SimpleDateFormat df = CachingDateFormat.getDateFormat();
+            String strCreatedDate = df.format(this.createdDateFrom);
+            String strCreatedDateTo = df.format(this.createdDateTo);
+            search.addRangeQuery(ContentModel.PROP_CREATED, strCreatedDate, strCreatedDateTo, true);
          }
          if (this.modifiedDateChecked == true)
          {
-            String strModifiedDate = ISO8601DateFormat.format(this.modifiedDateFrom).substring(0, 10);
-            String strModifiedDateTo = ISO8601DateFormat.format(this.modifiedDateTo).substring(0, 10);
-            search.addAdditionalAttribute(ContentModel.PROP_MODIFIED, "[" + strModifiedDate + " TO " + strModifiedDateTo + "]");
+            SimpleDateFormat df = CachingDateFormat.getDateFormat();
+            String strModifiedDate = df.format(this.modifiedDateFrom);
+            String strModifiedDateTo = df.format(this.modifiedDateTo);
+            search.addRangeQuery(ContentModel.PROP_MODIFIED, strModifiedDate, strModifiedDateTo, true);
          }
          
          // location path search

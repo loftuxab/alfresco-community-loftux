@@ -39,17 +39,17 @@
       </data-type>
 
       <data-type name="d:long">
-         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+         <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.LongAnalyser</analyser-class>
          <java-class>java.lang.Long</java-class>
       </data-type>
 
       <data-type name="d:float">
-         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+         <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.FloatAnalyser</analyser-class>
          <java-class>java.lang.Float</java-class>
       </data-type>
 
       <data-type name="d:double">
-         <analyser-class>org.apache.lucene.analysis.standard.StandardAnalyzer</analyser-class>
+         <analyser-class>org.alfresco.repo.search.impl.lucene.analysis.DoubleAnalyser</analyser-class>
          <java-class>java.lang.Double</java-class>
       </data-type>
 

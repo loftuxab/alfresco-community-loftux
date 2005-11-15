@@ -22,20 +22,21 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 
 /**
- * Simple analyser for integers.
+ * Simple analyser for longs.
  * 
  * @author Andy Hind
  */
-public class IntegerAnalyser extends Analyzer
+public class LongAnalyser extends Analyzer
 {
 
-    public IntegerAnalyser()
+    public LongAnalyser()
     {
         super();
     }
 
+
     public TokenStream tokenStream(String fieldName, Reader reader)
     {
-        return new IntegerTokenFilter(reader);
+        return new LongTokenFilter(reader);
     }
 }

@@ -24,15 +24,15 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 /**
- * Simple tokeniser for integers.
+ * Simple tokeniser for floats.
  * 
  * @author Andy Hind
  */
-public class IntegerTokenFilter extends Tokenizer
+public class FloatTokenFilter extends Tokenizer
 {
     Tokenizer baseTokeniser;
     
-    public IntegerTokenFilter(Reader in)
+    public FloatTokenFilter(Reader in)
     {
         super(in);
         baseTokeniser = new StandardTokenizer(in);
@@ -49,11 +49,11 @@ public class IntegerTokenFilter extends Tokenizer
         Token candidate;
         while((candidate = baseTokeniser.next()) != null)
         {
-            Integer integer = Integer.valueOf(candidate.termText());
-            String valueString = NumericEncoder.encode(integer.intValue());
-            Token integerToken = new Token(valueString, candidate.startOffset(), candidate.startOffset(),
+            Float floatValue = Float.valueOf(candidate.termText());
+            String valueString = NumericEncoder.encode(floatValue.floatValue());
+            Token floatToken = new Token(valueString, candidate.startOffset(), candidate.startOffset(),
                     candidate.type());
-            return integerToken;
+            return floatToken;
         }
         return null;
     }

@@ -16,7 +16,12 @@
  */
 package org.alfresco.repo.search.impl.lucene;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Vector;
 
 import org.alfresco.repo.search.SearcherException;
 import org.alfresco.repo.search.impl.lucene.query.PathQuery;
@@ -27,9 +32,13 @@ import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.document.DateField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.TermQuery;
 import org.saxpath.SAXPathException;
 
@@ -38,11 +47,11 @@ import com.werken.saxpath.XPathReader;
 public class LuceneQueryParser extends QueryParser
 {
     private static Logger s_logger = Logger.getLogger(LuceneQueryParser.class);
-    
+
     private NamespacePrefixResolver namespacePrefixResolver;
-    
+
     private DictionaryService dictionaryService;
-    
+
     /**
      * Parses a query string, returning a {@link org.apache.lucene.search.Query}.
      * 
@@ -55,11 +64,13 @@ public class LuceneQueryParser extends QueryParser
      * @throws ParseException
      *             if the parsing fails
      */
-    static public Query parse(String query, String field, Analyzer analyzer, NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService, int defaultOperator) throws ParseException
+    static public Query parse(String query, String field, Analyzer analyzer,
+            NamespacePrefixResolver namespacePrefixResolver, DictionaryService dictionaryService, int defaultOperator)
+            throws ParseException
     {
-        if(s_logger.isDebugEnabled())
+        if (s_logger.isDebugEnabled())
         {
-            s_logger.debug("Using Alfresco Lucene Query Parser for query: "+query);
+            s_logger.debug("Using Alfresco Lucene Query Parser for query: " + query);
         }
         LuceneQueryParser parser = new LuceneQueryParser(field, analyzer);
         parser.setOperator(defaultOperator);
@@ -72,7 +83,6 @@ public class LuceneQueryParser extends QueryParser
     {
         this.namespacePrefixResolver = namespacePrefixResolver;
     }
-    
 
     public LuceneQueryParser(String arg0, Analyzer arg1)
     {
@@ -119,22 +129,22 @@ public class LuceneQueryParser extends QueryParser
             }
             else if (field.equals("ID"))
             {
-                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                TermQuery termQuery = new TermQuery(new Term(field, queryText));
                 return termQuery;
             }
             else if (field.equals("TX"))
             {
-                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                TermQuery termQuery = new TermQuery(new Term(field, queryText));
                 return termQuery;
             }
             else if (field.equals("PARENT"))
             {
-                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                TermQuery termQuery = new TermQuery(new Term(field, queryText));
                 return termQuery;
             }
             else if (field.equals("PRIMARYPARENT"))
             {
-                TermQuery termQuery =  new TermQuery(new Term(field, queryText));
+                TermQuery termQuery = new TermQuery(new Term(field, queryText));
                 return termQuery;
             }
             else if (field.equals("QNAME"))
@@ -144,35 +154,36 @@ public class LuceneQueryParser extends QueryParser
                 handler.setNamespacePrefixResolver(namespacePrefixResolver);
                 handler.setDictionaryService(dictionaryService);
                 reader.setXPathHandler(handler);
-                reader.parse("//"+queryText);
+                reader.parse("//" + queryText);
                 return handler.getQuery();
             }
             else if (field.equals("TYPE"))
             {
                 TypeDefinition target = dictionaryService.getType(QName.createQName(queryText));
-                if(target == null)
+                if (target == null)
                 {
-                    throw new SearcherException("Invalid type: "+queryText);
+                    throw new SearcherException("Invalid type: " + queryText);
                 }
                 QName targetQName = target.getName();
                 HashSet<QName> subclasses = new HashSet<QName>();
-                for(QName classRef : dictionaryService.getAllTypes())
+                for (QName classRef : dictionaryService.getAllTypes())
                 {
                     TypeDefinition current = dictionaryService.getType(classRef);
-                    while( (current != null) && !current.getName().equals(targetQName))
+                    while ((current != null) && !current.getName().equals(targetQName))
                     {
-                        current = (current.getParentName() == null) ? null : dictionaryService.getType(current.getParentName());
+                        current = (current.getParentName() == null) ? null : dictionaryService.getType(current
+                                .getParentName());
                     }
-                    if(current != null)
+                    if (current != null)
                     {
                         subclasses.add(classRef);
                     }
                 }
                 BooleanQuery booleanQuery = new BooleanQuery();
-                for(QName qname: subclasses)
-                { 
-                   TermQuery termQuery =  new TermQuery(new Term(field, qname.toString()));
-                   booleanQuery.add(termQuery, false, false);
+                for (QName qname : subclasses)
+                {
+                    TermQuery termQuery = new TermQuery(new Term(field, qname.toString()));
+                    booleanQuery.add(termQuery, false, false);
                 }
                 return booleanQuery;
             }
@@ -181,23 +192,24 @@ public class LuceneQueryParser extends QueryParser
                 AspectDefinition target = dictionaryService.getAspect(QName.createQName(queryText));
                 QName targetQName = target.getName();
                 HashSet<QName> subclasses = new HashSet<QName>();
-                for(QName classRef : dictionaryService.getAllAspects())
+                for (QName classRef : dictionaryService.getAllAspects())
                 {
                     AspectDefinition current = dictionaryService.getAspect(classRef);
-                    while( (current != null) && !current.getName().equals(targetQName))
+                    while ((current != null) && !current.getName().equals(targetQName))
                     {
-                        current = (current.getParentName() == null) ? null : dictionaryService.getAspect(current.getParentName());
+                        current = (current.getParentName() == null) ? null : dictionaryService.getAspect(current
+                                .getParentName());
                     }
-                    if(current != null)
+                    if (current != null)
                     {
                         subclasses.add(classRef);
                     }
                 }
-                
+
                 BooleanQuery booleanQuery = new BooleanQuery();
-                for(QName qname: subclasses)
-                { 
-                    TermQuery termQuery =  new TermQuery(new Term(field, qname.toString()));
+                for (QName qname : subclasses)
+                {
+                    TermQuery termQuery = new TermQuery(new Term(field, qname.toString()));
                     booleanQuery.add(termQuery, false, false);
                 }
                 return booleanQuery;
@@ -205,18 +217,21 @@ public class LuceneQueryParser extends QueryParser
             else if (field.startsWith("@"))
             {
                 // Check for any prefixes and expand to the full uri
-                if(field.charAt(1) != '{')
+                if (field.charAt(1) != '{')
                 {
                     int colonPosition = field.indexOf(':');
-                    if(colonPosition == -1)
+                    if (colonPosition == -1)
                     {
                         // use the default namespace
-                        return super.getFieldQuery("@{"+namespacePrefixResolver.getNamespaceURI("")+"}"+field.substring(1), queryText);
+                        return super.getFieldQuery("@{"
+                                + namespacePrefixResolver.getNamespaceURI("") + "}" + field.substring(1), queryText);
                     }
                     else
                     {
                         // find the prefix
-                        return super.getFieldQuery("@{"+namespacePrefixResolver.getNamespaceURI(field.substring(1, colonPosition))+"}"+field.substring(colonPosition+1), queryText);
+                        return super.getFieldQuery("@{"
+                                + namespacePrefixResolver.getNamespaceURI(field.substring(1, colonPosition)) + "}"
+                                + field.substring(colonPosition + 1), queryText);
                     }
                 }
                 else
@@ -237,10 +252,78 @@ public class LuceneQueryParser extends QueryParser
 
     }
 
+    /**
+     * @exception ParseException
+     *                throw in overridden method to disallow
+     */
+    protected Query getRangeQuery(String field, String part1, String part2, boolean inclusive) throws ParseException
+    {
+        if (field.startsWith("@"))
+        {
+            String fieldName = field;
+            // Check for any prefixes and expand to the full uri
+            if (field.charAt(1) != '{')
+            {
+                int colonPosition = field.indexOf(':');
+                if (colonPosition == -1)
+                {
+                    // use the default namespace
+                    fieldName = "@{" + namespacePrefixResolver.getNamespaceURI("") + "}" + field.substring(1);
+                }
+                else
+                {
+                    // find the prefix
+                    fieldName = "@{"
+                            + namespacePrefixResolver.getNamespaceURI(field.substring(1, colonPosition)) + "}"
+                            + field.substring(colonPosition + 1);
+                }
+            }
+            return new RangeQuery(new Term(fieldName, getToken(fieldName, part1)), new Term(fieldName, getToken(
+                    fieldName, part2)), inclusive);
+
+        }
+        else
+        {
+            return super.getRangeQuery(field, part1, part2, inclusive);
+        }
+
+    }
+
+    private String getToken(String field, String value)
+    {
+        TokenStream source = analyzer.tokenStream(field, new StringReader(value));
+        org.apache.lucene.analysis.Token t;
+        String tokenised = null;
+
+        while (true)
+        {
+            try
+            {
+                t = source.next();
+            }
+            catch (IOException e)
+            {
+                t = null;
+            }
+            if (t == null)
+                break;
+            tokenised = t.termText();
+        }
+        try
+        {
+            source.close();
+        }
+        catch (IOException e)
+        {
+
+        }
+        return tokenised;
+
+    }
+
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
     }
-    
 
 }

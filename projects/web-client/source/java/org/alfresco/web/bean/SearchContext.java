@@ -63,6 +63,11 @@ public final class SearchContext implements Serializable
    /** any additional attribute to add to the search */
    private Map<QName, String> additionalAttributes = new HashMap<QName, String>(5, 1.0f);
    
+   /** any additional range attribute to add to the search */
+   private Map<QName, RangeProperties> rangeAttributes = new HashMap<QName, RangeProperties>(5, 1.0f);
+   
+   
+   
    /** logger */
    private static Log logger = LogFactory.getLog(SearchContext.class);
       
@@ -160,6 +165,23 @@ public final class SearchContext implements Serializable
             String value = QueryParser.escape(additionalAttributes.get(qname));
             attributeQuery.append(" +@").append(escapedName)
                           .append(":").append(value);
+         }
+      }
+      
+      if (rangeAttributes.size() != 0)
+      {
+         if(attributeQuery == null)
+         {
+            attributeQuery = new StringBuilder(additionalAttributes.size() << 5);
+         }
+         for (QName qname : rangeAttributes.keySet())
+         {
+            String escapedName = Repository.escapeQName(qname);
+            RangeProperties rp = rangeAttributes.get(qname);
+            String value1 = QueryParser.escape(rp.lower);
+            String value2 = QueryParser.escape(rp.upper);
+            attributeQuery.append(" +@").append(escapedName)
+                          .append(":").append(rp.inclusive ? "[" : "{").append(value1).append(" TO ").append(value2).append(rp.inclusive ? "]" : "}");
          }
       }
       
@@ -317,5 +339,26 @@ public final class SearchContext implements Serializable
    public void addAdditionalAttribute(QName qname, String value)
    {
       this.additionalAttributes.put(qname, value);
+   }
+   
+   public void addRangeQuery(QName qname, String lower, String upper, boolean inclusive)
+   {
+       this.rangeAttributes.put(qname, new RangeProperties(qname, lower, upper, inclusive));
+   }
+   
+   private static class RangeProperties
+   {
+       QName qname;
+       String lower;
+       String upper;
+       boolean inclusive;
+       
+       RangeProperties(QName qname, String lower, String upper, boolean inclusive)
+       {
+           this.qname = qname;
+           this.lower = lower;
+           this.upper = upper;
+           this.inclusive = inclusive;
+       }
    }
 }

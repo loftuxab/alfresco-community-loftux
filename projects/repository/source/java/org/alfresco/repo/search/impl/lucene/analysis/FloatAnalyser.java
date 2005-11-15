@@ -22,20 +22,20 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 
 /**
- * Simple analyser for integers.
+ * Simple analyser for floats.
  * 
  * @author Andy Hind
  */
-public class IntegerAnalyser extends Analyzer
+public class FloatAnalyser extends Analyzer
 {
 
-    public IntegerAnalyser()
+    public FloatAnalyser()
     {
         super();
     }
 
     public TokenStream tokenStream(String fieldName, Reader reader)
     {
-        return new IntegerTokenFilter(reader);
+        return new FloatTokenFilter(reader);
     }
 }

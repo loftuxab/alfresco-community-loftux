@@ -24,15 +24,15 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 /**
- * Simple tokeniser for integers.
+ * Simple tokeniser for longs.
  * 
  * @author Andy Hind
  */
-public class IntegerTokenFilter extends Tokenizer
+public class LongTokenFilter extends Tokenizer
 {
     Tokenizer baseTokeniser;
     
-    public IntegerTokenFilter(Reader in)
+    public LongTokenFilter(Reader in)
     {
         super(in);
         baseTokeniser = new StandardTokenizer(in);
@@ -49,11 +49,11 @@ public class IntegerTokenFilter extends Tokenizer
         Token candidate;
         while((candidate = baseTokeniser.next()) != null)
         {
-            Integer integer = Integer.valueOf(candidate.termText());
-            String valueString = NumericEncoder.encode(integer.intValue());
-            Token integerToken = new Token(valueString, candidate.startOffset(), candidate.startOffset(),
+            Long longValue = Long.valueOf(candidate.termText());
+            String valueString = NumericEncoder.encode(longValue.longValue());
+            Token longToken = new Token(valueString, candidate.startOffset(), candidate.startOffset(),
                     candidate.type());
-            return integerToken;
+            return longToken;
         }
         return null;
     }
