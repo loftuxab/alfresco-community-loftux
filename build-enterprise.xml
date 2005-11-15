@@ -11,6 +11,7 @@
    <target name="init" depends="common-init.init">
       <property name="dir.name.enterprise" value="enterprise" />
       <property name="dir.config.enterprise" value="${dir.projects}/${dir.name.enterprise}/${dir.name.config}" />
+      <property name="files.faces.config.enterprise" value="/WEB-INF/faces-config-navigation.xml,/WEB-INF/faces-config-common.xml,/WEB-INF/faces-config-repo.xml,/WEB-INF/faces-config-zoo.xml,/WEB-INF/faces-config-enterprise.xml" />
       
       <filelist id="files.project.build" dir="."
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
@@ -28,16 +29,40 @@
       </copy>
    </target>
    
+   <!-- override jboss build to pass enterprise faces config files -->
+   <target name="incremental-jboss" depends="init" description="Builds the projects for use in JBoss">
+      <subant target="incremental">
+         <property name="server" value="jboss"/>
+         <property name="files.faces.config" value="${files.faces.config.enterprise}" />
+         <filelist refid="files.project.build"/>
+      </subant>
+      <antcall target="deploy-jboss" />
+   </target>
+   
+   <!-- override tomcat build to pass enterprise faces config files -->
+   <target name="incremental-tomcat" depends="init" description="Builds the projects for use in Tomcat">
+      <subant target="incremental">
+         <property name="server" value="tomcat"/>
+         <property name="files.faces.config" value="${files.faces.config.enterprise}" />
+         <filelist refid="files.project.build"/>
+      </subant>
+      <antcall target="deploy-tomcat" />
+   </target>
+   
    <!-- do the normal deploy plus copy the enterprise config files -->
    <target name="deploy-jboss" depends="alfresco.deploy-jboss" description="Deploys to JBoss">
       <copy todir="${dir.deploy.jboss}/../conf" overwrite="yes">
          <fileset dir="${dir.config.enterprise}"/>
       </copy>
+      <war warfile="${dir.deploy.jboss}/${file.name.war.alfresco}" update="true" duplicate="preserve">
+         <fileset dir="${dir.name.projects}/${dir.name.enterprise}/source/web" />
+      </war>
    </target>
    
    <!-- override the update of the WAR file to include the enterprise config files -->
    <target name="update-tomcat-war" depends="init">
       <war warfile="${dir.deploy.tomcat}/${file.name.war.alfresco}" update="true" duplicate="preserve">
+         <fileset dir="${dir.name.projects}/${dir.name.enterprise}/source/web" />
          <classes dir="${dir.config.enterprise}"/>
          <classes dir="${dir.config.repository}"/>
          <classes dir="${dir.config.webclient}"/>
