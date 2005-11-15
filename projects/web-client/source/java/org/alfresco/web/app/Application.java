@@ -426,7 +426,7 @@ public class Application
     * @param context        FacesContext
     * @param msg            Message ID
     * 
-    * @return String from message bundle or null if not found
+    * @return String from message bundle or $$msg$$ if not found
     */
    public static String getMessage(FacesContext context, String msg)
    {
@@ -439,7 +439,7 @@ public class Application
     * @param session        HttpSession
     * @param msg            Message ID
     * 
-    * @return String from message bundle or null if not found
+    * @return String from message bundle or $$msg$$ if not found
     */
    public static String getMessage(HttpSession session, String msg)
    {

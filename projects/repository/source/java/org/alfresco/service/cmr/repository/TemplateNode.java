@@ -40,7 +40,9 @@ import org.xml.sax.InputSource;
 import freemarker.ext.dom.NodeModel;
 
 /**
- * Node class specific for use by Template pages.
+ * Node class specific for use by Template pages that support Bean objects as part of the model.
+ * The default template engine FreeMarker can use these objects and they are provided to support it.
+ * A single method is completely freemarker specific - getXmlNodeModel()
  * <p>
  * The class exposes Node properties, children as dynamically populated maps and lists.
  * <p>

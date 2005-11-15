@@ -24,6 +24,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.config.ConfigService;
+import org.alfresco.repo.template.HasAspectMethod;
+import org.alfresco.repo.template.I18NMessageMethod;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.TemplateException;
@@ -176,7 +178,7 @@ public class UITemplate extends SelfRenderingComponent
    /**
     * Return the data model to bind template against.
     * <p>
-    * By default we return a model containing root references to the Company Home Space,
+    * By default we return a Map model containing root references to the Company Home Space,
     * the users Home Space and the Person Node for the current user.
     * 
     * @return Returns the data model to bind template against.
@@ -192,36 +194,45 @@ public class UITemplate extends SelfRenderingComponent
             model = vb.getValue(getFacesContext());
          }
          
-         // create default model
-         Map root = new HashMap(3, 1.0f);
-         
-         FacesContext context = FacesContext.getCurrentInstance();
-         ServiceRegistry services = Repository.getServiceRegistry(context);
-         
-         // supply the CompanyHome space as "companyhome"
-         NodeRef companyRootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
-         TemplateNode companyRootNode = new TemplateNode(companyRootRef, services, imageResolver);
-         root.put("companyhome", companyRootNode);
-         
-         // supply the users Home Space as "userhome"
-         User user = Application.getCurrentUser(context);
-         NodeRef userRootRef = new NodeRef(Repository.getStoreRef(), user.getHomeSpaceId());
-         TemplateNode userRootNode = new TemplateNode(userRootRef, services, imageResolver);
-         root.put("userhome", userRootNode);
-         
-         // supply the current user Node as "person"
-         root.put("person", new TemplateNode(user.getPerson(), services, imageResolver));
-         
-         // merge models
-         if (model instanceof Map)
+         if (getEngine().equals(ENGINE_DEFAULT))
          {
-            if (logger.isDebugEnabled())
-               logger.debug("Found model to merge: " + model);
+            // create FreeMarker default model and merge
+            Map root = new HashMap(7, 1.0f);
             
-            root.putAll((Map)model);
+            FacesContext context = FacesContext.getCurrentInstance();
+            ServiceRegistry services = Repository.getServiceRegistry(context);
+            
+            // supply the CompanyHome space as "companyhome"
+            NodeRef companyRootRef = new NodeRef(Repository.getStoreRef(), Application.getCompanyRootId());
+            TemplateNode companyRootNode = new TemplateNode(companyRootRef, services, imageResolver);
+            root.put("companyhome", companyRootNode);
+            
+            // supply the users Home Space as "userhome"
+            User user = Application.getCurrentUser(context);
+            NodeRef userRootRef = new NodeRef(Repository.getStoreRef(), user.getHomeSpaceId());
+            TemplateNode userRootNode = new TemplateNode(userRootRef, services, imageResolver);
+            root.put("userhome", userRootNode);
+            
+            // supply the current user Node as "person"
+            root.put("person", new TemplateNode(user.getPerson(), services, imageResolver));
+            
+            // add custom method objects
+            root.put("hasAspect", new HasAspectMethod());
+            root.put("message", new I18NMessageMethod());
+            
+            // merge models
+            if (model instanceof Map)
+            {
+               if (logger.isDebugEnabled())
+                  logger.debug("Found valid Map model to merge with FreeMarker: " + model);
+               
+               root.putAll((Map)model);
+            }
+            
+            model = root;
          }
          
-         return root;
+         return model;
       }
       else
       {
