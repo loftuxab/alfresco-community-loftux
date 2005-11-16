@@ -225,7 +225,7 @@ public class InviteUsersWizard extends AbstractWizardBean
                      notifyUser(this.personService.getPerson(authority), folderNodeRef, from, userGroupRole.getRole());
                   }
                }
-               else
+               else if (authType.equals(AuthorityType.GROUP))
                {
                   // else notify all members of the group
                   Set<String> users = this.authorityService.getContainedAuthorities(AuthorityType.USER, authority, false);
