@@ -10,16 +10,16 @@
    <!-- Define an ordered list of projects to build -->
    <target name="init" depends="common-init.init">
       <property name="dir.name.enterprise" value="enterprise" />
-      <property name="dir.config.enterprise" value="${dir.projects}/${dir.name.enterprise}/${dir.name.config}" />
-      <property name="files.faces.config.enterprise" value="/WEB-INF/faces-config-navigation.xml,/WEB-INF/faces-config-common.xml,/WEB-INF/faces-config-repo.xml,/WEB-INF/faces-config-zoo.xml,/WEB-INF/faces-config-enterprise.xml" />
-      
+      <property name="dir.project.enterprise" value="${dir.name.projects}/${dir.name.enterprise}" />
+      <property name="file.deploy" value="${dir.project.enterprise}/build/dist/${file.name.war.alfresco}" />
+
       <filelist id="files.project.build" dir="."
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.jcr}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.enterprise}/${file.name.project.build}"/>
+                       ${dir.project.enterprise}/${file.name.project.build}"/>
    </target>
    
    <!-- build the documentation for the enterprise project -->
@@ -28,52 +28,15 @@
           <fileset dir="${dir.project.enterprise}/build/docs/java"/>
       </copy>
    </target>
-   
-   <!-- override jboss build to pass enterprise faces config files -->
-   <target name="incremental-jboss" depends="init" description="Builds the projects for use in JBoss">
-      <subant target="incremental">
-         <property name="server" value="jboss"/>
-         <property name="files.faces.config" value="${files.faces.config.enterprise}" />
-         <filelist refid="files.project.build"/>
-      </subant>
-      <antcall target="deploy-jboss" />
-   </target>
-   
-   <!-- override tomcat build to pass enterprise faces config files -->
-   <target name="incremental-tomcat" depends="init" description="Builds the projects for use in Tomcat">
-      <subant target="incremental">
-         <property name="server" value="tomcat"/>
-         <property name="files.faces.config" value="${files.faces.config.enterprise}" />
-         <filelist refid="files.project.build"/>
-      </subant>
-      <antcall target="deploy-tomcat" />
-   </target>
-   
-   <!-- do the normal deploy plus copy the enterprise config files -->
-   <target name="deploy-jboss" depends="alfresco.deploy-jboss" description="Deploys to JBoss">
-      <copy todir="${dir.deploy.jboss}/../conf" overwrite="yes">
-         <fileset dir="${dir.config.enterprise}"/>
-      </copy>
-      <war warfile="${dir.deploy.jboss}/${file.name.war.alfresco}" update="true" duplicate="preserve">
-         <fileset dir="${dir.name.projects}/${dir.name.enterprise}/source/web" />
-      </war>
-   </target>
-   
-   <!-- override the update of the WAR file to include the enterprise config files -->
-   <target name="update-tomcat-war" depends="init">
-      <war warfile="${dir.deploy.tomcat}/${file.name.war.alfresco}" update="true" duplicate="preserve">
-         <fileset dir="${dir.name.projects}/${dir.name.enterprise}/source/web" />
-         <classes dir="${dir.config.enterprise}"/>
-         <classes dir="${dir.config.repository}"/>
-         <classes dir="${dir.config.webclient}"/>
-         <classes file="${dir.project.core}/source/java/log4j.properties" 
-                  prefix="WEB-INF/classes"/>
-      </war>
-   </target>
 
    <!-- override the drop-database target to also delete the enterprise index files -->
    <target name="drop-database" depends="alfresco.drop-database">
-      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.name.projects}/${dir.name.enterprise}/alf_data" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.enterprise}/alf_data" />
+   </target>
+   
+   <!-- override the clean-war target so we remove the assemble folder -->
+   <target name="clean-war" depends="alfresco.clean-war">
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.enterprise}/build/assemble" />
    </target>
    
 </project>

@@ -89,27 +89,28 @@
         <jar jarfile="${dir.dist}/${file.name.jar}" basedir="${dir.classes}" />
     </target>
 
-    <target name="package-war" depends="package-jar" description="Packages the WAR file">
+    <target name="package-war" depends="assemble-war" description="Packages the WAR file">
         <mkdir dir="${dir.dist}" />
         <war warfile="${dir.dist}/${file.name.war}" webxml="${dir.src.webinf}/web.xml">
-            <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
-            <webinf dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes}" />
-            <lib dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" />
-            <lib dir="${dir.dist}" includes="${file.name.jar}" />
+           <fileset dir="${dir.assemble}" />
         </war>
     </target>
-
-    <target name="assemble-ear" depends="package-war">
-        <copy todir="${dir.assemble}">
-            <fileset dir="${dir.dist}" includes="*.war" />
-        </copy>
-    </target>
-
-    <target name="package-ear" depends="assemble-ear" description="Packages the EAR file">
-        <mkdir dir="${dir.assemble}" />
-        <ear earfile="${dir.dist}/${file.name.ear}" appxml="${dir.src.metainf}/application.xml">
-            <fileset dir="${dir.assemble}" />
-        </ear>
+   
+    <target name="assemble-war" depends="package-jar">
+       <mkdir dir="${dir.assemble}" />
+       
+       <copy todir="${dir.assemble}">
+          <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
+       </copy>
+       
+       <copy todir="${dir.assemble}/WEB-INF">
+          <fileset dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes}" />
+       </copy>
+       
+       <copy todir="${dir.assemble}/WEB-INF/lib">
+          <fileset dir="${dir.common.lib}" includes="${webinf.lib.includes}" excludes="${webinf.lib.excludes}" />
+          <fileset dir="${dir.dist}" includes="${file.name.jar}" />
+       </copy>
     </target>
 
     <!-- ********************** -->
