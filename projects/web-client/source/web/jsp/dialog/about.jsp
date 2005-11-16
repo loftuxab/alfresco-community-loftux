@@ -224,7 +224,9 @@
                                  Michiel Steltman,
                                  cnalfresco,
                                  Theodoros Papageorgiou,
-                                 Andrejus Chaliapinas
+                                 Andrejus Chaliapinas,
+                                 Antti Jokipii,
+                                 Henning Kristensen
                               </td>
                            </tr>
                         </table>
