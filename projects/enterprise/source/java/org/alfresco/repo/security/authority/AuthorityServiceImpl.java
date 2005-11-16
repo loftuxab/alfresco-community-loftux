@@ -103,6 +103,10 @@ public class AuthorityServiceImpl implements AuthorityService
         {
             authorities.addAll(adminSet);
         }
+        if(AuthorityType.getAuthorityType(currentUserName) != AuthorityType.GUEST)
+        {
+           authorities.addAll(allSet);
+        }
         authorities.addAll(getContainingAuthorities(null, currentUserName, false));
         return authorities;
     }
@@ -121,8 +125,7 @@ public class AuthorityServiceImpl implements AuthorityService
         case GUEST:
             authorities.addAll(guestSet);
             break;
-        case GROUP:
-            authorities.addAll(allSet);
+        case GROUP:           
             authorities.addAll(authorityDAO.getAllAuthorities(type));
             break;
         case OWNER:
