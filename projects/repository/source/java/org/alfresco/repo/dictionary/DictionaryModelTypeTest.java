@@ -117,12 +117,14 @@ public class DictionaryModelTypeTest extends BaseAlfrescoTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        /*
         super.onSetUpInTransaction();
         
         // Get the required services
         this.dictionaryService = (DictionaryService)this.applicationContext.getBean("dictionaryService");
         this.namespaceService = (NamespaceService)this.applicationContext.getBean("namespaceService");
         this.cociService = (CheckOutCheckInService)this.applicationContext.getBean("checkOutCheckInService");
+        */
     }
     
     /**
