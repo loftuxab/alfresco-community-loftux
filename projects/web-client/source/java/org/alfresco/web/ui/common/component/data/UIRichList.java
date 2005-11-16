@@ -363,7 +363,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          if (getDataModel().size() > 64)
          {
             FacesContext context = FacesContext.getCurrentInstance();
-            tx = Repository.getUserTransaction(context);
+            tx = Repository.getUserTransaction(context, true);
             tx.begin();
          }
          

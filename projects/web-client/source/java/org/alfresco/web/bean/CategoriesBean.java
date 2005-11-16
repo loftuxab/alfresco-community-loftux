@@ -318,7 +318,7 @@ public class CategoriesBean implements IContextListener
       try
       {
          FacesContext context = FacesContext.getCurrentInstance();
-         tx = Repository.getUserTransaction(context);
+         tx = Repository.getUserTransaction(context, true);
          tx.begin();
          
          Collection<ChildAssociationRef> refs;

@@ -385,8 +385,22 @@ public final class Repository
     */
    public static UserTransaction getUserTransaction(FacesContext context)
    {
-       TransactionService transactionService = getServiceRegistry(context).getTransactionService(); 
-       return transactionService.getUserTransaction();
+      TransactionService transactionService = getServiceRegistry(context).getTransactionService(); 
+      return transactionService.getUserTransaction();
+   }
+   
+   /**
+    * Return a UserTransaction instance
+    * 
+    * @param context    FacesContext
+    * @param readonly   Transaction readonly state
+    * 
+    * @return UserTransaction
+    */
+   public static UserTransaction getUserTransaction(FacesContext context, boolean readonly)
+   {
+      TransactionService transactionService = getServiceRegistry(context).getTransactionService(); 
+      return transactionService.getUserTransaction(readonly);
    }
 
    /**
@@ -397,8 +411,8 @@ public final class Repository
     */
    public static ServiceRegistry getServiceRegistry(FacesContext context)
    {
-       return (ServiceRegistry)FacesContextUtils.getRequiredWebApplicationContext(
-               context).getBean(ServiceRegistry.SERVICE_REGISTRY);
+      return (ServiceRegistry)FacesContextUtils.getRequiredWebApplicationContext(
+            context).getBean(ServiceRegistry.SERVICE_REGISTRY);
    }
    
    /**
@@ -409,10 +423,10 @@ public final class Repository
     */
    public static ServiceRegistry getServiceRegistry(ServletContext context)
    {
-       return (ServiceRegistry)WebApplicationContextUtils.getRequiredWebApplicationContext(
-               context).getBean(ServiceRegistry.SERVICE_REGISTRY);
+      return (ServiceRegistry)WebApplicationContextUtils.getRequiredWebApplicationContext(
+            context).getBean(ServiceRegistry.SERVICE_REGISTRY);
    }
-
+   
    /**
     * Return the Configurable Service
     * 
@@ -420,9 +434,9 @@ public final class Repository
     */
    public static ConfigurableService getConfigurableService(FacesContext context)
    {
-       return (ConfigurableService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("configurableService");
+      return (ConfigurableService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("configurableService");
    }
-
+   
    /**
     * Return the Metadata Extracter Registry
     * 
@@ -431,8 +445,8 @@ public final class Repository
     */
    public static MetadataExtracterRegistry getMetadataExtracterRegistry(FacesContext context)
    {
-       return (MetadataExtracterRegistry)FacesContextUtils.getRequiredWebApplicationContext(
-               context).getBean(METADATA_EXTACTER_REGISTRY);
+      return (MetadataExtracterRegistry)FacesContextUtils.getRequiredWebApplicationContext(
+            context).getBean(METADATA_EXTACTER_REGISTRY);
    }
    
    /**
@@ -481,7 +495,7 @@ public final class Repository
       UserTransaction tx = null;
       try
       {
-         tx = Repository.getUserTransaction(context);
+         tx = Repository.getUserTransaction(context, true);
          tx.begin();
          
          PersonService personService = (PersonService)FacesContextUtils.getRequiredWebApplicationContext(context).getBean("personService");

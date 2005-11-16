@@ -92,7 +92,7 @@ public class UserShortcutsBean
          try
          {
             FacesContext context = FacesContext.getCurrentInstance();
-            tx = Repository.getUserTransaction(context);
+            tx = Repository.getUserTransaction(context, true);
             tx.begin();
             
             // get the shortcuts from the preferences for this user

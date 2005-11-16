@@ -100,7 +100,7 @@ public class NodeDescendantsLinkRenderer extends BaseRenderer
          UserTransaction tx = null;
          try
          {
-            tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+            tx = Repository.getUserTransaction(FacesContext.getCurrentInstance(), true);
             tx.begin();
                
             // TODO: need a comparator to sort node refs (based on childref qname)

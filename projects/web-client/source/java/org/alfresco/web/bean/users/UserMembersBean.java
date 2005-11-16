@@ -240,7 +240,7 @@ public class UserMembersBean implements IContextListener
       UserTransaction tx = null;
       try
       {
-         tx = Repository.getUserTransaction(context);
+         tx = Repository.getUserTransaction(context, true);
          tx.begin();
          
          // Return all the permissions set against the current node

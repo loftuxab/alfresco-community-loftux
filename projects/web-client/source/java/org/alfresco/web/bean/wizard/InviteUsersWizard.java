@@ -309,14 +309,6 @@ public class InviteUsersWizard extends AbstractWizardBean
    }
    
    /**
-    * Populates the wizard's values with the current values
-    * of the node about to be edited
-    */
-   public void populate()
-   {
-   }
-   
-   /**
     * Returns the properties for current user-roles JSF DataModel
     * 
     * @return JSF DataModel representing the current user-roles
@@ -352,7 +344,7 @@ public class InviteUsersWizard extends AbstractWizardBean
       UserTransaction tx = null;
       try
       {
-         tx = Repository.getUserTransaction(context);
+         tx = Repository.getUserTransaction(context, true);
          tx.begin();
          
          if (filterIndex == 0)
@@ -385,6 +377,8 @@ public class InviteUsersWizard extends AbstractWizardBean
          {
             // groups - simple text based match on name
             Set<String> groups = authorityService.getAllAuthorities(AuthorityType.GROUP);
+            groups.addAll(authorityService.getAllAuthorities(AuthorityType.EVERYONE));
+            
             List<SelectItem> results = new ArrayList<SelectItem>(groups.size());
             String containsLower = contains.toLowerCase();
             int offset = PermissionService.GROUP_PREFIX.length();

@@ -66,7 +66,9 @@ import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.alfresco.web.ui.repo.component.UINodePath;
 import org.alfresco.web.ui.repo.component.UISimpleSearch;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 
 /**
  * Bean providing properties and behaviour for the main folder/document browse screen and
@@ -438,7 +440,7 @@ public class BrowseBean implements IContextListener
       try
       {
          FacesContext context = FacesContext.getCurrentInstance();
-         tx = Repository.getUserTransaction(context);
+         tx = Repository.getUserTransaction(context, true);
          tx.begin();
          
          NodeRef parentRef;
@@ -462,39 +464,42 @@ public class BrowseBean implements IContextListener
             // create our Node representation from the NodeRef
             NodeRef nodeRef = ref.getChildRef();
             
-            // find it's type so we can see if it's a node we are interested in
-            QName type = this.nodeService.getType(nodeRef);
-            
-            // make sure the type is defined in the data dictionary
-            TypeDefinition typeDef = this.dictionaryService.getType(type);
-            
-            if (typeDef != null)
+            if (this.nodeService.exists(nodeRef))
             {
-               // look for Space or File nodes
-               if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) == true && 
-               	 this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+               // find it's type so we can see if it's a node we are interested in
+               QName type = this.nodeService.getType(nodeRef);
+               
+               // make sure the type is defined in the data dictionary
+               TypeDefinition typeDef = this.dictionaryService.getType(type);
+               
+               if (typeDef != null)
                {
-                  // create our Node representation
-                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
-                  node.addPropertyResolver("icon", this.resolverSpaceIcon);
-                  node.addPropertyResolver("templatable", this.resolverTemplatable);
-                  
-                  this.containerNodes.add(node);
+                  // look for Space or File nodes
+                  if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) == true && 
+                  	 this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+                  {
+                     // create our Node representation
+                     MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                     node.addPropertyResolver("icon", this.resolverSpaceIcon);
+                     node.addPropertyResolver("templatable", this.resolverTemplatable);
+                     
+                     this.containerNodes.add(node);
+                  }
+                  else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+                  {
+                     // create our Node representation
+                     MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                     
+                     setupDataBindingProperties(node);
+                     
+                     this.contentNodes.add(node);
+                  }
                }
-               else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+               else
                {
-                  // create our Node representation
-                  MapNode node = new MapNode(nodeRef, this.nodeService, true);
-                  
-                  setupDataBindingProperties(node);
-                  
-                  this.contentNodes.add(node);
+                  if (logger.isEnabledFor(Priority.WARN))
+                     logger.warn("Found invalid object in database: id = " + nodeRef + ", type = " + type);
                }
-            }
-            else
-            {
-               logger.warn("Found invalid object in database: id = " + nodeRef.toString() + 
-                     ", type = " + type.toString());
             }
          }
          
@@ -509,7 +514,7 @@ public class BrowseBean implements IContextListener
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
-      catch (Exception err)
+      catch (Throwable err)
       {
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
                FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), err.getMessage()), err);
@@ -553,7 +558,7 @@ public class BrowseBean implements IContextListener
       ResultSet results = null;
       try
       {
-         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance(), true);
          tx.begin();
          
          results = this.searchService.query(
@@ -571,47 +576,55 @@ public class BrowseBean implements IContextListener
             {
                NodeRef nodeRef = row.getNodeRef();
                
-               // find it's type so we can see if it's a node we are interested in
-               QName type = this.nodeService.getType(nodeRef);
-               
-               // make sure the type is defined in the data dictionary
-               TypeDefinition typeDef = this.dictionaryService.getType(type);
-            
-               if (typeDef != null)
+               if (this.nodeService.exists(nodeRef))
                {
-                  // look for Space or File nodes
-                  if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) && 
-                      this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+                  // find it's type so we can see if it's a node we are interested in
+                  QName type = this.nodeService.getType(nodeRef);
+                  
+                  // make sure the type is defined in the data dictionary
+                  TypeDefinition typeDef = this.dictionaryService.getType(type);
+               
+                  if (typeDef != null)
                   {
-                     // create our Node representation
-                     MapNode node = new MapNode(nodeRef, this.nodeService, true);
-                     
-                     // construct the path to this Node
-                     node.addPropertyResolver("path", this.resolverPath);
-                     node.addPropertyResolver("displayPath", this.resolverDisplayPath);
-                     node.addPropertyResolver("icon", this.resolverSpaceIcon);
-                     node.addPropertyResolver("templatable", this.resolverTemplatable);
-                     
-                     this.containerNodes.add(node);
+                     // look for Space or File nodes
+                     if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER) && 
+                         this.dictionaryService.isSubClass(type, ContentModel.TYPE_SYSTEM_FOLDER) == false)
+                     {
+                        // create our Node representation
+                        MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                        
+                        // construct the path to this Node
+                        node.addPropertyResolver("path", this.resolverPath);
+                        node.addPropertyResolver("displayPath", this.resolverDisplayPath);
+                        node.addPropertyResolver("icon", this.resolverSpaceIcon);
+                        node.addPropertyResolver("templatable", this.resolverTemplatable);
+                        
+                        this.containerNodes.add(node);
+                     }
+                     else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+                     {
+                        // create our Node representation
+                        MapNode node = new MapNode(nodeRef, this.nodeService, true);
+                        
+                        setupDataBindingProperties(node);
+                        
+                        // construct the path to this Node
+                        node.addPropertyResolver("path", this.resolverPath);
+                        node.addPropertyResolver("displayPath", this.resolverDisplayPath);
+                        
+                        this.contentNodes.add(node);
+                     }
                   }
-                  else if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
+                  else
                   {
-                     // create our Node representation
-                     MapNode node = new MapNode(nodeRef, this.nodeService, true);
-                     
-                     setupDataBindingProperties(node);
-                     
-                     // construct the path to this Node
-                     node.addPropertyResolver("path", this.resolverPath);
-                     node.addPropertyResolver("displayPath", this.resolverDisplayPath);
-                     
-                     this.contentNodes.add(node);
+                     if (logger.isEnabledFor(Priority.WARN))
+                        logger.warn("Found invalid object in database: id = " + nodeRef + ", type = " + type);
                   }
                }
                else
                {
-                  logger.warn("Found invalid object in database: id = " + nodeRef.toString() + 
-                     ", type = " + type.toString());
+                  if (logger.isEnabledFor(Priority.WARN))
+                     logger.warn("Missing object returned from search indexes: id = " + nodeRef + " search query: " + query);
                }
             }
          }
@@ -627,7 +640,7 @@ public class BrowseBean implements IContextListener
          this.contentNodes = Collections.<Node>emptyList();
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
       }
-      catch (Exception err)
+      catch (Throwable err)
       {
          logger.info("Search failed for: " + query);
          Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
@@ -638,10 +651,10 @@ public class BrowseBean implements IContextListener
       }
       finally
       {
-          if(results != null)
-          {
-              results.close();
-          }
+         if (results != null)
+         {
+            results.close();
+         }
       }
       
       if (logger.isDebugEnabled())

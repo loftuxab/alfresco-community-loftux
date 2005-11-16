@@ -54,4 +54,9 @@ public class DummyTransactionService implements TransactionService
     {
         return txn;
     }
+    
+    public UserTransaction getUserTransaction(boolean readonly)
+    {
+        return txn;
+    }
 }

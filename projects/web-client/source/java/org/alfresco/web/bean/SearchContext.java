@@ -25,7 +25,6 @@ import org.alfresco.repo.search.impl.lucene.QueryParser;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.ui.common.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -168,11 +167,12 @@ public final class SearchContext implements Serializable
          }
       }
       
+      // range attributes are a special case also
       if (rangeAttributes.size() != 0)
       {
-         if(attributeQuery == null)
+         if (attributeQuery == null)
          {
-            attributeQuery = new StringBuilder(additionalAttributes.size() << 5);
+            attributeQuery = new StringBuilder(rangeAttributes.size() << 5);
          }
          for (QName qname : rangeAttributes.keySet())
          {
@@ -341,24 +341,36 @@ public final class SearchContext implements Serializable
       this.additionalAttributes.put(qname, value);
    }
    
+   /**
+    * Add an additional range attribute to search against
+    * 
+    * @param qname      QName of the attribute to search against
+    * @param lower      Lower value for range
+    * @param upper      Upper value for range
+    * @param inclusive  True for inclusive within the range, false otherwise
+    */
    public void addRangeQuery(QName qname, String lower, String upper, boolean inclusive)
    {
-       this.rangeAttributes.put(qname, new RangeProperties(qname, lower, upper, inclusive));
+      this.rangeAttributes.put(qname, new RangeProperties(qname, lower, upper, inclusive));
    }
    
+   
+   /**
+    * Simple wrapper class for range query attribute properties 
+    */
    private static class RangeProperties
    {
-       QName qname;
-       String lower;
-       String upper;
-       boolean inclusive;
-       
-       RangeProperties(QName qname, String lower, String upper, boolean inclusive)
-       {
-           this.qname = qname;
-           this.lower = lower;
-           this.upper = upper;
-           this.inclusive = inclusive;
-       }
+      QName qname;
+      String lower;
+      String upper;
+      boolean inclusive;
+      
+      RangeProperties(QName qname, String lower, String upper, boolean inclusive)
+      {
+         this.qname = qname;
+         this.lower = lower;
+         this.upper = upper;
+         this.inclusive = inclusive;
+      }
    }
 }

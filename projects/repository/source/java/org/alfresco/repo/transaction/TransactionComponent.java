@@ -67,6 +67,16 @@ public class TransactionComponent implements TransactionService
         txn.setReadOnly(readOnly);
         return txn;
     }
+    
+    /**
+     * @see org.springframework.transaction.TransactionDefinition#PROPAGATION_REQUIRED
+     */
+    public UserTransaction getUserTransaction(boolean readonly)
+    {
+        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(transactionManager);
+        txn.setReadOnly(readonly | readOnly);   // cannot allow write when globally set as readonly
+        return txn;
+    }
 
     /**
      * @see org.springframework.transaction.TransactionDefinition#PROPAGATION_REQUIRES_NEW

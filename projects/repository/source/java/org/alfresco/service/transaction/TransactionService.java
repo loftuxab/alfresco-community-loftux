@@ -33,12 +33,22 @@ public interface TransactionService
     public boolean isReadOnly();
     
     /**
-     * Gets a user transaction that supports transaction gation.
+     * Gets a user transaction that supports transaction propagation.
      * This is like the EJB <b>REQUIRED</b> transaction attribute.
      * 
      * @return the user transaction
      */
     UserTransaction getUserTransaction();
+    
+    /**
+     * Gets a user transaction that supports transaction propagation.
+     * This is like the EJB <b>REQUIRED</b> transaction attribute.
+     * 
+     * @param readonly     Set true for a READONLY transaction instance, false otherwise
+     * 
+     * @return the user transaction
+     */
+    UserTransaction getUserTransaction(boolean readonly);
     
     /**
      * Gets a user transaction that ensures a new transaction is created.

@@ -292,7 +292,7 @@ public abstract class AbstractItemSelector extends UIInput
                UserTransaction tx = null;
                try
                {
-                  tx = Repository.getUserTransaction(context);
+                  tx = Repository.getUserTransaction(context, true);
                   tx.begin();
                   
                   NodeRef submittedValue = (NodeRef)getSubmittedValue();
@@ -404,7 +404,7 @@ public abstract class AbstractItemSelector extends UIInput
                UserTransaction tx = null;
                try
                {
-                  tx = Repository.getUserTransaction(context);
+                  tx = Repository.getUserTransaction(context, true);
                   tx.begin();
                   
                   buf.append("<table border=0 cellspacing=1 cellpadding=1");

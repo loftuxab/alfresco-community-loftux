@@ -122,7 +122,7 @@ public class NodePathLinkRenderer extends BaseRenderer
       UserTransaction tx = null;
       try
       {
-         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
+         tx = Repository.getUserTransaction(FacesContext.getCurrentInstance(), true);
          tx.begin();
          
          if (path == null)
