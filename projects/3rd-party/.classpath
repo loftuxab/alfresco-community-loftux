@@ -69,7 +69,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-beanutils-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-codec-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-collections-3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons/commons-dbcp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-digester-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-discovery-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-el.jar"/>
@@ -79,6 +78,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-pool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups-2.2.8.jar"/>
-	<classpathentry kind="output" path=""/>
 	<classpathentry exported="true" kind="lib" path="lib/odf_utils.jar"/>
+	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.1.jar"/>
+	<classpathentry kind="output" path=""/>
 </classpath>
