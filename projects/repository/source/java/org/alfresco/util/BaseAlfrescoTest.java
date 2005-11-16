@@ -16,6 +16,8 @@
  */
 package org.alfresco.util;
 
+
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -64,6 +66,26 @@ public class BaseAlfrescoTest extends BaseSpringTest
         this.rootNodeRef = this.nodeService.getRootNode(this.storeRef);
         
         // Authenticate as the admin user
-        authenticationService.authenticate("admin", "admin".toCharArray());
+        
+        try
+        {
+           authenticationService.authenticate("admin", "admin".toCharArray());
+        }
+        catch(AuthenticationException e)
+        {
+            authenticationService.createAuthentication("admin", "admin".toCharArray());
+            authenticationService.authenticate("admin", "admin".toCharArray());
+        }
     }
+
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationService.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
+    }
+    
+    
+    
+    
 }
