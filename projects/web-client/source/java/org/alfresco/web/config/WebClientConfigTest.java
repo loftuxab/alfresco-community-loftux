@@ -259,6 +259,11 @@ public class WebClientConfigTest extends BaseTest
       assertEquals("result should be 'newOutcome'", "newOutcome", 
             navResult.getResult());
       assertTrue("isOutcome test should be true", navResult.isOutcome());
+      
+      // call getOverride passing a valid view id but an invalid outcome
+      // and make sure the result is null
+      navResult = navCfg.getOverride("/jsp/browse/browse.jsp", "nonExistentOutcome");
+      assertNull("result should be null", navResult);
    }
    
    public void testNavigationGenericConfig()

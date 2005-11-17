@@ -220,8 +220,8 @@ public class NavigationConfigElement extends ConfigElementAdapter
     * Returns the best match navigation override configured for the given
     * current view id and/or outcome.
     * 
-    * If both a view id and outcome are passed, a match for the outcome 
-    * is tested first.
+    * If an outcome is passed it takes precedence, the view id will not be
+    * used.
     * 
     * @param fromViewId The current view id 
     * @param fromOutcome The current outcome 
@@ -236,10 +236,7 @@ public class NavigationConfigElement extends ConfigElementAdapter
       {
          result = this.outcomes.get(fromOutcome);
       }
-      
-      // if there was no outcome match and we have a view id to
-      // test see if there is a match for that
-      if (result == null && fromViewId != null)
+      else if (fromViewId != null)
       {
          result = this.viewIds.get(fromViewId);
       }
