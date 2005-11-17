@@ -86,7 +86,7 @@ public class TransactionUtil
      * @param transactionWork the transaction work
      * @param ignoreException indicates whether errors raised in the work are
      *        ignored or re-thrown
-     * @param nonPropigatingUserTransaction indicates whether the transaction
+     * @param nonPropagatingUserTransaction indicates whether the transaction
      *        should be non propigating or not
      * 
      * @throws java.lang.RuntimeException if the transaction was rolled back
@@ -94,7 +94,7 @@ public class TransactionUtil
     private static <R> R executeInTransaction(
             TransactionService transactionService,
             TransactionWork<R> transactionWork,
-            boolean nonPropigatingUserTransaction)
+            boolean nonPropagatingUserTransaction)
     {
         ParameterCheck.mandatory("transactionWork", transactionWork);
 
@@ -102,7 +102,7 @@ public class TransactionUtil
 
         // Get the right type of user transaction
         UserTransaction txn = null;
-        if (nonPropigatingUserTransaction == true)
+        if (nonPropagatingUserTransaction == true)
         {
             txn = transactionService.getNonPropagatingUserTransaction();
         }
