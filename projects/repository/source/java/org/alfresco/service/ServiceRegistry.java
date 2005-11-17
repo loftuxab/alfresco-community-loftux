@@ -22,6 +22,7 @@ import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.MimetypeService;
@@ -75,6 +76,7 @@ public interface ServiceRegistry
     static final QName PERMISSIONS_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "PermissionService");
     static final QName AUTHORITY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "AuthorityService");
     static final QName TEMPLATE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "TemplateService");
+    static final QName FILE_FOLDER_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "FileFolderService");
     
     /**
      * Get the list of services provided by the Repository
@@ -206,4 +208,9 @@ public interface ServiceRegistry
      * @return the template service (or null if one is not provided)
      */
     TemplateService getTemplateService();
+    
+    /**
+     * @return the file-folder manipulation service (or null if one is not provided)
+     */
+    FileFolderService getFileFolderService();
 }

@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.MimetypeService;
@@ -285,5 +286,13 @@ public class ServiceDescriptorRegistry
     public TemplateService getTemplateService()
     {
         return (TemplateService)getService(TEMPLATE_SERVICE);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getTemplateService()
+     */
+    public FileFolderService getFileFolderService()
+    {
+        return (FileFolderService) getService(FILE_FOLDER_SERVICE);
     }
 }
