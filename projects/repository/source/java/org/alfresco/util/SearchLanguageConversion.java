@@ -25,8 +25,29 @@ import org.alfresco.repo.search.impl.lucene.QueryParser;
  */
 public class SearchLanguageConversion
 {
+    /**
+     * XPath like query language summary:
+     * <ul>
+     *   <li>Escape: \</li>
+     *   <li>Single char search: _</li>
+     *   <li>Multiple char search: %</li>
+     *   <li>Reserved: \%_</li>
+     * </ul>
+     */
     public static LanguageDefinition DEF_XPATH_LIKE = new SimpleLanguageDef('\\', "%", "_", "\\%_");
+    /**
+     * Regular expression query language summary:
+     * <ul>
+     *   <li>Escape: \</li>
+     *   <li>Single char search: .</li>
+     *   <li>Multiple char search: .*</li>
+     *   <li>Reserved: \*.+?^$(){}|</li>
+     * </ul>
+     */
     public static LanguageDefinition DEF_REGEX = new SimpleLanguageDef('\\', ".*", ".", "\\*.+?^$(){}|");
+    /**
+     * Lucene syntax summary: {@link QueryParser#escape(String) Lucene Query Parser}
+     */
     public static LanguageDefinition DEF_LUCENE = new LuceneLanguageDef();
 
     /**
