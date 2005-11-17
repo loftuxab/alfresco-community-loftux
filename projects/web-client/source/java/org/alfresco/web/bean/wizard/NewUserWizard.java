@@ -80,7 +80,7 @@ public class NewUserWizard extends AbstractWizardBean
    private String confirm = null;
    private String email = null;
    private String companyId = null;
-   private String homeSpaceName = null;
+   private String homeSpaceName = "";
    private NodeRef homeSpaceLocation = null;
 
    /** AuthenticationService bean reference */
@@ -212,6 +212,9 @@ public class NewUserWizard extends AbstractWizardBean
             this.homeSpaceLocation = homeFolderRef;
          }
       }
+      
+      if (logger.isDebugEnabled())
+         logger.debug("Edit user home space location: " + homeSpaceLocation + " home space name: " + homeSpaceName);
    }
 
    /**
@@ -393,34 +396,55 @@ public class NewUserWizard extends AbstractWizardBean
             props.put(ContentModel.PROP_LASTNAME, this.lastName);
             
             // calculate whether we need to move the old home space or create new
+            NodeRef newHomeFolderRef;
             NodeRef oldHomeFolderRef = (NodeRef)this.nodeService.getProperty(nodeRef, ContentModel.PROP_HOMEFOLDER);
             boolean moveHomeSpace = false;
             boolean renameHomeSpace = false;
-            if (oldHomeFolderRef != null)
+            if (oldHomeFolderRef != null && this.nodeService.exists(oldHomeFolderRef) == true)
             {
-               if (this.nodeService.exists(oldHomeFolderRef) == true)
+               // the original home folder ref exists so may need moving if it has been changed
+               ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(oldHomeFolderRef);
+               NodeRef currentHomeSpaceLocation = childAssocRef.getParentRef();
+               if (this.homeSpaceName.length() != 0)
                {
-                  ChildAssociationRef childAssocRef = this.nodeService.getPrimaryParent(oldHomeFolderRef);
-                  NodeRef oldHomeSpaceLocationRef = childAssocRef.getParentRef();
-                  if ((oldHomeFolderRef.equals(this.homeSpaceLocation) == false) && (oldHomeSpaceLocationRef.equals(this.homeSpaceLocation) == false))
+                  if (currentHomeSpaceLocation.equals(this.homeSpaceLocation) == false &&
+                      oldHomeFolderRef.equals(this.homeSpaceLocation) == false &&
+                      currentHomeSpaceLocation.equals(getCompanyHomeSpace()) == false)
                   {
                      moveHomeSpace = true;
                   }
+                  
                   String oldHomeSpaceName = Repository.getNameForNode(nodeService, oldHomeFolderRef);
-                  renameHomeSpace = ((oldHomeFolderRef.equals(this.homeSpaceLocation) == false) && (oldHomeSpaceName.equals(this.homeSpaceName) == false));
+                  if (oldHomeSpaceName.equals(this.homeSpaceName) == false &&
+                      oldHomeFolderRef.equals(this.homeSpaceLocation) == false)
+                  {
+                     renameHomeSpace = true;
+                  }
                }
             }
             
-            NodeRef homeSpaceNodeRef;
+            if (logger.isDebugEnabled())
+               logger.debug("Moving space: " + moveHomeSpace + "  and renaming space: " + renameHomeSpace);
+            
             if (moveHomeSpace == false && renameHomeSpace == false)
             {
                if (this.homeSpaceLocation != null && this.homeSpaceName.length() != 0)
                {
-                  homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation.getId(), this.homeSpaceName, false);
+                  newHomeFolderRef = createHomeSpace(this.homeSpaceLocation.getId(), this.homeSpaceName, false);
+               }
+               else if (this.homeSpaceLocation != null)
+               {
+                  // location selected but no home space name entered,
+                  // so the home ref should be set to the newly selected space
+                  newHomeFolderRef = this.homeSpaceLocation;
+                  
+                  // set the permissions for this space so the user can access it
+                  
                }
                else
                {
-                  homeSpaceNodeRef = getCompanyHomeSpace();
+                  // nothing selected - use Company Home by default
+                  newHomeFolderRef = getCompanyHomeSpace();
                }
             }
             else
@@ -434,16 +458,16 @@ public class NewUserWizard extends AbstractWizardBean
                         ContentModel.ASSOC_CONTAINS,
                         this.nodeService.getPrimaryParent(oldHomeFolderRef).getQName());
                }
-               homeSpaceNodeRef = oldHomeFolderRef;   // ref ID doesn't change
+               newHomeFolderRef = oldHomeFolderRef;   // ref ID doesn't change
                
                if (renameHomeSpace == true)
                {
                   // change HomeSpace node name
-                  this.nodeService.setProperty(homeSpaceNodeRef, ContentModel.PROP_NAME, this.homeSpaceName);
+                  this.nodeService.setProperty(newHomeFolderRef, ContentModel.PROP_NAME, this.homeSpaceName);
                }
             }
             
-            props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceNodeRef);
+            props.put(ContentModel.PROP_HOMEFOLDER, newHomeFolderRef);
             props.put(ContentModel.PROP_EMAIL, this.email);
             props.put(ContentModel.PROP_ORGID, this.companyId);
             this.nodeService.setProperties(nodeRef, props);
@@ -455,10 +479,10 @@ public class NewUserWizard extends AbstractWizardBean
          {
             if (this.password.equals(this.confirm))
             {
-                if(!this.personService.getUserNamesAreCaseSensitive())
-                {
-                    this.userName = this.userName.toLowerCase();
-                }
+               if (!this.personService.getUserNamesAreCaseSensitive())
+               {
+                  this.userName = this.userName.toLowerCase();
+               }
                 
                // create properties for Person type from submitted Form data
                Map<QName, Serializable> props = new HashMap<QName, Serializable>(7, 1.0f);
@@ -468,28 +492,36 @@ public class NewUserWizard extends AbstractWizardBean
                NodeRef homeSpaceNodeRef;
                if (this.homeSpaceLocation != null && this.homeSpaceName.length() != 0)
                {
+                  // create new
                   homeSpaceNodeRef = createHomeSpace(this.homeSpaceLocation.getId(), this.homeSpaceName, true);
+               }
+               else if (this.homeSpaceLocation != null)
+               {
+                  // set to existing
+                  homeSpaceNodeRef = homeSpaceLocation;
+                  setupHomeSpacePermissions(homeSpaceNodeRef);
                }
                else
                {
+                  // default to Company Home
                   homeSpaceNodeRef = getCompanyHomeSpace();
                }
                props.put(ContentModel.PROP_HOMEFOLDER, homeSpaceNodeRef);
                props.put(ContentModel.PROP_EMAIL, this.email);
                props.put(ContentModel.PROP_ORGID, this.companyId);
-   
+               
                // create the node to represent the Person
                String assocName = QName.createValidLocalName(this.userName);
                NodeRef newPerson = this.personService.createPerson(props);
-   
+               
                // ensure the user can access their own Person object
                this.permissionService.setPermission(newPerson, this.userName, permissionService.getAllPermission(), true);
-   
+               
                if (logger.isDebugEnabled()) logger.debug("Created Person node for username: " + this.userName);
-   
+               
                // create the ACEGI Authentication instance for the new user
                this.authenticationService.createAuthentication(this.userName, this.password.toCharArray());
-   
+               
                if (logger.isDebugEnabled()) logger.debug("Created User Authentication instance for username: " + this.userName);
             }
             else
@@ -498,10 +530,10 @@ public class NewUserWizard extends AbstractWizardBean
                Utils.addErrorMessage(Application.getMessage(context, UsersBean.ERROR_PASSWORD_MATCH));
             }
          }
-
+         
          // commit the transaction
          tx.commit();
-
+         
          // reset the richlist component so it rebinds to the users list
          invalidateUserList();
       }
@@ -523,7 +555,7 @@ public class NewUserWizard extends AbstractWizardBean
    public String getSummary()
    {
       String homeSpaceLabel = this.homeSpaceName;
-      if ((this.homeSpaceName == null || this.homeSpaceName.length() == 0) && this.homeSpaceLocation != null)
+      if (this.homeSpaceName.length() == 0 && this.homeSpaceLocation != null)
       {
          homeSpaceLabel = Repository.getNameForNode(this.nodeService, this.homeSpaceLocation);
       }
@@ -855,10 +887,8 @@ public class NewUserWizard extends AbstractWizardBean
       {
          NodeRef parentRef = new NodeRef(Repository.getStoreRef(), locationId);
          
-         // check for existance of home space with same name - return
-         // immediately
-         // if it exists or throw an exception an give user chance to enter
-         // another name
+         // check for existance of home space with same name - return immediately
+         // if it exists or throw an exception an give user chance to enter another name
          // TODO: this might be better replaced with an XPath query!
          List<ChildAssociationRef> children = this.nodeService.getChildAssocs(parentRef);
          for (ChildAssociationRef ref : children)
@@ -896,23 +926,7 @@ public class NewUserWizard extends AbstractWizardBean
          uiFacetsProps.put(ContentModel.PROP_TITLE, spaceName);
          this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_UIFACETS, uiFacetsProps);
          
-         // Admin Authority has full permissions by default (automatic - set in the permission config)
-         // give full permissions to the new user
-         this.permissionService.setPermission(nodeRef, this.userName, permissionService.getAllPermission(), true);
-         
-         // by default other users will only have GUEST access to the space contents
-         String permission = getDefaultPermission();
-         if (permission != null && permission.length() != 0)
-         {
-            this.permissionService.setPermission(nodeRef, permissionService.getAllAuthorities(), permission, true);
-         }
-         
-         // the new user is the OWNER of their own space and has full permissions
-         this.ownableService.setOwner(nodeRef, this.userName);
-         this.permissionService.setPermission(nodeRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
-         
-         // now detach (if we did this first we could not set any permissions!)
-         this.permissionService.setInheritParentPermissions(nodeRef, false);
+         setupHomeSpacePermissions(nodeRef);
          
          // return the ID of the created space
          homeSpaceNodeRef = nodeRef;
@@ -920,6 +934,33 @@ public class NewUserWizard extends AbstractWizardBean
       }
       
       return homeSpaceNodeRef;
+   }
+
+   /**
+    * Setup the default permissions for this and other users on the Home Space
+    * 
+    * @param homeSpaceRef     Home Space reference
+    */
+   private void setupHomeSpacePermissions(NodeRef homeSpaceRef)
+   {
+      // Admin Authority has full permissions by default (automatic - set in the permission config)
+      // give full permissions to the new user
+      this.permissionService.setPermission(homeSpaceRef, this.userName, permissionService.getAllPermission(), true);
+      
+      // by default other users will only have GUEST access to the space contents
+      // or whatever is configured as the default in the web-client-xml config
+      String permission = getDefaultPermission();
+      if (permission != null && permission.length() != 0)
+      {
+         this.permissionService.setPermission(homeSpaceRef, permissionService.getAllAuthorities(), permission, true);
+      }
+      
+      // the new user is the OWNER of their own space and always has full permissions
+      this.ownableService.setOwner(homeSpaceRef, this.userName);
+      this.permissionService.setPermission(homeSpaceRef, permissionService.getOwnerAuthority(), permissionService.getAllPermission(), true);
+      
+      // now detach (if we did this first we could not set any permissions!)
+      this.permissionService.setInheritParentPermissions(homeSpaceRef, false);
    }
    
    /**
