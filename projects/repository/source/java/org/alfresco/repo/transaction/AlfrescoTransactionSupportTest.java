@@ -26,9 +26,7 @@ import junit.framework.TestCase;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
-import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.TransactionDefinition;
 
 /**
  * Tests integration between our <tt>UserTransaction</tt> implementation and
@@ -78,8 +76,7 @@ public class AlfrescoTransactionSupportTest extends TestCase
         
         // begin a new, inner transaction
         {
-            SpringAwareUserTransaction txnInner = (SpringAwareUserTransaction) transactionService.getUserTransaction();
-            txnInner.setPropagationBehaviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            UserTransaction txnInner = transactionService.getNonPropagatingUserTransaction();
             
             String txnIdInner = AlfrescoTransactionSupport.getTransactionId();
             assertEquals("Inner transaction not started, so txn ID should not change", txnId, txnIdInner);

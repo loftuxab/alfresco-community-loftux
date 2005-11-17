@@ -48,8 +48,7 @@ public abstract class AlfrescoTransactionSupport
      * is to convey the idea that the execution of these services when the
      * transaction completes is very explicit.  As we only have a finite
      * list of types of services that need registration, this is still
-     * OK.  3rd party users of the repository can make use of their own
-     * Spring synchronization execution relative to the order defined below.
+     * OK.
      */
     
     /**
@@ -585,32 +584,39 @@ public abstract class AlfrescoTransactionSupport
         @Override
         public void afterCompletion(int status)
         {
+            String statusStr = "unknown";
+            switch (status)
+            {
+                case TransactionSynchronization.STATUS_COMMITTED:
+                    statusStr = "committed";
+                    break;
+                case TransactionSynchronization.STATUS_ROLLED_BACK:
+                    statusStr = "rolled-back";
+                    break;
+                default:
+            }
             if (logger.isDebugEnabled())
             {
-                String statusStr = "unknown";
-                switch (status)
-                {
-                    case TransactionSynchronization.STATUS_COMMITTED:
-                        statusStr = "committed";
-                        break;
-                    case TransactionSynchronization.STATUS_ROLLED_BACK:
-                        statusStr = "rolled-back";
-                        break;
-                    default:
-                }
                 logger.debug("After completion (" + statusStr + "): " + this);
             }
             
             // commit/rollback Lucene
             for (LuceneIndexerAndSearcherFactory lucene : lucenes)
             {
-                if (status  == TransactionSynchronization.STATUS_COMMITTED)
+                try
                 {
-                    lucene.commit();
+                    if (status  == TransactionSynchronization.STATUS_COMMITTED)
+                    {
+                        lucene.commit();
+                    }
+                    else
+                    {
+                        lucene.rollback();
+                    }
                 }
-                else
+                catch (RuntimeException e)
                 {
-                    lucene.rollback();
+                    logger.error("After completion (" + statusStr + ") Lucene exception", e);
                 }
             }
             
@@ -619,14 +625,32 @@ public abstract class AlfrescoTransactionSupport
             {
                 for (TransactionListener listener : listeners)
                 {
-                    listener.afterCommit();
+                    try
+                    {
+                        listener.afterCommit();
+                    }
+                    catch (RuntimeException e)
+                    {
+                        logger.error("After completion (" + statusStr + ") listener exception: \n" +
+                                "   listener: " + listener,
+                                e);
+                    }
                 }
             }
             else
             {
                 for (TransactionListener listener : listeners)
                 {
-                    listener.afterRollback();
+                    try
+                    {
+                        listener.afterRollback();
+                    }
+                    catch (RuntimeException e)
+                    {
+                        logger.error("After completion (" + statusStr + ") listener exception: \n" +
+                                "   listener: " + listener,
+                                e);
+                    }
                 }
             }
             
