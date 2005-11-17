@@ -19,7 +19,11 @@ package org.alfresco.service.transaction;
 import javax.transaction.UserTransaction;
 
 /**
- * Contract for retrieving access to a transaction
+ * Contract for retrieving access to a user transaction.
+ * <p>
+ * Note that the implementation of the {@link javax.transaction.UserTransaction}
+ * is not able to provide the full set of status codes available on the
+ * {@link javax.transaction.Status} class.
  * 
  * @author David Caruana
  */
@@ -44,7 +48,9 @@ public interface TransactionService
      * Gets a user transaction that supports transaction propagation.
      * This is like the EJB <b>REQUIRED</b> transaction attribute.
      * 
-     * @param readonly     Set true for a READONLY transaction instance, false otherwise
+     * @param readonly     Set true for a READONLY transaction instance, false otherwise.
+     *      Note that it is not <i>always</i> possible to force a write transaction if the
+     *      system is in read-only mode.
      * 
      * @return the user transaction
      */

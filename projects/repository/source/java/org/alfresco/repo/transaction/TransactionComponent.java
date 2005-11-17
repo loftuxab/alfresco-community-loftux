@@ -63,18 +63,26 @@ public class TransactionComponent implements TransactionService
      */
     public UserTransaction getUserTransaction()
     {
-        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(transactionManager);
-        txn.setReadOnly(readOnly);
+        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(
+                transactionManager,
+                this.readOnly,
+                TransactionDefinition.ISOLATION_DEFAULT,
+                TransactionDefinition.PROPAGATION_REQUIRED,
+                TransactionDefinition.TIMEOUT_DEFAULT);
         return txn;
     }
     
     /**
      * @see org.springframework.transaction.TransactionDefinition#PROPAGATION_REQUIRED
      */
-    public UserTransaction getUserTransaction(boolean readonly)
+    public UserTransaction getUserTransaction(boolean readOnly)
     {
-        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(transactionManager);
-        txn.setReadOnly(readonly | readOnly);   // cannot allow write when globally set as readonly
+        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(
+                transactionManager,
+                (readOnly | this.readOnly),
+                TransactionDefinition.ISOLATION_DEFAULT,
+                TransactionDefinition.PROPAGATION_REQUIRED,
+                TransactionDefinition.TIMEOUT_DEFAULT);
         return txn;
     }
 
@@ -83,9 +91,12 @@ public class TransactionComponent implements TransactionService
      */
     public UserTransaction getNonPropagatingUserTransaction()
     {
-        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(transactionManager);
-        txn.setReadOnly(readOnly);
-        txn.setPropagationBehaviour(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        SpringAwareUserTransaction txn = new SpringAwareUserTransaction(
+                transactionManager,
+                this.readOnly,
+                TransactionDefinition.ISOLATION_DEFAULT,
+                TransactionDefinition.PROPAGATION_REQUIRES_NEW,
+                TransactionDefinition.TIMEOUT_DEFAULT);
         return txn;
     }
 }

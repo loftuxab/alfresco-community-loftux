@@ -22,7 +22,9 @@ import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
 
+import org.springframework.transaction.NoTransactionException;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
@@ -45,7 +47,17 @@ public class SpringAwareUserTransactionTest extends TestCase
     protected void setUp() throws Exception
     {
         transactionManager = new DummyTransactionManager();
-        txn = new SpringAwareUserTransaction(transactionManager);
+        txn = getTxn();
+    }
+    
+    private UserTransaction getTxn()
+    {
+        return new SpringAwareUserTransaction(
+                transactionManager,
+                false,
+                TransactionDefinition.ISOLATION_DEFAULT,
+                TransactionDefinition.PROPAGATION_REQUIRED,
+                TransactionDefinition.TIMEOUT_DEFAULT);
     }
     
     public void testSetUp() throws Exception
@@ -54,8 +66,22 @@ public class SpringAwareUserTransactionTest extends TestCase
         assertNotNull(txn);
     }
     
+    private void checkNoStatusOnThread()
+    {
+        try
+        {
+            TransactionAspectSupport.currentTransactionStatus();
+            fail("Spring transaction info is present outside of transaction boundaries");
+        }
+        catch (NoTransactionException e)
+        {
+            // expected
+        }
+    }
+    
     public void testNoTxnStatus() throws Exception
     {
+        checkNoStatusOnThread();
         assertEquals("Transaction status is not correct",
                 Status.STATUS_NO_TRANSACTION,
                 txn.getStatus());
@@ -64,8 +90,9 @@ public class SpringAwareUserTransactionTest extends TestCase
                 transactionManager.getStatus());
     }
 
-    public void testSimpleTxnWithCommit() throws Exception
+    public void testSimpleTxnWithCommit() throws Throwable
     {
+        testNoTxnStatus();
         try
         {
             txn.begin();
@@ -86,12 +113,23 @@ public class SpringAwareUserTransactionTest extends TestCase
         }
         catch (Throwable e)
         {
-            txn.rollback();
+            // unexpected exception - attempt a cleanup
+            try
+            {
+                txn.rollback();
+            }
+            catch (Throwable ee)
+            {
+                e.printStackTrace();
+            }
+            throw e;
         }
+        checkNoStatusOnThread();
     }
     
     public void testSimpleTxnWithRollback() throws Exception
     {
+        testNoTxnStatus();
         try
         {
             txn.begin();
@@ -108,10 +146,12 @@ public class SpringAwareUserTransactionTest extends TestCase
         assertEquals("Transaction manager not called correctly",
                 txn.getStatus(),
                 transactionManager.getStatus());
+        checkNoStatusOnThread();
     }
     
     public void testNoBeginCommit() throws Exception
     {
+        testNoTxnStatus();
         try
         {
             txn.commit();
@@ -121,10 +161,13 @@ public class SpringAwareUserTransactionTest extends TestCase
         {
             // expected
         }
+        checkNoStatusOnThread();
     }
     
     public void testPostRollbackCommitDetection() throws Exception
     {
+        testNoTxnStatus();
+
         txn.begin();
         txn.rollback();
         try
@@ -136,10 +179,13 @@ public class SpringAwareUserTransactionTest extends TestCase
         {
             // expected
         }
+        checkNoStatusOnThread();
     }
     
     public void testPostSetRollbackOnlyCommitDetection() throws Exception
     {
+        testNoTxnStatus();
+
         txn.begin();
         txn.setRollbackOnly();
         try
@@ -151,6 +197,43 @@ public class SpringAwareUserTransactionTest extends TestCase
         {
             // expected
         }
+        checkNoStatusOnThread();
+    }
+    
+    public void testMismatchedBeginCommit() throws Exception
+    {
+        UserTransaction txn1 = getTxn();
+        UserTransaction txn2 = getTxn();
+
+        testNoTxnStatus();
+
+        txn1.begin();
+        txn2.begin();
+        
+        txn2.commit();
+        txn1.commit();
+        
+        checkNoStatusOnThread();
+        
+        txn1 = getTxn();
+        txn2 = getTxn();
+        
+        txn1.begin();
+        txn2.begin();
+        
+        try
+        {
+            txn1.commit();
+            fail("Failure to detect mismatched transaction begin/commit");
+        }
+        catch (RuntimeException e)
+        {
+            // expected
+        }
+        txn2.commit();
+        txn1.commit();
+
+        checkNoStatusOnThread();
     }
     
     /**
