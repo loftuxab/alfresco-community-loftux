@@ -125,17 +125,6 @@
                         <tr valign=top>
                         
                            <td width=100% colspan=2>
-                              <a:panel label="Late Documents" id="dash4_1" border="white" bgcolor="white" progressive="true">
-                                 
-                                 <r:template id="t4_1" template="alfresco/templates/late_docs.ftl" />
-                                 
-                              </a:panel>
-                           </td>
-                           
-                        </tr>
-                        <tr valign=top>
-                        
-                           <td width=100% colspan=2>
                               <a:panel label="Press Releases" id="dash4" border="blue" bgcolor="#d3e6fe" progressive="true">
                                  
                                  <r:template id="t4" template="alfresco/templates/my_pressreleases.ftl" />
