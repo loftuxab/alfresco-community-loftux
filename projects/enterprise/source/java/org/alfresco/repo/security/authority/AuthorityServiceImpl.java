@@ -21,10 +21,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.permissions.PermissionServiceSPI;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -42,6 +43,8 @@ public class AuthorityServiceImpl implements AuthorityService
     private NodeService nodeService;
 
     private AuthorityDAO authorityDAO;
+    
+    private PermissionServiceSPI permissionServiceSPI;
 
     private Set<String> adminSet = Collections.singleton(PermissionService.ADMINISTRATOR_AUTHORITY);
 
@@ -51,7 +54,7 @@ public class AuthorityServiceImpl implements AuthorityService
 
     private Set<String> adminUsers;
 
-    private AuthenticationService authenticationService;
+    private AuthenticationComponent authenticationComponent;
     
     public AuthorityServiceImpl()
     {
@@ -73,21 +76,26 @@ public class AuthorityServiceImpl implements AuthorityService
         this.authorityDAO = authorityDAO;
     }
     
+    public void setPermissionServiceSPI(PermissionServiceSPI permissionServiceSPI)
+    {
+        this.permissionServiceSPI = permissionServiceSPI;
+    }
+    
     /**
      * Currently the admin authority is granted only to the ALFRESCO_ADMIN_USER
      * user.
      */
     public boolean hasAdminAuthority()
     {
-        String currentUserName = authenticationService.getCurrentUserName();
+        String currentUserName = authenticationComponent.getCurrentUserName();
         return ((currentUserName != null) && adminUsers.contains(currentUserName));
     }
 
     // IOC
 
-    public void setAuthenticationService(AuthenticationService authenticationService)
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
-        this.authenticationService = authenticationService;
+        this.authenticationComponent = authenticationComponent;
     }
 
     public void setAdminUsers(Set<String> adminUsers)
@@ -98,7 +106,7 @@ public class AuthorityServiceImpl implements AuthorityService
     public Set<String> getAuthorities()
     {
         Set<String> authorities = new HashSet<String>();
-        String currentUserName = authenticationService.getCurrentUserName();
+        String currentUserName = authenticationComponent.getCurrentUserName();
         if (adminUsers.contains(currentUserName))
         {
             authorities.addAll(adminSet);
@@ -176,6 +184,7 @@ public class AuthorityServiceImpl implements AuthorityService
         AuthorityType type = AuthorityType.getAuthorityType(name);
         checkTypeIsMutable(type);
         authorityDAO.deleteAuthority(name);
+        permissionServiceSPI.deletePermissions(name);
     }
 
     public Set<String> getAllRootAuthorities(AuthorityType type)

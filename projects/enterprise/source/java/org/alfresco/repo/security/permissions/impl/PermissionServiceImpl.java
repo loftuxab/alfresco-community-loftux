@@ -44,7 +44,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.namespace.QName;
@@ -84,12 +83,6 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
      * Access to the data dictionary
      */
     private DictionaryService dictionaryService;
-
-    /*
-     * Access to the authentication service
-     */
-
-    private AuthenticationService authenticationService;
 
     /*
      * Access to the authentication component
@@ -137,11 +130,6 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         this.permissionsDAO = permissionsDAO;
     }
 
-    public void setAuthenticationService(AuthenticationService authenticationService)
-    {
-        this.authenticationService = authenticationService;
-    }
-
     public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
         this.authenticationComponent = authenticationComponent;
@@ -174,10 +162,6 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         if (permissionsDAO == null)
         {
             throw new IllegalArgumentException("There must be a permission dao");
-        }
-        if (authenticationService == null)
-        {
-            throw new IllegalArgumentException("There must be an authentication service");
         }
         if (authenticationComponent == null)
         {
@@ -228,7 +212,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
     private Set<AccessPermission> getAllPermissionsImpl(NodeRef nodeRef, boolean includeTrue, boolean includeFalse)
     {
-        String userName = authenticationService.getCurrentUserName();
+        String userName = authenticationComponent.getCurrentUserName();
         HashSet<AccessPermission> accessPermissions = new HashSet<AccessPermission>();
         for (PermissionReference pr : getSettablePermissionReferences(nodeRef))
         {
@@ -394,7 +378,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         {
             log.debug("Permission <"
                     + perm + "> is " + (result ? "allowed" : "denied") + " for "
-                    + authenticationService.getCurrentUserName() + " on node " + nodeService.getPath(nodeRef));
+                    + authenticationComponent.getCurrentUserName() + " on node " + nodeService.getPath(nodeRef));
         }
         return result ? AccessStatus.ALLOWED : AccessStatus.DENIED;
 
@@ -1041,4 +1025,11 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         setPermission(nodeRef, authority, getPermissionReference(perm), allow);
     }
 
+    public void deletePermissions(String recipient)
+    {
+        permissionsDAO.deleteAllPermissionsForAuthority(recipient);
+    }
+
+    
+    
 }

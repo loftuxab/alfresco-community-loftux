@@ -1842,6 +1842,20 @@ public class PermissionServiceTest extends AbstractPermissionTest
         permissionService.clearPermission(rootNodeRef, "andy");
     }
     
+    public void testDeletePermissionByRecipient()
+    {
+        runAs("andy");
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        permissionService.setPermission(new SimplePermissionEntry(rootNodeRef, getPermission(PermissionService.READ),
+                "GROUP_test", AccessStatus.ALLOWED));
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        authorityService.createAuthority(AuthorityType.GROUP, null, "test");
+        authorityService.addAuthority("GROUP_test", "andy");
+        assertTrue(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+        permissionService.deletePermissions("GROUP_test");
+        assertFalse(permissionService.hasPermission(rootNodeRef, getPermission(PermissionService.READ)) == AccessStatus.ALLOWED);
+    }
+    
     // TODO: Test permissions on missing nodes
     
    

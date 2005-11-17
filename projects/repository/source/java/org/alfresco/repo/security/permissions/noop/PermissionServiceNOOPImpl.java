@@ -19,10 +19,13 @@ package org.alfresco.repo.security.permissions.noop;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.alfresco.repo.security.permissions.NodePermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionEntry;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.PermissionServiceSPI;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 
 
@@ -31,7 +34,7 @@ import org.alfresco.service.namespace.QName;
  *  
  */
 public class PermissionServiceNOOPImpl
-    implements PermissionService
+    implements PermissionServiceSPI
 {
     
     /* (non-Javadoc)
@@ -132,6 +135,83 @@ public class PermissionServiceNOOPImpl
     {
         
     }
+
+    // SPI
+    
+    public void deletePermission(PermissionEntry permissionEntry)
+    {
+        
+    }
+
+    public void deletePermissions(NodePermissionEntry nodePermissionEntry)
+    {
+        
+    }
+
+    public void deletePermissions(String recipient)
+    {
+        
+    }
+
+    public NodePermissionEntry explainPermission(NodeRef nodeRef, PermissionReference perm)
+    {
+       throw new UnsupportedOperationException();
+    }
+
+    public PermissionReference getAllPermissionReference()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public String getPermission(PermissionReference permissionReference)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public PermissionReference getPermissionReference(QName qname, String permissionName)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public PermissionReference getPermissionReference(String permissionName)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public NodePermissionEntry getSetPermissions(NodeRef nodeRef)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public Set<PermissionReference> getSettablePermissionReferences(NodeRef nodeRef)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public Set<PermissionReference> getSettablePermissionReferences(QName type)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public AccessStatus hasPermission(NodeRef nodeRef, PermissionReference perm)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setPermission(NodePermissionEntry nodePermissionEntry)
+    {
+        throw new UnsupportedOperationException();
+        
+    }
+
+    public void setPermission(PermissionEntry permissionEntry)
+    {
+        throw new UnsupportedOperationException();
+        
+    }
+    
+   
+    
     
     
 }

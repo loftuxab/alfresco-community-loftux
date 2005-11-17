@@ -122,5 +122,11 @@ public interface PermissionsDAO
      * @param authority
      */
     public void clearPermission(NodeRef nodeRef, String authority);
+    
+    /**
+     * Remove all permissions for the specvified authority
+     * @param authority
+     */
+    public void deleteAllPermissionsForAuthority(String authority);
 
 }

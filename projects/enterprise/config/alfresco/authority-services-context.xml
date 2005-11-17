@@ -5,8 +5,8 @@
 <beans>
     
     <bean id="authorityService" class="org.alfresco.repo.security.authority.AuthorityServiceImpl">
-        <property name="authenticationService">
-            <ref bean="authenticationService" />
+        <property name="authenticationComponent">
+            <ref bean="authenticationComponent" />
         </property>
         <property name="personService">
             <ref bean="personService" />
@@ -17,7 +17,9 @@
         <property name="authorityDAO">
             <ref bean="authorityDAO" />
         </property>
-        
+        <property name="permissionServiceSPI">
+            <ref bean="permissionServiceImpl" />
+        </property>
         <property name="adminUsers">
             <set>
     			<value>admin</value>

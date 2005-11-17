@@ -7,14 +7,13 @@
     
    <bean id='permissionService' class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="proxyInterfaces">
-            <value>org.alfresco.service.cmr.security.PermissionService</value>
+            <value>org.alfresco.repo.security.permissions.PermissionServiceSPI</value>
         </property>
         <property name="transactionManager">
             <ref bean="transactionManager" />
         </property>
         <property name="target">
-            <bean class="org.alfresco.repo.security.permissions.noop.PermissionServiceNOOPImpl">
-            </bean>
+            <ref bean="permissionServiceImpl" />
         </property>
         <property name="transactionAttributes">
             <props>
@@ -22,6 +21,9 @@
             </props>
         </property>
     </bean>
+    
+      <bean id="permissionServiceImpl" class="org.alfresco.repo.security.permissions.noop.PermissionServiceNOOPImpl">
+            </bean>
     
     <bean id="NamespaceService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     

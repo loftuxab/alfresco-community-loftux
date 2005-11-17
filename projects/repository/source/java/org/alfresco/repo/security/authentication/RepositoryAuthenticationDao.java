@@ -31,6 +31,7 @@ import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.QueryParameterDefImpl;
+import org.alfresco.repo.security.permissions.PermissionServiceSPI;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -81,6 +82,8 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao
         this.dictionaryService = dictionaryService;
     }
 
+   
+    
     public void setNamespaceService(NamespacePrefixResolver namespacePrefixResolver)
     {
         this.namespacePrefixResolver = namespacePrefixResolver;

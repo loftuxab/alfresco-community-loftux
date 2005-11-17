@@ -130,4 +130,14 @@
         </set>
     </class>
     
+    <query name="permission.GetPermissionsForRecipient">
+      select
+         permissionEntry
+      from
+         org.alfresco.repo.security.permissions.impl.hibernate.PermissionEntryImpl as permissionEntry
+         join permissionEntry.recipient as recipient
+      where
+         recipient = :recipientKey 
+   </query>
+    
 </hibernate-mapping>

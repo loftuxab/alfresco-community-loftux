@@ -136,4 +136,6 @@ public interface PermissionServiceSPI extends PermissionService
      * @return
      */
     public String getPermission(PermissionReference permissionReference);
+    
+    public void deletePermissions(String recipient);
 }

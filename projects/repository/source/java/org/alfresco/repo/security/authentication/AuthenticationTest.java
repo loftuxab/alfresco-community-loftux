@@ -39,6 +39,7 @@ import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.dao.SaltSource;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.permissions.PermissionServiceSPI;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -85,6 +86,8 @@ public class AuthenticationTest extends TestCase
     private AuthenticationService authenticationService;
 
     private AuthenticationComponent authenticationComponent;
+    
+    private PermissionServiceSPI permissionServiceSPI;
 
     private UserTransaction userTransaction;
 
@@ -108,6 +111,8 @@ public class AuthenticationTest extends TestCase
         ticketComponent = (TicketComponent) ctx.getBean("ticketComponent");
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
         authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
+        permissionServiceSPI = (PermissionServiceSPI) ctx.getBean("permissionService");
+        
 
         dao = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
         authenticationManager = (AuthenticationManager) ctx.getBean("authenticationManager");

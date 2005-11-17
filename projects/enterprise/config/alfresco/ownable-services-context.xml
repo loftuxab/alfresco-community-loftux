@@ -7,7 +7,7 @@
             <ref bean="nodeService"/>
         </property>
         <property name="authenticationService">
-            <ref bean="authenticationService"/>
+            <ref bean="authenticationServiceImpl"/>
         </property>
     </bean>
 </beans>
