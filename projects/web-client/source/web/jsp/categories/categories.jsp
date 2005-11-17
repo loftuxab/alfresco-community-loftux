@@ -170,7 +170,7 @@
                                     </a:actionLink>
                                  </a:column>
                                  
-                                 <a:dataPager/>
+                                 <a:dataPager styleClass="pager" />
                               </a:richList>
                               
                               </a:panel>

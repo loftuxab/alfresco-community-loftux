@@ -412,3 +412,14 @@ a.topToolbarLinkHighlight, a.topToolbarLinkHighlight:link, a.topToolbarLinkHighl
    padding: 4px;
    background-color: #e9f0f4;
 }
+
+.pager
+{
+   padding: 3px;
+   border: 1px dashed #cccccc;
+}
+
+.pager img
+{
+   vertical-align: -20%;
+}

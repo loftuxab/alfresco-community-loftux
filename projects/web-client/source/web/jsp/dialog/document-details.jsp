@@ -374,7 +374,7 @@
                                        <a:actionLink id="view-link" value="View" href="#{r.url}" target="new" />
                                     </a:column>
               
-                                    <a:dataPager/>
+                                    <a:dataPager styleClass="pager" />
                                  </a:richList>
                               </a:panel>
                               <a:panel label="#{msg.version_history}" id="no-version-history-panel" progressive="true"

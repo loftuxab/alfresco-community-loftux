@@ -85,62 +85,147 @@ public class UIDataPager extends UICommand
       }
       
       ResponseWriter out = context.getResponseWriter();
-      
       ResourceBundle bundle = Application.getBundle(context);
+      StringBuilder buf = new StringBuilder(512);
       
-      StringBuilder buf = new StringBuilder(420);
+      int currentPage = dataContainer.getCurrentPage();
+      int pageCount = dataContainer.getPageCount();
+      
+      buf.append("<span");
+      if (getAttributes().get("style") != null)
+      {
+         buf.append(" style=\"")
+            .append(getAttributes().get("style"))
+            .append('"');
+      }
+      if (getAttributes().get("styleClass") != null)
+      {
+         buf.append(" class=")
+            .append(getAttributes().get("styleClass"));
+      }
+      buf.append('>');
+      
+      // output Page X of Y text
+      buf.append(MessageFormat.format(bundle.getString(MSG_PAGEINFO), new Object[] {
+            Integer.toString(currentPage + 1),  // current page can be zero if no data present
+            Integer.toString(pageCount)
+            }));
+      
+      buf.append("&nbsp;");
       
       // output HTML links or labels to render the paging controls
-      int nCurrentPage = dataContainer.getCurrentPage();
-      
       // first page
-      if (nCurrentPage != 0)
+      if (currentPage != 0)
       {
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(0));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE, 16, 16, bundle.getString(FIRST_PAGE), null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE, 16, 16, bundle.getString(FIRST_PAGE)));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE_NONE, 16, 16, null, null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_FIRSTPAGE_NONE, 16, 16, null));
       }
       
       // previous page
-      if (nCurrentPage != 0)
+      if (currentPage != 0)
       {
          buf.append("<a href='#' onclick=\"");
-         buf.append(generateEventScript(nCurrentPage - 1));
+         buf.append(generateEventScript(currentPage - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE, 16, 16, bundle.getString(PREVIOUS_PAGE), null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE, 16, 16, bundle.getString(PREVIOUS_PAGE)));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE_NONE, 16, 16, null, null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_PREVIOUSPAGE_NONE, 16, 16, null));
       }
       
       buf.append("&nbsp;");
-      // handle that the page count can be zero if no data present
-      buf.append(MessageFormat.format(bundle.getString(MSG_PAGEINFO), new Object[] {
-            Integer.toString(dataContainer.getCurrentPage() + 1),
-            Integer.toString(dataContainer.getPageCount())
-            }));
-      buf.append("&nbsp;");
+      
+      // clickable digits for pages 1 to 10
+      int totalIndex = (pageCount < 10 ? pageCount : 10);
+      for (int i=0; i<totalIndex; i++)
+      {
+         if (i != currentPage)
+         {
+            buf.append("<a href='#' onclick=\"")
+               .append(generateEventScript(i))
+               .append("\">")
+               .append(i + 1)
+               .append("</a>&nbsp;");
+         }
+         else
+         {
+            buf.append("<b>")
+               .append(i + 1)
+               .append("</b>&nbsp;");
+         }
+      }
+      // clickable digits for pages 20 to 100 (in jumps of 10)
+      if (pageCount >= 20)
+      {
+         buf.append("...&nbsp;");
+         totalIndex = (pageCount / 10) * 10;
+         totalIndex = (totalIndex < 100 ? totalIndex : 100);
+         for (int i=19; i<totalIndex; i += 10)
+         {
+            if (i != currentPage)
+            {
+               buf.append("<a href='#' onclick=\"")
+                  .append(generateEventScript(i))
+                  .append("\">")
+                  .append(i + 1)
+                  .append("</a>&nbsp;");
+            }
+            else
+            {
+               buf.append("<b>")
+                  .append(i + 1)
+                  .append("</b>&nbsp;");
+            }
+         }
+      }
+      // clickable digits for last page if > 10 and not already shown
+      if ((pageCount > 10) && (pageCount % 10 != 0))
+      {
+         if (pageCount-1 != currentPage)
+         {
+            if (pageCount < 20)
+            {
+               buf.append("...&nbsp;");
+            }
+            buf.append("<a href='#' onclick=\"")
+               .append(generateEventScript(pageCount-1))
+               .append("\">")
+               .append(pageCount)
+               .append("</a>&nbsp;");
+         }
+         else
+         {
+            if (pageCount < 20)
+            {
+               buf.append("...&nbsp;");
+            }
+            buf.append("<b>")
+               .append(pageCount)
+               .append("</b>&nbsp;");
+         }
+      }
       
       // next page
       if ((dataContainer.getCurrentPage() < dataContainer.getPageCount() - 1) == true)
       {
          buf.append("<a href='#' onclick=\"");
-         buf.append(generateEventScript(nCurrentPage + 1));
+         buf.append(generateEventScript(currentPage + 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE, 16, 16, bundle.getString(NEXT_PAGE), null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE, 16, 16, bundle.getString(NEXT_PAGE)));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE_NONE, 16, 16, null, null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_NEXTPAGE_NONE, 16, 16, null));
       }
       
       // last page
@@ -149,13 +234,15 @@ public class UIDataPager extends UICommand
          buf.append("<a href='#' onclick=\"");
          buf.append(generateEventScript(dataContainer.getPageCount() - 1));
          buf.append("\">");
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE, 16, 16, bundle.getString(LAST_PAGE), null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE, 16, 16, bundle.getString(LAST_PAGE)));
          buf.append("</a>");
       }
       else
       {
-         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE_NONE, 16, 16, null, null, "absmiddle"));
+         buf.append(Utils.buildImageTag(context, WebResources.IMAGE_LASTPAGE_NONE, 16, 16, null));
       }
+      
+      buf.append("</span>");
       
       out.write(buf.toString());
    }
