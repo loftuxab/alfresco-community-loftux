@@ -32,10 +32,13 @@ public class ClientElementReader implements ConfigElementReader
 {
    public static final String ELEMENT_CLIENT = "client";
    public static final String ELEMENT_PAGESIZE = "page-size";
+   public static final String ELEMENT_BROWSE = "browse";
+   public static final String ELEMENT_FORUMS = "forums";
    public static final String ELEMENT_LIST = "list";
    public static final String ELEMENT_DETAILS = "details";
    public static final String ELEMENT_ICONS = "icons";
    public static final String ELEMENT_DEFAULTVIEW = "default-view";
+   public static final String ELEMENT_DEFAULTFORUMSVIEW = "default-forums-view";
    public static final String ELEMENT_RECENTSPACESITEMS = "recent-spaces-items";
    public static final String ELEMENT_LANGUAGES = "languages";
    public static final String ELEMENT_LANGUAGE = "language";
@@ -67,25 +70,45 @@ public class ClientElementReader implements ConfigElementReader
          Element pageSize = element.element(ELEMENT_PAGESIZE);
          if (pageSize != null)
          {
+            // get the config for the browse view
+            Element browseView = pageSize.element(ELEMENT_BROWSE);
+            if (browseView != null)
             {
                Element viewPageSize = pageSize.element(ELEMENT_LIST);
                if (viewPageSize != null)
                {
                   configElement.setListPageSize(Integer.parseInt(viewPageSize.getTextTrim()));
                }
-            }
-            {
-               Element viewPageSize = pageSize.element(ELEMENT_DETAILS);
-               if (viewPageSize != null)
+               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
+               if (detailsPageSize != null)
                {
-                  configElement.setDetailsPageSize(Integer.parseInt(viewPageSize.getTextTrim()));
+                  configElement.setDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
+               }
+               Element iconsPageSize = pageSize.element(ELEMENT_ICONS);
+               if (iconsPageSize != null)
+               {
+                  configElement.setIconsPageSize(Integer.parseInt(iconsPageSize.getTextTrim()));
                }
             }
+            
+            // get the config for the forums view
+            Element forumsView = pageSize.element(ELEMENT_FORUMS);
+            if (forumsView != null)
             {
-               Element viewPageSize = pageSize.element(ELEMENT_ICONS);
+               Element viewPageSize = pageSize.element(ELEMENT_LIST);
                if (viewPageSize != null)
                {
-                  configElement.setIconsPageSize(Integer.parseInt(viewPageSize.getTextTrim()));
+                  configElement.setForumsListPageSize(Integer.parseInt(viewPageSize.getTextTrim()));
+               }
+               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
+               if (detailsPageSize != null)
+               {
+                  configElement.setForumsDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
+               }
+               Element iconsPageSize = pageSize.element(ELEMENT_ICONS);
+               if (iconsPageSize != null)
+               {
+                  configElement.setForumsIconsPageSize(Integer.parseInt(iconsPageSize.getTextTrim()));
                }
             }
          }
@@ -115,6 +138,13 @@ public class ClientElementReader implements ConfigElementReader
          if (defaultView != null)
          {
             configElement.setDefaultView(defaultView.getTextTrim());
+         }
+         
+         // get the default forums view mode
+         Element defaultForumsView = element.element(ELEMENT_DEFAULTFORUMSVIEW);
+         if (defaultForumsView != null)
+         {
+            configElement.setDefaultForumsView(defaultForumsView.getTextTrim());
          }
          
          // get the recent space max items

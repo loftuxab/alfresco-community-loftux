@@ -5,6 +5,7 @@
 
    <!-- ==================== APPLICATION ==================== -->
    <application>
+      <navigation-handler>org.alfresco.web.app.AlfrescoNavigationHandler</navigation-handler>
       <variable-resolver>org.springframework.web.jsf.DelegatingVariableResolver</variable-resolver>
       <locale-config>
          <default-locale>en</default-locale>
@@ -108,6 +109,23 @@
       </managed-property>
    </managed-bean>
    
+   <managed-bean>
+      <description>
+         The bean that holds forums state.
+      </description>
+      <managed-bean-name>ForumsBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.ForumsBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{NodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>configService</property-name>
+         <value>#{configService}</value>
+      </managed-property>
+   </managed-bean>
+
    <managed-bean>
       <description>
          The bean that holds a users Clipboard state.
@@ -802,5 +820,13 @@
          <value>#{SearchService}</value>
       </managed-property>
    </managed-bean>
+
+   <!-- ==================== LIFECYCLE ==================== -->
+
+   <!--
+   <lifecycle>
+      <phase-listener>org.alfresco.web.app.DebugPhaseListener</phase-listener>
+   </lifecycle>
+   -->
    
 </faces-config>

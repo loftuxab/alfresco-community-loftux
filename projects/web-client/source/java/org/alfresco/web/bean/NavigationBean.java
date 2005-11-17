@@ -34,6 +34,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.web.app.AlfrescoNavigationHandler;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.repository.Node;
@@ -349,6 +350,35 @@ public class NavigationBean
       this.location = location;
    }
    
+   /**
+    * Sets up the dispatch context so that the navigation handler knows
+    * what object is being acted upon
+    * 
+    * @param node The node to be added to the dispatch context
+    */
+   public void setupDispatchContext(Node node)
+   {
+      this.dispatchContext = node;
+   }
+   
+   /**
+    * Resets the dispatch context
+    */
+   public void resetDispatchContext()
+   {
+      this.dispatchContext = null;
+   }
+   
+   /**
+    * Returns the node currently set in the dispatch context
+    * 
+    * @return The node being dispatched or null if there is no 
+    *         dispatch context
+    */
+   public Node getDispatchContextNode()
+   {
+      return this.dispatchContext;
+   }
    
    // ------------------------------------------------------------------------------
    // Navigation action event handlers
@@ -498,6 +528,9 @@ public class NavigationBean
          setCurrentNodeId(ref.getId());
          setLocation( (List)breadcrumb.getValue() );
          
+         // setup the dispatch context
+         setupDispatchContext(new Node(ref));
+         
          if (fc.getViewRoot().getViewId().equals(BrowseBean.BROWSE_VIEW_ID))
          {
             return null;
@@ -558,6 +591,9 @@ public class NavigationBean
    
    /** Node we are using for UI context operations */
    private Node currentNode = null;
+   
+   /** Node we are using for dispatching */
+   private Node dispatchContext = null;
    
    /** Current toolbar location */
    private String toolbarLocation = LOCATION_HOME;

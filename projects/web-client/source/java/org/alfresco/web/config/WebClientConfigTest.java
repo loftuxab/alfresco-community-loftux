@@ -184,4 +184,141 @@ public class WebClientConfigTest extends BaseTest
       logger.info("error page = " + errorPage);
       assertTrue("error page should be '/jsp/error.jsp'", errorPage.equals("/jsp/error.jsp"));
    }
+   
+   /**
+    * Tests the navigation config i.e. the custom element reader and config element
+    */
+   public void testNavigation()
+   {
+      // setup the config service
+      String configFiles = getResourcesDir() + "test-config.xml";
+      XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
+      svc.init();
+
+      // *** Test the returning of a view id override
+      Config testCfg = svc.getConfig("viewid-navigation-result");
+      assertNotNull("viewid-navigation-result config should not be null", testCfg);
+      
+      NavigationConfigElement navCfg = (NavigationConfigElement)testCfg.getConfigElement("navigation");
+      assertNotNull("navigation config should not be null", navCfg);
+      
+      // get the result for the browse view id
+      NavigationResult navResult = navCfg.getOverride("/jsp/browse/browse.jsp", null);
+      assertEquals("result should be '/jsp/forums/forums.jsp'", "/jsp/forums/forums.jsp", 
+            navResult.getResult());
+      assertFalse("isOutcome test should be false", navResult.isOutcome());
+      
+      // get the result for the browse outcome
+      navResult = navCfg.getOverride(null, "browse");
+      assertEquals("result should be '/jsp/forums/topics.jsp'", "/jsp/forums/topics.jsp", 
+            navResult.getResult());
+      assertFalse("isOutcome test should be false", navResult.isOutcome());
+      
+      // get the result when passing both the browse view id and outcome, make
+      // sure we get the result for the outcome as it should take precedence
+      navResult = navCfg.getOverride("/jsp/browse/browse.jsp", "browse");
+      assertEquals("result should be '/jsp/forums/topics.jsp'", "/jsp/forums/topics.jsp", 
+            navResult.getResult());
+      assertFalse("isOutcome test should be false", navResult.isOutcome());
+      
+      // *** Test the returning of an outcome override
+      testCfg = svc.getConfig("outcome-navigation-result");
+      assertNotNull("outcome-navigation-result config should not be null", testCfg);
+      
+      navCfg = (NavigationConfigElement)testCfg.getConfigElement("navigation");
+      assertNotNull("navigation config should not be null", navCfg);
+      
+      // get the result for the browse view id
+      navResult = navCfg.getOverride("/jsp/browse/browse.jsp", null);
+      assertEquals("result should be 'showSomethingElse'", "showSomethingElse", 
+            navResult.getResult());
+      assertTrue("isOutcome test should be true", navResult.isOutcome());
+      
+      // get the result for the browse outcome
+      navResult = navCfg.getOverride(null, "browse");
+      assertEquals("result should be 'showSomethingElse'", "showSomethingElse", 
+            navResult.getResult());
+      assertTrue("isOutcome test should be true", navResult.isOutcome());
+      
+      // get the result when passing both the browse view id and outcome, make
+      // sure we get the result for the outcome as it should take precedence
+      navResult = navCfg.getOverride("/jsp/browse/browse.jsp", "browse");
+      assertEquals("result should be 'showSomethingElse'", "showSomethingElse", 
+            navResult.getResult());
+      assertTrue("isOutcome test should be true", navResult.isOutcome());
+      
+      // *** Test the duplicate result config 
+      testCfg = svc.getConfig("duplicate-navigation-overrides");
+      assertNotNull("duplicate-navigation-overrides config should not be null", testCfg);
+      
+      navCfg = (NavigationConfigElement)testCfg.getConfigElement("navigation");
+      assertNotNull("navigation config should not be null", navCfg);
+      
+      // make sure the outcome result is 'newOutcome'
+      navResult = navCfg.getOverride(null, "browse");
+      assertEquals("result should be 'newOutcome'", "newOutcome", 
+            navResult.getResult());
+      assertTrue("isOutcome test should be true", navResult.isOutcome());
+   }
+   
+   public void testNavigationGenericConfig()
+   {
+      // setup the config service
+      String configFiles = getResourcesDir() + "test-config.xml";
+      XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
+      svc.init();
+      
+      // do a lookup using the generic config elements and make sure the correct
+      // info comes out
+      Config testCfg = svc.getConfig("duplicate-navigation-overrides");
+      assertNotNull("duplicate-navigation-overrides config should not be null", testCfg);
+      
+      ConfigElement ce = testCfg.getConfigElement("navigation");
+      assertNotNull("navigation config should not be null", ce);
+      
+      List<ConfigElement> children = ce.getChildren();
+      assertNotNull(children);
+      
+      // make sure there are 2 children
+      assertEquals("There should be 2 children", 2, children.size());
+      
+      // get the first child and make sure the attributes are correct,
+      // from-view-id should be '/jsp/browse/browse.jsp' and to-view-id
+      // should be '/jsp/forums/forums.jsp'
+      ConfigElement child = children.get(0);
+      String fromViewId = child.getAttribute("from-view-id");
+      String fromOutcome = child.getAttribute("from-outcome");
+      String toViewId = child.getAttribute("to-view-id");
+      String toOutcome = child.getAttribute("to-outcome");
+      
+      logger.info("fromViewId = " + fromViewId);
+      logger.info("fromOutcome = " + fromOutcome);
+      logger.info("toViewId = " + toViewId);
+      logger.info("toOutcome = " + toOutcome);
+      
+      assertNull(fromOutcome);
+      assertNull(toOutcome);
+      
+      assertEquals("/jsp/browse/browse.jsp", fromViewId);
+      assertEquals("/jsp/forums/forums.jsp", toViewId);
+      
+      // get the second child and make sure the attributes are correct,
+      // from-outcome should be 'browse' and to-outcome should be 'newOutcome'
+      child = children.get(1);
+      fromViewId = child.getAttribute("from-view-id");
+      fromOutcome = child.getAttribute("from-outcome");
+      toViewId = child.getAttribute("to-view-id");
+      toOutcome = child.getAttribute("to-outcome");
+      
+      logger.info("fromViewId = " + fromViewId);
+      logger.info("fromOutcome = " + fromOutcome);
+      logger.info("toViewId = " + toViewId);
+      logger.info("toOutcome = " + toOutcome);
+      
+      assertNull(fromViewId);
+      assertNull(toViewId);
+      
+      assertEquals("browse", fromOutcome);
+      assertEquals("newOutcome", toOutcome);
+   }
 }

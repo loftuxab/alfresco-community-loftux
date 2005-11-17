@@ -27,6 +27,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -960,6 +962,9 @@ public class BrowseBean implements IContextListener
             
             // prepare a node for the action context
             setActionSpace(node);
+            
+            // setup the dispatch context in case it is required
+            this.navigator.setupDispatchContext(node);
          }
          catch (InvalidNodeRefException refErr)
          {
@@ -1050,6 +1055,9 @@ public class BrowseBean implements IContextListener
             
             // remember the document
             setDocument(node);
+            
+            // setup the dispatch context in case it is required
+            this.navigator.setupDispatchContext(node);
          }
          catch (InvalidNodeRefException refErr)
          {
@@ -1273,6 +1281,8 @@ public class BrowseBean implements IContextListener
       
       // set the current node Id ready for page refresh
       this.navigator.setCurrentNodeId(ref.getId());
+
+      this.navigator.setupDispatchContext(new Node(ref));
       
       navigateBrowseScreen();
    }
@@ -1289,18 +1299,32 @@ public class BrowseBean implements IContextListener
       if (this.contentRichList != null)
       {
          this.contentRichList.setValue(null);
-         if (this.navigator.getSearchContext() != null)
+         if (this.navigator.getSearchContext() == null)
          {
-            // clear the sorting mode so the search results are displayed in default 'score' order
+            if (this.contentRichList.getInitialSortColumn() == null)
+            {
+               this.contentRichList.setInitialSortColumn("name");
+            }
+         }
+         else
+         {
+            // and clear the sorting mode so the results are displayed in default 'score' order
             this.contentRichList.clearSort();
          }
       }
       if (this.spacesRichList != null)
       {
          this.spacesRichList.setValue(null);
-         if (this.navigator.getSearchContext() != null)
+         if (this.navigator.getSearchContext() == null)
          {
-            // clear the sorting mode so the search results are displayed in default 'score' order
+            if (this.spacesRichList.getInitialSortColumn() == null)
+            {
+               this.spacesRichList.setInitialSortColumn("name");
+            }
+         }
+         else
+         {
+            // and clear the sorting mode so the results are displayed in default 'score' order
             this.spacesRichList.clearSort();
          }
       }
@@ -1323,14 +1347,17 @@ public class BrowseBean implements IContextListener
     */
    private void navigateBrowseScreen()
    {
+      String outcome = null;
+      
       if (isViewCurrent() == false)
       {
-         FacesContext fc = FacesContext.getCurrentInstance();
-         fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "browse");
+         outcome = "browse";
       }
+      
+      FacesContext fc = FacesContext.getCurrentInstance();
+      fc.getApplication().getNavigationHandler().handleNavigation(fc, null, outcome);
    }
    
-
    // ------------------------------------------------------------------------------
    // Inner classes
    
@@ -1371,6 +1398,9 @@ public class BrowseBean implements IContextListener
          // set the current node id
          navigator.setCurrentNodeId(this.nodeRef.getId());
          navigator.setLocation( (List)breadcrumb.getValue() );
+         
+         // setup the dispatch context
+         navigator.setupDispatchContext(new Node(this.nodeRef));
          
          // return to browse page if required
          return (isViewCurrent() ? null : "browse"); 

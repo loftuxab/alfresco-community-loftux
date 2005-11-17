@@ -9,6 +9,7 @@
          <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
          <element-reader element-name="client" class="org.alfresco.web.config.ClientElementReader"/>
          <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
+         <element-reader element-name="navigation" class="org.alfresco.web.config.NavigationElementReader" />
       </element-readers>
    </plug-ins>
    
@@ -35,16 +36,27 @@
             <!-- <language locale="ja_JP">Japanese</language> -->
          </languages>
          
-         <!-- the maximum page size for each view mode in the browse screen -->
+         <!-- the maximum page size for each view mode in the client screens -->
          <page-size>
-            <list>10</list>
-            <details>10</details>
-            <icons>9</icons>
+            <browse>
+               <list>10</list>
+               <details>10</details>
+               <icons>9</icons>
+            </browse>
+            <forums>
+               <list>20</list>
+               <details>20</details>
+               <icons>20</icons>
+            </forums>
          </page-size>
          
          <!-- the default view mode in the browse screen -->
          <!-- can be: list|details|icons -->
          <default-view>icons</default-view>
+         
+         <!-- the default view mode in the forums screens -->
+         <!-- can be: list|details|icons -->
+         <default-forums-view>list</default-forums-view>
          
          <!-- the maximum number of items to show in the recent spaces shelf component -->
          <recent-spaces-items>6</recent-spaces-items>
@@ -86,6 +98,11 @@
          <show-property name="description"/>
          <show-property name="fm:status"/>
       </property-sheet>
+
+      <navigation>
+         <override from-view-id="/jsp/browse/browse.jsp" to-view-id="/jsp/forums/forums.jsp" />
+         <override from-outcome="browse" to-view-id="/jsp/forums/forums.jsp" />
+      </navigation>
    </config>
 
    <!-- Example client config for type defined in exampleModel.xml -->   

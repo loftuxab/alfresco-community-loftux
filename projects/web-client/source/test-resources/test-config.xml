@@ -4,6 +4,7 @@
       <element-readers>
          <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
          <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
+         <element-reader element-name="navigation" class="org.alfresco.web.config.NavigationElementReader" />
       </element-readers>
    </plug-ins>
 
@@ -30,6 +31,28 @@
       <renderers>
          <renderer mode="details">org.alfresco.web.ui.common.renderer.data.RichListRenderer.DetailsViewRenderer</renderer>
       </renderers>
+   </config>
+   
+   <config evaluator="string-compare" condition="viewid-navigation-result">
+      <navigation>
+         <override from-view-id="/jsp/browse/browse.jsp" to-view-id="/jsp/forums/forums.jsp" />
+         <override from-outcome="browse" to-view-id="/jsp/forums/topics.jsp" />
+      </navigation>
+   </config>
+   
+   <config evaluator="string-compare" condition="outcome-navigation-result">
+      <navigation>
+         <override from-view-id="/jsp/browse/browse.jsp" to-outcome="showSomethingElse" />
+         <override from-outcome="browse" to-outcome="showSomethingElse"  />
+      </navigation>
+   </config>
+   
+   <config evaluator="string-compare" condition="duplicate-navigation-overrides">
+      <navigation>
+         <override from-view-id="/jsp/browse/browse.jsp" to-view-id="/jsp/forums/forums.jsp" />
+         <override from-outcome="browse" to-outcome="showSomethingElse"  />
+         <override from-outcome="browse" to-outcome="newOutcome"  />
+      </navigation>
    </config>
    
 </alfresco-config>

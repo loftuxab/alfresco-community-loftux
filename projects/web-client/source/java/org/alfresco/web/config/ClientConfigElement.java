@@ -37,7 +37,13 @@ public class ClientConfigElement extends ConfigElementAdapter
    private int listPageSize = 10;
    private int detailsPageSize = 10;
    private int iconsPageSize = 9;
-   private String defaultView = "list";
+   private String defaultView = "icons";
+   
+   private int forumsListPageSize = 20;
+   private int forumsDetailsPageSize = 20;
+   private int forumsIconsPageSize = 20;
+   private String defaultForumsView = "list";
+   
    private int recentSpacesItems = 6;
    private int searchMinimum = 3;
    private String helpUrl = null;
@@ -133,6 +139,70 @@ public class ClientConfigElement extends ConfigElementAdapter
    /*package*/ void setListPageSize(int listPageSize)
    {
       this.listPageSize = listPageSize;
+   }
+   
+   /**
+    * @return Returns the defaultForumsView.
+    */
+   public String getDefaultForumsView()
+   {
+      return this.defaultForumsView;
+   }
+
+   /**
+    * @param defaultForumsView The defaultForumsView to set.
+    */
+   /*package*/ void setDefaultForumsView(String defaultForumsView)
+   {
+      this.defaultForumsView = defaultForumsView;
+   }
+
+   /**
+    * @return Returns the forumsDetailsPageSize.
+    */
+   public int getForumsDetailsPageSize()
+   {
+      return this.forumsDetailsPageSize;
+   }
+
+   /**
+    * @param forumsDetailsPageSize The forumsDetailsPageSize to set.
+    */
+   /*package*/ void setForumsDetailsPageSize(int forumsDetailsPageSize)
+   {
+      this.forumsDetailsPageSize = forumsDetailsPageSize;
+   }
+
+   /**
+    * @return Returns the forumsIconsPageSize.
+    */
+   public int getForumsIconsPageSize()
+   {
+      return this.forumsDetailsPageSize;
+   }
+
+   /**
+    * @param forumsIconsPageSize The forumsIconsPageSize to set.
+    */
+   /*package*/ void setForumsIconsPageSize(int forumsIconsPageSize)
+   {
+      this.forumsDetailsPageSize = forumsIconsPageSize;
+   }
+
+   /**
+    * @return Returns the forumsListPageSize.
+    */
+   public int getForumsListPageSize()
+   {
+      return this.forumsDetailsPageSize;
+   }
+
+   /**
+    * @param forumsListPageSize The forumsListPageSize to set.
+    */
+   /*package*/ void setForumsListPageSize(int forumsListPageSize)
+   {
+      this.forumsDetailsPageSize = forumsListPageSize;
    }
 
    /**
