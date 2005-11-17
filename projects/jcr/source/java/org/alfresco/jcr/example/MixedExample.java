@@ -46,7 +46,7 @@ public class MixedExample
         throws Exception
     {
         // Setup Spring and Transaction Service
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/alfresco/jcr/test/test-context.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:alfresco/jcr-context.xml");
         ServiceRegistry registry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
         TransactionService trxService = (TransactionService)registry.getTransactionService();
         NodeService nodeService = (NodeService)registry.getNodeService();
@@ -57,7 +57,7 @@ public class MixedExample
         // Login to workspace
         // Note: Default workspace is the one used by Alfresco Web Client which contains all the Spaces
         //       and their documents
-        Session session = repository.login(new SimpleCredentials("superuser", "".toCharArray()));
+        Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
         // Start a Transaction
         UserTransaction trx = trxService.getUserTransaction();
@@ -67,7 +67,7 @@ public class MixedExample
         {
             // Retrieve Company Home
             Node root = session.getRootNode();
-            Node companyHome = root.getNode("app:Company_Home");
+            Node companyHome = root.getNode("app:company_home");
 
             // Read Company Home Name
             Property name = companyHome.getProperty("cm:name");
