@@ -103,6 +103,11 @@
           <fileset dir="${dir.src.web}" excludes="WEB-INF/**" />
        </copy>
        
+       <java classname="CommentStripper" dir="${dir.assemble}" fork="yes">
+          <arg line="-l -t -r .jsp" />
+          <classpath refid="classpath.compile" />
+       </java>
+       
        <copy todir="${dir.assemble}/WEB-INF">
           <fileset dir="${dir.src.webinf}" includes="${webinf.includes}" excludes="${webinf.excludes}" />
        </copy>
