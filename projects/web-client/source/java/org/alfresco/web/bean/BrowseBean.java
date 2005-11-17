@@ -1299,32 +1299,18 @@ public class BrowseBean implements IContextListener
       if (this.contentRichList != null)
       {
          this.contentRichList.setValue(null);
-         if (this.navigator.getSearchContext() == null)
+         if (this.navigator.getSearchContext() != null)
          {
-            if (this.contentRichList.getInitialSortColumn() == null)
-            {
-               this.contentRichList.setInitialSortColumn("name");
-            }
-         }
-         else
-         {
-            // and clear the sorting mode so the results are displayed in default 'score' order
+            // clear the sorting mode so the search results are displayed in default 'score' order
             this.contentRichList.clearSort();
          }
       }
       if (this.spacesRichList != null)
       {
          this.spacesRichList.setValue(null);
-         if (this.navigator.getSearchContext() == null)
+         if (this.navigator.getSearchContext() != null)
          {
-            if (this.spacesRichList.getInitialSortColumn() == null)
-            {
-               this.spacesRichList.setInitialSortColumn("name");
-            }
-         }
-         else
-         {
-            // and clear the sorting mode so the results are displayed in default 'score' order
+            // clear the sorting mode so the search results are displayed in default 'score' order
             this.spacesRichList.clearSort();
          }
       }
