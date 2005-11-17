@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    
+   <bean name="fileFolderService" class="org.alfresco.repo.model.filefolder.FileFolderServiceImpl" >
+      <property name="namespaceService"><ref bean="namespaceService" /></property>
+      <property name="dictionaryService"><ref bean="dictionaryService" /></property>
+      <property name="unprotectedNodeService"><ref bean="nodeService" /></property>
+      <property name="nodeService"><ref bean="nodeService" /></property>
+      <property name="searchService"><ref bean="SearchService" /></property>
+   </bean>
+
+</beans>

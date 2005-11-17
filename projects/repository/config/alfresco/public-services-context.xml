@@ -757,7 +757,6 @@
     	</property>
     </bean>
     
-    
     <!-- Template Service -->
     <bean id="TemplateService" class="org.springframework.aop.framework.ProxyFactoryBean">
     	<property name="proxyInterfaces">
@@ -792,6 +791,33 @@
     	<property name="description">
     		<value>TemplateService Service</value>
     	</property>
+    </bean>
+    
+    <!-- File/Folder Service -->
+    <bean id="FileFolderService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.model.FileFolderService</value>
+    	</property>
+    	<property name="target"><ref bean="fileFolderService"/></property>
+    	<property name="interceptorNames">
+            <list>
+                <idref local="FileFolderService_transaction" />
+                <idref local="exceptionTranslator" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="FileFolderService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="list*">${server.transaction.mode.readOnly}</prop>
+                <prop key="search*">${server.transaction.mode.readOnly}</prop>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
     </bean>
     
 </beans>
