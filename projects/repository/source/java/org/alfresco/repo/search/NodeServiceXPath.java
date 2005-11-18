@@ -316,18 +316,20 @@ public class NodeServiceXPath extends BaseXPath
      * <p>
      * The default is JSR170 compliant. The optional boolean allows searching
      * only against the property value itself.
+     * <p>
+     * The search is always case-insensitive.
      * 
      * @author Derek Hulley
      */
     static class Like implements Function
     {
-
         public Object call(Context context, List args) throws FunctionCallException
         {
             if (args.size() < 2 || args.size() > 3)
             {
                 throw new FunctionCallException("like() usage: like(@attr, 'pattern' [, includeFTS]) \n"
-                        + " - includeFTS can be 'true' or 'false'");
+                        + " - includeFTS can be 'true' or 'false' \n"
+                        + " - search is case-insensitive");
             }
             // default includeFTS to true
             return evaluate(context.getNodeSet(), args.get(0), args.get(1), args.size() == 2 ? Boolean.toString(true)
