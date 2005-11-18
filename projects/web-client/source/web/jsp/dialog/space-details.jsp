@@ -143,11 +143,17 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="#{msg.properties}" id="properties-panel" border="white" bgcolor="white" 
-                                       titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       progressive="true" action="editSpaceProperties" linkTooltip="#{msg.modify}"
-                                       actionListener="#{EditSpaceDialog.startWizardForEdit}"
-                                       linkIcon="/images/icons/Change_details.gif">
+                              <%-- wrapper comment used by the panel to add additional component facets --%>
+                              <h:column id="props-panel-facets">
+                                 <f:facet name="title">
+                                    <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write">
+                                       <a:actionLink id="titleLink1" value="#{msg.modify}" showLink="false" image="/images/icons/Change_details.gif"
+                                             action="editSpaceProperties" actionListener="#{EditSpaceDialog.startWizardForEdit}" />
+                                    </r:permissionEvaluator>
+                                 </f:facet>
+                              </h:column>
+                              <a:panel label="#{msg.properties}" id="properties-panel" facetsId="props-panel-facets"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
                                        <td width=80 align=center>
@@ -178,15 +184,20 @@
                               </a:panel>
                               
                               <br/>
-                              
-                              <a:panel label="#{msg.rules}" id="rules-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       action="manageRules" linkTooltip="#{msg.modify}" linkIcon="/images/icons/rule.gif">
+                              <h:column id="rules-panel-facets">
+                                 <f:facet name="title">
+                                    <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write">
+                                       <a:actionLink id="titleLink2" value="#{msg.modify}" showLink="false" image="/images/icons/rule.gif" action="manageRules" />
+                                    </r:permissionEvaluator>
+                                 </f:facet>
+                              </h:column>
+                              <a:panel label="#{msg.rules}" id="rules-panel" facetsId="rules-panel-facets" progressive="true"
+                                       expanded="false" border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
                                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
                                           altRowStyleClass="recordSetRowAlt" width="100%" pageSize="10"
                                           initialSortColumn="title" initialSortDescending="true">
-                        
+                                    
                                     <%-- Primary column for details view mode --%>
                                     <a:column id="col1" primary="true" width="200" style="padding:2px;text-align:left">
                                        <f:facet name="header">
@@ -239,6 +250,8 @@
                               <br/>
                               
                               <%-- TODO: implement this - but READONLY details only! Manage Space Users for edits...
+                                         need support for panel with facets - so can hide edit link unless edit permissions
+                                         also need to wrap this panel with an permissions check: ReadPermissions
                               <a:panel label="#{msg.security}" id="security-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        action="manageInvitedUsers" linkTooltip="#{msg.manage_invited_users}" linkIcon="/images/icons/invite.gif">

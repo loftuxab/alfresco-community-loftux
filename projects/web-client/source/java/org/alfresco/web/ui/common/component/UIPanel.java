@@ -58,6 +58,31 @@ public class UIPanel extends UICommand
    {
       return "org.alfresco.faces.Controls";
    }
+   
+   /**
+    * Return the UI Component to be displayed on the right of the panel title area
+    * 
+    * @return UIComponent
+    */
+   public UIComponent getTitleComponent()
+   {
+      UIComponent titleComponent = null;
+      
+      // attempt to find a component with the specified ID
+      String facetsId = getFacetsId();
+      if (facetsId != null)
+      {
+         UIForm parent = Utils.getParentForm(FacesContext.getCurrentInstance(), this);
+         UIComponent facetsComponent = parent.findComponent(facetsId);
+         if (facetsComponent != null)
+         {
+            // get the 'title' facet from the component
+            titleComponent = facetsComponent.getFacet("title");
+         }
+      }
+      
+      return titleComponent;
+   }
 
    /**
     * @see javax.faces.component.UIComponentBase#encodeBegin(javax.faces.context.FacesContext)
@@ -71,18 +96,12 @@ public class UIPanel extends UICommand
       
       ResponseWriter out = context.getResponseWriter();
       
-      // determine if we have a link on the header
-      boolean linkPresent = false;
-      String linkLabel = getLinkLabel();
-      String linkIcon = getLinkIcon();
-      if (linkLabel != null || linkIcon != null)
-      {
-         linkPresent = true;
-      }
+      // determine if we have a component on the header
+      UIComponent titleComponent = getTitleComponent();
       
-      // determine whether we have any adornment
+      // determine whether we have any adornments
       String label = getLabel();
-      if (label != null || isProgressive() == true || linkPresent == true)
+      if (label != null || isProgressive() == true || titleComponent != null)
       {
          this.hasAdornments = true;
       }
@@ -165,31 +184,12 @@ public class UIPanel extends UICommand
          out.write("</td>");
       }
       
-      if (linkPresent)
+      // render the title component if supplied
+      if (titleComponent != null)
       {
          out.write("<td align='right'>");
-         
-         out.write("<a href=\"#\" onclick=\"");
-         out.write(Utils.generateFormSubmit(context, this, getHiddenFieldName(), 
-               getClientId(context) + NamingContainer.SEPARATOR_CHAR + LINK_CLICKED));
-         out.write("\"");
-         Utils.outputAttribute(out, getLinkStyleClass(), "class");
-         Utils.outputAttribute(out, getLinkTooltip(), "title");
-         out.write(">");
-         
-         if (getLinkIcon() != null)
-         {
-            out.write(Utils.buildImageTag(context, getLinkIcon(), getLinkTooltip(), "absmiddle"));
-         }
-         
-         if (getLinkLabel() != null)
-         {
-            out.write("<span style='padding-left: 6px;'>");
-            out.write(getLinkLabel());
-            out.write("</span>");
-         }
-         
-         out.write("</a></td>");
+         Utils.encodeRecursive(context, titleComponent);
+         out.write("</td>");
       }
       
       if (this.hasAdornments)
@@ -253,18 +253,9 @@ public class UIPanel extends UICommand
          // we were clicked, strip out the value
          value = value.substring(getClientId(context).length() + 1);
          
-         if (value.equals(LINK_CLICKED))
-         {
-            // the action link was clicked, so queue the action event
-            ActionEvent event = new ActionEvent(this);
-            queueEvent(event);
-         }
-         else
-         {
-            // the expand/collapse icon was clicked, so toggle the state
-            ExpandedEvent event = new ExpandedEvent(this, Boolean.parseBoolean(value));
-            queueEvent(event);
-         }
+         // the expand/collapse icon was clicked, so toggle the state
+         ExpandedEvent event = new ExpandedEvent(this, Boolean.parseBoolean(value));
+         queueEvent(event);
          
          //
          // TODO: See http://forums.java.sun.com/thread.jspa?threadID=524925&start=15&tstart=0
@@ -315,13 +306,10 @@ public class UIPanel extends UICommand
       this.border = (String)values[3];
       this.bgcolor = (String)values[4];
       this.label = (String)values[5];
-      this.linkLabel = (String)values[6];
-      this.linkIcon = (String)values[7];
-      this.linkStyleClass = (String)values[8];
-      this.linkTooltip = (String)values[9];
-      this.titleBgcolor = (String)values[10];
-      this.titleBorder = (String)values[11];
-      this.expandedActionListener = (MethodBinding)values[12];
+      this.titleBgcolor = (String)values[6];
+      this.titleBorder = (String)values[7];
+      this.expandedActionListener = (MethodBinding)values[8];
+      this.facetsId = (String)values[9];
    }
    
    /**
@@ -329,7 +317,7 @@ public class UIPanel extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[13];
+      Object values[] = new Object[10];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = (isExpanded() ? Boolean.TRUE : Boolean.FALSE);
@@ -337,13 +325,10 @@ public class UIPanel extends UICommand
       values[3] = this.border;
       values[4] = this.bgcolor;
       values[5] = this.label;
-      values[6] = this.linkLabel;
-      values[7] = this.linkIcon;
-      values[8] = this.linkStyleClass;
-      values[9] = this.linkTooltip;
-      values[10] = this.titleBgcolor;
-      values[11] = this.titleBorder;
-      values[12] = this.expandedActionListener;
+      values[6] = this.titleBgcolor;
+      values[7] = this.titleBorder;
+      values[8] = this.expandedActionListener;
+      values[9] = this.facetsId;
       return values;
    }
    
@@ -476,94 +461,6 @@ public class UIPanel extends UICommand
    {
       this.label = label;
    }
-   
-   /**
-    * @return Returns the icon to use for the link
-    */
-   public String getLinkIcon()
-   {
-      ValueBinding vb = getValueBinding("linkIcon");
-      if (vb != null)
-      {
-         this.linkIcon = (String)vb.getValue(getFacesContext());
-      }
-      
-      return this.linkIcon;
-   }
-
-   /**
-    * @param linkIcon Sets the link icon
-    */
-   public void setLinkIcon(String linkIcon)
-   {
-      this.linkIcon = linkIcon;
-   }
-
-   /**
-    * @return Returns the label to use for the link
-    */
-   public String getLinkLabel()
-   {
-      ValueBinding vb = getValueBinding("linkLabel");
-      if (vb != null)
-      {
-         this.linkLabel = (String)vb.getValue(getFacesContext());
-      }
-      
-      return this.linkLabel;
-   }
-
-   /**
-    * @param linkLabel Sets the link label
-    */
-   public void setLinkLabel(String linkLabel)
-   {
-      this.linkLabel = linkLabel;
-   }
-
-   /**
-    * @return Returns the link style class
-    */
-   public String getLinkStyleClass()
-   {
-      ValueBinding vb = getValueBinding("linkStyleClass");
-      if (vb != null)
-      {
-         this.linkStyleClass = (String)vb.getValue(getFacesContext());
-      }
-      
-      return this.linkStyleClass;
-   }
-
-   /**
-    * @param linkStyleClass Sets the link style class
-    */
-   public void setLinkStyleClass(String linkStyleClass)
-   {
-      this.linkStyleClass = linkStyleClass;
-   }
-
-   /**
-    * @return Returns the tooltip for the link
-    */
-   public String getLinkTooltip()
-   {
-      ValueBinding vb = getValueBinding("linkTooltip");
-      if (vb != null)
-      {
-         this.linkTooltip = (String)vb.getValue(getFacesContext());
-      }
-      
-      return this.linkTooltip;
-   }
-
-   /**
-    * @param linkTooltip Sets the link tooltip
-    */
-   public void setLinkTooltip(String linkTooltip)
-   {
-      this.linkTooltip = linkTooltip;
-   }
 
    /**
     * @return Returns the progressive display setting.
@@ -627,6 +524,32 @@ public class UIPanel extends UICommand
       this.expanded = Boolean.valueOf(expanded);
    }
    
+   /**
+    * Get the facets component Id to use
+    *
+    * @return the facets component Id
+    */
+   public String getFacetsId()
+   {
+      ValueBinding vb = getValueBinding("facets");
+      if (vb != null)
+      {
+         this.facetsId = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.facetsId;
+   }
+
+   /**
+    * Set the facets component Id to use
+    *
+    * @param facets     the facets component Id
+    */
+   public void setFacetsId(String facets)
+   {
+      this.facetsId = facets;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Private helpers
@@ -646,12 +569,6 @@ public class UIPanel extends UICommand
    
    
    // ------------------------------------------------------------------------------
-   // Constants 
-   
-   private final static String LINK_CLICKED = "link-clicked";
-   
-   
-   // ------------------------------------------------------------------------------
    // Private members 
    
    // component settings
@@ -661,10 +578,7 @@ public class UIPanel extends UICommand
    private String titleBgcolor = null;
    private Boolean progressive = null;
    private String label = null;
-   private String linkLabel = null;
-   private String linkIcon = null;
-   private String linkTooltip = null;
-   private String linkStyleClass = null;
+   private String facetsId = null;
    private MethodBinding expandedActionListener = null;
    
    // component state

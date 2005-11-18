@@ -376,9 +376,9 @@
          display more complex areas of the UI as required. It also allows the developer to surround an
          area of the UI with an attractive graphical border and title label. The component tags can
          contain any combination of HTML or child JSF components. IMPORTANT NOTE: Currently there is an
-         issue in the SunRI of JSF whereby all child components of the panel must have an id attribute
-         specified if a progressive style panel is used - else an exception will occur when the panel
-         visibility is toggled by the user!
+         issue in the SunRI and MyFaces impl of JSF whereby all child components of the panel must have an
+         id attribute specified if a progressive style panel is used - else an exception will occur when the
+         panel visibility is toggled by the user!
       </description>
       
       <attribute>
@@ -460,43 +460,13 @@
       </attribute>
       
       <attribute>
-         <name>action</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>actionListener</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>linkLabel</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>linkIcon</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>linkTooltip</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
-         <name>linkStyleClass</name>
-         <required>false</required>
-         <rtexprvalue>true</rtexprvalue>
-      </attribute>
-      
-      <attribute>
          <name>expandedActionListener</name>
+         <required>false</required>
+         <rtexprvalue>true</rtexprvalue>
+      </attribute>
+      
+      <attribute>
+         <name>facetsId</name>
          <required>false</required>
          <rtexprvalue>true</rtexprvalue>
       </attribute>

@@ -216,12 +216,20 @@
                                     </tr>
                                  </table>
                               </a:panel>
+                              
                               <br/>
-                              <a:panel label="#{msg.properties}" id="properties-panel" progressive="true"
+                              
+                              <h:column id="props-panel-facets">
+                                 <f:facet name="title">
+                                    <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
+                                       <a:actionLink id="titleLink1" value="#{msg.modify}" showLink="false" image="/images/icons/Change_details.gif"
+                                             action="editDocProperties" actionListener="#{EditDocPropsDialog.setupDocumentForAction}" />
+                                    </r:permissionEvaluator>
+                                 </f:facet>
+                              </h:column>
+                              <a:panel label="#{msg.properties}" id="properties-panel" facetsId="props-panel-facets" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       action="editDocProperties" linkIcon="/images/icons/Change_details.gif"
-                                       actionListener="#{EditDocPropsDialog.setupDocumentForAction}"
-                                       linkTooltip="#{msg.modify}" rendered="#{DocumentDetailsBean.locked == false}"
+                                       rendered="#{DocumentDetailsBean.locked == false}"
                                        expanded='#{DocumentDetailsBean.panels["properties-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
@@ -259,9 +267,11 @@
                                     </tr>
                                  </table>
                               </a:panel>
+                              
+                              <br/>
+                              
                               <a:panel label="#{msg.properties}" id="properties-panel-locked" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.locked}"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" rendered="#{DocumentDetailsBean.locked}"
                                        expanded='#{DocumentDetailsBean.panels["properties-panel-locked"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
                                     <tr>
@@ -292,27 +302,40 @@
                                     </tr>
                                  </table>
                               </a:panel>
+                              
                               <br/>
-                              <a:panel label="#{msg.workflow}" id="workflow-panel" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       action="editSimpleWorkflow" linkIcon="/images/icons/Change_details.gif"
-                                       rendered="#{DocumentDetailsBean.approveStepName != null}" linkTooltip="#{msg.workflow}"
+                              
+                              <h:column id="workflow-panel-facets">
+                                 <f:facet name="title">
+                                    <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
+                                       <a:actionLink id="titleLink2" value="#{msg.workflow}" showLink="false" image="/images/icons/Change_details.gif" action="editSimpleWorkflow" />
+                                    </r:permissionEvaluator>
+                                 </f:facet>
+                              </h:column>
+                              <a:panel label="#{msg.workflow}" id="workflow-panel" facetsId="workflow-panel-facets" progressive="true"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" rendered="#{DocumentDetailsBean.approveStepName != null}"
                                        expanded='#{DocumentDetailsBean.panels["workflow-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="workflow-overview" value="#{DocumentDetailsBean.workflowOverviewHTML}" 
                                                escape="false" />
                               </a:panel>
                               <a:panel label="#{msg.workflow}" id="no-workflow-panel" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.approveStepName == null}"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" rendered="#{DocumentDetailsBean.approveStepName == null}"
                                        expanded='#{DocumentDetailsBean.panels["workflow-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="no-workflow-msg" value="#{msg.not_in_workflow}" />
                               </a:panel>
+                              
                               <br/>
-                              <a:panel label="#{msg.category}" id="category-panel" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       action="editCategories" actionListener="#{DocumentDetailsBean.setupCategoriesForEdit}"
-                                       linkIcon="/images/icons/Change_details.gif" linkTooltip="#{msg.change_category}"
-                                       rendered="#{DocumentDetailsBean.categorised}"
+                              
+                              <h:column id="category-panel-facets">
+                                 <f:facet name="title">
+                                    <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
+                                       <a:actionLink id="titleLink3" value="#{msg.change_category}" showLink="false" image="/images/icons/Change_details.gif"
+                                             action="editCategories" actionListener="#{DocumentDetailsBean.setupCategoriesForEdit}" />
+                                    </r:permissionEvaluator>
+                                 </f:facet>
+                              </h:column>
+                              <a:panel label="#{msg.category}" id="category-panel" facetsId="category-panel-facets" progressive="true"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" rendered="#{DocumentDetailsBean.categorised}"
                                        expanded='#{DocumentDetailsBean.panels["category-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <h:outputText id="category-overview" value="#{DocumentDetailsBean.categoriesOverviewHTML}" 
                                                escape="false" />
@@ -329,10 +352,11 @@
                                                   rendered="#{DocumentDetailsBean.locked == false}" />
                                  </r:permissionEvaluator>
                               </a:panel>
+                              
                               <br/>
+                              
                               <a:panel label="#{msg.version_history}" id="version-history-panel" progressive="true"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       rendered="#{DocumentDetailsBean.versionable}"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" rendered="#{DocumentDetailsBean.versionable}"
                                        expanded='#{DocumentDetailsBean.panels["version-history-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  
                                  <a:richList id="versionHistoryList" viewMode="details" value="#{DocumentDetailsBean.versionHistory}" 

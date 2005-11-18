@@ -53,8 +53,6 @@ public class PanelTag extends HtmlComponentTag
    {
       super.setProperties(component);
       
-      setActionProperty((UICommand)component, this.action);
-      setActionListenerProperty((UICommand)component, this.actionListener);
       setStringProperty(component, "label", this.label);
       setStringProperty(component, "border", this.border);
       setBooleanProperty(component, "progressive", this.progressive);
@@ -62,10 +60,7 @@ public class PanelTag extends HtmlComponentTag
       setStringProperty(component, "titleBorder", this.titleBorder);
       setStringProperty(component, "titleBgcolor", this.titleBgcolor);
       setBooleanProperty(component, "expanded", this.expanded);
-      setStringProperty(component, "linkLabel", this.linkLabel);
-      setStringProperty(component, "linkIcon", this.linkIcon);
-      setStringProperty(component, "linkStyleClass", this.linkStyleClass);
-      setStringProperty(component, "linkTooltip", this.linkTooltip);
+      setStringProperty(component, "facetsId", this.facetsId);
       if (expandedActionListener != null)
       {
          if (isValueReference(expandedActionListener))
@@ -91,13 +86,8 @@ public class PanelTag extends HtmlComponentTag
       this.progressive = null;
       this.bgcolor = null;
       this.expanded = null;
-      this.action = null;
-      this.actionListener = null;
-      this.linkIcon = null;
-      this.linkLabel = null;
-      this.linkStyleClass = null;
-      this.linkTooltip = null;
       this.expandedActionListener = null;
+      this.facetsId = null;
    }
    
    /**
@@ -195,54 +185,6 @@ public class PanelTag extends HtmlComponentTag
    }
 
    /**
-    * @param action Sets the action
-    */
-   public void setAction(String action)
-   {
-      this.action = action;
-   }
-
-   /**
-    * @param actionListener Sets the action listener
-    */
-   public void setActionListener(String actionListener)
-   {
-      this.actionListener = actionListener;
-   }
-
-   /**
-    * @param linkIcon Sets the icon to use for the link
-    */
-   public void setLinkIcon(String linkIcon)
-   {
-      this.linkIcon = linkIcon;
-   }
-
-   /**
-    * @param linkLabel Sets the label to use for the link
-    */
-   public void setLinkLabel(String linkLabel)
-   {
-      this.linkLabel = linkLabel;
-   }
-
-   /**
-    * @param linkStyleClass Sets the style to use for the link
-    */
-   public void setLinkStyleClass(String linkStyleClass)
-   {
-      this.linkStyleClass = linkStyleClass;
-   }
-
-   /**
-    * @param linkTooltip Sets the tooltip to use for the link
-    */
-   public void setLinkTooltip(String linkTooltip)
-   {
-      this.linkTooltip = linkTooltip;
-   }
-
-   /**
     * Set the expandedActionListener
     *
     * @param expandedActionListener     the expandedActionListener
@@ -252,6 +194,19 @@ public class PanelTag extends HtmlComponentTag
       this.expandedActionListener = expandedActionListener;
    }
 
+   /**
+    * Set the facetsId
+    *
+    * @param facets     the facetsId
+    */
+   public void setFacetsId(String facetsId)
+   {
+      this.facetsId = facetsId;
+   }
+
+
+   /** the facets component Id */
+   private String facetsId;
 
    /** the expandedActionListener */
    private String expandedActionListener;
@@ -276,22 +231,4 @@ public class PanelTag extends HtmlComponentTag
    
    /** the title bgcolor */
    private String titleBgcolor;
-   
-   /** the action */
-   private String action;
-   
-   /** the action listener */
-   private String actionListener;
-   
-   /** the link label */
-   private String linkLabel;
-   
-   /** the link icon */
-   private String linkIcon;
-   
-   /** the link tooltip */
-   private String linkTooltip;
-   
-   /** the link style class */
-   private String linkStyleClass;
 }
