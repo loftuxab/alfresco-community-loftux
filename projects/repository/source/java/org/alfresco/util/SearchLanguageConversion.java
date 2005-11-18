@@ -117,7 +117,7 @@ public class SearchLanguageConversion
         return convert(DEF_XPATH_LIKE, DEF_LUCENE, xpathLikeClause);
     }
     
-    private static String convert(LanguageDefinition from, LanguageDefinition to, String query)
+    public static String convert(LanguageDefinition from, LanguageDefinition to, String query)
     {
         char[] chars = query.toCharArray();
         
