@@ -108,15 +108,11 @@
          <property name="contentService"><ref bean="contentService" /></property>
    </bean>
    
-   <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">
-      <constructor-arg>
-         <ref bean="dictionaryService"/>
-      </constructor-arg>
-      <constructor-arg>
-         <ref bean="namespaceService"/>
-      </constructor-arg>
-         
+   <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper" init-method="init">
+      <property name="dictionaryService"><ref bean="dictionaryService" /></property>
+      <property name="namespaceService"><ref bean="namespaceService" /></property>
       <property name="nodeService"><ref bean="NodeService" /></property>
+      <property name="contentService"><ref bean="ContentService" /></property>
       <property name="searchService"><ref bean="SearchService" /></property>
       <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
       <property name="permissionService"><ref bean="permissionService"/></property>

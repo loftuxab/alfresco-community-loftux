@@ -40,6 +40,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -79,6 +80,7 @@ public class CifsHelper
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
+    private ContentService contentService;
     private SearchService searchService;
     private MimetypeService mimetypeService;
     private PermissionService permissionService;
@@ -97,28 +99,9 @@ public class CifsHelper
     
     /**
      * Class constructor
-     * 
-     * @param dictionService DictionaryService
-     * @param namespaceService NamespaceService
      */
-    public CifsHelper(DictionaryService dictionaryService, NamespaceService namespaceService)
+    public CifsHelper()
     {
-        this.dictionaryService = dictionaryService;
-        this.namespaceService  = namespaceService;
-        
-        // Get the text data type
-        dataType = dictionaryService.getDataType(DataTypeDefinition.TEXT);
-        
-        // Generate the parameter names for searches
-        cmName = QName.createQName("cm:name", namespaceService);
-        cmSystemFolderType = QName.createQName("cm:systemfoldertype", namespaceService);
-        cmFileType = QName.createQName("cm:filetype", namespaceService);
-        cmFolderType = QName.createQName("cm:foldertype", namespaceService);
-        
-        // Create the fixed search parameter definitions
-        systemFolderType = new QueryParameterDefImpl( cmSystemFolderType, dataType, true, ContentModel.TYPE_SYSTEM_FOLDER.toString());
-        fileType   = new QueryParameterDefImpl( cmFileType, dataType, true, ContentModel.TYPE_CONTENT.toString());
-        folderType = new QueryParameterDefImpl( cmFolderType, dataType, true, ContentModel.TYPE_FOLDER.toString());
     }
     
     public void setDictionaryService(DictionaryService dictionaryService)
@@ -136,6 +119,11 @@ public class CifsHelper
         this.nodeService = nodeService;
     }
     
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
@@ -154,6 +142,26 @@ public class CifsHelper
     public void setPermissionService(PermissionService permissionService)
     {
         this.permissionService = permissionService;
+    }
+
+    /**
+     * Post-property set initialization
+     */
+    public void init()
+    {
+        // Get the text data type
+        dataType = dictionaryService.getDataType(DataTypeDefinition.TEXT);
+        
+        // Generate the parameter names for searches
+        cmName = QName.createQName("cm:name", namespaceService);
+        cmSystemFolderType = QName.createQName("cm:systemfoldertype", namespaceService);
+        cmFileType = QName.createQName("cm:filetype", namespaceService);
+        cmFolderType = QName.createQName("cm:foldertype", namespaceService);
+        
+        // Create the fixed search parameter definitions
+        systemFolderType = new QueryParameterDefImpl( cmSystemFolderType, dataType, true, ContentModel.TYPE_SYSTEM_FOLDER.toString());
+        fileType   = new QueryParameterDefImpl( cmFileType, dataType, true, ContentModel.TYPE_CONTENT.toString());
+        folderType = new QueryParameterDefImpl( cmFolderType, dataType, true, ContentModel.TYPE_FOLDER.toString());
     }
     
     /**
