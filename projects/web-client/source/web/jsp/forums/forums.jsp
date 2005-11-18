@@ -72,17 +72,17 @@
                               </td>
                               <td>
                                  <%-- Summary --%>
-                                 <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg1" /></div>
-                                 <div class="mainTitle"><h:outputText value="#{msg.forums}" id="msg2" /></div>
+                                 <div class="mainSubTitle"><h:outputText value="#{msg.forums}" id="msg1" /></div>
+                                 <div class="mainTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" id="msg2" /></div>
                                  <div class="mainSubText"><h:outputText value="#{msg.forums_info}" id="msg3" /></div>
-                                 <%--<div style="padding-top:2px"><a:statusMessage id="status1" border="yellowInner" bgcolor="#ffffcc" binding="#{BrowseBean.statusMessage}" /></div>--%>
+                                 <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
                               <td width=110 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren" id="eval1">
-                                    <a:actionLink value="#{msg.new_forum}" image="/images/icons/create_forum.gif" padding="4" action="createForum" id="link1" />
+                                    <a:actionLink value="#{msg.new_forum}" image="/images/icons/create_forum.gif" padding="4" action="createForum" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
                                  </r:permissionEvaluator>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="Delete" id="eval2">
                                     <a:actionLink value="#{msg.delete_forum}" image="/images/icons/delete.gif" padding="4" action="deleteForum" actionListener="#{BrowseBean.setupDeleteAction}" id="link2">
@@ -220,19 +220,17 @@
                            <f:facet name="header">
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
-                           <r:permissionEvaluator value="#{r}" allow="CreateChildren">
-                              <a:actionLink value="#{msg.new_forum}" image="/images/icons/create_forum.gif" showLink="false" styleClass="inlineAction">
-                                 <f:param name="id" value="#{r.id}" />
-                              </a:actionLink>
-                           </r:permissionEvaluator>
                            <r:permissionEvaluator value="#{r}" allow="Delete">
-                              <a:actionLink value="#{msg.delete_forum}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction">
+                              <a:actionLink value="#{msg.delete_forum}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteForum" actionListener="#{BrowseBean.setupDeleteAction}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </r:permissionEvaluator>
+                           <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" showLink="false" styleClass="inlineAction" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
+                              <f:param name="id" value="#{r.id}" />
+                           </a:actionLink>
                         </a:column>
                         
-                        <a:dataPager/>
+                        <a:dataPager styleClass="pager" />
                      </a:richList>
                      
                      </a:panel>

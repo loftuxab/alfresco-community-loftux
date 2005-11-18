@@ -183,13 +183,8 @@
                                     <td><h:outputText value="#{msg.choose_space_icon}"/>:</td>
                                     <td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
-                                       <a:imagePickerRadio columns="6" spacing="4" value="#{NewSpaceWizard.icon}">
-                                          <a:listItem value="space-icon-default" image="/images/icons/space-icon-default.gif" />
-                                          <a:listItem value="space-icon-star" image="/images/icons/space-icon-star.gif" />
-                                          <a:listItem value="space-icon-doc" image="/images/icons/space-icon-doc.gif" />
-                                          <a:listItem value="space-icon-pen" image="/images/icons/space-icon-pen.gif" />
-                                          <a:listItem value="space-icon-cd" image="/images/icons/space-icon-cd.gif" />
-                                          <a:listItem value="space-icon-image" image="/images/icons/space-icon-image.gif" />
+                                       <a:imagePickerRadio columns="6" spacing="4" value="#{NewSpaceWizard.icon}" id="space-icon">
+                                          <a:listItems value="#{NewSpaceWizard.icons}" />
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                     </td>

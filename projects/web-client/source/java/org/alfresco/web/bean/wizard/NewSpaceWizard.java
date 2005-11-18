@@ -34,6 +34,7 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.ForumModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -97,6 +98,8 @@ public class NewSpaceWizard extends AbstractWizardBean
    private boolean saveAsTemplate;
    private List<SelectItem> templates;
    private List<UIListItem> folderTypes;
+   private List<UIListItem> genericIcons;
+   private List<UIListItem> forumIcons;
    private List<UIDescription> folderTypeDescriptions;
    
    /**
@@ -534,7 +537,7 @@ public class NewSpaceWizard extends AbstractWizardBean
     * @return List of UIListItem components
     */
    @SuppressWarnings("unchecked")
-public List<UIListItem> getFolderTypes()
+   public List<UIListItem> getFolderTypes()
    {
       if (this.folderTypes == null)
       {
@@ -668,6 +671,84 @@ public List<UIListItem> getFolderTypes()
       }
       
       return this.folderTypeDescriptions;
+   }
+   
+   /**
+    * Returns a list of icons to allow the user to select from.
+    * The list can change according to the type of space being created.
+    * 
+    * @return A list of icons
+    */
+   @SuppressWarnings("unchecked")
+   public List<UIListItem> getIcons()
+   {
+      // TODO: Drive the list of icons to show for each space type from the config
+      
+      List<UIListItem> icons = null;
+      
+      if (this.spaceType.equals(ForumModel.TYPE_FORUM.toString()))
+      {
+         // return the various forum icons
+         if (this.forumIcons == null)
+         {
+            this.forumIcons = new ArrayList<UIListItem>(1);
+            
+            // change default icon to be forums
+            this.icon = "forum_large";
+            
+            UIListItem item = new UIListItem();
+            item.setValue("forum_large");
+            item.getAttributes().put("image", "/images/icons/forum_large.gif");
+            this.forumIcons.add(item);
+         }
+         
+         icons = this.forumIcons;
+      }
+      else
+      {
+         // return the generic space icons
+         if (this.genericIcons == null)
+         {
+            this.genericIcons = new ArrayList<UIListItem>(6);
+            
+            // change default icon
+            this.icon = SPACE_ICON_DEFAULT;
+            
+            UIListItem item = new UIListItem();
+            item.setValue("space-icon-default");
+            item.getAttributes().put("image", "/images/icons/space-icon-default.gif");
+            this.genericIcons.add(item);
+            
+            item = new UIListItem();
+            item.setValue("space-icon-star");
+            item.getAttributes().put("image", "/images/icons/space-icon-star.gif");
+            this.genericIcons.add(item);
+            
+            item = new UIListItem();
+            item.setValue("space-icon-doc");
+            item.getAttributes().put("image", "/images/icons/space-icon-doc.gif");
+            this.genericIcons.add(item);
+            
+            item = new UIListItem();
+            item.setValue("space-icon-pen");
+            item.getAttributes().put("image", "/images/icons/space-icon-pen.gif");
+            this.genericIcons.add(item);
+            
+            item = new UIListItem();
+            item.setValue("space-icon-cd");
+            item.getAttributes().put("image", "/images/icons/space-icon-cd.gif");
+            this.genericIcons.add(item);
+            
+            item = new UIListItem();
+            item.setValue("space-icon-image");
+            item.getAttributes().put("image", "/images/icons/space-icon-image.gif");
+            this.genericIcons.add(item);
+         }
+         
+         icons = this.genericIcons;
+      }
+      
+      return icons;
    }
    
    /**

@@ -214,6 +214,8 @@ public class ImagePickerRadioRenderer extends BaseRenderer
      
       out.write("<input type='radio' name='");
       out.write(imagePicker.getClientId(context));
+      out.write("' id='");
+      out.write(imagePicker.getClientId(context));
       out.write("' value='");
       // TODO: need to take into account values that may need to be converted,
       //       for now presume a string is OK

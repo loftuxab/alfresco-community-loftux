@@ -140,7 +140,7 @@ public class AlfrescoNavigationHandler extends NavigationHandler
          }
          
          // reset the dispatch context
-         navBean.resetDispatchContext();
+//         navBean.resetDispatchContext();
       }
       else if (logger.isDebugEnabled())
       {

@@ -152,6 +152,19 @@
       </navigation-case>
    </navigation-rule>
    
+   <!-- Forums screen action outcomes -->
+   <navigation-rule>
+      <from-view-id>/jsp/forums/forums.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>createForum</from-outcome>
+         <to-view-id>/jsp/dialog/new-space.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>deleteForum</from-outcome>
+         <to-view-id>/jsp/forums/delete-forum.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
    <!-- Admin Console rules -->
    <navigation-rule>
       <from-view-id>/jsp/admin/admin-console.jsp</from-view-id>
