@@ -19,9 +19,9 @@ package org.alfresco.repo.model.filefolder;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
@@ -47,6 +47,17 @@ import org.springframework.context.ApplicationContext;
 public class FileFolderServiceImplTest extends TestCase
 {
     private static final String IMPORT_VIEW = "filefolder/filefolder-test-import.xml";
+    
+    private static final String L0_FILE_A = "L0: File A";
+    private static final String L0_FILE_B = "L0: File B";
+    private static final String L0_FOLDER_A = "L0: Folder A";
+    private static final String L0_FOLDER_B = "L0: Folder B";
+    private static final String L0_FOLDER_C = "L0: Folder C";
+    private static final String L1_FOLDER_A = "L1: Folder A";
+    private static final String L1_FOLDER_B = "L1: Folder B";
+    private static final String L1_FILE_A = "L1: File A";
+    private static final String L1_FILE_B = "L1: File B";
+    private static final String L1_FILE_C = "L1: File C (%_)";
     
     private static final ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
@@ -90,15 +101,103 @@ public class FileFolderServiceImplTest extends TestCase
     
     public void tearDown() throws Exception
     {
-        if (txn.getStatus() == Status.STATUS_ACTIVE)
+        txn.rollback();
+    }
+
+    /**
+     * Checks that the names and numbers of files and folders in the provided list is correct
+     * 
+     * @param files the list of files
+     * @param expectedFileCount the number of uniquely named files expected
+     * @param expectedFolderCount the number of uniquely named folders expected
+     * @param expectedNames the names of the files and folders expected
+     */
+    private void checkFileList(List<FileInfo> files, int expectedFileCount, int expectedFolderCount, String[] expectedNames)
+    {
+        int fileCount = 0;
+        int folderCount = 0;
+        List<String> check = new ArrayList<String>(8);
+        for (String filename : expectedNames)
         {
-            txn.rollback();
+            check.add(filename);
         }
+        for (FileInfo file : files)
+        {
+            if (file.isFolder())
+            {
+                folderCount++;
+            }
+            else
+            {
+                fileCount++;
+            }
+            check.remove(file.getName());
+        }
+        assertTrue("Name list was not exact - remaining: " + check, check.size() == 0);
+        assertEquals("Incorrect number of files", expectedFileCount, fileCount);
+        assertEquals("Incorrect number of folders", expectedFolderCount, folderCount);
+    }
+    
+    public void testShallowFilesAndFoldersList() throws Exception
+    {
+        List<FileInfo> files = fileFolderService.list(rootNodeRef);
+        // check
+        String[] expectedNames = new String[] {L0_FILE_A, L0_FILE_B, L0_FOLDER_A, L0_FOLDER_B, L0_FOLDER_C};
+        checkFileList(files, 2, 3, expectedNames);
     }
     
     public void testShallowFilesOnlyList() throws Exception
     {
         List<FileInfo> files = fileFolderService.listFiles(rootNodeRef);
-        assertEquals("Expected exactly 2 files", 2, files.size());
+        // check
+        String[] expectedNames = new String[] {L0_FILE_A, L0_FILE_B};
+        checkFileList(files, 2, 0, expectedNames);
+    }
+    
+    public void testShallowFoldersOnlyList() throws Exception
+    {
+        List<FileInfo> files = fileFolderService.listFolders(rootNodeRef);
+        // check
+        String[] expectedNames = new String[] {L0_FOLDER_A, L0_FOLDER_B, L0_FOLDER_C};
+        checkFileList(files, 0, 3, expectedNames);
+    }
+    
+    public void testShallowFileSearch() throws Exception
+    {
+        List<FileInfo> files = fileFolderService.search(
+                rootNodeRef,
+                L0_FILE_B,
+                true,
+                false,
+                false);
+        // check
+        String[] expectedNames = new String[] {L0_FILE_B};
+        checkFileList(files, 1, 0, expectedNames);
+    }
+    
+    public void testDeepFilesAndFoldersSearch() throws Exception
+    {
+        List<FileInfo> files = fileFolderService.search(
+                rootNodeRef,
+                "?1:*",
+                true,
+                true,
+                true);
+        // check
+        String[] expectedNames = new String[] {L1_FOLDER_A, L1_FOLDER_B, L1_FILE_A, L1_FILE_B, L1_FILE_C};
+        checkFileList(files, 3, 2, expectedNames);
+    }
+    
+    public void testDeepFilesOnlySearch() throws Exception
+    {
+        List<FileInfo> files = fileFolderService.search(
+                rootNodeRef,
+                "?1:*",
+                true,
+                false,
+                true);
+        // check
+        String[] expectedNames = new String[] {L1_FILE_A, L1_FILE_B, L1_FILE_C};
+        checkFileList(files, 3, 0, expectedNames);
     }
 }

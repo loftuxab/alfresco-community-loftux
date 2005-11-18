@@ -3,7 +3,7 @@
 
 <beans>
     
-   <bean name="fileFolderService" class="org.alfresco.repo.model.filefolder.FileFolderServiceImpl" >
+   <bean name="fileFolderService" class="org.alfresco.repo.model.filefolder.FileFolderServiceImpl" init-method="init">
       <property name="namespaceService"><ref bean="namespaceService" /></property>
       <property name="dictionaryService"><ref bean="dictionaryService" /></property>
       <property name="unprotectedNodeService"><ref bean="nodeService" /></property>

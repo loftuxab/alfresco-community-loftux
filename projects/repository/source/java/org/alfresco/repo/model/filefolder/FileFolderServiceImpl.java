@@ -19,10 +19,13 @@ package org.alfresco.repo.model.filefolder;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.search.QueryParameterDefImpl;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -32,6 +35,7 @@ import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.SearchLanguageConversion;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -56,7 +60,8 @@ public class FileFolderServiceImpl implements FileFolderService
     /** Shallow search for all files and folders */
     private static final String XPATH_QUERY_SHALLOW_ALL =
         "./*" +
-        "[not (subtypeOf('" + ContentModel.TYPE_SYSTEM_FOLDER + "'))" +
+        "[like(@cm:name, $cm:name, false)" +
+        " and not (subtypeOf('" + ContentModel.TYPE_SYSTEM_FOLDER + "'))" +
         " and (subtypeOf('" + ContentModel.TYPE_FOLDER + "') or subtypeOf('" + ContentModel.TYPE_CONTENT + "'))]";
     
     /** Deep search for files and folders with a name pattern */
@@ -67,7 +72,8 @@ public class FileFolderServiceImpl implements FileFolderService
         " and (subtypeOf('" + ContentModel.TYPE_FOLDER + "') or subtypeOf('" + ContentModel.TYPE_CONTENT + "'))]";
     
     /** empty parameters */
-    private static final QueryParameterDefinition[] EMPTY_PARAMS = new QueryParameterDefinition[0];
+    private static final QueryParameterDefinition[] PARAMS_EMPTY = new QueryParameterDefinition[0];
+    private static final QueryParameterDefinition[] PARAMS_ANY_NAME = new QueryParameterDefinition[1];
     
     private static Log logger = LogFactory.getLog(FileFolderServiceImpl.class);
 
@@ -110,6 +116,15 @@ public class FileFolderServiceImpl implements FileFolderService
     {
         this.searchService = searchService;
     }
+    
+    public void init()
+    {
+        PARAMS_ANY_NAME[0] = new QueryParameterDefImpl(
+                ContentModel.PROP_NAME,
+                dictionaryService.getDataType(DataTypeDefinition.TEXT),
+                true,
+                "%");
+    }
 
     /**
      * Helper method to convert node reference instances to file info
@@ -145,7 +160,7 @@ public class FileFolderServiceImpl implements FileFolderService
         List<NodeRef> nodeRefs = searchService.selectNodes(
                 folderNodeRef,
                 XPATH_QUERY_SHALLOW_ALL,
-                EMPTY_PARAMS,
+                PARAMS_ANY_NAME,
                 namespaceService,
                 false);
         // convert the noderefs
@@ -169,7 +184,7 @@ public class FileFolderServiceImpl implements FileFolderService
         List<NodeRef> nodeRefs = searchService.selectNodes(
                 folderNodeRef,
                 XPATH_QUERY_SHALLOW_FILES,
-                EMPTY_PARAMS,
+                PARAMS_EMPTY,
                 namespaceService,
                 false);
         // convert the noderefs
@@ -193,7 +208,7 @@ public class FileFolderServiceImpl implements FileFolderService
         List<NodeRef> nodeRefs = searchService.selectNodes(
                 folderNodeRef,
                 XPATH_QUERY_SHALLOW_FOLDERS,
-                EMPTY_PARAMS,
+                PARAMS_EMPTY,
                 namespaceService,
                 false);
         // convert the noderefs
@@ -232,6 +247,70 @@ public class FileFolderServiceImpl implements FileFolderService
             return Collections.emptyList();
         }
         
-        throw new UnsupportedOperationException();
+        // if the name pattern is null, then we use the ANY pattern
+        QueryParameterDefinition[] params = null;
+        if (namePattern != null)
+        {
+            // the interface specifies the Lucene syntax, so perform a conversion
+            namePattern = SearchLanguageConversion.convert(
+                    SearchLanguageConversion.DEF_LUCENE,
+                    SearchLanguageConversion.DEF_XPATH_LIKE,
+                    namePattern);
+            
+            params = new QueryParameterDefinition[1];
+            params[0] = new QueryParameterDefImpl(
+                    ContentModel.PROP_NAME,
+                    dictionaryService.getDataType(DataTypeDefinition.TEXT),
+                    true,
+                    namePattern);
+        }
+        else
+        {
+            params = PARAMS_ANY_NAME;
+        }
+        // determine the correct query to use
+        String query = null;
+        if (includeSubFolders)
+        {
+            query = XPATH_QUERY_DEEP_ALL;
+        }
+        else
+        {
+            query = XPATH_QUERY_SHALLOW_ALL;
+        }
+        // execute the query
+        List<NodeRef> nodeRefs = searchService.selectNodes(
+                folderNodeRef,
+                query,
+                params,
+                namespaceService,
+                false);
+        List<FileInfo> results = toFileInfo(nodeRefs);
+        // eliminate unwanted files/folders
+        Iterator<FileInfo> iterator = results.iterator(); 
+        while (iterator.hasNext())
+        {
+            FileInfo file = iterator.next();
+            if (file.isFolder() && !folderSearch)
+            {
+                iterator.remove();
+            }
+            else if (!file.isFolder() && !fileSearch)
+            {
+                iterator.remove();
+            }
+        }
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Deep search: \n" +
+                    "   context: " + folderNodeRef + "\n" +
+                    "   pattern: " + namePattern + "\n" +
+                    "   files: " + fileSearch + "\n" +
+                    "   folders: " + folderSearch + "\n" +
+                    "   deep: " + includeSubFolders + "\n" +
+                    "   results: " + results);
+        }
+        return results;
     }
 }
