@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.component.UIActionLink;
 
@@ -36,6 +37,10 @@ public class SpaceDetailsBean
    
    /** The NavigationBean bean reference */
    private NavigationBean navigator;
+   
+   /** PermissionService bean reference */
+   private PermissionService permissionService;
+   
    
    // ------------------------------------------------------------------------------
    // Bean property getters and setters 
@@ -56,6 +61,14 @@ public class SpaceDetailsBean
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
+   }
+   
+   /**
+    * @param permissionService      The PermissionService to set.
+    */
+   public void setPermissionService(PermissionService permissionService)
+   {
+      this.permissionService = permissionService;
    }
    
    /**

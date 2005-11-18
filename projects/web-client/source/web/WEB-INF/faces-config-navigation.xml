@@ -233,6 +233,10 @@
          <to-view-id>/jsp/dialog/edit-space.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>manageInvitedUsers</from-outcome>
+         <to-view-id>/jsp/roles/manage-invited-users.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>manageRules</from-outcome>
          <to-view-id>/jsp/dialog/rules.jsp</to-view-id>
       </navigation-case>

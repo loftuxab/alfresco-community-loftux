@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.component.UISelectOne;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.transaction.UserTransaction;
@@ -43,25 +45,25 @@ import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.web.app.Application;
-import org.alfresco.web.app.ContextListener;
-import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
-import org.alfresco.web.bean.NavigationBean;
+import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.repository.MapNode;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.common.component.UIGenericPicker;
 import org.alfresco.web.ui.common.component.data.UIRichList;
 import org.alfresco.web.ui.repo.WebResources;
 
 /**
  * @author Kevin Roast
  */
-public class UserMembersBean implements IContextListener
+public class UserMembersBean
 {
+   private static final String MSG_SUCCESS_INHERIT_NOT = "success_not_inherit_permissions";
+   private static final String MSG_SUCCESS_INHERIT = "success_inherit_permissions";
+   
    private static final String ERROR_DELETE = "error_remove_user";
 
    private static final String OUTCOME_FINISH = "finish";
@@ -78,8 +80,8 @@ public class UserMembersBean implements IContextListener
    /** PersonService bean reference */
    private PersonService personService;
    
-   /** NavigationBean bean refernce */
-   private NavigationBean navigator;
+   /** BrowseBean bean refernce */
+   private BrowseBean browseBean;
    
    /** OwnableService bean reference */
    private OwnableService ownableService;
@@ -98,18 +100,6 @@ public class UserMembersBean implements IContextListener
    
    /** roles for current person */
    private List<PermissionWrapper> personRoles = null;
-   
-   
-   // ------------------------------------------------------------------------------
-   // Construction
-
-   /**
-    * Default Constructor
-    */
-   public UserMembersBean()
-   {
-      UIContextService.getInstance(FacesContext.getCurrentInstance()).registerBean(this);
-   }
    
    
    // ------------------------------------------------------------------------------
@@ -156,11 +146,19 @@ public class UserMembersBean implements IContextListener
    }
    
    /**
-    * @param navigator           The NavigationBean to set.
+    * @param browseBean The BrowseBean to set.
     */
-   public void setNavigator(NavigationBean navigator)
+   public void setBrowseBean(BrowseBean browseBean)
    {
-      this.navigator = navigator;
+      this.browseBean = browseBean;
+   }
+   
+   /**
+    * @return The space to work against
+    */
+   public Node getSpace()
+   {
+      return this.browseBean.getActionSpace();
    }
    
    /**
@@ -177,6 +175,9 @@ public class UserMembersBean implements IContextListener
    public void setUsersRichList(UIRichList usersRichList)
    {
       this.usersRichList = usersRichList;
+      
+      // force refresh on exit of the page (as this property is set by JSF on view restore) 
+      this.usersRichList.setValue(null);
    }
    
    /**
@@ -229,6 +230,38 @@ public class UserMembersBean implements IContextListener
    }
    
    /**
+    * @return true if the current user can change permissions on this Space
+    */
+   public boolean getHasChangePermissions()
+   {
+      return getSpace().hasPermission(PermissionService.CHANGE_PERMISSIONS);
+   }
+   
+   /**
+    * @return Returns the inherit parent permissions flag set for the current space.
+    */
+   public boolean isInheritPermissions()
+   {
+      return this.permissionService.getInheritParentPermissions(getSpace().getNodeRef());
+   }
+
+   /**
+    * @param inheritPermissions The inheritPermissions to set.
+    */
+   public void setInheritPermissions(boolean inheritPermissions)
+   {
+      // stub - no impl as changes are made immediately using a ValueChanged listener
+   }
+   
+   /**
+    * Return the owner username
+    */
+   public String getOwner()
+   {
+      return this.ownableService.getOwner(getSpace().getNodeRef());
+   }
+   
+   /**
     * @return the list of user nodes for list data binding
     */
    public List<Map> getUsers()
@@ -248,7 +281,7 @@ public class UserMembersBean implements IContextListener
          // Then combine them into a single list for each authentication found. 
          User user = Application.getCurrentUser(context);
          Map<String, List<String>> permissionMap = new HashMap<String, List<String>>(13, 1.0f);
-         Set<AccessPermission> permissions = permissionService.getAllSetPermissions(navigator.getCurrentNode().getNodeRef());
+         Set<AccessPermission> permissions = permissionService.getAllSetPermissions(getSpace().getNodeRef());
          if (permissions != null)
          {
             for (AccessPermission permission : permissions)
@@ -355,13 +388,9 @@ public class UserMembersBean implements IContextListener
       return buf.toString();
    }
    
-   /**
-    * Return the owner username
-    */
-   public String getOwner()
-   {
-      return this.ownableService.getOwner(this.navigator.getCurrentNode().getNodeRef());
-   }
+   
+   // ------------------------------------------------------------------------------
+   // Action event handlers
    
    /**
     * Action event called by all actions that need to setup a Person context on
@@ -397,7 +426,7 @@ public class UserMembersBean implements IContextListener
             
             // setup roles for this Authority
             List<PermissionWrapper> userPermissions = new ArrayList<PermissionWrapper>(4);
-            Set<AccessPermission> permissions = permissionService.getAllSetPermissions(navigator.getCurrentNode().getNodeRef());
+            Set<AccessPermission> permissions = permissionService.getAllSetPermissions(getSpace().getNodeRef());
             if (permissions != null)
             {
                for (AccessPermission permission : permissions)
@@ -419,10 +448,6 @@ public class UserMembersBean implements IContextListener
             // action context setup
             this.personRoles = userPermissions;
             setPersonAuthority(authority);
-            
-            // clear the UI state in preparation for finishing the action
-            // and returning to the main page
-            contextUpdated();
          }
          catch (Exception err)
          {
@@ -433,6 +458,39 @@ public class UserMembersBean implements IContextListener
       else
       {
          setPersonAuthority(null);
+      }
+   }
+   
+   
+   /**
+    * Inherit parent Space permissions value changed by the user
+    */
+   public void inheritPermissionsValueChanged(ValueChangeEvent event)
+   {
+      try
+      {
+         // change the value to the new selected value
+         boolean inheritPermissions = (Boolean)event.getNewValue();
+         this.permissionService.setInheritParentPermissions(getSpace().getNodeRef(), inheritPermissions);
+         
+         // inform the user that the change occured
+         FacesContext context = FacesContext.getCurrentInstance();
+         String msg;
+         if (inheritPermissions)
+         {
+            msg = Application.getMessage(context, MSG_SUCCESS_INHERIT);
+         }
+         else
+         {
+            msg = Application.getMessage(context, MSG_SUCCESS_INHERIT_NOT);
+         }
+         FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_INFO, msg, msg);
+         context.addMessage(event.getComponent().getClientId(context), facesMsg);
+      }
+      catch (Throwable e)
+      {
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), e.getMessage()), e);
       }
    }
    
@@ -484,7 +542,7 @@ public class UserMembersBean implements IContextListener
             
             // clear the currently set permissions for this user
             // and add each of the new permissions in turn
-            NodeRef nodeRef = navigator.getCurrentNode().getNodeRef();
+            NodeRef nodeRef = getSpace().getNodeRef();
             this.permissionService.clearPermission(nodeRef, getPersonAuthority());
             for (PermissionWrapper wrapper : personRoles)
             {
@@ -527,7 +585,7 @@ public class UserMembersBean implements IContextListener
          if (getPersonAuthority() != null)
          {
             // clear permissions for the specified Authority
-            this.permissionService.clearPermission(this.navigator.getCurrentNode().getNodeRef(), getPersonAuthority());
+            this.permissionService.clearPermission(getSpace().getNodeRef(), getPersonAuthority());
          }
          
          // commit the transaction
@@ -546,19 +604,7 @@ public class UserMembersBean implements IContextListener
    
    
    // ------------------------------------------------------------------------------
-   // IContextListener implementation
-
-   /**
-    * @see org.alfresco.web.app.context.IContextListener#contextUpdated()
-    */
-   public void contextUpdated()
-   {
-      if (this.usersRichList != null)
-      {
-         this.usersRichList.setValue(null);
-      }
-   }
-   
+   // Inner classes
    
    /**
     * Wrapper class for list data model to display current roles for user

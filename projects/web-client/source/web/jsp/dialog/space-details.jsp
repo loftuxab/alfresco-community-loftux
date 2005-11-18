@@ -104,6 +104,11 @@
                                  <a:actionLink value="#{msg.create_shortcut}" image="/images/icons/shortcut.gif" actionListener="#{UserShortcutsBean.createShortcut}">
                                     <f:param name="id" value="#{SpaceDetailsBean.id}" />
                                  </a:actionLink>
+                                 <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="ChangePermissions">
+                                    <a:actionLink value="#{msg.manage_invited_users}" image="/images/icons/invite.gif" action="manageInvitedUsers" actionListener="#{BrowseBean.setupSpaceAction}">
+                                       <f:param name="id" value="#{SpaceDetailsBean.id}" />
+                                    </a:actionLink>
+                                 </r:permissionEvaluator>
                               </a:menu>
                            </td>
                            
@@ -171,10 +176,12 @@
                                     </tr>
                                  </table>
                               </a:panel>
+                              
                               <br/>
+                              
                               <a:panel label="#{msg.rules}" id="rules-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
-                                       action="manageRules" linkTooltip="#{msg.modify}" linkIcon="/images/icons/Change_details.gif">
+                                       action="manageRules" linkTooltip="#{msg.modify}" linkIcon="/images/icons/rule.gif">
                                  <a:richList id="rulesList" viewMode="details" value="#{RulesBean.rules}" var="r"
                                           styleClass="recordSet" headerStyleClass="recordSetHeader" rowStyleClass="recordSetRow" 
                                           altRowStyleClass="recordSetRowAlt" width="100%" pageSize="10"
@@ -230,18 +237,25 @@
                                  </a:richList>
                               </a:panel>
                               <br/>
+                              
+                              <%-- TODO: implement this - but READONLY details only! Manage Space Users for edits...
+                              <a:panel label="#{msg.security}" id="security-panel" progressive="true" expanded="false"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
+                                       action="manageInvitedUsers" linkTooltip="#{msg.manage_invited_users}" linkIcon="/images/icons/invite.gif">
+                                 <table cellspacing="2" cellpadding="0" border="0" width="100%">
+                                    
+                                 </table>
+                              </a:panel>
+                              <br/>
+                              --%>
+                              
                               <%-- TBD
                               <a:panel label="Preferences" id="preferences-panel" progressive="true" expanded="false"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
                                  <div></div>
                               </a:panel>
                               <br/>
-                              <a:panel label="Space Members" id="members-panel" progressive="true" expanded="false"
-                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
-                                 <div></div>
-                              </a:panel>
-                              <br/>
-                               --%>
+                              --%>
                            </td>
                            
                            <td valign="top">

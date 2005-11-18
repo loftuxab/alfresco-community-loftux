@@ -470,6 +470,14 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         permissionsDAO.setInheritParentPermissions(nodeRef, inheritParentPermissions);
     }
+    
+    /**
+     * @see org.alfresco.service.cmr.security.PermissionService#getInheritParentPermissions(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public boolean getInheritParentPermissions(NodeRef nodeRef)
+    {
+        return permissionsDAO.getInheritParentPermissions(nodeRef);
+    }
 
     //
     // SUPPORT CLASSES
@@ -1029,7 +1037,4 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         permissionsDAO.deleteAllPermissionsForAuthority(recipient);
     }
-
-    
-    
 }

@@ -69,7 +69,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/users_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties["name"]}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{BrowseBean.actionSpace.name}' /></div>
                               <div class="mainTitle"><h:outputText value="#{InviteUsersWizard.wizardTitle}" /></div>
                               <div class="mainSubText"><h:outputText value="#{InviteUsersWizard.wizardDescription}" /></div>
                            </td>

@@ -69,7 +69,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/users_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value='#{NavigationBean.nodeProperties.name}' /></div>
+                              <div class="mainSubTitle"><h:outputText value='#{BrowseBean.actionSpace.name}' /></div>
                               <div class="mainTitle"><h:outputText value="#{msg.manage_invited_users}" /></div>
                               <div class="mainSubText">
                                  <h:outputFormat value="#{msg.space_owner}" rendered="#{UserMembersBean.owner != null}">
@@ -179,6 +179,27 @@
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                            </td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
+               </tr>
+               
+               <tr>
+                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
+                  <td>
+                     <table cellspacing="2" cellpadding="0" border="0" width="100%">
+                        <tr>
+                           <td>
+                              <h:selectBooleanCheckbox id="chkPermissions" value="#{UserMembersBean.inheritPermissions}" valueChangeListener="#{UserMembersBean.inheritPermissionsValueChanged}"
+                                    onchange="document.forms['users'].submit(); return true;" disabled="#{!UserMembersBean.hasChangePermissions}" />
+                           </td>
+                           <td width=100%>
+                              &nbsp;<h:outputText value="#{msg.inherit_permissions}" />
+                           </td>
+                        </tr>
+                        <tr>
+                           <td colspan=2><h:message for="chkPermissions" styleClass="statusMessage" /></td>
                         </tr>
                      </table>
                   </td>

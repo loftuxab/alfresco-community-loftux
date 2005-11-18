@@ -106,7 +106,9 @@
                                        <a:actionLink value="#{msg.create_content}" image="/images/icons/new_content.gif" id="link3_1" action="createContent" actionListener="#{CreateContentWizard.startWizard}" />
                                     </r:permissionEvaluator>
                                     <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="ChangePermissions" id="eval3_1">
-                                       <a:actionLink value="#{msg.manage_invited_users}" image="/images/icons/invite.gif" id="link4" action="manageInvitedUsers" />
+                                       <a:actionLink value="#{msg.manage_invited_users}" image="/images/icons/invite.gif" id="link4" action="manageInvitedUsers" actionListener="#{BrowseBean.setupSpaceAction}">
+                                          <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param6_1" />
+                                       </a:actionLink>
                                     </r:permissionEvaluator>
                                     <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="Delete" id="eval4">
                                        <a:actionLink value="#{msg.delete_space}" image="/images/icons/delete.gif" action="deleteSpace" actionListener="#{BrowseBean.setupDeleteAction}" id="link2">

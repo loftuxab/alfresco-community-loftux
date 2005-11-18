@@ -190,7 +190,8 @@ public class InviteUsersWizard extends AbstractWizardBean
             from = "alfresco@alfresco.org";
          }
          
-         NodeRef folderNodeRef = this.navigator.getCurrentNode().getNodeRef();
+         // get the Space to apply changes too
+         NodeRef folderNodeRef = this.browseBean.getActionSpace().getNodeRef();
          
          // set permissions for each user and send them a mail
          for (int i=0; i<this.userGroupRoles.size(); i++)
@@ -699,7 +700,7 @@ public class InviteUsersWizard extends AbstractWizardBean
          
          String personName = Application.getCurrentUser(context).getFullName(getNodeService());
          String msgInvite = Application.getMessage(context, MSG_INVITED_SPACE);
-         Node node = getNavigator().getCurrentNode();
+         Node node = this.browseBean.getActionSpace();
          String path = this.nodeService.getPath(node.getNodeRef()).toDisplayPath(this.nodeService);
          buf.append(MessageFormat.format(msgInvite, new Object[] {
                path + '/' + node.getName(),

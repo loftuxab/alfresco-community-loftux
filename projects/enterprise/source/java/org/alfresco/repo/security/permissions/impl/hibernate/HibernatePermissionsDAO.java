@@ -57,7 +57,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class HibernatePermissionsDAO extends HibernateDaoSupport implements PermissionsDAO
 {
-
     private SimpleCache<NodeRef, SimpleNodePermissionEntry> nullPermissionCache;
 
     public HibernatePermissionsDAO()
@@ -345,6 +344,11 @@ public class HibernatePermissionsDAO extends HibernateDaoSupport implements Perm
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
         getHibernateNodePermissionEntry(nodeRef, true).setInherits(inheritParentPermissions);
+    }
+    
+    public boolean getInheritParentPermissions(NodeRef nodeRef)
+    {
+        return getHibernateNodePermissionEntry(nodeRef, true).getInherits();
     }
 
     @SuppressWarnings("unchecked")

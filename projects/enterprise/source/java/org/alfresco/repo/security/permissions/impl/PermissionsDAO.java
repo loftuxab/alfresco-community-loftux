@@ -35,7 +35,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface PermissionsDAO
 {
-
     /**
      * Get the permissions that have been set on a given node.
      * 
@@ -115,6 +114,14 @@ public interface PermissionsDAO
      */
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
 
+    /**
+     * Return the inheritance behaviour for permissions on a given node.
+     * 
+     * @param nodeRef
+     * @return inheritParentPermissions
+     */
+    public boolean getInheritParentPermissions(NodeRef nodeRef);
+    
     /**
      * Clear all the permissions set for a given authentication
      * 

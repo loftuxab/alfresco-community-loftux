@@ -222,4 +222,12 @@ public interface PermissionService
      * @param inheritParentPermissions
      */
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
+    
+    /**
+     * Return the global inheritance behaviour for permissions on a node.
+     * 
+     * @param nodeRef
+     * @return inheritParentPermissions
+     */
+    public boolean getInheritParentPermissions(NodeRef nodeRef);
 }

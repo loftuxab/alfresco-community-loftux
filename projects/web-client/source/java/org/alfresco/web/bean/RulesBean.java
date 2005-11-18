@@ -31,6 +31,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIModeList;
@@ -69,6 +70,14 @@ public class RulesBean
    }
    
    /**
+    * @return The space to work against
+    */
+   public Node getSpace()
+   {
+      return this.browseBean.getActionSpace();
+   }
+   
+   /**
     * Returns the list of rules to display
     * 
     * @return
@@ -83,13 +92,13 @@ public class RulesBean
       }
 
       // get the rules from the repository
-      List<Rule> repoRules = this.ruleService.getRules(this.browseBean.getActionSpace().getNodeRef(), includeInherited);
+      List<Rule> repoRules = this.ruleService.getRules(getSpace().getNodeRef(), includeInherited);
       this.rules = new ArrayList<WrappedRule>(repoRules.size());
       
       // wrap them all passing the current space
       for (Rule rule : repoRules)
       {
-         WrappedRule wrapped = new WrappedRule(rule, this.browseBean.getActionSpace().getNodeRef());
+         WrappedRule wrapped = new WrappedRule(rule, getSpace().getNodeRef());
          this.rules.add(wrapped);
       }
       
@@ -112,7 +121,7 @@ public class RulesBean
             logger.debug("Rule clicked, it's id is: " + id);
          
          this.currentRule = this.ruleService.getRule(
-               this.browseBean.getActionSpace().getNodeRef(), id);
+               getSpace().getNodeRef(), id);
       }
    }
    
@@ -141,7 +150,7 @@ public class RulesBean
          {
             String ruleTitle = this.currentRule.getTitle();
             
-            this.ruleService.removeRule(this.browseBean.getActionSpace().getNodeRef(),
+            this.ruleService.removeRule(getSpace().getNodeRef(),
                   this.currentRule);
             
             // clear the current rule

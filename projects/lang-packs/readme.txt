@@ -2,7 +2,7 @@
 Alfresco Language Pack
 ======================
 
-For release: RC1
+For release: 1.0
 
 For locale: EN-US (default)
 
@@ -51,6 +51,15 @@ Installation
 - Save the file.
 
 - Restart the Alfresco server.
+
+
+====================
+Note for translators
+====================
+
+If the message contains a variable e.g. {0} then any single quotes must be doubled up as '' to escape them correctly.
+If the message does not contain a variable then a single quote character should be used as normal.
+
 
 
 ==================================

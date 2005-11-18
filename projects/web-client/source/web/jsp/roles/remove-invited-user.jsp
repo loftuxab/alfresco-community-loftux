@@ -70,7 +70,7 @@
                               <h:graphicImage url="/images/icons/delete_large.gif"/>
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
                               <div class="mainTitle"><h:outputText value="#{msg.remove_user}" /> '<h:outputText value="#{UserMembersBean.personName}" />'</div>
                               <div class="mainSubText"><h:outputText value="#{msg.remove_invited_user_info}" /></div>
                            </td>

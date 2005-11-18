@@ -130,8 +130,17 @@ public class PermissionServiceNOOPImpl
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
     }
+    
+    /* (non-Javadoc)
+    * @see org.alfresco.service.cmr.security.PermissionService#getInheritParentPermissions(org.alfresco.service.cmr.repository.NodeRef)
+    */
+   public boolean getInheritParentPermissions(NodeRef nodeRef)
+   {
+      // TODO Auto-generated method stub
+      return true;
+   }
 
-    public void clearPermission(NodeRef nodeRef, String authority)
+   public void clearPermission(NodeRef nodeRef, String authority)
     {
         
     }
@@ -201,17 +210,10 @@ public class PermissionServiceNOOPImpl
     public void setPermission(NodePermissionEntry nodePermissionEntry)
     {
         throw new UnsupportedOperationException();
-        
     }
 
     public void setPermission(PermissionEntry permissionEntry)
     {
         throw new UnsupportedOperationException();
-        
     }
-    
-   
-    
-    
-    
 }
