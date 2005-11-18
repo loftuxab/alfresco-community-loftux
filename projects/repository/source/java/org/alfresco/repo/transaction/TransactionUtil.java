@@ -16,7 +16,6 @@
  */
 package org.alfresco.repo.transaction;
 
-import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.service.transaction.TransactionService;
@@ -124,10 +123,7 @@ public class TransactionUtil
             try
             {
                 // Roll back the exception
-                if (txn.getStatus() == Status.STATUS_ACTIVE)
-                {
-                    txn.rollback();
-                }
+                txn.rollback();
             }
             catch (Throwable rollbackException)
             {
