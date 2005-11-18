@@ -64,6 +64,7 @@ import org.springframework.web.jsf.FacesContextUtils;
 public class NewSpaceWizard extends AbstractWizardBean
 {
    public static final String SPACE_ICON_DEFAULT = "space-icon-default";
+   public static final String FORUM_ICON_DEFAULT = "discussion_large";
 
    private static Log logger = LogFactory.getLog(NewSpaceWizard.class);
    
@@ -437,6 +438,14 @@ public class NewSpaceWizard extends AbstractWizardBean
       this.description = "";
       this.templateName = null;
       this.saveAsTemplate = false;
+      
+      // if we are in the forums scenario set the space type
+      // and icon accordingly
+      if ("forums".equals(this.scenario))
+      {
+         this.spaceType = ForumModel.TYPE_FORUM.toString();
+         this.icon = "forum_large";
+      }
    }
 
    /**
@@ -694,11 +703,11 @@ public class NewSpaceWizard extends AbstractWizardBean
             this.forumIcons = new ArrayList<UIListItem>(1);
             
             // change default icon to be forums
-            this.icon = "forum_large";
+            this.icon = FORUM_ICON_DEFAULT;
             
             UIListItem item = new UIListItem();
-            item.setValue("forum_large");
-            item.getAttributes().put("image", "/images/icons/forum_large.gif");
+            item.setValue(FORUM_ICON_DEFAULT);
+            item.getAttributes().put("image", "/images/icons/discussion_large.gif");
             this.forumIcons.add(item);
          }
          

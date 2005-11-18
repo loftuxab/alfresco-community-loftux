@@ -68,7 +68,7 @@
                            <%-- actions for forums --%>
                            <a:panel id="forum-actions">
                               <td width=32>
-                                 <h:graphicImage id="space-logo" url="/images/icons/forum_large.gif" width="32" height="32" />
+                                 <h:graphicImage id="space-logo" url="/images/icons/discussion_large.gif" width="32" height="32" />
                               </td>
                               <td>
                                  <%-- Summary --%>
@@ -82,7 +82,7 @@
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren" id="eval1">
-                                    <a:actionLink value="#{msg.new_forum}" image="/images/icons/create_forum.gif" padding="4" action="createForum" actionListener="#{NewSpaceDialog.startWizard}" id="link1" />
+                                    <a:actionLink value="#{msg.create_forum}" image="/images/icons/create_forum.gif" padding="4" action="createForum" actionListener="#{CreateForumDialog.startWizard}" id="link1" />
                                  </r:permissionEvaluator>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="Delete" id="eval2">
                                     <a:actionLink value="#{msg.delete_forum}" image="/images/icons/delete.gif" padding="4" action="deleteForum" actionListener="#{BrowseBean.setupDeleteAction}" id="link2">

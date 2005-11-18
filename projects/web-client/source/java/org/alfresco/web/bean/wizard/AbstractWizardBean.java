@@ -16,6 +16,9 @@
  */
 package org.alfresco.web.bean.wizard;
 
+import java.util.Map;
+
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
@@ -25,6 +28,7 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;
+import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,6 +53,7 @@ public abstract class AbstractWizardBean
    // common wizard properties
    protected int currentStep = 1;
    protected boolean editMode = false;
+   protected String scenario;
    protected NodeService nodeService;
    protected SearchService searchService;
    protected NavigationBean navigator;
@@ -209,6 +214,28 @@ public abstract class AbstractWizardBean
    public void populate()
    {
       // subclasses will override this method to setup accordingly
+   }
+
+   /**
+    * Returns the scenario this wizard is being used in
+    * 
+    * @return The scenario
+    */
+   public String getScenario()
+   {
+      return this.scenario;
+   }
+
+   /**
+    * Sets the scenario this wizard is being used in. 
+    * This allows the same wizard class to be used in multiple 
+    * scenarios.
+    * 
+    * @param scenario The scenario
+    */
+   public void setScenario(String scenario)
+   {
+      this.scenario = scenario;
    }
 
    /**

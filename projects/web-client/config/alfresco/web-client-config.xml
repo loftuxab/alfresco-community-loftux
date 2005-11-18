@@ -239,7 +239,7 @@
    
    <config evaluator="string-compare" condition="Custom Folder Types">
       <folder-types>
-         <type name="fm:forum" icon="/images/icons/forum_large.gif" descriptionMsgId="forum_desc" />
+         <type name="fm:forum" icon="/images/icons/discussion_large.gif" descriptionMsgId="forum_desc" />
       </folder-types>
    </config>
       
