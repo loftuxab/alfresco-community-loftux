@@ -22,9 +22,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import javax.jcr.RepositoryException;
+import javax.jcr.lock.LockException;
+import javax.jcr.nodetype.ConstraintViolationException;
+import javax.jcr.nodetype.NoSuchNodeTypeException;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.repo.node.integrity.IntegrityException;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
+import org.alfresco.service.cmr.lock.NodeLockedException;
 
 
 /**
@@ -117,7 +123,21 @@ public class JCRProxyFactory
             catch (InvocationTargetException e)
             {
                 Throwable cause = e.getCause();
-                if (cause instanceof AlfrescoRuntimeException)
+                
+                // Map Alfresco exceptions to JCR exceptions
+                if (cause instanceof IntegrityException)
+                {
+                    throw new ConstraintViolationException(cause);
+                }
+                else if (cause instanceof NodeLockedException)
+                {
+                    throw new LockException(cause);
+                }
+                else if (cause instanceof InvalidTypeException)
+                {
+                    throw new NoSuchNodeTypeException(cause);
+                }
+                else if (cause instanceof AlfrescoRuntimeException)
                 {
                     throw new RepositoryException(cause);
                 }

@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jcr.AccessDeniedException;
@@ -49,9 +50,12 @@ import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 import javax.jcr.version.VersionHistory;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -105,13 +109,12 @@ public class NodeImpl extends ItemImpl implements Node
         return proxy;
     }
     
-    
     /* (non-Javadoc)
      * @see javax.jcr.Node#addNode(java.lang.String)
      */
     public Node addNode(String relPath) throws ItemExistsException, PathNotFoundException, VersionException, ConstraintViolationException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        return addNode(relPath, null);
     }
 
     /* (non-Javadoc)
@@ -119,9 +122,112 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Node addNode(String relPath, String primaryNodeTypeName) throws ItemExistsException, PathNotFoundException, NoSuchNodeTypeException, LockException, VersionException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
+        Path path = new JCRPath(session.getNamespaceResolver(), relPath).getPath();
+        
+        // Determine parent node reference and new node name
+        QName nodeName = null;
+        NodeRef parentRef = null;
+        if (path.size() == 1)
+        {
+            parentRef = nodeRef;
+            nodeName = ((JCRPath.SimpleElement)path.get(0)).getQName();
+        }
+        else
+        {
+            Path parentPath = path.subPath(path.size() -1);
+            parentRef = ItemResolver.getNodeRef(session, nodeRef, parentPath.toPrefixString(session.getNamespaceResolver()));
+            if (parentRef == null)
+            {
+                throw new PathNotFoundException("Path '" + relPath + "' does not exist from node " + nodeRef);
+            }
+            nodeName = ((JCRPath.SimpleElement)path.get(path.size() -1)).getQName();
+        }
+
+        // Check for invalid node name
+        if (nodeName.getLocalName().indexOf('[') != -1 || nodeName.getLocalName().indexOf(']') != -1)
+        {
+            throw new RepositoryException("Node name '" + nodeName + "' is invalid");
+        }
+
+        // Determine child association to add node under
+        ChildAssociationDefinition childAssocDef = null;
+        QName nodeType = null;
+        if (primaryNodeTypeName == null || primaryNodeTypeName.length() == 0)
+        {
+            childAssocDef = getDefaultChildAssocDefForParent(nodeService, dictionaryService, parentRef);
+            nodeType = childAssocDef.getTargetClass().getName();
+        }
+        else
+        {
+            nodeType = QName.createQName(primaryNodeTypeName, session.getNamespaceResolver());  
+            childAssocDef = getNodeTypeChildAssocDefForParent(nodeService, dictionaryService, parentRef, nodeType);
+        }
+
+        // Create node
+        // Note: Integrity exception will be thrown when the node is saved
+        ChildAssociationRef childRef = nodeService.createNode(parentRef, childAssocDef.getName(), nodeName, nodeType);
+        NodeImpl nodeImpl = new NodeImpl(session, childRef.getChildRef());
+        return nodeImpl.getProxy();
     }
 
+    /**
+     * Get the default child association definition for the specified node
+     * 
+     * @param nodeService   node service
+     * @param dictionaryService  dictionary service
+     * @param nodeRef  node reference
+     * @return  child association definition
+     */
+    private ChildAssociationDefinition getDefaultChildAssocDefForParent(NodeService nodeService, DictionaryService dictionaryService, NodeRef nodeRef)
+    {
+        QName type = nodeService.getType(nodeRef);
+        Set<QName> aspects = nodeService.getAspects(nodeRef);
+        ClassDefinition classDef = dictionaryService.getAnonymousType(type, aspects);
+        Map<QName, ChildAssociationDefinition> childAssocs = classDef.getChildAssociations();
+        if (childAssocs.size() != 1)
+        {
+            throw new AlfrescoRuntimeException("Cannot determine node type for child within parent " + nodeRef);
+        }
+        ChildAssociationDefinition childAssocDef = childAssocs.values().iterator().next();
+        return childAssocDef;
+    }
+    
+    /**
+     * Get the child association definition whose target matches the specified node type for the specified node
+     * 
+     * @param nodeService  node service
+     * @param dictionaryService  dictionary service
+     * @param nodeRef   node reference
+     * @param nodeType  node type to find child association definition for
+     * @return  child association definition
+     */
+    private ChildAssociationDefinition getNodeTypeChildAssocDefForParent(NodeService nodeService, DictionaryService dictionaryService, NodeRef nodeRef, QName nodeType)
+    {
+        ChildAssociationDefinition nodeTypeChildAssocDef = null; 
+        QName type = nodeService.getType(nodeRef);
+        Set<QName> aspects = nodeService.getAspects(nodeRef);
+        ClassDefinition classDef = dictionaryService.getAnonymousType(type, aspects);
+        Map<QName, ChildAssociationDefinition> childAssocs = classDef.getChildAssociations();
+        for (ChildAssociationDefinition childAssocDef : childAssocs.values())
+        {
+            if (dictionaryService.isSubClass(nodeType, childAssocDef.getTargetClass().getName()))
+            {
+                if (nodeTypeChildAssocDef != null)
+                {
+                    throw new AlfrescoRuntimeException("Cannot determine child association for node type '" + nodeType + " within parent " + nodeRef);
+                }
+                nodeTypeChildAssocDef = childAssocDef;
+            }
+        }
+        if (nodeTypeChildAssocDef == null)
+        {
+            throw new AlfrescoRuntimeException("Cannot determine child association for node type '" + nodeType + " within parent " + nodeRef);
+        }
+        return nodeTypeChildAssocDef;
+    }
+    
     /* (non-Javadoc)
      * @see javax.jcr.Node#orderBefore(java.lang.String, java.lang.String)
      */

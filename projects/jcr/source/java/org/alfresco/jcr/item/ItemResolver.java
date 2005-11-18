@@ -126,7 +126,7 @@ public class ItemResolver
      * @param path  the path
      * @return  the node reference (or null if not found)
      */
-    private static NodeRef getNodeRef(SessionImpl context, NodeRef from, String path)
+    public static NodeRef getNodeRef(SessionImpl context, NodeRef from, String path)
     {
         NodeRef nodeRef = null;
         
