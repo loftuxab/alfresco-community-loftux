@@ -118,6 +118,12 @@ public class RepositoryWebService extends AbstractWebService implements
             for (int x = 0; x < stores.size(); x++)
             {
                 StoreRef storeRef = stores.get(x);
+                
+                if (logger.isDebugEnabled() == true)
+                {
+                    logger.debug("Store protocol :" + storeRef.getProtocol());
+                }
+                
                 StoreEnum storeEnum = StoreEnum.fromString(storeRef
                         .getProtocol());
                 Store store = new Store(storeEnum, storeRef.getIdentifier());

@@ -39,6 +39,7 @@
     		<xsd:enumeration value="user"/>
     		<xsd:enumeration value="search"/>
     		<xsd:enumeration value="http"/>
+    		<xsd:enumeration value="system"/>
     	</xsd:restriction>
     </xsd:simpleType>
     

@@ -22,11 +22,13 @@ public class StoreEnum implements java.io.Serializable {
     public static final java.lang.String _user = "user";
     public static final java.lang.String _search = "search";
     public static final java.lang.String _http = "http";
+    public static final java.lang.String _system = "system";
     public static final StoreEnum workspace = new StoreEnum(_workspace);
     public static final StoreEnum versionStore = new StoreEnum(_versionStore);
     public static final StoreEnum user = new StoreEnum(_user);
     public static final StoreEnum search = new StoreEnum(_search);
     public static final StoreEnum http = new StoreEnum(_http);
+    public static final StoreEnum system = new StoreEnum(_system);
     public java.lang.String getValue() { return _value_;}
     public static StoreEnum fromValue(java.lang.String value)
           throws java.lang.IllegalArgumentException {
