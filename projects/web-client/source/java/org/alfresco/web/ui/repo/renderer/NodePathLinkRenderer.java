@@ -25,6 +25,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -142,6 +143,11 @@ public class NodePathLinkRenderer extends BaseRenderer
          tx.commit();
       }
       catch (InvalidNodeRefException refErr)
+      {
+         // this error simple means we cannot output the path
+         try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}
+      }
+      catch (AccessDeniedException accessErr)
       {
          // this error simple means we cannot output the path
          try { if (tx != null) {tx.rollback();} } catch (Exception tex) {}

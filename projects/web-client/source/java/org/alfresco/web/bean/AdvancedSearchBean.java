@@ -19,6 +19,8 @@ package org.alfresco.web.bean;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.faces.event.ActionEvent;
 
@@ -32,12 +34,25 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.CachingDateFormat;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
 
 /**
  * @author Kevin Roast
  */
 public class AdvancedSearchBean
 {
+   /**
+    * Default constructor
+    */
+   public AdvancedSearchBean()
+   {
+      // initial state of progressive panels that don't use the default
+      panels.put("categories-panel", false);
+      panels.put("attrs-panel", false);
+      panels.put("custom-panel", false);
+   }
+   
+   
    // ------------------------------------------------------------------------------
    // Bean property getters and setters 
    
@@ -63,6 +78,22 @@ public class AdvancedSearchBean
    public void setNamespaceService(NamespaceService namespaceService)
    {
       this.namespaceService = namespaceService;
+   }
+   
+   /**
+    * @return Returns the progressive panels expanded state map.
+    */
+   public Map<String, Boolean> getPanels()
+   {
+      return this.panels;
+   }
+
+   /**
+    * @param panels The progressive panels expanded state map.
+    */
+   public void setPanels(Map<String, Boolean> panels)
+   {
+      this.panels = panels;
    }
    
    /**
@@ -427,6 +458,17 @@ public class AdvancedSearchBean
    }
    
    /**
+    * Save the state of the progressive panel that was expanded/collapsed
+    */
+   public void expandPanel(ActionEvent event)
+   {
+      if (event instanceof ExpandedEvent)
+      {
+         this.panels.put(event.getComponent().getId(), ((ExpandedEvent)event).State);
+      }
+   }
+   
+   /**
     * Generate a search XPATH pointing to the specified node Id, optionally return an XPATH
     * that includes the child nodes.
     *  
@@ -493,6 +535,9 @@ public class AdvancedSearchBean
    
    /** The NavigationBean reference */
    private NavigationBean navigator;
+   
+   /** Progressive panel UI state */
+   private Map<String, Boolean> panels = new HashMap(5, 1.0f);
    
    /** the text to search for */
    private String text = "";

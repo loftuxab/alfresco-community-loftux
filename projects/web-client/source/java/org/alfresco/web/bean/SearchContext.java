@@ -65,11 +65,10 @@ public final class SearchContext implements Serializable
    /** any additional range attribute to add to the search */
    private Map<QName, RangeProperties> rangeAttributes = new HashMap<QName, RangeProperties>(5, 1.0f);
    
-   
-   
    /** logger */
    private static Log logger = LogFactory.getLog(SearchContext.class);
-      
+   
+   
    /**
     * Build the search query string based on the current search context members.
     * 
@@ -77,7 +76,7 @@ public final class SearchContext implements Serializable
     */
    public String buildQuery()
    {
-      // TODO: change this to a StringBuilder
+      // TODO: change this to use a StringBuilder
       String query;
       
       // the QName for the well known "name" attribute

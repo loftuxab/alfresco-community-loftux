@@ -130,120 +130,137 @@
                               <table cellpadding="2" cellspacing="2" border="0" valign="top">
                                  
                                  <tr>
-                                    <td colspan=3>
-                                       <h:outputText value="#{msg.look_for}" />:&nbsp;
+                                    <td colspan=2>
+                                       <h:outputText value="#{msg.look_for}" style="font-weight:bold" />:&nbsp;
                                        <h:inputText id="search-text" value="#{AdvancedSearchBean.text}" size="42" maxlength="1024"
                                              onkeyup="javascript:checkButtonState();" onchange="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
                                  
                                  <tr>
-                                    <td>
-                                       <table cellpadding="2" cellspacing="2" border="0">
-                                          <tr><td class="paddingRow"></td></tr>
-                                          <tr>
-                                             <td><h:outputText value="#{msg.look_in}" />:</td>
-                                          </tr>
-                                          <tr>
-                                             <td>
-                                                <h:selectOneRadio value="#{AdvancedSearchBean.lookin}" layout="pageDirection">
-                                                   <f:selectItem itemValue="all" itemLabel="#{msg.all_spaces}" />
-                                                   <f:selectItem itemValue="other" itemLabel="#{msg.specify_space}:" />
-                                                </h:selectOneRadio>
-                                             </td>
-                                          </tr>
-                                          <tr>
-                                             <td style="padding-left:26px">
-                                                <r:spaceSelector label="#{msg.select_space_prompt}" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" styleClass="selector"/>
-                                             </td>
-                                          </tr>
-                                          <tr>
-                                             <td style="padding-left:22px">
-                                                <h:selectBooleanCheckbox value="#{AdvancedSearchBean.locationChildren}" />
-                                                <span style="vertical-align:20%"><h:outputText value="#{msg.include_child_spaces}" /></span>
-                                             </td>
-                                          </tr>
-                                          
-                                          <tr><td class="paddingRow"></td></tr>
-                                          <tr>
-                                             <td><h:outputText value="#{msg.show_results_for}" />:</td>
-                                          </tr>
-                                          <tr>
-                                             <td>
-                                                <h:selectOneRadio value="#{AdvancedSearchBean.mode}" layout="pageDirection">
-                                                   <f:selectItem itemValue="all" itemLabel="#{msg.all_items}" />
-                                                   <f:selectItem itemValue="files_text" itemLabel="#{msg.file_names_contents}" />
-                                                   <f:selectItem itemValue="files" itemLabel="#{msg.file_names}" />
-                                                   <f:selectItem itemValue="folders" itemLabel="#{msg.space_names}" />
-                                                </h:selectOneRadio>
-                                             </td>
-                                          </tr>
-                                          
-                                          <tr><td class="paddingRow"></td></tr>
-                                          <tr>
-                                             <td><h:outputText value="#{msg.show_results_categories}" />:</td>
-                                          </tr>
-                                          <tr>
-                                             <td style="padding-left:8px;padding-top:8px">
-                                                <r:categorySelector label="#{msg.select_category_prompt}" value="#{AdvancedSearchBean.category}" styleClass="selector"/>
-                                             </td>
-                                          </tr>
-                                          <tr>
-                                             <td style="padding-left:4px">
-                                                <h:selectBooleanCheckbox value="#{AdvancedSearchBean.categoryChildren}" />
-                                                <span style="vertical-align:20%"><h:outputText value="#{msg.include_sub_categories}" /></span>
-                                             </td>
-                                          </tr>
-                                       </table>
-                                    </td>
-                                    
-                                    <td style="padding:8px"></td>
-                                    
                                     <td valign="top">
-                                       <table cellpadding="2" cellspacing="2" border="0">
-                                          <tr><td class="paddingRow"></td></tr>
-                                          <tr>
-                                             <td><h:outputText value="#{msg.also_search_results}" />:</td>
-                                          </tr>
-                                          <tr>
-                                             <td>
-                                                <table cellpadding="2" cellspacing="2" border="0">
-                                                   <tr>
-                                                      <td style="padding-left:8px"><h:outputText value="#{msg.title}" />:</td><td><h:inputText value="#{AdvancedSearchBean.title}" size="28" maxlength="1024" id="title" /></td>
-                                                   </tr>
-                                                   <tr>
-                                                      <td style="padding-left:8px"><h:outputText value="#{msg.description}" />:</td><td><h:inputText value="#{AdvancedSearchBean.description}" size="28" maxlength="1024" id="desc" /></td>
-                                                   </tr>
-                                                   <tr>
-                                                      <td style="padding-left:8px"><h:outputText value="#{msg.author}" />:</td><td><h:inputText value="#{AdvancedSearchBean.author}" size="28" maxlength="1024" id="author" /></td>
-                                                   </tr>
-                                                </table>
-                                                <table cellpadding="1" cellspacing="0" border="0">
-                                                   <tr><td colspan=2 class="paddingRow"></td></tr>
-                                                   <tr>
-                                                      <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.modifiedDateChecked}" /><span style="vertical-align:20%"><h:outputText value="#{msg.modified_date}" />:</span></td>
-                                                   </tr>
-                                                   <tr>
-                                                      <td style="padding-left:8px"><h:outputText value="#{msg.from}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateFrom}" startYear="1985" yearCount="21" /></td>
-                                                   </tr>
-                                                   <tr>
-                                                      <td style="padding-left:8px"><h:outputText value="#{msg.to}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateTo}" startYear="1985" yearCount="21" /><td>
-                                                   </tr>
-                                                   
-                                                   <tr>
-                                                      <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.createdDateChecked}" /><span style="vertical-align:20%"><h:outputText value="#{msg.created_date}" />:</span></td>
-                                                   </tr>
-                                                   <tr>
-                                                      <td style="padding-left:8px"><h:outputText value="#{msg.from}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateFrom}" startYear="1985" yearCount="21" /></td>
-                                                   </tr>
-                                                   <tr>
-                                                      <td style="padding-left:8px"><h:outputText value="#{msg.to}" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateTo}" startYear="1985" yearCount="21" /><td>
-                                                   </tr>
-                                                </table>
-                                             </td>
-                                          </tr>
-                                       </table>
+                                       <a:panel label="#{msg.show_results_for}" id="restrict-panel" style="font-weight:bold" border="white" bgcolor="white" progressive="true"
+                                             expanded='#{AdvancedSearchBean.panels["restrict-panel"]}' expandedActionListener="#{AdvancedSearchBean.expandPanel}">
+                                          <table cellpadding="2" cellspacing="2" border="0">
+                                             <tr>
+                                                <td>
+                                                   <h:selectOneRadio value="#{AdvancedSearchBean.mode}" layout="pageDirection" id="radioMode" >
+                                                      <f:selectItem itemValue="all" itemLabel="#{msg.all_items}" id="selectAll" />
+                                                      <f:selectItem itemValue="files_text" itemLabel="#{msg.file_names_contents}" id="selectFilesText" />
+                                                      <f:selectItem itemValue="files" itemLabel="#{msg.file_names}" id="selectFiles" />
+                                                      <f:selectItem itemValue="folders" itemLabel="#{msg.space_names}" id="selectFolders" />
+                                                   </h:selectOneRadio>
+                                                </td>
+                                             </tr>
+                                          </table>
+                                       </a:panel>
+                                       
+                                       <div style="padding:3px"></div>
+                                       
+                                       <a:panel label="#{msg.look_in}" id="location-panel" style="font-weight:bold" border="white" bgcolor="white" progressive="true"
+                                             expanded='#{AdvancedSearchBean.panels["location-panel"]}' expandedActionListener="#{AdvancedSearchBean.expandPanel}">
+                                          <table cellpadding="2" cellspacing="2" border="0">
+                                             <tr>
+                                                <td>
+                                                   <h:selectOneRadio value="#{AdvancedSearchBean.lookin}" layout="pageDirection" id="radioLookin">
+                                                      <f:selectItem itemValue="all" itemLabel="#{msg.all_spaces}" id="spacesAll" />
+                                                      <f:selectItem itemValue="other" itemLabel="#{msg.specify_space}:" id="spacesOther" />
+                                                   </h:selectOneRadio>
+                                                </td>
+                                             </tr>
+                                             <tr>
+                                                <td style="padding-left:26px">
+                                                   <r:spaceSelector label="#{msg.select_space_prompt}" value="#{AdvancedSearchBean.location}" initialSelection="#{NavigationBean.currentNodeId}" styleClass="selector" id="spaceSelector" />
+                                                </td>
+                                             </tr>
+                                             <tr>
+                                                <td style="padding-left:22px">
+                                                   <h:selectBooleanCheckbox value="#{AdvancedSearchBean.locationChildren}" id="chkLocation" />
+                                                   <span style="vertical-align:20%"><h:outputText value="#{msg.include_child_spaces}" id="incchild" /></span>
+                                                </td>
+                                             </tr>
+                                          </table>
+                                       </a:panel>
+                                       
+                                       <div style="padding:3px"></div>
+                                       
+                                       <a:panel label="#{msg.show_results_categories}" id="categories-panel" style="font-weight:bold" border="white" bgcolor="white" progressive="true"
+                                             expanded='#{AdvancedSearchBean.panels["categories-panel"]}' expandedActionListener="#{AdvancedSearchBean.expandPanel}">
+                                          <table cellpadding="2" cellspacing="2" border="0">
+                                             <tr>
+                                                <td style="padding-left:8px;padding-top:8px">
+                                                   <r:categorySelector label="#{msg.select_category_prompt}" value="#{AdvancedSearchBean.category}" styleClass="selector" id="catSelector" />
+                                                </td>
+                                             </tr>
+                                             <tr>
+                                                <td style="padding-left:4px">
+                                                   <h:selectBooleanCheckbox value="#{AdvancedSearchBean.categoryChildren}" id="chkCategory" />
+                                                   <span style="vertical-align:20%"><h:outputText value="#{msg.include_sub_categories}" id="incCats" /></span>
+                                                </td>
+                                             </tr>
+                                          </table>
+                                       </a:panel>
+                                       
                                     </td>
+                                    
+                                    <td valign="top">                                   
+                                       
+                                       <a:panel label="#{msg.also_search_results}" id="attrs-panel" style="font-weight:bold" border="white" bgcolor="white" progressive="true"
+                                             expanded='#{AdvancedSearchBean.panels["attrs-panel"]}' expandedActionListener="#{AdvancedSearchBean.expandPanel}">
+                                          <table cellpadding="2" cellspacing="2" border="0">
+                                             <tr>
+                                                <td>
+                                                   <table cellpadding="2" cellspacing="2" border="0">
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.title}" id="title" />:</td><td><h:inputText value="#{AdvancedSearchBean.title}" size="28" maxlength="1024" id="txtTitle" /></td>
+                                                      </tr>
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.description}" id="desc" />:</td><td><h:inputText value="#{AdvancedSearchBean.description}" size="28" maxlength="1024" id="txtDesc" /></td>
+                                                      </tr>
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.author}" id="author" />:</td><td><h:inputText value="#{AdvancedSearchBean.author}" size="28" maxlength="1024" id="txtAuthor" /></td>
+                                                      </tr>
+                                                   </table>
+                                                   <table cellpadding="1" cellspacing="0" border="0">
+                                                      <tr><td colspan=2 class="paddingRow"></td></tr>
+                                                      <tr>
+                                                         <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.modifiedDateChecked}" id="chkModDate" /><span style="vertical-align:20%"><h:outputText value="#{msg.modified_date}" id="modDate" />:</span></td>
+                                                      </tr>
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.from}" id="modDateFrom" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateFrom}" startYear="1985" yearCount="21" id="dateModFrom" /></td>
+                                                      </tr>
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.to}" id="modDateTo" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.modifiedDateTo}" startYear="1985" yearCount="21" id="dateModTo" /><td>
+                                                      </tr>
+                                                      
+                                                      <tr>
+                                                         <td colspan=2><h:selectBooleanCheckbox value="#{AdvancedSearchBean.createdDateChecked}" id="chkCreateDate" /><span style="vertical-align:20%"><h:outputText value="#{msg.created_date}" id="createDate" />:</span></td>
+                                                      </tr>
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.from}" id="createDateFrom" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateFrom}" startYear="1985" yearCount="21" id="dateCreatedFrom" /></td>
+                                                      </tr>
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.to}" id="createDateTo" />:</td><td><a:inputDatePicker value="#{AdvancedSearchBean.createdDateTo}" startYear="1985" yearCount="21" id="dateCreatedTo" /><td>
+                                                      </tr>
+                                                   </table>
+                                                   <div style="padding:4px"></div>
+                                                   <a:panel label="#{msg.additional_options}" id="custom-panel" style="font-weight:bold" progressive="true"
+                                                         expanded='#{AdvancedSearchBean.panels["custom-panel"]}' expandedActionListener="#{AdvancedSearchBean.expandPanel}">
+                                                      <%--<table cellpadding="2" cellspacing="2" border="0">
+                                                         <tr>
+                                                            <td style="padding-left:8px"><h:outputText value="ISBN" id="custom" />:</td><td><h:inputText size="28" maxlength="1024" id="txtCustom" /></td>
+                                                         </tr>
+                                                         <tr>
+                                                            <td style="padding-left:8px"><h:outputText value="InvoiceID" id="custom2" />:</td><td><h:inputText size="28" maxlength="1024" id="txtCustom2" /></td>
+                                                         </tr>
+                                                      </table>--%>
+                                                   </a:panel>
+                                                </td>
+                                             </tr>
+                                          </table>
+                                       </a:panel>
+                                    </td>
+                                    
                                  </tr>
                               </table>
                               
