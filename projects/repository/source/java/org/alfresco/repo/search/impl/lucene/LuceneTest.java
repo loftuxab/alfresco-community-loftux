@@ -230,6 +230,8 @@ public class LuceneTest extends TestCase
         Map<QName, Serializable> testProperties = new HashMap<QName, Serializable>();
         testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-atomic"),
                 "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYONE");
+        testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-unstored-tokenised-atomic"),
+                "TEXT THAT IS INDEXED STORED AND TOKENISED ATOMICALLY KEYUNSTORED");
         testProperties.put(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"),
                 "TEXT THAT IS INDEXED STORED AND TOKENISED BUT NOT ATOMICALLY KEYTWO");
         testProperties.put(QName.createQName(TEST_NAMESPACE, "int-ista"), Integer.valueOf(1));
@@ -1604,12 +1606,12 @@ public class LuceneTest extends TestCase
         assertEquals(13, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testAspect.toString() + "\"", null,
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + ISO9075.getXPathName(testAspect) + "\"", null,
                 null);
         assertEquals(1, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + testSuperAspect.toString() + "\"",
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASPECT:\"" + ISO9075.getXPathName(testSuperAspect) + "\"",
                 null, null);
         assertEquals(1, results.length());
         results.close();
@@ -2653,6 +2655,12 @@ public class LuceneTest extends TestCase
                 + ":\"KEYONE\"", null, null);
         assertEquals(1, results.length());
         results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-unstored-tokenised-atomic"))
+                + ":\"KEYUNSTORED\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
 
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
                 + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"))
@@ -2688,6 +2696,12 @@ public class LuceneTest extends TestCase
                 + ":\"keytwo\"", null, null);
         assertEquals(1, results.length());
         results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-unstored-tokenised-atomic"))
+                + ":\"keyunstored\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
 
         runBaseTests();
         luceneFTS.resume();
@@ -2710,6 +2724,12 @@ public class LuceneTest extends TestCase
         assertEquals(1, results.length());
         results.close();
 
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-unstored-tokenised-atomic"))
+                + ":\"KEYUNSTORED\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+        
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
                 + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"))
                 + ":\"KEYTWO\"", null, null);
@@ -2751,6 +2771,12 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
                 + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-stored-tokenised-nonatomic"))
                 + ":\"keytwo\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@"
+                + escapeQName(QName.createQName(TEST_NAMESPACE, "text-indexed-unstored-tokenised-atomic"))
+                + ":\"KEYUNSTORED\"", null, null);
         assertEquals(1, results.length());
         results.close();
 

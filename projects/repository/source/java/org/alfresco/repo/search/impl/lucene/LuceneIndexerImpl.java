@@ -562,8 +562,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             for (Helper helper : toFTSIndex)
             {
                 BooleanQuery query = new BooleanQuery();
-                query.add(new TermQuery(new Term("ID", helper.document.getField("ID").stringValue())), true, false);
-                query.add(new TermQuery(new Term("TX", helper.document.getField("TX").stringValue())), true, false);
+                query.add(new TermQuery(new Term("ID", helper.nodeRef.toString())), true, false);
+                query.add(new TermQuery(new Term("TX", helper.tx)), true, false);
+                query.add(new TermQuery(new Term("ISNODE", "T")), false, false);
 
                 try
                 {
@@ -1062,7 +1063,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
         try
         {
-            List<Document> docs = createDocuments(nodeRef, isNew);
+            List<Document> docs = createDocuments(nodeRef, isNew, false, true);
             for (Document doc : docs)
             {
                 try
@@ -1137,7 +1138,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         }
     }
 
-    private List<Document> createDocuments(NodeRef nodeRef, boolean isNew)
+    private List<Document> createDocuments(NodeRef nodeRef, boolean isNew, boolean indexAllProperties,
+            boolean includeDirectoryDocuments)
     {
         Map<ChildAssociationRef, Counter> nodeCounts = getNodeCounts(nodeRef);
         List<Document> docs = new ArrayList<Document>();
@@ -1163,6 +1165,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             Serializable value = properties.get(propertyName);
             isAtomic = indexProperty(nodeRef, propertyName, value, xdoc, isAtomic, true);
+            if (indexAllProperties)
+            {
+                indexProperty(nodeRef, propertyName, value, xdoc, false, false);
+            }
         }
 
         boolean isRoot = nodeRef.equals(nodeService.getRootNode(nodeRef.getStoreRef()));
@@ -1225,25 +1231,29 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 QName nodeTypeRef = nodeService.getType(nodeRef);
                 TypeDefinition nodeTypeDef = getDictionaryService().getType(nodeTypeRef);
                 // check for child associations
-                if (nodeTypeDef.getChildAssociations().size() > 0)
+
+                if (includeDirectoryDocuments)
                 {
-                    if (directPaths.contains(pair.getFirst()))
+                    if (nodeTypeDef.getChildAssociations().size() > 0)
                     {
-                        Document directoryEntry = new Document();
-                        directoryEntry.add(new Field("ID", nodeRef.toString(), true, true, false));
-                        directoryEntry.add(new Field("PATH", pathString, true, true, true));
-                        for (NodeRef parent : getParents(pair.getFirst()))
+                        if (directPaths.contains(pair.getFirst()))
                         {
-                            directoryEntry.add(new Field("ANCESTOR", parent.toString(), true, true, false));
-                        }
-                        directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
+                            Document directoryEntry = new Document();
+                            directoryEntry.add(new Field("ID", nodeRef.toString(), true, true, false));
+                            directoryEntry.add(new Field("PATH", pathString, true, true, true));
+                            for (NodeRef parent : getParents(pair.getFirst()))
+                            {
+                                directoryEntry.add(new Field("ANCESTOR", parent.toString(), false, true, false));
+                            }
+                            directoryEntry.add(new Field("ISCONTAINER", "T", true, true, false));
 
-                        if (isCategory(getDictionaryService().getType(nodeService.getType(nodeRef))))
-                        {
-                            directoryEntry.add(new Field("ISCATEGORY", "T", true, true, false));
-                        }
+                            if (isCategory(getDictionaryService().getType(nodeService.getType(nodeRef))))
+                            {
+                                directoryEntry.add(new Field("ISCATEGORY", "T", true, true, false));
+                            }
 
-                        docs.add(directoryEntry);
+                            docs.add(directoryEntry);
+                        }
                     }
                 }
             }
@@ -1256,10 +1266,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
             xdoc.add(new Field("ISCONTAINER", "T", true, true, false));
             xdoc.add(new Field("PATH", "", true, true, true));
             xdoc.add(new Field("QNAME", "", true, true, true));
-            xdoc.add(new Field("ISROOT", "T", true, true, false));
+            xdoc.add(new Field("ISROOT", "T", false, true, false));
             xdoc.add(new Field("PRIMARYASSOCTYPEQNAME", ISO9075.getXPathName(ContentModel.ASSOC_CHILDREN), true, false,
                     false));
-            xdoc.add(new Field("ISNODE", "T", true, true, false));
+            xdoc.add(new Field("ISNODE", "T", false, true, false));
             docs.add(xdoc);
 
         }
@@ -1282,21 +1292,21 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 xdoc.add(new Field("ASPECT", ISO9075.getXPathName(classRef), true, true, false));
             }
 
-            xdoc.add(new Field("ISROOT", "F", true, true, false));
-            xdoc.add(new Field("ISNODE", "T", true, true, false));
-            if (isAtomic)
+            xdoc.add(new Field("ISROOT", "F", false, true, false));
+            xdoc.add(new Field("ISNODE", "T", false, true, false));
+            if (isAtomic || indexAllProperties)
             {
-                xdoc.add(new Field("FTSSTATUS", "Clean", true, true, false));
+                xdoc.add(new Field("FTSSTATUS", "Clean", false, true, false));
             }
             else
             {
                 if (isNew)
                 {
-                    xdoc.add(new Field("FTSSTATUS", "New", true, true, false));
+                    xdoc.add(new Field("FTSSTATUS", "New", false, true, false));
                 }
                 else
                 {
-                    xdoc.add(new Field("FTSSTATUS", "Dirty", true, true, false));
+                    xdoc.add(new Field("FTSSTATUS", "Dirty", false, true, false));
                 }
             }
 
@@ -1365,9 +1375,9 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
         {
             if (indexAtomicProperties == atomic)
             {
-                if(!indexAtomicProperties)
+                if (!indexAtomicProperties)
                 {
-                   doc.removeFields(propertyName.toString());
+                    doc.removeFields(propertyName.toString());
                 }
                 // convert value to String
                 for (String strValue : DefaultTypeConverter.INSTANCE.getCollection(String.class, value))
@@ -1622,13 +1632,13 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     public void updateFullTextSearch(int size) throws LuceneIndexException
     {
         checkAbleToDoWork(true, false);
-        if(!mainIndexExists())
+        if (!mainIndexExists())
         {
             return;
         }
         try
         {
-            String lastId = null;
+            NodeRef lastId = null;
 
             toFTSIndex = new ArrayList<Helper>(size);
             BooleanQuery booleanQuery = new BooleanQuery();
@@ -1656,7 +1666,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 for (ResultSetRow row : results)
                 {
                     LuceneResultSetRow lrow = (LuceneResultSetRow) row;
-                    Helper helper = new Helper(lrow.getNodeRef(), lrow.getDocument(), lrow.getIndex());
+                    Helper helper = new Helper(lrow.getNodeRef(), lrow.getDocument().getField("TX").stringValue());
                     toFTSIndex.add(helper);
                     if (++count >= size)
                     {
@@ -1694,30 +1704,24 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                     writer = getDeltaWriter();
                     for (Helper helper : toFTSIndex)
                     {
-                        Document document = helper.document;
+                        // Document document = helper.document;
                         NodeRef ref = helper.nodeRef;
-                        Map<QName, Serializable> properties = nodeService.getProperties(ref);
 
-                        for (QName propertyName : properties.keySet())
+                        List<Document> docs = createDocuments(ref, false, true, false);
+                        for (Document doc : docs)
                         {
-                            Serializable value = properties.get(propertyName);
-                            indexProperty(ref, propertyName, value, document, false, false);
-                        }
-                        
-                        document.removeField("FTSSTATUS");
-                        document.add(new Field("FTSSTATUS", "Clean", true, true, false));
-
-                        try
-                        {
-                            writer.addDocument(document /*
+                            try
+                            {
+                                writer.addDocument(doc /*
                                                          * TODO: Select the
                                                          * language based
                                                          * analyser
                                                          */);
-                        }
-                        catch (IOException e)
-                        {
-                            throw new LuceneIndexException("Failed to add document while updating fts index", e);
+                            }
+                            catch (IOException e)
+                            {
+                                throw new LuceneIndexException("Failed to add document while updating fts index", e);
+                            }
                         }
 
                         // Need to do all the current id in the TX - should all
@@ -1725,12 +1729,11 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                         // together so skip until id changes
                         if (writer.docCount() > size)
                         {
-                            String id = document.getField("ID").stringValue();
                             if (lastId == null)
                             {
-                                lastId = id;
+                                lastId = ref;
                             }
-                            if (!lastId.equals(id))
+                            if (!lastId.equals(ref))
                             {
                                 break;
                             }
@@ -1764,17 +1767,12 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
     {
         NodeRef nodeRef;
 
-        Document document;
+        String tx;
 
-        int index;
-
-        boolean update = false;
-
-        Helper(NodeRef nodeRef, Document document, int index)
+        Helper(NodeRef nodeRef, String tx)
         {
             this.nodeRef = nodeRef;
-            this.document = document;
-            this.index = index;
+            this.tx = tx;
         }
     }
 

@@ -41,6 +41,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -64,6 +65,8 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 
     private static final String ACL_ALLOW = "ACL_ALLOW";
 
+    private static final String ACL_METHOD = "ACL_METHOD";
+
     private PermissionService permissionService;
 
     private NamespacePrefixResolver nspr;
@@ -71,6 +74,8 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
     private NodeService nodeService;
 
     private AuthenticationService authenticationService;
+
+    private AuthorityService authorityService;
 
     public ACLEntryVoter()
     {
@@ -120,6 +125,11 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         this.authenticationService = authenticationService;
     }
 
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
+
     public void afterPropertiesSet() throws Exception
     {
         if (permissionService == null)
@@ -138,14 +148,20 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
         {
             throw new IllegalArgumentException("There must be an authentication service");
         }
+        if (authorityService == null)
+        {
+            throw new IllegalArgumentException("There must be an authority service");
+        }
 
     }
 
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
-                && (attribute.getAttribute().startsWith(ACL_NODE) || attribute.getAttribute().startsWith(ACL_PARENT) || attribute
-                        .getAttribute().startsWith(ACL_ALLOW)))
+                && (attribute.getAttribute().startsWith(ACL_NODE)
+                        || attribute.getAttribute().startsWith(ACL_PARENT)
+                        || attribute.getAttribute().startsWith(ACL_ALLOW) || attribute.getAttribute().startsWith(
+                        ACL_METHOD)))
         {
             return true;
         }
@@ -206,7 +222,19 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
-            else if(cad.parameter >= invocation.getArguments().length)
+            else if (cad.typeString.equals(ACL_METHOD))
+            {
+                if (authenticationService.getCurrentUserName().equals(cad.authority))
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+                else
+                {
+                    return authorityService.getAuthorities().contains(cad.authority) ? AccessDecisionVoter.ACCESS_GRANTED
+                            : AccessDecisionVoter.ACCESS_DENIED;
+                }
+            }
+            else if (cad.parameter >= invocation.getArguments().length)
             {
                 continue;
             }
@@ -333,22 +361,24 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
 
         int parameter;
 
+        String authority;
+
         ConfigAttributeDefintion(ConfigAttribute attr)
         {
             StringTokenizer st = new StringTokenizer(attr.getAttribute(), ".", false);
-            if(st.countTokens() < 1)
+            if (st.countTokens() < 1)
             {
                 throw new ACLEntryVoterException("There must be at least one token in a config attribute");
             }
             typeString = st.nextToken();
-           
 
-            if (!(typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT) || typeString.equals(ACL_ALLOW)))
+            if (!(typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT) || typeString.equals(ACL_ALLOW) || typeString
+                    .equals(ACL_METHOD)))
             {
                 throw new ACLEntryVoterException("Invalid type: must be ACL_NODE, ACL_PARENT or ACL_ALLOW");
             }
 
-            if (!typeString.equals(ACL_ALLOW))
+            if (typeString.equals(ACL_NODE) || typeString.equals(ACL_PARENT))
             {
                 if (st.countTokens() != 3)
                 {
@@ -357,12 +387,21 @@ public class ACLEntryVoter implements AccessDecisionVoter, InitializingBean
                 String numberString = st.nextToken();
                 String qNameString = st.nextToken();
                 String permissionString = st.nextToken();
-                
+
                 parameter = Integer.parseInt(numberString);
 
                 QName qName = QName.createQName(qNameString, nspr);
 
                 required = new SimplePermissionReference(qName, permissionString);
+            }
+            else if (typeString.equals(ACL_METHOD))
+            {
+                if (st.countTokens() != 1)
+                {
+                    throw new ACLEntryVoterException(
+                            "There must be two . separated tokens in each group or role config attribute");
+                }
+                authority = st.nextToken();
             }
 
         }

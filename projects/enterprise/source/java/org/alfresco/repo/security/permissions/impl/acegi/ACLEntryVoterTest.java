@@ -694,8 +694,52 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
         method.invoke(proxy, new Object[] { null, null, null, nodeService.getPrimaryParent(rootNodeRef) });
     }
 
+    public void testMethodACL() throws Exception
+    {
+        runAs("andy");
+
+        Object o = new ClassWithMethods();
+        Method method = o.getClass().getMethod(
+                "testMethod",
+                new Class[] { });
+
+        AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.addAdvisor(advisorAdapterRegistry.wrap(new Interceptor("ACL_METHOD.andy")));
+        proxyFactory.setTargetSource(new SingletonTargetSource(o));
+        Object proxy = proxyFactory.getProxy();
+
+        method.invoke(proxy, new Object[] {  });
+    }
+    
+    public void testMethodACL2() throws Exception
+    {
+        runAs("andy");
+
+        Object o = new ClassWithMethods();
+        Method method = o.getClass().getMethod(
+                "testMethod",
+                new Class[] { });
+
+        AdvisorAdapterRegistry advisorAdapterRegistry = GlobalAdvisorAdapterRegistry.getInstance();
+
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.addAdvisor(advisorAdapterRegistry.wrap(new Interceptor("ACL_METHOD."+PermissionService.ALL_AUTHORITIES)));
+        proxyFactory.setTargetSource(new SingletonTargetSource(o));
+        Object proxy = proxyFactory.getProxy();
+
+        method.invoke(proxy, new Object[] {  });
+    }
+
+    
     public static class ClassWithMethods
     {
+        public void testMethod()
+        {
+            
+        }
+        
         public void testOneStoreRef(StoreRef storeRef)
         {
             
@@ -752,6 +796,7 @@ public class ACLEntryVoterTest extends AbstractPermissionTest
             voter.setPermissionService(permissionService);
             voter.setNodeService(nodeService);
             voter.setAuthenticationService(authenticationService);
+            voter.setAuthorityService(authorityService);
 
             if (!(voter.vote(null, invocation, cad) == AccessDecisionVoter.ACCESS_DENIED))
             {

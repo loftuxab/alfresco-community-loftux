@@ -29,9 +29,9 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
 /**
- * A row ina result set. Created on the fly.
+ * A row in a result set. Created on the fly.
  * 
- * @author andyh
+ * @author Andy Hind
  * 
  */
 public class LuceneResultSetRow extends AbstractResultSetRow

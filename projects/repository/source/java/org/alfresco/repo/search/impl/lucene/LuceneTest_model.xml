@@ -47,6 +47,16 @@
                   <tokenised>true</tokenised>
                </index>
             </property>
+            <property name="test:text-indexed-unstored-tokenised-atomic">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <multiple>false</multiple>
+               <index enabled="true">
+                  <atomic>true</atomic>
+                  <stored>false</stored>
+                  <tokenised>true</tokenised>
+               </index>
+            </property>
             <property name="test:text-indexed-stored-tokenised-nonatomic">
                <type>d:text</type>
                <mandatory>true</mandatory>
