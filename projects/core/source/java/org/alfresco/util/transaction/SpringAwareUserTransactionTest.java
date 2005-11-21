@@ -196,6 +196,7 @@ public class SpringAwareUserTransactionTest extends TestCase
         catch (RollbackException e)
         {
             // expected
+            txn.rollback();
         }
         checkNoStatusOnThread();
     }

@@ -81,6 +81,8 @@ public class SpringAwareUserTransaction
     private TransactionInfo internalTxnInfo;
     /** keep the thread that the transaction was started on to perform thread safety checks */
     private long threadId = Long.MIN_VALUE;
+    /** make sure that we clean up the thread transaction stack properly */
+    private boolean finalized = false;
     
     /**
      * Creates a user transaction that defaults to {@link TransactionDefinition#PROPAGATION_REQUIRED}.
@@ -343,50 +345,54 @@ public class SpringAwareUserTransaction
         // perform checks
         TransactionInfo txnInfo = getTransactionInfo();
 
-        try
+        int status = getStatus();
+        // check the status
+        if (status == Status.STATUS_NO_TRANSACTION)
         {
-            int status = getStatus();
-            // check the status
-            if (status == Status.STATUS_NO_TRANSACTION)
-            {
-                throw new IllegalStateException("The transaction has not yet begun");
-            }
-            else if (status == Status.STATUS_ROLLING_BACK || status == Status.STATUS_ROLLEDBACK)
-            {
-                throw new RollbackException("The transaction has already been rolled back");
-            }
-            else if (status == Status.STATUS_MARKED_ROLLBACK)
-            {
-                throw new RollbackException("The transaction has already been marked for rollback");
-            }
-            else if (status == Status.STATUS_COMMITTING || status == Status.STATUS_COMMITTED)
-            {
-                throw new IllegalStateException("The transaction has already been committed");
-            }
-            else if (status != Status.STATUS_ACTIVE || txnInfo == null)
-            {
-                throw new IllegalStateException("Can only commit after a begin");
-            }
+            throw new IllegalStateException("The transaction has not yet begun");
+        }
+        else if (status == Status.STATUS_ROLLING_BACK || status == Status.STATUS_ROLLEDBACK)
+        {
+            throw new RollbackException("The transaction has already been rolled back");
+        }
+        else if (status == Status.STATUS_MARKED_ROLLBACK)
+        {
+            throw new RollbackException("The transaction has already been marked for rollback");
+        }
+        else if (status == Status.STATUS_COMMITTING || status == Status.STATUS_COMMITTED)
+        {
+            throw new IllegalStateException("The transaction has already been committed");
+        }
+        else if (status != Status.STATUS_ACTIVE || txnInfo == null)
+        {
+            throw new IllegalStateException("No user transaction is active");
+        }
             
-            // the status seems correct - we can try a commit
-            doCommitTransactionAfterReturning(txnInfo);
-            
-            // regardless of whether the transaction was finally committed or not, the status
-            // as far as UserTransaction is concerned should be 'committed'
-            
-            // keep track that this UserTransaction was explicitly committed
-            internalStatus = Status.STATUS_COMMITTED;
-            
-            // done
-            if (logger.isDebugEnabled())
+        if (!finalized)
+        {
+            try
             {
-                logger.debug("Committed user transaction: " + this);
+                // the status seems correct - we can try a commit
+                doCommitTransactionAfterReturning(txnInfo);
+            }
+            finally
+            {
+                // make sure that we clean up the stack
+                doFinally(txnInfo);
+                finalized = true;
             }
         }
-        finally
+        
+        // regardless of whether the transaction was finally committed or not, the status
+        // as far as UserTransaction is concerned should be 'committed'
+        
+        // keep track that this UserTransaction was explicitly committed
+        internalStatus = Status.STATUS_COMMITTED;
+        
+        // done
+        if (logger.isDebugEnabled())
         {
-            // make sure that we clean up the stack
-            doFinally(txnInfo);
+            logger.debug("Committed user transaction: " + this);
         }
     }
 
@@ -395,40 +401,44 @@ public class SpringAwareUserTransaction
     {
         // perform checks
         TransactionInfo txnInfo = getTransactionInfo();
-        if (txnInfo == null)
-        {
-            throw new IllegalStateException("Can only rollback after a begin");
-        }
         
-        try
+        int status = getStatus();
+        // check the status
+        if (status == Status.STATUS_ROLLING_BACK || status == Status.STATUS_ROLLEDBACK)
         {
-            int status = getStatus();
-            // check the status
-            if (status == Status.STATUS_ROLLING_BACK || status == Status.STATUS_ROLLEDBACK)
-            {
-                throw new IllegalStateException("The transaction has already been rolled back");
-            }
-            else if (status == Status.STATUS_COMMITTING || status == Status.STATUS_COMMITTED)
-            {
-                throw new IllegalStateException("The transaction has already been committed");
-            }
+            throw new IllegalStateException("The transaction has already been rolled back");
+        }
+        else if (status == Status.STATUS_COMMITTING || status == Status.STATUS_COMMITTED)
+        {
+            throw new IllegalStateException("The transaction has already been committed");
+        }
+        else if (txnInfo == null)
+        {
+            throw new IllegalStateException("No user transaction is active");
+        }
     
-            // force a rollback by generating an exception that will trigger a rollback
-            doCloseTransactionAfterThrowing(txnInfo, new Exception());
-    
-            // the internal status notes that we were specifically rolled back 
-            internalStatus = Status.STATUS_ROLLEDBACK;
-            
-            // done
-            if (logger.isDebugEnabled())
+        if (!finalized)
+        {
+            try
             {
-                logger.debug("Rolled back user transaction: " + this);
+                // force a rollback by generating an exception that will trigger a rollback
+                doCloseTransactionAfterThrowing(txnInfo, new Exception());
+            }
+            finally
+            {
+                // make sure that we clean up the stack
+                doFinally(txnInfo);
+                finalized = true;
             }
         }
-        finally
+
+        // the internal status notes that we were specifically rolled back 
+        internalStatus = Status.STATUS_ROLLEDBACK;
+        
+        // done
+        if (logger.isDebugEnabled())
         {
-            // make sure that we clean up the stack
-            doFinally(txnInfo);
+            logger.debug("Rolled back user transaction: " + this);
         }
     }
 }

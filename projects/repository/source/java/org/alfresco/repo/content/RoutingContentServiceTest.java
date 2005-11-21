@@ -557,6 +557,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
             catch (Throwable e)
             {
                 try {txn.rollback(); } catch (Exception ee) {}
+                e.printStackTrace();
                 throw new RuntimeException("Failed writing to output stream for writer: " + writer, e);
             }
             finally
@@ -565,8 +566,8 @@ public class RoutingContentServiceTest extends BaseSpringTest
                 {
                     try { os.close(); } catch (IOException e) {}
                 }
+                isDone = true;
             }
-            isDone = true;
         }
     }
 }
