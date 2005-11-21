@@ -117,14 +117,14 @@ public class DictionaryModelTypeTest extends BaseAlfrescoTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
-        /*
+        
         super.onSetUpInTransaction();
         
         // Get the required services
         this.dictionaryService = (DictionaryService)this.applicationContext.getBean("dictionaryService");
         this.namespaceService = (NamespaceService)this.applicationContext.getBean("namespaceService");
         this.cociService = (CheckOutCheckInService)this.applicationContext.getBean("checkOutCheckInService");
-        */
+        
     }
     
     /**
@@ -132,7 +132,7 @@ public class DictionaryModelTypeTest extends BaseAlfrescoTest
      */
     public void testCreateAndUpdateDictionaryModelNodeContent()
     {
-        /*
+        
         try
         {
             // Check that the model has not yet been loaded into the dictionary
@@ -191,6 +191,6 @@ public class DictionaryModelTypeTest extends BaseAlfrescoTest
         
         // Now check that the model has been updated
         assertEquals("1.1", this.nodeService.getProperty(modelNode, ContentModel.PROP_MODEL_VERSION));
-        */
+        
     }
 }

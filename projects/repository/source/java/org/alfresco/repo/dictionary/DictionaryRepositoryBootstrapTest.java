@@ -77,7 +77,6 @@ public class DictionaryRepositoryBootstrapTest extends BaseAlfrescoTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
-        /*
         super.onSetUpInTransaction();
         
         // Get the behaviour filter and turn the behaviour off for the model type
@@ -103,8 +102,7 @@ public class DictionaryRepositoryBootstrapTest extends BaseAlfrescoTest
         
         List<RepositoryLocation> locations = new ArrayList<RepositoryLocation>();
         locations.add(location);
-        this.bootstrap.setRepositoryLocations(locations);
-        */        
+        this.bootstrap.setRepositoryLocations(locations);      
     }
     
     /**
@@ -112,7 +110,6 @@ public class DictionaryRepositoryBootstrapTest extends BaseAlfrescoTest
      */
     public void testBootstrap()
     {
-        /*
         createModelNode(
                 "http://www.alfresco.org/model/test2DictionaryBootstrapFromRepo/1.0",
                 "test2",
@@ -163,7 +160,6 @@ public class DictionaryRepositoryBootstrapTest extends BaseAlfrescoTest
         ModelDefinition modelDefinition3 = this.dictionaryDAO.getModel(
                 QName.createQName("http://www.alfresco.org/model/test3DictionaryBootstrapFromRepo/1.0", "testModel3"));
         assertNotNull(modelDefinition3);
-        */
     }
 
     /**
