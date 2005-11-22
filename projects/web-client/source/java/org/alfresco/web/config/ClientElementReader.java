@@ -16,11 +16,14 @@
  */
 package org.alfresco.web.config;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.alfresco.web.config.ClientConfigElement.CustomProperty;
 import org.dom4j.Element;
 
 /**
@@ -47,6 +50,13 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_HELPURL = "help-url";
    public static final String ELEMENT_SEARCHMINIMUM = "search-minimum";
    public static final String ELEMENT_HOMESPACEPERMISSION = "home-space-permission";
+   public static final String ELEMENT_ADVANCEDSEARCH = "advanced-search";
+   public static final String ELEMENT_CONTENTTYPES = "content-types";
+   public static final String ELEMENT_TYPE = "type";
+   public static final String ELEMENT_CUSTOMPROPS = "custom-properties";
+   public static final String ELEMENT_METADATA = "meta-data";
+   public static final String ATTRIBUTE_PROPERTY = "property";
+   public static final String ATTRIBUTE_ASPECT = "aspect";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -173,6 +183,40 @@ public class ClientElementReader implements ConfigElementReader
          if (permission != null)
          {
             configElement.setHomeSpacePermission(permission.getTextTrim());
+         }
+         
+         // get the Advanced Search config block
+         Element advsearch = element.element(ELEMENT_ADVANCEDSEARCH);
+         if (advsearch != null)
+         {
+            // get the list of content types
+            Element contentTypes = advsearch.element(ELEMENT_CONTENTTYPES);
+            Iterator<Element> typesItr = contentTypes.elementIterator(ELEMENT_TYPE);
+            List<String> types = new ArrayList<String>(5);
+            while (typesItr.hasNext())
+            {
+               Element contentType = typesItr.next();
+               String type = contentType.attributeValue(ATTRIBUTE_NAME);
+               if (type != null)
+               {
+                  types.add(type);
+               }
+            }
+            
+            // get the list of custom properties to display
+            Element customProps = advsearch.element(ELEMENT_CUSTOMPROPS);
+            Iterator<Element> propsItr = contentTypes.elementIterator(ELEMENT_METADATA);
+            List<CustomProperty> props = new ArrayList<CustomProperty>(5);
+            while (propsItr.hasNext())
+            {
+               Element propElement = propsItr.next();
+               String type = propElement.attributeValue(ATTRIBUTE_NAME);
+               String aspect = propElement.attributeValue(ATTRIBUTE_ASPECT);
+               String prop = propElement.attributeValue(ATTRIBUTE_PROPERTY);
+               props.add(new ClientConfigElement.CustomProperty(type, aspect, prop));
+            }
+            
+            configElement.setContentTypes(types);
          }
       }
       

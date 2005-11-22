@@ -132,7 +132,7 @@
                                  <tr>
                                     <td colspan=2>
                                        <h:outputText value="#{msg.look_for}" style="font-weight:bold" />:&nbsp;
-                                       <h:inputText id="search-text" value="#{AdvancedSearchBean.text}" size="42" maxlength="1024"
+                                       <h:inputText id="search-text" value="#{AdvancedSearchBean.text}" size="48" maxlength="1024"
                                              onkeyup="javascript:checkButtonState();" onchange="javascript:checkButtonState();" />&nbsp;*
                                     </td>
                                  </tr>
@@ -211,6 +211,14 @@
                                              <tr>
                                                 <td>
                                                    <table cellpadding="2" cellspacing="2" border="0">
+                                                      <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.content_type}" id="contentType" />:</td>
+                                                         <td>
+                                                            <h:selectOneMenu value="#{AdvancedSearchBean.contentType}" id="selectContentType">
+                                                               <f:selectItems value="#{AdvancedSearchBean.contentTypes}" id="contentTypes" />
+                                                            </h:selectOneMenu>
+                                                         </td>
+                                                      </tr>
                                                       <tr>
                                                          <td style="padding-left:8px"><h:outputText value="#{msg.title}" id="title" />:</td><td><h:inputText value="#{AdvancedSearchBean.title}" size="28" maxlength="1024" id="txtTitle" /></td>
                                                       </tr>

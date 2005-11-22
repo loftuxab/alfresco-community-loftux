@@ -17,30 +17,43 @@
 package org.alfresco.web.bean;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 
+import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.ISO9075;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.CachingDateFormat;
-import org.alfresco.util.ISO8601DateFormat;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.config.ClientConfigElement;
+import org.alfresco.web.data.IDataContainer;
+import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
  */
 public class AdvancedSearchBean
 {
+   private static final String MSG_CONTENT = "content";
    /**
     * Default constructor
     */
@@ -343,6 +356,22 @@ public class AdvancedSearchBean
    {
       return this.createdDateChecked;
    }
+   
+   /**
+    * @return Returns the content type currenty selected
+    */
+   public String getContentType()
+   {
+      return this.contentType;
+   }
+
+   /**
+    * @param contentType Sets the currently selected content type
+    */
+   public void setContentType(String contentType)
+   {
+      this.contentType = contentType;
+   }
 
    /**
     * @param createdDateChecked The createdDateChecked to set.
@@ -350,6 +379,58 @@ public class AdvancedSearchBean
    public void setCreatedDateChecked(boolean createdDateChecked)
    {
       this.createdDateChecked = createdDateChecked;
+   }
+   
+   /**
+    * @return Returns a list of content object types to allow the user to select from
+    */
+   public List<SelectItem> getContentTypes()
+   {
+      if (this.contentTypes == null)
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         
+         // add the well known cm:content object type by default
+         this.contentTypes = new ArrayList<SelectItem>(5);
+         this.contentTypes.add(new SelectItem(ContentModel.TYPE_CONTENT.toString(), 
+               Application.getMessage(context, MSG_CONTENT)));
+         
+         // add any configured content sub-types to the list
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               context).getBean(Application.BEAN_CONFIG_SERVICE);
+         ClientConfigElement clientConfig = (ClientConfigElement)svc.getGlobalConfig().getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
+         
+         List<String> types = clientConfig.getContentTypes();
+         if (types != null)
+         {
+            DictionaryService dictionaryService = Repository.getServiceRegistry(context).getDictionaryService();
+            for (String type : types)
+            {
+               QName idQName = Repository.resolveToQName(type);
+               TypeDefinition typeDef = dictionaryService.getType(idQName);
+               
+               if (typeDef != null && dictionaryService.isSubClass(typeDef.getName(), ContentModel.TYPE_CONTENT))
+               {
+                  // try and get label from the dictionary
+                  String label = typeDef.getTitle();
+                  
+                  // else just use the localname
+                  if (label == null)
+                  {
+                     label = idQName.getLocalName();
+                  }
+                  
+                  this.contentTypes.add(new SelectItem(idQName.toString(), label));
+               }
+            }
+            
+            // make sure the list is sorted by the label
+            QuickSort sorter = new QuickSort(this.contentTypes, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+            sorter.sort();
+         }
+      }
+      
+      return this.contentTypes;
    }
    
    
@@ -364,6 +445,7 @@ public class AdvancedSearchBean
       this.text = "";
       this.mode = MODE_ALL;
       this.lookin = LOOKIN_ALL;
+      this.contentType = null;
       this.location = null;
       this.category = null;
       this.title = null;
@@ -407,10 +489,6 @@ public class AdvancedSearchBean
             search.setMode(SearchContext.SEARCH_SPACE_NAMES);
          }
          
-         // set the Search Context onto the top-level navigator bean
-         // this causes the browse screen to switch into search results view
-         this.navigator.setSearchContext(search);
-         
          // additional attributes search
          if (this.description != null && this.description.length() != 0)
          {
@@ -450,6 +528,16 @@ public class AdvancedSearchBean
          {
             search.setCategories(new String[]{getPathFromSpaceId(this.category.getId(), this.categoryChildren)});
          }
+         
+         // content type restriction
+         if (this.contentType != null)
+         {
+            search.setContentType(this.contentType);
+         }
+         
+         // set the Search Context onto the top-level navigator bean
+         // this causes the browse screen to switch into search results view
+         this.navigator.setSearchContext(search);
          
          outcome = "browse";
       }
@@ -538,6 +626,12 @@ public class AdvancedSearchBean
    
    /** Progressive panel UI state */
    private Map<String, Boolean> panels = new HashMap(5, 1.0f);
+   
+   /** content types to allow searching against */
+   private List<SelectItem> contentTypes;
+   
+   /** content type selection */
+   private String contentType;
    
    /** the text to search for */
    private String text = "";

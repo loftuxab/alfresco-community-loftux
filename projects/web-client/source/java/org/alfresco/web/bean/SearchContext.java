@@ -59,6 +59,9 @@ public final class SearchContext implements Serializable
    /** true to search category children as well as category */
    private boolean categoryChildren = true;
    
+   /** content type to restrict search against */
+   private String contentType = null;
+   
    /** any additional attribute to add to the search */
    private Map<QName, String> additionalAttributes = new HashMap<QName, String>(5, 1.0f);
    
@@ -92,7 +95,7 @@ public final class SearchContext implements Serializable
       {
          // simple single word text search
          fullTextQuery = " TEXT:" + safeText + '*';
-         nameAttrQuery = " +@" + nameAttr + ":" + safeText + '*';
+         nameAttrQuery = " @" + nameAttr + ":" + safeText + '*';
       }
       else
       {
@@ -101,7 +104,7 @@ public final class SearchContext implements Serializable
          {
             // as quoted phrase
             fullTextQuery = " TEXT:" + text;
-            nameAttrQuery = " +@" + nameAttr + ":" + text;
+            nameAttrQuery = " @" + nameAttr + ":" + text;
          }
          else
          {
@@ -184,8 +187,17 @@ public final class SearchContext implements Serializable
          }
       }
       
-      // match against CONTENT type
-      String fileTypeQuery = " +TYPE:\"{" + NamespaceService.CONTENT_MODEL_1_0_URI + "}content\" ";
+      // match against appropriate content type
+      String fileTypeQuery;
+      if (contentType != null)
+      {
+         fileTypeQuery = " +TYPE:\"" + contentType + "\" ";
+      }
+      else
+      {
+         // default to cm:content
+         fileTypeQuery = " +TYPE:\"{" + NamespaceService.CONTENT_MODEL_1_0_URI + "}content\" ";
+      }
       
       // match against FOLDER type
       String folderTypeQuery = " +TYPE:\"{" + NamespaceService.CONTENT_MODEL_1_0_URI + "}folder\" ";
@@ -193,7 +205,8 @@ public final class SearchContext implements Serializable
       switch (mode)
       {
          case SearchContext.SEARCH_ALL:
-            query = '(' + nameAttrQuery + ')' + " OR " + fullTextQuery;
+            query = '(' + fileTypeQuery + " AND " + '(' + nameAttrQuery + fullTextQuery + ')' + ')' + " OR " +
+                    '(' + folderTypeQuery + " AND " + nameAttrQuery + ')';
             break;
          
          case SearchContext.SEARCH_FILE_NAMES:
@@ -201,7 +214,7 @@ public final class SearchContext implements Serializable
             break;
          
          case SearchContext.SEARCH_FILE_NAMES_CONTENTS:
-            query = '(' + fileTypeQuery + " AND " + nameAttrQuery + ") OR " + fullTextQuery;
+            query = fileTypeQuery + " AND " + '(' + nameAttrQuery + fullTextQuery + ')';
             break;
          
          case SearchContext.SEARCH_SPACE_NAMES:
@@ -295,6 +308,22 @@ public final class SearchContext implements Serializable
    public void setText(String text)
    {
       this.text = text;
+   }
+
+   /**
+    * @return Returns the contentType.
+    */
+   public String getContentType()
+   {
+      return this.contentType;
+   }
+
+   /**
+    * @param contentType The content type to restrict attribute search against.
+    */
+   public void setContentType(String contentType)
+   {
+      this.contentType = contentType;
    }
 
    /**

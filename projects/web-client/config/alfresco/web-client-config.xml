@@ -36,6 +36,23 @@
             <!-- <language locale="ja_JP">Japanese</language> -->
          </languages>
          
+         <!-- advanced search custom attribute config -->
+         <advanced-search>
+            <!-- type constraint drop-down -->
+            <content-types>
+               <!-- cm:content type is implicit in this list -->
+               <!-- types must extend cm:content for the Alfresco web-client -->
+               <type name="cm:dictionaryModel" />
+               <type name="fm:post" />
+            </content-types>
+            <!-- custom properties to be shown in the More Options panel -->
+            <custom-properties>
+               <meta-data type="cm:modelAuthor" property="cm:dictionaryModel" />
+               <meta-data type="cm:modelAuthor" property="cm:dictionaryModel" />
+               <meta-data aspect="app:simpleworkflow" property="app:approveStep" />
+            </custom-properties>
+         </advanced-search>
+         
          <!-- the maximum page size for each view mode in the client screens -->
          <page-size>
             <browse>

@@ -50,6 +50,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    private Map<String, String> localeMap = new HashMap<String, String>();
    private List<String> languages = new ArrayList<String>(8);
    private String homeSpacePermission = null;
+   private List<String> contentTypes = null;
    
    /**
     * Default Constructor
@@ -297,5 +298,36 @@ public class ClientConfigElement extends ConfigElementAdapter
    /*package*/ void setHomeSpacePermission(String homeSpacePermission)
    {
       this.homeSpacePermission = homeSpacePermission;
+   }
+
+   /**
+    * @return Returns the contentTypes.
+    */
+   public List<String> getContentTypes()
+   {
+      return this.contentTypes;
+   }
+
+   /**
+    * @param contentTypes The contentTypes to set.
+    */
+   /*package*/ void setContentTypes(List<String> contentTypes)
+   {
+      this.contentTypes = contentTypes;
+   }
+   
+   
+   public static class CustomProperty
+   {
+      CustomProperty(String type, String aspect, String property)
+      {
+         Type = type;
+         Aspect = aspect;
+         Property = property;
+      }
+      
+      public String Type;
+      public String Aspect;
+      public String Property;
    }
 }
