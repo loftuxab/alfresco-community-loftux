@@ -69,7 +69,13 @@
 
    <table>
    <tr>
-      <td><nobr><b>Primary Path:</b></nobr></td><td><nobr><h:outputText id="primaryPath" value="#{AdminNodeBrowseBean.primaryPath}"/></nobr></td>
+      <td><nobr><b>Primary Path:</b></nobr></td><td>
+          <nobr>
+          <h:commandLink id="selectPrimaryParent" action="#{AdminNodeBrowseBean.selectPrimaryPath}">
+              <h:outputText id="primaryPath" value="#{AdminNodeBrowseBean.primaryPath}"/>
+          </h:commandLink>
+          </nobr>
+      </td>
    </tr>
    <tr>
       <td><b>Reference:</b></td><td><h:outputText id="nodeRef" value="#{AdminNodeBrowseBean.nodeRef}"/></td>

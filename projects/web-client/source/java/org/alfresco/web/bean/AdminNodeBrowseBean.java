@@ -364,6 +364,18 @@ public class AdminNodeBrowseBean
         stores = null;
         return "success";
     }
+
+    /**
+     * Action to select primary path
+     * 
+     * @return  next action
+     */
+    public String selectPrimaryPath()
+    {
+        // force refresh of self
+        setNodeRef(nodeRef);
+        return "success";
+    }
     
     /**
      * Action to select primary parent
