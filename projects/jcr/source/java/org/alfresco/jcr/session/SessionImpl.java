@@ -60,6 +60,7 @@ import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.item.ValueFactoryImpl;
 import org.alfresco.jcr.repository.RepositoryImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -82,6 +83,9 @@ public class SessionImpl implements Session
 {
     /** Parent Repository */ 
     private RepositoryImpl repository;
+    
+    /** Transaction Id */
+    private String trxId;
     
     /** Authenticated ticket */
     private String ticket;
@@ -120,8 +124,14 @@ public class SessionImpl implements Session
      * @throws NoSuchWorkspaceException
      */
     public SessionImpl(RepositoryImpl repository, String ticket, String workspaceName, Map<String, Object> attributes)
-        throws NoSuchWorkspaceException
+        throws NoSuchWorkspaceException, RepositoryException
     {
+        this.trxId = AlfrescoTransactionSupport.getTransactionId();
+        if (this.trxId == null)
+        {
+            throw new RepositoryException("Session cannot be opened outside of a transaction.");
+        }
+        
         this.repository = repository;
         this.ticket = ticket;
         this.attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
@@ -166,6 +176,16 @@ public class SessionImpl implements Session
         return ticket;
     }
 
+    /**
+     * Get the associated transaction Id
+     * 
+     * @return transaction id
+     */
+    public String getTransactionId()
+    {
+        return trxId;
+    }
+    
     /**
      * Get the Type Converter
      *
@@ -322,7 +342,7 @@ public class SessionImpl implements Session
      */
     public void save() throws AccessDeniedException, ItemExistsException, ConstraintViolationException, InvalidItemStateException, VersionException, LockException, NoSuchNodeTypeException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        AlfrescoTransactionSupport.flush();        
     }
 
     /* (non-Javadoc)

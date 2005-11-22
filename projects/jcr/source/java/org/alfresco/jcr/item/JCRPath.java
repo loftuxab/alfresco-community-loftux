@@ -50,7 +50,7 @@ public class JCRPath
             {
                 root = true;
             }
-            else
+            else if (!token.equals("/"))
             {
                 if (root)
                 {

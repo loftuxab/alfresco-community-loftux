@@ -29,6 +29,7 @@ import javax.jcr.nodetype.NoSuchNodeTypeException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.repo.node.integrity.IntegrityException;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.lock.NodeLockedException;
 
@@ -109,8 +110,17 @@ public class JCRProxyFactory
             // Ensure invocation is under correct context
             try
             {
-                // setup authentication context
-                // TODO: throw error when session is not live?
+                // test transaction
+                String trxId = AlfrescoTransactionSupport.getTransactionId();
+                if (trxId != null)
+                {
+                    if (!trxId.equals(context.getTransactionId()))
+                    {
+                        throw new RepositoryException("Cannot use session in transaction " + trxId + " as it is tied to transaction " + context.getTransactionId());
+                    }
+                }
+                
+                // test authentication
                 String ticket = context.getTicket();
                 if (ticket != null)
                 {
@@ -137,6 +147,7 @@ public class JCRProxyFactory
                 {
                     throw new NoSuchNodeTypeException(cause);
                 }
+                // TODO: AccessDenied Exception
                 else if (cause instanceof AlfrescoRuntimeException)
                 {
                     throw new RepositoryException(cause);

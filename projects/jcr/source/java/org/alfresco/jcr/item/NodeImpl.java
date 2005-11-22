@@ -51,6 +51,7 @@ import javax.jcr.version.VersionException;
 import javax.jcr.version.VersionHistory;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.jcr.dictionary.NodeDefinitionImpl;
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
@@ -65,6 +66,7 @@ import org.alfresco.service.cmr.repository.Path.Element;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.ParameterCheck;
 
 
 /**
@@ -122,11 +124,12 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Node addNode(String relPath, String primaryNodeTypeName) throws ItemExistsException, PathNotFoundException, NoSuchNodeTypeException, LockException, VersionException, ConstraintViolationException, RepositoryException
     {
+        ParameterCheck.mandatoryString("relPath", relPath);
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
-        Path path = new JCRPath(session.getNamespaceResolver(), relPath).getPath();
         
         // Determine parent node reference and new node name
+        Path path = new JCRPath(session.getNamespaceResolver(), relPath).getPath();
         QName nodeName = null;
         NodeRef parentRef = null;
         if (path.size() == 1)
@@ -136,7 +139,7 @@ public class NodeImpl extends ItemImpl implements Node
         }
         else
         {
-            Path parentPath = path.subPath(path.size() -1);
+            Path parentPath = path.subPath(path.size() -2);
             parentRef = ItemResolver.getNodeRef(session, nodeRef, parentPath.toPrefixString(session.getNamespaceResolver()));
             if (parentRef == null)
             {
@@ -146,6 +149,7 @@ public class NodeImpl extends ItemImpl implements Node
         }
 
         // Check for invalid node name
+        // TODO: Replace with proper name validation
         if (nodeName.getLocalName().indexOf('[') != -1 || nodeName.getLocalName().indexOf(']') != -1)
         {
             throw new RepositoryException("Node name '" + nodeName + "' is invalid");
@@ -226,6 +230,24 @@ public class NodeImpl extends ItemImpl implements Node
             throw new AlfrescoRuntimeException("Cannot determine child association for node type '" + nodeType + " within parent " + nodeRef);
         }
         return nodeTypeChildAssocDef;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#remove()
+     */
+    public void remove() throws VersionException, LockException, ConstraintViolationException, RepositoryException
+    {
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        
+        // Note: remove the primary child association, therefore forcing a delete of the node (including any secondary child
+        //       associations)
+        ChildAssociationRef assocRef = nodeService.getPrimaryParent(nodeRef);
+        NodeRef parentRef = assocRef.getParentRef();
+        if (parentRef == null)
+        {
+            throw new ConstraintViolationException("Cannot remove the root node");
+        }
+        nodeService.removeChild(parentRef, nodeRef);
     }
     
     /* (non-Javadoc)
@@ -613,8 +635,12 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public NodeDefinition getDefinition() throws RepositoryException
     {
-        // TODO Auto-generated method stub
-        return null;
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
+        ChildAssociationRef childAssocRef = nodeService.getPrimaryParent(this.nodeRef);
+        ChildAssociationDefinition childAssocDef = (ChildAssociationDefinition)dictionaryService.getAssociation(childAssocRef.getTypeQName());
+        NodeDefinition nodeDef = new NodeDefinitionImpl(session.getTypeManager(), childAssocDef);
+        return nodeDef;
     }
 
     /* (non-Javadoc)

@@ -38,7 +38,6 @@ import javax.jcr.version.VersionException;
 import org.alfresco.jcr.dictionary.DataTypeMap;
 import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
-import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -87,6 +86,14 @@ public class PropertyImpl extends ItemImpl implements Property
             proxy = (Property)JCRProxyFactory.create(this, Property.class, session); 
         }
         return proxy;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.jcr.Item#remove()
+     */
+    public void remove() throws VersionException, LockException, ConstraintViolationException, RepositoryException
+    {
+        // TODO: Implement as setValue(null) ?
     }
     
     /* (non-Javadoc)
@@ -305,11 +312,6 @@ public class PropertyImpl extends ItemImpl implements Property
     public int getType() throws RepositoryException
     {
         // TODO: The type should be based on the property value (in the case of undefined required type)
-        // TODO: Switch on data type
-        if (name.equals(ContentModel.PROP_CONTENT))
-        {
-            return DataTypeMap.convertDataTypeToPropertyType(DataTypeDefinition.CONTENT);
-        }
         return DataTypeMap.convertDataTypeToPropertyType(getPropertyDefinition().getDataType().getName());
     }
 
@@ -426,8 +428,7 @@ public class PropertyImpl extends ItemImpl implements Property
     {
         Object value = null; 
 
-        // TODO: Switch on data type
-        if (name.equals(ContentModel.PROP_CONTENT))
+        if (getPropertyDefinition().getDataType().getName().equals(DataTypeDefinition.CONTENT))
         {
             // Retrieve content reader as value
             ContentService contentService = node.session.getRepositoryImpl().getServiceRegistry().getContentService();

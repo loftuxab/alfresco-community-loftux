@@ -89,8 +89,7 @@ public abstract class ItemImpl implements Item
      */
     public void save() throws AccessDeniedException, ItemExistsException, ConstraintViolationException, InvalidItemStateException, ReferentialIntegrityException, VersionException, LockException, NoSuchNodeTypeException, RepositoryException
     {
-        // TODO: Item level flush
-        // AlfrescoTransactionSupport.flush();
+        AlfrescoTransactionSupport.flush();
     }
 
     /* (non-Javadoc)
@@ -99,15 +98,6 @@ public abstract class ItemImpl implements Item
     public void refresh(boolean keepChanges) throws InvalidItemStateException, RepositoryException
     {
         throw new UnsupportedRepositoryOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see javax.jcr.Item#remove()
-     */
-    public void remove() throws VersionException, LockException, ConstraintViolationException, RepositoryException
-    {
-        // TODO: Implement... temporarily commented out to enable TCK test setup
-        //throw new UnsupportedRepositoryOperationException();
     }
 
     
