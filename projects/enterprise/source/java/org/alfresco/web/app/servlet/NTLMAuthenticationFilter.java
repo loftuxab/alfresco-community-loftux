@@ -772,6 +772,11 @@ public class NTLMAuthenticationFilter implements Filter
                 
                 m_authComponent.setCurrentUser(userName);
                 
+                // The user name used may be a different case to the NTLM supplied user name, read the current
+                // user and use that name
+                
+                userName = m_authComponent.getCurrentUserName();
+                
                 // Setup User object and Home space ID etc.
                 
                 user = new User(userName, m_authService.getCurrentTicket(), m_personService.getPerson(userName));
