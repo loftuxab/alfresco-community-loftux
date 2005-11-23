@@ -394,7 +394,6 @@ public class NewRuleWizard extends BaseActionWizard
     */
    public String promptForActionValues()
    {
-      
       // set the flag to show we are creating a new action
       this.editingAction = false;
       
@@ -408,6 +407,11 @@ public class NewRuleWizard extends BaseActionWizard
          this.currentActionProperties.put("approveAction", "move");
          this.currentActionProperties.put("rejectStepPresent", "yes");
          this.currentActionProperties.put("rejectAction", "move");
+         
+         outcome = this.action;
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Added 'simple-workflow' action to list");
       }
       else if ("extract-metadata".equals(this.action))
       {
@@ -421,6 +425,7 @@ public class NewRuleWizard extends BaseActionWizard
       else
       {
          outcome = this.action;
+         
          if (logger.isDebugEnabled())
             logger.debug("Added '" + this.action + "' action to list");
       }
