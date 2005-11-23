@@ -1,7 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
-<!-- Beans pertinent to node persistence and services --> 
+<!-- ========================================================= -->
+<!-- The configuration of the Authority Service Implementation -->
+<!-- ========================================================= -->
+
+<!--                                                                          -->
+<!-- This implementation supports the identification of users as admin users. -->
+<!-- It also supports groups and allows groups and users to be arranged into  -->
+<!-- hierarchies.                                                             -->
+<!--                                                                          --> 
 <beans>
     
     <bean id="authorityService" class="org.alfresco.repo.security.authority.AuthorityServiceImpl">
@@ -20,6 +28,19 @@
         <property name="permissionServiceSPI">
             <ref bean="permissionServiceImpl" />
         </property>
+        <!--                                                                  -->
+        <!-- A list of users with admin rights.                               -->
+        <!--                                                                  -->
+        <!-- If the security framework is case sensitive these values should  -->
+        <!-- be case sensitive user names. If the security framework is not   -->
+        <!-- case sensitive these values should be the lower-case user names. -->
+        <!--                                                                  -->
+        <!-- By default this includes:                                        -->
+        <!--    admin (the user name of default alfresco admin user)          -->
+        <!--    administrator (the windows default admin user)                -->
+        <!--                                                                  -->
+        <!-- This assumes that user names are not case sensitive.             -->
+        <!--                                                                  -->
         <property name="adminUsers">
             <set>
     			<value>admin</value>
@@ -28,6 +49,11 @@
         </property>
     </bean>
     
+    <!-- Authority DAO that stores group information along with user information, -->
+    <!-- in the repository.                                                       -->
+    <!--                                                                          -->
+    <!-- This bean uses the userToAuthorityCache configured in cache-context.xml  -->
+    <!--                                                                          -->
     <bean id="authorityDAO" class="org.alfresco.repo.security.authority.AuthorityDAOImpl">   
         <property name="nodeService">
             <ref bean="nodeService" />
