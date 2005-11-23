@@ -80,6 +80,8 @@ public class AuthorityServiceTest extends TestCase
         {
             authenticationService.createAuthentication("administrator", "administrator".toCharArray());
         }
+        
+        authenticationComponent.setSystemUserAsCurrentUser();
     }
 
     @Override
