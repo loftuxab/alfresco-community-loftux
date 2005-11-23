@@ -212,21 +212,22 @@
                               </td>
                               <td>&nbsp;&#8226;&nbsp;</td>
                               <td width=50%>
-                                 Gian Luca Farina Perseu,
-                                 Betty Mai,
-                                 Gert Thiel,
                                  Camille B&#233;gnis,
+                                 Andrejus Chaliapinas,
                                  Laurent Genier,
+                                 Antti Jokipii,
+                                 Henning Kristensen,
+                                 Betty Mai,
+                                 Fabian Mandelbaum,
+                                 Theodoros Papageorgiou,
+                                 Gian Luca Farina Perseu,
+                                 Alex Revesz,
                                  Christian Roy,
                                  Philippe Seillier,
                                  Frank Shipley,
-                                 Alex Revesz,
                                  Michiel Steltman,
-                                 cnalfresco,
-                                 Theodoros Papageorgiou,
-                                 Andrejus Chaliapinas,
-                                 Antti Jokipii,
-                                 Henning Kristensen
+                                 Gert Thiel,
+                                 cnalfresco
                               </td>
                            </tr>
                         </table>
