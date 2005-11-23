@@ -31,7 +31,7 @@
         <!--                                                                  -->
         <!-- By default this includes:                                        -->
         <!--    admin (the user name of default alfresco admin user)          -->
-        <!--    administrator (the windows default adminn user)               -->
+        <!--    administrator (the windows default admin user)                -->
         <!--                                                                  -->
         <!-- This assumes that user names are not case sensitive.             -->
         <!--                                                                  -->
