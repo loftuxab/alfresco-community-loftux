@@ -33,16 +33,15 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.model.FileExistsException;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
@@ -102,10 +101,11 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             Node currentDocument = this.browseBean.getDocument();
             NodeRef nodeRef = currentDocument.getNodeRef();
             
+            // move the file - location and name checks will be performed
+            this.fileFolderService.move(nodeRef, null, this.fileName); 
             // set up the content data
             // update the modified timestamp and other content props
             Map<QName, Serializable> contentProps = this.nodeService.getProperties(nodeRef);
-            contentProps.put(ContentModel.PROP_NAME, this.fileName);
             contentProps.put(ContentModel.PROP_TITLE, this.title);
             contentProps.put(ContentModel.PROP_DESCRIPTION, this.description);
             contentProps.put(ContentModel.PROP_CREATOR, this.author);
@@ -152,21 +152,14 @@ public abstract class BaseContentWizard extends AbstractWizardBean
                containerNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
             }
             
-            // create properties for content type
-            Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>(5, 1.0f);
-            contentProps.put(ContentModel.PROP_NAME, this.fileName);
-            contentProps.put(ContentModel.PROP_CREATOR, this.author);
-            
-            // create the node to represent the content
-            String assocName = QName.createValidLocalName(this.fileName);
-            ChildAssociationRef assocRef = this.nodeService.createNode(
+            FileInfo fileInfo = fileFolderService.create(
                   containerNodeRef,
-                  ContentModel.ASSOC_CONTAINS,
-                  QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, assocName),
-                  Repository.resolveToQName(this.objectType),
-                  contentProps);
+                  this.fileName,
+                  Repository.resolveToQName(this.objectType));
+            NodeRef fileNodeRef = fileInfo.getNodeRef();
             
-            NodeRef fileNodeRef = assocRef.getChildRef();
+            // set the author
+            this.nodeService.setProperty(fileNodeRef, ContentModel.PROP_CREATOR, this.author);
             
             if (logger.isDebugEnabled())
                logger.debug("Created file node for file: " + this.fileName);
@@ -208,6 +201,19 @@ public abstract class BaseContentWizard extends AbstractWizardBean
          
          // commit the transaction
          tx.commit();
+      }
+      catch (FileExistsException e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         // print status message  
+         String statusMsg = MessageFormat.format(
+               Application.getMessage(
+                     FacesContext.getCurrentInstance(), "error_exists_file"), 
+                     e.getExisting().getName());
+         Utils.addErrorMessage(statusMsg);
+         // no outcome
+         outcome = null;
       }
       catch (Exception e)
       {

@@ -22,6 +22,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
+import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.web.app.Application;
@@ -55,6 +56,7 @@ public abstract class AbstractWizardBean
    protected boolean editMode = false;
    protected String scenario;
    protected NodeService nodeService;
+   protected FileFolderService fileFolderService;
    protected SearchService searchService;
    protected NavigationBean navigator;
    protected BrowseBean browseBean;
@@ -255,6 +257,14 @@ public abstract class AbstractWizardBean
    }
 
    /**
+    * @param fileFolderService used to manipulate folder/folder model nodes
+    */
+   public void setFileFolderService(FileFolderService fileFolderService)
+   {
+      this.fileFolderService = fileFolderService;
+   }
+
+   /**
     * @param searchService the service used to find nodes
     */
    public void setSearchService(SearchService searchService)
@@ -262,7 +272,7 @@ public abstract class AbstractWizardBean
       this.searchService = searchService;
    }
 
-/**
+   /**
     * @return Returns the navigation bean instance.
     */
    public NavigationBean getNavigator()

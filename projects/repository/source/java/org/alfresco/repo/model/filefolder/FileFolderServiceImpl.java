@@ -23,12 +23,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
@@ -80,7 +85,7 @@ public class FileFolderServiceImpl implements FileFolderService
     private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
-    private NodeService unprotectedNodeService;
+    private CopyService copyService;
     private SearchService searchService;
     
     private QName cmName;
@@ -102,16 +107,16 @@ public class FileFolderServiceImpl implements FileFolderService
         this.dictionaryService = dictionaryService;
     }
     
-    public void setUnprotectedNodeService(NodeService unprotectedNodeService)
-    {
-        this.unprotectedNodeService = unprotectedNodeService;
-    }
-    
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
     
+    public void setCopyService(CopyService copyService)
+    {
+        this.copyService = copyService;
+    }
+
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
@@ -132,29 +137,86 @@ public class FileFolderServiceImpl implements FileFolderService
      * @param nodeRefs the node references
      * @return Return a list of file info
      */
-    private List<FileInfo> toFileInfo(List<NodeRef> nodeRefs)
+    private List<FileInfo> toFileInfo(List<NodeRef> nodeRefs) throws FileNotFoundException
     {
         List<FileInfo> results = new ArrayList<FileInfo>(nodeRefs.size());
         for (NodeRef nodeRef : nodeRefs)
         {
-            // get the file attributes
-            Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-            String name = (String) properties.get(ContentModel.PROP_NAME);
-            // is it a folder
-            QName typeQName = unprotectedNodeService.getType(nodeRef);
-            boolean isFolder = dictionaryService.isSubClass(typeQName, ContentModel.TYPE_FOLDER);
-            
-            // construct the file info and add to the results
-            FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, name);
+            FileInfo fileInfo = toFileInfo(nodeRef);
             results.add(fileInfo);
         }
         return results;
     }
     
     /**
+     * Helper method to convert a node reference instance to a file info
+     */
+    private FileInfo toFileInfo(NodeRef nodeRef) throws FileNotFoundException
+    {
+        // check the node type
+        QName nodeTypeQName = nodeService.getType(nodeRef);
+        // get the file attributes
+        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+        String name = (String) properties.get(ContentModel.PROP_NAME);
+        // is it a folder
+        QName typeQName = nodeService.getType(nodeRef);
+        boolean isFolder = isFolder(typeQName);
+        
+        // construct the file info and add to the results
+        FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, name);
+        // done
+        return fileInfo;
+    }
+
+    /**
+     * Ensure that a file or folder does not already exist
+     * 
+     * @throws FileExistsException if the folder or folder doesn't exist
+     */
+    private void checkExists(NodeRef parentFolderRef, String name, boolean isFolder)
+            throws FileExistsException, FileNotFoundException
+    {
+        // check for existing file or folder
+        List<FileInfo> existingFileInfos = this.search(parentFolderRef, name, !isFolder, isFolder, false);
+        if (existingFileInfos.size() > 0)
+        {
+            throw new FileExistsException(existingFileInfos.get(0));
+        }
+    }
+
+    /**
+     * Checks the type for whether it is a file or folder.  All invalid types
+     * lead to runtime exceptions.
+     * 
+     * @param typeQName the type to check
+     * @return Returns true if the type is a valid folder type, false if it is a file.
+     */
+    private boolean isFolder(QName typeQName)
+    {
+        if (dictionaryService.isSubClass(typeQName, ContentModel.TYPE_FOLDER))
+        {
+            if (dictionaryService.isSubClass(typeQName, ContentModel.TYPE_SYSTEM_FOLDER))
+            {
+                throw new AlfrescoRuntimeException("This service should ignore type " + ContentModel.TYPE_SYSTEM_FOLDER);
+            }
+            return true;
+        }
+        else if (dictionaryService.isSubClass(typeQName, ContentModel.TYPE_CONTENT))
+        {
+            // it is a regular file
+            return false;
+        }
+        else
+        {
+            // unhandled type
+            throw new AlfrescoRuntimeException("Type is not handled by this service: " + typeQName);
+        }
+    }
+
+    /**
      * TODO: Use Lucene search to get file attributes without having to visit the node service
      */
-    public List<FileInfo> list(NodeRef folderNodeRef)
+    public List<FileInfo> list(NodeRef folderNodeRef) throws FileNotFoundException
     {
         // execute the query
         List<NodeRef> nodeRefs = searchService.selectNodes(
@@ -178,7 +240,7 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * TODO: Use Lucene search to get file attributes without having to visit the node service
      */
-    public List<FileInfo> listFiles(NodeRef folderNodeRef)
+    public List<FileInfo> listFiles(NodeRef folderNodeRef) throws FileNotFoundException
     {
         // execute the query
         List<NodeRef> nodeRefs = searchService.selectNodes(
@@ -202,7 +264,7 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * TODO: Use Lucene search to get file attributes without having to visit the node service
      */
-    public List<FileInfo> listFolders(NodeRef folderNodeRef)
+    public List<FileInfo> listFolders(NodeRef folderNodeRef) throws FileNotFoundException
     {
         // execute the query
         List<NodeRef> nodeRefs = searchService.selectNodes(
@@ -227,6 +289,7 @@ public class FileFolderServiceImpl implements FileFolderService
      * @see #search(NodeRef, String, boolean, boolean, boolean)
      */
     public List<FileInfo> search(NodeRef folderNodeRef, String namePattern, boolean includeSubFolders)
+            throws FileNotFoundException
     {
         return search(folderNodeRef, namePattern, true, true, includeSubFolders);
     }
@@ -240,6 +303,7 @@ public class FileFolderServiceImpl implements FileFolderService
             boolean fileSearch,
             boolean folderSearch,
             boolean includeSubFolders)
+            throws FileNotFoundException
     {
         // shortcut if the search is requesting nothing
         if (!fileSearch && !folderSearch)
@@ -312,5 +376,153 @@ public class FileFolderServiceImpl implements FileFolderService
                     "   results: " + results);
         }
         return results;
+    }
+
+    public List<String> getNamePath(NodeRef nodeRef) throws FileNotFoundException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @see #move(NodeRef, NodeRef, String)
+     */
+    public FileInfo rename(NodeRef sourceNodeRef, String newName) throws FileExistsException, FileNotFoundException
+    {
+        return move(sourceNodeRef, null, newName);
+    }
+
+    /**
+     * @see #moveOrCopy(NodeRef, NodeRef, String, boolean)
+     */
+    public FileInfo move(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName) throws FileExistsException, FileNotFoundException
+    {
+        return moveOrCopy(sourceNodeRef, targetFolderRef, newName, true);
+    }
+    
+    /**
+     * @see #moveOrCopy(NodeRef, NodeRef, String, boolean)
+     */
+    public FileInfo copy(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName) throws FileExistsException, FileNotFoundException
+    {
+        return moveOrCopy(sourceNodeRef, targetFolderRef, newName, false);
+    }
+
+    /**
+     * Implements both move and copy behaviour
+     * 
+     * @param move true to move, otherwise false to copy
+     */
+    private FileInfo moveOrCopy(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName, boolean move) throws FileExistsException, FileNotFoundException
+    {
+        // get file/folder in its current state
+        FileInfo beforeFileInfo = toFileInfo(sourceNodeRef);
+        boolean isFolder = beforeFileInfo.isFolder();
+        // check the name - null means keep the existing name
+        if (newName == null)
+        {
+            newName = beforeFileInfo.getName();
+        }
+        
+        // we need the current association type
+        ChildAssociationRef assocRef = nodeService.getPrimaryParent(sourceNodeRef);
+        if (targetFolderRef == null)
+        {
+            targetFolderRef = assocRef.getParentRef();
+        }
+        
+        // check that the parent folder is good
+        FileInfo parentFileInfo = toFileInfo(targetFolderRef);
+        
+        // there is nothing to do if both the name and parent folder haven't changed
+        if (targetFolderRef.equals(assocRef.getParentRef()) && newName.equals(beforeFileInfo.getName()))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Doing nothing - neither filename or parent has not changed: \n" +
+                        "   parent: " + parentFileInfo + "\n" +
+                        "   before: " + beforeFileInfo + "\n" +
+                        "   new name: " + newName);
+            }
+            return beforeFileInfo;
+        }
+        
+        // check for existing file or folder
+        checkExists(targetFolderRef, newName, isFolder);
+        
+        QName qname = QName.createQName(
+                NamespaceService.CONTENT_MODEL_1_0_URI,
+                QName.createValidLocalName(newName));
+        
+        // move or copy
+        NodeRef targetNodeRef = null;
+        if (move)
+        {
+            // move the node so that the association moves as well
+            ChildAssociationRef newAssocRef = nodeService.moveNode(
+                    sourceNodeRef,
+                    targetFolderRef,
+                    assocRef.getTypeQName(),
+                    qname);
+            targetNodeRef = newAssocRef.getChildRef();
+        }
+        else
+        {
+            // copy the node
+            targetNodeRef = copyService.copy(
+                    sourceNodeRef,
+                    targetFolderRef,
+                    assocRef.getTypeQName(),
+                    qname,
+                    true);
+        }
+        // changed the name property
+        nodeService.setProperty(sourceNodeRef, ContentModel.PROP_NAME, newName);
+        
+        // get the details after the operation
+        FileInfo afterFileInfo = toFileInfo(targetNodeRef);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("" + (move ? "Moved" : "Copied") + " node: \n" +
+                    "   parent: " + parentFileInfo + "\n" +
+                    "   before: " + beforeFileInfo + "\n" +
+                    "   after: " + afterFileInfo);
+        }
+        return afterFileInfo;
+    }
+    
+    public FileInfo create(NodeRef parentFolderRef, String name, QName typeQName)
+            throws FileExistsException, FileNotFoundException
+    {
+        // file or folder
+        boolean isFolder = isFolder(typeQName);
+        
+        // check for existing file or folder
+        checkExists(parentFolderRef, name, isFolder);
+        
+        // create the node
+        QName qname = QName.createQName(
+                NamespaceService.CONTENT_MODEL_1_0_URI,
+                QName.createValidLocalName(name));
+        Map<QName, Serializable> properties = Collections.singletonMap(
+                ContentModel.PROP_NAME,
+                (Serializable) name);
+        ChildAssociationRef assocRef = nodeService.createNode(
+                parentFolderRef,
+                ContentModel.ASSOC_CONTAINS,
+                qname,
+                typeQName,
+                properties);
+        NodeRef nodeRef = assocRef.getChildRef();
+        FileInfo fileInfo = toFileInfo(nodeRef);
+        // done
+        if (logger.isDebugEnabled())
+        {
+            FileInfo parentFileInfo = toFileInfo(parentFolderRef);
+            logger.debug("Created: \n" +
+                    "   parent: " + parentFileInfo + "\n" +
+                    "   created: " + fileInfo);
+        }
+        return fileInfo;
     }
 }

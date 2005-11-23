@@ -256,6 +256,10 @@
          <value>#{NodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>fileFolderService</property-name>
+         <value>#{FileFolderService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>searchService</property-name>
          <value>#{SearchService}</value>
       </managed-property>
@@ -266,14 +270,6 @@
       <managed-property>
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{SearchService}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>nodeOperationsService</property-name>
-         <value>#{CopyService}</value>
       </managed-property>
       <managed-property>
          <property-name>dictionaryService</property-name>
@@ -293,6 +289,10 @@
          <value>#{NodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>fileFolderService</property-name>
+         <value>#{FileFolderService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>searchService</property-name>
          <value>#{SearchService}</value>
       </managed-property>
@@ -303,10 +303,6 @@
       <managed-property>
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
-      </managed-property>
-      <managed-property>
-         <property-name>searchService</property-name>
-         <value>#{SearchService}</value>
       </managed-property>
    </managed-bean>
    
@@ -417,6 +413,10 @@
          <value>#{NodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>fileFolderService</property-name>
+         <value>#{FileFolderService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>searchService</property-name>
          <value>#{SearchService}</value>
       </managed-property>
@@ -450,6 +450,10 @@
          <value>#{NodeService}</value>
       </managed-property>
       <managed-property>
+         <property-name>fileFolderService</property-name>
+         <value>#{FileFolderService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>searchService</property-name>
          <value>#{SearchService}</value>
       </managed-property>
@@ -481,6 +485,10 @@
       <managed-property>
          <property-name>nodeService</property-name>
          <value>#{NodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>fileFolderService</property-name>
+         <value>#{FileFolderService}</value>
       </managed-property>
       <managed-property>
          <property-name>dictionaryService</property-name>

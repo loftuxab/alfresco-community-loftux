@@ -19,7 +19,6 @@ package org.alfresco.web.bean.wizard;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +36,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.model.ForumModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.model.FileExistsException;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.DynamicNamespacePrefixResolver;
@@ -84,7 +83,6 @@ public class NewSpaceWizard extends AbstractWizardBean
    
    // new space wizard specific properties
    private SearchService searchService;
-   private CopyService nodeOperationsService;
    private DictionaryService dictionaryService;
    
    private String createFrom;
@@ -130,20 +128,11 @@ public class NewSpaceWizard extends AbstractWizardBean
             // update the existing node in the repository
             Node currentSpace = this.browseBean.getActionSpace();
             NodeRef nodeRef = currentSpace.getNodeRef();
+            // rename
+            fileFolderService.rename(nodeRef, this.name);
             
-            Map<QName, Serializable> properties = this.nodeService.getProperties(nodeRef);
-            // if the name has changed, the node must move
-            if (!this.name.equals(properties.get(ContentModel.PROP_NAME)))
-            {
-               ChildAssociationRef assocRef = this.nodeService.getPrimaryParent(nodeRef);
-               // the name has changed
-               this.nodeService.moveNode(
-                     nodeRef,
-                     assocRef.getParentRef(),
-                     assocRef.getTypeQName(),
-                     qname);
-            }
             // update the properties
+            Map<QName, Serializable> properties = this.nodeService.getProperties(nodeRef);
             properties.put(ContentModel.PROP_NAME, this.name);
             properties.put(ContentModel.PROP_ICON, this.icon);
             properties.put(ContentModel.PROP_DESCRIPTION, this.description);
@@ -168,17 +157,11 @@ public class NewSpaceWizard extends AbstractWizardBean
                   parentNodeRef = new NodeRef(Repository.getStoreRef(), nodeId);
                }
                
-               Map<QName, Serializable> properties = Collections.singletonMap(
-                       ContentModel.PROP_NAME,
-                       (Serializable) this.name);
-               ChildAssociationRef assocRef = this.nodeService.createNode(
+               FileInfo fileInfo = fileFolderService.create(
                      parentNodeRef,
-                     ContentModel.ASSOC_CONTAINS,
-                     qname,
-                     Repository.resolveToQName(this.spaceType),
-                     properties);
-               
-               NodeRef nodeRef = assocRef.getChildRef();
+                     this.name,
+                     Repository.resolveToQName(this.spaceType));
+               NodeRef nodeRef = fileInfo.getNodeRef();
                newSpaceId = nodeRef.getId();
                
                if (logger.isDebugEnabled())
@@ -199,13 +182,9 @@ public class NewSpaceWizard extends AbstractWizardBean
                // copy the selected space and update the name, description and icon
                NodeRef sourceNode = this.existingSpaceId;
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
-               NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
-                     ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(this.name)),
-                     true);
+               // copy from existing
+               NodeRef copiedNode = this.fileFolderService.copy(sourceNode, parentSpace, this.name).getNodeRef(); 
                // also need to set the new description and icon properties
-               // TODO: remove this when the copy also copies the name
-               this.nodeService.setProperty(copiedNode, ContentModel.PROP_NAME, this.name);
                this.nodeService.setProperty(copiedNode, ContentModel.PROP_DESCRIPTION, this.description);
                this.nodeService.setProperty(copiedNode, ContentModel.PROP_ICON, this.icon);
                
@@ -219,13 +198,9 @@ public class NewSpaceWizard extends AbstractWizardBean
                // copy the selected space and update the name, description and icon
                NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), this.templateSpaceId);
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
-               NodeRef copiedNode = this.nodeOperationsService.copy(sourceNode, parentSpace, 
-                     ContentModel.ASSOC_CONTAINS,
-                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(this.name)), 
-                     true);
+               // copy from the template
+               NodeRef copiedNode = this.fileFolderService.copy(sourceNode, parentSpace, this.name).getNodeRef();
                // also need to set the new description and icon properties
-               // TODO: remove this when the copy also copies the name
-               this.nodeService.setProperty(copiedNode, ContentModel.PROP_NAME, this.name);
                this.nodeService.setProperty(copiedNode, ContentModel.PROP_DESCRIPTION, this.description);
                this.nodeService.setProperty(copiedNode, ContentModel.PROP_ICON, this.icon);
                
@@ -256,10 +231,8 @@ public class NewSpaceWizard extends AbstractWizardBean
                   // get the first item in the list as we from test above there is only one!
                   NodeRef templateNode = templateNodeList.get(0);
                   NodeRef sourceNode = new NodeRef(Repository.getStoreRef(), newSpaceId);
-                  NodeRef templateCopyNode = this.nodeOperationsService.copy(sourceNode, templateNode, 
-                        ContentModel.ASSOC_CONTAINS, 
-                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(this.templateName)));
-                  this.nodeService.setProperty(templateCopyNode, ContentModel.PROP_NAME, this.templateName);
+                  // copy this to the template location
+                  fileFolderService.copy(sourceNode, templateNode, this.templateName);
                }
             }
          }
@@ -285,6 +258,19 @@ public class NewSpaceWizard extends AbstractWizardBean
          
          // add the status message
          Utils.addStatusMessage(FacesMessage.SEVERITY_INFO, statusMsg);
+      }
+      catch (FileExistsException e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         // print status message  
+         String statusMsg = MessageFormat.format(
+               Application.getMessage(
+                     FacesContext.getCurrentInstance(), "error_exists_space"), 
+                     e.getExisting().getName());
+         Utils.addErrorMessage(statusMsg);
+         // no outcome
+         outcome = null;
       }
       catch (Exception e)
       {
@@ -784,22 +770,6 @@ public class NewSpaceWizard extends AbstractWizardBean
    public void setDictionaryService(DictionaryService dictionaryService)
    {
       this.dictionaryService = dictionaryService;
-   }
-   
-   /**
-    * @return Returns the NodeOperationsService.
-    */
-   public CopyService getNodeOperationsService()
-   {
-      return this.nodeOperationsService;
-   }
-
-   /**
-    * @param nodeOperationsService   The NodeOperationsService to set.
-    */
-   public void setNodeOperationsService(CopyService nodeOperationsService)
-   {
-      this.nodeOperationsService = nodeOperationsService;
    }
    
    /**

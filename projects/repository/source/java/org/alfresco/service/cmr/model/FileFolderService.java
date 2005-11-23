@@ -19,6 +19,7 @@ package org.alfresco.service.cmr.model;
 import java.util.List;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Provides methods specific to manipulating {@link org.alfresco.model.ContentModel#TYPE_CONTENT files}
@@ -35,37 +36,42 @@ public interface FileFolderService
      * 
      * @param folderNodeRef the folder to start searching in
      * @return Returns a list of matching files and folders
+     * @throws FileNotFoundException if the search context could not be found
      */
-    public List<FileInfo> list(NodeRef folderNodeRef);
+    public List<FileInfo> list(NodeRef folderNodeRef) throws FileNotFoundException;
     
     /**
      * Lists all immediate child files of the given context folder
      * 
      * @param folderNodeRef the folder to start searching in
      * @return Returns a list of matching files
+     * @throws FileNotFoundException if the search context could not be found
      */
-    public List<FileInfo> listFiles(NodeRef folderNodeRef);
+    public List<FileInfo> listFiles(NodeRef folderNodeRef) throws FileNotFoundException;
     
     /**
      * Lists all immediate child folders of the given context folder
      * 
      * @param folderNodeRef the folder to start searching in
      * @return Returns a list of matching folders
+     * @throws FileNotFoundException if the search context could not be found
      */
-    public List<FileInfo> listFolders(NodeRef folderNodeRef);
+    public List<FileInfo> listFolders(NodeRef folderNodeRef) throws FileNotFoundException;
 
     /**
-     * Searches for all files and folders with the matching name pattern.
+     * Searches for all files and folders with the matching name pattern,
+     * using wildcard characters <b>*</b> and <b>?</b>.
      * 
      * @see #search(NodeRef, String, boolean, boolean, boolean)
      */
     public List<FileInfo> search(
             NodeRef folderNodeRef,
             String namePattern,
-            boolean includeSubFolders);
+            boolean includeSubFolders) throws FileNotFoundException;
     
     /**
      * Perform a search against the name of the files or folders within a hierarchy.
+     * Wildcard characters are <b>*</b> and <b>?</b>.
      * 
      * @param folderNodeRef the context of the search.  This node will never be returned
      *      as part of the search results.
@@ -76,11 +82,65 @@ public interface FileFolderService
      * @param folderSearch true if folder types are to be included in the search results
      * @param includeSubFolders true to search the entire hierarchy below the search context
      * @return Returns a list of file or folder matches
+     * @throws FileNotFoundException if the search context could not be found
      */
     public List<FileInfo> search(
             NodeRef folderNodeRef,
             String namePattern,
             boolean fileSearch,
             boolean folderSearch,
-            boolean includeSubFolders);
+            boolean includeSubFolders) throws FileNotFoundException;
+    
+    /**
+     * Get the file or folder names from the root down to and including the node provided.
+     * The root is defined as the first non-folder parent node along the primary parent-child
+     * relationships or the root of the workspace, whichever comes first when browsing up
+     * from the given node.
+     * 
+     * @param nodeRef a reference to the file or folder
+     * @return Returns a list of file/folder names from the root down to and including the
+     *      given file or folder
+     * @throws FileNotFoundException if the node could not be found
+     */
+    public List<String> getNamePath(NodeRef nodeRef) throws FileNotFoundException;
+    
+    /**
+     * Rename a file or folder in its current location
+     * 
+     * @param fileFolderRef the file or folder to rename
+     * @param newName the new name
+     * @return Return the new file info
+     * @throws FileExistsException if a file or folder with the new name already exists
+     * @throws FileNotFoundException the file or folder reference doesn't exist
+     */
+    public FileInfo rename(NodeRef fileFolderRef, String newName) throws FileExistsException, FileNotFoundException;
+    
+    /**
+     * Move a file or folder to a new name and/or location.
+     * 
+     * @param sourceNodeRef the file or folder to move
+     * @param targetFolderRef the new folder to move the node to - null means rename in situ
+     * @param newName the name to change the file or folder to - null to keep the existing name
+     * @return Returns the new file info
+     * @throws FileExistsException
+     * @throws FileNotFoundException
+     */
+    public FileInfo move(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName)
+            throws FileExistsException, FileNotFoundException;
+
+    public FileInfo copy(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName)
+            throws FileExistsException, FileNotFoundException;
+
+    /**
+     * Create a file or folder; or any valid node of type derived from file or folder
+     * 
+     * @param parentFolderRef the parent folder
+     * @param name the name of the node
+     * @param typeQName the type to create
+     * @return Returns the new node's file information
+     * @throws FileExistsException
+     * @throws FileNotFoundException
+     */
+    public FileInfo create(NodeRef parentFolderRef, String name, QName typeQName)
+            throws FileExistsException, FileNotFoundException;
 }

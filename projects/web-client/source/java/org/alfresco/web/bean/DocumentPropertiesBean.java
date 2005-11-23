@@ -31,12 +31,12 @@ import javax.transaction.UserTransaction;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.ConfigService;
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.model.FileExistsException;
+import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -44,7 +44,6 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
@@ -65,6 +64,7 @@ public class DocumentPropertiesBean
    private static final String TEMP_PROP_MIMETYPE = "mimetype";
    
    private NodeService nodeService;
+   private FileFolderService fileFolderService;
    private DictionaryService dictionaryService;
    private BrowseBean browseBean;
    private List<SelectItem> contentTypes;
@@ -118,14 +118,21 @@ public class DocumentPropertiesBean
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
          
-         Map<QName, Serializable> properties = this.nodeService.getProperties(
-               this.browseBean.getDocument().getNodeRef());
+         NodeRef nodeRef = this.browseBean.getDocument().getNodeRef();
+         Map<String, Object> props = this.editableNode.getProperties();
          
+         // get the name and move the node as necessary
+         String name = (String) props.get(ContentModel.PROP_NAME);
+         if (name != null)
+         {
+            fileFolderService.rename(nodeRef, name);
+         }
+         
+         Map<QName, Serializable> properties = this.nodeService.getProperties(nodeRef);
          // we need to put all the properties from the editable bag back into 
          // the format expected by the repository
          
          // but first extract and deal with the special mimetype property for ContentData
-         Map<String, Object> props = this.editableNode.getProperties();
          String mimetype = (String)props.get(TEMP_PROP_MIMETYPE);
          if (mimetype != null)
          {
@@ -134,7 +141,7 @@ public class DocumentPropertiesBean
             ContentData contentData = (ContentData)props.get(ContentModel.PROP_CONTENT);
             if (contentData != null)
             {
-               contentData = contentData.setMimetype(contentData, mimetype);
+               contentData = ContentData.setMimetype(contentData, mimetype);
                props.put(ContentModel.PROP_CONTENT.toString(), contentData);
             }
          }
@@ -206,6 +213,19 @@ public class DocumentPropertiesBean
          
          // reset the document held by the browse bean as it's just been updated
          this.browseBean.getDocument().reset();
+      }
+      catch (FileExistsException e)
+      {
+         // rollback the transaction
+         try { if (tx != null) {tx.rollback();} } catch (Exception ex) {}
+         // print status message  
+         String statusMsg = MessageFormat.format(
+               Application.getMessage(
+                     FacesContext.getCurrentInstance(), "error_exists_file"), 
+                     e.getExisting().getName());
+         Utils.addErrorMessage(statusMsg);
+         // no outcome
+         outcome = null;
       }
       catch (InvalidNodeRefException err)
       {
@@ -297,6 +317,14 @@ public class DocumentPropertiesBean
       this.nodeService = nodeService;
    }
    
+   /**
+    * @param fileFolderService the file and folder model-specific functions
+    */
+   public void setFileFolderService(FileFolderService fileFolderService)
+   {
+      this.fileFolderService = fileFolderService;
+   }
+
    /**
     * Sets the DictionaryService to use when persisting metadata
     * 
