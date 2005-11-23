@@ -86,7 +86,7 @@ public class DocumentDetailsBean
    private OwnableService ownableService;
    private NavigationBean navigator;
    
-   private Map<String, Boolean> panels = new HashMap(5, 1.0f);
+   private Map<String, Boolean> panels = new HashMap<String, Boolean>(5, 1.0f);
    
    private Map<String, Serializable> workflowProperties;
    private NodeRef addedCategory;
