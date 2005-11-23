@@ -14,10 +14,11 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.action.evaluator;
+package org.alfresco.repo.action.evaluator.compare;
 
 import java.io.Serializable;
 
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 
@@ -34,7 +35,7 @@ public class NumericPropertyValueComparator implements PropertyValueComparator
     private static final String MSGID_INVALID_OPERATION = "numeric_property_value_comparator.invalid_operation";
     
     /**
-     * @see org.alfresco.repo.action.evaluator.PropertyValueComparator#compare(java.io.Serializable, java.io.Serializable, org.alfresco.repo.action.evaluator.ComparePropertyValueOperation)
+     * @see org.alfresco.repo.action.evaluator.compare.PropertyValueComparator#compare(java.io.Serializable, java.io.Serializable, org.alfresco.repo.action.evaluator.compare.ComparePropertyValueOperation)
      */
     public boolean compare(
             Serializable propertyValue,
@@ -91,7 +92,7 @@ public class NumericPropertyValueComparator implements PropertyValueComparator
     }
 
     /**
-     * @see org.alfresco.repo.action.evaluator.PropertyValueComparator#registerComparator(org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator)
+     * @see org.alfresco.repo.action.evaluator.compare.PropertyValueComparator#registerComparator(org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator)
      */
     public void registerComparator(ComparePropertyValueEvaluator evaluator)
     {

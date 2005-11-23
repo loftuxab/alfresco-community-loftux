@@ -1,4 +1,4 @@
-package org.alfresco.repo.action.evaluator;
+package org.alfresco.repo.action.evaluator.compare;
 
 /**
  * ComparePropertyValueOperation enum.

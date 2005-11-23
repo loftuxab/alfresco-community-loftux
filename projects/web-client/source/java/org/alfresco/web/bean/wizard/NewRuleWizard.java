@@ -36,6 +36,7 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.action.evaluator.CompareMimeTypeEvaluator;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.evaluator.HasAspectEvaluator;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
@@ -44,6 +45,7 @@ import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
@@ -78,6 +80,7 @@ public class NewRuleWizard extends BaseActionWizard
    public static final String PROP_PROPERTY = "property";
    public static final String PROP_CONTAINS_TEXT = "containstext";
    public static final String PROP_MODEL_TYPE = "modeltype";
+   public static final String PROP_MIMETYPE = "mimetype";
    public static final String PROP_MODEL_ASPECT = "modelaspect";
    public static final String PROP_TYPE_OR_ASPECT = "typeoraspect";
    
@@ -110,6 +113,7 @@ public class NewRuleWizard extends BaseActionWizard
    private RulesBean rulesBean;
    
    private List<SelectItem> modelTypes;
+   private List<SelectItem> mimeTypes;
    private List<SelectItem> types;
    private List<SelectItem> conditions;
    private List<SelectItem> typesAndAspects;
@@ -885,6 +889,14 @@ public class NewRuleWizard extends BaseActionWizard
    }
    
    /**
+    * @param mimetypeService Sets the mimetype service to use
+    */
+   public void setMimetypeService(MimetypeService mimetypeService)
+   {
+      this.mimetypeService = mimetypeService;
+   }
+   
+   /**
     * Sets the RulesBean instance to be used by the wizard in edit mode
     * 
     * @param rulesBean The RulesBean
@@ -981,6 +993,31 @@ public class NewRuleWizard extends BaseActionWizard
       }
       
       return this.modelTypes;
+   }
+   
+   /**
+    * Returns a list of mime types in the system
+    * 
+    * @return List of mime types
+    */
+   public List<SelectItem> getMimeTypes()
+   {
+       if (this.mimeTypes == null)
+       {
+           this.mimeTypes = new ArrayList<SelectItem>(50);
+           
+           Map<String, String> mimeTypes = mimetypeService.getDisplaysByMimetype();
+           for (String mimeType : mimeTypes.keySet())
+           {
+              this.mimeTypes.add(new SelectItem(mimeType, mimeTypes.get(mimeType)));
+           }
+           
+           // make sure the list is sorted by the values
+           QuickSort sorter = new QuickSort(this.mimeTypes, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+           sorter.sort();
+       }
+       
+       return this.mimeTypes;
    }
    
    /**
@@ -1127,6 +1164,10 @@ public class NewRuleWizard extends BaseActionWizard
          // add the aspect
          repoParams.put(HasAspectEvaluator.PARAM_ASPECT, QName.createQName((String)params.get(PROP_ASPECT)));
       }
+      else if (condName.equals(CompareMimeTypeEvaluator.NAME))
+      {
+          repoParams.put(CompareMimeTypeEvaluator.PARAM_VALUE, params.get(PROP_MIMETYPE));
+      }
       
       return repoParams;
    }
@@ -1161,6 +1202,10 @@ public class NewRuleWizard extends BaseActionWizard
       else if (name.equals(HasAspectEvaluator.NAME))
       {
          condProps.put(PROP_ASPECT, ((QName)repoCondProps.get(HasAspectEvaluator.PARAM_ASPECT)).toString());
+      }
+      else if (name.equals(CompareMimeTypeEvaluator.NAME))
+      {
+          condProps.put(PROP_MIMETYPE, repoCondProps.get(CompareMimeTypeEvaluator.PARAM_VALUE));
       }
       
       // specify whether the condition result should be inverted
@@ -1234,6 +1279,18 @@ public class NewRuleWizard extends BaseActionWizard
             for (SelectItem item : this.getAspects())
             {
                if (item.getValue().equals(aspectName))
+               {
+                  summary.append("'").append(item.getLabel()).append("'");
+                  break;
+               }
+            }
+         }
+         else if (CompareMimeTypeEvaluator.NAME.equals(condName))
+         {
+            String mimetype = (String)props.get(PROP_MIMETYPE);
+            for (SelectItem item : this.getMimeTypes())
+            {
+               if (item.getValue().equals(mimetype))
                {
                   summary.append("'").append(item.getLabel()).append("'");
                   break;

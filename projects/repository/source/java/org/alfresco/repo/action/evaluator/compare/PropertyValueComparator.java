@@ -14,9 +14,11 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.action.evaluator;
+package org.alfresco.repo.action.evaluator.compare;
 
 import java.io.Serializable;
+
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 
 /**
  * Property value comparator interface
@@ -41,7 +43,7 @@ public interface PropertyValueComparator
      * @return                  the result of the comparision, true if successful false otherwise
      */
     boolean compare(
-            Serializable propertyValue, 
+            Serializable propertyValue,             
             Serializable compareValue, 
             ComparePropertyValueOperation operation);
 }

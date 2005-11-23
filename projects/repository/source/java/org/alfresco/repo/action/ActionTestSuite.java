@@ -19,9 +19,12 @@ package org.alfresco.repo.action;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.alfresco.repo.action.evaluator.CompareMimeTypeEvaluatorTest;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluatorTest;
 import org.alfresco.repo.action.evaluator.HasAspectEvaluatorTest;
 import org.alfresco.repo.action.evaluator.IsSubTypeEvaluatorTest;
+import org.alfresco.repo.action.executer.AddFeaturesActionExecuterTest;
+import org.alfresco.repo.action.executer.ContentMetadataExtracterTest;
 import org.alfresco.repo.action.executer.SetPropertyValueActionExecuterTest;
 
 
@@ -51,10 +54,13 @@ public class ActionTestSuite extends TestSuite
         // Test evaluators
         suite.addTestSuite(IsSubTypeEvaluatorTest.class);
         suite.addTestSuite(ComparePropertyValueEvaluatorTest.class);
+        suite.addTestSuite(CompareMimeTypeEvaluatorTest.class);
         suite.addTestSuite(HasAspectEvaluatorTest.class);
         
         // Test executors
         suite.addTestSuite(SetPropertyValueActionExecuterTest.class);
+        suite.addTestSuite(AddFeaturesActionExecuterTest.class);
+        suite.addTestSuite(ContentMetadataExtracterTest.class);
         
         return suite;
     }

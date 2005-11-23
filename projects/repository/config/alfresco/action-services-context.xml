@@ -72,17 +72,22 @@
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>
+        <property name="contentService">
+            <ref bean="contentService" />
+        </property>
         <property name="dictionaryService">
             <ref bean="dictionaryService" />
         </property>
         <property name="propertyValueComparators">
             <list>
-            	<bean class="org.alfresco.repo.action.evaluator.TextPropertyValueComparator"/>
-            	<bean class="org.alfresco.repo.action.evaluator.NumericPropertyValueComparator"/>
-            	<bean class="org.alfresco.repo.action.evaluator.DatePropertyValueComparator"/>
+            	<bean class="org.alfresco.repo.action.evaluator.compare.TextPropertyValueComparator"/>
+            	<bean class="org.alfresco.repo.action.evaluator.compare.NumericPropertyValueComparator"/>
+            	<bean class="org.alfresco.repo.action.evaluator.compare.DatePropertyValueComparator"/>
             </list>
         </property>
     </bean>
+    
+    <bean id="compare-mime-type" class="org.alfresco.repo.action.evaluator.CompareMimeTypeEvaluator" parent="compare-property-value"/>
 
     <bean id="in-category" class="org.alfresco.repo.action.evaluator.InCategoryEvaluator" parent="action-condition-evaluator">
         <property name="nodeService">

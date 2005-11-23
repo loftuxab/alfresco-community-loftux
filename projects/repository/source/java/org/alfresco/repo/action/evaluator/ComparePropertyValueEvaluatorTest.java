@@ -23,12 +23,17 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ActionConditionImpl;
+import org.alfresco.repo.action.evaluator.compare.ComparePropertyValueOperation;
+import org.alfresco.repo.action.evaluator.compare.ContentPropertyName;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.repo.dictionary.M2Type;
 import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -61,6 +66,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
     
     private DictionaryDAO dictionaryDAO;
     private NodeService nodeService;
+    private ContentService contentService;
     private StoreRef testStoreRef;
     private NodeRef rootNodeRef;
     private NodeRef nodeRef;
@@ -86,6 +92,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         createTestModel();
         
         this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
+        this.contentService = (ContentService)this.applicationContext.getBean("contentService");
         
         // Create the store and get the root node
         this.testStoreRef = this.nodeService.createStore(
@@ -136,7 +143,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, INT_VALUE);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -146,7 +153,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals greater than operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, 99);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -156,7 +163,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals greater than operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, 99);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -169,7 +176,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals less than operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, 101);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -179,7 +186,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals less than equals operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, 101);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -192,11 +199,11 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Ensure other operators are invalid
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {exception.printStackTrace();};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};  
     }
     
@@ -218,7 +225,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test the equals operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, this.dateValue);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -228,7 +235,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals greater than operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, this.beforeDateValue);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -238,7 +245,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals greater than operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, this.beforeDateValue);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -251,7 +258,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals less than operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, this.afterDateValue);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -261,7 +268,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals less than equals operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, this.afterDateValue);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -274,11 +281,11 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Ensure other operators are invalid
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {exception.printStackTrace();};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};  
     }
     
@@ -312,7 +319,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals operator
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, TEXT_VALUE);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -322,7 +329,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test contains operator
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "Document");
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -332,7 +339,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test begins operator
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "my");
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -342,7 +349,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test ends operator
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "doc");
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -352,13 +359,13 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Ensure other operators are invalid
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {exception.printStackTrace();};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
     }
     
@@ -385,7 +392,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Test equals operation
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.EQUALS.toString());
         
         condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, this.nodeValue);
         assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
@@ -395,20 +402,58 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         
         // Ensure other operators are invalid
         
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.BEGINS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) { exception.printStackTrace();};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.ENDS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.CONTAINS.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.GREATER_THAN_EQUAL.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
-        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN_EQUAL.toString());
         try { this.evaluator.evaluate(condition, this.nodeRef); fail("An exception should have been raised here."); } catch (ActionServiceException exception) {};
+        
+    }
+    
+    public void testContentPropertyComparisons()
+    {
+        ActionConditionImpl condition = new ActionConditionImpl(GUID.generate(), ComparePropertyValueEvaluator.NAME);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_PROPERTY, ContentModel.PROP_CONTENT);
+        
+        // What happens if you do this and the node has no content set yet !!
+        
+        // Add some content to the node reference
+        ContentWriter contentWriter = this.contentService.getWriter(this.nodeRef, ContentModel.PROP_CONTENT, true);
+        contentWriter.setEncoding("UTF-8");
+        contentWriter.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        contentWriter.putContent("This is some test content.");        
+        
+        // Test matching the mimetype
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_CONTENT_PROPERTY, ContentPropertyName.MIME_TYPE.toString());
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, MimetypeMap.MIMETYPE_HTML);
+        assertFalse(this.evaluator.evaluate(condition, this.nodeRef));
+        
+        // Test matching the encoding
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_CONTENT_PROPERTY, ContentPropertyName.ENCODING.toString());
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "UTF-8");
+        assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "UTF-16");
+        assertFalse(this.evaluator.evaluate(condition, this.nodeRef));
+        
+        // Test comparision to the size of the content
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_CONTENT_PROPERTY, ContentPropertyName.SIZE.toString());
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_OPERATION, ComparePropertyValueOperation.LESS_THAN.toString());
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, 50);
+        assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, 2);
+        assertFalse(this.evaluator.evaluate(condition, this.nodeRef));
+        
         
     }
     
@@ -421,7 +466,7 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
         model.createImport(NamespaceService.CONTENT_MODEL_1_0_URI, NamespaceService.CONTENT_MODEL_PREFIX);
 
         M2Type testType = model.createType("test:" + TEST_TYPE_QNAME.getLocalName());
-        testType.setParentName("cm:" + ContentModel.TYPE_CMOBJECT.getLocalName());
+        testType.setParentName("cm:" + ContentModel.TYPE_CONTENT.getLocalName());
         
         M2Property prop1 = testType.createProperty("test:" + PROP_TEXT.getLocalName());
         prop1.setMandatory(false);

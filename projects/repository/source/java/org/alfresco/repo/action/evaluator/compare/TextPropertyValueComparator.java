@@ -14,12 +14,13 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.repo.action.evaluator;
+package org.alfresco.repo.action.evaluator.compare;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.service.cmr.action.ActionServiceException;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 
@@ -41,7 +42,7 @@ public class TextPropertyValueComparator implements PropertyValueComparator
     private static final String STAR = "*";
     
     /**
-     * @see org.alfresco.repo.action.evaluator.PropertyValueComparator#compare(java.io.Serializable, java.io.Serializable, org.alfresco.repo.action.evaluator.ComparePropertyValueOperation)
+     * @see org.alfresco.repo.action.evaluator.compare.PropertyValueComparator#compare(java.io.Serializable, java.io.Serializable, org.alfresco.repo.action.evaluator.compare.ComparePropertyValueOperation)
      */
     public boolean compare(
             Serializable propertyValue,
@@ -161,7 +162,7 @@ public class TextPropertyValueComparator implements PropertyValueComparator
     }
 
     /**
-     * @see org.alfresco.repo.action.evaluator.PropertyValueComparator#registerComparator(org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator)
+     * @see org.alfresco.repo.action.evaluator.compare.PropertyValueComparator#registerComparator(org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator)
      */
     public void registerComparator(ComparePropertyValueEvaluator evaluator)
     {

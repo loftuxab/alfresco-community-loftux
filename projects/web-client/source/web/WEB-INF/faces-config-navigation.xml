@@ -660,6 +660,10 @@
          <to-view-id>/jsp/wizard/new-rule/condition-is-subtype.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>compare-mime-type</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/condition-has-mimetype.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>has-aspect</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/condition-has-aspect.jsp</to-view-id>
       </navigation-case>
