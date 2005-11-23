@@ -265,7 +265,7 @@ public class UIMultiValueEditor extends UIInput
     */
    public void setReadOnly(boolean readOnly)
    {
-      this.readOnly = new Boolean(readOnly);
+      this.readOnly = Boolean.valueOf(readOnly);
    }
    
    /**

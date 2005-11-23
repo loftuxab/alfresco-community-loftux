@@ -55,6 +55,7 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_TYPE = "type";
    public static final String ELEMENT_CUSTOMPROPS = "custom-properties";
    public static final String ELEMENT_METADATA = "meta-data";
+   public static final String ATTRIBUTE_TYPE = "type";
    public static final String ATTRIBUTE_PROPERTY = "property";
    public static final String ATTRIBUTE_ASPECT = "aspect";
    
@@ -202,21 +203,21 @@ public class ClientElementReader implements ConfigElementReader
                   types.add(type);
                }
             }
+            configElement.setContentTypes(types);
             
             // get the list of custom properties to display
             Element customProps = advsearch.element(ELEMENT_CUSTOMPROPS);
-            Iterator<Element> propsItr = contentTypes.elementIterator(ELEMENT_METADATA);
+            Iterator<Element> propsItr = customProps.elementIterator(ELEMENT_METADATA);
             List<CustomProperty> props = new ArrayList<CustomProperty>(5);
             while (propsItr.hasNext())
             {
                Element propElement = propsItr.next();
-               String type = propElement.attributeValue(ATTRIBUTE_NAME);
+               String type = propElement.attributeValue(ATTRIBUTE_TYPE);
                String aspect = propElement.attributeValue(ATTRIBUTE_ASPECT);
                String prop = propElement.attributeValue(ATTRIBUTE_PROPERTY);
                props.add(new ClientConfigElement.CustomProperty(type, aspect, prop));
             }
-            
-            configElement.setContentTypes(types);
+            configElement.setCustomProperties(props);
          }
       }
       

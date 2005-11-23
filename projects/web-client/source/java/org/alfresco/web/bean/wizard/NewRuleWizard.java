@@ -1214,7 +1214,7 @@ public class NewRuleWizard extends BaseActionWizard
       }
       
       // specify whether the condition result should be inverted
-      condProps.put(PROP_CONDITION_NOT, new Boolean(condition.getInvertCondition()));
+      condProps.put(PROP_CONDITION_NOT, Boolean.valueOf(condition.getInvertCondition()));
       
       // generate the summary 
       condProps.put(PROP_CONDITION_SUMMARY, buildConditionSummary(condProps));

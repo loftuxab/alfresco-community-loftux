@@ -556,7 +556,7 @@ public class DocumentDetailsBean
          {
             approveMove = false;
          }
-         updateProps.put(ContentModel.PROP_APPROVE_MOVE, new Boolean(approveMove));
+         updateProps.put(ContentModel.PROP_APPROVE_MOVE, Boolean.valueOf(approveMove));
          
          // create node ref representation of the destination folder
          updateProps.put(ContentModel.PROP_APPROVE_FOLDER,
@@ -585,7 +585,7 @@ public class DocumentDetailsBean
             {
                rejectMove = false;
             }
-            updateProps.put(ContentModel.PROP_REJECT_MOVE, new Boolean(rejectMove));
+            updateProps.put(ContentModel.PROP_REJECT_MOVE, Boolean.valueOf(rejectMove));
 
             // create node ref representation of the destination folder
             updateProps.put(ContentModel.PROP_REJECT_FOLDER,

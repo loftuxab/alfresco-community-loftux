@@ -17,11 +17,18 @@
 package org.alfresco.web.bean;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.faces.context.FacesContext;
+
+import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.impl.lucene.QueryParser;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.bean.repository.Repository;
@@ -62,11 +69,14 @@ public final class SearchContext implements Serializable
    /** content type to restrict search against */
    private String contentType = null;
    
-   /** any additional attribute to add to the search */
-   private Map<QName, String> additionalAttributes = new HashMap<QName, String>(5, 1.0f);
+   /** any extra query attributes to add to the search */
+   private Map<QName, String> queryAttributes = new HashMap<QName, String>(5, 1.0f);
    
    /** any additional range attribute to add to the search */
    private Map<QName, RangeProperties> rangeAttributes = new HashMap<QName, RangeProperties>(5, 1.0f);
+   
+   /** any additional fixed value attributes to add to the search, such as boolean or noderef */
+   private Map<QName, String> queryFixedValues = new HashMap<QName, String>(5, 1.0f);
    
    /** logger */
    private static Log logger = LogFactory.getLog(SearchContext.class);
@@ -79,7 +89,6 @@ public final class SearchContext implements Serializable
     */
    public String buildQuery()
    {
-      // TODO: change this to use a StringBuilder
       String query;
       
       // the QName for the well known "name" attribute
@@ -87,15 +96,26 @@ public final class SearchContext implements Serializable
       
       // match against content text
       String text = this.text.trim();
-      String safeText = QueryParser.escape(text);
       String fullTextQuery;
       String nameAttrQuery;
       
       if (text.indexOf(' ') == -1)
       {
          // simple single word text search
-         fullTextQuery = " TEXT:" + safeText + '*';
-         nameAttrQuery = " @" + nameAttr + ":" + safeText + '*';
+         if (text.charAt(0) != '*')
+         {
+            // escape characters and append the wildcard character
+            String safeText = QueryParser.escape(text);
+            fullTextQuery = " TEXT:" + safeText + '*';
+            nameAttrQuery = " @" + nameAttr + ":" + safeText + '*';
+         }
+         else
+         {
+            // found a leading wildcard - prepend it again after escaping the other characters
+            String safeText = QueryParser.escape(text.substring(1));
+            fullTextQuery = " TEXT:*" + safeText + '*';
+            nameAttrQuery = " @" + nameAttr + ":*" + safeText + '*';
+         }
       }
       else
       {
@@ -103,23 +123,33 @@ public final class SearchContext implements Serializable
          if (text.charAt(0) == '"' && text.charAt(text.length() - 1) == '"')
          {
             // as quoted phrase
-            fullTextQuery = " TEXT:" + text;
-            nameAttrQuery = " @" + nameAttr + ":" + text;
+            String quotedSafeText = '"' + QueryParser.escape(text.substring(1, text.length() - 1)) + '"';
+            fullTextQuery = " TEXT:" + quotedSafeText;
+            nameAttrQuery = " @" + nameAttr + ":" + quotedSafeText;
          }
          else
          {
             // as individual search terms
-            StringTokenizer t = new StringTokenizer(safeText, " ");
+            StringTokenizer t = new StringTokenizer(text, " ");
             StringBuilder fullTextBuf = new StringBuilder(64);
             StringBuilder nameAttrBuf = new StringBuilder(64);
             fullTextBuf.append('(');
             nameAttrBuf.append('(');
             while (t.hasMoreTokens())
             {
-               String term = QueryParser.escape(t.nextToken());
-               
-               fullTextBuf.append("TEXT:").append(term).append('*');
-               nameAttrBuf.append("@").append(nameAttr).append(":").append(term).append('*');
+               String term = t.nextToken();
+               if (term.charAt(0) != '*')
+               {
+                  String safeTerm = QueryParser.escape(term);
+                  fullTextBuf.append("TEXT:").append(safeTerm).append('*');
+                  nameAttrBuf.append("@").append(nameAttr).append(":").append(safeTerm).append('*');
+               }
+               else
+               {
+                  String safeTerm = QueryParser.escape(term.substring(1));
+                  fullTextBuf.append("TEXT:*").append(safeTerm).append('*');
+                  nameAttrBuf.append("@").append(nameAttr).append(":*").append(safeTerm).append('*');
+               }
                if (t.hasMoreTokens())
                {
                   fullTextBuf.append(" OR ");
@@ -133,7 +163,7 @@ public final class SearchContext implements Serializable
          }
       }
       
-      // match a specific PATH
+      // match a specific PATH for space location or categories
       StringBuilder pathQuery = null;
       if (location != null || (categories != null && categories.length !=0))
       {
@@ -155,17 +185,33 @@ public final class SearchContext implements Serializable
          }
       }
       
-      // match any additional attribute values specified
+      // match any extra query attribute values specified
       StringBuilder attributeQuery = null;
-      if (additionalAttributes.size() != 0)
+      if (queryAttributes.size() != 0)
       {
-         attributeQuery = new StringBuilder(additionalAttributes.size() << 5);
-         for (QName qname : additionalAttributes.keySet())
+         attributeQuery = new StringBuilder(queryAttributes.size() << 6);
+         for (QName qname : queryAttributes.keySet())
          {
             String escapedName = Repository.escapeQName(qname);
-            String value = QueryParser.escape(additionalAttributes.get(qname));
+            String value = QueryParser.escape(queryAttributes.get(qname));
             attributeQuery.append(" +@").append(escapedName)
-                          .append(":").append(value);
+                          .append(":").append(value).append('*');
+         }
+      }
+      
+      // match any extra fixed value attributes specified
+      if (queryFixedValues.size() != 0)
+      {
+         if (attributeQuery == null)
+         {
+            attributeQuery = new StringBuilder(queryFixedValues.size() << 6);
+         }
+         for (QName qname : queryFixedValues.keySet())
+         {
+            String escapedName = Repository.escapeQName(qname);
+            String value = queryFixedValues.get(qname);
+            attributeQuery.append(" +@").append(escapedName)
+                          .append(":\"").append(value).append('"');
          }
       }
       
@@ -174,7 +220,7 @@ public final class SearchContext implements Serializable
       {
          if (attributeQuery == null)
          {
-            attributeQuery = new StringBuilder(rangeAttributes.size() << 5);
+            attributeQuery = new StringBuilder(rangeAttributes.size() << 6);
          }
          for (QName qname : rangeAttributes.keySet())
          {
@@ -183,7 +229,8 @@ public final class SearchContext implements Serializable
             String value1 = QueryParser.escape(rp.lower);
             String value2 = QueryParser.escape(rp.upper);
             attributeQuery.append(" +@").append(escapedName)
-                          .append(":").append(rp.inclusive ? "[" : "{").append(value1).append(" TO ").append(value2).append(rp.inclusive ? "]" : "}");
+                          .append(":").append(rp.inclusive ? "[" : "{").append(value1)
+                          .append(" TO ").append(value2).append(rp.inclusive ? "]" : "}");
          }
       }
       
@@ -241,6 +288,54 @@ public final class SearchContext implements Serializable
          logger.debug("Query: " + query);
       
       return query;
+   }
+   
+   /**
+    * Generate a search XPATH pointing to the specified node Id, optionally return an XPATH
+    * that includes the child nodes.
+    *  
+    * @param id         Of the node to generate path too
+    * @param children   Whether to include children of the node
+    * 
+    * @return the path
+    */
+   /*package*/ static String getPathFromSpaceRef(NodeRef ref, boolean children)
+   {
+      FacesContext context = FacesContext.getCurrentInstance();
+      Path path = Repository.getServiceRegistry(context).getNodeService().getPath(ref);
+      NamespaceService ns = Repository.getServiceRegistry(context).getNamespaceService();
+      StringBuilder buf = new StringBuilder(64);
+      for (int i=0; i<path.size(); i++)
+      {
+         String elementString = "";
+         Path.Element element = path.get(i);
+         if (element instanceof Path.ChildAssocElement)
+         {
+            ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
+            if (elementRef.getParentRef() != null)
+            {
+               Collection prefixes = ns.getPrefixes(elementRef.getQName().getNamespaceURI());
+               if (prefixes.size() >0)
+               {
+                  elementString = '/' + (String)prefixes.iterator().next() + ':' + ISO9075.encode(elementRef.getQName().getLocalName());
+               }
+            }
+         }
+         
+         buf.append(elementString);
+      }
+      if (children == true)
+      {
+         // append syntax to get all children of the path
+         buf.append("//*");
+      }
+      else
+      {
+         // append syntax to just represent the path, not the children
+         buf.append("/*");
+      }
+      
+      return buf.toString();
    }
    
    /**
@@ -364,9 +459,9 @@ public final class SearchContext implements Serializable
     * @param qname      QName of the attribute to search against
     * @param value      Value of the attribute to use
     */
-   public void addAdditionalAttribute(QName qname, String value)
+   public void addAttributeQuery(QName qname, String value)
    {
-      this.additionalAttributes.put(qname, value);
+      this.queryAttributes.put(qname, value);
    }
    
    /**
@@ -380,6 +475,17 @@ public final class SearchContext implements Serializable
    public void addRangeQuery(QName qname, String lower, String upper, boolean inclusive)
    {
       this.rangeAttributes.put(qname, new RangeProperties(qname, lower, upper, inclusive));
+   }
+   
+   /**
+    * Add an additional fixed value attribute to search against
+    * 
+    * @param qname      QName of the attribute to search against
+    * @param value      Fixed value of the attribute to use
+    */
+   public void addFixedValueQuery(QName qname, String value)
+   {
+      this.queryFixedValues.put(qname, value);
    }
    
    

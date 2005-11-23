@@ -295,7 +295,7 @@ public class DocumentPropertiesBean
          Config configProps = configSvc.getConfig(this.editableNode, new ConfigLookupContext("edit-properties"));
          PropertySheetConfigElement propsToDisplay = (PropertySheetConfigElement)configProps.
                getConfigElement("property-sheet");
-         this.hasOtherProperties = new Boolean(propsToDisplay != null);
+         this.hasOtherProperties = Boolean.valueOf(propsToDisplay != null);
       }
       
       return this.hasOtherProperties.booleanValue();

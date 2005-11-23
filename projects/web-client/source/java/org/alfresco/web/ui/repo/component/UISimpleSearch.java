@@ -76,7 +76,7 @@ public class UISimpleSearch extends UICommand
     */
    public Object saveState(FacesContext context)
    {
-      Object values[] = new Object[3];
+      Object values[] = new Object[2];
       // standard component attributes are saved by the super class
       values[0] = super.saveState(context);
       values[1] = this.search;

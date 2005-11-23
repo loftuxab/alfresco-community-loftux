@@ -177,8 +177,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
             approveMove = false;
          }
          
-         actionParams.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_MOVE,
-               new Boolean(approveMove));
+         actionParams.put(SimpleWorkflowActionExecuter.PARAM_APPROVE_MOVE, Boolean.valueOf(approveMove));
          
          // add the destination folder of the content
          NodeRef approveDestNodeRef = null;
@@ -215,8 +214,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
                rejectMove = false;
             }
             
-            actionParams.put(SimpleWorkflowActionExecuter.PARAM_REJECT_MOVE,
-                  new Boolean(rejectMove));
+            actionParams.put(SimpleWorkflowActionExecuter.PARAM_REJECT_MOVE, Boolean.valueOf(rejectMove));
             
             // add the destination folder of the content
             NodeRef rejectDestNodeRef = null;

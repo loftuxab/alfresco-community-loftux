@@ -47,9 +47,6 @@
             </content-types>
             <!-- custom properties to be shown in the More Options panel -->
             <custom-properties>
-               <meta-data type="cm:modelAuthor" property="cm:dictionaryModel" />
-               <meta-data type="cm:modelAuthor" property="cm:dictionaryModel" />
-               <meta-data aspect="app:simpleworkflow" property="app:approveStep" />
             </custom-properties>
          </advanced-search>
          

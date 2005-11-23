@@ -228,7 +228,7 @@ public class RichListRenderer extends BaseRenderer
          out.write("<tr");
          String rowStyle = (String)richList.getAttributes().get("rowStyleClass");
          String altStyle = (String)richList.getAttributes().get("altRowStyleClass");
-         if (altStyle != null && this.rowIndex++ % 2 == 1)
+         if (altStyle != null && (this.rowIndex++ & 1) == 1)
          {
             rowStyle = altStyle;
          }         
@@ -398,7 +398,7 @@ public class RichListRenderer extends BaseRenderer
          // start new row if we are on an even column in this view
          // we show 2 columns, left to right
          String rowStyle = (String)richList.getAttributes().get("rowStyleClass");
-         if (this.rowIndex % 2 == 0)
+         if ((this.rowIndex & 1) == 0)
          {
             out.write("<tr");
             outputAttribute(out, rowStyle, "class");
@@ -513,7 +513,7 @@ public class RichListRenderer extends BaseRenderer
          
          out.write("</table></td>");
          
-         if (this.rowIndex % 2 == 1)
+         if ((this.rowIndex & 1) == 1)
          {
             // end row and output a blank padding row/div
             out.write(END_ROW_SEPARATOR);
@@ -535,7 +535,7 @@ public class RichListRenderer extends BaseRenderer
          ResponseWriter out = context.getResponseWriter();
          
          // finish last row if required (we used an open-ended column rendering algorithm)
-         if ((this.rowIndex-1) % 2 != 1)
+         if ( ((this.rowIndex-1) & 1) != 1)
          {
             out.write(END_ROW_SEPARATOR);
          }

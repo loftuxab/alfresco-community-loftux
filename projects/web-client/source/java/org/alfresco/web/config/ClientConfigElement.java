@@ -51,6 +51,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    private List<String> languages = new ArrayList<String>(8);
    private String homeSpacePermission = null;
    private List<String> contentTypes = null;
+   private List<CustomProperty> customProps = null;
    
    /**
     * Default Constructor
@@ -314,6 +315,22 @@ public class ClientConfigElement extends ConfigElementAdapter
    /*package*/ void setContentTypes(List<String> contentTypes)
    {
       this.contentTypes = contentTypes;
+   }
+   
+   /**
+    * @return Returns the customProps.
+    */
+   public List<CustomProperty> getCustomProperties()
+   {
+      return this.customProps;
+   }
+
+   /**
+    * @param customProps The customProps to set.
+    */
+   /*package*/ void setCustomProperties(List<CustomProperty> customProps)
+   {
+      this.customProps = customProps;
    }
    
    

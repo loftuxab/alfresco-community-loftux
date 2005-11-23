@@ -254,14 +254,7 @@
                                                    <div style="padding:4px"></div>
                                                    <a:panel label="#{msg.additional_options}" id="custom-panel" style="font-weight:bold" progressive="true"
                                                          expanded='#{AdvancedSearchBean.panels["custom-panel"]}' expandedActionListener="#{AdvancedSearchBean.expandPanel}">
-                                                      <%--<table cellpadding="2" cellspacing="2" border="0">
-                                                         <tr>
-                                                            <td style="padding-left:8px"><h:outputText value="ISBN" id="custom" />:</td><td><h:inputText size="28" maxlength="1024" id="txtCustom" /></td>
-                                                         </tr>
-                                                         <tr>
-                                                            <td style="padding-left:8px"><h:outputText value="InvoiceID" id="custom2" />:</td><td><h:inputText size="28" maxlength="1024" id="txtCustom2" /></td>
-                                                         </tr>
-                                                      </table>--%>
+                                                      <r:searchCustomProperties id="customProps" bean="AdvancedSearchBean" var="customProperties" style="padding-left:12px;padding-top:4px" />
                                                    </a:panel>
                                                 </td>
                                              </tr>

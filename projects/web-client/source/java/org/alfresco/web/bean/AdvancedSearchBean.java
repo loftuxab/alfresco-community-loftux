@@ -18,7 +18,6 @@ package org.alfresco.web.bean;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,30 +29,30 @@ import javax.faces.model.SelectItem;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.search.ISO9075;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.CachingDateFormat;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.config.ClientConfigElement;
+import org.alfresco.web.config.ClientConfigElement.CustomProperty;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
-import org.springframework.web.jsf.FacesContextUtils;
+import org.alfresco.web.ui.repo.component.UISearchCustomProperties;
 
 /**
  * @author Kevin Roast
  */
 public class AdvancedSearchBean
 {
-   private static final String MSG_CONTENT = "content";
    /**
     * Default constructor
     */
@@ -372,6 +371,22 @@ public class AdvancedSearchBean
    {
       this.contentType = contentType;
    }
+   
+   /**
+    * @return Returns the custom properties Map.
+    */
+   public Map<String, Object> getCustomProperties()
+   {
+      return this.customProperties;
+   }
+
+   /**
+    * @param customProperties The custom properties Map to set.
+    */
+   public void setCustomProperties(Map<String, Object> customProperties)
+   {
+      this.customProperties = customProperties;
+   }
 
    /**
     * @param createdDateChecked The createdDateChecked to set.
@@ -396,11 +411,7 @@ public class AdvancedSearchBean
                Application.getMessage(context, MSG_CONTENT)));
          
          // add any configured content sub-types to the list
-         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
-               context).getBean(Application.BEAN_CONFIG_SERVICE);
-         ClientConfigElement clientConfig = (ClientConfigElement)svc.getGlobalConfig().getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
-         
-         List<String> types = clientConfig.getContentTypes();
+         List<String> types = getClientConfig().getContentTypes();
          if (types != null)
          {
             DictionaryService dictionaryService = Repository.getServiceRegistry(context).getDictionaryService();
@@ -455,6 +466,7 @@ public class AdvancedSearchBean
       this.modifiedDateFrom = null;
       this.createdDateChecked = false;
       this.modifiedDateChecked = false;
+      this.customProperties.clear();
    }
    
    /**
@@ -492,15 +504,15 @@ public class AdvancedSearchBean
          // additional attributes search
          if (this.description != null && this.description.length() != 0)
          {
-            search.addAdditionalAttribute(ContentModel.PROP_DESCRIPTION, this.description + '*');
+            search.addAttributeQuery(ContentModel.PROP_DESCRIPTION, this.description);
          }
          if (this.title != null && this.title.length() != 0)
          {
-            search.addAdditionalAttribute(ContentModel.PROP_TITLE, this.title + '*');
+            search.addAttributeQuery(ContentModel.PROP_TITLE, this.title);
          }
          if (this.author != null && this.author.length() != 0)
          {
-            search.addAdditionalAttribute(ContentModel.PROP_CREATOR, this.author + '*');
+            search.addAttributeQuery(ContentModel.PROP_CREATOR, this.author);
          }
          if (this.createdDateChecked == true)
          {
@@ -517,16 +529,74 @@ public class AdvancedSearchBean
             search.addRangeQuery(ContentModel.PROP_MODIFIED, strModifiedDate, strModifiedDateTo, true);
          }
          
+         // walk each of the custom properties add add them as additional attributes
+         for (String qname : this.customProperties.keySet())
+         {
+            Object value = this.customProperties.get(qname);
+            DataTypeDefinition typeDef = getCustomPropertyLookup().get(qname);
+            if (typeDef != null)
+            {
+               QName typeName = typeDef.getName();
+               if (DataTypeDefinition.DATE.equals(typeName) || DataTypeDefinition.DATETIME.equals(typeName))
+               {
+                  // only apply date to search if the user has checked the enable checkbox
+                  if (value != null && Boolean.valueOf(value.toString()) == true)
+                  {
+                     SimpleDateFormat df = CachingDateFormat.getDateFormat();
+                     String strDateFrom = df.format(this.customProperties.get(
+                           UISearchCustomProperties.PREFIX_DATE_FROM + qname));
+                     String strDateTo = df.format(this.customProperties.get(
+                           UISearchCustomProperties.PREFIX_DATE_TO + qname));
+                     search.addRangeQuery(QName.createQName(qname), strDateFrom, strDateTo, true);
+                  }
+               }
+               else if (DataTypeDefinition.BOOLEAN.equals(typeName))
+               {
+                  if (((Boolean)value) == true)
+                  {
+                     search.addFixedValueQuery(QName.createQName(qname), value.toString());
+                  }
+               }
+               else if (DataTypeDefinition.NODE_REF.equals(typeName) || DataTypeDefinition.CATEGORY.equals(typeName))
+               {
+                  if (value != null)
+                  {
+                     search.addFixedValueQuery(QName.createQName(qname), value.toString());
+                  }
+               }
+               else if (DataTypeDefinition.INT.equals(typeName) || DataTypeDefinition.LONG.equals(typeName) ||
+                        DataTypeDefinition.FLOAT.equals(typeName) || DataTypeDefinition.DOUBLE.equals(typeName))
+               {
+                  String strVal = value.toString();
+                  if (strVal != null && strVal.length() != 0)
+                  {
+                     search.addFixedValueQuery(QName.createQName(qname), strVal);
+                  }
+               }
+               else
+               {
+                  // by default use toString() value - this is for text fields and unknown types
+                  String strVal = value.toString();
+                  if (strVal != null && strVal.length() != 0)
+                  {
+                     search.addAttributeQuery(QName.createQName(qname), strVal);
+                  }
+               }
+            }
+         }
+         
          // location path search
          if (this.lookin.equals(LOOKIN_OTHER) && this.location != null)
          {
-            search.setLocation(getPathFromSpaceId(this.location.getId(), this.locationChildren));
+            search.setLocation(SearchContext.getPathFromSpaceRef(
+                  new NodeRef(Repository.getStoreRef(), this.location.getId()), this.locationChildren));
          }
          
          // category path search
          if (this.category != null)
          {
-            search.setCategories(new String[]{getPathFromSpaceId(this.category.getId(), this.categoryChildren)});
+            search.setCategories(new String[]{SearchContext.getPathFromSpaceRef(
+                  new NodeRef(Repository.getStoreRef(), this.category.getId()), this.categoryChildren)});
          }
          
          // content type restriction
@@ -546,6 +616,57 @@ public class AdvancedSearchBean
    }
    
    /**
+    * @return ClientConfigElement
+    */
+   private ClientConfigElement getClientConfig()
+   {
+      if (clientConfigElement == null)
+      {
+         ConfigService configService = Application.getConfigService(FacesContext.getCurrentInstance());
+         clientConfigElement = (ClientConfigElement)configService.getGlobalConfig().getConfigElement(
+               ClientConfigElement.CONFIG_ELEMENT_ID);
+      }
+      return clientConfigElement;
+   }
+   
+   /**
+    * Helper map to lookup custom property QName strings against a DataTypeDefinition
+    * 
+    * @return custom property lookup Map
+    */
+   private Map<String, DataTypeDefinition> getCustomPropertyLookup()
+   {
+      if (customPropertyLookup == null)
+      {
+         customPropertyLookup = new HashMap<String, DataTypeDefinition>(7, 1.0f);
+         List<CustomProperty> customProps = getClientConfig().getCustomProperties();
+         if (customProps != null)
+         {
+            DictionaryService dd = Repository.getServiceRegistry(FacesContext.getCurrentInstance()).getDictionaryService();
+            for (CustomProperty customProp : customProps)
+            {
+               PropertyDefinition propDef = null;
+               QName propQName = Repository.resolveToQName(customProp.Property);
+               if (customProp.Type != null)
+               {
+                  QName type = Repository.resolveToQName(customProp.Type);
+                  TypeDefinition typeDef = dd.getType(type);
+                  propDef = typeDef.getProperties().get(propQName);
+               }
+               else if (customProp.Aspect != null)
+               {
+                  QName aspect = Repository.resolveToQName(customProp.Aspect);
+                  AspectDefinition aspectDef = dd.getAspect(aspect);
+                  propDef = aspectDef.getProperties().get(propQName);
+               }
+               customPropertyLookup.put(propQName.toString(), propDef.getDataType());
+            }
+         }
+      }
+      return customPropertyLookup;
+   }
+   
+   /**
     * Save the state of the progressive panel that was expanded/collapsed
     */
    public void expandPanel(ActionEvent event)
@@ -556,56 +677,11 @@ public class AdvancedSearchBean
       }
    }
    
-   /**
-    * Generate a search XPATH pointing to the specified node Id, optionally return an XPATH
-    * that includes the child nodes.
-    *  
-    * @param id         Of the node to generate path too
-    * @param children   Whether to include children of the node
-    * 
-    * @return the path
-    */
-   private String getPathFromSpaceId(String id, boolean children)
-   {
-      NodeRef ref = new NodeRef(Repository.getStoreRef(), id);
-      Path path = this.nodeService.getPath(ref);
-      StringBuilder buf = new StringBuilder(64);
-      for (int i=0; i<path.size(); i++)
-      {
-         String elementString = "";
-         Path.Element element = path.get(i);
-         if (element instanceof Path.ChildAssocElement)
-         {
-            ChildAssociationRef elementRef = ((Path.ChildAssocElement)element).getRef();
-            if (elementRef.getParentRef() != null)
-            {
-               Collection prefixes = this.namespaceService.getPrefixes(elementRef.getQName().getNamespaceURI());
-               if (prefixes.size() >0)
-               {
-                  elementString = '/' + (String)prefixes.iterator().next() + ':' + ISO9075.encode(elementRef.getQName().getLocalName());
-               }
-            }
-         }
-         
-         buf.append(elementString);
-      }
-      if (children == true)
-      {
-         // append syntax to get all children of the path
-         buf.append("//*");
-      }
-      else
-      {
-         // append syntax to just represent the path, not the children
-         buf.append("/*");
-      }
-      
-      return buf.toString();
-   }
-   
    
    // ------------------------------------------------------------------------------
    // Private data 
+   
+   private static final String MSG_CONTENT = "content";
    
    private static final String MODE_ALL = "all";
    private static final String MODE_FILES_TEXT = "files_text";
@@ -624,8 +700,17 @@ public class AdvancedSearchBean
    /** The NavigationBean reference */
    private NavigationBean navigator;
    
+   /** Client Config reference */
+   private ClientConfigElement clientConfigElement = null;
+   
    /** Progressive panel UI state */
    private Map<String, Boolean> panels = new HashMap(5, 1.0f);
+   
+   /** custom property names to values */
+   private Map<String, Object> customProperties = new HashMap(5, 1.0f);
+   
+   /** lookup of custom property QName string to DataTypeDefinition for the property */
+   private Map<String, DataTypeDefinition> customPropertyLookup = null;
    
    /** content types to allow searching against */
    private List<SelectItem> contentTypes;
@@ -639,7 +724,7 @@ public class AdvancedSearchBean
    /** search mode */
    private String mode = MODE_ALL;
    
-   /** folder lookin to look in */
+   /** folder lookin mode */
    private String lookin = LOOKIN_ALL;
    
    /** Space Selector location */

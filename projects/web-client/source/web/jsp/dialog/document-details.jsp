@@ -219,14 +219,14 @@
                               
                               <br/>
                               
-                              <h:column id="props-panel-facets">
+                              <h:panelGroup id="props-panel-facets">
                                  <f:facet name="title">
                                     <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
                                        <a:actionLink id="titleLink1" value="#{msg.modify}" showLink="false" image="/images/icons/Change_details.gif"
                                              action="editDocProperties" actionListener="#{EditDocPropsDialog.setupDocumentForAction}" />
                                     </r:permissionEvaluator>
                                  </f:facet>
-                              </h:column>
+                              </h:panelGroup>
                               <a:panel label="#{msg.properties}" id="properties-panel" facetsId="props-panel-facets" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        rendered="#{DocumentDetailsBean.locked == false}"
@@ -303,15 +303,13 @@
                                  </table>
                               </a:panel>
                               
-                              <br/>
-                              
-                              <h:column id="workflow-panel-facets">
+                              <h:panelGroup id="workflow-panel-facets">
                                  <f:facet name="title">
                                     <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
                                        <a:actionLink id="titleLink2" value="#{msg.workflow}" showLink="false" image="/images/icons/Change_details.gif" action="editSimpleWorkflow" />
                                     </r:permissionEvaluator>
                                  </f:facet>
-                              </h:column>
+                              </h:panelGroup>
                               <a:panel label="#{msg.workflow}" id="workflow-panel" facetsId="workflow-panel-facets" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" rendered="#{DocumentDetailsBean.approveStepName != null}"
                                        expanded='#{DocumentDetailsBean.panels["workflow-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
@@ -326,14 +324,14 @@
                               
                               <br/>
                               
-                              <h:column id="category-panel-facets">
+                              <h:panelGroup id="category-panel-facets">
                                  <f:facet name="title">
                                     <r:permissionEvaluator value="#{DocumentDetailsBean.document}" allow="Write">
                                        <a:actionLink id="titleLink3" value="#{msg.change_category}" showLink="false" image="/images/icons/Change_details.gif"
                                              action="editCategories" actionListener="#{DocumentDetailsBean.setupCategoriesForEdit}" />
                                     </r:permissionEvaluator>
                                  </f:facet>
-                              </h:column>
+                              </h:panelGroup>
                               <a:panel label="#{msg.category}" id="category-panel" facetsId="category-panel-facets" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" rendered="#{DocumentDetailsBean.categorised}"
                                        expanded='#{DocumentDetailsBean.panels["category-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
