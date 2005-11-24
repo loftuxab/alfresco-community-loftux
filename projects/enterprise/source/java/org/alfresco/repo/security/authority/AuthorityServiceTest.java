@@ -21,6 +21,7 @@ import javax.transaction.UserTransaction;
 import junit.framework.TestCase;
 
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -38,6 +39,8 @@ public class AuthorityServiceTest extends TestCase
     private AuthenticationComponent authenticationComponent;
 
     private AuthenticationService authenticationService;
+    
+    private MutableAuthenticationDao authenticationDAO;
 
     private AuthorityService authorityService;
 
@@ -60,23 +63,25 @@ public class AuthorityServiceTest extends TestCase
         authorityService = (AuthorityService) ctx.getBean("authorityService");
         pubAuthorityService = (AuthorityService) ctx.getBean("AuthorityService");
         personService = (PersonService) ctx.getBean("personService");
-
+        authenticationDAO = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
+        
+        
         TransactionService transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE
                 .getLocalName());
         tx = transactionService.getUserTransaction();
         tx.begin();
 
-        if (!authenticationComponent.exists("andy"))
+        if (!authenticationDAO.userExists("andy"))
         {
             authenticationService.createAuthentication("andy", "andy".toCharArray());
         }
 
-        if (!authenticationComponent.exists("admin"))
+        if (!authenticationDAO.userExists("admin"))
         {
             authenticationService.createAuthentication("admin", "admin".toCharArray());
         }
 
-        if (!authenticationComponent.exists("administrator"))
+        if (!authenticationDAO.userExists("administrator"))
         {
             authenticationService.createAuthentication("administrator", "administrator".toCharArray());
         }

@@ -1625,6 +1625,10 @@ public class LuceneTest extends TestCase
         results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "@"+LuceneQueryParser.escape(ContentModel.PROP_CONTENT.toString())+":\"fox\"", null, null);
         assertEquals(1, results.length());
         results.close();
+        
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "@"+LuceneQueryParser.escape(ContentModel.PROP_CONTENT.toString())+".mimetype:\"text/plain\"", null, null);
+        assertEquals(1, results.length());
+        results.close();
 
         QName queryQName = QName.createQName("alf:test1", namespacePrefixResolver);
         results = searcher.query(rootNodeRef.getStoreRef(), queryQName, null);

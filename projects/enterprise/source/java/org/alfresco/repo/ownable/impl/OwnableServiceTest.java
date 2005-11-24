@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -50,6 +51,8 @@ public class OwnableServiceTest extends TestCase
     private AuthenticationService authenticationService;
     
     private AuthenticationComponent authenticationComponent;
+    
+    private MutableAuthenticationDao authenticationDAO;
 
     private OwnableService ownableService;
 
@@ -80,6 +83,8 @@ public class OwnableServiceTest extends TestCase
         permissionService = (PermissionService) ctx.getBean("permissionService");
     
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
+        authenticationDAO = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
+        
         
         TransactionService transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName());
         userTransaction = transactionService.getUserTransaction();
@@ -89,7 +94,7 @@ public class OwnableServiceTest extends TestCase
         rootNodeRef = nodeService.getRootNode(storeRef);
         permissionService.setPermission(rootNodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.ADD_CHILDREN, true);
         
-        if(authenticationComponent.exists("andy"))
+        if(authenticationDAO.userExists("andy"))
         {
             authenticationService.deleteAuthentication("andy");
         }

@@ -52,6 +52,7 @@ import org.alfresco.filesys.server.auth.passthru.AuthenticateSession;
 import org.alfresco.filesys.server.auth.passthru.PassthruServers;
 import org.alfresco.filesys.smb.SMBException;
 import org.alfresco.filesys.smb.SMBStatus;
+import org.alfresco.repo.security.authentication.AbstractAuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.NTLMMode;
@@ -66,15 +67,13 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author GKSpencer
  */
-public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
+public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationComponent
 {
     // Logging
     
     private static final Log logger = LogFactory.getLog("org.alfresco.passthru.auth");
 
-    // Name of the system user
     
-    private static final String SYSTEM_USER_NAME = "System";
 
     // Constants
     //
@@ -551,125 +550,15 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
         return auth;
     }
     
-    /**
-     * Explicitly set the current user to be authenticated.
-     * 
-     * @param userName String
-     * @return Authentication
-     */
-    public Authentication setCurrentUser(String userName)
-    {
-        try
-        {
-            UserDetails ud = null;
-            if (userName.equals(SYSTEM_USER_NAME))
-            {
-                GrantedAuthority[] gas = new GrantedAuthority[1];
-                gas[0] = new GrantedAuthorityImpl("ROLE_SYSTEM");
-                ud = new User(SYSTEM_USER_NAME, "", true, true, true, true, gas);
-            }
-            else
-            {
-                GrantedAuthority[] gas = new GrantedAuthority[1];
-                gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
-                
-                ud = new User(userName, "", true, true, true, true, gas);
-            }
-            
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, "", ud
-                    .getAuthorities());
-            auth.setDetails(ud);
-            auth.setAuthenticated(true);
-            return setCurrentAuthentication(auth);
-        }
-        catch (net.sf.acegisecurity.AuthenticationException ae)
-        {
-            throw new AuthenticationException(ae.getMessage(), ae);
-        }
-    }
+    
 
-    /**
-     * Remove the current security information
-     */
-    public void clearCurrentSecurityContext()
-    {
-        ContextHolder.setContext(null);
-    }
+  
+  
 
-    /**
-     * Explicitly set the current suthentication.
-     * 
-     * @param authentication Authentication
-     */
-    public Authentication setCurrentAuthentication(Authentication authentication)
-    {
-        Context context = ContextHolder.getContext();
-        SecureContext sc = null;
-        if ((context == null) || !(context instanceof SecureContext))
-        {
-            sc = new SecureContextImpl();
-            ContextHolder.setContext(sc);
-        }
-        else
-        {
-            sc = (SecureContext) context;
-        }
-        authentication.setAuthenticated(true);
-        sc.setAuthentication(authentication);
-        return authentication;
-    }
+    
 
-    /**
-     * Get the current authentication context
-     *  
-     * @return Authentication
-     * @throws AuthenticationException
-     */
-    public Authentication getCurrentAuthentication() throws AuthenticationException
-    {
-        Context context = ContextHolder.getContext();
-        if ((context == null) || !(context instanceof SecureContext))
-        {
-            return null;
-        }
-        return ((SecureContext) context).getAuthentication();
-    }
+    
 
-    /**
-     * Set the system user as the current user.
-     * 
-     * @return Authentication
-     */
-    public Authentication setSystemUserAsCurrentUser()
-    {
-        return setCurrentUser(SYSTEM_USER_NAME);
-    }
-
-    /**
-     * Get the name of the system user
-     * 
-     * @return String
-     */
-    public String getSystemUserName()
-    {
-        return SYSTEM_USER_NAME;
-    }
-
-    /**
-     * Get the current user name.
-     * 
-     * @return String
-     * @throws AuthenticationException
-     */
-    public String getCurrentUserName() throws AuthenticationException
-    {
-        Context context = ContextHolder.getContext();
-        if ((context == null) || !(context instanceof SecureContext))
-        {
-            return null;
-        }
-        return getUserName(((SecureContext) context).getAuthentication());
-    }
 
     /**
      * Get the enum that describes NTLM integration
@@ -957,29 +846,6 @@ public class NTLMAuthenticationComponentImpl implements AuthenticationComponent
         }
     }
 
-    /**
-     * Get the current user name
-     * 
-     * @param authentication Authentication
-     * @return String
-     */
-    private String getUserName(Authentication authentication)
-    {
-        String username = authentication.getPrincipal().toString();
-
-        if (authentication.getPrincipal() instanceof UserDetails)
-        {
-            username = ((UserDetails) authentication.getPrincipal()).getUsername();
-        }
-
-        return username;
-    }
-
-    public boolean exists(String userName)
-    {
-       throw new UnsupportedOperationException();
-    }
-    
     
     
 }

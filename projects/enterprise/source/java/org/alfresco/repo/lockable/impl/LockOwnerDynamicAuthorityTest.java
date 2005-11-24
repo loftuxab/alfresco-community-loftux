@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
@@ -45,6 +46,8 @@ public class LockOwnerDynamicAuthorityTest extends TestCase
     private AuthenticationService authenticationService;
 
     private AuthenticationComponent authenticationComponent;
+    
+    private MutableAuthenticationDao authenticationDAO;
 
     private LockService lockService;
 
@@ -73,6 +76,7 @@ public class LockOwnerDynamicAuthorityTest extends TestCase
         authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
         lockService = (LockService) ctx.getBean("lockService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
+        authenticationDAO = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
 
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
 
@@ -86,17 +90,17 @@ public class LockOwnerDynamicAuthorityTest extends TestCase
         permissionService.setPermission(rootNodeRef, PermissionService.ALL_AUTHORITIES, PermissionService.ADD_CHILDREN,
                 true);
 
-        if (authenticationComponent.exists("andy"))
+        if (authenticationDAO.userExists("andy"))
         {
             authenticationService.deleteAuthentication("andy");
         }
         authenticationService.createAuthentication("andy", "andy".toCharArray());
-        if (authenticationComponent.exists("lemur"))
+        if (authenticationDAO.userExists("lemur"))
         {
             authenticationService.deleteAuthentication("lemur");
         }
         authenticationService.createAuthentication("lemur", "lemur".toCharArray());
-        if (authenticationComponent.exists("frog"))
+        if (authenticationDAO.userExists("frog"))
         {
             authenticationService.deleteAuthentication("frog");
         }

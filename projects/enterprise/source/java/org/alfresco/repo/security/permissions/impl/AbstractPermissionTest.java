@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.PermissionServiceSPI;
 import org.alfresco.service.ServiceRegistry;
@@ -57,6 +58,8 @@ public class AbstractPermissionTest extends BaseSpringTest
     protected PermissionServiceSPI permissionService;
 
     protected AuthenticationService authenticationService;
+    
+    private MutableAuthenticationDao authenticationDAO;
 
     protected LocalSessionFactoryBean sessionFactory;
 
@@ -98,7 +101,9 @@ public class AbstractPermissionTest extends BaseSpringTest
         authorityService = (AuthorityService) applicationContext.getBean("authorityService");
         
         authenticationComponent.setCurrentUser(authenticationComponent.getSystemUserName());
-
+        authenticationDAO = (MutableAuthenticationDao) applicationContext.getBean("alfDaoImpl");
+        
+        
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.nanoTime());
         rootNodeRef = nodeService.getRootNode(storeRef);
 
@@ -115,19 +120,19 @@ public class AbstractPermissionTest extends BaseSpringTest
         nodeService.createNode(typesNodeRef, children, ContentModel.TYPE_PERSON, container, props).getChildRef();
 
         // create an authentication object e.g. the user
-        if(authenticationComponent.exists("andy"))
+        if(authenticationDAO.userExists("andy"))
         {
             authenticationService.deleteAuthentication("andy");
         }
         authenticationService.createAuthentication("andy", "andy".toCharArray());
 
-        if(authenticationComponent.exists("lemur"))
+        if(authenticationDAO.userExists("lemur"))
         {
             authenticationService.deleteAuthentication("lemur");
         }
         authenticationService.createAuthentication("lemur", "lemur".toCharArray());
         
-        if(authenticationComponent.exists("admin"))
+        if(authenticationDAO.userExists("admin"))
         {
             authenticationService.deleteAuthentication("admin");
         }

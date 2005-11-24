@@ -18,25 +18,22 @@ package org.alfresco.repo.search.impl.lucene;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Vector;
 
 import org.alfresco.repo.search.SearcherException;
 import org.alfresco.repo.search.impl.lucene.query.PathQuery;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.document.DateField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.TermQuery;
@@ -216,6 +213,8 @@ public class LuceneQueryParser extends QueryParser
             }
             else if (field.startsWith("@"))
             {
+
+                String expandedFieldName = field;
                 // Check for any prefixes and expand to the full uri
                 if (field.charAt(1) != '{')
                 {
@@ -223,22 +222,34 @@ public class LuceneQueryParser extends QueryParser
                     if (colonPosition == -1)
                     {
                         // use the default namespace
-                        return super.getFieldQuery("@{"
-                                + namespacePrefixResolver.getNamespaceURI("") + "}" + field.substring(1), queryText);
+                        expandedFieldName = "@{"
+                            + namespacePrefixResolver.getNamespaceURI("") + "}" + field.substring(1);
                     }
                     else
                     {
                         // find the prefix
-                        return super.getFieldQuery("@{"
+                        expandedFieldName = "@{"
                                 + namespacePrefixResolver.getNamespaceURI(field.substring(1, colonPosition)) + "}"
-                                + field.substring(colonPosition + 1), queryText);
+                                + field.substring(colonPosition + 1);
                     }
                 }
-                else
+                
+                if(expandedFieldName.endsWith(".mimetype"))
                 {
-                    // Already in expanded form
-                    return super.getFieldQuery(field, queryText);
+                    QName propertyQName = QName.createQName(expandedFieldName.substring(1, expandedFieldName.length()-9));
+                    PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
+                    if((propertyDef != null) && (propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT)))
+                    {
+                        TermQuery termQuery = new TermQuery(new Term(expandedFieldName, queryText));
+                        return termQuery;
+                    }
+                            
                 }
+                
+                // Already in expanded form
+                return super.getFieldQuery(expandedFieldName, queryText);
+               
+
             }
             else
             {

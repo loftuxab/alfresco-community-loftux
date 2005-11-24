@@ -27,6 +27,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoService;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -53,6 +54,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
     protected ContentService contentService;
 	protected DictionaryDAO dictionaryDAO;
     protected AuthenticationService authenticationService;
+    protected MutableAuthenticationDao authenticationDAO;
 	
     /*
      * Data used by tests
@@ -133,6 +135,8 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.contentService = (ContentService)applicationContext.getBean("contentService");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         this.authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
+        this.authenticationDAO = (MutableAuthenticationDao) applicationContext.getBean("alfDaoImpl");
+        
         
         authenticationService.clearCurrentSecurityContext();
         
@@ -161,7 +165,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         
         // Create an authenticate the user
         
-        if(!authenticationComponent.exists(USER_NAME))
+        if(!authenticationDAO.userExists(USER_NAME))
         {
             authenticationService.createAuthentication(USER_NAME, PWD.toCharArray());
         }

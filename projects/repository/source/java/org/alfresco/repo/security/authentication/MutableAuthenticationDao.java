@@ -66,6 +66,7 @@ public interface MutableAuthenticationDao extends AuthenticationDao, SaltSource
      */
     public boolean userExists(String userName);
     
+    
     /**
      * Get the store ref where user objects are persisted.
      * 

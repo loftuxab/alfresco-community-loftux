@@ -1460,6 +1460,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                                 + QName.createQName(propertyName.getNamespaceURI(), ISO9075
                                                         .encode(propertyName.getLocalName())), new InputStreamReader(
                                                 reader.getReader().getContentInputStream())));
+                                        doc.add(new Field(attributeName+".mimetype", reader.getMimetype(), false, true, false));
                                     }
                                 }
 
