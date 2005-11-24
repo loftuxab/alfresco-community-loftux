@@ -280,7 +280,7 @@
          <mimetype mimetype="application/zip" display="ZIP">
             <extension>zip</extension>
          </mimetype>
-         <mimetype mimetype="application/vnd.oasis.opendocument.text" display="OpenDocument Text (OpenOffice.org 2.0)">
+         <mimetype mimetype="application/vnd.oasis.opendocument.text" display="OpenDocument Text (OpenOffice 2.0)">
             <extension>odt</extension>
          </mimetype>
 	     <mimetype mimetype="application/vnd.oasis.opendocument.text-template" display="OpenDocument Text Template">
@@ -322,7 +322,7 @@
 	     <mimetype mimetype="application/vnd.oasis.opendocument.image" display="OpenDocument Image">
 	       <extension>odi</extension>
          </mimetype>
-         <mimetype mimetype="application/vnd.sun.xml.writer" display="OpenOffice.org 1.0 / StarOffice6.0 Writer 6.0">
+         <mimetype mimetype="application/vnd.sun.xml.writer" display="OpenOffice 1.0/StarOffice6.0 Writer 6.0">
            <extension>sxw</extension>
          </mimetype>
          <mimetype mimetype="image/x-dwg" display="AutoCAD Drawing">
