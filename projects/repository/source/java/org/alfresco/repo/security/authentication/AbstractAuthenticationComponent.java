@@ -30,30 +30,31 @@ import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import net.sf.acegisecurity.providers.dao.User;
 
 /**
- * This class abstract the support required to set up and query the Acegi context for
- * security enforcement. 
+ * This class abstract the support required to set up and query the Acegi
+ * context for security enforcement.
  * 
- * There are some simple default method implementations to support simple authentication.
+ * There are some simple default method implementations to support simple
+ * authentication.
  * 
  * @author Andy Hind
  */
 public abstract class AbstractAuthenticationComponent implements AuthenticationComponent
 {
-    
+
     // Name of the system user
-    
+
     private static final String SYSTEM_USER_NAME = "System";
 
     public AbstractAuthenticationComponent()
     {
         super();
     }
-    
-    
+
     /**
      * Explicitly set the current user to be authenticated.
      * 
-     * @param userName String
+     * @param userName
+     *            String
      * @return Authentication
      */
     public Authentication setCurrentUser(String userName)
@@ -68,10 +69,10 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
                 ud = new User(SYSTEM_USER_NAME, "", true, true, true, true, gas);
             }
             else
-            {   
+            {
                 ud = getUserDetails(userName);
             }
-            
+
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(ud, "", ud
                     .getAuthorities());
             auth.setDetails(ud);
@@ -83,10 +84,9 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
             throw new AuthenticationException(ae.getMessage(), ae);
         }
     }
-   
-    
+
     /**
-     * Default implementation that makes an ACEGI object on the fly 
+     * Default implementation that makes an ACEGI object on the fly
      * 
      * @param userName
      * @return
@@ -94,15 +94,16 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
     protected UserDetails getUserDetails(String userName)
     {
         GrantedAuthority[] gas = new GrantedAuthority[1];
-        gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");   
+        gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
         UserDetails ud = new User(userName, "", true, true, true, true, gas);
         return ud;
     }
 
     /**
-     * Explicitly set the current suthentication.
+     * Explicitly set the current authentication.
      * 
-     * @param authentication Authentication
+     * @param authentication
+     *            Authentication
      */
     public Authentication setCurrentAuthentication(Authentication authentication)
     {
@@ -121,10 +122,10 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
         sc.setAuthentication(authentication);
         return authentication;
     }
-    
+
     /**
      * Get the current authentication context
-     *  
+     * 
      * @return Authentication
      * @throws AuthenticationException
      */
@@ -137,7 +138,6 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
         }
         return ((SecureContext) context).getAuthentication();
     }
-    
 
     /**
      * Get the current user name.
@@ -155,11 +155,11 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
         return getUserName(((SecureContext) context).getAuthentication());
     }
 
-    
     /**
      * Get the current user name
      * 
-     * @param authentication Authentication
+     * @param authentication
+     *            Authentication
      * @return String
      */
     private String getUserName(Authentication authentication)
@@ -174,7 +174,6 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
         return username;
     }
 
-    
     /**
      * Set the system user as the current user.
      * 
@@ -194,7 +193,7 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
     {
         return SYSTEM_USER_NAME;
     }
-    
+
     /**
      * Remove the current security information
      */
@@ -210,7 +209,7 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
     {
         throw new AlfrescoRuntimeException("Authentication via token not supported");
     }
-    
+
     /**
      * The should only be supported if getNTLMMode() is NTLMMode.MD4_PROVIDER.
      */
@@ -220,16 +219,12 @@ public abstract class AbstractAuthenticationComponent implements AuthenticationC
     }
 
     /**
-     * Get the NTML mode 
-     * - none
-     * - supports MD4 hash to integrate
-     * - or it can asct as an NTLM authentication
+     * Get the NTML mode - none - supports MD4 hash to integrate - or it can
+     * asct as an NTLM authentication
      */
     public NTLMMode getNTLMMode()
     {
         return NTLMMode.NONE;
     }
 
-    
-    
 }
