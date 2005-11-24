@@ -744,8 +744,8 @@ public final class Utils
       context.addMessage(null, facesMsg);
       if (err != null)
       {
-         if (err instanceof InvalidNodeRefException == false &&
-             err instanceof AccessDeniedException == false)
+         if ((err instanceof InvalidNodeRefException == false &&
+              err instanceof AccessDeniedException == false) || logger.isDebugEnabled())
          {
             logger.error(msg, err);
          }
