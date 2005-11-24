@@ -34,8 +34,10 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.search.QueryParameterDefinition;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -153,19 +155,30 @@ public class FileFolderServiceImpl implements FileFolderService
      */
     private FileInfo toFileInfo(NodeRef nodeRef) throws FileNotFoundException
     {
-        // check the node type
-        QName nodeTypeQName = nodeService.getType(nodeRef);
-        // get the file attributes
-        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-        String name = (String) properties.get(ContentModel.PROP_NAME);
-        // is it a folder
-        QName typeQName = nodeService.getType(nodeRef);
-        boolean isFolder = isFolder(typeQName);
-        
-        // construct the file info and add to the results
-        FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, name);
-        // done
-        return fileInfo;
+        try
+        {
+            // check the node type
+            QName nodeTypeQName = nodeService.getType(nodeRef);
+            // get the file attributes
+            Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+            String name = (String) properties.get(ContentModel.PROP_NAME);
+            // is it a folder
+            QName typeQName = nodeService.getType(nodeRef);
+            boolean isFolder = isFolder(typeQName);
+            
+            // construct the file info and add to the results
+            FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, name);
+            // done
+            return fileInfo;
+        }
+        catch (InvalidNodeRefException e)
+        {
+            throw new FileNotFoundException(nodeRef);
+        }
+        catch (InvalidTypeException e)
+        {
+            throw new FileNotFoundException(nodeRef);
+        }
     }
 
     /**
@@ -185,19 +198,38 @@ public class FileFolderServiceImpl implements FileFolderService
     }
 
     /**
+     * Exception when the type is not a valid File or Folder type
+     * 
+     * @see ContentModel#TYPE_CONTENT
+     * @see ContentModel#TYPE_FOLDER
+     * 
+     * @author Derek Hulley
+     */
+    private static class InvalidTypeException extends Exception
+    {
+        private static final long serialVersionUID = -310101369475434280L;
+        
+        public InvalidTypeException(String msg)
+        {
+            super(msg);
+        }
+    }
+    
+    /**
      * Checks the type for whether it is a file or folder.  All invalid types
      * lead to runtime exceptions.
      * 
      * @param typeQName the type to check
      * @return Returns true if the type is a valid folder type, false if it is a file.
+     * @throws AlfrescoRuntimeException if the type is not handled by this service
      */
-    private boolean isFolder(QName typeQName)
+    private boolean isFolder(QName typeQName) throws InvalidTypeException
     {
         if (dictionaryService.isSubClass(typeQName, ContentModel.TYPE_FOLDER))
         {
             if (dictionaryService.isSubClass(typeQName, ContentModel.TYPE_SYSTEM_FOLDER))
             {
-                throw new AlfrescoRuntimeException("This service should ignore type " + ContentModel.TYPE_SYSTEM_FOLDER);
+                throw new InvalidTypeException("This service should ignore type " + ContentModel.TYPE_SYSTEM_FOLDER);
             }
             return true;
         }
@@ -209,7 +241,7 @@ public class FileFolderServiceImpl implements FileFolderService
         else
         {
             // unhandled type
-            throw new AlfrescoRuntimeException("Type is not handled by this service: " + typeQName);
+            throw new InvalidTypeException("Type is not handled by this service: " + typeQName);
         }
     }
 
@@ -378,11 +410,6 @@ public class FileFolderServiceImpl implements FileFolderService
         return results;
     }
 
-    public List<String> getNamePath(NodeRef nodeRef) throws FileNotFoundException
-    {
-        throw new UnsupportedOperationException();
-    }
-
     /**
      * @see #move(NodeRef, NodeRef, String)
      */
@@ -495,7 +522,15 @@ public class FileFolderServiceImpl implements FileFolderService
             throws FileExistsException, FileNotFoundException
     {
         // file or folder
-        boolean isFolder = isFolder(typeQName);
+        boolean isFolder = false;
+        try
+        {
+            isFolder = isFolder(typeQName);
+        }
+        catch (InvalidTypeException e)
+        {
+            throw new AlfrescoRuntimeException("The type is not supported by this service: " + typeQName);
+        }
         
         // check for existing file or folder
         checkExists(parentFolderRef, name, isFolder);
@@ -524,5 +559,129 @@ public class FileFolderServiceImpl implements FileFolderService
                     "   created: " + fileInfo);
         }
         return fileInfo;
+    }
+
+    public List<FileInfo> getNamePath(NodeRef rootNodeRef, NodeRef nodeRef) throws FileNotFoundException
+    {
+        // check the root
+        if (rootNodeRef == null)
+        {
+            rootNodeRef = nodeService.getRootNode(nodeRef.getStoreRef());
+        }
+        else
+        {
+            // make sure that the root exists and is a valid folder
+            FileInfo rootFileInfo = toFileInfo(rootNodeRef);
+        }
+        try
+        {
+            List<FileInfo> results = new ArrayList<FileInfo>(10);
+            // get the primary path
+            Path path = nodeService.getPath(nodeRef);
+            // iterate and turn the results into file info objects
+            boolean foundRoot = false;
+            for (Path.Element element : path)
+            {
+                // ignore everything down to the root
+                Path.ChildAssocElement assocElement = (Path.ChildAssocElement) element;
+                NodeRef childNodeRef = assocElement.getRef().getChildRef();
+                if (childNodeRef.equals(rootNodeRef))
+                {
+                    // just found the root - but we don't put in an entry for it
+                    foundRoot = true;
+                    continue;
+                }
+                else if (!foundRoot)
+                {
+                    // keep looking for the root
+                    continue;
+                }
+                // we found the root and expect to be building the path up
+                FileInfo pathInfo = toFileInfo(childNodeRef);
+                results.add(pathInfo);
+            }
+            // check that we found the root
+            if (!foundRoot || results.size() == 0)
+            {
+                throw new FileNotFoundException(nodeRef);
+            }
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Built name path for node: \n" +
+                        "   root: " + rootNodeRef + "\n" +
+                        "   node: " + nodeRef + "\n" +
+                        "   path: " + results);
+            }
+            return results;
+        }
+        catch (InvalidNodeRefException e)
+        {
+            throw new FileNotFoundException(nodeRef);
+        }
+    }
+
+    public FileInfo resolveNamePath(NodeRef rootNodeRef, List<String> pathElements, boolean isFolder) throws FileNotFoundException
+    {
+        if (pathElements.size() == 0)
+        {
+            throw new IllegalArgumentException("Path elements list is empty");
+        }
+        // walk the folder tree first
+        NodeRef parentNodeRef = rootNodeRef;
+        StringBuilder currentPath = new StringBuilder(pathElements.size() * 20);
+        int folderCount = pathElements.size() - 1;
+        for (int i = 0; i < folderCount; i++)
+        {
+            String pathElement = pathElements.get(i);
+            FileInfo pathElementInfo = getPathElementInfo(currentPath, rootNodeRef, parentNodeRef, pathElement, true);
+            parentNodeRef = pathElementInfo.getNodeRef();
+        }
+        // we have resolved the folder path - resolve the last component
+        String pathElement = pathElements.get(pathElements.size() - 1);
+        FileInfo result = getPathElementInfo(currentPath, rootNodeRef, parentNodeRef, pathElement, isFolder);
+        // found it
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Resoved path element: \n" +
+                    "   root: " + rootNodeRef + "\n" +
+                    "   path: " + currentPath + "\n" +
+                    "   node: " + result);
+        }
+        return result;
+    }
+    
+    /**
+     * Helper method to dig down a level for a node based on name
+     */
+    private FileInfo getPathElementInfo(
+            StringBuilder currentPath,
+            NodeRef rootNodeRef,
+            NodeRef parentNodeRef,
+            String pathElement,
+            boolean isFolder) throws FileNotFoundException
+    {
+        currentPath.append("/").append(pathElement);
+        List<FileInfo> pathElementInfos = search(parentNodeRef, pathElement, !isFolder, isFolder, false);
+        // check
+        if (pathElementInfos.size() == 0)
+        {
+            StringBuilder sb = new StringBuilder(128);
+            sb.append(isFolder ? "Folder" : "File").append(" not found: \n")
+              .append("   root: ").append(rootNodeRef).append("\n")
+              .append("   path: ").append(currentPath);
+            throw new FileNotFoundException(sb.toString());
+        }
+        else if (pathElementInfos.size() > 1)
+        {
+            // we have detected a duplicate name - warn, but allow
+            StringBuilder sb = new StringBuilder(128);
+            sb.append("Duplicate ").append(isFolder ? "folder" : "file").append(" found: \n")
+              .append("   root: ").append(rootNodeRef).append("\n")
+              .append("   path: ").append(currentPath);
+            logger.warn(sb);
+        }
+        FileInfo pathElementInfo = pathElementInfos.get(0);
+        return pathElementInfo;
     }
 }

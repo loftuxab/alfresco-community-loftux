@@ -92,19 +92,6 @@ public interface FileFolderService
             boolean includeSubFolders) throws FileNotFoundException;
     
     /**
-     * Get the file or folder names from the root down to and including the node provided.
-     * The root is defined as the first non-folder parent node along the primary parent-child
-     * relationships or the root of the workspace, whichever comes first when browsing up
-     * from the given node.
-     * 
-     * @param nodeRef a reference to the file or folder
-     * @return Returns a list of file/folder names from the root down to and including the
-     *      given file or folder
-     * @throws FileNotFoundException if the node could not be found
-     */
-    public List<String> getNamePath(NodeRef nodeRef) throws FileNotFoundException;
-    
-    /**
      * Rename a file or folder in its current location
      * 
      * @param fileFolderRef the file or folder to rename
@@ -117,6 +104,8 @@ public interface FileFolderService
     
     /**
      * Move a file or folder to a new name and/or location.
+     * <p>
+     * If both the parent folder and name remain the same, then nothing is done.
      * 
      * @param sourceNodeRef the file or folder to move
      * @param targetFolderRef the new folder to move the node to - null means rename in situ
@@ -128,6 +117,19 @@ public interface FileFolderService
     public FileInfo move(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName)
             throws FileExistsException, FileNotFoundException;
 
+    /**
+     * Copy a source file or folder.  The source can be optionally renamed and optionally
+     * moved into another folder.
+     * <p>
+     * If both the parent folder and name remain the same, then nothing is done.
+     * 
+     * @param sourceNodeRef the file or folder to copy
+     * @param targetFolderRef the target folder to copy to, or null to use the current parent folder
+     * @param newName the new name, or null to keep the existing name.
+     * @return Return the new file info
+     * @throws FileExistsException
+     * @throws FileNotFoundException
+     */
     public FileInfo copy(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName)
             throws FileExistsException, FileNotFoundException;
 
@@ -143,4 +145,33 @@ public interface FileFolderService
      */
     public FileInfo create(NodeRef parentFolderRef, String name, QName typeQName)
             throws FileExistsException, FileNotFoundException;
+    
+    /**
+     * Get the file or folder names from the root down to and including the node provided.
+     * <ul>
+     *   <li>The root node can be of any type and is not included in the path list.</li>
+     *   <li>Only the primary path is considered.  If the target node is not a descendent of the
+     *       root along purely primary associations, then an exception is generated.</li>
+     *   <li>If an invalid type is encoutered along the path, then an exception is generated.</li>
+     * </ul>
+     * 
+     * @param rootNodeRef the start of the returned path, or null if the <b>store</b> root
+     *      node must be assumed.
+     * @param nodeRef a reference to the file or folder
+     * @return Returns a list of file/folder infos from the root (excluded) down to and
+     *      including the destination file or folder
+     * @throws FileNotFoundException if the node could not be found
+     */
+    public List<FileInfo> getNamePath(NodeRef rootNodeRef, NodeRef nodeRef) throws FileNotFoundException;
+    
+    /**
+     * Resolve a file or folder name path from a given root node down to the final node.
+     * 
+     * @param rootNodeRef the start of the path given, i.e. the '/' in '/A/B/C' for example
+     * @param pathElements a list of names in the path
+     * @param isFolder true if we are searching for folder or false to search for a file
+     * @return Returns the info of the file or folder
+     * @throws FileNotFoundException if no file or folder exists along the path
+     */
+    public FileInfo resolveNamePath(NodeRef rootNodeRef, List<String> pathElements, boolean isFolder) throws FileNotFoundException;
 }

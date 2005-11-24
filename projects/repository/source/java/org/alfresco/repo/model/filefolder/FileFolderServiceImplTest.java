@@ -33,6 +33,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -370,5 +371,48 @@ public class FileFolderServiceImplTest extends TestCase
         // check
         assertTrue("Node not created", nodeService.exists(fileInfo.getNodeRef()));
         assertFalse("File type expected", fileInfo.isFolder());
+    }
+    
+    public void testGetNamePath() throws Exception
+    {
+        FileInfo fileInfo = getByName(NAME_L1_FILE_A, false);
+        assertNotNull(fileInfo);
+        NodeRef nodeRef = fileInfo.getNodeRef();
+        
+        List<FileInfo> infoPaths = fileFolderService.getNamePath(workingRootNodeRef, nodeRef);
+        assertEquals("Not enough elements", 2, infoPaths.size());
+        assertEquals("First level incorrent", NAME_L0_FOLDER_A, infoPaths.get(0).getName());
+        assertEquals("Second level incorrent", NAME_L1_FILE_A, infoPaths.get(1).getName());
+        
+        // pass in a null root and make sure that it still works
+        infoPaths = fileFolderService.getNamePath(null, nodeRef);
+        assertEquals("Not enough elements", 3, infoPaths.size());
+        assertEquals("First level incorrent", workingRootNodeRef.getId(), infoPaths.get(0).getName());
+        assertEquals("Second level incorrent", NAME_L0_FOLDER_A, infoPaths.get(1).getName());
+        assertEquals("Third level incorrent", NAME_L1_FILE_A, infoPaths.get(2).getName());
+        
+        // check that a non-aligned path is detected
+        NodeRef startRef = getByName(NAME_L0_FOLDER_B, true).getNodeRef();
+        try
+        {
+            fileFolderService.getNamePath(startRef, nodeRef);
+            fail("Failed to detect non-aligned path from root to target node");
+        }
+        catch (FileNotFoundException e)
+        {
+            // expected
+        }
+    }
+    
+    public void testResolveNamePath() throws Exception
+    {
+        FileInfo fileInfo = getByName(NAME_L1_FILE_A, false);
+        List<String> pathElements = new ArrayList<String>(3);
+        pathElements.add(NAME_L0_FOLDER_A);
+        pathElements.add(NAME_L1_FILE_A);
+        
+        FileInfo fileInfoCheck = fileFolderService.resolveNamePath(workingRootNodeRef, pathElements, false);
+        assertNotNull("File info not found", fileInfoCheck);
+        assertEquals("Path not resolved to correct node", fileInfo.getNodeRef(), fileInfoCheck.getNodeRef());
     }
 }
