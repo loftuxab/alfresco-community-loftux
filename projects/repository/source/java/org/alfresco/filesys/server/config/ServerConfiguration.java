@@ -57,6 +57,7 @@ import org.alfresco.filesys.server.auth.acl.InvalidACLTypeException;
 import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.core.ShareMapper;
+import org.alfresco.filesys.server.core.ShareType;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
 import org.alfresco.filesys.server.filesys.DefaultShareMapper;
@@ -2246,6 +2247,37 @@ public class ServerConfiguration
         return domainName;
     }
 
+    /**
+     * Return the primary filesystem shared device, or null if not available
+     * 
+     * @return DiskSharedDevice
+     */
+    public final DiskSharedDevice getPrimaryFilesystem()
+    {
+        // Check if there are any global shares defined
+
+        SharedDeviceList shares = getShares();
+        DiskSharedDevice diskShare = null;
+        
+        if ( shares != null && shares.numberOfShares() > 0)
+        {
+            // Find the first available filesystem device
+            
+            Enumeration<SharedDevice> shareEnum = shares.enumerateShares();
+
+            while ( diskShare == null && shareEnum.hasMoreElements())
+            {
+                SharedDevice curShare = shareEnum.nextElement();
+                if ( curShare.getType() == ShareType.DISK)
+                    diskShare = (DiskSharedDevice) curShare;
+            }
+        }
+        
+        // Return the first filesystem device, or null
+        
+        return diskShare;
+    }
+    
     /**
      * Determine if Macintosh extension SMBs are enabled
      * 
