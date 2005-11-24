@@ -165,6 +165,20 @@ public interface NodeService
     public QName getType(NodeRef nodeRef) throws InvalidNodeRefException;
     
     /**
+     * Re-sets the type of the node.  Can be called in order specialise a node to a sub-type.
+     * 
+     * This should be used with caution since calling it changes the type of the node and thus
+     * implies a different set of aspects, properties and associations.  It is the calling codes
+     * responsibility to ensure that the node is in a approriate state after changing the type.
+     * 
+     * @param nodeRef   the node reference
+     * @param typeQName the type QName
+     * 
+     * @since 1.1
+     */
+    public void setType(NodeRef nodeRef, QName typeQName) throws InvalidNodeRefException;
+    
+    /**
      * Applies an aspect to the given node.  After this method has been called,
      * the node with have all the aspect-related properties present
      * 

@@ -54,6 +54,17 @@
          </mandatory-aspects>
       </type>
       
+       <type name="test:extendedcontent">
+         <title>Extended Content</title>
+         <parent>test:content</parent>
+         <properties>
+            <property name="test:prop1">
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+   	  </type>
+      
       <type name="test:multiprop">
          <title>MultiProp</title>
          <parent>sys:base</parent>

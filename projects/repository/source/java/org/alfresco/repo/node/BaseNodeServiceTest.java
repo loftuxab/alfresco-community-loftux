@@ -102,7 +102,9 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName PROP_QNAME_PATH_VALUE = QName.createQName(NAMESPACE, "pathValue");
     public static final QName PROP_QNAME_CATEGORY_VALUE = QName.createQName(NAMESPACE, "categoryValue");
     public static final QName PROP_QNAME_NULL_VALUE = QName.createQName(NAMESPACE, "nullValue");
-    public static final QName PROP_QNAME_MULTI_VALUE = QName.createQName(NAMESPACE, "multiValue");
+    public static final QName PROP_QNAME_MULTI_VALUE = QName.createQName(NAMESPACE, "multiValue");    
+    public static final QName TYPE_QNAME_EXTENDED_CONTENT = QName.createQName(NAMESPACE, "extendedcontent");
+    public static final QName PROP_QNAME_PROP1 = QName.createQName(NAMESPACE, "prop1");
     
     protected PolicyComponent policyComponent;
     protected DictionaryService dictionaryService;
@@ -470,6 +472,20 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // get the type
         QName type = nodeService.getType(nodeRef);
         assertEquals("Type mismatch", ContentModel.TYPE_CONTAINER, type);
+    }
+    
+    public void testSetType() throws Exception
+    {
+        NodeRef nodeRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("setTypeTest"),
+                TYPE_QNAME_TEST_CONTENT).getChildRef();        
+        assertEquals(TYPE_QNAME_TEST_CONTENT, this.nodeService.getType(nodeRef));
+        
+        // Now change the type
+        this.nodeService.setType(nodeRef, TYPE_QNAME_EXTENDED_CONTENT);
+        assertEquals(TYPE_QNAME_EXTENDED_CONTENT, this.nodeService.getType(nodeRef));        
     }
     
     /**

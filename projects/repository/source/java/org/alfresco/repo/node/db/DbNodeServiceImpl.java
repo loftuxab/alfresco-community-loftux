@@ -264,7 +264,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // create the node instance
         Node node = nodeDaoService.newNode(store, newId, nodeTypeQName);
-        NodeRef childRef = node.getNodeRef();
         
         // get the parent node
         Node parentNode = getNodeNotNull(parentRef);
@@ -273,15 +272,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ChildAssoc childAssoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocTypeQName, assocQName);
         ChildAssociationRef childAssocRef = childAssoc.getChildAssocRef();
         
-        // get the mandatory aspects for the node type
-        List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
-        
-        // add all the aspects to the node
-        Set<QName> nodeAspects = node.getAspects();
-        for (AspectDefinition defaultAspectDef : defaultAspectDefs)
-        {
-            nodeAspects.add(defaultAspectDef.getName());
-        }
+        // Add the default aspects to the node
+        addDefaultAspect(nodeTypeDef, node, childAssocRef.getChildRef());
         
         // set the properties - it is a new node so only set properties if there are any
         if (properties.size() > 0)
@@ -295,6 +287,26 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
 		// done
 		return childAssocRef;
+    }
+    
+    /**
+     * Add the default aspects to a given node
+     * 
+     * @param nodeTypeDef
+     */
+    private void addDefaultAspect(TypeDefinition nodeTypeDef, Node node, NodeRef nodeRef)
+    {
+        // get the mandatory aspects for the node type
+        List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
+        
+        // add all the aspects to the node
+        Set<QName> nodeAspects = node.getAspects();
+        for (AspectDefinition defaultAspectDef : defaultAspectDefs)        
+        {
+            invokeBeforeAddAspect(nodeRef, defaultAspectDef.getName());
+            nodeAspects.add(defaultAspectDef.getName());
+            invokeOnAddAspect(nodeRef, defaultAspectDef.getName());
+        }
     }
     
     /**
@@ -376,6 +388,32 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
     {
         Node node = getNodeNotNull(nodeRef);
         return node.getTypeQName();
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.repository.NodeService#setType(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
+    public void setType(NodeRef nodeRef, QName typeQName) throws InvalidNodeRefException
+    {
+        // check the node type
+        TypeDefinition nodeTypeDef = dictionaryService.getType(typeQName);
+        if (nodeTypeDef == null)
+        {
+            throw new InvalidTypeException(typeQName);
+        }
+        
+        // Invoke policies
+        invokeBeforeUpdateNode(nodeRef);
+        
+        // Get the node and set the new type
+        Node node = getNodeNotNull(nodeRef);
+        node.setTypeQName(typeQName);
+        
+        // Add the default aspects to the node
+        addDefaultAspect(nodeTypeDef, node, nodeRef);
+        
+        // Invoke policies
+        invokeOnUpdateNode(nodeRef);
     }
     
     /**
@@ -623,8 +661,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
                     "   child: " + childRef,
                     childRef);
         }
-        String protocol = parentRef.getStoreRef().getProtocol();
-        String identifier = parentRef.getStoreRef().getIdentifier();
+
         // get the parent node and ensure that it is a container node
         Node parentNode = getNodeNotNull(parentRef);
         // get the child node
@@ -767,7 +804,6 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // find the node
         Node node = getNodeNotNull(nodeRef);
-        QName nodeTypeQName = node.getTypeQName();
         // get the properties before
         Map<QName, Serializable> propertiesBefore = getProperties(nodeRef);
 

@@ -254,6 +254,15 @@ public class NodeServiceImpl implements NodeService, VersionModel
     }
     
     /**
+     * @see org.alfresco.service.cmr.repository.NodeService#setType(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
+    public void setType(NodeRef nodeRef, QName typeQName) throws InvalidNodeRefException
+    {
+        // This operation is not supported for a version store
+        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+    }
+    
+    /**
      * @throws UnsupportedOperationException always
      */
     public void addAspect(NodeRef nodeRef, QName aspectRef, Map<QName, Serializable> aspectProperties) throws InvalidNodeRefException, InvalidAspectException
