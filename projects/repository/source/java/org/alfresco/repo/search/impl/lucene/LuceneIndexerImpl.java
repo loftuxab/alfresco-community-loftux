@@ -17,8 +17,10 @@
 package org.alfresco.repo.search.impl.lucene;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +48,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -1392,10 +1395,10 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
 
                         if (isContent)
                         {
+                            ContentData contentData = DefaultTypeConverter.INSTANCE.convert(ContentData.class, value);
                             if (index)
                             {
                                 ContentReader reader = contentService.getReader(nodeRef, propertyName);
-                                String mimeType = reader.getMimetype();
                                 if (reader != null && reader.exists())
                                 {
                                     boolean readerReady = true;
@@ -1455,13 +1458,35 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                     // reader, but only if the reader is valid
                                     if (readerReady)
                                     {
-                                        doc.add(Field.Text("TEXT",
-                                                new InputStreamReader(reader.getContentInputStream())));
+                                        InputStreamReader isr = null; 
+                                        InputStream ris = reader.getContentInputStream(); 
+                                        try 
+                                        { 
+                                            isr = new InputStreamReader(ris,"UTF-8"); 
+                                        } 
+                                        catch (UnsupportedEncodingException e) 
+                                        { 
+                                            isr = new InputStreamReader(ris); 
+                                        }  
+                                        doc.add(Field.Text("TEXT", isr));
+                                        
+                                        
+                                        ris = reader.getReader().getContentInputStream(); 
+                                        try 
+                                        { 
+                                            isr = new InputStreamReader(ris,"UTF-8"); 
+                                        } 
+                                        catch (UnsupportedEncodingException e) 
+                                        { 
+                                            isr = new InputStreamReader(ris); 
+                                        } 
+                                        
                                         doc.add(Field.Text("@"
                                                 + QName.createQName(propertyName.getNamespaceURI(), ISO9075
-                                                        .encode(propertyName.getLocalName())), new InputStreamReader(
-                                                reader.getReader().getContentInputStream())));
-                                        doc.add(new Field(attributeName+".mimetype", mimeType, false, true, false));
+                                                        .encode(propertyName.getLocalName())), isr));
+                                        
+                                        
+                                        doc.add(new Field(attributeName+".mimetype", contentData.getMimetype(), false, true, false));
                                     }
                                 }
 
