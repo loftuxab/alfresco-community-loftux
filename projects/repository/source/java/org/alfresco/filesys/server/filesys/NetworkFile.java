@@ -91,14 +91,11 @@ public abstract class NetworkFile
     protected int m_writeCount;
 
     // List of locks on this file by this session. The lock object will almost certainly be
-    // referenced
-    // elsewhere depending upon the LockManager implementation used. If locking support is not
-    // enabled
-    // for the DiskInterface implementation the lock list will not be allocated.
+    // referenced elsewhere depending upon the LockManager implementation used. If locking support is not
+    // enabled for the DiskInterface implementation the lock list will not be allocated.
     //
     // This lock list is used to release locks on the file if the session abnormally terminates or
-    // closes
-    // the file without releasing all locks.
+    // closes the file without releasing all locks.
 
     private FileLockList m_lockList;
 

@@ -117,6 +117,19 @@ public class DiskDeviceContext extends DeviceContext
     }
 
     /**
+     * Return the filesystem type, either FileSystem.TypeFAT or FileSystem.TypeNTFS.
+     * 
+     * Defaults to FileSystem.FAT but will be overridden if the filesystem driver implements the
+     * NTFSStreamsInterface.
+     * 
+     * @return String
+     */
+    public String getFilesystemType()
+    {
+        return FileSystem.TypeFAT;
+    }
+    
+    /**
      * Return the device attributes
      * 
      * @return int

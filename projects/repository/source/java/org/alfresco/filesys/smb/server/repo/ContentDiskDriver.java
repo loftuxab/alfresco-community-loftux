@@ -29,19 +29,23 @@ import org.alfresco.filesys.server.core.DeviceContext;
 import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.filesys.AccessDeniedException;
 import org.alfresco.filesys.server.filesys.AccessMode;
-import org.alfresco.filesys.server.filesys.DiskDeviceContext;
+import org.alfresco.filesys.server.filesys.DiskInterface;
 import org.alfresco.filesys.server.filesys.FileExistsException;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
+import org.alfresco.filesys.server.filesys.FileSharingException;
 import org.alfresco.filesys.server.filesys.FileStatus;
 import org.alfresco.filesys.server.filesys.FileSystem;
 import org.alfresco.filesys.server.filesys.NetworkFile;
 import org.alfresco.filesys.server.filesys.SearchContext;
 import org.alfresco.filesys.server.filesys.SrvDiskInfo;
 import org.alfresco.filesys.server.filesys.TreeConnection;
+import org.alfresco.filesys.smb.SharingMode;
+import org.alfresco.filesys.smb.server.repo.FileState.FileStateStatus;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.lock.NodeLockedException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -59,11 +63,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * First-pass implementation to enable SMB support in the repo.
+ * Content repository filesystem driver class
+ * 
+ * <p>Provides a filesystem interface for various protocols such as SMB/CIFS and FTP.
  * 
  * @author Derek Hulley
  */
-public class ContentDiskDriver implements ContentDiskInterface
+public class ContentDiskDriver implements DiskInterface
 {
     private static final String KEY_STORE = "store";
     private static final String KEY_ROOT_PATH = "rootPath";
@@ -82,10 +88,9 @@ public class ContentDiskDriver implements ContentDiskInterface
     private MimetypeService mimetypeService;
     private PermissionService permissionService;
 
-    private String shareName;
-    private NodeRef rootNodeRef;
-
     /**
+     * Class constructor
+     * 
      * @param serviceRegistry to connect to the repository services
      */
     public ContentDiskDriver(CifsHelper cifsHelper)
@@ -177,14 +182,18 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
     
     /**
-     * @param element the configuration element from which to configure the class
+     * Parse and validate the parameter string and create a device context object for this instance
+     * of the shared device. The same DeviceInterface implementation may be used for multiple
+     * shares.
+     * 
+     * @param args ConfigElement
+     * @return DeviceContext
+     * @exception DeviceContextException
      */
     public DeviceContext createContext(ConfigElement cfg) throws DeviceContextException
     {
-        // get the name of the share
-        shareName = cfg.getAttribute("name");
+        // Get the store
         
-        // get the store
         ConfigElement storeElement = cfg.getChild(KEY_STORE);
         if (storeElement == null || storeElement.getValue() == null || storeElement.getValue().length() == 0)
         {
@@ -193,23 +202,30 @@ public class ContentDiskDriver implements ContentDiskInterface
         String storeValue = storeElement.getValue();
         StoreRef storeRef = new StoreRef(storeValue);
         
-        // connect to the repo and ensure that the store exists
+        // Connect to the repo and ensure that the store exists
+        
         if (!unprotectedNodeService.exists(storeRef))
         {
             throw new DeviceContextException("Store not created prior to application startup: " + storeRef);
         }
         NodeRef storeRootNodeRef = unprotectedNodeService.getRootNode(storeRef);
         
-        // get the root path
+        // Get the root path
+        
         ConfigElement rootPathElement = cfg.getChild(KEY_ROOT_PATH);
         if (rootPathElement == null || rootPathElement.getValue() == null || rootPathElement.getValue().length() == 0)
         {
             throw new DeviceContextException("Device missing init value: " + KEY_ROOT_PATH);
         }
         String rootPath = rootPathElement.getValue();
-        // find the root node for this device
+        
+        // Find the root node for this device
+        
         List<NodeRef> nodeRefs = unprotectedSearchService.selectNodes(
                 storeRootNodeRef, rootPath, null, namespaceService, false);
+        
+        NodeRef rootNodeRef = null;
+        
         if (nodeRefs.size() > 1)
         {
             throw new DeviceContextException("Multiple possible roots for device: \n" +
@@ -228,31 +244,30 @@ public class ContentDiskDriver implements ContentDiskInterface
             rootNodeRef = nodeRefs.get(0);
         }
         
-        // create the context
-        DiskDeviceContext context = new DiskDeviceContext(rootNodeRef.toString());
+        // Create the context
+        
+        ContentContext context = new ContentContext(storeValue, rootPath, rootNodeRef);
 
-        //  Default the filesystem to look like an 80Gb sized disk with 90% free space
+        // Default the filesystem to look like an 80Gb sized disk with 90% free space
+        
         context.setDiskInformation(new SrvDiskInfo(2560, 64, 512, 2304));
         
-        // set parameters
+        // Set parameters
+        
         context.setFilesystemAttributes(FileSystem.CasePreservedNames);
         
-        // done
+        // Return the context for this shared filesystem
+        
         return context;
     }
 
-    public String getShareName()
-    {
-        return shareName;
-    }
-
-    public NodeRef getContextRootNodeRef()
-    {
-        return rootNodeRef;
-    }
-
     /**
-     * Always writable
+     * Determine if the disk device is read-only.
+     * 
+     * @param sess Server session
+     * @param ctx Device context
+     * @return boolean
+     * @exception java.io.IOException If an error occurs.
      */
     public boolean isReadOnly(SrvSession sess, DeviceContext ctx) throws IOException
     {
@@ -260,45 +275,83 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
     
     /**
-     * Helper method to get the device root
+     * Get the file information for the specified file.
      * 
-     * @param tree
-     * @return Returns the device root node
-     * @throws AlfrescoRuntimeException if the device root node does not exist
-     */
-    private NodeRef getDeviceRootNode(TreeConnection tree)
-    {
-        // get the device root
-        String deviceName = tree.getContext().getDeviceName();
-        NodeRef deviceRootNodeRef = new NodeRef(deviceName);
-        
-        // no need to check for existence - we checked when the service started
-        // done
-        return deviceRootNodeRef;
-    }
-    
-    /**
-     * Device method
-     * 
-     * @see ContentDiskDriver#getFileInformation(NodeRef, boolean)
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param name File name/path that information is required for.
+     * @return File information if valid, else null
+     * @exception java.io.IOException The exception description.
      */
     public FileInfo getFileInformation(SrvSession session, TreeConnection tree, String path) throws IOException
     {
         // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+        
+        ContentContext ctx = (ContentContext) tree.getContext();
+        NodeRef infoParentNodeRef = ctx.getRootNode();
+        String infoPath = path;
         
         try
         {
-            boolean includeName = (path.length() > 0);
-            FileInfo fileInfo = cifsHelper.getFileInformation(deviceRootNodeRef, path, includeName);
-            // done
-            if (logger.isDebugEnabled())
+            // Get the node ref for the path, chances are there is a file state in the cache
+            
+            FileInfo finfo = null;
+            NodeRef nodeRef = getNodeForPath(tree, infoPath);
+            if ( nodeRef != null)
             {
-                logger.debug("Getting file information: \n" +
-                        "   path: " + path + "\n" +
-                        "   file info: " + fileInfo);
+                // Get the file information for the node
+                
+                finfo = cifsHelper.getFileInformation(nodeRef, true);
+
+                // DEBUG
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("getInfo using cached noderef for path " + path);
             }
-            return fileInfo;
+            
+            // If the required node was not in the state cache, the parent folder node might be
+            
+            if ( finfo == null)
+            {
+                String[] paths = FileName.splitPath(path);
+                if ( paths[0] != null && paths[0].length() > 1)
+                {
+                    // Find the node ref for the folder being searched
+                    
+                    nodeRef = getNodeForPath(tree, paths[0]);
+                    
+                    if ( nodeRef != null)
+                    {
+                        infoParentNodeRef = nodeRef;
+                        infoPath          = paths[1];
+                        
+                        // DEBUG
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("getInfo using cached noderef for parent " + path);
+                    }
+                }
+            
+                // Access the repository to get the file information
+                
+                session.beginTransaction(transactionService, true);
+                
+                boolean includeName = (path.length() > 0);
+                finfo = cifsHelper.getFileInformation(infoParentNodeRef, infoPath, includeName);
+                
+                // DEBUG
+                
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Getting file information: \n" +
+                            "   path: " + path + "\n" +
+                            "   file info: " + finfo);
+                }
+            }
+
+            // Return the file information
+            
+            return finfo;
         }
         catch (FileNotFoundException e)
         {
@@ -334,22 +387,73 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
     }
 
+    /**
+     * Start a new search on the filesystem using the specified searchPath that may contain
+     * wildcards.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param searchPath File(s) to search for, may include wildcards.
+     * @param attrib Attributes of the file(s) to search for, see class SMBFileAttribute.
+     * @return SearchContext
+     * @exception java.io.FileNotFoundException If the search could not be started.
+     */
     public SearchContext startSearch(SrvSession sess, TreeConnection tree, String searchPath, int attributes) throws FileNotFoundException
     {
         try
         {
-            // get the device root
-            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+            // Access the device context
             
-            SearchContext ctx = ContentSearchContext.search(transactionService, cifsHelper, deviceRootNodeRef, searchPath, attributes);
+            ContentContext ctx = (ContentContext) tree.getContext();
+
+            String searchFileSpec = searchPath;
+            NodeRef searchRootNodeRef = ctx.getRootNode();
+            
+            // If the state table is available see if we can speed up the search using either cached
+            // file information or find the folder node to be searched without having to walk the path
+          
+            if ( ctx.hasStateTable())
+            {
+                // See if the folder to be searched has a file state, we can avoid having to walk the path
+                
+                String[] paths = FileName.splitPath(searchPath);
+                if ( paths[0] != null && paths[0].length() > 1)
+                {
+                    // Find the node ref for the folder being searched
+                    
+                    NodeRef nodeRef = getNodeForPath(tree, paths[0]);
+                    
+                    if ( nodeRef != null)
+                    {
+                        searchRootNodeRef = nodeRef;
+                        searchFileSpec    = paths[1];
+                        
+                        // DEBUG
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Search using cached noderef for path " + searchPath);
+                    }
+                }
+            }
+            
+            // Create the transaction
+            
+            sess.beginTransaction(transactionService, true);
+            
+            // Start the search
+            
+            SearchContext searchCtx = ContentSearchContext.search(transactionService, cifsHelper, searchRootNodeRef,
+                    searchFileSpec, attributes);
+            
             // done
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug("Started search: \n" +
                         "   search path: " + searchPath + "\n" +
                         "   attributes: " + attributes);
             }
-            return ctx;
+            return searchCtx;
         }
         catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
         {
@@ -376,25 +480,62 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
 
     /**
+     * Check if the specified file exists, and whether it is a file or directory.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param name java.lang.String
+     * @return int
      * @see FileStatus
      */
     public int fileExists(SrvSession sess, TreeConnection tree, String name)
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
         
-        int status = FileStatus.Unknown; 
-        // get the file info
+        int status = FileStatus.Unknown;
+        
         try
         {
-            FileInfo info = getFileInformation(sess, tree, name);
-            if (info.isDirectory())
+            // Check for a cached file state
+            
+            ContentContext ctx = (ContentContext) tree.getContext();
+            FileState fstate = null;
+            
+            if ( ctx.hasStateTable())
+                ctx.getStateTable().findFileState(name);
+            
+            if ( fstate != null)
             {
-                status = FileStatus.DirectoryExists;
+                FileStateStatus fsts = fstate.getFileStatus();
+
+                if ( fsts == FileStateStatus.FileExists)
+                    status = FileStatus.FileExists;
+                else if ( fsts == FileStateStatus.FolderExists)
+                    status = FileStatus.DirectoryExists;
+                else if ( fsts == FileStateStatus.NotExist || fsts == FileStateStatus.Renamed)
+                    status = FileStatus.NotExist;
+                
+                // DEBUG
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Cache hit - fileExists() " + name + ", sts=" + status);
             }
             else
             {
-                status = FileStatus.FileExists;
+                // Create the transaction
+                
+                sess.beginTransaction(transactionService, true);
+                
+                // Get the file information to check if the file/folder exists
+                
+                FileInfo info = getFileInformation(sess, tree, name);
+                if (info.isDirectory())
+                {
+                    status = FileStatus.DirectoryExists;
+                }
+                else
+                {
+                    status = FileStatus.FileExists;
+                }
             }
         }
         catch (FileNotFoundException e)
@@ -431,17 +572,16 @@ public class ContentDiskDriver implements ContentDiskInterface
      */
     public NetworkFile openFile(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
+        // Create the transaction
+        
+        sess.beginTransaction(transactionService, false);
+        
         try
         {
-            // Get the device root
+            // Get the node for the path
             
-            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-            
-            String path = params.getPath(); 
-    
-            // Get the file/folder node
-            
-            NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, path);
+            ContentContext ctx = (ContentContext) tree.getContext();
+            NodeRef nodeRef = getNodeForPath(tree, params.getPath());
             
             // Check permissions on the file/folder node
             //
@@ -463,16 +603,54 @@ public class ContentDiskDriver implements ContentDiskInterface
                     permissionService.hasPermission(nodeRef, PermissionService.DELETE) == AccessStatus.DENIED)
                 throw new AccessDeniedException("No delete access to " + params.getFullPath());
             
+            //  Check if there is a file state for the file
+
+            FileState fstate = null;
+            
+            if ( ctx.hasStateTable())
+            {
+                // Check if there is a file state for the file
+
+                fstate = ctx.getStateTable().findFileState( params.getPath());
+            
+                if ( fstate != null)
+                {                
+                    // Check if the file exists
+                    
+                    if ( fstate.exists() == false)
+                        throw new FileNotFoundException();
+                    
+                    // Check if the open request shared access indicates exclusive file access
+                    
+                    if ( fstate != null && params.getSharedAccess() == SharingMode.NOSHARING &&
+                            fstate.getOpenCount() > 0)
+                        throw new FileSharingException("File already open, " + params.getPath());
+                }
+            }
+            
             // Create the network file
             
             NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
+            
+            // Create a file state for the open file
+            
+            if ( ctx.hasStateTable())
+            {
+                if ( fstate  == null)
+                    fstate = ctx.getStateTable().findFileState(params.getPath(), params.isDirectory(), true);
+            
+                // Update the file state, cache the node
+                
+                fstate.incrementOpenCount();
+                fstate.setNodeRef(nodeRef);
+            }
             
             // Debug
             
             if (logger.isDebugEnabled())
             {
                 logger.debug("Opened network file: \n" +
-                        "   path: " + path + "\n" +
+                        "   path: " + params.getPath() + "\n" +
                         "   file open parameters: " + params + "\n" +
                         "   network file: " + netFile);
             }
@@ -506,23 +684,56 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
     
     /**
-     * @see CifsHelper#createNode(NodeRef, String, boolean)
+     * Create a new file on the file system.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param params File create parameters
+     * @return NetworkFile
+     * @exception java.io.IOException If an error occurs.
      */
     public NetworkFile createFile(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
+        // Create the transaction
+        
+        sess.beginTransaction(transactionService, false);
+        
         try
         {
             // get the device root
-            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
 
-            String path = params.getPath(); 
-            boolean isFile = !params.isDirectory();
+            ContentContext ctx = (ContentContext) tree.getContext();
+            NodeRef deviceRootNodeRef = ctx.getRootNode();
             
-            // create it - the path will be created, if necessary
-            NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
+            String path = params.getPath(); 
+            
+            // Create it - the path will be created, if necessary
+            
+            NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, true);
             
             // create the network file
             NetworkFile netFile = ContentNetworkFile.createFile(nodeService, contentService, cifsHelper, nodeRef, params);
+            
+            // Add a file state for the new file/folder
+            
+            if ( ctx.hasStateTable())
+            {
+                FileState fstate = ctx.getStateTable().findFileState(path, false, true);
+                if ( fstate != null)
+                {
+                    // Indicate that the file is open
+    
+                    fstate.setFileStatus(FileStateStatus.FileExists);
+                    fstate.incrementOpenCount();
+                    fstate.setNodeRef(nodeRef);
+                    
+                    // DEBUG
+                    
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Creaste file, state=" + fstate);
+                }
+            }
+            
             // done
             if (logger.isDebugEnabled())
             {
@@ -559,18 +770,53 @@ public class ContentDiskDriver implements ContentDiskInterface
         
     }
 
+    /**
+     * Create a new directory on this file system.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection.
+     * @param params Directory create parameters
+     * @exception java.io.IOException If an error occurs.
+     */
     public void createDirectory(SrvSession sess, TreeConnection tree, FileOpenParams params) throws IOException
     {
+        // Create the transaction
+        
+        sess.beginTransaction(transactionService, false);
+        
         try
         {
             // get the device root
-            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+            
+            ContentContext ctx = (ContentContext) tree.getContext();
+            NodeRef deviceRootNodeRef = ctx.getRootNode();
             
             String path = params.getPath(); 
-            boolean isFile = !params.isDirectory();
             
-            // create it - the path will be created, if necessary
-            NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, isFile);
+            // Create it - the path will be created, if necessary
+            
+            NodeRef nodeRef = cifsHelper.createNode(deviceRootNodeRef, path, false);
+
+            // Add a file state for the new folder
+            
+            if ( ctx.hasStateTable())
+            {
+                FileState fstate = ctx.getStateTable().findFileState(path, true, true);
+                if ( fstate != null)
+                {
+                    // Indicate that the file is open
+    
+                    fstate.setFileStatus(FileStateStatus.FolderExists);
+                    fstate.incrementOpenCount();
+                    fstate.setNodeRef(nodeRef);
+                    
+                    // DEBUG
+                    
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Creaste folder, state=" + fstate);
+                }
+            }
+            
             // done
             if (logger.isDebugEnabled())
             {
@@ -604,10 +850,24 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
     }
 
+    /**
+     * Delete the directory from the filesystem.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param dir Directory name.
+     * @exception java.io.IOException The exception description.
+     */
     public void deleteDirectory(SrvSession sess, TreeConnection tree, String dir) throws IOException
     {
+        // Create the transaction
+        
+        sess.beginTransaction(transactionService, false);
+        
         // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+        
+        ContentContext ctx = (ContentContext) tree.getContext();
+        NodeRef deviceRootNodeRef = ctx.getRootNode();
         
         try
         {
@@ -616,6 +876,11 @@ public class ContentDiskDriver implements ContentDiskInterface
             if (nodeService.exists(nodeRef))
             {
                 nodeService.deleteNode(nodeRef);
+                
+                // Remove the file state
+                
+                if ( ctx.hasStateTable())
+                    ctx.getStateTable().removeFileState(dir);
             }
             // done
             if (logger.isDebugEnabled())
@@ -658,6 +923,14 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
     }
 
+    /**
+     * Flush any buffered output for the specified file.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param file Network file context.
+     * @exception java.io.IOException The exception description.
+     */
     public void flushFile(SrvSession sess, TreeConnection tree, NetworkFile file) throws IOException
     {
         // Flush the file data
@@ -665,8 +938,31 @@ public class ContentDiskDriver implements ContentDiskInterface
         file.flushFile();
     }
 
+    /**
+     * Close the file.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection.
+     * @param param Network file context.
+     * @exception java.io.IOException If an error occurs.
+     */
     public void closeFile(SrvSession sess, TreeConnection tree, NetworkFile file) throws IOException
     {
+        // Create the transaction
+        
+        sess.beginTransaction(transactionService, false);
+        
+        // Get the associated file state
+        
+        ContentContext ctx = (ContentContext) tree.getContext();
+        
+        if ( ctx.hasStateTable())
+        {
+            FileState fstate = ctx.getStateTable().findFileState(file.getFullName());
+            if ( fstate != null)
+                fstate.decrementOpenCount();
+        }
+        
         // Defer to the network file to close the stream and remove the content
            
         file.closeFile();
@@ -684,6 +980,11 @@ public class ContentDiskDriver implements ContentDiskInterface
                     // Delete the file
                     
                     nodeService.deleteNode(nodeRef);
+
+                    // Remove the file state
+                    
+                    if ( ctx.hasStateTable())
+                        ctx.getStateTable().removeFileState(file.getFullName());
                 }
                 catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
                 {
@@ -707,19 +1008,38 @@ public class ContentDiskDriver implements ContentDiskInterface
         }
     }
 
+    /**
+     * Delete the specified file.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param file NetworkFile
+     * @exception java.io.IOException The exception description.
+     */
     public void deleteFile(SrvSession sess, TreeConnection tree, String name) throws IOException
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+        // Create the transaction
+        
+        sess.beginTransaction(transactionService, false);
+        
+        // Get the device context
+        
+        ContentContext ctx = (ContentContext) tree.getContext();
         
         try
         {
             // get the node
-            NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, name);
+            NodeRef nodeRef = getNodeForPath(tree, name);
             if (nodeService.exists(nodeRef))
             {
                 nodeService.deleteNode(nodeRef);
+                
+                // Remove the file state
+                
+                if ( ctx.hasStateTable())
+                    ctx.getStateTable().removeFileState(name);
             }
+            
             // done
             if (logger.isDebugEnabled())
             {
@@ -762,64 +1082,77 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
 
     /**
-     * This is used by both rename and move
+     * Rename the specified file.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param oldName java.lang.String
+     * @param newName java.lang.String
+     * @exception java.io.IOException The exception description.
      */
     public void renameFile(SrvSession sess, TreeConnection tree, String oldName, String newName) throws IOException
     {
-        // get the device root
-        NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
+        // Create the transaction
         
-        // check that the target node doesn't exist
+        sess.beginTransaction(transactionService, false);
+        
         try
         {
-            NodeRef existingNodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, newName);
-            // we found a node with a conflicting name - check for the type of the old name
-            NodeRef oldNodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, oldName);
-            if (cifsHelper.isDirectory(existingNodeRef) == cifsHelper.isDirectory(oldNodeRef))
+            // Get the device context
+            
+            ContentContext ctx = (ContentContext) tree.getContext();
+            
+            // Check that the target node doesn't exist
+            
+            int newNodeSts = fileExists(sess, tree, newName);
+
+            if ( newNodeSts != FileStatus.NotExist)
             {
-                // name clash and both are of the same type
+                // Destination file/folder already exists
+                
                 throw new FileExistsException();
             }
-        }
-        catch (FileNotFoundException e)
-        {
-            // good - the file doesn't exist
-        }
-        
-        try
-        {
-            // get the file/folder to move
-            NodeRef nodeToMoveRef = cifsHelper.getNodeRef(deviceRootNodeRef, oldName);
+
+            // Get the file/folder to move
+            
+            NodeRef nodeToMoveRef = getNodeForPath(tree, oldName);
             ChildAssociationRef nodeToMoveAssoc = nodeService.getPrimaryParent(nodeToMoveRef);
             
-            // get the new target folder - it must be a folder
+            // Get the new target folder - it must be a folder
+            
             String[] splitPaths = FileName.splitPath(newName);
-            NodeRef targetFolderRef = cifsHelper.getNodeRef(deviceRootNodeRef, splitPaths[0]);
+            NodeRef targetFolderRef = getNodeForPath(tree, splitPaths[0]);
+            
             if (!cifsHelper.isDirectory(targetFolderRef))
             {
                 throw new AlfrescoRuntimeException("Cannot move not into anything but a folder: \n" +
-                        "   device root: " + deviceRootNodeRef + "\n" +
+                        "   device root: " + ctx.getRootNode() + "\n" +
                         "   old path: " + oldName + "\n" +
                         "   new path: " + newName);
             }
             
-            // we escape the local name of the path so that it conforms to the general standard of being
+            // We escape the local name of the path so that it conforms to the general standard of being
             // an escaped version of the name property
-            QName newAssocQName = QName.createQName(
-                    NamespaceService.CONTENT_MODEL_1_0_URI,
-                    QName.createValidLocalName(splitPaths[1]));
             
-            // move it
+            QName newAssocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(splitPaths[1]));
+            
+            // Move it
+            
             nodeService.moveNode(nodeToMoveRef, targetFolderRef, nodeToMoveAssoc.getTypeQName(), newAssocQName);
             
-            // set the properties
+            // Set the properties
+            
             Map<QName, Serializable> properties = nodeService.getProperties(nodeToMoveRef);
             properties.put(ContentModel.PROP_NAME, splitPaths[1]);
+            
             if (!cifsHelper.isDirectory(nodeToMoveRef))
             {
                 // reguess the mimetype in case the extension has changed
+                
                 String mimetype = mimetypeService.guessMimetype(splitPaths[1]);
+                
                 // get the current content properties
+                
                 ContentData contentData = (ContentData) properties.get(ContentModel.PROP_CONTENT);
                 if (contentData == null)
                 {
@@ -840,14 +1173,99 @@ public class ContentDiskDriver implements ContentDiskInterface
                 properties.put(ContentModel.PROP_CONTENT, contentData);
             }
             nodeService.setProperties(nodeToMoveRef, properties);
+
+            // Update the state table
             
-            // done
-            if (logger.isDebugEnabled())
+            if ( ctx.hasStateTable())
             {
-                logger.debug("Moved node: \n" +
-                        "   from: " + oldName + "\n" +
-                        "   to: " + newName);
+                // Check if the file rename can be relinked to a previous version
+                
+                if ( cifsHelper.isDirectory(nodeToMoveRef) == false)
+                {
+                    // Check if there is a renamed file state for the new file name
+                    
+                    FileState renState = ctx.getStateTable().removeFileState(newName);
+                    
+                    if ( renState != null && renState.getFileStatus() == FileStateStatus.Renamed)
+                    {
+                        // DEBUG
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug(" Found rename state, relinking, " + renState);
+                        
+                        // Relink the new version of the file data to the previously renamed node so that it
+                        // picks up version history and other settings.
+                        
+                        cifsHelper.relinkNode( renState.getNodeRef(), nodeToMoveRef);
+
+                        // Link the node ref for the associated rename state
+                        
+                        if ( renState.hasRenameState())
+                            renState.getRenameState().setNodeRef(nodeToMoveRef);
+                        
+                        // Remove the file state for the old file name
+                        
+                        ctx.getStateTable().removeFileState(oldName);
+                        
+                        // Get, or create, a file state for the new file path
+                        
+                        FileState fstate = ctx.getStateTable().findFileState(newName, false, true);
+                        
+                        fstate.setNodeRef(renState.getNodeRef());
+                        fstate.setFileStatus(FileStateStatus.FileExists);
+                    }
+                    else
+                    {
+                        // Get or create a new file state for the old file path
+                        
+                        FileState fstate = ctx.getStateTable().findFileState(oldName, false, true);
+                        
+                        // Make sure the file state is cached for a short while, the file may not be open so the
+                        // file state could be expired
+                        
+                        fstate.setExpiryTime(System.currentTimeMillis() + FileState.RenameTimeout);
+                        
+                        // Indicate that this is a renamed file state, set the node ref of the file that was renamed
+                        
+                        fstate.setFileStatus(FileStateStatus.Renamed);
+                        fstate.setNodeRef(nodeToMoveRef);
+                        
+                        // Get, or create, a file state for the new file path
+                        
+                        FileState newState = ctx.getStateTable().findFileState(newName, false, true);
+                        
+                        newState.setNodeRef(nodeToMoveRef);
+                        newState.setFileStatus(FileStateStatus.FileExists);
+                        
+                        // Link the renamed state to the new state
+                        
+                        fstate.setRenameState(newState);
+                        
+                        // DEBUG
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Cached rename state for " + oldName + ", state=" + fstate);
+                    }
+                }
+                else
+                {
+                    // Get the file state for the folder, if available
+                    
+                    FileState fstate = ctx.getStateTable().findFileState(oldName);
+                    
+                    if ( fstate != null)
+                    {
+                        // Update the file state index to use the new name
+                        
+                        ctx.getStateTable().renameFileState(newName, fstate);
+                    }
+                }
             }
+
+            // DEBUG
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Moved node: " + " from: " + oldName + " to: " + newName);
         }
         catch (org.alfresco.repo.security.permissions.AccessDeniedException ex)
         {
@@ -859,6 +1277,17 @@ public class ContentDiskDriver implements ContentDiskInterface
             // Convert to a filesystem access denied status
             
             throw new AccessDeniedException("Rename file " + oldName);
+        }
+        catch (NodeLockedException ex)
+        {
+            // Debug
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Rename file", ex);
+            
+            // Convert to an filesystem access denied exception
+            
+            throw new AccessDeniedException("Node locked " + oldName);
         }
         catch (AlfrescoRuntimeException ex)
         {
@@ -886,13 +1315,9 @@ public class ContentDiskDriver implements ContentDiskInterface
     {
         try
         {
-            // Get the device root
-            
-            NodeRef deviceRootNodeRef = getDeviceRootNode(tree);
-    
             // Get the file/folder node
             
-            NodeRef nodeRef = cifsHelper.getNodeRef(deviceRootNodeRef, name);
+            NodeRef nodeRef = getNodeForPath(tree, name);
             
             // Check permissions on the file/folder node
             
@@ -924,11 +1349,20 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
 
     /**
-     * Called once the size of the incoming file data is known
+     * Truncate a file to the specified size
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param file Network file details
+     * @param siz New file length
+     * @exception java.io.IOException The exception description.
      */
     public void truncateFile(SrvSession sess, TreeConnection tree, NetworkFile file, long size) throws IOException
     {
+        // Truncate or extend the file to the required size
+        
         file.truncateFile(size);
+        
         // done
         if (logger.isDebugEnabled())
         {
@@ -939,7 +1373,17 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
 
     /**
-     * Defers to the network file
+     * Read a block of data from the specified file.
+     * 
+     * @param sess Session details
+     * @param tree Tree connection
+     * @param file Network file
+     * @param buf Buffer to return data to
+     * @param bufPos Starting position in the return buffer
+     * @param siz Maximum size of data to return
+     * @param filePos File offset to read data
+     * @return Number of bytes read
+     * @exception java.io.IOException The exception description.
      */
     public int readFile(
             SrvSession sess, TreeConnection tree, NetworkFile file,
@@ -950,7 +1394,10 @@ public class ContentDiskDriver implements ContentDiskInterface
         if(file.isDirectory())
             throw new AccessDeniedException();
             
+        // Read a block of data from the file
+        
         int count = file.readFile(buffer, size, bufferPosition, fileOffset);
+        
         // done
         if (logger.isDebugEnabled())
         {
@@ -965,18 +1412,41 @@ public class ContentDiskDriver implements ContentDiskInterface
         return count;
     }
 
+    /**
+     * Seek to the specified file position.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param file Network file.
+     * @param pos Position to seek to.
+     * @param typ Seek type.
+     * @return New file position, relative to the start of file.
+     */
     public long seekFile(SrvSession sess, TreeConnection tree, NetworkFile file, long pos, int typ) throws IOException
     {
-        throw new UnsupportedOperationException("Unsupported: " + file);
+        throw new UnsupportedOperationException("Unsupported: " + file + " (seek)");
     }
 
     /**
-     * Called to transfer data to the underlying content
+     * Write a block of data to the file.
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
+     * @param file Network file details
+     * @param buf byte[] Data to be written
+     * @param bufoff Offset within the buffer that the data starts
+     * @param siz int Data length
+     * @param fileoff Position within the file that the data is to be written.
+     * @return Number of bytes actually written
+     * @exception java.io.IOException The exception description.
      */
     public int writeFile(SrvSession sess, TreeConnection tree, NetworkFile file,
             byte[] buffer, int bufferOffset, int size, long fileOffset) throws IOException
     {
+        // Write to the file
+        
         file.writeFile(buffer, size, bufferOffset, fileOffset);
+        
         // done
         if (logger.isDebugEnabled())
         {
@@ -990,17 +1460,53 @@ public class ContentDiskDriver implements ContentDiskInterface
     }
 
     /**
-     * NOOP
+     * Get the node for the specified path
+     * 
+     * @param tree TreeConnection
+     * @param path String
+     * @return NodeRef
+     * @exception FileNotFoundException
+     */
+    private NodeRef getNodeForPath(TreeConnection tree, String path)
+        throws FileNotFoundException
+    {
+        // Check if there is a cached state for the path
+        
+        ContentContext ctx = (ContentContext) tree.getContext();
+        
+        if ( ctx.hasStateTable())
+        {
+            // Try and get the node ref from an in memory file state
+            
+            FileState fstate = ctx.getStateTable().findFileState(path);
+            if ( fstate != null && fstate.hasNodeRef() && fstate.exists())
+                return fstate.getNodeRef();
+        }
+        
+        // Search the repository for the node
+        
+        return cifsHelper.getNodeRef(ctx.getRootNode(), path);
+    }
+    
+    /**
+     * Connection opened to this disk device
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
      */
     public void treeClosed(SrvSession sess, TreeConnection tree)
     {
+        // Nothing to do
     }
 
     /**
-     * NOOP
+     * Connection closed to this device
+     * 
+     * @param sess Server session
+     * @param tree Tree connection
      */
     public void treeOpened(SrvSession sess, TreeConnection tree)
     {
+        // Nothing to do
     }
-
 }

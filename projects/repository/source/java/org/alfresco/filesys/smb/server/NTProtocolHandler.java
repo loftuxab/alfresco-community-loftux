@@ -46,6 +46,7 @@ import org.alfresco.filesys.server.filesys.FileOfflineException;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
 import org.alfresco.filesys.server.filesys.FileSharingException;
 import org.alfresco.filesys.server.filesys.FileStatus;
+import org.alfresco.filesys.server.filesys.FileSystem;
 import org.alfresco.filesys.server.filesys.NetworkFile;
 import org.alfresco.filesys.server.filesys.NotifyChange;
 import org.alfresco.filesys.server.filesys.PathNotFoundException;
@@ -1043,13 +1044,14 @@ public class NTProtocolHandler extends CoreProtocolHandler
     
                     NTFSStreamsInterface ntfsStreams = (NTFSStreamsInterface) shareDev.getInterface();
                     if (ntfsStreams.hasStreamsEnabled(m_sess, tree))
-                        devType = "NTFS";
+                        devType = FileSystem.TypeNTFS;
                 }
                 else
                 {
-                    // Default to a FAT type filesystem
-                    
-                    devType = "FAT";
+                    // Get the filesystem type from the context
+
+                    DiskDeviceContext diskCtx = (DiskDeviceContext) tree.getContext();
+                    devType = diskCtx.getFilesystemType();
                 }
             }
         }
@@ -1544,13 +1546,14 @@ public class NTProtocolHandler extends CoreProtocolHandler
     
                     NTFSStreamsInterface ntfsStreams = (NTFSStreamsInterface) shareDev.getInterface();
                     if (ntfsStreams.hasStreamsEnabled(m_sess, tree))
-                        devType = "NTFS";
+                        devType = FileSystem.TypeNTFS;
                 }
                 else
                 {
-                    // Default to a FAT type filesystem
-                    
-                    devType = "FAT";
+                    // Get the filesystem type from the context
+
+                    DiskDeviceContext diskCtx = (DiskDeviceContext) tree.getContext();
+                    devType = diskCtx.getFilesystemType();
                 }
             }
         }
@@ -3969,7 +3972,8 @@ public class NTProtocolHandler extends CoreProtocolHandler
             // Filesystem attribute information
 
             case DiskInfoPacker.InfoFsAttribute:
-                String fsType = "FAT32";
+                String fsType = diskCtx.getFilesystemType();
+                
                 if (disk instanceof NTFSStreamsInterface)
                 {
 

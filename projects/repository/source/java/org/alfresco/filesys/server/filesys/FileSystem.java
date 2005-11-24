@@ -39,4 +39,9 @@ public final class FileSystem
     public static final int VolumeIsCompressed = 0x00008000;
     public static final int ObjectIds = 0x00010000;
     public static final int Encryption = 0x00020000;
+    
+    // Filesystem type strings
+    
+    public static final String TypeFAT  = "FAT";
+    public static final String TypeNTFS = "NTFS";
 }

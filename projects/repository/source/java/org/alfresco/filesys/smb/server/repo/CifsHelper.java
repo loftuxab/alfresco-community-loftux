@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -596,4 +597,68 @@ public class CifsHelper
         return nodeRef;
     }
 
+    /**
+     * Relink the content data from a new node to an existing node to preserve the version history.
+     * 
+     * @param oldNode NodeRef
+     * @param newNode NodeRef
+     */
+    public void relinkNode(NodeRef oldNode, NodeRef newNode)
+    {
+        // Get the properties for the old and new nodes
+        
+        Map<QName, Serializable> oldProperties = nodeService.getProperties(oldNode);
+        Map<QName, Serializable> newProperties = nodeService.getProperties(newNode);
+
+        // Save the current name of the old node
+        
+        String oldName = (String) oldProperties.get(ContentModel.PROP_NAME);
+        
+        // Link the new content into the old node, and reset the old nodes name to the new nodes name
+        
+        oldProperties.put(ContentModel.PROP_NAME, newProperties.get(ContentModel.PROP_NAME));
+        
+        if (! isDirectory(oldNode))
+        {
+            // Replace the content of the old node with the new version
+            
+            ContentData contentData = (ContentData) newProperties.get(ContentModel.PROP_CONTENT);
+            if (contentData == null)
+            {
+                // Guess the mimetype from the file extension
+                
+                String mimetype = mimetypeService.guessMimetype((String) newProperties.get(ContentModel.PROP_NAME));
+                
+                // Create empty content
+                
+                contentData = new ContentData(
+                        null,
+                        mimetype,
+                        0L,
+                        "UTF-8");
+            }
+            else
+            {
+                contentData = new ContentData(
+                        contentData.getContentUrl(),
+                        contentData.getMimetype(),
+                        contentData.getSize(),
+                        contentData.getEncoding());
+            }
+            oldProperties.put(ContentModel.PROP_CONTENT, contentData);
+        }
+        
+        // Update the old node with the new content and original name
+        
+        nodeService.setProperties(oldNode, oldProperties);
+        
+        // Rename the new node to the old name, and replace the content with empty content
+        
+        newProperties.put(ContentModel.PROP_NAME, oldName);
+        
+        ContentData nullData = new ContentData(null, "", 0L, "UTF-8");
+        newProperties.put(ContentModel.PROP_CONTENT, nullData);
+        
+        nodeService.setProperties(newNode, newProperties);
+    }
 }

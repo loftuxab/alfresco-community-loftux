@@ -18,9 +18,13 @@ package org.alfresco.filesys.server;
 
 import java.net.InetAddress;
 
+import javax.transaction.UserTransaction;
+
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.server.auth.ClientInfo;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
+import org.alfresco.service.transaction.TransactionService;
 
 /**
  * Server Session Base Class
@@ -82,6 +86,11 @@ public abstract class SrvSession
     //  List of dynamic/temporary shares created for this session
     
     private SharedDeviceList m_dynamicShares;
+    
+    // Active transaction and read/write flag
+    
+    private UserTransaction m_transaction;
+    private boolean m_readOnlyTrans;
     
     /**
      * Class constructor
@@ -448,5 +457,89 @@ public abstract class SrvSession
             
             getServer().getShareMapper().deleteShares(this);
         }
+    }
+    
+    /**
+     * Create and start a transaction, if not already active
+     * 
+     * @param transService TransactionService
+     * @param readOnly boolean
+     * @return boolean
+     * @exception AlfrescoRuntimeException
+     */
+    public final boolean beginTransaction(TransactionService transService, boolean readOnly)
+        throws AlfrescoRuntimeException
+    {
+        boolean created = false;
+        
+        // If there is an active transaction check that it is the required type
+        
+        if ( m_transaction != null)
+        {
+            // Check if the transaction is a write transaction, if write has been requested
+            
+            if ( readOnly == false && m_readOnlyTrans == true)
+            {
+                // Commit the read-only transaction
+                
+                try
+                {
+                    m_transaction.commit();
+                }
+                catch ( Exception ex)
+                {
+                    throw new AlfrescoRuntimeException("Failed to commit read-only transaction, " + ex.getMessage());
+                }
+                finally
+                {
+                    // Clear the active transaction
+
+                    m_transaction = null;
+                }
+            }
+        }
+        
+        // Create the transaction
+        
+        if ( m_transaction == null)
+        {
+            try
+            {
+                m_transaction = transService.getUserTransaction(readOnly);
+                m_transaction.begin();
+                
+                created = true;
+                
+                m_readOnlyTrans = readOnly;
+            }
+            catch (Exception ex)
+            {
+                throw new AlfrescoRuntimeException("Failed to create transaction, " + ex.getMessage());
+            }
+        }
+        
+        return created;
+    }
+    
+    /**
+     * Determine if the session has an active transaction
+     * 
+     * @return boolean
+     */
+    public final boolean hasUserTransaction()
+    {
+        return m_transaction != null ? true : false;
+    }
+    
+    /**
+     * Get the active transaction and clear the stored transaction
+     * 
+     *  @return UserTransaction
+     */
+    public final UserTransaction getUserTransaction()
+    {
+        UserTransaction trans = m_transaction;
+        m_transaction = null;
+        return trans;
     }
 }

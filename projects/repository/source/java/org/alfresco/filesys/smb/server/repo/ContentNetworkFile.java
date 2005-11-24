@@ -324,17 +324,36 @@ public class ContentNetworkFile extends NetworkFile
         }
     }
 
-    @Override
+    /**
+     * Write a block of data to the file.
+     * 
+     * @param buf byte[]
+     * @param len int
+     * @param pos int
+     * @param fileOff long
+     * @exception IOException
+     */
     public synchronized void writeFile(byte[] buffer, int length, int position, long fileOffset) throws IOException
     {
-        // open the channel for writing
+        // Open the channel for writing
+        
         openContent(true);
-        // write to the channel
+        
+        // Write to the channel
+        
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer, position, length);
         int count = channel.write(byteBuffer, fileOffset);
-        // set modification flag
+        
+        // Set modification flag
+        
         modified = true;
-        // done
+
+        // Update the current file size
+        
+        setFileSize(channel.size());
+        
+        // DEBUG
+        
         if (logger.isDebugEnabled())
         {
             logger.debug("Wrote to channel: " +
@@ -343,7 +362,16 @@ public class ContentNetworkFile extends NetworkFile
         }
     }
 
-    @Override
+    /**
+     * Read from the file.
+     * 
+     * @param buf byte[]
+     * @param len int
+     * @param pos int
+     * @param fileOff long
+     * @return Length of data read.
+     * @exception IOException
+     */
     public synchronized int readFile(byte[] buffer, int length, int position, long fileOffset) throws IOException
     {
         // open the channel for reading

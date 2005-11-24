@@ -58,6 +58,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * SMB Session Class
+ * 
  * <p>
  * The SMB server creates a server session object for each incoming session request.
  * <p>
@@ -150,8 +152,7 @@ public class SMBSrvSession extends SrvSession implements Runnable
     private boolean m_notifyPending;
 
     // Default SMB/CIFS flags anf flags2, ORed with the SMB packet flags/flags2 before sending a
-    // response
-    // to the client.
+    // response to the client.
 
     private int m_defFlags;
     private int m_defFlags2;
@@ -159,10 +160,8 @@ public class SMBSrvSession extends SrvSession implements Runnable
     // Asynchrnous response packet queue
     //
     // Contains SMB response packets that could not be sent due to SMB requests being processed. The
-    // asynchronous
-    // responses must be sent after any pending requests have been processed as the client may
-    // disconnect the
-    // session.
+    // asynchronous responses must be sent after any pending requests have been processed as the client may
+    // disconnect the session.
 
     private Vector<SMBSrvPacket> m_asynchQueue;
 
@@ -1480,11 +1479,6 @@ public class SMBSrvSession extends SrvSession implements Runnable
      */
     public void run()
     {
-        // Transaction used to wrap all processing
-        
-        UserTransaction tx = null;
-        TransactionService transactionService = getSMBServer().getConfiguration().getTransactionService();
-        
         try
         {
 
@@ -1493,15 +1487,18 @@ public class SMBSrvSession extends SrvSession implements Runnable
             if (logger.isDebugEnabled() && hasDebug(SMBSrvSession.DBG_NEGOTIATE))
                 logger.debug("Server session started");
 
+            // Get the transaction service
+            
+            TransactionService transactionService = getSMBServer().getConfiguration().getTransactionService();
+            
             // The server session loops until the NetBIOS hangup state is set.
 
             while (m_state != SMBSrvSessionState.NBHANGUP)
             {
 
                 // Set the current receive length to -1 to indicate that the session thread is not
-                // currently processing
-                // an SMB packet. This is used by the asynchronous response code to determine when
-                // it can send the response.
+                // currently processing an SMB packet. This is used by the asynchronous response code
+                // to determine when it can send the response.
 
                 m_rxlen = -1;
 
@@ -1526,10 +1523,9 @@ public class SMBSrvSession extends SrvSession implements Runnable
 
                 m_smbPkt.setReceivedLength(m_rxlen);
 
-                // Create a transaction for the request
+                // Start a transaction
                 
-                tx = transactionService.getUserTransaction();
-                tx.begin();
+                beginTransaction(transactionService, false);
                 
                 // Process the received packet
 
@@ -1565,16 +1561,16 @@ public class SMBSrvSession extends SrvSession implements Runnable
 
                 } // end switch session state
 
-                // Commit the transaction
+                // Check for an active transaction, and commit it
                 
-                if ( tx != null)
+                if ( hasUserTransaction())
                 {
                     try
                     {
                         // Commit the transaction
 
-                        tx.commit();
-                        tx = null;
+                        UserTransaction trans = getUserTransaction();
+                        trans.commit();
                     }
                     catch ( Exception ex)
                     {
@@ -1584,7 +1580,7 @@ public class SMBSrvSession extends SrvSession implements Runnable
                             logger.debug("Error committing transaction", ex);
                     }
                 }
-                
+
                 // Give up the CPU
 
                 Thread.yield();
@@ -1614,12 +1610,11 @@ public class SMBSrvSession extends SrvSession implements Runnable
         {
             // If there is an active transaction then roll it back
             
-            if ( tx != null)
+            if ( hasTransaction())
             {
                 try
                 {
-                    tx.rollback();
-                    tx = null;
+                    getUserTransaction().rollback();
                 }
                 catch (Exception ex)
                 {

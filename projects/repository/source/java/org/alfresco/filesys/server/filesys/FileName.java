@@ -456,11 +456,6 @@ public final class FileName
             pathStr[1] = "";
         }
 
-        // Debug
-
-        // Debug.println ( "SplitPath: original=" + path + ", pathStr[0]=" + pathStr[0] + ",
-        // pathStr[1]=" + pathStr[1]);
-
         // Return the path strings
 
         return pathStr;

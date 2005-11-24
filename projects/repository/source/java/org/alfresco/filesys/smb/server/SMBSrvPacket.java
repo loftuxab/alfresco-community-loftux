@@ -778,6 +778,9 @@ public class SMBSrvPacket
         case PacketType.NTTransactSecond:
             pktType = "NTTRANSACT_SECONDARY";
             break;
+        case PacketType.ReadAndX:
+            pktType = "READ_ANDX";
+            break;
         default:
             pktType = "0x" + Integer.toHexString(getCommand());
             break;

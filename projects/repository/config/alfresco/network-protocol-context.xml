@@ -51,7 +51,7 @@
    <!-- Filesystem Interface -->   
    <bean id="contentDiskDriver" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="proxyInterfaces">
-         <value>org.alfresco.filesys.smb.server.repo.ContentDiskInterface</value>
+         <value>org.alfresco.filesys.server.filesys.DiskInterface</value>
       </property>
       <property name="transactionManager"><ref bean="transactionManager"/></property>
       <property name="target">
