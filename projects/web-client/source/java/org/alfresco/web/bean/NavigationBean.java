@@ -27,6 +27,8 @@ import javax.faces.event.ActionEvent;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.CIFSServer;
+import org.alfresco.filesys.server.filesys.DiskSharedDevice;
+import org.alfresco.filesys.smb.server.repo.ContentContext;
 import org.alfresco.filesys.smb.server.repo.ContentDiskInterface;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -302,13 +304,17 @@ public class NavigationBean
          Path path = this.nodeService.getPath(nodeRef);
          
          // resolve CIFS network folder location for this node
-         if (this.contentDiskDriver != null)
+         
+         DiskSharedDevice diskShare = cifsServer.getConfiguration().getPrimaryFilesystem();
+         
+         if (diskShare != null)
          {
-            NodeRef rootNode = this.contentDiskDriver.getContextRootNodeRef();
-            String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath());
+             ContentContext contentCtx = (ContentContext) diskShare.getContext();
+             NodeRef rootNode = contentCtx.getRootNode();
+             String cifsPath = Repository.getNamePath(this.nodeService, path, rootNode, "\\", "file:///" + getCIFSServerPath(diskShare));
               
-            node.getProperties().put("cifsPath", cifsPath);
-            node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
+             node.getProperties().put("cifsPath", cifsPath);
+             node.getProperties().put("cifsPathLabel", cifsPath.substring(8));  // strip file:/// part
          }
          
          this.currentNode = node;
@@ -465,9 +471,10 @@ public class NavigationBean
    }
    
    /**
+    * @param diskShare Filesystem shared device
     * @return CIFS server path as network style string label
     */
-   private String getCIFSServerPath()
+   private String getCIFSServerPath(DiskSharedDevice diskShare)
    {
       if (this.cifsServerPath == null)
       {
@@ -479,7 +486,7 @@ public class NavigationBean
             buf.append("\\\\")
                .append(serverName)
                .append("\\");
-            buf.append(this.contentDiskDriver.getShareName());
+            buf.append(diskShare.getName());
          }
          
          this.cifsServerPath = buf.toString();
