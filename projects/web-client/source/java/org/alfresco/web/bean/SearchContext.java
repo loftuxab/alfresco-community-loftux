@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.ISO9075;
 import org.alfresco.repo.search.impl.lucene.QueryParser;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -68,6 +69,9 @@ public final class SearchContext implements Serializable
    
    /** content type to restrict search against */
    private String contentType = null;
+   
+   /** content mimetype to restrict search against */
+   private String mimeType = null;
    
    /** any extra query attributes to add to the search */
    private Map<QName, String> queryAttributes = new HashMap<QName, String>(5, 1.0f);
@@ -232,6 +236,19 @@ public final class SearchContext implements Serializable
                           .append(":").append(rp.inclusive ? "[" : "{").append(value1)
                           .append(" TO ").append(value2).append(rp.inclusive ? "]" : "}");
          }
+      }
+      
+      // mimetype is a special case - it is indexed as a special attribute it comes from the combined
+      // ContentData attribute of cm:content - ContentData string cannot be searched directly
+      if (mimeType != null && mimeType.length() != 0)
+      {
+         if (attributeQuery == null)
+         {
+            attributeQuery = new StringBuilder(64);
+         }
+         String escapedName = Repository.escapeQName(QName.createQName(ContentModel.PROP_CONTENT + ".mimetype"));
+         attributeQuery.append(" +@").append(escapedName)
+                       .append(":").append(mimeType);
       }
       
       // match against appropriate content type
@@ -419,6 +436,21 @@ public final class SearchContext implements Serializable
    public void setContentType(String contentType)
    {
       this.contentType = contentType;
+   }
+   
+   /**
+    * @return Returns the mimeType.
+    */
+   public String getMimeType()
+   {
+      return this.mimeType;
+   }
+   /**
+    * @param mimeType The mimeType to set.
+    */
+   public void setMimeType(String mimeType)
+   {
+      this.mimeType = mimeType;
    }
 
    /**

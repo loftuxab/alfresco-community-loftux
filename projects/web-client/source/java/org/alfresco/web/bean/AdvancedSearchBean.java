@@ -29,11 +29,13 @@ import javax.faces.model.SelectItem;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -49,10 +51,17 @@ import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
 import org.alfresco.web.ui.repo.component.UISearchCustomProperties;
 
 /**
+ * Provides the form state and action event handling for the Advanced Search UI.
+ * <p>
+ * Integrates with the web-client ConfigService to retrieve configuration of custom
+ * meta-data searching fields. Custom fields can be configured to appear in the UI
+ * and they are they automatically added to the search query by this bean.
+ * 
  * @author Kevin Roast
  */
 public class AdvancedSearchBean
 {
+   private static final String MIMETYPE_ALL = "_all";
    /**
     * Default constructor
     */
@@ -373,6 +382,22 @@ public class AdvancedSearchBean
    }
    
    /**
+    * @return Returns the contentFormat.
+    */
+   public String getContentFormat()
+   {
+      return this.contentFormat;
+   }
+
+   /**
+    * @param contentFormat The contentFormat to set.
+    */
+   public void setContentFormat(String contentFormat)
+   {
+      this.contentFormat = contentFormat;
+   }
+   
+   /**
     * @return Returns the custom properties Map.
     */
    public Map<String, Object> getCustomProperties()
@@ -444,6 +469,35 @@ public class AdvancedSearchBean
       return this.contentTypes;
    }
    
+   /**
+    * @return Returns a list of content formats to allow the user to select from
+    */
+   public List<SelectItem> getContentFormats()
+   {
+      if (this.contentFormats == null)
+      {
+         this.contentFormats = new ArrayList<SelectItem>(80);
+         ServiceRegistry registry = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
+         MimetypeService mimetypeService = registry.getMimetypeService();
+         
+         // get the mime type display names
+         Map<String, String> mimeTypes = mimetypeService.getDisplaysByMimetype();
+         for (String mimeType : mimeTypes.keySet())
+         {
+            this.contentFormats.add(new SelectItem(mimeType, mimeTypes.get(mimeType)));
+         }
+         
+         // make sure the list is sorted by the values
+         QuickSort sorter = new QuickSort(this.contentFormats, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+         sorter.sort();
+         
+         // add the "All Formats" constant marker at the top of the list (default selection)
+         this.contentFormats.add(0, new SelectItem("", Application.getMessage(FacesContext.getCurrentInstance(), MSG_ALL_FORMATS)));
+      }
+      
+      return this.contentFormats;
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Action event handlers
@@ -513,6 +567,10 @@ public class AdvancedSearchBean
          if (this.author != null && this.author.length() != 0)
          {
             search.addAttributeQuery(ContentModel.PROP_CREATOR, this.author);
+         }
+         if (this.contentFormat != null && this.contentFormat.length() != 0)
+         {
+            search.setMimeType(this.contentFormat);
          }
          if (this.createdDateChecked == true)
          {
@@ -682,6 +740,7 @@ public class AdvancedSearchBean
    // Private data 
    
    private static final String MSG_CONTENT = "content";
+   private static final String MSG_ALL_FORMATS = "all_formats";
    
    private static final String MODE_ALL = "all";
    private static final String MODE_FILES_TEXT = "files_text";
@@ -712,11 +771,17 @@ public class AdvancedSearchBean
    /** lookup of custom property QName string to DataTypeDefinition for the property */
    private Map<String, DataTypeDefinition> customPropertyLookup = null;
    
-   /** content types to allow searching against */
+   /** content types to for restricting searches */
    private List<SelectItem> contentTypes;
+   
+   /** content format list restricting searches */
+   private List<SelectItem> contentFormats;
    
    /** content type selection */
    private String contentType;
+   
+   /** content format selection */
+   private String contentFormat;
    
    /** the text to search for */
    private String text = "";

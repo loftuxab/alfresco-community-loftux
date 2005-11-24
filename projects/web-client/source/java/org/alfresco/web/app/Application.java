@@ -443,6 +443,18 @@ public class Application
     */
    public static String getMessage(HttpSession session, String msg)
    {
+      return getBundle(session).getString(msg);
+   }
+   
+   /**
+    * Get the specified the default message bundle for this user
+    * 
+    * @param session        HttpSession
+    * 
+    * @return ResourceBundle for this user
+    */
+   public static ResourceBundle getBundle(HttpSession session)
+   {
       ResourceBundle bundle = (ResourceBundle)session.getAttribute(MESSAGE_BUNDLE);
       if (bundle == null)
       {
@@ -464,7 +476,7 @@ public class Application
          session.setAttribute(MESSAGE_BUNDLE, bundle);
       }
       
-      return bundle.getString(msg);
+      return bundle;
    }
    
    /**

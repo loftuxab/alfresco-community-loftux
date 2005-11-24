@@ -220,6 +220,14 @@
                                                          </td>
                                                       </tr>
                                                       <tr>
+                                                         <td style="padding-left:8px"><h:outputText value="#{msg.content_format}" id="contentFormat" />:</td>
+                                                         <td>
+                                                            <h:selectOneMenu value="#{AdvancedSearchBean.contentFormat}" id="selectContentFormat">
+                                                               <f:selectItems value="#{AdvancedSearchBean.contentFormats}" id="contentFormats" />
+                                                            </h:selectOneMenu>
+                                                         </td>
+                                                      </tr>
+                                                      <tr>
                                                          <td style="padding-left:8px"><h:outputText value="#{msg.title}" id="title" />:</td><td><h:inputText value="#{AdvancedSearchBean.title}" size="28" maxlength="1024" id="txtTitle" /></td>
                                                       </tr>
                                                       <tr>

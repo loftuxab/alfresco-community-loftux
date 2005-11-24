@@ -94,11 +94,19 @@ public class ExternalAccessServlet extends HttpServlet
       // set the args if any
       req.getSession().setAttribute(LoginBean.LOGIN_OUTCOME_ARGS, tokens);
       
-      // redirect to any faces URL will force the login page to appear via the Authentication Filter
-      res.sendRedirect(req.getContextPath() + "/faces");
+      // redirect to root URL will force the login page to appear via the Authentication Filter
+      res.sendRedirect(req.getContextPath());
    }
    
-   
+   /**
+    * Generate a URL to the External Access Servlet.
+    * Allows access to JSF views (via an "outcome" ID) from external URLs.
+    * 
+    * @param outcome
+    * @param args
+    * 
+    * @return URL
+    */
    public final static String generateExternalURL(String outcome, String args)
    {
       if (args == null)
@@ -112,6 +120,6 @@ public class ExternalAccessServlet extends HttpServlet
    }
    
    // example: http://<server>/alfresco/navigate/<outcome>[/<workspace>/<store>/<nodeId>]
-   private static final String EXTERNAL_URL  = "/navigate/{3}";
-   private static final String EXTERNAL_URL_ARGS  = "/navigate/{3}/{4}";
+   private static final String EXTERNAL_URL  = "/navigate/{0}";
+   private static final String EXTERNAL_URL_ARGS  = "/navigate/{0}/{1}";
 }

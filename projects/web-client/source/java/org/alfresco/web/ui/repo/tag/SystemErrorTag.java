@@ -18,15 +18,18 @@ package org.alfresco.web.ui.repo.tag;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletSession;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.alfresco.web.app.Application;
+import org.alfresco.web.app.servlet.ExternalAccessServlet;
 import org.alfresco.web.bean.ErrorBean;
 
 /**
@@ -37,6 +40,9 @@ import org.alfresco.web.bean.ErrorBean;
 public class SystemErrorTag extends TagSupport
 {
    private static final String MSG_RETURN_TO_APP = "return_to_application";
+   private static final String MSG_HIDE_DETAILS  = "hide_details";
+   private static final String MSG_SHOW_DETAILS  = "show_details";
+   private static final String MSG_LOGOUT        = "logout";
    
    private String styleClass;
    private String detailsStyleClass;
@@ -125,6 +131,8 @@ public class SystemErrorTag extends TagSupport
       {
          Writer out = pageContext.getOut();
          
+         ResourceBundle bundle = Application.getBundle(pageContext.getSession());
+         
          out.write("<div");
          
          if (this.styleClass != null)
@@ -155,11 +163,15 @@ public class SystemErrorTag extends TagSupport
          out.write(";\n");   
          out.write("function toggleDetails() {\n");
          out.write("if (hidden) {\n");
-         out.write("document.getElementById('detailsTitle').innerHTML = 'Hide Details<br/><br/>';\n");
+         out.write("document.getElementById('detailsTitle').innerHTML = '");
+         out.write(bundle.getString(MSG_HIDE_DETAILS));
+         out.write("<br/><br/>';\n");
          out.write("document.getElementById('details').style.display = 'inline';\n");
          out.write("hidden = false;\n");
          out.write("} else {\n");
-         out.write("document.getElementById('detailsTitle').innerHTML = 'Show Details';\n");
+         out.write("document.getElementById('detailsTitle').innerHTML = '");
+         out.write(bundle.getString(MSG_SHOW_DETAILS));
+         out.write(")';\n");
          out.write("document.getElementById('details').style.display = 'none';\n");
          out.write("hidden = true;\n");
          out.write("} } </script>\n");
@@ -190,8 +202,8 @@ public class SystemErrorTag extends TagSupport
       
          if (Application.inPortalServer())
          {
-            RenderResponse renderResp  = (RenderResponse)pageContext.getRequest().
-                                   getAttribute("javax.portlet.response");
+            RenderResponse renderResp  = (RenderResponse)pageContext.getRequest().getAttribute(
+                  "javax.portlet.response");
             if (renderResp == null)
             {
                throw new IllegalStateException("RenderResponse object is null");
@@ -223,8 +235,20 @@ public class SystemErrorTag extends TagSupport
          }
          
          out.write("'>");
-         out.write(Application.getMessage(pageContext.getSession(), MSG_RETURN_TO_APP));
+         out.write(bundle.getString(MSG_RETURN_TO_APP));
          out.write("</a></div>");
+                   
+         // use External Access Servlet to generate a URL to relogin again
+         // this can be used by the user if the app has got into a total mess
+         if (Application.inPortalServer() == false)
+         {
+            out.write("\n<div style='padding-top:16px;'><a href='");
+            out.write(((HttpServletRequest)pageContext.getRequest()).getContextPath());
+            out.write(ExternalAccessServlet.generateExternalURL("browse", null));
+            out.write("'>");
+            out.write(bundle.getString(MSG_LOGOUT));
+            out.write("</a></div>");
+         }
       }
       catch (IOException ioe)
       {
