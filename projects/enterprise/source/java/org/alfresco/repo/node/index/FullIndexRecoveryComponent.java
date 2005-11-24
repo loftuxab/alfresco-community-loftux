@@ -26,7 +26,6 @@ package org.alfresco.repo.node.index;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -537,10 +536,7 @@ public class FullIndexRecoveryComponent extends HibernateDaoSupport implements I
         {
             try
             {
-                if (txn.getStatus() == Status.STATUS_ACTIVE)
-                {
-                    txn.rollback();
-                }
+                txn.rollback();
             }
             catch (Throwable ee)
             {
