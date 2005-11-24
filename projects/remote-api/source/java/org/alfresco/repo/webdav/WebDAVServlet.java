@@ -32,6 +32,9 @@ import org.alfresco.filesys.server.core.InvalidDeviceInterfaceException;
 import org.alfresco.filesys.server.core.ShareType;
 import org.alfresco.filesys.server.core.SharedDevice;
 import org.alfresco.filesys.server.core.SharedDeviceList;
+import org.alfresco.filesys.server.filesys.DiskInterface;
+import org.alfresco.filesys.server.filesys.DiskSharedDevice;
+import org.alfresco.filesys.smb.server.repo.ContentContext;
 import org.alfresco.filesys.smb.server.repo.ContentDiskInterface;
 import org.alfresco.repo.webdav.auth.AuthenticationFilter;
 import org.alfresco.repo.webdav.auth.WebDAVUser;
@@ -290,41 +293,14 @@ public class WebDAVServlet extends HttpServlet
         if ( fileSrvConfig == null)
             throw new ServletException("File server configuration not available");
 
-        SharedDeviceList shares = fileSrvConfig.getShares();
+        DiskSharedDevice filesys = fileSrvConfig.getPrimaryFilesystem();
         
-        if ( shares != null || shares.numberOfShares() > 0)
+        if ( filesys != null)
         {
-            try
-            {
-                Enumeration<SharedDevice> shareEnum = shares.enumerateShares();
-                
-                while ( shareEnum.hasMoreElements() && m_rootNodeRef == null)
-                {
-                    SharedDevice share = shareEnum.nextElement();
-                    if ( share != null && share.getInterface() != null && share.getType() == ShareType.DISK)
-                    {
-                        // Get the root node from the filesystem driver
-                        
-                        ContentDiskInterface contentDisk = (ContentDiskInterface) share.getInterface();
-                        m_rootNodeRef = contentDisk.getContextRootNodeRef();
-                    }
-                }
-
-                // Check if the root node was set successfully
-                
-                if ( m_rootNodeRef == null)
-                    logger.warn("Failed to set root node for WebDAV");
-            }
-            catch (InvalidDeviceInterfaceException ex)
-            {
-                // Log the error
-                
-                logger.error("WebDAV servlet initialization error", ex);
-                
-                // Rethrow as a servlet exception
-                
-                throw new ServletException(ex);
-            }
+            // Get the root node from the filesystem
+            
+            ContentContext contentCtx = (ContentContext) filesys.getContext();
+            m_rootNodeRef = contentCtx.getRootNode();
         }
         else
         {

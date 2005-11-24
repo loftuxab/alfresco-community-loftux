@@ -864,7 +864,6 @@ public class WebDAVHelper
         // Create the properties for the new file/folder
 
         NodeService nodeService = getNodeService();
-        MimetypeService mimetypeService = getMimetypeService();
         
         // Get the path name
         
@@ -905,8 +904,6 @@ public class WebDAVHelper
     public final String makeETag(NodeRef node)
     {
         // Get the modify date/time property for the node
-        
-        Object modVal = getNodeService().getProperty(node, ContentModel.PROP_MODIFIED);
         
         StringBuilder etag = new StringBuilder();
         makeETagString(node, etag);
