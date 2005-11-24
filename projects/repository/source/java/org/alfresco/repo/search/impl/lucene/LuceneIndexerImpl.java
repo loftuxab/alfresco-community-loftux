@@ -1395,6 +1395,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                             if (index)
                             {
                                 ContentReader reader = contentService.getReader(nodeRef, propertyName);
+                                String mimeType = reader.getMimetype();
                                 if (reader != null && reader.exists())
                                 {
                                     boolean readerReady = true;
@@ -1460,7 +1461,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                                 + QName.createQName(propertyName.getNamespaceURI(), ISO9075
                                                         .encode(propertyName.getLocalName())), new InputStreamReader(
                                                 reader.getReader().getContentInputStream())));
-                                        doc.add(new Field(attributeName+".mimetype", reader.getMimetype(), false, true, false));
+                                        doc.add(new Field(attributeName+".mimetype", mimeType, false, true, false));
                                     }
                                 }
 
