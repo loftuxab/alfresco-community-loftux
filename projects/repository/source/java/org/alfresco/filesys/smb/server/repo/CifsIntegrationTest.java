@@ -19,6 +19,7 @@ package org.alfresco.filesys.smb.server.repo;
 import junit.framework.TestCase;
 
 import org.alfresco.filesys.CIFSServer;
+import org.alfresco.filesys.server.filesys.DiskSharedDevice;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -50,19 +51,33 @@ public class CifsIntegrationTest extends TestCase
         assertNotNull("No server name available", serverName);
         assertTrue("No server name available (zero length)", serverName.length() > 0);
 
-        // check the disk interface
-        ContentDiskInterface diskInterface = (ContentDiskInterface) ctx.getBean("contentDiskDriver");
-        assertNotNull("No content disk interface found", diskInterface);
+        // Get the primary filesystem, might be null if the home folder mapper is configured
         
-        // get the root share name
-        String shareName = diskInterface.getShareName();
-        assertNotNull("No share name available", shareName);
-        assertTrue("No share name available (zero length)", shareName.length() > 0);
+        DiskSharedDevice mainFilesys = cifsServer.getConfiguration().getPrimaryFilesystem();
         
-        NodeService nodeService = (NodeService) ctx.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
-        // get the share root node and check that it exists
-        NodeRef shareNodeRef = diskInterface.getContextRootNodeRef();
-        assertNotNull("No share root node available", shareNodeRef);
-        assertTrue("Share root node doesn't exist", nodeService.exists(shareNodeRef));
+        if ( mainFilesys != null)
+        {
+            // Check the share name
+            
+            String shareName = mainFilesys.getName();
+            assertNotNull("No share name available", shareName);
+            assertTrue("No share name available (zero length)", shareName.length() > 0);
+
+            // Check that the context is valid
+            
+            ContentContext filesysCtx = (ContentContext) mainFilesys.getContext();
+            assertNotNull("Content context is null", filesysCtx);
+            assertNotNull("Store id is null", filesysCtx.getStoreName());
+            assertNotNull("Root path is null", filesysCtx.getRootPath());
+            assertNotNull("Root node is null", filesysCtx.getRootNode());
+            
+            // Check the root node
+            
+            NodeService nodeService = (NodeService) ctx.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
+            // get the share root node and check that it exists
+            NodeRef shareNodeRef = filesysCtx.getRootNode();
+            assertNotNull("No share root node available", shareNodeRef);
+            assertTrue("Share root node doesn't exist", nodeService.exists(shareNodeRef));
+        }
     }
 }
