@@ -33,8 +33,10 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.DataDictionary;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.ui.common.ComponentConstants;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.converter.XMLDateConverter;
+import org.alfresco.web.ui.repo.RepoConstants;
 import org.alfresco.web.ui.repo.component.UICategorySelector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -169,20 +171,20 @@ public class UIProperty extends PropertySheetItem
          if (typeName.equals(DataTypeDefinition.CATEGORY))
          {
             control = (UICategorySelector)context.getApplication().
-                  createComponent("org.alfresco.faces.CategorySelector");
+                  createComponent(RepoConstants.ALFRESCO_FACES_CATEGORY_SELECTOR);
             ((UICategorySelector)control).setDisabled(true);
          }
          else
          {
-            control = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-            control.setRendererType("javax.faces.Text");
+            control = (UIOutput)context.getApplication().createComponent(ComponentConstants.JAVAX_FACES_OUTPUT);
+            control.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
          }
          
          // if it is a date or datetime property add the converter
          if (typeName.equals(DataTypeDefinition.DATETIME) )
          {
             XMLDateConverter conv = (XMLDateConverter)context.getApplication().
-               createConverter("org.alfresco.faces.XMLDataConverter");
+               createConverter(RepoConstants.ALFRESCO_FACES_XMLDATA_CONVERTER);
             conv.setType("both");
             conv.setPattern(Application.getMessage(context, MSG_DATE_TIME));
             control.setConverter(conv);
@@ -190,7 +192,7 @@ public class UIProperty extends PropertySheetItem
          else if (typeName.equals(DataTypeDefinition.DATE))
          {
             XMLDateConverter conv = (XMLDateConverter)context.getApplication().
-               createConverter("org.alfresco.faces.XMLDataConverter");
+               createConverter(RepoConstants.ALFRESCO_FACES_XMLDATA_CONVERTER);
             conv.setType("date");
             conv.setPattern(Application.getMessage(context, MSG_DATE));
             control.setConverter(conv);
@@ -202,19 +204,19 @@ public class UIProperty extends PropertySheetItem
          if (typeName.equals(DataTypeDefinition.BOOLEAN))
          {
             control = (UISelectBoolean)context.getApplication().
-                  createComponent("javax.faces.SelectBoolean");
-            control.setRendererType("javax.faces.Checkbox");
+                  createComponent(ComponentConstants.JAVAX_FACES_SELECT_BOOLEAN);
+            control.setRendererType(ComponentConstants.JAVAX_FACES_CHECKBOX);
          }
          else if (typeName.equals(DataTypeDefinition.CATEGORY))
          {
             control = (UICategorySelector)context.getApplication().
-                  createComponent("org.alfresco.faces.CategorySelector");
+                  createComponent(RepoConstants.ALFRESCO_FACES_CATEGORY_SELECTOR);
          }
          else if (typeName.equals(DataTypeDefinition.DATETIME))
          {
             control = (UIInput)context.getApplication().
-                  createComponent("javax.faces.Input");
-            control.setRendererType("org.alfresco.faces.DatePickerRenderer");
+                  createComponent(ComponentConstants.JAVAX_FACES_INPUT);
+            control.setRendererType(RepoConstants.ALFRESCO_FACES_DATE_PICKER_RENDERER);
             control.getAttributes().put("startYear", new Integer(1970));
             control.getAttributes().put("yearCount", new Integer(50));
             control.getAttributes().put("showTime", Boolean.valueOf(true));
@@ -223,8 +225,8 @@ public class UIProperty extends PropertySheetItem
          else if (typeName.equals(DataTypeDefinition.DATE))
          {
             control = (UIInput)context.getApplication().
-                  createComponent("javax.faces.Input");
-            control.setRendererType("org.alfresco.faces.DatePickerRenderer");
+                  createComponent(ComponentConstants.JAVAX_FACES_INPUT);
+            control.setRendererType(RepoConstants.ALFRESCO_FACES_DATE_PICKER_RENDERER);
             control.getAttributes().put("startYear", new Integer(1970));
             control.getAttributes().put("yearCount", new Integer(50));
             control.getAttributes().put("style", "margin-right: 7px;");
@@ -233,8 +235,8 @@ public class UIProperty extends PropertySheetItem
          {
             // any other type is represented as an input text field
             control = (UIInput)context.getApplication().
-                  createComponent("javax.faces.Input");
-            control.setRendererType("javax.faces.Text");
+                  createComponent(ComponentConstants.JAVAX_FACES_INPUT);
+            control.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
             control.getAttributes().put("size", "35");
             control.getAttributes().put("maxlength", "1024");
          }
@@ -316,14 +318,14 @@ public class UIProperty extends PropertySheetItem
       if (propSheet.getMode().equalsIgnoreCase(UIPropertySheet.VIEW_MODE))
       {
          // if we are in view mode simply output the text to the screen
-         control = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-         control.setRendererType("javax.faces.Text");
+         control = (UIOutput)context.getApplication().createComponent(ComponentConstants.JAVAX_FACES_OUTPUT);
+         control.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
       }
       else
       {
          // as we don't know the type of the property we can only output a text field 
-         control = (UIInput)context.getApplication().createComponent("javax.faces.Input");
-         control.setRendererType("javax.faces.Text");
+         control = (UIInput)context.getApplication().createComponent(ComponentConstants.JAVAX_FACES_INPUT);
+         control.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
          control.getAttributes().put("size", "35");
          control.getAttributes().put("maxlength", "1024");
       

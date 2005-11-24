@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIOutput;
@@ -41,8 +42,10 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.config.ClientConfigElement.CustomProperty;
+import org.alfresco.web.ui.common.ComponentConstants;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
+import org.alfresco.web.ui.repo.RepoConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -50,7 +53,7 @@ import org.springframework.web.jsf.FacesContextUtils;
 /**
  * @author Kevin Roast
  */
-public class UISearchCustomProperties extends SelfRenderingComponent
+public class UISearchCustomProperties extends SelfRenderingComponent implements NamingContainer
 {
    public static final String PREFIX_DATE_TO    = "to_";
    public static final String PREFIX_DATE_FROM  = "from_";
@@ -200,9 +203,9 @@ public class UISearchCustomProperties extends SelfRenderingComponent
     */
    private UIComponent generateLabel(FacesContext context, String displayLabel)
    {
-      UIOutput label = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-      label.setId("_prop" + context.getViewRoot().createUniqueId());
-      label.setRendererType("javax.faces.Text");
+      UIOutput label = (UIOutput)context.getApplication().createComponent(ComponentConstants.JAVAX_FACES_OUTPUT);
+      label.setId(context.getViewRoot().createUniqueId());
+      label.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
       label.setValue(displayLabel + ": ");
       return label;
    }
@@ -233,13 +236,13 @@ public class UISearchCustomProperties extends SelfRenderingComponent
       // generate the appropriate input field
       if (typeName.equals(DataTypeDefinition.BOOLEAN))
       {
-         control = (UISelectBoolean)facesApp.createComponent("javax.faces.SelectBoolean");
-         control.setRendererType("javax.faces.Checkbox");
+         control = (UISelectBoolean)facesApp.createComponent(ComponentConstants.JAVAX_FACES_SELECT_BOOLEAN);
+         control.setRendererType(ComponentConstants.JAVAX_FACES_CHECKBOX);
          control.setValueBinding("value", vb);
       }
       else if (typeName.equals(DataTypeDefinition.CATEGORY))
       {
-         control = (UICategorySelector)facesApp.createComponent("org.alfresco.faces.CategorySelector");
+         control = (UICategorySelector)facesApp.createComponent(RepoConstants.ALFRESCO_FACES_CATEGORY_SELECTOR);
          control.setValueBinding("value", vb);
       }
       else if (typeName.equals(DataTypeDefinition.DATETIME) || typeName.equals(DataTypeDefinition.DATE))
@@ -248,37 +251,37 @@ public class UISearchCustomProperties extends SelfRenderingComponent
          
          // Need to output component for From and To date selectors and labels
          // also neeed checkbox for enable/disable state - requires an outer wrapper component
-         control = (UIPanel)facesApp.createComponent("javax.faces.Panel");
-         control.setRendererType("javax.faces.Grid");
+         control = (UIPanel)facesApp.createComponent(ComponentConstants.JAVAX_FACES_PANEL);
+         control.setRendererType(ComponentConstants.JAVAX_FACES_GRID);
          control.getAttributes().put("columns", Integer.valueOf(2));
          
          // enabled state checkbox
-         UIInput checkbox = (UIInput)facesApp.createComponent("javax.faces.SelectBoolean");
-         checkbox.setRendererType("javax.faces.Checkbox");
-         checkbox.setId("_prop" + context.getViewRoot().createUniqueId());
+         UIInput checkbox = (UIInput)facesApp.createComponent(ComponentConstants.JAVAX_FACES_SELECT_BOOLEAN);
+         checkbox.setRendererType(ComponentConstants.JAVAX_FACES_CHECKBOX);
+         checkbox.setId(context.getViewRoot().createUniqueId());
          ValueBinding vbCheckbox = facesApp.createValueBinding(
             "#{" + beanBinding + "[\"" + propDef.getName().toString() + "\"]}");
          checkbox.setValueBinding("value", vbCheckbox);
          control.getChildren().add(checkbox);
          
          // main display label
-         UIOutput label = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-         label.setId("_prop" + context.getViewRoot().createUniqueId());
-         label.setRendererType("javax.faces.Text");
+         UIOutput label = (UIOutput)context.getApplication().createComponent(ComponentConstants.JAVAX_FACES_OUTPUT);
+         label.setId(context.getViewRoot().createUniqueId());
+         label.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
          label.setValue(displayLabel + ":");
          control.getChildren().add(label);
          
          // from date label
-         UIOutput labelFromDate = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-         labelFromDate.setId("_prop" + context.getViewRoot().createUniqueId());
-         labelFromDate.setRendererType("javax.faces.Text");
+         UIOutput labelFromDate = (UIOutput)context.getApplication().createComponent(ComponentConstants.JAVAX_FACES_OUTPUT);
+         labelFromDate.setId(context.getViewRoot().createUniqueId());
+         labelFromDate.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
          labelFromDate.setValue(Application.getMessage(context, MSG_FROM));
          control.getChildren().add(labelFromDate);
          
          // from date control
-         UIInput inputFromDate = (UIInput)facesApp.createComponent("javax.faces.Input");
-         inputFromDate.setId("_prop" + context.getViewRoot().createUniqueId());
-         inputFromDate.setRendererType("org.alfresco.faces.DatePickerRenderer");
+         UIInput inputFromDate = (UIInput)facesApp.createComponent(ComponentConstants.JAVAX_FACES_INPUT);
+         inputFromDate.setId(context.getViewRoot().createUniqueId());
+         inputFromDate.setRendererType(RepoConstants.ALFRESCO_FACES_DATE_PICKER_RENDERER);
          inputFromDate.getAttributes().put("startYear", new Integer(1970));
          inputFromDate.getAttributes().put("yearCount", new Integer(50));
          inputFromDate.getAttributes().put("showTime", showTime);
@@ -288,16 +291,16 @@ public class UISearchCustomProperties extends SelfRenderingComponent
          control.getChildren().add(inputFromDate);
          
          // to date label
-         UIOutput labelToDate = (UIOutput)context.getApplication().createComponent("javax.faces.Output");
-         labelToDate.setId("_prop" + context.getViewRoot().createUniqueId());
-         labelToDate.setRendererType("javax.faces.Text");
+         UIOutput labelToDate = (UIOutput)context.getApplication().createComponent(ComponentConstants.JAVAX_FACES_OUTPUT);
+         labelToDate.setId(context.getViewRoot().createUniqueId());
+         labelToDate.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
          labelToDate.setValue(Application.getMessage(context, MSG_TO));
          control.getChildren().add(labelToDate);
          
          // to date control
-         UIInput inputToDate = (UIInput)facesApp.createComponent("javax.faces.Input");
-         inputToDate.setId("_prop" + context.getViewRoot().createUniqueId());
-         inputToDate.setRendererType("org.alfresco.faces.DatePickerRenderer");
+         UIInput inputToDate = (UIInput)facesApp.createComponent(ComponentConstants.JAVAX_FACES_INPUT);
+         inputToDate.setId(context.getViewRoot().createUniqueId());
+         inputToDate.setRendererType(RepoConstants.ALFRESCO_FACES_DATE_PICKER_RENDERER);
          inputToDate.getAttributes().put("startYear", new Integer(1970));
          inputToDate.getAttributes().put("yearCount", new Integer(50));
          inputToDate.getAttributes().put("showTime", showTime);
@@ -308,21 +311,21 @@ public class UISearchCustomProperties extends SelfRenderingComponent
       }
       else if (typeName.equals(DataTypeDefinition.NODE_REF))
       {
-         control = (UISpaceSelector)facesApp.createComponent("org.alfresco.faces.SpaceSelector");
+         control = (UISpaceSelector)facesApp.createComponent(RepoConstants.ALFRESCO_FACES_SPACE_SELECTOR);
          control.setValueBinding("value", vb);
       }
       else
       {
          // any other type is represented as an input text field
-         control = (UIInput)facesApp.createComponent("javax.faces.Input");
-         control.setRendererType("javax.faces.Text");
+         control = (UIInput)facesApp.createComponent(ComponentConstants.JAVAX_FACES_INPUT);
+         control.setRendererType(ComponentConstants.JAVAX_FACES_TEXT);
          control.getAttributes().put("size", "28");
          control.getAttributes().put("maxlength", "1024");
          control.setValueBinding("value", vb);
       }
       
       // set up the common aspects of the control
-      control.setId("_prop" + context.getViewRoot().createUniqueId());
+      control.setId(context.getViewRoot().createUniqueId());
       
       return control;
    }
