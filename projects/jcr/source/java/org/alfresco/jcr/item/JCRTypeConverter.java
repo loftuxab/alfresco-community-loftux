@@ -369,6 +369,17 @@ public class JCRTypeConverter
                     }
                 }
             });
+            
+            /**
+             * Converter for translating Node Ref to JCR Id
+             */
+            addConverter(NodeRef.class, String.class, new TypeConverter.Converter<NodeRef, String>()
+            {
+                public String convert(NodeRef source)
+                {
+                    return source.getId();
+                }
+            });
         }
 
         /**

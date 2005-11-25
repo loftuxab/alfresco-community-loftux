@@ -127,6 +127,23 @@
                <type>d:text</type>
                <multiple>true</multiple>
             </property>
+            <property name="jcrtest:setContent">
+               <type>d:content</type>
+            </property>
+            <property name="jcrtest:setNodeRef">
+               <type>d:noderef</type>
+            </property>
+            <property name="jcrtest:setMultiNodeRef">
+               <type>d:noderef</type>
+               <multiple>true</multiple>
+            </property>
+            <property name="jcrtest:setAny">
+               <type>d:any</type>
+            </property>
+            <property name="jcrtest:setMultipleAny">
+               <type>d:any</type>
+               <multiple>true</multiple>
+            </property>
          </properties>
       </type>
       

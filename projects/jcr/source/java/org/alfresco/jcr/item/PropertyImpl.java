@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
+import javax.activation.MimeType;
 import javax.jcr.AccessDeniedException;
 import javax.jcr.Item;
 import javax.jcr.ItemNotFoundException;
@@ -41,6 +42,7 @@ import javax.jcr.version.VersionException;
 import org.alfresco.jcr.dictionary.DataTypeMap;
 import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
@@ -537,7 +539,14 @@ public class PropertyImpl extends ItemImpl implements Property
         writeValue(castValues);
     }
        
-    
+    /**
+     * Cast value to appropriate type for this property
+     * 
+     * @param value  value to cast
+     * @param type  -1 => cast to property type; otherwise cast to type explicitly provided
+     * @return  the cast value
+     * @throws RepositoryException
+     */
     private Object castValue(Object value, int type)
         throws RepositoryException
     {
@@ -554,8 +563,11 @@ public class PropertyImpl extends ItemImpl implements Property
             // attempt to cast to explicitly specified type, but only in case where property type can be ANY
             QName dataTypeName = DataTypeMap.convertPropertyTypeToDataType(type);
             DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
-            dataTypeDef = dictionaryService.getDataType(dataTypeName); 
-            value = session.getTypeConverter().convert(dataTypeDef, value);
+            dataTypeDef = dictionaryService.getDataType(dataTypeName);
+            if (!dataTypeName.equals(DataTypeDefinition.CONTENT))
+            {
+                value = session.getTypeConverter().convert(dataTypeDef, value);
+            }
         }
         
         // special case where binary is converted to inputStream ready for writing via a ContentWriter
@@ -567,6 +579,12 @@ public class PropertyImpl extends ItemImpl implements Property
         return value;
     }
     
+    /**
+     * Write the passed value to the property
+     * 
+     * @param value  value to write
+     * @throws ValueFormatException
+     */
     private void writeValue(Object value)
         throws ValueFormatException
     {
@@ -578,6 +596,7 @@ public class PropertyImpl extends ItemImpl implements Property
             {
                 ContentService contentService = session.getRepositoryImpl().getServiceRegistry().getContentService();
                 ContentWriter writer = contentService.getWriter(node.getNodeRef(), name, true);
+                writer.setMimetype(MimetypeMap.MIMETYPE_BINARY);
                 writer.putContent((InputStream)value);
             }
             catch(InvalidTypeException e)
@@ -624,7 +643,7 @@ public class PropertyImpl extends ItemImpl implements Property
     private void checkMultiValued()
         throws ValueFormatException
     {
-        if (!getPropertyDefinition().isMultiValued())
+        if (getPropertyDefinition().isMultiValued())
         {
             // Expected exception for JSR-170
             throw new ValueFormatException("Property " + name + " is single-valued.");
