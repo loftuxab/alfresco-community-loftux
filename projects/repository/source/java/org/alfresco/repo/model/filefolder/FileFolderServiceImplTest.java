@@ -276,8 +276,8 @@ public class FileFolderServiceImplTest extends TestCase
     {
         FileInfo folderInfo = getByName(NAME_L0_FOLDER_A, true);
         assertNotNull(folderInfo);
-        // rename duplicate
-        String newName = NAME_L0_FOLDER_B;
+        // rename duplicate.  A file with that name already exists
+        String newName = NAME_L0_FILE_A;
         try
         {
             folderInfo = fileFolderService.rename(folderInfo.getNodeRef(), newName);
@@ -445,7 +445,7 @@ public class FileFolderServiceImplTest extends TestCase
         pathElements.add(NAME_L0_FOLDER_A);
         pathElements.add(NAME_L1_FILE_A);
         
-        FileInfo fileInfoCheck = fileFolderService.resolveNamePath(workingRootNodeRef, pathElements, false);
+        FileInfo fileInfoCheck = fileFolderService.resolveNamePath(workingRootNodeRef, pathElements);
         assertNotNull("File info not found", fileInfoCheck);
         assertEquals("Path not resolved to correct node", fileInfo.getNodeRef(), fileInfoCheck.getNodeRef());
     }

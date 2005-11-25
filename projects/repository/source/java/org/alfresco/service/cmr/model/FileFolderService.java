@@ -179,11 +179,10 @@ public interface FileFolderService
      * 
      * @param rootNodeRef the start of the path given, i.e. the '/' in '/A/B/C' for example
      * @param pathElements a list of names in the path
-     * @param isFolder true if we are searching for folder or false to search for a file
      * @return Returns the info of the file or folder
      * @throws FileNotFoundException if no file or folder exists along the path
      */
-    public FileInfo resolveNamePath(NodeRef rootNodeRef, List<String> pathElements, boolean isFolder) throws FileNotFoundException;
+    public FileInfo resolveNamePath(NodeRef rootNodeRef, List<String> pathElements) throws FileNotFoundException;
     
     /**
      * Get the file info (name, folder, etc) for the given node

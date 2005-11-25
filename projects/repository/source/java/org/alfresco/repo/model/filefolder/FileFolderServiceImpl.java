@@ -635,7 +635,7 @@ public class FileFolderServiceImpl implements FileFolderService
         }
     }
 
-    public FileInfo resolveNamePath(NodeRef rootNodeRef, List<String> pathElements, boolean isFolder) throws FileNotFoundException
+    public FileInfo resolveNamePath(NodeRef rootNodeRef, List<String> pathElements) throws FileNotFoundException
     {
         if (pathElements.size() == 0)
         {
@@ -653,7 +653,7 @@ public class FileFolderServiceImpl implements FileFolderService
         }
         // we have resolved the folder path - resolve the last component
         String pathElement = pathElements.get(pathElements.size() - 1);
-        FileInfo result = getPathElementInfo(currentPath, rootNodeRef, parentNodeRef, pathElement, isFolder);
+        FileInfo result = getPathElementInfo(currentPath, rootNodeRef, parentNodeRef, pathElement, false);
         // found it
         if (logger.isDebugEnabled())
         {
@@ -673,15 +673,17 @@ public class FileFolderServiceImpl implements FileFolderService
             NodeRef rootNodeRef,
             NodeRef parentNodeRef,
             String pathElement,
-            boolean isFolder) throws FileNotFoundException
+            boolean folderOnly) throws FileNotFoundException
     {
         currentPath.append("/").append(pathElement);
-        List<FileInfo> pathElementInfos = search(parentNodeRef, pathElement, !isFolder, isFolder, false);
+        
+        boolean includeFiles = (folderOnly ? false : true);
+        List<FileInfo> pathElementInfos = search(parentNodeRef, pathElement, includeFiles, true, false);
         // check
         if (pathElementInfos.size() == 0)
         {
             StringBuilder sb = new StringBuilder(128);
-            sb.append(isFolder ? "Folder" : "File").append(" not found: \n")
+            sb.append(folderOnly ? "Folder" : "File or folder").append(" not found: \n")
               .append("   root: ").append(rootNodeRef).append("\n")
               .append("   path: ").append(currentPath);
             throw new FileNotFoundException(sb.toString());
@@ -690,7 +692,7 @@ public class FileFolderServiceImpl implements FileFolderService
         {
             // we have detected a duplicate name - warn, but allow
             StringBuilder sb = new StringBuilder(128);
-            sb.append("Duplicate ").append(isFolder ? "folder" : "file").append(" found: \n")
+            sb.append("Duplicate file or folder found: \n")
               .append("   root: ").append(rootNodeRef).append("\n")
               .append("   path: ").append(currentPath);
             logger.warn(sb);
