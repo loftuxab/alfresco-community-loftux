@@ -110,13 +110,19 @@ public class JCRProxyFactory
             // Ensure invocation is under correct context
             try
             {
-                // test transaction
-                String trxId = AlfrescoTransactionSupport.getTransactionId();
-                if (trxId != null)
-                {
-                    if (!trxId.equals(context.getTransactionId()))
+                // test for existence of transaction
+                if (!(method.equals("login") || method.equals("logout")))
+                {        
+                    String trxId = AlfrescoTransactionSupport.getTransactionId();
+                    if (trxId == null)
                     {
-                        throw new RepositoryException("Cannot use session in transaction " + trxId + " as it is tied to transaction " + context.getTransactionId());
+                        throw new RepositoryException("Session must be used within the context of a transaction.");
+                        
+                        // TODO: Check that session is tied to single transaction
+                        //if (!trxId.equals(context.getTransactionId()))
+                        //{
+                        //    throw new RepositoryException("Cannot use session in transaction " + trxId + " as it is tied to transaction " + context.getTransactionId());
+                        //}
                     }
                 }
                 

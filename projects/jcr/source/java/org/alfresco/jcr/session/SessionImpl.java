@@ -126,12 +126,6 @@ public class SessionImpl implements Session
     public SessionImpl(RepositoryImpl repository, String ticket, String workspaceName, Map<String, Object> attributes)
         throws NoSuchWorkspaceException, RepositoryException
     {
-        this.trxId = AlfrescoTransactionSupport.getTransactionId();
-        if (this.trxId == null)
-        {
-            throw new RepositoryException("Session cannot be opened outside of a transaction.");
-        }
-        
         this.repository = repository;
         this.ticket = ticket;
         this.attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
