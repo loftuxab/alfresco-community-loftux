@@ -33,6 +33,7 @@ import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
 import org.alfresco.web.app.context.UIContextService;
+import org.alfresco.web.bean.LoginBean;
 import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.Utils;
@@ -236,14 +237,18 @@ public class UsersBean implements IContextListener
          FacesContext context = FacesContext.getCurrentInstance();
          tx = Repository.getUserTransaction(context);
          tx.begin();
-
-         // delete the User authentication
-         authenticationService.deleteAuthentication((String) getPerson().getProperties().get(
-               "userName"));
-
+         
+         // we only delete the user auth if Alfresco is managing the authentication 
+         Map session = context.getExternalContext().getSessionMap();
+         if (session.get(LoginBean.LOGIN_EXTERNAL_AUTH) == null)
+         {
+            // delete the User authentication
+            authenticationService.deleteAuthentication((String) getPerson().getProperties().get("userName"));
+         }
+         
          // delete the associated Person
          this.nodeService.deleteNode(getPerson().getNodeRef());
-
+         
          // commit the transaction
          tx.commit();
       }
