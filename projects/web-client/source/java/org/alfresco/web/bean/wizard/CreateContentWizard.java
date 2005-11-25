@@ -33,8 +33,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CreateContentWizard extends BaseContentWizard
 {
-   private static final String CONTENT_TEXT = "txt";
-   private static final String CONTENT_HTML = "html";
+   protected static final String CONTENT_TEXT = "txt";
+   protected static final String CONTENT_HTML = "html";
 
    private static Log logger = LogFactory.getLog(CreateContentWizard.class);
 
@@ -49,8 +49,8 @@ public class CreateContentWizard extends BaseContentWizard
    private static final String STEP3_DESCRIPTION_ID = "create_content_step3_desc";
    
    // create content wizard specific properties
-   private String content;
-   private String createType = CONTENT_HTML;
+   protected String content;
+   protected String createType = CONTENT_HTML;
    
    
    /**

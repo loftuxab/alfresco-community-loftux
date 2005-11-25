@@ -63,7 +63,7 @@ import org.springframework.web.jsf.FacesContextUtils;
 public class NewSpaceWizard extends AbstractWizardBean
 {
    public static final String SPACE_ICON_DEFAULT = "space-icon-default";
-   public static final String FORUM_ICON_DEFAULT = "discussion_large";
+   public static final String FORUMS_ICON_DEFAULT = "forums_large";
 
    private static Log logger = LogFactory.getLog(NewSpaceWizard.class);
    
@@ -80,26 +80,29 @@ public class NewSpaceWizard extends AbstractWizardBean
    
    private static final String ERROR = "error_space";
    private static final String DEFAULT_SPACE_TYPE_ICON = "/images/icons/space.gif";
-   
+
    // new space wizard specific properties
    private SearchService searchService;
    private DictionaryService dictionaryService;
    
-   private String createFrom;
-   private String spaceType;
-   private NodeRef existingSpaceId;
-   private String templateSpaceId;
-   private String copyPolicy;
-   private String name;
-   private String description;
-   private String icon;
-   private String templateName;
-   private boolean saveAsTemplate;
-   private List<SelectItem> templates;
-   private List<UIListItem> folderTypes;
-   private List<UIListItem> genericIcons;
-   private List<UIListItem> forumIcons;
-   private List<UIDescription> folderTypeDescriptions;
+   protected String spaceType;
+   protected String icon;
+   protected String createFrom;
+   protected NodeRef existingSpaceId;
+   protected String templateSpaceId;
+   protected String copyPolicy;
+   protected String name;
+   protected String description;
+   protected String templateName;
+   protected boolean saveAsTemplate;
+   protected List<SelectItem> templates;
+   protected List<UIListItem> folderTypes;
+   protected List<UIListItem> genericIcons;
+   protected List<UIListItem> forumsIcons;
+   protected List<UIDescription> folderTypeDescriptions;
+   
+   // the NodeRef of the node created during finish
+   protected NodeRef createdNode;
    
    /**
     * Deals with the finish button being pressed
@@ -128,7 +131,8 @@ public class NewSpaceWizard extends AbstractWizardBean
             // update the existing node in the repository
             Node currentSpace = this.browseBean.getActionSpace();
             NodeRef nodeRef = currentSpace.getNodeRef();
-            // rename
+            
+            // rename if necessary
             fileFolderService.rename(nodeRef, this.name);
             
             // update the properties
@@ -136,6 +140,10 @@ public class NewSpaceWizard extends AbstractWizardBean
             properties.put(ContentModel.PROP_NAME, this.name);
             properties.put(ContentModel.PROP_ICON, this.icon);
             properties.put(ContentModel.PROP_DESCRIPTION, this.description);
+            
+            // extension point for subclasses to update type specific properties
+            this.addSubTypeEditedProperties(properties);
+            
             // apply properties
             this.nodeService.setProperties(nodeRef, properties);
          }
@@ -176,14 +184,22 @@ public class NewSpaceWizard extends AbstractWizardBean
                
                if (logger.isDebugEnabled())
                   logger.debug("Added uifacets aspect with properties: " + uiFacetsProps);
+               
+               // extension point for subclasses to add type specific properties to the node
+               addSubTypeProps(nodeRef, getSubTypeCreationProperties());
+               
+               // remember the created node
+               this.createdNode = nodeRef;
             }
             else if (this.createFrom.equals("existing"))
             {
                // copy the selected space and update the name, description and icon
                NodeRef sourceNode = this.existingSpaceId;
                NodeRef parentSpace = new NodeRef(Repository.getStoreRef(), getNavigator().getCurrentNodeId());
+               
                // copy from existing
                NodeRef copiedNode = this.fileFolderService.copy(sourceNode, parentSpace, this.name).getNodeRef(); 
+               
                // also need to set the new description and icon properties
                this.nodeService.setProperty(copiedNode, ContentModel.PROP_DESCRIPTION, this.description);
                this.nodeService.setProperty(copiedNode, ContentModel.PROP_ICON, this.icon);
@@ -192,6 +208,12 @@ public class NewSpaceWizard extends AbstractWizardBean
                   
                if (logger.isDebugEnabled())
                   logger.debug("Copied space with id of " + sourceNode.getId() + " to " + this.name);
+               
+               // extension point for subclasses to add type specific properties to the node
+               addSubTypeProps(copiedNode, getSubTypeCreationProperties());
+               
+               // remember the created node
+               this.createdNode = copiedNode;
             }
             else if (this.createFrom.equals("template"))
             {
@@ -208,6 +230,12 @@ public class NewSpaceWizard extends AbstractWizardBean
                
                if (logger.isDebugEnabled())
                   logger.debug("Copied template space with id of " + sourceNode.getId() + " to " + this.name);
+               
+               // extension point for subclasses to add type specific properties to the node
+               addSubTypeProps(copiedNode, getSubTypeCreationProperties());
+               
+               // remember the created node
+               this.createdNode = copiedNode;
             }
             
             // if the user selected to save the space as a template space copy the new
@@ -423,15 +451,7 @@ public class NewSpaceWizard extends AbstractWizardBean
       this.name = null;
       this.description = "";
       this.templateName = null;
-      this.saveAsTemplate = false;
-      
-      // if we are in the forums scenario set the space type
-      // and icon accordingly
-      if ("forums".equals(this.scenario))
-      {
-         this.spaceType = ForumModel.TYPE_FORUM.toString();
-         this.icon = "forum_large";
-      }
+      this.saveAsTemplate = false;  
    }
 
    /**
@@ -678,26 +698,28 @@ public class NewSpaceWizard extends AbstractWizardBean
    public List<UIListItem> getIcons()
    {
       // TODO: Drive the list of icons to show for each space type from the config
+      //       this will then remove the dependency on forums from this generic 
+      //       class
       
       List<UIListItem> icons = null;
       
-      if (this.spaceType.equals(ForumModel.TYPE_FORUM.toString()))
+      if (this.spaceType.equals(ForumModel.TYPE_FORUMS.toString()))
       {
          // return the various forum icons
-         if (this.forumIcons == null)
+         if (this.forumsIcons == null)
          {
-            this.forumIcons = new ArrayList<UIListItem>(1);
+            this.forumsIcons = new ArrayList<UIListItem>(2);
             
             // change default icon to be forums
-            this.icon = FORUM_ICON_DEFAULT;
+            this.icon = FORUMS_ICON_DEFAULT;
             
             UIListItem item = new UIListItem();
-            item.setValue(FORUM_ICON_DEFAULT);
-            item.getAttributes().put("image", "/images/icons/discussion_large.gif");
-            this.forumIcons.add(item);
+            item.setValue(FORUMS_ICON_DEFAULT);
+            item.getAttributes().put("image", "/images/icons/forums_large.gif");
+            this.forumsIcons.add(item);
          }
          
-         icons = this.forumIcons;
+         icons = this.forumsIcons;
       }
       else
       {
@@ -980,5 +1002,48 @@ public class NewSpaceWizard extends AbstractWizardBean
       }
       
       return outcome;
+   }
+   
+   /**
+    * Method that can be overridden by subclasses to add any extra properties
+    * that may belong to the subtype of space.
+    * 
+    * @param props The set of properties to update
+    */
+   protected void addSubTypeEditedProperties(Map<QName, Serializable> props)
+   {
+      // do nothing in here, subclasses can override if necessary
+   }
+   
+   /**
+    * Method that can be overridden by subclasses to return any custom
+    * properties for the subtype that need to be saved
+    * 
+    * @return Set of custom properties to use at creation time
+    */
+   protected Map<QName, Serializable> getSubTypeCreationProperties()
+   {
+      return null;
+   }
+   
+   /**
+    * Adds the given custom properties to the given NodeRef
+    * 
+    * @param nodeRef The node to add the properties to
+    * @param customProps The custom properties
+    */
+   private void addSubTypeProps(NodeRef nodeRef, Map<QName, Serializable> customProps)
+   {
+      if (customProps != null)
+      {
+         for (QName qname : customProps.keySet())
+         {
+            this.nodeService.setProperty(nodeRef, qname, customProps.get(qname));
+         
+            if (logger.isDebugEnabled())
+               logger.debug("Added sub type property (name=" + qname.toString() + 
+                            " value=" + customProps.get(qname));
+         }
+      }
    }
 }

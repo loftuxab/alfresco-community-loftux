@@ -19,11 +19,15 @@
    </namespaces>
    
    <types>
+      <type name="fm:forums">
+         <parent>cm:folder</parent>
+      </type>
+      
       <type name="fm:forum">
          <parent>cm:folder</parent>
          <properties>
             <property name="fm:status">
-               <type>d:int</type>
+               <type>d:category</type>
             </property>
          </properties>
       </type>
@@ -32,7 +36,7 @@
          <parent>cm:folder</parent>
          <properties>
             <property name="fm:type">
-               <type>d:int</type>
+               <type>d:category</type>
             </property>
          </properties>
       </type>

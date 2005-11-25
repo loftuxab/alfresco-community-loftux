@@ -43,6 +43,15 @@ public class ClientConfigElement extends ConfigElementAdapter
    private int forumsDetailsPageSize = 20;
    private int forumsIconsPageSize = 20;
    private String defaultForumsView = "list";
+
+   private int forumDetailsPageSize = 20;
+   private int forumBubblePageSize = 20;
+   private String defaultForumView = "details";
+
+   private int topicDetailsPageSize = 20;
+   private int topicBubblePageSize = 20;
+   private String defaultTopicView = "details";
+   private String defaultTopicSortDir = "ascending";
    
    private int recentSpacesItems = 6;
    private int searchMinimum = 3;
@@ -180,7 +189,7 @@ public class ClientConfigElement extends ConfigElementAdapter
     */
    public int getForumsIconsPageSize()
    {
-      return this.forumsDetailsPageSize;
+      return this.forumsIconsPageSize;
    }
 
    /**
@@ -188,7 +197,7 @@ public class ClientConfigElement extends ConfigElementAdapter
     */
    /*package*/ void setForumsIconsPageSize(int forumsIconsPageSize)
    {
-      this.forumsDetailsPageSize = forumsIconsPageSize;
+      this.forumsIconsPageSize = forumsIconsPageSize;
    }
 
    /**
@@ -196,7 +205,7 @@ public class ClientConfigElement extends ConfigElementAdapter
     */
    public int getForumsListPageSize()
    {
-      return this.forumsDetailsPageSize;
+      return this.forumsListPageSize;
    }
 
    /**
@@ -204,7 +213,123 @@ public class ClientConfigElement extends ConfigElementAdapter
     */
    /*package*/ void setForumsListPageSize(int forumsListPageSize)
    {
-      this.forumsDetailsPageSize = forumsListPageSize;
+      this.forumsListPageSize = forumsListPageSize;
+   }
+
+   /**
+    * @return Returns the defaultForumView.
+    */
+   public String getDefaultForumView()
+   {
+      return this.defaultForumView;
+   }
+
+   /**
+    * @param defaultForumView The defaultForumView to set.
+    */
+   /*package*/ void setDefaultForumView(String defaultForumView)
+   {
+      this.defaultForumView = defaultForumView;
+   }
+
+   /**
+    * @return Returns the forumDetailsPageSize.
+    */
+   public int getForumDetailsPageSize()
+   {
+      return this.forumDetailsPageSize;
+   }
+
+   /**
+    * @param forumDetailsPageSize The forumDetailsPageSize to set.
+    */
+   /*package*/ void setForumDetailsPageSize(int forumDetailsPageSize)
+   {
+      this.forumDetailsPageSize = forumDetailsPageSize;
+   }
+
+   /**
+    * @return Returns the forumBubblePageSize.
+    */
+   public int getForumBubblePageSize()
+   {
+      return this.forumBubblePageSize;
+   }
+
+   /**
+    * @param forumBubblePageSize The forumBubblePageSize to set.
+    */
+   /*package*/ void setForumBubblePageSize(int forumBubblePageSize)
+   {
+      this.forumBubblePageSize = forumBubblePageSize;
+   }
+
+   /**
+    * @return Returns the defaultTopicView.
+    */
+   public String getDefaultTopicView()
+   {
+      return this.defaultTopicView;
+   }
+
+   /**
+    * @param defaultTopicView The defaultTopicView to set.
+    */
+   /*package*/ void setDefaultTopicView(String defaultTopicView)
+   {
+      this.defaultTopicView = defaultTopicView;
+   }
+
+   /**
+    * @return Returns the topicDetailsPageSize.
+    */
+   public int getTopicDetailsPageSize()
+   {
+      return this.topicDetailsPageSize;
+   }
+
+   /**
+    * @param topicDetailsPageSize The topicDetailsPageSize to set.
+    */
+   /*package*/ void setTopicDetailsPageSize(int topicDetailsPageSize)
+   {
+      this.topicDetailsPageSize = topicDetailsPageSize;
+   }
+
+   /**
+    * @return Returns the topicBubblePageSize.
+    */
+   public int getTopicBubblePageSize()
+   {
+      return this.topicBubblePageSize;
+   }
+
+   /**
+    * @param topicBubblePageSize The topicBubblePageSize to set.
+    */
+   /*package*/ void setTopicBubblePageSize(int topicBubblePageSize)
+   {
+      this.topicBubblePageSize = topicBubblePageSize;
+   }
+   
+   /**
+    * Returns the default sort direction for the topic view
+    * 
+    * @return descending or ascending
+    */
+   public String getDefaultTopicSortDir()
+   {
+      return this.defaultTopicSortDir;
+   }
+
+   /**
+    * Sets the default sort direction for the topic view 
+    * 
+    * @param defaultTopicSortDir either descending or ascending
+    */
+   /*package*/ void setDefaultTopicSortDir(String defaultTopicSortDir)
+   {
+      this.defaultTopicSortDir = defaultTopicSortDir;
    }
 
    /**

@@ -62,15 +62,35 @@
                <details>20</details>
                <icons>20</icons>
             </forums>
+            <forum>
+               <details>20</details>
+               <bubble>20</bubble>
+            </forum>
+            <topic>
+               <details>20</details>
+               <bubble>20</bubble>
+            </topic>
          </page-size>
          
          <!-- the default view mode in the browse screen -->
          <!-- can be: list|details|icons -->
          <default-view>icons</default-view>
          
-         <!-- the default view mode in the forums screens -->
+         <!-- the default view mode in the forums screen -->
          <!-- can be: list|details|icons -->
          <default-forums-view>list</default-forums-view>
+         
+         <!-- the default view mode in the forum screen -->
+         <!-- can be: details|bubble -->
+         <default-forum-view>details</default-forum-view>
+         
+         <!-- the default view mode in the topic screen -->
+         <!-- can be: details|bubble -->
+         <default-topic-view>details</default-topic-view>
+         
+         <!-- the default sort direction for the topic view -->
+         <!-- can be: descending|ascending -->
+         <default-topic-sort-direction>ascending</default-topic-sort-direction>
          
          <!-- the maximum number of items to show in the recent spaces shelf component -->
          <recent-spaces-items>6</recent-spaces-items>
@@ -106,6 +126,19 @@
       </property-sheet>
    </config>
    
+   <config evaluator="node-type" condition="fm:forums">
+      <property-sheet>
+         <show-property name="name"/>
+         <show-property name="description"/>
+      </property-sheet>
+
+      <navigation>
+         <override from-view-id="/jsp/browse/browse.jsp" to-view-id="/jsp/forums/forums.jsp" />
+         <override from-outcome="browse" to-view-id="/jsp/forums/forums.jsp" />
+         <override from-outcome="showSpaceDetails" to-view-id="/jsp/forums/forums-details.jsp" />
+      </navigation>
+   </config>
+   
    <config evaluator="node-type" condition="fm:forum">
       <property-sheet>
          <show-property name="name"/>
@@ -114,8 +147,22 @@
       </property-sheet>
 
       <navigation>
-         <override from-view-id="/jsp/browse/browse.jsp" to-view-id="/jsp/forums/forums.jsp" />
-         <override from-outcome="browse" to-view-id="/jsp/forums/forums.jsp" />
+         <override from-view-id="/jsp/browse/browse.jsp" to-view-id="/jsp/forums/forum.jsp" />
+         <override from-outcome="browse" to-view-id="/jsp/forums/forum.jsp" />
+         <override from-outcome="showSpaceDetails" to-view-id="/jsp/forums/forum-details.jsp" />
+      </navigation>
+   </config>
+   
+   <config evaluator="node-type" condition="fm:topic">
+      <property-sheet>
+         <show-property name="name"/>
+         <show-property name="fm:type"/>
+      </property-sheet>
+
+      <navigation>
+         <override from-view-id="/jsp/browse/browse.jsp" to-view-id="/jsp/forums/topic.jsp" />
+         <override from-outcome="browse" to-view-id="/jsp/forums/topic.jsp" />
+         <override from-outcome="showSpaceDetails" to-view-id="/jsp/forums/topic-details.jsp" />
       </navigation>
    </config>
 
@@ -253,7 +300,7 @@
    
    <config evaluator="string-compare" condition="Custom Folder Types">
       <folder-types>
-         <type name="fm:forum" icon="/images/icons/discussion_large.gif" descriptionMsgId="forum_desc" />
+         <type name="fm:forums" icon="/images/icons/forums_large.gif" descriptionMsgId="forums_desc" />
       </folder-types>
    </config>
       

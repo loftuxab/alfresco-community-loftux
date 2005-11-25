@@ -37,11 +37,18 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ELEMENT_PAGESIZE = "page-size";
    public static final String ELEMENT_BROWSE = "browse";
    public static final String ELEMENT_FORUMS = "forums";
+   public static final String ELEMENT_FORUM = "forum";
+   public static final String ELEMENT_TOPIC = "topic";
    public static final String ELEMENT_LIST = "list";
    public static final String ELEMENT_DETAILS = "details";
    public static final String ELEMENT_ICONS = "icons";
+   public static final String ELEMENT_BUBBLE = "bubble";
+   public static final String ELEMENT_LINEAR = "linear";
    public static final String ELEMENT_DEFAULTVIEW = "default-view";
    public static final String ELEMENT_DEFAULTFORUMSVIEW = "default-forums-view";
+   public static final String ELEMENT_DEFAULTFORUMVIEW = "default-forum-view";
+   public static final String ELEMENT_DEFAULTTOPICVIEW = "default-topic-view";
+   public static final String ELEMENT_DEFAULTTOPICSORTDIR = "default-topic-sort-direction";
    public static final String ELEMENT_RECENTSPACESITEMS = "recent-spaces-items";
    public static final String ELEMENT_LANGUAGES = "languages";
    public static final String ELEMENT_LANGUAGE = "language";
@@ -122,6 +129,38 @@ public class ClientElementReader implements ConfigElementReader
                   configElement.setForumsIconsPageSize(Integer.parseInt(iconsPageSize.getTextTrim()));
                }
             }
+            
+            // get the config for the forum view
+            Element forumView = pageSize.element(ELEMENT_FORUM);
+            if (forumView != null)
+            {
+               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
+               if (detailsPageSize != null)
+               {
+                  configElement.setForumDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
+               }
+               Element bubblePageSize = pageSize.element(ELEMENT_BUBBLE);
+               if (bubblePageSize != null)
+               {
+                  configElement.setForumBubblePageSize(Integer.parseInt(bubblePageSize.getTextTrim()));
+               }
+            }
+            
+            // get the config for the topic view
+            Element topicView = pageSize.element(ELEMENT_TOPIC);
+            if (topicView != null)
+            {
+               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
+               if (detailsPageSize != null)
+               {
+                  configElement.setTopicDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
+               }
+               Element bubblePageSize = pageSize.element(ELEMENT_BUBBLE);
+               if (bubblePageSize != null)
+               {
+                  configElement.setTopicBubblePageSize(Integer.parseInt(bubblePageSize.getTextTrim()));
+               }
+            }
          }
          
          // get the languages sub-element
@@ -156,6 +195,27 @@ public class ClientElementReader implements ConfigElementReader
          if (defaultForumsView != null)
          {
             configElement.setDefaultForumsView(defaultForumsView.getTextTrim());
+         }
+         
+         // get the default forum view mode
+         Element defaultForumView = element.element(ELEMENT_DEFAULTFORUMVIEW);
+         if (defaultForumView != null)
+         {
+            configElement.setDefaultForumView(defaultForumView.getTextTrim());
+         }
+         
+         // get the default topic view mode
+         Element defaultTopicView = element.element(ELEMENT_DEFAULTTOPICVIEW);
+         if (defaultTopicView != null)
+         {
+            configElement.setDefaultTopicView(defaultTopicView.getTextTrim());
+         }
+         
+         // get the default topic sort direction
+         Element defaultTopicSortDir = element.element(ELEMENT_DEFAULTTOPICSORTDIR);
+         if (defaultTopicSortDir != null)
+         {
+            configElement.setDefaultTopicSortDir(defaultTopicSortDir.getTextTrim());
          }
          
          // get the recent space max items

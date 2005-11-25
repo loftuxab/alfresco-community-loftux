@@ -158,8 +158,11 @@ public abstract class BaseContentWizard extends AbstractWizardBean
                   Repository.resolveToQName(this.objectType));
             NodeRef fileNodeRef = fileInfo.getNodeRef();
             
-            // set the author
-            this.nodeService.setProperty(fileNodeRef, ContentModel.PROP_CREATOR, this.author);
+            // set the author (if we have)
+            if (this.author != null)
+            {
+               this.nodeService.setProperty(fileNodeRef, ContentModel.PROP_CREATOR, this.author);
+            }
             
             if (logger.isDebugEnabled())
                logger.debug("Created file node for file: " + this.fileName);

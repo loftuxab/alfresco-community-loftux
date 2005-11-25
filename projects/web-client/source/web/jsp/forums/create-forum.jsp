@@ -93,7 +93,7 @@
                               <h:graphicImage id="wizard-logo" url="/images/icons/create_forum_large.gif" />
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{BrowseBean.actionSpace.name}" /></div>
+                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainTitle"><h:outputText value="#{msg.create_forum}" /></div>
                               <div class="mainSubText"><h:outputText value="#{msg.create_forum_description}" /></div>
                            </td>
@@ -149,7 +149,7 @@
                                        <table border="0" cellpadding="0" cellspacing="0"><tr><td>
                                        <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "blue", "#D3E6FE"); %>
                                        <a:imagePickerRadio columns="6" spacing="4" value="#{CreateForumDialog.icon}">
-                                          <a:listItem value="forum_large" image="/images/icons/forum_large.gif" />
+                                          <a:listItems value="#{CreateForumDialog.icons}" />
                                        </a:imagePickerRadio>
                                        <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "blue"); %>
                                        </td></tr></table>

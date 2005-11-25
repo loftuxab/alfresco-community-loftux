@@ -54,7 +54,6 @@ public abstract class AbstractWizardBean
    // common wizard properties
    protected int currentStep = 1;
    protected boolean editMode = false;
-   protected String scenario;
    protected NodeService nodeService;
    protected FileFolderService fileFolderService;
    protected SearchService searchService;
@@ -216,28 +215,6 @@ public abstract class AbstractWizardBean
    public void populate()
    {
       // subclasses will override this method to setup accordingly
-   }
-
-   /**
-    * Returns the scenario this wizard is being used in
-    * 
-    * @return The scenario
-    */
-   public String getScenario()
-   {
-      return this.scenario;
-   }
-
-   /**
-    * Sets the scenario this wizard is being used in. 
-    * This allows the same wizard class to be used in multiple 
-    * scenarios.
-    * 
-    * @param scenario The scenario
-    */
-   public void setScenario(String scenario)
-   {
-      this.scenario = scenario;
    }
 
    /**

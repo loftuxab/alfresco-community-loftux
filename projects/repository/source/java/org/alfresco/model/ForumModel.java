@@ -31,6 +31,7 @@ public interface ForumModel
     static final String FORUMS_MODEL_URI = "http://www.alfresco.org/model/forum/1.0";
     static final String FORUMS_MODEL_PREFIX = "fm";
     
+    static final QName TYPE_FORUMS = QName.createQName(FORUMS_MODEL_URI, "forums");
     static final QName TYPE_FORUM = QName.createQName(FORUMS_MODEL_URI, "forum");
     static final QName TYPE_TOPIC = QName.createQName(FORUMS_MODEL_URI, "topic");
     static final QName TYPE_POST = QName.createQName(FORUMS_MODEL_URI, "post");

@@ -370,6 +370,31 @@ public class BrowseBean implements IContextListener
       return result;
    }
    
+   /**
+    * Setup the additional properties required at data-binding time.
+    * <p>
+    * These are properties used by components on the page when iterating over the nodes.
+    * Information such as whether the node is locked, a working copy, download URL etc.
+    * <p>
+    * We use a set of anonymous inner classes to provide the implemention for the property
+    * getters. The interfaces are only called when the properties are first required. 
+    * 
+    * @param node       MapNode to add the properties too
+    */
+   public void setupDataBindingProperties(MapNode node)
+   {
+      // special properties to be used by the value binding components on the page
+      node.addPropertyResolver("locked", this.resolverlocked);
+      node.addPropertyResolver("owner", this.resolverOwner);
+      node.addPropertyResolver("workingCopy", this.resolverWorkingCopy);
+      node.addPropertyResolver("url", this.resolverUrl);
+      node.addPropertyResolver("fileType16", this.resolverFileType16);
+      node.addPropertyResolver("fileType32", this.resolverFileType32);
+      node.addPropertyResolver("templatable", this.resolverTemplatable);
+      node.addPropertyResolver("size", this.resolverSize);
+      node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
+      node.addPropertyResolver("checkIn", this.resolverCheckIn);
+   }
    
    // ------------------------------------------------------------------------------
    // IContextListener implementation 
@@ -666,45 +691,22 @@ public class BrowseBean implements IContextListener
       }
    }
    
-   /**
-    * Setup the additional properties required at data-binding time.
-    * <p>
-    * These are properties used by components on the page when iterating over the nodes.
-    * Information such as whether the node is locked, a working copy, download URL etc.
-    * <p>
-    * We use a set of annoymous inner classes to provide the implemention for the property
-    * getters. The interfaces are only called when the properties are first required. 
-    * 
-    * @param node       MapNode to add the properties too
-    */
-   private void setupDataBindingProperties(MapNode node)
-   {
-      // special properties to be used by the value binding components on the page
-      node.addPropertyResolver("locked", this.resolverlocked);
-      node.addPropertyResolver("owner", this.resolverOwner);
-      node.addPropertyResolver("workingCopy", this.resolverWorkingCopy);
-      node.addPropertyResolver("url", this.resolverUrl);
-      node.addPropertyResolver("fileType16", this.resolverFileType16);
-      node.addPropertyResolver("fileType32", this.resolverFileType32);
-      node.addPropertyResolver("templatable", this.resolverTemplatable);
-      node.addPropertyResolver("size", this.resolverSize);
-      node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
-      node.addPropertyResolver("checkIn", this.resolverCheckIn);
-   }
+   // ------------------------------------------------------------------------------
+   // Property Resolvers
    
-   private NodePropertyResolver resolverlocked = new NodePropertyResolver() {
+   public NodePropertyResolver resolverlocked = new NodePropertyResolver() {
       public Object get(Node node) {
          return Repository.isNodeLocked(node, lockService);
       }
    };
    
-   private NodePropertyResolver resolverOwner = new NodePropertyResolver() {
+   public NodePropertyResolver resolverOwner = new NodePropertyResolver() {
       public Object get(Node node) {
          return Repository.isNodeOwner(node, lockService);
       }
    };
    
-   private NodePropertyResolver resolverCancelCheckOut = new NodePropertyResolver() {
+   public NodePropertyResolver resolverCancelCheckOut = new NodePropertyResolver() {
       public Object get(Node node) {
          if (node.hasPermission(null))
          {
@@ -717,7 +719,7 @@ public class BrowseBean implements IContextListener
       }
    };
    
-   private NodePropertyResolver resolverCheckIn = new NodePropertyResolver() {
+   public NodePropertyResolver resolverCheckIn = new NodePropertyResolver() {
       public Object get(Node node) {
          if (node.hasPermission(null))
          {
@@ -730,50 +732,50 @@ public class BrowseBean implements IContextListener
       }
    };
    
-   private NodePropertyResolver resolverWorkingCopy = new NodePropertyResolver() {
+   public NodePropertyResolver resolverWorkingCopy = new NodePropertyResolver() {
       public Object get(Node node) {
          return node.hasAspect(ContentModel.ASPECT_WORKING_COPY);
       }
    };
    
-   private NodePropertyResolver resolverDownload = new NodePropertyResolver() {
+   public NodePropertyResolver resolverDownload = new NodePropertyResolver() {
       public Object get(Node node) {
          return DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName());
       }
    };
    
-   private NodePropertyResolver resolverUrl = new NodePropertyResolver() {
+   public NodePropertyResolver resolverUrl = new NodePropertyResolver() {
       public Object get(Node node) {
          return DownloadContentServlet.generateBrowserURL(node.getNodeRef(), node.getName());
       }
    };
    
-   private NodePropertyResolver resolverFileType16 = new NodePropertyResolver() {
+   public NodePropertyResolver resolverFileType16 = new NodePropertyResolver() {
       public Object get(Node node) {
          return Utils.getFileTypeImage(node.getName(), true);
       }
    };
    
-   private NodePropertyResolver resolverFileType32 = new NodePropertyResolver() {
+   public NodePropertyResolver resolverFileType32 = new NodePropertyResolver() {
       public Object get(Node node) {
          return Utils.getFileTypeImage(node.getName(), false);
       }
    };
    
-   private NodePropertyResolver resolverPath = new NodePropertyResolver() {
+   public NodePropertyResolver resolverPath = new NodePropertyResolver() {
       public Object get(Node node) {
          return nodeService.getPath(node.getNodeRef());
       }
    };
    
-   private NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
+   public NodePropertyResolver resolverDisplayPath = new NodePropertyResolver() {
       public Object get(Node node) {
          // TODO: replace this with a method that shows the full display name - not QNames
          return Repository.getDisplayPath( (Path)node.getProperties().get("path") );
       }
    };
    
-   private NodePropertyResolver resolverSpaceIcon = new NodePropertyResolver() {
+   public NodePropertyResolver resolverSpaceIcon = new NodePropertyResolver() {
       public Object get(Node node) {
          QNameNodeMap props = (QNameNodeMap)node.getProperties();
          String icon = (String)props.getRaw("app:icon");
@@ -781,20 +783,20 @@ public class BrowseBean implements IContextListener
       }
    };
    
-   private NodePropertyResolver resolverTemplatable = new NodePropertyResolver() {
+   public NodePropertyResolver resolverTemplatable = new NodePropertyResolver() {
       public Object get(Node node) {
          return Boolean.valueOf(node.hasAspect(ContentModel.ASPECT_TEMPLATABLE));
       }
    };
    
-   private NodePropertyResolver resolverMimetype = new NodePropertyResolver() {
+   public NodePropertyResolver resolverMimetype = new NodePropertyResolver() {
       public Object get(Node node) {
          ContentData content = (ContentData)node.getProperties().get(ContentModel.PROP_CONTENT);
          return (content != null ? content.getMimetype() : null);
       }
    };
    
-   private NodePropertyResolver resolverSize = new NodePropertyResolver() {
+   public NodePropertyResolver resolverSize = new NodePropertyResolver() {
       public Object get(Node node) {
          ContentData content = (ContentData)node.getProperties().get(ContentModel.PROP_CONTENT);
          return (content != null ? new Long(content.getSize()) : null);
@@ -980,7 +982,8 @@ public class BrowseBean implements IContextListener
       // clear the UI state in preparation for finishing the next action
       if (invalidate == true)
       {
-         invalidateComponents();
+         // use the context service to notify all registered beans
+         UIContextService.getInstance(FacesContext.getCurrentInstance()).notifyBeans();
       }
    }
    
@@ -1293,7 +1296,7 @@ public class BrowseBean implements IContextListener
    private void invalidateComponents()
    {
       if (logger.isDebugEnabled())
-         logger.debug("Invalidating UI List Components...");
+         logger.debug("Invalidating browse components...");
       
       // clear the value for the list components - will cause re-bind to it's data and refresh
       if (this.contentRichList != null)
