@@ -56,9 +56,12 @@ import org.alfresco.jcr.dictionary.NodeDefinitionImpl;
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -607,7 +610,6 @@ public class NodeImpl extends ItemImpl implements Node
         
         // Add mix:referenceable aspect (to represent the Alfresco sys:referenceable aspect)
         nodeTypes[i] = session.getTypeManager().getNodeTypeImpl(NodeTypeImpl.MIX_REFERENCEABLE);
-        
         return nodeTypes;
     }
 
@@ -654,7 +656,18 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void addMixin(String mixinName) throws NoSuchNodeTypeException, VersionException, ConstraintViolationException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // retrieve aspect definition
+        QName mixin = QName.createQName(mixinName, session.getNamespaceResolver());
+        DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
+        AspectDefinition aspectDef = dictionaryService.getAspect(mixin);
+        if (aspectDef == null)
+        {
+            throw new NoSuchNodeTypeException("Unknown mixin name '" + mixinName + "'");
+        }
+        
+        // apply aspect
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        nodeService.addAspect(nodeRef, mixin, null);
     }
 
     /* (non-Javadoc)
@@ -662,7 +675,25 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void removeMixin(String mixinName) throws NoSuchNodeTypeException, VersionException, ConstraintViolationException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // retrieve aspect definition
+        QName mixin = QName.createQName(mixinName, session.getNamespaceResolver());
+        DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
+        AspectDefinition aspectDef = dictionaryService.getAspect(mixin);
+        if (aspectDef == null)
+        {
+            throw new NoSuchNodeTypeException("Unknown mixin name '" + mixinName + "'");
+        }
+
+        // check the node actually has the mixin
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        Set<QName> nodeAspects = nodeService.getAspects(nodeRef);
+        if (!nodeAspects.contains(mixin))
+        {
+            throw new NoSuchNodeTypeException("Node " + nodeRef.getId() + " does not have the mixin " + mixin);
+        }
+        
+        // remove aspect
+        nodeService.removeAspect(nodeRef, mixin);
     }
 
     /* (non-Javadoc)
@@ -670,7 +701,27 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean canAddMixin(String mixinName) throws NoSuchNodeTypeException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // retrieve aspect definition
+        QName mixin = QName.createQName(mixinName, session.getNamespaceResolver());
+        DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
+        AspectDefinition aspectDef = dictionaryService.getAspect(mixin);
+        if (aspectDef == null)
+        {
+            throw new NoSuchNodeTypeException("Unknown mixin name '" + mixinName + "'");
+        }
+
+        // TODO: check for write permission
+
+        // check for locked node
+        LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+        LockStatus lockStatus = lockService.getLockStatus(nodeRef);
+        if (lockStatus == LockStatus.LOCKED)
+        {
+            return false;
+        }
+        
+        // mixin addition is allowed
+        return true;
     }
 
     /* (non-Javadoc)
