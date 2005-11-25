@@ -389,8 +389,9 @@ public class JCRDocumentXMLExporter implements Exporter
      * @return
      */
     private String getValue(Object value)
+        throws RepositoryException
     {
-        String strValue = session.getTypeConverter().getConverter().convert(String.class, value);
+        String strValue = session.getTypeConverter().convert(String.class, value);
         return encodeBlanks(strValue);
     }
     

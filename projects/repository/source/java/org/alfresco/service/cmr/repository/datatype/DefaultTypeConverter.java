@@ -26,9 +26,9 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -103,7 +103,7 @@ public class DefaultTypeConverter
                 }
                 catch (ParseException e)
                 {
-                    throw new UnsupportedOperationException("Failed to parse number " + source, e);
+                    throw new TypeConversionException("Failed to parse number " + source, e);
                 }
             }
         });
@@ -179,7 +179,7 @@ public class DefaultTypeConverter
                 Date date = ISO8601DateFormat.parse(source);
                 if (date == null)
                 {
-                    throw new UnsupportedOperationException("Failed to parse date " + source);
+                    throw new TypeConversionException("Failed to parse date " + source);
                 }
                 return date;
             }
@@ -229,7 +229,7 @@ public class DefaultTypeConverter
                 }
                 catch (UnsupportedEncodingException e)
                 {
-                    throw new UnsupportedOperationException("Encoding not supported", e);
+                    throw new TypeConversionException("Encoding not supported", e);
                 }
             }
         });
@@ -360,6 +360,16 @@ public class DefaultTypeConverter
             public String convert(Date source)
             {
                 return ISO8601DateFormat.format(source);
+            }
+        });
+        
+        INSTANCE.addConverter(Date.class, Calendar.class, new TypeConverter.Converter<Date, Calendar>()
+        {
+            public Calendar convert(Date source)
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(source);
+                return calendar;
             }
         });
 
@@ -507,6 +517,18 @@ public class DefaultTypeConverter
         INSTANCE.addDynamicTwoStageConverter(BigInteger.class, String.class, InputStream.class);
 
         //
+        // Calendar
+        //
+        
+        INSTANCE.addConverter(Calendar.class, Date.class, new TypeConverter.Converter<Calendar, Date>()
+        {
+            public Date convert(Calendar source)
+            {
+                return source.getTime();
+            }
+        });
+        
+        //
         // BigDecimal
         //
 
@@ -595,7 +617,7 @@ public class DefaultTypeConverter
                 String encoding = source.getEncoding();
                 if (encoding == null || !encoding.equals("UTF-8"))
                 {
-                    throw new UnsupportedOperationException("Cannot convert non UTF-8 streams to String.");
+                    throw new TypeConversionException("Cannot convert non UTF-8 streams to String.");
                 }
                 
                 // TODO: Throw error on size limit
@@ -640,11 +662,11 @@ public class DefaultTypeConverter
                 } 
                 catch (UnsupportedEncodingException e)
                 {
-                    throw new UnsupportedOperationException("Cannot convert input stream to String.", e);
+                    throw new TypeConversionException("Cannot convert input stream to String.", e);
                 }
                 catch (IOException e)
                 {
-                    throw new AlfrescoRuntimeException("Conversion from stream to string failed", e);
+                    throw new TypeConversionException("Conversion from stream to string failed", e);
                 }
                 finally
                 {

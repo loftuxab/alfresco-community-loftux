@@ -59,6 +59,7 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.QNamePattern;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -551,9 +552,12 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             boolean isMultiValued = propertyDef.isMultiValued();
             if (isMultiValued && !(value instanceof Collection))
             {
-                // put the value into a collection
-                // the implementation gives back a Serializable list
-                value = (Serializable) Collections.singletonList(value);
+                if (value != null)
+                {
+                    // put the value into a collection
+                    // the implementation gives back a Serializable list
+                    value = (Serializable) Collections.singletonList(value);
+                }
             }
             else if (!isMultiValued && (value instanceof Collection))
             {
@@ -568,9 +572,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             // done
             return propertyValue;
         }
-        catch (UnsupportedOperationException e)
+        catch (TypeConversionException e)
         {
-            throw new AlfrescoRuntimeException(
+            throw new TypeConversionException(
                     "The property value is not compatible with the type defined for the property: \n" +
                     "   property: " + (propertyDef == null ? "unknown" : propertyDef) + "\n" +
                     "   value: " + value + "\n" +
@@ -610,9 +614,9 @@ public abstract class AbstractNodeServiceImpl implements NodeService
             // done
             return value;
         }
-        catch (UnsupportedOperationException e)
+        catch (TypeConversionException e)
         {
-            throw new AlfrescoRuntimeException(
+            throw new TypeConversionException(
                     "The property value is not compatible with the type defined for the property: \n" +
                     "   property: " + (propertyDef == null ? "unknown" : propertyDef) + "\n" +
                     "   property value: " + propertyValue,

@@ -312,9 +312,13 @@ public class JCRSystemXMLExporter implements Exporter
         {
             // emit value element
             contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
-            String strValue = session.getTypeConverter().getConverter().convert(String.class, value);
+            String strValue = session.getTypeConverter().convert(String.class, value);
             contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
             contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
+        }
+        catch (RepositoryException e)
+        {
+            throw new ExporterException("Failed to process value event - nodeRef " + nodeRef + "; property " + toPrefixString(property) + "; value " + value, e);
         }
         catch (SAXException e)
         {

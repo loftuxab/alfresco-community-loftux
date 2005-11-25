@@ -55,6 +55,21 @@ public class DataTypeMap
         dataTypeToPropertyType.put(DataTypeDefinition.ANY, PropertyType.UNDEFINED);
     }
     
+    /** Map of JCR Property Type to Alfresco Data Type */
+    private static Map<Integer, QName> propertyTypeToDataType = new HashMap<Integer, QName>();
+    static
+    {
+        propertyTypeToDataType.put(PropertyType.STRING, DataTypeDefinition.TEXT);
+        propertyTypeToDataType.put(PropertyType.BINARY, DataTypeDefinition.CONTENT);
+        propertyTypeToDataType.put(PropertyType.LONG, DataTypeDefinition.LONG);
+        propertyTypeToDataType.put(PropertyType.DOUBLE, DataTypeDefinition.DOUBLE);
+        propertyTypeToDataType.put(PropertyType.DATE, DataTypeDefinition.DATETIME);
+        propertyTypeToDataType.put(PropertyType.BOOLEAN, DataTypeDefinition.BOOLEAN);
+        propertyTypeToDataType.put(PropertyType.NAME, DataTypeDefinition.QNAME);
+        propertyTypeToDataType.put(PropertyType.REFERENCE, DataTypeDefinition.NODE_REF);
+        propertyTypeToDataType.put(PropertyType.PATH, DataTypeDefinition.PATH);
+        propertyTypeToDataType.put(PropertyType.UNDEFINED, DataTypeDefinition.ANY);
+    }
     
     /**
      * Convert an Alfresco Data Type to a JCR Property Type
@@ -72,5 +87,22 @@ public class DataTypeMap
         }
         return propertyType;
     }
-    
+
+    /**
+     * Convert a JCR Property Type to an Alfresco Data Type
+     * 
+     * @param  propertyType  JCR property type
+     * @return  alfresco data type
+     * @throws RepositoryException
+     */
+    public static QName convertPropertyTypeToDataType(int propertyType)
+    {
+        QName type = propertyTypeToDataType.get(propertyType);
+        if (type == null)
+        {
+            throw new AlfrescoRuntimeException("Cannot map JCR property type " + propertyType + " to Alfresco data type.");
+        }
+        return type;
+    }
+
 }

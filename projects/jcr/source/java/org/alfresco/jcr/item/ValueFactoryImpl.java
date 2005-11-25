@@ -18,6 +18,7 @@ package org.alfresco.jcr.item;
 
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
@@ -93,7 +94,7 @@ public class ValueFactoryImpl implements ValueFactory
                     createdValue = createValue(session.getTypeConverter().booleanValue(value));
                     break;
                 case PropertyType.DATE:
-                    createdValue = new ValueImpl(session, PropertyType.DATE, session.getTypeConverter().dateValue(value));
+                    createdValue = new ValueImpl(session, PropertyType.DATE, session.getTypeConverter().convert(Date.class, value));
                     break;
                 case PropertyType.BINARY:
                     createdValue = createValue(session.getTypeConverter().streamValue(value));
@@ -102,11 +103,11 @@ public class ValueFactoryImpl implements ValueFactory
                     createdValue = new ValueImpl(session, PropertyType.REFERENCE, session.getTypeConverter().referenceValue(value));
                     break;
                 case PropertyType.NAME:
-                    QName name = session.getTypeConverter().getConverter().convert(QName.class, value);
+                    QName name = session.getTypeConverter().convert(QName.class, value);
                     createdValue = new ValueImpl(session, PropertyType.NAME, name);
                     break;
                 case PropertyType.PATH:
-                    Path path = session.getTypeConverter().getConverter().convert(Path.class, value);
+                    Path path = session.getTypeConverter().convert(Path.class, value);
                     createdValue = new ValueImpl(session, PropertyType.PATH, path);
                     break;
                 default:

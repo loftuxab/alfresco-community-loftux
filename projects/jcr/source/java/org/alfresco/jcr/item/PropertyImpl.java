@@ -17,8 +17,11 @@
 package org.alfresco.jcr.item;
 
 import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 
 import javax.jcr.AccessDeniedException;
 import javax.jcr.Item;
@@ -40,11 +43,14 @@ import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 import org.alfresco.service.namespace.QName;
 
 
@@ -117,7 +123,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(String value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue(value, -1);
     }
 
     /* (non-Javadoc)
@@ -198,15 +204,18 @@ public class PropertyImpl extends ItemImpl implements Property
         int type = getType();
 
         // construct JCR wrappers
-        ValueImpl[] valueImpls = new ValueImpl[values.size()];
-        int i = 0;
+        List<Value> jcrValues = new ArrayList<Value>(values.size());
         for (Object value : values)
         {
-            // TODO: Could consider returning proxied value implementation (but i don't think is necessary)
-            valueImpls[i++] = new ValueImpl(session, type, value);
+            // Note: In JCR all null values are stripped
+            if (value != null)
+            {
+                // TODO: Could consider returning proxied value implementation (but i don't think is necessary)
+                jcrValues.add(new ValueImpl(session, type, value));
+            }
         }
         
-        return valueImpls;
+        return jcrValues.toArray(new Value[jcrValues.size()]);
     }
 
     /* (non-Javadoc)
@@ -460,7 +469,7 @@ public class PropertyImpl extends ItemImpl implements Property
         
         return value;
     }
-    
+
     /**
      * Get Length of a Value
      * 
@@ -469,7 +478,7 @@ public class PropertyImpl extends ItemImpl implements Property
      * @throws ValueFormatException
      * @throws RepositoryException
      */
-    public static long getPropertyLength(Object value) throws ValueFormatException, RepositoryException
+    private long getPropertyLength(Object value) throws ValueFormatException, RepositoryException
     {
         // Handle streams
         if (value instanceof ContentReader)
@@ -485,7 +494,113 @@ public class PropertyImpl extends ItemImpl implements Property
         String strValue = (String)DefaultTypeConverter.INSTANCE.convert(String.class, value);
         return strValue.length();
     }
+
+    /**
+     * Sets a property value
+     * 
+     * @param value  the value to set
+     * @param type  type to explicitly convert to or -1 to convert to property type
+     * @throws RepositoryException
+     */
+    protected void setPropertyValue(Object value, int type)
+        throws RepositoryException
+    {
+        checkSingleValued();
+        Object castValue = castValue(value, type);
+        writeValue(castValue);
+    }    
+    
+    /**
+     * Sets a property value
+     * 
+     * @param values  the values to set
+     * @param type  type to explicitly convert to or -1 to convert to property type
+     * @throws RepositoryException
+     */
+    protected void setPropertyValue(Object[] values, int type)
+        throws RepositoryException
+    {
+        checkMultiValued();
         
+        // create collection for multi-valued property
+        List<Object> castValues = null;
+        if (values != null)
+        {
+            castValues = new ArrayList<Object>(values.length);
+            for (Object value : values)
+            {
+                Object castValue = castValue(value, type);
+                castValues.add(castValue);
+            }
+        }
+        
+        writeValue(castValues);
+    }
+       
+    
+    private Object castValue(Object value, int type)
+        throws RepositoryException
+    {
+        // extract raw value if JCR value provided
+        if (value instanceof Value)
+        {
+            value = ValueImpl.getValue((Value)value);
+        }
+
+        // cast value to appropriate type
+        DataTypeDefinition dataTypeDef = getPropertyDefinition().getDataType();
+        if (type != -1 && dataTypeDef.getName().equals(DataTypeDefinition.ANY))
+        {
+            // attempt to cast to explicitly specified type, but only in case where property type can be ANY
+            QName dataTypeName = DataTypeMap.convertPropertyTypeToDataType(type);
+            DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
+            dataTypeDef = dictionaryService.getDataType(dataTypeName); 
+            value = session.getTypeConverter().convert(dataTypeDef, value);
+        }
+        
+        // special case where binary is converted to inputStream ready for writing via a ContentWriter
+        if (dataTypeDef.getName().equals(DataTypeDefinition.CONTENT))
+        {
+            value = session.getTypeConverter().streamValue(value);
+        }
+        
+        return value;
+    }
+    
+    private void writeValue(Object value)
+        throws ValueFormatException
+    {
+        // set the property value
+        if (value instanceof InputStream)
+        {
+            // write content
+            try
+            {
+                ContentService contentService = session.getRepositoryImpl().getServiceRegistry().getContentService();
+                ContentWriter writer = contentService.getWriter(node.getNodeRef(), name, true);
+                writer.putContent((InputStream)value);
+            }
+            catch(InvalidTypeException e)
+            {
+                throw new ValueFormatException(e);
+            }
+        }
+        else
+        {
+            // write property value
+            // Note: In the case of Content properties, this effectively "deletes" the content when the value is null
+            try
+            {
+                NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+                nodeService.setProperty(node.getNodeRef(), name, (Serializable)value);
+            }
+            catch(TypeConversionException e)
+            {
+                throw new ValueFormatException(e);
+            }
+        }
+    }
+    
     /**
      * Checks that this property is single valued.
      * 

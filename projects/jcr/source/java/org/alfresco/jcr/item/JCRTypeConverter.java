@@ -24,9 +24,11 @@ import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
 
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 import org.alfresco.service.cmr.repository.datatype.TypeConverter;
 import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.QName;
@@ -74,16 +76,8 @@ public class JCRTypeConverter
      */
     public NodeImpl referenceValue(Object value) throws ValueFormatException, RepositoryException
     {
-        try
-        {
-            NodeRef nodeRef = (NodeRef)jcrTypeConverter.convert(NodeRef.class, value);
-            return new NodeImpl(jcrTypeConverter.getSession(), nodeRef);
-        }
-        catch(Exception e)
-        {
-            translateException(e);
-            throw new RepositoryException(e);
-        }
+        NodeRef nodeRef = (NodeRef)convert(NodeRef.class, value);
+        return new NodeImpl(jcrTypeConverter.getSession(), nodeRef);
     }
         
     /**
@@ -96,15 +90,7 @@ public class JCRTypeConverter
      */
     public String stringValue(Object value) throws ValueFormatException, RepositoryException 
     {
-        try
-        {
-            return (String)jcrTypeConverter.convert(String.class, value);
-        }
-        catch(Exception e)
-        {
-            translateException(e);
-            throw new RepositoryException(e);
-        }
+        return (String)convert(String.class, value);
     }
 
     /**
@@ -117,15 +103,7 @@ public class JCRTypeConverter
      */
     public InputStream streamValue(Object value) throws IllegalStateException, RepositoryException
     {
-        try
-        {
-            return (InputStream)jcrTypeConverter.convert(InputStream.class, value);
-        }
-        catch(Exception e)
-        {
-            translateException(e);
-            throw new RepositoryException(e);
-        }
+        return (InputStream)convert(InputStream.class, value);
     }
 
     /**
@@ -183,18 +161,10 @@ public class JCRTypeConverter
      */
     public Calendar dateValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
-        try
-        {
-            Date date = (Date)jcrTypeConverter.convert(Date.class, value);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            return calendar;
-        }
-        catch(Exception e)
-        {
-            translateException(e);
-            throw new RepositoryException(e);
-        }
+        Date date = (Date)convert(Date.class, value);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar;
     }
 
     /**
@@ -230,15 +200,7 @@ public class JCRTypeConverter
      */
     public QName nameValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
-        try
-        {
-            return jcrTypeConverter.convert(QName.class, value);
-        }
-        catch(Exception e)
-        {
-            translateException(e);
-            throw new RepositoryException(e);
-        }
+        return convert(QName.class, value);
     }
 
     /**
@@ -252,9 +214,24 @@ public class JCRTypeConverter
      */
     public Path pathValue(Object value) throws ValueFormatException, IllegalStateException, RepositoryException
     {
+        return convert(Path.class, value);
+    }
+
+    
+    /**
+     * General conversion method using JCR converters
+     * 
+     * @param propertyType  datatype to convert to
+     * @param value  the value to convert
+     * @return  the converted value
+     * @throws RepositoryException
+     */
+    public final Object convert(DataTypeDefinition propertyType, Object value)
+        throws RepositoryException
+    {
         try
         {
-            return jcrTypeConverter.convert(Path.class, value);
+            return jcrTypeConverter.convert(propertyType, value);
         }
         catch(Exception e)
         {
@@ -262,7 +239,30 @@ public class JCRTypeConverter
             throw new RepositoryException(e);
         }
     }
-
+    
+    /**
+     * General conversion method using JCR converters
+     * 
+     * @param <T>  class
+     * @param c  class
+     * @param value  value to convert
+     * @return  converted value
+     * @throws RepositoryException
+     */
+    public final <T> T convert(Class<T> c, Object value)
+        throws RepositoryException
+    {
+        try
+        {
+            return jcrTypeConverter.convert(c, value);
+        }
+        catch(Exception e)
+        {
+            translateException(e);
+            throw new RepositoryException(e);
+        }
+    }
+    
     /**
      * Catch and translate value conversion errors
      * 
@@ -271,7 +271,7 @@ public class JCRTypeConverter
      */
     private static void translateException(Exception e) throws ValueFormatException 
     {
-        if (e instanceof UnsupportedOperationException ||
+        if (e instanceof TypeConversionException ||
             e instanceof NumberFormatException)
         {
             throw new ValueFormatException(e);
@@ -311,7 +311,7 @@ public class JCRTypeConverter
                     }
                     catch(NamespaceException e)
                     {
-                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                        throw new TypeConversionException("Cannot convert " + source + " to qualified name", e);
                     }
                 }
             });
@@ -329,7 +329,7 @@ public class JCRTypeConverter
                     }
                     catch(NamespaceException e)
                     {
-                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                        throw new TypeConversionException("Cannot convert " + source + " to qualified name", e);
                     }
                 }
             });
@@ -347,7 +347,7 @@ public class JCRTypeConverter
                     }
                     catch(NamespaceException e)
                     {
-                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                        throw new TypeConversionException("Cannot convert " + source + " to qualified name", e);
                     }
                 }
             });
@@ -365,7 +365,7 @@ public class JCRTypeConverter
                     }
                     catch(NamespaceException e)
                     {
-                        throw new UnsupportedOperationException("Cannot convert " + source + " to qualified name", e);
+                        throw new TypeConversionException("Cannot convert " + source + " to qualified name", e);
                     }
                 }
             });
@@ -385,6 +385,7 @@ public class JCRTypeConverter
          * @see org.alfresco.service.cmr.repository.datatype.TypeConverter#getConverter(java.lang.Class, java.lang.Class)
          */
         @Override
+        @SuppressWarnings("unchecked")
         public <F, T> Converter getConverter(Class<F> source, Class<T> dest)
         {
             Converter converter = super.getConverter(source, dest);

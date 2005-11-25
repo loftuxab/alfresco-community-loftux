@@ -36,6 +36,7 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.datatype.TypeConversionException;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.view.ExportPackageHandler;
@@ -394,7 +395,7 @@ public class ExporterComponent
                             exporter.value(nodeRef, property, value);
                         }
                     }
-                    catch(UnsupportedOperationException e)
+                    catch(TypeConversionException e)
                     {
                         exporter.warning("Value of property " + property + " could not be converted to xml string");
                         exporter.value(nodeRef, property, properties.get(property).toString());

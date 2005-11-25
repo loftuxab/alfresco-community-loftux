@@ -71,6 +71,12 @@ import org.alfresco.service.namespace.QName;
         {
             throw new DictionaryException("Property type " + propertyTypeName.toPrefixString() + " of property " + name.toPrefixString() + " is not found");
         }
+        
+        // ensure content properties are not multi-valued
+        if (propertyTypeName.equals(DataTypeDefinition.CONTENT) && isMultiValued())
+        {
+            throw new DictionaryException("Content properties must be single-valued");
+        }
     }
     
     

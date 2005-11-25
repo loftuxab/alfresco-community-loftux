@@ -80,6 +80,55 @@
             </property>
          </properties>
       </type>
+
+      <type name="jcrtest:testsetprop">
+         <title>Test Set Properties</title>
+         <parent>jcrtest:basetesttype</parent>
+         <properties>
+            <property name="jcrtest:setBoolean">
+               <type>d:boolean</type>
+            </property>
+            <property name="jcrtest:setMultiBoolean">
+               <type>d:boolean</type>
+               <multiple>true</multiple>
+            </property>
+            <property name="jcrtest:setDate">
+               <type>d:date</type>
+            </property>
+            <property name="jcrtest:setMultiDate">
+               <type>d:date</type>
+               <multiple>true</multiple>
+            </property>
+            <property name="jcrtest:setDouble">
+               <type>d:double</type>
+            </property>
+            <property name="jcrtest:setMultiDouble">
+               <type>d:double</type>
+               <multiple>true</multiple>
+            </property>
+            <property name="jcrtest:setLong">
+               <type>d:long</type>
+            </property>
+            <property name="jcrtest:setMultiLong">
+               <type>d:long</type>
+               <multiple>true</multiple>
+            </property>
+            <property name="jcrtest:setName">
+               <type>d:qname</type>
+            </property>
+            <property name="jcrtest:setMultiName">
+               <type>d:qname</type>
+               <multiple>true</multiple>
+            </property>
+            <property name="jcrtest:setString">
+               <type>d:text</type>
+            </property>
+            <property name="jcrtest:setMultiString">
+               <type>d:text</type>
+               <multiple>true</multiple>
+            </property>
+         </properties>
+      </type>
       
    </types>
    

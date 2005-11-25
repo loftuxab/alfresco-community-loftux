@@ -75,7 +75,7 @@ public class TypeConverter
      * @param c - a class for the target type
      * @param value - the value to be converted
      * @return - the converted value as the correct type
-     * @throws UnsupportedOperationException if the conversion cannot be performed
+     * @throws TypeConversionException if the conversion cannot be performed
      */
     @SuppressWarnings("unchecked")
     public final <T> T convert(Class<T> c, Object value)
@@ -89,7 +89,7 @@ public class TypeConverter
         if (c.isPrimitive())
         {
             // We can not suport primitive type conversion
-            throw new UnsupportedOperationException("Can not convert direct to primitive type " + c.getName());
+            throw new TypeConversionException("Can not convert direct to primitive type " + c.getName());
         }
 
         // Check if we already have the correct type
@@ -102,7 +102,7 @@ public class TypeConverter
         Converter converter = getConverter(value, c);
         if (converter == null)
         {
-            throw new UnsupportedOperationException(
+            throw new TypeConversionException(
                     "There is no conversion registered for the value: \n" +
                     "   value class: " + value.getClass().getName() + "\n" +
                     "   to class: " + c.getName() + "\n" +
@@ -120,7 +120,7 @@ public class TypeConverter
      * @param value - the value to be converted
      * @return - the converted value as the correct type
      * @throws DictionaryException if the property type's registered java class is invalid
-     * @throws UnsupportedOperationException if the conversion cannot be performed
+     * @throws TypeConversionException if the conversion cannot be performed
      */
     @SuppressWarnings("unchecked")
     public final Collection convert(DataTypeDefinition propertyType, Collection values)
@@ -150,7 +150,7 @@ public class TypeConverter
      * @param c - a class for the target type
      * @param value - the collection to be converted
      * @return - the converted collection
-     * @throws UnsupportedOperationException if the conversion cannot be performed
+     * @throws TypeConversionException if the conversion cannot be performed
      */
     public final <T> Collection<T> convert(Class<T> c, Collection values)
     {
@@ -584,7 +584,7 @@ public class TypeConverter
             Converter tConverter = TypeConverter.this.getConverter(intermediate, to);
             if (iConverter == null || tConverter == null)
             {
-                throw new UnsupportedOperationException("Cannot convert from " + from.getName() + " to " + to.getName());
+                throw new TypeConversionException("Cannot convert from " + from.getName() + " to " + to.getName());
             }
             
             Object iValue = iConverter.convert(source);

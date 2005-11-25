@@ -279,7 +279,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property setProperty(String name, Value[] values) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        QName propertyName = QName.createQName(name, session.getNamespaceResolver());
+        PropertyImpl property = new PropertyImpl(this, propertyName);
+        property.setPropertyValue(values, -1);
+        return (values == null ) ? null : property;
     }
 
     /* (non-Javadoc)
@@ -287,7 +290,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property setProperty(String name, Value[] values, int type) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        QName propertyName = QName.createQName(name, session.getNamespaceResolver());
+        PropertyImpl property = new PropertyImpl(this, propertyName);
+        property.setPropertyValue(values, type);
+        return (values == null ) ? null : property;
     }
 
     /* (non-Javadoc)
@@ -295,7 +301,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property setProperty(String name, String[] values) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        QName propertyName = QName.createQName(name, session.getNamespaceResolver());
+        PropertyImpl property = new PropertyImpl(this, propertyName);
+        property.setPropertyValue(values, -1);
+        return (values == null ) ? null : property;
     }
 
     /* (non-Javadoc)
@@ -303,7 +312,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property setProperty(String name, String[] values, int type) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        QName propertyName = QName.createQName(name, session.getNamespaceResolver());
+        PropertyImpl property = new PropertyImpl(this, propertyName);
+        property.setPropertyValue(values, type);
+        return (values == null ) ? null : property;
     }
 
     /* (non-Javadoc)
@@ -311,7 +323,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property setProperty(String name, String value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        QName propertyName = QName.createQName(name, session.getNamespaceResolver());
+        PropertyImpl property = new PropertyImpl(this, propertyName);
+        property.setPropertyValue(value, -1);
+        return (value == null ) ? null : property;
     }
 
     /* (non-Javadoc)
@@ -319,7 +334,10 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Property setProperty(String name, String value, int type) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        QName propertyName = QName.createQName(name, session.getNamespaceResolver());
+        PropertyImpl property = new PropertyImpl(this, propertyName);
+        property.setPropertyValue(value, type);
+        return (value == null ) ? null : property;
     }
 
     /* (non-Javadoc)
