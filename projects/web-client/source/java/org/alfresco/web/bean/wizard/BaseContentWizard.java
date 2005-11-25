@@ -159,7 +159,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             NodeRef fileNodeRef = fileInfo.getNodeRef();
             
             // set the author (if we have)
-            if (this.author != null)
+            if (this.author != null && this.author.length() > 0)
             {
                this.nodeService.setProperty(fileNodeRef, ContentModel.PROP_CREATOR, this.author);
             }

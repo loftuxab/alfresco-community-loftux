@@ -196,6 +196,7 @@ public class DocumentDetailsBean
                // create a map node representation of the version
                MapNode clientVersion = new MapNode(version.getFrozenStateNodeRef());
                clientVersion.put("versionLabel", version.getVersionLabel());
+               clientVersion.put("notes", version.getDescription());
                clientVersion.put("author", clientVersion.get("creator"));
                clientVersion.put("versionDate", version.getCreatedDate());
                clientVersion.put("url", DownloadContentServlet.generateBrowserURL(version.getFrozenStateNodeRef(), 

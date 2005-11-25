@@ -179,8 +179,8 @@
                         
                      </a:panel>
                      
-                     <div>
-                     
+                     </div>
+                                          
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width=4></td>
                </tr>

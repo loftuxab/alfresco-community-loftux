@@ -28,6 +28,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -38,6 +39,7 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
@@ -177,6 +179,22 @@ public class CheckinCheckoutBean
    public boolean getKeepCheckedOut()
    {
       return this.keepCheckedOut;
+   }
+   
+   /**
+    * @param minorChange   The minorChange to set.
+    */
+   public void setMinorChange(boolean minorChange)
+   {
+      this.minorChange = minorChange;
+   }
+   
+   /**
+    * @return Returns the minorChange flag.
+    */
+   public boolean getMinorChange()
+   {
+      return this.minorChange;
    }
    
    /**
@@ -756,6 +774,16 @@ public class CheckinCheckoutBean
             // add version history text to props
             Map<String, Serializable> props = new HashMap<String, Serializable>(1, 1.0f);
             props.put(Version.PROP_DESCRIPTION, this.versionNotes);
+            // set the flag for minor or major change
+            if (this.minorChange)
+            {
+               props.put(VersionModel.PROP_VERSION_TYPE, VersionType.MINOR);
+            }
+            else
+            {
+               props.put(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR);
+            }
+            
             NodeRef originalDoc = this.versionOperationsService.checkin(
                   node.getNodeRef(),
                   props,
@@ -862,6 +890,7 @@ public class CheckinCheckoutBean
       this.file = null;
       this.fileName = null;
       this.keepCheckedOut = false;
+      this.minorChange = true;
       this.copyLocation = COPYLOCATION_CURRENT;
       this.versionNotes = "";
       this.selectedSpaceId = null;
@@ -903,6 +932,7 @@ public class CheckinCheckoutBean
    private File file;
    private String fileName;
    private boolean keepCheckedOut = false;
+   private boolean minorChange = true;
    private String copyLocation = COPYLOCATION_CURRENT;
    private String versionNotes = "";
    private NodeRef selectedSpaceId = null;

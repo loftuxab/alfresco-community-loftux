@@ -134,6 +134,12 @@
                                  </tr>
                                  <tr>
                                     <td>
+                                       <h:selectBooleanCheckbox value="#{CheckinCheckoutBean.minorChange}" />
+                                       <span style="vertical-align:20%"><h:outputText value="#{msg.minor_change}" /></span>
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td>
                                        <h:selectBooleanCheckbox value="#{CheckinCheckoutBean.keepCheckedOut}" />
                                        <span style="vertical-align:20%"><h:outputText value="#{msg.checkin_changes_info}" /></span>
                                     </td>

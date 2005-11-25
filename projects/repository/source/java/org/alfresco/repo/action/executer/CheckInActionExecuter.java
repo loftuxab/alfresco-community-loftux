@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -30,6 +31,7 @@ import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.version.Version;
+import org.alfresco.service.cmr.version.VersionType;
 
 /**
  * Check in action executor
@@ -40,6 +42,7 @@ public class CheckInActionExecuter extends ActionExecuterAbstractBase
 {
     public static final String NAME = "check-in";
     public static final String PARAM_DESCRIPTION = "description";
+    public static final String PARAM_MINOR_CHANGE = "minorChange";
     
     /**
      * The node service
@@ -84,6 +87,17 @@ public class CheckInActionExecuter extends ActionExecuterAbstractBase
             String description = (String)ruleAction.getParameterValue(PARAM_DESCRIPTION);
             Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(1);
             versionProperties.put(Version.PROP_DESCRIPTION, description);
+            
+            // determine whether the change is minor or major
+            Boolean minorChange = (Boolean)ruleAction.getParameterValue(PARAM_MINOR_CHANGE);
+            if (minorChange != null && minorChange.booleanValue() == false)
+            {
+               versionProperties.put(VersionModel.PROP_VERSION_TYPE, VersionType.MAJOR);
+            }
+            else
+            {
+               versionProperties.put(VersionModel.PROP_VERSION_TYPE, VersionType.MINOR);
+            }
             
             // TODO determine whether the document should be kept checked out
             

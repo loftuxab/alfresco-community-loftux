@@ -110,6 +110,13 @@
                                                         rows="2" cols="50" />
                                     </td>
                                  </tr>
+                                 <tr>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                       <h:selectBooleanCheckbox value="#{NewRuleWizard.actionProperties.checkinMinorChange}" />
+                                       <span style="vertical-align:20%"><h:outputText value="#{msg.minor_change}" /></span>
+                                    </td>
+                                 </tr>
                                  <tr><td class="paddingRow"></td></tr>
                               </table>
                               <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>

@@ -16,9 +16,6 @@
  */
 package org.alfresco.web.bean.wizard;
 
-import java.util.Map;
-
-import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
@@ -29,7 +26,6 @@ import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.UIContextService;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.NavigationBean;
-import org.alfresco.web.ui.common.component.UIActionLink;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

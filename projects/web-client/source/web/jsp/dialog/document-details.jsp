@@ -370,8 +370,16 @@
                                        <a:actionLink id="label" value="#{r.versionLabel}" href="#{r.url}" target="new" />
                                     </a:column>
                                     
-                                    <%-- Description columns --%>
+                                    <%-- Version notes columns --%>
                                     <a:column id="col2" style="text-align:left">
+                                       <f:facet name="header">
+                                          <a:sortLink label="#{msg.notes}" value="notes" styleClass="header"/>
+                                       </f:facet>
+                                       <h:outputText id="notes" value="#{r.notes}" />
+                                    </a:column>
+                                    
+                                    <%-- Description columns --%>
+                                    <a:column id="col3" style="text-align:left">
                                        <f:facet name="header">
                                           <a:sortLink label="#{msg.author}" value="author" styleClass="header"/>
                                        </f:facet>
@@ -379,7 +387,7 @@
                                     </a:column>
                                     
                                     <%-- Created Date column for details view mode --%>
-                                    <a:column id="col3" style="text-align:left">
+                                    <a:column id="col4" style="text-align:left">
                                        <f:facet name="header">
                                           <a:sortLink label="#{msg.date}" value="versionDate" styleClass="header"/>
                                        </f:facet>
@@ -389,7 +397,7 @@
                                     </a:column>
                                     
                                     <%-- view the contents of the specific version --%>
-                                    <a:column id="col4" style="text-align: left">
+                                    <a:column id="col5" style="text-align: left">
                                        <f:facet name="header">
                                           <h:outputText value="#{msg.actions}"/>
                                        </f:facet>

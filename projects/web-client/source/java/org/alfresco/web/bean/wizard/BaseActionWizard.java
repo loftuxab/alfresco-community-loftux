@@ -76,6 +76,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    public static final String PROP_REJECT_ACTION = "rejectAction";
    public static final String PROP_REJECT_FOLDER = "rejectFolder";
    public static final String PROP_CHECKIN_DESC = "checkinDescription";
+   public static final String PROP_CHECKIN_MINOR = "checkinMinorChange";
    public static final String PROP_TRANSFORMER = "transformer";
    public static final String PROP_IMAGE_TRANSFORMER = "imageTransformer";
    public static final String PROP_TRANSFORM_OPTIONS = "transformOptions";
@@ -117,9 +118,12 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       this.currentActionProperties = new HashMap<String, Serializable>(3);
       
       // default the approve and reject actions
-      this.currentActionProperties.put("approveAction", "move");
-      this.currentActionProperties.put("rejectStepPresent", "yes");
-      this.currentActionProperties.put("rejectAction", "move");
+      this.currentActionProperties.put(PROP_APPROVE_ACTION, "move");
+      this.currentActionProperties.put(PROP_REJECT_STEP_PRESENT, "yes");
+      this.currentActionProperties.put(PROP_REJECT_ACTION, "move");
+      
+      // default the checkin minor change
+      this.currentActionProperties.put(PROP_CHECKIN_MINOR, new Boolean(true));
    }
    
    /**
@@ -260,6 +264,10 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          // add the description for the checkin to the action params
          actionParams.put(CheckInActionExecuter.PARAM_DESCRIPTION, 
                this.currentActionProperties.get(PROP_CHECKIN_DESC));
+         
+         // add the minor change flag
+         actionParams.put(CheckInActionExecuter.PARAM_MINOR_CHANGE,
+               this.currentActionProperties.get(PROP_CHECKIN_MINOR));
       }
       else if (this.action.equals(TransformActionExecuter.NAME))
       {
@@ -391,6 +399,9 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       {
          String checkDesc = (String)actionProps.get(CheckInActionExecuter.PARAM_DESCRIPTION);
          this.currentActionProperties.put(PROP_CHECKIN_DESC, checkDesc);
+         
+         Boolean minorChange = (Boolean)actionProps.get(CheckInActionExecuter.PARAM_MINOR_CHANGE);
+         this.currentActionProperties.put(PROP_CHECKIN_MINOR, minorChange);
       }
       else if (this.action.equals(TransformActionExecuter.NAME))
       {

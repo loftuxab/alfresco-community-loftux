@@ -41,6 +41,8 @@ import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.evaluator.HasAspectEvaluator;
 import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.IsSubTypeEvaluator;
+import org.alfresco.repo.action.executer.CheckInActionExecuter;
+import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
@@ -401,17 +403,25 @@ public class NewRuleWizard extends BaseActionWizard
       actionProps.put(PROP_ACTION_NAME, this.action);
       this.currentActionProperties = actionProps;
       
-      String outcome = null;
-      if ("simple-workflow".equals(this.action))
+      String outcome = this.action;
+      
+      if (SimpleWorkflowActionExecuter.NAME.equals(this.action))
       {
          this.currentActionProperties.put("approveAction", "move");
          this.currentActionProperties.put("rejectStepPresent", "yes");
          this.currentActionProperties.put("rejectAction", "move");
          
-         outcome = this.action;
+         if (logger.isDebugEnabled())
+            logger.debug("Added '" + SimpleWorkflowActionExecuter.NAME + 
+                  "' action to list");
+      }
+      else if (CheckInActionExecuter.NAME.equals(this.action))
+      {
+         this.currentActionProperties.put(PROP_CHECKIN_MINOR, new Boolean(true));
          
          if (logger.isDebugEnabled())
-            logger.debug("Added 'simple-workflow' action to list");
+            logger.debug("Added '" + CheckInActionExecuter.NAME + 
+                  "' action to list");
       }
       else if ("extract-metadata".equals(this.action))
       {
@@ -419,13 +429,13 @@ public class NewRuleWizard extends BaseActionWizard
          actionProps.put(PROP_ACTION_SUMMARY, buildActionSummary(actionProps));
          this.allActionsProperties.add(actionProps);
          
+         outcome = null;
+         
          if (logger.isDebugEnabled())
             logger.debug("Added 'extract-metadata' action to list");
       }
       else
       {
-         outcome = this.action;
-         
          if (logger.isDebugEnabled())
             logger.debug("Added '" + this.action + "' action to list");
       }
@@ -1434,7 +1444,20 @@ public class NewRuleWizard extends BaseActionWizard
          else if ("check-in".equals(actionName))
          {
             String comment = (String)this.currentActionProperties.get(PROP_CHECKIN_DESC);
-            summary.append("'").append(comment).append("'");
+            Boolean minorChange = (Boolean)this.currentActionProperties.get(PROP_CHECKIN_MINOR);
+            String change = null;
+            if (minorChange != null && minorChange.booleanValue())
+            {
+               change = Application.getMessage(FacesContext.getCurrentInstance(), "minor_change");
+            }
+            else
+            {
+               change = Application.getMessage(FacesContext.getCurrentInstance(), "major_change");
+            }
+            
+            // recreate the summary object as it contains parameters
+            String msg = MessageFormat.format(summary.toString(), new Object[] {change, comment});
+            summary = new StringBuilder(msg);
          }
          else if ("import".equals(actionName))
          {
