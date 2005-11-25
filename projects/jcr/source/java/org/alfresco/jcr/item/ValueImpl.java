@@ -189,7 +189,8 @@ public class ValueImpl implements Value
                 objValue = value.getStream();
                 break;
             default:
-                // Note: fallthrough
+                // Note: just take the internal value
+                objValue = ((ValueImpl)value).value;
                 break;
         }
         

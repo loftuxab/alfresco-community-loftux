@@ -23,7 +23,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
-import javax.activation.MimeType;
 import javax.jcr.AccessDeniedException;
 import javax.jcr.Item;
 import javax.jcr.ItemNotFoundException;
@@ -31,7 +30,6 @@ import javax.jcr.ItemVisitor;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
-import javax.jcr.UnsupportedRepositoryOperationException;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 import javax.jcr.lock.LockException;
@@ -39,6 +37,7 @@ import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.nodetype.PropertyDefinition;
 import javax.jcr.version.VersionException;
 
+import org.alfresco.jcr.api.JCRNodeRef;
 import org.alfresco.jcr.dictionary.DataTypeMap;
 import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
@@ -101,7 +100,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void remove() throws VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        // TODO: Implement as setValue(null) ?
+        setValue((Value)null);
     }
     
     /* (non-Javadoc)
@@ -109,7 +108,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(Value value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        setPropertyValue(value, -1);
     }
 
     /* (non-Javadoc)
@@ -117,7 +116,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(Value[] values) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue(values, -1);
     }
     
     /* (non-Javadoc)
@@ -133,7 +132,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(String[] values) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue(values, -1);
     }
 
     /* (non-Javadoc)
@@ -141,7 +140,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(InputStream value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue(value, -1);
     }
 
     /* (non-Javadoc)
@@ -149,7 +148,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(long value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue(value, -1);
     }
 
     /* (non-Javadoc)
@@ -157,7 +156,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(double value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue(value, -1);
     }
 
     /* (non-Javadoc)
@@ -165,7 +164,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(Calendar value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue((value == null) ? null : value.getTime(), -1);
     }
 
     /* (non-Javadoc)
@@ -173,7 +172,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(boolean value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue(value, -1);
     }
 
     /* (non-Javadoc)
@@ -181,7 +180,7 @@ public class PropertyImpl extends ItemImpl implements Property
      */
     public void setValue(Node value) throws ValueFormatException, VersionException, LockException, ConstraintViolationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        setPropertyValue((value == null) ? null : JCRNodeRef.getNodeRef(value), -1);
     }    
     
     /* (non-Javadoc)
@@ -280,7 +279,7 @@ public class PropertyImpl extends ItemImpl implements Property
     public Node getNode() throws ValueFormatException, RepositoryException
     {
         checkSingleValued();
-        return session.getTypeConverter().referenceValue(getPropertyValue());
+        return session.getTypeConverter().referenceValue(getPropertyValue()).getProxy();
     }
 
     /* (non-Javadoc)
@@ -560,7 +559,7 @@ public class PropertyImpl extends ItemImpl implements Property
         DataTypeDefinition dataTypeDef = getPropertyDefinition().getDataType();
         if (type != -1 && dataTypeDef.getName().equals(DataTypeDefinition.ANY))
         {
-            // attempt to cast to explicitly specified type, but only in case where property type can be ANY
+            // attempt cast to explicitly specified type, but only in case where property type can be ANY
             QName dataTypeName = DataTypeMap.convertPropertyTypeToDataType(type);
             DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
             dataTypeDef = dictionaryService.getDataType(dataTypeName);
@@ -643,7 +642,7 @@ public class PropertyImpl extends ItemImpl implements Property
     private void checkMultiValued()
         throws ValueFormatException
     {
-        if (getPropertyDefinition().isMultiValued())
+        if (!getPropertyDefinition().isMultiValued())
         {
             // Expected exception for JSR-170
             throw new ValueFormatException("Property " + name + " is single-valued.");

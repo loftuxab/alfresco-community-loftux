@@ -528,6 +528,14 @@ public class DefaultTypeConverter
             }
         });
         
+        INSTANCE.addConverter(Calendar.class, String.class, new TypeConverter.Converter<Calendar, String>()
+        {
+            public String convert(Calendar source)
+            {
+                return ISO8601DateFormat.format(source.getTime());
+            }
+        });
+        
         //
         // BigDecimal
         //
