@@ -652,13 +652,9 @@ public class CifsHelper
         
         nodeService.setProperties(oldNode, oldProperties);
         
-        // Rename the new node to the old name, and replace the content with empty content
+        // Rename the new node to the old name
         
         newProperties.put(ContentModel.PROP_NAME, oldName);
-        
-        ContentData nullData = new ContentData(null, "", 0L, "UTF-8");
-        newProperties.put(ContentModel.PROP_CONTENT, nullData);
-        
         nodeService.setProperties(newNode, newProperties);
-    }
+     }
 }
