@@ -32,31 +32,28 @@ import org.alfresco.service.namespace.QName;
 public interface FileFolderService
 {
     /**
-     * Lists immediate child files and folders of the given context folder
+     * Lists immediate child files and folders of the given context node
      * 
-     * @param folderNodeRef the folder to start searching in
+     * @param contextNodeRef the node to start searching in
      * @return Returns a list of matching files and folders
-     * @throws FileNotFoundException if the search context could not be found
      */
-    public List<FileInfo> list(NodeRef folderNodeRef) throws FileNotFoundException;
+    public List<FileInfo> list(NodeRef contextNodeRef);
     
     /**
-     * Lists all immediate child files of the given context folder
+     * Lists all immediate child files of the given context node
      * 
      * @param folderNodeRef the folder to start searching in
      * @return Returns a list of matching files
-     * @throws FileNotFoundException if the search context could not be found
      */
-    public List<FileInfo> listFiles(NodeRef folderNodeRef) throws FileNotFoundException;
+    public List<FileInfo> listFiles(NodeRef folderNodeRef);
     
     /**
-     * Lists all immediate child folders of the given context folder
+     * Lists all immediate child folders of the given context node
      * 
-     * @param folderNodeRef the folder to start searching in
+     * @param contextNodeRef the node to start searching in
      * @return Returns a list of matching folders
-     * @throws FileNotFoundException if the search context could not be found
      */
-    public List<FileInfo> listFolders(NodeRef folderNodeRef) throws FileNotFoundException;
+    public List<FileInfo> listFolders(NodeRef contextNodeRef);
 
     /**
      * Searches for all files and folders with the matching name pattern,
@@ -65,15 +62,15 @@ public interface FileFolderService
      * @see #search(NodeRef, String, boolean, boolean, boolean)
      */
     public List<FileInfo> search(
-            NodeRef folderNodeRef,
+            NodeRef contextNodeRef,
             String namePattern,
-            boolean includeSubFolders) throws FileNotFoundException;
+            boolean includeSubFolders);
     
     /**
      * Perform a search against the name of the files or folders within a hierarchy.
      * Wildcard characters are <b>*</b> and <b>?</b>.
      * 
-     * @param folderNodeRef the context of the search.  This node will never be returned
+     * @param contextNodeRef the context of the search.  This node will never be returned
      *      as part of the search results.
      * @param namePattern the name of the file or folder to search for, or a
      *      {@link org.alfresco.util.SearchLanguageConversion#DEF_LUCENE wildcard} pattern
@@ -82,14 +79,13 @@ public interface FileFolderService
      * @param folderSearch true if folder types are to be included in the search results
      * @param includeSubFolders true to search the entire hierarchy below the search context
      * @return Returns a list of file or folder matches
-     * @throws FileNotFoundException if the search context could not be found
      */
     public List<FileInfo> search(
-            NodeRef folderNodeRef,
+            NodeRef contextNodeRef,
             String namePattern,
             boolean fileSearch,
             boolean folderSearch,
-            boolean includeSubFolders) throws FileNotFoundException;
+            boolean includeSubFolders);
     
     /**
      * Rename a file or folder in its current location
@@ -108,13 +104,13 @@ public interface FileFolderService
      * If both the parent folder and name remain the same, then nothing is done.
      * 
      * @param sourceNodeRef the file or folder to move
-     * @param targetFolderRef the new folder to move the node to - null means rename in situ
+     * @param targetParentRef the new parent node to move the node to - null means rename in situ
      * @param newName the name to change the file or folder to - null to keep the existing name
      * @return Returns the new file info
      * @throws FileExistsException
      * @throws FileNotFoundException
      */
-    public FileInfo move(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName)
+    public FileInfo move(NodeRef sourceNodeRef, NodeRef targetParentRef, String newName)
             throws FileExistsException, FileNotFoundException;
 
     /**
@@ -124,27 +120,41 @@ public interface FileFolderService
      * If both the parent folder and name remain the same, then nothing is done.
      * 
      * @param sourceNodeRef the file or folder to copy
-     * @param targetFolderRef the target folder to copy to, or null to use the current parent folder
+     * @param targetParentRef the new parent node to copy the node to - null means rename in situ
      * @param newName the new name, or null to keep the existing name.
      * @return Return the new file info
      * @throws FileExistsException
      * @throws FileNotFoundException
      */
-    public FileInfo copy(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName)
+    public FileInfo copy(NodeRef sourceNodeRef, NodeRef targetParentRef, String newName)
             throws FileExistsException, FileNotFoundException;
 
     /**
      * Create a file or folder; or any valid node of type derived from file or folder
      * 
-     * @param parentFolderRef the parent folder
+     * @param parentNodeRef the parent node.  The parent must be a valid
+     *      {@link org.alfresco.model.ContentModel#TYPE_CONTAINER container}.
      * @param name the name of the node
      * @param typeQName the type to create
      * @return Returns the new node's file information
      * @throws FileExistsException
-     * @throws FileNotFoundException
      */
-    public FileInfo create(NodeRef parentFolderRef, String name, QName typeQName)
-            throws FileExistsException, FileNotFoundException;
+    public FileInfo create(NodeRef parentNodeRef, String name, QName typeQName) throws FileExistsException;
+    
+    /**
+     * Checks for the presence of, and creates as necessary, the folder structure in the provided path.
+     * <p>
+     * If the path could not be created, then <code>false</code> is returned.  Note that an empty name list
+     * will always return <code>true</code> as there is nothing to do.
+     * 
+     * @param parentNodeRef the node under which the path will be created
+     * @param pathElements the folder name path to create
+     * @param folderTypeQName the types of nodes to create.  This must be a valid subtype of
+     *      {@link org.alfresco.model.ContentModel#TYPE_FOLDER they folder type}.
+     * @return Returns true if the folder structure exists after the call, false if it could not
+     *      be created
+     */
+    public boolean makeFolders(NodeRef parentNodeRef, List<String> pathElements, QName folderTypeQName);
     
     /**
      * Get the file or folder names from the root down to and including the node provided.
@@ -174,4 +184,12 @@ public interface FileFolderService
      * @throws FileNotFoundException if no file or folder exists along the path
      */
     public FileInfo resolveNamePath(NodeRef rootNodeRef, List<String> pathElements, boolean isFolder) throws FileNotFoundException;
+    
+    /**
+     * Get the file info (name, folder, etc) for the given node
+     * 
+     * @param nodeRef the node to get info for
+     * @return Returns the file info or null if the node does not represent a file or folder
+     */
+    public FileInfo getFileInfo(NodeRef nodeRef);
 }

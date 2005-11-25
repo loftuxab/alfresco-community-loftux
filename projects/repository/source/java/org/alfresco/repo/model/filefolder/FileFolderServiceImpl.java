@@ -90,8 +90,6 @@ public class FileFolderServiceImpl implements FileFolderService
     private CopyService copyService;
     private SearchService searchService;
     
-    private QName cmName;
-
     /**
      * Default constructor
      */
@@ -138,8 +136,9 @@ public class FileFolderServiceImpl implements FileFolderService
      * 
      * @param nodeRefs the node references
      * @return Return a list of file info
+     * @throws InvalidTypeException if the node is not a valid type
      */
-    private List<FileInfo> toFileInfo(List<NodeRef> nodeRefs) throws FileNotFoundException
+    private List<FileInfo> toFileInfo(List<NodeRef> nodeRefs) throws InvalidTypeException
     {
         List<FileInfo> results = new ArrayList<FileInfo>(nodeRefs.size());
         for (NodeRef nodeRef : nodeRefs)
@@ -153,44 +152,31 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * Helper method to convert a node reference instance to a file info
      */
-    private FileInfo toFileInfo(NodeRef nodeRef) throws FileNotFoundException
+    private FileInfo toFileInfo(NodeRef nodeRef) throws InvalidTypeException
     {
-        try
-        {
-            // check the node type
-            QName nodeTypeQName = nodeService.getType(nodeRef);
-            // get the file attributes
-            Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-            String name = (String) properties.get(ContentModel.PROP_NAME);
-            // is it a folder
-            QName typeQName = nodeService.getType(nodeRef);
-            boolean isFolder = isFolder(typeQName);
-            
-            // construct the file info and add to the results
-            FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, name);
-            // done
-            return fileInfo;
-        }
-        catch (InvalidNodeRefException e)
-        {
-            throw new FileNotFoundException(nodeRef);
-        }
-        catch (InvalidTypeException e)
-        {
-            throw new FileNotFoundException(nodeRef);
-        }
+        // get the file attributes
+        Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
+        String name = (String) properties.get(ContentModel.PROP_NAME);
+        // is it a folder
+        QName typeQName = nodeService.getType(nodeRef);
+        boolean isFolder = isFolder(typeQName);
+        
+        // construct the file info and add to the results
+        FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, name);
+        // done
+        return fileInfo;
     }
 
     /**
-     * Ensure that a file or folder does not already exist
+     * Ensure that a file or folder with the given name does not already exist
      * 
-     * @throws FileExistsException if the folder or folder doesn't exist
+     * @throws FileExistsException if a same-named file or folder already exists
      */
-    private void checkExists(NodeRef parentFolderRef, String name, boolean isFolder)
-            throws FileExistsException, FileNotFoundException
+    private void checkExists(NodeRef parentFolderRef, String name)
+            throws FileExistsException
     {
         // check for existing file or folder
-        List<FileInfo> existingFileInfos = this.search(parentFolderRef, name, !isFolder, isFolder, false);
+        List<FileInfo> existingFileInfos = this.search(parentFolderRef, name, true, true, false);
         if (existingFileInfos.size() > 0)
         {
             throw new FileExistsException(existingFileInfos.get(0));
@@ -205,7 +191,7 @@ public class FileFolderServiceImpl implements FileFolderService
      * 
      * @author Derek Hulley
      */
-    private static class InvalidTypeException extends Exception
+    private static class InvalidTypeException extends RuntimeException
     {
         private static final long serialVersionUID = -310101369475434280L;
         
@@ -248,11 +234,11 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * TODO: Use Lucene search to get file attributes without having to visit the node service
      */
-    public List<FileInfo> list(NodeRef folderNodeRef) throws FileNotFoundException
+    public List<FileInfo> list(NodeRef contextNodeRef)
     {
         // execute the query
         List<NodeRef> nodeRefs = searchService.selectNodes(
-                folderNodeRef,
+                contextNodeRef,
                 XPATH_QUERY_SHALLOW_ALL,
                 PARAMS_ANY_NAME,
                 namespaceService,
@@ -263,7 +249,7 @@ public class FileFolderServiceImpl implements FileFolderService
         if (logger.isDebugEnabled())
         {
             logger.debug("Shallow search for files and folders: \n" +
-                    "   context: " + folderNodeRef + "\n" +
+                    "   context: " + contextNodeRef + "\n" +
                     "   results: " + results);
         }
         return results;
@@ -272,11 +258,11 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * TODO: Use Lucene search to get file attributes without having to visit the node service
      */
-    public List<FileInfo> listFiles(NodeRef folderNodeRef) throws FileNotFoundException
+    public List<FileInfo> listFiles(NodeRef contextNodeRef)
     {
         // execute the query
         List<NodeRef> nodeRefs = searchService.selectNodes(
-                folderNodeRef,
+                contextNodeRef,
                 XPATH_QUERY_SHALLOW_FILES,
                 PARAMS_EMPTY,
                 namespaceService,
@@ -287,7 +273,7 @@ public class FileFolderServiceImpl implements FileFolderService
         if (logger.isDebugEnabled())
         {
             logger.debug("Shallow search for files: \n" +
-                    "   context: " + folderNodeRef + "\n" +
+                    "   context: " + contextNodeRef + "\n" +
                     "   results: " + results);
         }
         return results;
@@ -296,11 +282,11 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * TODO: Use Lucene search to get file attributes without having to visit the node service
      */
-    public List<FileInfo> listFolders(NodeRef folderNodeRef) throws FileNotFoundException
+    public List<FileInfo> listFolders(NodeRef contextNodeRef)
     {
         // execute the query
         List<NodeRef> nodeRefs = searchService.selectNodes(
-                folderNodeRef,
+                contextNodeRef,
                 XPATH_QUERY_SHALLOW_FOLDERS,
                 PARAMS_EMPTY,
                 namespaceService,
@@ -311,7 +297,7 @@ public class FileFolderServiceImpl implements FileFolderService
         if (logger.isDebugEnabled())
         {
             logger.debug("Shallow search for folders: \n" +
-                    "   context: " + folderNodeRef + "\n" +
+                    "   context: " + contextNodeRef + "\n" +
                     "   results: " + results);
         }
         return results;
@@ -320,22 +306,20 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * @see #search(NodeRef, String, boolean, boolean, boolean)
      */
-    public List<FileInfo> search(NodeRef folderNodeRef, String namePattern, boolean includeSubFolders)
-            throws FileNotFoundException
+    public List<FileInfo> search(NodeRef contextNodeRef, String namePattern, boolean includeSubFolders)
     {
-        return search(folderNodeRef, namePattern, true, true, includeSubFolders);
+        return search(contextNodeRef, namePattern, true, true, includeSubFolders);
     }
 
     /**
      * Full search with all options
      */
     public List<FileInfo> search(
-            NodeRef folderNodeRef,
+            NodeRef contextNodeRef,
             String namePattern,
             boolean fileSearch,
             boolean folderSearch,
             boolean includeSubFolders)
-            throws FileNotFoundException
     {
         // shortcut if the search is requesting nothing
         if (!fileSearch && !folderSearch)
@@ -376,7 +360,7 @@ public class FileFolderServiceImpl implements FileFolderService
         }
         // execute the query
         List<NodeRef> nodeRefs = searchService.selectNodes(
-                folderNodeRef,
+                contextNodeRef,
                 query,
                 params,
                 namespaceService,
@@ -400,7 +384,7 @@ public class FileFolderServiceImpl implements FileFolderService
         if (logger.isDebugEnabled())
         {
             logger.debug("Deep search: \n" +
-                    "   context: " + folderNodeRef + "\n" +
+                    "   context: " + contextNodeRef + "\n" +
                     "   pattern: " + namePattern + "\n" +
                     "   files: " + fileSearch + "\n" +
                     "   folders: " + folderSearch + "\n" +
@@ -421,17 +405,17 @@ public class FileFolderServiceImpl implements FileFolderService
     /**
      * @see #moveOrCopy(NodeRef, NodeRef, String, boolean)
      */
-    public FileInfo move(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName) throws FileExistsException, FileNotFoundException
+    public FileInfo move(NodeRef sourceNodeRef, NodeRef targetParentRef, String newName) throws FileExistsException, FileNotFoundException
     {
-        return moveOrCopy(sourceNodeRef, targetFolderRef, newName, true);
+        return moveOrCopy(sourceNodeRef, targetParentRef, newName, true);
     }
     
     /**
      * @see #moveOrCopy(NodeRef, NodeRef, String, boolean)
      */
-    public FileInfo copy(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName) throws FileExistsException, FileNotFoundException
+    public FileInfo copy(NodeRef sourceNodeRef, NodeRef targetParentRef, String newName) throws FileExistsException, FileNotFoundException
     {
-        return moveOrCopy(sourceNodeRef, targetFolderRef, newName, false);
+        return moveOrCopy(sourceNodeRef, targetParentRef, newName, false);
     }
 
     /**
@@ -439,11 +423,10 @@ public class FileFolderServiceImpl implements FileFolderService
      * 
      * @param move true to move, otherwise false to copy
      */
-    private FileInfo moveOrCopy(NodeRef sourceNodeRef, NodeRef targetFolderRef, String newName, boolean move) throws FileExistsException, FileNotFoundException
+    private FileInfo moveOrCopy(NodeRef sourceNodeRef, NodeRef targetParentRef, String newName, boolean move) throws FileExistsException, FileNotFoundException
     {
         // get file/folder in its current state
         FileInfo beforeFileInfo = toFileInfo(sourceNodeRef);
-        boolean isFolder = beforeFileInfo.isFolder();
         // check the name - null means keep the existing name
         if (newName == null)
         {
@@ -452,21 +435,18 @@ public class FileFolderServiceImpl implements FileFolderService
         
         // we need the current association type
         ChildAssociationRef assocRef = nodeService.getPrimaryParent(sourceNodeRef);
-        if (targetFolderRef == null)
+        if (targetParentRef == null)
         {
-            targetFolderRef = assocRef.getParentRef();
+            targetParentRef = assocRef.getParentRef();
         }
         
-        // check that the parent folder is good
-        FileInfo parentFileInfo = toFileInfo(targetFolderRef);
-        
         // there is nothing to do if both the name and parent folder haven't changed
-        if (targetFolderRef.equals(assocRef.getParentRef()) && newName.equals(beforeFileInfo.getName()))
+        if (targetParentRef.equals(assocRef.getParentRef()) && newName.equals(beforeFileInfo.getName()))
         {
             if (logger.isDebugEnabled())
             {
                 logger.debug("Doing nothing - neither filename or parent has not changed: \n" +
-                        "   parent: " + parentFileInfo + "\n" +
+                        "   parent: " + targetParentRef + "\n" +
                         "   before: " + beforeFileInfo + "\n" +
                         "   new name: " + newName);
             }
@@ -474,7 +454,7 @@ public class FileFolderServiceImpl implements FileFolderService
         }
         
         // check for existing file or folder
-        checkExists(targetFolderRef, newName, isFolder);
+        checkExists(targetParentRef, newName);
         
         QName qname = QName.createQName(
                 NamespaceService.CONTENT_MODEL_1_0_URI,
@@ -487,7 +467,7 @@ public class FileFolderServiceImpl implements FileFolderService
             // move the node so that the association moves as well
             ChildAssociationRef newAssocRef = nodeService.moveNode(
                     sourceNodeRef,
-                    targetFolderRef,
+                    targetParentRef,
                     assocRef.getTypeQName(),
                     qname);
             targetNodeRef = newAssocRef.getChildRef();
@@ -497,7 +477,7 @@ public class FileFolderServiceImpl implements FileFolderService
             // copy the node
             targetNodeRef = copyService.copy(
                     sourceNodeRef,
-                    targetFolderRef,
+                    targetParentRef,
                     assocRef.getTypeQName(),
                     qname,
                     true);
@@ -511,21 +491,19 @@ public class FileFolderServiceImpl implements FileFolderService
         if (logger.isDebugEnabled())
         {
             logger.debug("" + (move ? "Moved" : "Copied") + " node: \n" +
-                    "   parent: " + parentFileInfo + "\n" +
+                    "   parent: " + targetParentRef + "\n" +
                     "   before: " + beforeFileInfo + "\n" +
                     "   after: " + afterFileInfo);
         }
         return afterFileInfo;
     }
     
-    public FileInfo create(NodeRef parentFolderRef, String name, QName typeQName)
-            throws FileExistsException, FileNotFoundException
+    public FileInfo create(NodeRef parentNodeRef, String name, QName typeQName) throws FileExistsException
     {
         // file or folder
-        boolean isFolder = false;
         try
         {
-            isFolder = isFolder(typeQName);
+            isFolder(typeQName);
         }
         catch (InvalidTypeException e)
         {
@@ -533,7 +511,7 @@ public class FileFolderServiceImpl implements FileFolderService
         }
         
         // check for existing file or folder
-        checkExists(parentFolderRef, name, isFolder);
+        checkExists(parentNodeRef, name);
         
         // create the node
         QName qname = QName.createQName(
@@ -543,7 +521,7 @@ public class FileFolderServiceImpl implements FileFolderService
                 ContentModel.PROP_NAME,
                 (Serializable) name);
         ChildAssociationRef assocRef = nodeService.createNode(
-                parentFolderRef,
+                parentNodeRef,
                 ContentModel.ASSOC_CONTAINS,
                 qname,
                 typeQName,
@@ -553,12 +531,53 @@ public class FileFolderServiceImpl implements FileFolderService
         // done
         if (logger.isDebugEnabled())
         {
-            FileInfo parentFileInfo = toFileInfo(parentFolderRef);
+            FileInfo parentFileInfo = toFileInfo(parentNodeRef);
             logger.debug("Created: \n" +
                     "   parent: " + parentFileInfo + "\n" +
                     "   created: " + fileInfo);
         }
         return fileInfo;
+    }
+
+    public boolean makeFolders(NodeRef parentNodeRef, List<String> pathElements, QName folderTypeQName)
+    {
+        if (pathElements.size() == 0)
+        {
+            // nothing to do
+            return true;
+        }
+        
+        // make sure that the folder is correct
+        boolean isFolder = isFolder(folderTypeQName);
+        if (!isFolder)
+        {
+            throw new IllegalArgumentException("Type is invalid to make folders with: " + folderTypeQName);
+        }
+        
+        NodeRef currentParentRef = parentNodeRef;
+        // just loop and create if necessary
+        for (String pathElement : pathElements)
+        {
+            try
+            {
+                // not present - make it
+                FileInfo createdFileInfo = create(currentParentRef, pathElement, folderTypeQName);
+                currentParentRef = createdFileInfo.getNodeRef();
+            }
+            catch (FileExistsException e)
+            {
+                // it exists - just get it
+                List<FileInfo> fileInfos = search(currentParentRef, pathElement, false, true, false);
+                if (fileInfos.size() == 0)
+                {
+                    // ? It must have been removed
+                    return false;
+                }
+                currentParentRef = fileInfos.get(0).getNodeRef();
+            }
+        }
+        // done
+        return true;
     }
 
     public List<FileInfo> getNamePath(NodeRef rootNodeRef, NodeRef nodeRef) throws FileNotFoundException
@@ -567,11 +586,6 @@ public class FileFolderServiceImpl implements FileFolderService
         if (rootNodeRef == null)
         {
             rootNodeRef = nodeService.getRootNode(nodeRef.getStoreRef());
-        }
-        else
-        {
-            // make sure that the root exists and is a valid folder
-            FileInfo rootFileInfo = toFileInfo(rootNodeRef);
         }
         try
         {
@@ -683,5 +697,17 @@ public class FileFolderServiceImpl implements FileFolderService
         }
         FileInfo pathElementInfo = pathElementInfos.get(0);
         return pathElementInfo;
+    }
+
+    public FileInfo getFileInfo(NodeRef nodeRef)
+    {
+        try
+        {
+            return toFileInfo(nodeRef);
+        }
+        catch (InvalidTypeException e)
+        {
+            return null;
+        }
     }
 }

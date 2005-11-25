@@ -816,6 +816,7 @@
                 <prop key="list*">${server.transaction.mode.readOnly}</prop>
                 <prop key="search*">${server.transaction.mode.readOnly}</prop>
                 <prop key="get*">${server.transaction.mode.readOnly}</prop>
+                <prop key="resolve*">${server.transaction.mode.readOnly}</prop>
                 <prop key="*">${server.transaction.mode.default}</prop>
             </props>
         </property>

@@ -72,6 +72,7 @@ public class FileFolderServiceImplTest extends TestCase
     private NodeService nodeService;
     private FileFolderService fileFolderService;
     private UserTransaction txn;
+    private NodeRef rootNodeRef;
     private NodeRef workingRootNodeRef;
     
     @Override
@@ -92,7 +93,7 @@ public class FileFolderServiceImplTest extends TestCase
         
         // create a test store
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, getName() + System.currentTimeMillis());
-        NodeRef rootNodeRef = nodeService.getRootNode(storeRef);
+        rootNodeRef = nodeService.getRootNode(storeRef);
         
         // create a folder to import into
         workingRootNodeRef = nodeService.createNode(
@@ -371,6 +372,39 @@ public class FileFolderServiceImplTest extends TestCase
         // check
         assertTrue("Node not created", nodeService.exists(fileInfo.getNodeRef()));
         assertFalse("File type expected", fileInfo.isFolder());
+    }
+    
+    public void testCreateInRoot() throws Exception
+    {
+        fileFolderService.create(rootNodeRef, "New Folder", ContentModel.TYPE_FOLDER);
+    }
+    
+    public void testMakeFolders() throws Exception
+    {
+        // create a completely new path below the root
+        List<String> namePath = new ArrayList<String>(4);
+        namePath.add("A");
+        namePath.add("B");
+        namePath.add("C");
+        namePath.add("D");
+        
+        boolean success = fileFolderService.makeFolders(rootNodeRef, namePath, ContentModel.TYPE_FOLDER);
+        assertTrue("First makeFolder failed", success);
+        // check that a repeat works
+        success = fileFolderService.makeFolders(rootNodeRef, namePath, ContentModel.TYPE_FOLDER);
+        assertTrue("Repeat makeFolders failed", success);
+        // check that it worked
+        List<FileInfo> checkInfos = fileFolderService.search(rootNodeRef, "D", false, true, true);
+        assertEquals("Expected to find a result", 1, checkInfos.size());
+        // get the path
+        List<FileInfo> checkPathInfos = fileFolderService.getNamePath(rootNodeRef, checkInfos.get(0).getNodeRef());
+        assertEquals("Path created is incorrect", namePath.size(), checkPathInfos.size());
+        int i = 0;
+        for (FileInfo checkInfo : checkPathInfos)
+        {
+            assertEquals("Path mismatch", namePath.get(i), checkInfo.getName());
+            i++;
+        }
     }
     
     public void testGetNamePath() throws Exception

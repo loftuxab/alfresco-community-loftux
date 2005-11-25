@@ -294,7 +294,7 @@ public class NewSpaceWizard extends AbstractWizardBean
          // print status message  
          String statusMsg = MessageFormat.format(
                Application.getMessage(
-                     FacesContext.getCurrentInstance(), "error_exists_space"), 
+                     FacesContext.getCurrentInstance(), "error_exists"), 
                      e.getExisting().getName());
          Utils.addErrorMessage(statusMsg);
          // no outcome

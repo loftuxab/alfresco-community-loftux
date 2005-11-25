@@ -212,7 +212,7 @@ public abstract class BaseContentWizard extends AbstractWizardBean
          // print status message  
          String statusMsg = MessageFormat.format(
                Application.getMessage(
-                     FacesContext.getCurrentInstance(), "error_exists_file"), 
+                     FacesContext.getCurrentInstance(), "error_exists"), 
                      e.getExisting().getName());
          Utils.addErrorMessage(statusMsg);
          // no outcome
