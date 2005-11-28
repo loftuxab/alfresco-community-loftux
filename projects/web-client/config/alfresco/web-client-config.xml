@@ -217,6 +217,7 @@
    <config evaluator="aspect-name" condition="versionable">
       <property-sheet>
          <show-property name="versionLabel"/>
+         <show-property name="autoVersion" converter="org.alfresco.faces.BooleanLabelConverter"/>         
       </property-sheet>
    </config>
    

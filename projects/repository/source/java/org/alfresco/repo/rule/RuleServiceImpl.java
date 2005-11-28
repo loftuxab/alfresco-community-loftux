@@ -690,6 +690,7 @@ public class RuleServiceImpl implements RuleService, RuntimeRuleService
                     }
     			}
     			
+                // Prevent hte same rule being executed more than one in the same transaction                
     			pendingRules.add(pendingRuleData);		
     		}
         }

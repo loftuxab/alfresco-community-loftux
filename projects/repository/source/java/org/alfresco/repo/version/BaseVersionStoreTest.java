@@ -40,6 +40,7 @@ import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.TestWithUserUtils;
 
@@ -54,6 +55,7 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
     protected ContentService contentService;
 	protected DictionaryDAO dictionaryDAO;
     protected AuthenticationService authenticationService;
+    protected TransactionService transactionService;
     protected MutableAuthenticationDao authenticationDAO;
 	
     /*
@@ -135,8 +137,8 @@ public abstract class BaseVersionStoreTest extends BaseSpringTest
         this.contentService = (ContentService)applicationContext.getBean("contentService");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
         this.authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
+        this.transactionService = (TransactionService)this.applicationContext.getBean("transactionComponent");
         this.authenticationDAO = (MutableAuthenticationDao) applicationContext.getBean("alfDaoImpl");
-        
         
         authenticationService.clearCurrentSecurityContext();
         

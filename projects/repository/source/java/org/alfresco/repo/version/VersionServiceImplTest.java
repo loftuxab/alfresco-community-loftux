@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -261,11 +262,14 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	ContentWriter contentWriter2 = this.contentService.getWriter(versionableNode, ContentModel.PROP_CONTENT, true);
     	assertNotNull(contentWriter2);
     	contentWriter2.putContent(UPDATED_CONTENT_2);
+        
+        String versionLabel = (String)this.dbNodeService.getProperty(versionableNode, ContentModel.PROP_VERSION_LABEL);
     	
     	// Revert to the previous version
     	this.versionService.revert(versionableNode);
     	
-    	// TODO check the version label is correct
+    	// Check that the version label is unchanged
+        assertEquals(versionLabel, this.dbNodeService.getProperty(versionableNode, ContentModel.PROP_VERSION_LABEL));
     	
     	// Check that the properties have been reverted
     	assertEquals(UPDATED_VALUE_1, this.dbNodeService.getProperty(versionableNode, PROP_1));
@@ -284,7 +288,8 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	// Revert to the first version
     	this.versionService.revert(versionableNode, version1);
     	
-    	// TODO check that the version label is correct
+    	// Check that the version label is correct
+        assertEquals(versionLabel, this.dbNodeService.getProperty(versionableNode, ContentModel.PROP_VERSION_LABEL));
     	
     	// Check that the properties are correct
     	assertEquals(VALUE_1, this.dbNodeService.getProperty(versionableNode, PROP_1));
@@ -300,7 +305,8 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	Set<QName> aspects2 = this.dbNodeService.getAspects(versionableNode);
     	assertEquals(aspects2.size(), origAspects.size());
     	
-    	// TODO version the reverted node and ensure that the next version is created correctly
+    	// Check that the version label is still the same
+        assertEquals(versionLabel, this.dbNodeService.getProperty(versionableNode, ContentModel.PROP_VERSION_LABEL));        
     }
     
     /**
@@ -427,5 +433,34 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	assertNotNull(versionLabel3);
     	assertEquals(version2.getVersionLabel(), versionLabel3);
     	
+    }
+    
+    public void testAutoVersion()
+    {
+        // Create a versionable node
+        final NodeRef versionableNode = createNewVersionableNode();
+
+        // Add some content 
+        ContentWriter contentWriter = this.contentService.getWriter(versionableNode, ContentModel.PROP_CONTENT, true);
+        assertNotNull(contentWriter);
+        contentWriter.putContent(UPDATED_CONTENT_1);
+        
+        // Need to commit in order to get the auto version to fire ...
+        setComplete();
+        endTransaction();
+        
+        // Now lets have a look and make sure we have the correct number of entries in the version history
+        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
+        {
+            public Object doWork() throws Exception
+            {
+                VersionHistory versionHistory = VersionServiceImplTest.this.versionService.getVersionHistory(versionableNode);
+                assertNotNull(versionHistory);
+                assertEquals(1, versionHistory.getAllVersions().size());
+                
+                return null;
+            }
+        
+        });
     }
 }

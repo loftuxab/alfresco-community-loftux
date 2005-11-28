@@ -66,6 +66,7 @@
             <property name="test:prop1">
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <default>defaultValue</default>
             </property>
          </properties>
    	  </type>
@@ -260,6 +261,15 @@
       </aspect>
       <aspect name="test:marker">
          <title>Marker Aspect</title>
+      </aspect>
+      <aspect name="test:withDefaultValue">
+         <title>Marker Aspect</title>
+         <properties>
+            <property name="test:prop2">
+               <type>d:text</type>
+               <default>defaultValue</default>
+            </property>
+         </properties>
       </aspect>
    </aspects>
 

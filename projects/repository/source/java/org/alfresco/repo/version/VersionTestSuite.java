@@ -16,13 +16,13 @@
  */
 package org.alfresco.repo.version;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.alfresco.repo.version.common.VersionHistoryImplTest;
 import org.alfresco.repo.version.common.VersionImplTest;
 import org.alfresco.repo.version.common.counter.VersionCounterDaoServiceTest;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicyTest;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * Version test suite
@@ -46,7 +46,6 @@ public class VersionTestSuite extends TestSuite
         suite.addTestSuite(VersionServiceImplTest.class);
         suite.addTestSuite(NodeServiceImplTest.class);
         suite.addTestSuite(ContentServiceImplTest.class);
-        //suite.addTestSuite(StateRetrievalTest.class);
         return suite;
     }
 }

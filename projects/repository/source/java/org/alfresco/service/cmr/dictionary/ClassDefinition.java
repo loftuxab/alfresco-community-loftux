@@ -16,6 +16,7 @@
  */
 package org.alfresco.service.cmr.dictionary;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.alfresco.service.namespace.QName;
@@ -61,6 +62,11 @@ public interface ClassDefinition
      * @return the properties of the class, including inherited properties
      */
     public Map<QName, PropertyDefinition> getProperties();
+    
+    /**
+     * @return a map containing the default property values, including inherited properties
+     */
+    public Map<QName, Serializable> getDefaultValues();
     
     /**
      * Fetch all associations for which this is a source type, including child associations.

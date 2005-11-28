@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
-import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.version.VersionServicePolicies;
@@ -39,10 +37,8 @@ import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionServiceException;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 
@@ -113,60 +109,8 @@ public abstract class AbstractVersionServiceImpl
 		// Register the policies
         this.beforeCreateVersionDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.BeforeCreateVersionPolicy.class);
 		this.onCreateVersionDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.OnCreateVersionPolicy.class);
-		this.calculateVersionLabelDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.CalculateVersionLabelPolicy.class);
-		
-		// Register the copy behaviour
-		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCopyNode"),
-				ContentModel.ASPECT_VERSIONABLE,
-				new JavaBehaviour(this, "onCopy"));
-		
-		// Register the onCreateVersion behavior for the version aspect
-		this.policyComponent.bindClassBehaviour(
-				QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateVersion"),
-				ContentModel.ASPECT_VERSIONABLE,
-				new JavaBehaviour(this, "onCreateVersion"));
-    }
-	
-	/**
-	 * OnCopy behaviour implementation for the version aspect.
-	 * <p>
-	 * Ensures that the propety values of the version aspect are not copied onto
-	 * the destination node.
-	 * 
-	 * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(QName, NodeRef, StoreRef, boolean, PolicyScope)
-	 */
-	public void onCopy(
-            QName sourceClassRef, 
-            NodeRef sourceNodeRef, 
-            StoreRef destinationStoreRef,
-            boolean copyToNewNode,            
-            PolicyScope copyDetails)
-	{
-		// Add the version aspect, but do not copy any of the properties
-		copyDetails.addAspect(ContentModel.ASPECT_VERSIONABLE);
-	}
-	
-	/**
-	 * OnCreateVersion behaviour for the version aspect
-	 * <p>
-	 * Ensures that the version aspect and it proerties are 'frozen' as part of
-	 * the versioned state.
-	 * 
-	 * @param classRef				the class reference
-	 * @param versionableNode		the versionable node reference
-	 * @param versionProperties		the version properties
-	 * @param nodeDetails			the details of the node to be versioned
-	 */
-	public void onCreateVersion(
-			QName classRef,
-			NodeRef versionableNode, 
-			Map<String, Serializable> versionProperties,
-			PolicyScope nodeDetails)
-	{
-		// Do nothing since we do not what to freeze any of the version 
-		// properties
-	}
+		this.calculateVersionLabelDelegate = this.policyComponent.registerClassPolicy(VersionServicePolicies.CalculateVersionLabelPolicy.class);		
+    }	
 	
 	/**
 	 * Invokes the before create version policy behaviour

@@ -219,10 +219,11 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
 		// Test standard check-in
 		Map<String, Serializable> versionProperties = new HashMap<String, Serializable>();
 		versionProperties.put(Version.PROP_DESCRIPTION, "This is a test version");		
-		this.cociService.checkin(workingCopy, versionProperties);		
+		this.cociService.checkin(workingCopy, versionProperties);	
 		
 		// Test check-in with content
         NodeRef workingCopy3 = checkout();
+        
 		this.nodeService.setProperty(workingCopy3, PROP_NAME_QNAME, TEST_VALUE_2);
 		this.nodeService.setProperty(workingCopy3, PROP2_QNAME, TEST_VALUE_3);
         ContentWriter tempWriter = this.contentService.getWriter(workingCopy3, ContentModel.PROP_CONTENT, false);

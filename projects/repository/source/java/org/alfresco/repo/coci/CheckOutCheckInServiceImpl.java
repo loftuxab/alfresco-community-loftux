@@ -23,6 +23,7 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.version.VersionableAspect;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.coci.CheckOutCheckInServiceException;
 import org.alfresco.service.cmr.lock.LockService;
@@ -91,6 +92,11 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
      * The authentication service
      */
     private AuthenticationService authenticationService;
+    
+    /**
+     * The versionable aspect behaviour implementation
+     */
+    private VersionableAspect versionableAspect;
 	
 	/**
 	 * Set the node service
@@ -152,6 +158,16 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
+    }
+    
+    /**
+     * Sets the versionable aspect behaviour implementation
+     * 
+     * @param versionableAspect     the versionable aspect behaviour implementation
+     */
+    public void setVersionableAspect(VersionableAspect versionableAspect)
+    {
+        this.versionableAspect = versionableAspect;
     }
     
     /**
@@ -286,67 +302,76 @@ public class CheckOutCheckInServiceImpl implements CheckOutCheckInService
 		// Check that the working node still has the copy aspect applied
 		if (this.nodeService.hasAspect(workingCopyNodeRef, ContentModel.ASPECT_COPIEDFROM) == true)
 		{
-            Map<QName, Serializable> workingCopyProperties = nodeService.getProperties(workingCopyNodeRef);
-			// Try and get the origional node reference
-			nodeRef = (NodeRef) workingCopyProperties.get(ContentModel.PROP_COPY_REFERENCE);
-			if(nodeRef == null)
-			{
-				// Error since the origional node can not be found
-				throw new CheckOutCheckInServiceException(MSG_ERR_BAD_COPY);							
-			}
-			
-			try
-			{
-				// Release the lock
-				this.lockService.unlock(nodeRef);
-			}
-			catch (UnableToReleaseLockException exception)
-			{
-				throw new CheckOutCheckInServiceException(MSG_ERR_NOT_OWNER, exception);
-			}
-			
-			if (contentUrl != null)
-			{
-                ContentData contentData = (ContentData) workingCopyProperties.get(ContentModel.PROP_CONTENT);
-                if (contentData == null)
-                {
-                    throw new AlfrescoRuntimeException(MSG_ERR_WORKINGCOPY_HAS_NO_MIMETYPE, new Object[]{workingCopyNodeRef});
-                }
-                else
-                {
-                    contentData = new ContentData(
-                            contentUrl,
-                            contentData.getMimetype(),
-                            contentData.getSize(),
-                            contentData.getEncoding());
-                }
-				// Set the content url value onto the working copy
-				this.nodeService.setProperty(
-						workingCopyNodeRef, 
-						ContentModel.PROP_CONTENT, 
-						contentData);
-			}
-			
-			// Copy the contents of the working copy onto the origional
-			this.copyService.copy(workingCopyNodeRef, nodeRef);
-			
-            if (versionProperties != null && this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == true)
+            // Disable versionable behaviours since we don't want the auto version policy behaviour to execute when we check-in
+            this.versionableAspect.disableAutoVersion();
+            try
             {
-                // Create the new version
-                this.versionService.createVersion(nodeRef, versionProperties);
+                Map<QName, Serializable> workingCopyProperties = nodeService.getProperties(workingCopyNodeRef);
+    			// Try and get the origional node reference
+    			nodeRef = (NodeRef) workingCopyProperties.get(ContentModel.PROP_COPY_REFERENCE);
+    			if(nodeRef == null)
+    			{
+    				// Error since the origional node can not be found
+    				throw new CheckOutCheckInServiceException(MSG_ERR_BAD_COPY);							
+    			}
+    			
+    			try
+    			{
+    				// Release the lock
+    				this.lockService.unlock(nodeRef);
+    			}
+    			catch (UnableToReleaseLockException exception)
+    			{
+    				throw new CheckOutCheckInServiceException(MSG_ERR_NOT_OWNER, exception);
+    			}
+    			
+    			if (contentUrl != null)
+    			{
+                    ContentData contentData = (ContentData) workingCopyProperties.get(ContentModel.PROP_CONTENT);
+                    if (contentData == null)
+                    {
+                        throw new AlfrescoRuntimeException(MSG_ERR_WORKINGCOPY_HAS_NO_MIMETYPE, new Object[]{workingCopyNodeRef});
+                    }
+                    else
+                    {
+                        contentData = new ContentData(
+                                contentUrl,
+                                contentData.getMimetype(),
+                                contentData.getSize(),
+                                contentData.getEncoding());
+                    }
+    				// Set the content url value onto the working copy
+    				this.nodeService.setProperty(
+    						workingCopyNodeRef, 
+    						ContentModel.PROP_CONTENT, 
+    						contentData);
+    			}
+                
+    			// Copy the contents of the working copy onto the origional
+    			this.copyService.copy(workingCopyNodeRef, nodeRef);
+                
+                if (versionProperties != null && this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == true)
+                {
+                    // Create the new version
+                    this.versionService.createVersion(nodeRef, versionProperties);
+                }
+                
+    			if (keepCheckedOut == false)
+    			{
+    				// Delete the working copy
+                    this.nodeService.removeAspect(workingCopyNodeRef, ContentModel.ASPECT_WORKING_COPY);
+    				this.nodeService.deleteNode(workingCopyNodeRef);							
+    			}
+    			else
+    			{
+    				// Re-lock the origional node
+    				this.lockService.lock(nodeRef, LockType.READ_ONLY_LOCK);
+    			}
             }
-            
-			if (keepCheckedOut == false)
-			{
-				// Delete the working copy
-                this.nodeService.removeAspect(workingCopyNodeRef, ContentModel.ASPECT_WORKING_COPY);
-				this.nodeService.deleteNode(workingCopyNodeRef);							
-			}
-			else
-			{
-				// Re-lock the origional node
-				this.lockService.lock(nodeRef, LockType.READ_ONLY_LOCK);
-			}
+            finally
+            {
+                this.versionableAspect.enableAutoVersion();
+            }
 			
 		}
 		else

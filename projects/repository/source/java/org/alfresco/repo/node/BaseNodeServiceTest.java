@@ -105,6 +105,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName PROP_QNAME_MULTI_VALUE = QName.createQName(NAMESPACE, "multiValue");    
     public static final QName TYPE_QNAME_EXTENDED_CONTENT = QName.createQName(NAMESPACE, "extendedcontent");
     public static final QName PROP_QNAME_PROP1 = QName.createQName(NAMESPACE, "prop1");
+    public static final QName ASPECT_QNAME_WITH_DEFAULT_VALUE = QName.createQName(NAMESPACE, "withDefaultValue");
+    public static final QName PROP_QNAME_PROP2 = QName.createQName(NAMESPACE, "prop2");
     
     protected PolicyComponent policyComponent;
     protected DictionaryService dictionaryService;
@@ -1269,6 +1271,39 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // check that the rest disappeared
         assertFalse("n6 not cascade deleted", nodeService.exists(n6Ref));
         assertFalse("n8 not cascade deleted", nodeService.exists(n8Ref));
+    }
+    
+    /**
+     * Test that default values are set when nodes are created and aspects applied
+     * 
+     * @throws Exception
+     */
+    public void testDefaultValues() throws Exception
+    {
+        NodeRef nodeRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("testDefaultValues"),
+                TYPE_QNAME_EXTENDED_CONTENT).getChildRef();                
+        assertEquals("defaultValue", this.nodeService.getProperty(nodeRef, PROP_QNAME_PROP1));
+        this.nodeService.addAspect(nodeRef, ASPECT_QNAME_WITH_DEFAULT_VALUE, null);
+        assertEquals("defaultValue", this.nodeService.getProperty(nodeRef, PROP_QNAME_PROP2));
+        
+        // Ensure that default values do not overrite already set values
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(PROP_QNAME_PROP1, "notDefaultValue");
+        NodeRef nodeRef2 = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("testDefaultValues"),
+                TYPE_QNAME_EXTENDED_CONTENT,
+                props).getChildRef();                
+        assertEquals("notDefaultValue", this.nodeService.getProperty(nodeRef2, PROP_QNAME_PROP1));
+        Map<QName, Serializable> prop2 = new HashMap<QName, Serializable>(1);
+        prop2.put(PROP_QNAME_PROP2, "notDefaultValue");
+        this.nodeService.addAspect(nodeRef2, ASPECT_QNAME_WITH_DEFAULT_VALUE, prop2);
+        assertEquals("notDefaultValue", this.nodeService.getProperty(nodeRef2, PROP_QNAME_PROP2));
+                
     }
     
     private void garbageCollect() throws Exception

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyScope;
 import org.alfresco.repo.version.common.AbstractVersionServiceImpl;
@@ -78,6 +79,11 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
      * The db node service, used as the version store implementation
      */
     protected NodeService dbNodeService;
+    
+    /**
+     * Policy behaviour filter
+     */
+    private BehaviourFilter policyBehaviourFilter;
 
     /**
      * The repository searcher
@@ -119,6 +125,16 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
     {
         this.versionCounterService = versionCounterService;
     }    
+    
+    /**
+     * Set the policy behaviour filter
+     * 
+     * @param policyBehaviourFilter     the policy behaviour filter
+     */
+    public void setPolicyBehaviourFilter(BehaviourFilter policyBehaviourFilter)
+    {
+        this.policyBehaviourFilter = policyBehaviourFilter;
+    }
     
 	/**
 	 * Initialise method
@@ -864,95 +880,115 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             throw new VersionServiceException(MSGID_ERR_REVERT_MISMATCH);
         }
         
-		NodeRef versionNodeRef = version.getFrozenStateNodeRef();
-		
-		// Revert the property values
-		this.nodeService.setProperties(nodeRef, this.nodeService.getProperties(versionNodeRef));
-		
-		// Apply/remove the aspects as required
-		Set<QName> aspects = new HashSet<QName>(this.nodeService.getAspects(nodeRef));
-		for (QName versionAspect : this.nodeService.getAspects(versionNodeRef)) 
-		{
-			if (aspects.contains(versionAspect) == false)
-			{
-				this.nodeService.addAspect(nodeRef, versionAspect, null);
-			}
-			else
-			{
-				aspects.remove(versionAspect);
-			}
-		}
-		for (QName aspect : aspects) 
-		{
-			this.nodeService.removeAspect(nodeRef, aspect);
-		}
-        
-		// Re-add the versionable aspect to the reverted node
-        this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
-
-		// Add/remove the child nodes
-		List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(nodeRef));
-		for (ChildAssociationRef versionedChild : this.nodeService.getChildAssocs(versionNodeRef)) 
-		{
-			if (children.contains(versionedChild) == false)
-			{			
-				if (this.nodeService.exists(versionedChild.getChildRef()) == true)
-				{
-					// The node was a primary child of the parent, but that is no longer the case.  Dispite this
-					// the node still exits so this means it has been moved.
-					// The best thing to do in this situation will be to re-add the node as a child, but it will not
-					// be a primary child.
-					this.nodeService.addChild(nodeRef, versionedChild.getChildRef(), versionedChild.getTypeQName(), versionedChild.getQName());
-				}
-				else
-				{
-                    if (versionedChild.isPrimary() == true)
-                    {
-                        // Only try to resotre missing children if we are doing a deep revert
-                        // Look and see if we have a version history for the child node
-                        if (deep == true && getVersionHistoryNodeRef(versionedChild.getChildRef()) != null)
-                        {
-                            // We're going to try and restore the missing child node and recreate the assoc
-                            restore(
-                               versionedChild.getChildRef(),
-                               nodeRef,
-                               versionedChild.getTypeQName(), 
-                               versionedChild.getQName());
-                        }
-                        // else the deleted child did not have a version history so we can't restore the child
-                        // and so we can't revert the association
-                    }
-                    
-                    // else
-                    // Since this was never a primary assoc and the child has been deleted we won't recreate
-                    // the missing node as it was never owned by the node and we wouldn't know where to put it.
-				}
-			}
-			else
-			{
-				children.remove(versionedChild);
-			}
-		}
-		for (ChildAssociationRef ref : children) 
-		{
-			this.nodeService.removeChild(nodeRef, ref.getChildRef());
-		}
-		
-		// Add/remove the target associations
-		for (AssociationRef assocRef : this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL)) 
-		{
-			this.nodeService.removeAssociation(assocRef.getSourceRef(), assocRef.getTargetRef(), assocRef.getTypeQName());
-		}		
-		for (AssociationRef versionedAssoc : this.nodeService.getTargetAssocs(versionNodeRef, RegexQNamePattern.MATCH_ALL)) 
-		{
-			if (this.nodeService.exists(versionedAssoc.getTargetRef()) == true)
-			{
-				this.nodeService.createAssociation(nodeRef, versionedAssoc.getTargetRef(), versionedAssoc.getTypeQName());
-			}
+        // Turn off any auto-version policy behaviours
+        this.policyBehaviourFilter.disableBehaviour(nodeRef, ContentModel.ASPECT_VERSIONABLE);
+        try
+        {
+            // Store the current version label
+            String currentVersionLabel = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_VERSION_LABEL);
             
-			// else
-            // Since the tareget of the assoc no longer exists we can't recreate the assoc
-		}	
+            // Get the node that represents the frozen state
+    		NodeRef versionNodeRef = version.getFrozenStateNodeRef();        
+            
+    		// Revert the property values
+    		this.nodeService.setProperties(nodeRef, this.nodeService.getProperties(versionNodeRef));
+    		
+    		// Apply/remove the aspects as required
+    		Set<QName> aspects = new HashSet<QName>(this.nodeService.getAspects(nodeRef));
+    		for (QName versionAspect : this.nodeService.getAspects(versionNodeRef)) 
+    		{
+    			if (aspects.contains(versionAspect) == false)
+    			{
+    				this.nodeService.addAspect(nodeRef, versionAspect, null);
+    			}
+    			else
+    			{
+    				aspects.remove(versionAspect);
+    			}
+    		}
+    		for (QName aspect : aspects) 
+    		{
+    			this.nodeService.removeAspect(nodeRef, aspect);
+    		}
+            
+    		// Re-add the versionable aspect to the reverted node
+            if (this.nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
+            {
+                this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+            }
+            
+            // Re-set the version label property (since it should not be modified from the origional)
+            this.nodeService.setProperty(nodeRef, ContentModel.PROP_VERSION_LABEL, currentVersionLabel);
+    
+    		// Add/remove the child nodes
+    		List<ChildAssociationRef> children = new ArrayList<ChildAssociationRef>(this.nodeService.getChildAssocs(nodeRef));
+    		for (ChildAssociationRef versionedChild : this.nodeService.getChildAssocs(versionNodeRef)) 
+    		{
+    			if (children.contains(versionedChild) == false)
+    			{			
+    				if (this.nodeService.exists(versionedChild.getChildRef()) == true)
+    				{
+    					// The node was a primary child of the parent, but that is no longer the case.  Dispite this
+    					// the node still exits so this means it has been moved.
+    					// The best thing to do in this situation will be to re-add the node as a child, but it will not
+    					// be a primary child.
+    					this.nodeService.addChild(nodeRef, versionedChild.getChildRef(), versionedChild.getTypeQName(), versionedChild.getQName());
+    				}
+    				else
+    				{
+                        if (versionedChild.isPrimary() == true)
+                        {
+                            // Only try to resotre missing children if we are doing a deep revert
+                            // Look and see if we have a version history for the child node
+                            if (deep == true && getVersionHistoryNodeRef(versionedChild.getChildRef()) != null)
+                            {
+                                // We're going to try and restore the missing child node and recreate the assoc
+                                restore(
+                                   versionedChild.getChildRef(),
+                                   nodeRef,
+                                   versionedChild.getTypeQName(), 
+                                   versionedChild.getQName());
+                            }
+                            // else the deleted child did not have a version history so we can't restore the child
+                            // and so we can't revert the association
+                        }
+                        
+                        // else
+                        // Since this was never a primary assoc and the child has been deleted we won't recreate
+                        // the missing node as it was never owned by the node and we wouldn't know where to put it.
+    				}
+    			}
+    			else
+    			{
+    				children.remove(versionedChild);
+    			}
+    		}
+    		for (ChildAssociationRef ref : children) 
+    		{
+    			this.nodeService.removeChild(nodeRef, ref.getChildRef());
+    		}
+    		
+    		// Add/remove the target associations
+    		for (AssociationRef assocRef : this.nodeService.getTargetAssocs(nodeRef, RegexQNamePattern.MATCH_ALL)) 
+    		{
+    			this.nodeService.removeAssociation(assocRef.getSourceRef(), assocRef.getTargetRef(), assocRef.getTypeQName());
+    		}		
+    		for (AssociationRef versionedAssoc : this.nodeService.getTargetAssocs(versionNodeRef, RegexQNamePattern.MATCH_ALL)) 
+    		{
+    			if (this.nodeService.exists(versionedAssoc.getTargetRef()) == true)
+    			{
+    				this.nodeService.createAssociation(nodeRef, versionedAssoc.getTargetRef(), versionedAssoc.getTypeQName());
+    			}
+                
+    			// else
+                // Since the tareget of the assoc no longer exists we can't recreate the assoc
+    		}	
+        }
+        finally
+        {
+            // Turn auto-version policies back on
+            this.policyBehaviourFilter.enableBehaviour(nodeRef, ContentModel.ASPECT_VERSIONABLE);
+        }
 	}
     
     /**
@@ -977,6 +1013,8 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
             QName assocQName,
             boolean deep)
     {
+        NodeRef restoredNodeRef = null;
+             
         // Check that the node does not exist 
         if (this.nodeService.exists(nodeRef) == true)
         {
@@ -999,13 +1037,23 @@ public class VersionServiceImpl extends AbstractVersionServiceImpl
         // Get the type of the node node
         QName type = (QName)version.getVersionProperty(VersionModel.PROP_FROZEN_NODE_TYPE);
         
-        // Create the restored node
-        NodeRef restoredNodeRef = this.nodeService.createNode(
-                parentNodeRef,
-                assocTypeQName,
-                assocQName,
-                type,
-                props).getChildRef();
+        // Disable auto-version behaviour
+        this.policyBehaviourFilter.disableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+        try
+        {
+            // Create the restored node
+            restoredNodeRef = this.nodeService.createNode(
+                    parentNodeRef,
+                    assocTypeQName,
+                    assocQName,
+                    type,
+                    props).getChildRef();
+        }
+        finally
+        {
+            // Enable auto-version behaviour
+            this.policyBehaviourFilter.enableBehaviour(ContentModel.ASPECT_VERSIONABLE);
+        }
         
         // Now we need to revert the newly restored node
         revert(restoredNodeRef, version, deep);

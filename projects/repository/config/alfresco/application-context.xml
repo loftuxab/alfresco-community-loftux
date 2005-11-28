@@ -343,6 +343,9 @@
         <property name="policyComponent">
             <ref bean="policyComponent" />
         </property>
+        <property name="policyBehaviourFilter">
+            <ref bean="policyBehaviourFilter" />
+        </property>
     </bean>
 
     <bean id="versionNodeService" class="org.alfresco.repo.version.NodeServiceImpl">
@@ -381,6 +384,9 @@
         </property>
         <property name="ruleService">
             <ref bean="ruleService"/>
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService"/>
         </property>
         <property name="actionService">
             <ref bean="actionService"/>
@@ -520,6 +526,9 @@
         </property>
         <property name="searchService">
             <ref bean="searchService" />
+        </property>
+        <property name="versionableAspect">
+            <ref bean="versionableAspect" />
         </property>
     </bean>
 

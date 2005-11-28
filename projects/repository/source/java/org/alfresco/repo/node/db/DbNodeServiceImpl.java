@@ -39,6 +39,7 @@ import org.alfresco.repo.node.AbstractNodeServiceImpl;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.InvalidAspectException;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
@@ -236,8 +237,8 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // null property map is allowed
         if (properties == null)
-        {
-            properties = Collections.emptyMap();
+        {      
+            properties = new HashMap<QName, Serializable>();
         }
 		
 		// Invoke policy behaviour
@@ -272,14 +273,17 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         ChildAssoc childAssoc = nodeDaoService.newChildAssoc(parentNode, node, true, assocTypeQName, assocQName);
         ChildAssociationRef childAssocRef = childAssoc.getChildAssocRef();
         
+        // Set the default property values
+        addDefaultPropertyValues(nodeTypeDef, properties);
+        
         // Add the default aspects to the node
-        addDefaultAspect(nodeTypeDef, node, childAssocRef.getChildRef());
+        addDefaultAspect(nodeTypeDef, node, childAssocRef.getChildRef(), properties);                
         
         // set the properties - it is a new node so only set properties if there are any
         if (properties.size() > 0)
         {
             this.setProperties(node.getNodeRef(), properties);
-        }
+        }        
 
         // Invoke policy behaviour
 		invokeOnCreateNode(childAssocRef);
@@ -294,7 +298,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @param nodeTypeDef
      */
-    private void addDefaultAspect(TypeDefinition nodeTypeDef, Node node, NodeRef nodeRef)
+    private void addDefaultAspect(TypeDefinition nodeTypeDef, Node node, NodeRef nodeRef, Map<QName, Serializable> properties)
     {
         // get the mandatory aspects for the node type
         List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
@@ -305,7 +309,20 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {
             invokeBeforeAddAspect(nodeRef, defaultAspectDef.getName());
             nodeAspects.add(defaultAspectDef.getName());
+            addDefaultPropertyValues(defaultAspectDef, properties);
             invokeOnAddAspect(nodeRef, defaultAspectDef.getName());
+        }
+    }
+    
+    private void addDefaultPropertyValues(ClassDefinition classDefinition, Map<QName, Serializable> properties)
+    {
+        for (Map.Entry<QName, Serializable> entry : classDefinition.getDefaultValues().entrySet())
+        {
+            if (properties.containsKey(entry.getKey()) == false)
+            {
+                // Set the default value of the property
+                properties.put(entry.getKey(), entry.getValue());
+            }
         }
     }
     
@@ -409,8 +426,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         Node node = getNodeNotNull(nodeRef);
         node.setTypeQName(typeQName);
         
-        // Add the default aspects to the node
-        addDefaultAspect(nodeTypeDef, node, nodeRef);
+        // Add the default aspects to the node (update the properties with any new default values)
+        Map<QName, Serializable> properties = this.getProperties(nodeRef);
+        addDefaultAspect(nodeTypeDef, node, nodeRef, properties);
+        this.setProperties(nodeRef, properties);
         
         // Invoke policies
         invokeOnUpdateNode(nodeRef);
@@ -438,13 +457,19 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         Node node = getNodeNotNull(nodeRef);
         
+        // attach the properties to the current node properties
+        Map<QName, Serializable> nodeProperties = getProperties(nodeRef);
+        
         if (aspectProperties != null)
         {
-            // attach the properties to the current node properties
-            Map<QName, Serializable> nodeProperties = getProperties(nodeRef);
             nodeProperties.putAll(aspectProperties);
-            setProperties(nodeRef, nodeProperties);
         }
+        
+        // Set any default property values that appear on the aspect
+        addDefaultPropertyValues(aspectDef, nodeProperties);
+        
+        // Set the property values back on the node
+        setProperties(nodeRef, nodeProperties);
         
         // physically attach the aspect to the node
         if (node.getAspects().add(aspectTypeQName) == true)

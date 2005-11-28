@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.dictionary;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -136,6 +137,26 @@ import org.alfresco.service.namespace.QName;
     public Map<QName, PropertyDefinition> getProperties()
     {
         return Collections.unmodifiableMap(properties);
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.dictionary.ClassDefinition#getDefaultValues()
+     */
+    public Map<QName, Serializable> getDefaultValues()
+    {
+        Map<QName, Serializable> result = new HashMap<QName, Serializable>(5);
+        
+        for(Map.Entry<QName, PropertyDefinition> entry : properties.entrySet())
+        {
+            PropertyDefinition propertyDefinition = entry.getValue();
+            String defaultValue = propertyDefinition.getDefaultValue();
+            if (defaultValue != null)
+            {
+                result.put(entry.getKey(), defaultValue);
+            }
+        }
+        
+        return Collections.unmodifiableMap(result);
     }
 
     

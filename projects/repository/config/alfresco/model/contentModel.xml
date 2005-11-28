@@ -526,6 +526,12 @@
             <property name="cm:versionLabel">
                <title>Version Label</title>
                <type>d:text</type>
+               <protected>true</protected>
+            </property>
+            <property name="cm:autoVersion">
+               <title>Auto Version</title>
+               <type>d:boolean</type>
+               <default>true</default>
             </property>
           </properties>
       </aspect>
