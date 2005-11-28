@@ -17,8 +17,10 @@
 package org.alfresco.service.cmr.lock;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 
 
 /**
@@ -199,22 +201,6 @@ public interface LockService
    public LockStatus getLockStatus(NodeRef nodeRef);
    
    /**
-    * Indicates the current lock status for the user against the passed node.
-    * <p>
-    * Possible results are LOCKED (the node is locked by antoher user), NO_LOCK 
-    * (the node is not locked) , LOCK_OWNER (the node is locked by the referenced
-    * user).
-    * 
-    * TODO do we need LOCK_ADMINISTRATOR to indicate that the user does not own the
-    *      lock but can administer it??
-    * 
-    * @param nodeRef    the node reference
-    * @param userName    the user reference
-    * @return           the status of the lock in relation to the user
-    */
-   //public LockStatus getLockStatus(NodeRef nodeRef, String userName);
-   
-   /**
     * Gets the lock type for the node indicated.  
     * <p>
     * Returns null if the node is not locked.
@@ -236,20 +222,23 @@ public interface LockService
     * 
     * @param nodeRef   the node reference
     */
-   public void checkForLock(NodeRef nodeRef);
+   public void checkForLock(NodeRef nodeRef);   
    
    /**
-    * Checks to see if the node is locked or not.
-    * <p>
-    * Throws a NodeLockedException based on the lock status of the lock, the user ref and the
-    * lock type.
+    * Get all the node references that the current user has locked.
     * 
-    * @param nodeRef   the node reference
-    * @param userName   the user reference
-    * @throws NodeLockedException
-    *                  thrown if the node is determined to be locked based on the user ref and lock 
-    *                  type
+    * @param    storeRef    the store reference
+    * @return               a list of nodes that the current user has locked.
     */
-  // public void checkForLockWithUser(NodeRef nodeRef, String userName)
-  //     throws NodeLockedException;
+   public List<NodeRef> getLocks(StoreRef storeRef);
+   
+   /**
+    * Get all the node references that the current user has locked filtered by the provided lock type.
+    * 
+    * @param storeRef   the store reference
+    * @param lockType   the lock type to filter the results by
+    * 
+    * @return           a list of nodes that the current user has locked filtered by the lock type provided
+    */
+   public List<NodeRef> getLocks(StoreRef storeRef, LockType lockType);
 }

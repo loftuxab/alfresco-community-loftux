@@ -317,6 +317,9 @@
         <property name="ownableService">
             <ref bean="ownableService"></ref>
         </property>
+        <property name="searchService">
+            <ref bean="searchService"></ref>
+        </property>
     </bean>
 
     <!--                               -->

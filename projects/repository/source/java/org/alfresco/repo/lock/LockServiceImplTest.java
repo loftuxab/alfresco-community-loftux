@@ -18,6 +18,7 @@ package org.alfresco.repo.lock;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.lock.LockService;
@@ -60,6 +61,7 @@ public class LockServiceImplTest extends BaseSpringTest
     private static final String PWD = "password";
     
     NodeRef rootNodeRef;
+    private StoreRef storeRef;
 
     /**
      * Called during the transaction setup
@@ -76,7 +78,7 @@ public class LockServiceImplTest extends BaseSpringTest
         nodeProperties.put(QName.createQName("{test}property1"), "value1");
         
         // Create a workspace that contains the 'live' nodes
-        StoreRef storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         
         // Get a reference to the root node
         rootNodeRef = this.nodeService.getRootNode(storeRef);
@@ -291,6 +293,37 @@ public class LockServiceImplTest extends BaseSpringTest
         // Test method overload
         LockStatus lockStatus4 = this.lockService.getLockStatus(this.parentNode); 
         assertEquals(LockStatus.LOCK_OWNER, lockStatus4);
+    }
+    
+    public void testGetLocks()
+    {
+        TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
+        
+        List<NodeRef> locked1 = this.lockService.getLocks(this.storeRef);
+        assertNotNull(locked1);
+        assertEquals(0, locked1.size());
+        
+        this.lockService.lock(this.parentNode, LockType.WRITE_LOCK);
+        this.lockService.lock(this.childNode1, LockType.WRITE_LOCK);
+        this.lockService.lock(this.childNode2, LockType.READ_ONLY_LOCK);
+        
+        List<NodeRef> locked2 = this.lockService.getLocks(this.storeRef);
+        assertNotNull(locked2);
+        assertEquals(3, locked2.size());
+        
+        List<NodeRef> locked3 = this.lockService.getLocks(this.storeRef, LockType.WRITE_LOCK);
+        assertNotNull(locked3);
+        assertEquals(2, locked3.size());
+        
+        List<NodeRef> locked4 = this.lockService.getLocks(this.storeRef, LockType.READ_ONLY_LOCK);
+        assertNotNull(locked4);
+        assertEquals(1, locked4.size());
+        
+        TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
+        
+        List<NodeRef> locked5 = this.lockService.getLocks(this.storeRef);
+        assertNotNull(locked5);
+        assertEquals(0, locked5.size());
     }
     
     /**

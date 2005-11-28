@@ -17,10 +17,12 @@
 package org.alfresco.repo.lock;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,6 +41,8 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -76,6 +80,11 @@ public class LockServiceImpl implements LockService
      * 
      */
     private OwnableService ownableService;
+    
+    /**
+     * The search service
+     */
+    private SearchService searchService;
 
     /**
      * Set the node service
@@ -119,6 +128,16 @@ public class LockServiceImpl implements LockService
     public void setOwnableService(OwnableService ownableService)
     {
         this.ownableService = ownableService;
+    }
+    
+    /**
+     * Set the search service
+     * 
+     * @param searchService     the search service
+     */
+    public void setSearchService(SearchService searchService)
+    {
+        this.searchService = searchService;
     }
 
     /**
@@ -321,7 +340,13 @@ public class LockServiceImpl implements LockService
         return getLockStatus(nodeRef, getUserName());
     }
 
-
+    /**
+     * Gets the lock statuc for a node and a user name
+     * 
+     * @param nodeRef   the node reference
+     * @param userName  the user name
+     * @return          the lock status
+     */
     private LockStatus getLockStatus(NodeRef nodeRef, String userName)
     {
         LockStatus result = LockStatus.NO_LOCK;
@@ -486,5 +511,57 @@ public class LockServiceImpl implements LockService
     private String getUserName()
     {
         return this.authenticationService.getCurrentUserName();
+    }
+
+    /**
+     * @see org.alfresco.service.cmr.lock.LockService#getLocks()
+     */
+    public List<NodeRef> getLocks(StoreRef storeRef)
+    {
+        return getLocks(
+                storeRef,
+                "ASPECT:\"" + ContentModel.ASPECT_LOCKABLE.toString() + 
+                "\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}" + ContentModel.PROP_LOCK_OWNER.getLocalName() + ":\"" + getUserName() + "\"");
+    }
+    
+    /**
+     * Get the locks given a store and query string.
+     * 
+     * @param storeRef      the store reference
+     * @param query         the query string
+     * @return              the locked nodes
+     */
+    private List<NodeRef> getLocks(StoreRef storeRef, String query)
+    {
+        List<NodeRef> result = new ArrayList<NodeRef>();
+        ResultSet resultSet = null;
+        try
+        {
+            resultSet = this.searchService.query(
+                    storeRef,
+                    SearchService.LANGUAGE_LUCENE, 
+                    query);
+            result = resultSet.getNodeRefs();
+        }
+        finally
+        {
+            if (resultSet != null)
+            {
+                resultSet.close();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @see org.alfresco.service.cmr.lock.LockService#getLocks(org.alfresco.service.cmr.lock.LockType)
+     */
+    public List<NodeRef> getLocks(StoreRef storeRef, LockType lockType)
+    {
+        return getLocks(
+                storeRef,
+                "ASPECT:\"" + ContentModel.ASPECT_LOCKABLE.toString() + 
+                "\" +@\\{http\\://www.alfresco.org/model/content/1.0\\}" + ContentModel.PROP_LOCK_OWNER.getLocalName() + ":\"" + getUserName() + "\"" +
+                " +@\\{http\\://www.alfresco.org/model/content/1.0\\}" + ContentModel.PROP_LOCK_TYPE.getLocalName() + ":\"" + lockType.toString() + "\"");
     }
 }
