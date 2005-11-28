@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -58,6 +59,7 @@ public class FileImporterTest extends TestCase
     private DictionaryService dictionaryService;
     private ContentService contentService;
     private AuthenticationService authenticationService;
+    private AuthenticationComponent authenticationComponent;
     private MimetypeService mimetypeService;
     private NamespaceService namespaceService;
 
@@ -86,9 +88,11 @@ public class FileImporterTest extends TestCase
         dictionaryService = serviceRegistry.getDictionaryService();
         contentService = serviceRegistry.getContentService();
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
+        authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
         mimetypeService = serviceRegistry.getMimetypeService();
         namespaceService = serviceRegistry.getNamespaceService();
 
+        authenticationComponent.setSystemUserAsCurrentUser();
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
     }
@@ -195,6 +199,8 @@ public class FileImporterTest extends TestCase
             FileImporterTest test = new FileImporterTest();
             test.setUp();
 
+            
+            test.authenticationComponent.setSystemUserAsCurrentUser();
             TransactionService transactionService = test.serviceRegistry.getTransactionService();
             UserTransaction tx = transactionService.getUserTransaction(); 
             tx.begin();

@@ -39,10 +39,8 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
-import org.alfresco.util.transaction.SpringAwareUserTransaction;
 import org.apache.lucene.index.IndexWriter;
 import org.springframework.context.ApplicationContext;
-import org.springframework.transaction.PlatformTransactionManager;
 
 public class ConcurrentNodeServiceTest extends TestCase
 {
