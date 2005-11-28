@@ -22,6 +22,11 @@
             <property name="test:content">
                <type>d:content</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+                  <atomic>false</atomic>
+                  <stored>false</stored>
+                  <tokenised>true</tokenised>
+               </index>
             </property>
          </properties>
          <associations>
@@ -242,6 +247,11 @@
             <property name="test:title">
                <type>d:text</type>
                <mandatory>true</mandatory>
+                <index enabled="true">
+                  <atomic>false</atomic>
+                  <stored>false</stored>
+                  <tokenised>true</tokenised>
+               </index>
             </property>
             <property name="test:description">
                <type>d:text</type>
