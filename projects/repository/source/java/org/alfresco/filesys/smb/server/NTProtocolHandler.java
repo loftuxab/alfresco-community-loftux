@@ -500,7 +500,7 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
         // Check if this is a null session logon
 
-        if (user.length() == 0 && uniPwdLen == 0 && ascPwdLen == 0)
+        if (user.length() == 0 && domain.length() == 0 && uniPwdLen == 0 && ascPwdLen == 1)
             client.setLogonType(ClientInfo.LogonNull);
 
         // Authenticate the user, if the server is using user mode security
