@@ -35,20 +35,11 @@ import org.alfresco.service.namespace.QName;
 public interface NodeDaoService
 {
     /**
-     * Flush resources to the persistent store.  The underlying implementation
-     * may or may not actually perform the flush.  It is therefore advisable that
-     * this method be called whenever a logical unit of work has been <b>completed</b>.
-     * <p>
-     * For the most part, the transaction mechanisms will ensure
-     * that this method gets called at the end of the transactions.  However,
-     * long-running processes should find well-known points at which to call this
-     * in order to ensure that resources are freed up correctly, allowing the
-     * transactions to run indefinitely.  
-     * <p>
-     * While data <u>may</u> be flushed to the persistent stores, no data will be
-     * committed until the transaction has completed.
+     * Are there any pending changes which must be synchronized with the store?
+     * 
+     * @return true => changes are pending
      */
-    public void flush();
+    public boolean isDirty();
     
     /**
      * Fetch a list of all stores in the repository

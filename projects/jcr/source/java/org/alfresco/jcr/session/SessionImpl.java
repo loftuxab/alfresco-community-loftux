@@ -401,7 +401,7 @@ public class SessionImpl implements Session
      */
     public boolean hasPendingChanges() throws RepositoryException
     {
-        return false;
+        return AlfrescoTransactionSupport.isDirty();
     }
 
     /* (non-Javadoc)

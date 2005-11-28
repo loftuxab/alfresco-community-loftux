@@ -97,23 +97,23 @@ public class HibernateNodeDaoServiceImpl extends HibernateDaoSupport implements 
     }
 
     /**
-     * Flushes the Hibernate session.
+     * Does this <tt>Session</tt> contain any changes which must be
+     * synchronized with the store?
+     * 
+     * @return true => changes are pending
      */
-    public void flush()
+    public boolean isDirty()
     {
         // create a callback for the task
         HibernateCallback callback = new HibernateCallback()
         {
             public Object doInHibernate(Session session)
             {
-//                session.flush();
-                // done
-                return null;
+                return session.isDirty();
             }
         };
         // execute the callback
-        getHibernateTemplate().execute(callback);
-        // done
+        return ((Boolean)getHibernateTemplate().execute(callback)).booleanValue();
     }
 
     /**

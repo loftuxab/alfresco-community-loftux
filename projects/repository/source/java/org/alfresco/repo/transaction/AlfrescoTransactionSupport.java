@@ -96,6 +96,27 @@ public abstract class AlfrescoTransactionSupport
     }
     
     /**
+     * Are there any pending changes which must be synchronized with the store?
+     * 
+     * @return true => changes are pending
+     */
+    public static boolean isDirty()
+    {
+        TransactionSynchronizationImpl synch = getSynchronization();
+        
+        Set<NodeDaoService> services = synch.getNodeDaoServices();
+        for (NodeDaoService service : services)
+        {
+           if (service.isDirty())
+           {
+               return true;
+           }
+        }
+        
+        return false;
+    }
+    
+    /**
      * Gets a resource associated with the current transaction, which must be active.
      * <p>
      * All necessary synchronization instances will be registered automatically, if required.
@@ -488,11 +509,6 @@ public abstract class AlfrescoTransactionSupport
             for (IntegrityChecker integrityChecker : integrityCheckers)
             {
                 integrityChecker.checkIntegrity();
-            }
-            // flush the node DAO services
-            for (NodeDaoService nodeDaoService : nodeDaoServices)
-            {
-                nodeDaoService.flush();
             }
             // flush listeners
             for (TransactionListener listener : listeners)

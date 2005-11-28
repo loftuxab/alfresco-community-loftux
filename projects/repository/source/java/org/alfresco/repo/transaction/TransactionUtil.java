@@ -49,6 +49,14 @@ public class TransactionUtil
     }
 
     /**
+     * Flush transaction.
+     */
+    public static void flush()
+    {
+        AlfrescoTransactionSupport.flush();
+    }
+    
+    /**
      * Execute the transaction work in a user transaction
      * 
      * @param transactionService the transaction service
