@@ -128,7 +128,8 @@ public class WorkspaceImpl implements Workspace
      */
     public void move(String srcAbsPath, String destAbsPath) throws ConstraintViolationException, VersionException, AccessDeniedException, PathNotFoundException, ItemExistsException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        session.move(srcAbsPath, destAbsPath);
+        session.save();
     }
 
     /* (non-Javadoc)

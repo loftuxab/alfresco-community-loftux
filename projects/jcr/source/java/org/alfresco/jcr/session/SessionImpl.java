@@ -55,19 +55,25 @@ import org.alfresco.jcr.export.JCRDocumentXMLExporter;
 import org.alfresco.jcr.export.JCRSystemXMLExporter;
 import org.alfresco.jcr.item.ItemImpl;
 import org.alfresco.jcr.item.ItemResolver;
+import org.alfresco.jcr.item.JCRPath;
 import org.alfresco.jcr.item.JCRTypeConverter;
 import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.item.ValueFactoryImpl;
 import org.alfresco.jcr.repository.RepositoryImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ParameterCheck;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.xml.sax.ContentHandler;
@@ -319,6 +325,7 @@ public class SessionImpl implements Session
      */
     public boolean itemExists(String absPath) throws RepositoryException
     {
+        ParameterCheck.mandatoryString("absPath", absPath);
         NodeRef nodeRef = getRepositoryImpl().getServiceRegistry().getNodeService().getRootNode(workspaceStore);
         return ItemResolver.itemExists(this, nodeRef, absPath);
     }
@@ -328,7 +335,50 @@ public class SessionImpl implements Session
      */
     public void move(String srcAbsPath, String destAbsPath) throws ItemExistsException, PathNotFoundException, VersionException, ConstraintViolationException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        ParameterCheck.mandatoryString("srcAbsPath", srcAbsPath);
+        ParameterCheck.mandatoryString("destAbsPath", destAbsPath);
+        
+        // Find source node
+        NodeService nodeService = getRepositoryImpl().getServiceRegistry().getNodeService();
+        NodeRef rootRef = nodeService.getRootNode(workspaceStore);
+        NodeRef sourceRef = ItemResolver.getNodeRef(this, rootRef, srcAbsPath);
+        if (sourceRef == null)
+        {
+            throw new PathNotFoundException("Source path " + srcAbsPath + " cannot be found.");
+        }
+        
+        // Find dest node
+        NodeRef destRef = null;
+        QName destName = null;
+        Path destPath = new JCRPath(getNamespaceResolver(), destAbsPath).getPath();
+        if (destPath.size() == 1)
+        {
+            destRef = rootRef;
+            destName = ((JCRPath.SimpleElement)destPath.get(0)).getQName(); 
+        }
+        else
+        {
+            Path destParentPath = destPath.subPath(destPath.size() -2);
+            destRef = ItemResolver.getNodeRef(this, rootRef, destParentPath.toPrefixString(getNamespaceResolver()));
+            if (destRef == null)
+            {
+                throw new PathNotFoundException("Destination path " + destParentPath + " cannot be found.");
+            }
+            destName = ((JCRPath.SimpleElement)destPath.get(destPath.size() -1)).getQName();
+        }
+        
+        // Validate name
+        // TODO: Replace with proper name validation
+        if (destName.getLocalName().indexOf('[') != -1 || destName.getLocalName().indexOf(']') != -1)
+        {
+            throw new RepositoryException("Node name '" + destName + "' is invalid");
+        }
+        
+        // Determine child association type for destination
+        ChildAssociationRef childAssocRef = nodeService.getPrimaryParent(sourceRef);
+        
+        // Move node
+        nodeService.moveNode(sourceRef, destRef, childAssocRef.getTypeQName(), destName);
     }
 
     /* (non-Javadoc)
