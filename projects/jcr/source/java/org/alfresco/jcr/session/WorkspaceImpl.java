@@ -40,10 +40,18 @@ import javax.jcr.query.QueryManager;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionException;
 
+import org.alfresco.jcr.item.ItemResolver;
+import org.alfresco.jcr.item.JCRPath;
 import org.alfresco.jcr.query.QueryManagerImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ParameterCheck;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -104,7 +112,54 @@ public class WorkspaceImpl implements Workspace
      */
     public void copy(String srcAbsPath, String destAbsPath) throws ConstraintViolationException, VersionException, AccessDeniedException, PathNotFoundException, ItemExistsException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        ParameterCheck.mandatoryString("srcAbsPath", srcAbsPath);
+        ParameterCheck.mandatoryString("destAbsPath", destAbsPath);
+        
+        // find source node
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        NodeRef rootRef = nodeService.getRootNode(session.getWorkspaceStore());
+        NodeRef sourceRef = ItemResolver.getNodeRef(session, rootRef, srcAbsPath);
+        if (sourceRef == null)
+        {
+            throw new PathNotFoundException("Source path " + srcAbsPath + " cannot be found.");
+        }
+        
+        // find dest node
+        NodeRef destRef = null;
+        QName destName = null;
+        Path destPath = new JCRPath(session.getNamespaceResolver(), destAbsPath).getPath();
+        if (destPath.size() == 1)
+        {
+            destRef = rootRef;
+            destName = ((JCRPath.SimpleElement)destPath.get(0)).getQName(); 
+        }
+        else
+        {
+            Path destParentPath = destPath.subPath(destPath.size() -2);
+            destRef = ItemResolver.getNodeRef(session, rootRef, destParentPath.toPrefixString(session.getNamespaceResolver()));
+            if (destRef == null)
+            {
+                throw new PathNotFoundException("Destination path " + destParentPath + " cannot be found.");
+            }
+            destName = ((JCRPath.SimpleElement)destPath.get(destPath.size() -1)).getQName();
+        }
+        
+        // validate name
+        // TODO: Replace with proper name validation
+        if (destName.getLocalName().indexOf('[') != -1 || destName.getLocalName().indexOf(']') != -1)
+        {
+            throw new RepositoryException("Node name '" + destName + "' is invalid");
+        }
+        
+        // determine child association type for destination
+        ChildAssociationRef childAssocRef = nodeService.getPrimaryParent(sourceRef);
+        
+        // copy node
+        CopyService copyService = session.getRepositoryImpl().getServiceRegistry().getCopyService();
+        copyService.copy(sourceRef, destRef, childAssocRef.getTypeQName(), destName);
+
+        // finally save
+        session.save();
     }
 
     /* (non-Javadoc)
