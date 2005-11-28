@@ -117,7 +117,7 @@ public class NTLMPassthruToken extends NTLMLocalToken
      */
     public final void setUserAndPassword(String username, byte[] hashedPassword, int hashType)
     {
-        m_username       = username;
+        m_username       = username.toLowerCase();
         m_hashedPassword = hashedPassword;
         m_hashType       = hashType;
     }

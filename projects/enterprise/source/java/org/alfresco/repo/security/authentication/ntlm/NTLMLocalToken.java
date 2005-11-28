@@ -51,7 +51,7 @@ public class NTLMLocalToken extends UsernamePasswordAuthenticationToken
      * @param plainPwd String
      */
     public NTLMLocalToken(String username, String plainPwd) {
-        super(username, plainPwd);
+        super(username.toLowerCase(), plainPwd);
     }
     
     /**

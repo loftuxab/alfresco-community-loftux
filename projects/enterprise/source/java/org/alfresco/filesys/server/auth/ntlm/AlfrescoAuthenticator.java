@@ -28,6 +28,8 @@ import java.util.Random;
 
 import javax.transaction.UserTransaction;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.config.ConfigElement;
 import org.alfresco.filesys.server.SrvSession;
 import org.alfresco.filesys.server.auth.ClientInfo;
@@ -407,11 +409,13 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
         
         // Authenticate the user
         
+        Authentication genAuthToken = null;
+        
         try
         {
             // Run the second stage of the passthru authentication
             
-            m_authComponent.authenticate( authToken);
+            genAuthToken = m_authComponent.authenticate( authToken);
             
             // Check if the user has been logged on as a guest
 
@@ -438,14 +442,20 @@ public class AlfrescoAuthenticator extends SrvAuthenticator
 
             // Set the current user to be authenticated, save the authentication token
             
-            client.setAuthenticationToken( m_authComponent.setCurrentUser(client.getUserName()));
+            client.setAuthenticationToken( genAuthToken);
             
             // Get the users home folder node, if available
             
             getHomeFolderForUser( client);
+            
+            // DEBUG
+            
+            if ( logger.isDebugEnabled())
+                logger.debug("Auth token " + genAuthToken);
         }
         catch ( Exception ex)
         {
+            logger.error("Error during passthru authentication", ex);
         }
         
         // Clear the authentication token

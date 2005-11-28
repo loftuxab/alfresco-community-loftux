@@ -38,13 +38,6 @@ import net.sf.acegisecurity.BadCredentialsException;
 import net.sf.acegisecurity.CredentialsExpiredException;
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.GrantedAuthorityImpl;
-import net.sf.acegisecurity.UserDetails;
-import net.sf.acegisecurity.context.Context;
-import net.sf.acegisecurity.context.ContextHolder;
-import net.sf.acegisecurity.context.security.SecureContext;
-import net.sf.acegisecurity.context.security.SecureContextImpl;
-import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import net.sf.acegisecurity.providers.dao.User;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.server.auth.PasswordEncryptor;
@@ -52,10 +45,13 @@ import org.alfresco.filesys.server.auth.passthru.AuthenticateSession;
 import org.alfresco.filesys.server.auth.passthru.PassthruServers;
 import org.alfresco.filesys.smb.SMBException;
 import org.alfresco.filesys.smb.SMBStatus;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AbstractAuthenticationComponent;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.NTLMMode;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -72,8 +68,6 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
     // Logging
     
     private static final Log logger = LogFactory.getLog("org.alfresco.passthru.auth");
-
-    
 
     // Constants
     //
@@ -113,6 +107,11 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
     // Authentication session reaper thread
     
     private PassthruReaperThread m_reaperThread;
+    
+    // Person service, used to map passthru usernames to Alfresco person names
+    
+    private PersonService m_personService;
+    private NodeService m_nodeService;
     
     /**
      * Passthru Session Repear Thread
@@ -441,6 +440,26 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
     }
     
     /**
+     * Set the person service
+     * 
+     * @param personService PersonService
+     */
+    public final void setPersonService(PersonService personService)
+    {
+        m_personService = personService;
+    }
+    
+    /**
+     * Set the node service
+     * 
+     * @param nodeService NodeService
+     */
+    public final void setNodeService(NodeService nodeService)
+    {
+        m_nodeService = nodeService;
+    }
+    
+    /**
      * Return the authentication session timeout, in milliseconds
      * 
      * @return long
@@ -471,7 +490,7 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
         // Authenticate using the token
         
         authenticate( authToken);
-        setCurrentUser( userName);
+        setCurrentUser( userName.toLowerCase());
     }
 
     /**
@@ -547,19 +566,9 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
 
         // Return the updated authentication token
         
-        return auth;
+        return getCurrentAuthentication();
     }
     
-    
-
-  
-  
-
-    
-
-    
-
-
     /**
      * Get the enum that describes NTLM integration
      * 
@@ -641,7 +650,35 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
             // Indicate that the token is authenticated
             
             ntlmToken.setAuthenticated(true);
-            setCurrentUser( username);
+            
+            // Map the passthru username to an Alfresco person
+            
+            NodeRef userNode = m_personService.getPerson(username);
+            if ( userNode != null)
+            {
+                // Get the person name and use that as the current user to line up with permission checks
+                
+                String personName = (String) m_nodeService.getProperty(userNode, ContentModel.PROP_USERNAME);
+                setCurrentUser(personName);
+                
+                // DEBUG
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Setting current user using person " + personName + " (username " + username + ")");
+            }
+            else
+            {
+                // Set using the user name, lowercase the name if hte person service is case insensitive
+                
+                if ( m_personService.getUserNamesAreCaseSensitive() == false)
+                    username = username.toLowerCase();
+                setCurrentUser( username);
+                
+                // DEBUG
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Setting current user using username " + username);
+            }
             
             // Debug
             
@@ -783,12 +820,35 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
                 // Indicate that the token is authenticated
                 
                 ntlmToken.setAuthenticated(true);
-                setCurrentUser( username);
+
+                // Map the passthru username to an Alfresco person
                 
-                // Debug
-                
-                if ( logger.isDebugEnabled())
-                    logger.debug("Authenticated token=" + ntlmToken);
+                NodeRef userNode = m_personService.getPerson(username);
+                if ( userNode != null)
+                {
+                    // Get the person name and use that as the current user to line up with permission checks
+                    
+                    String personName = (String) m_nodeService.getProperty(userNode, ContentModel.PROP_USERNAME);
+                    setCurrentUser(personName);
+                    
+                    // DEBUG
+                    
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Setting current user using person " + personName + " (username " + username + ")");
+                }
+                else
+                {
+                    // Set using the user name, lowercase the name if the person service is case insensitive
+                    
+                    if ( m_personService.getUserNamesAreCaseSensitive() == false)
+                        username = username.toLowerCase();
+                    setCurrentUser( username);
+                    
+                    // DEBUG
+                    
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Setting current user using username " + username);
+                }
             }                
             catch (IOException ex)
             {
@@ -798,6 +858,11 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
             }
             catch (SMBException ex)
             {
+                // Debug
+                
+                if ( logger.isDebugEnabled())
+                    logger.debug("Passthru exception, " + ex);
+                
                 // Check the returned status code to determine why the logon failed and throw an appropriate exception
                 
                 if ( ex.getErrorClass() == SMBStatus.NTErr)
@@ -846,6 +911,14 @@ public class NTLMAuthenticationComponentImpl extends AbstractAuthenticationCompo
         }
     }
 
-    
-    
+    /**
+     * Check if the user exists
+     * 
+     * @param userName String
+     * @return boolean
+     */
+    public boolean exists(String userName)
+    {
+       throw new UnsupportedOperationException();
+    }
 }
