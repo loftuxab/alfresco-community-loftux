@@ -208,8 +208,8 @@
       </wsdl:operation>
       <wsdl:operation name="read">
          <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
-         <wsdl:input message="content:readRequest" name="describeRequest"/>
-         <wsdl:output message="content:readResponse" name="describeResponse"/>
+         <wsdl:input message="content:readRequest" name="readRequest"/>
+         <wsdl:output message="content:readResponse" name="readResponse"/>
          <wsdl:fault message="content:ContentFault" name="ContentFault"/>
       </wsdl:operation>
       <wsdl:operation name="write">
