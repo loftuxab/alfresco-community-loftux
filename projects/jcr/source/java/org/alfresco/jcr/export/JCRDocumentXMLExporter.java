@@ -26,11 +26,11 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 
-import org.alfresco.jcr.item.JCRMixinTypesProperty;
-import org.alfresco.jcr.item.JCRPrimaryTypeProperty;
-import org.alfresco.jcr.item.JCRUUIDProperty;
 import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.item.PropertyImpl;
+import org.alfresco.jcr.item.property.JCRMixinTypesProperty;
+import org.alfresco.jcr.item.property.JCRPrimaryTypeProperty;
+import org.alfresco.jcr.item.property.JCRUUIDProperty;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;

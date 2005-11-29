@@ -62,6 +62,8 @@ import org.alfresco.jcr.item.ValueFactoryImpl;
 import org.alfresco.jcr.repository.RepositoryImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -537,7 +539,7 @@ public class SessionImpl implements Session
      */
     public void addLockToken(String lt)
     {
-        // TODO: NOOP for level 1?
+        // TODO: UnsupportedRepositoryOperationException
     }
 
     /* (non-Javadoc)
@@ -545,7 +547,15 @@ public class SessionImpl implements Session
      */
     public String[] getLockTokens()
     {
-        return new String[0];
+        LockService lockService = getRepositoryImpl().getServiceRegistry().getLockService();
+        List<NodeRef> nodeRefs = lockService.getLocks(getWorkspaceStore(), LockType.WRITE_LOCK);
+        String[] tokens = new String[nodeRefs.size()];
+        int i = 0;
+        for (NodeRef nodeRef : nodeRefs)
+        {
+            tokens[i++] = nodeRef.toString();
+        }
+        return tokens;
     }
 
     /* (non-Javadoc)
@@ -553,9 +563,8 @@ public class SessionImpl implements Session
      */
     public void removeLockToken(String lt)
     {
-        // TODO: NOOP for level 1?
+        // TODO: UnsupportedRepositoryOperationException
     }
-
 
     /**
      * Gets the workspace store reference for the given workspace name
@@ -583,7 +592,6 @@ public class SessionImpl implements Session
         return workspace;
     }
 
-    
     /**
      * Create a Content Handler that outputs to the specified output stream.
      * 
@@ -609,7 +617,6 @@ public class SessionImpl implements Session
             throw new RepositoryException("Failed to create content handler for export", e);            
         }
     }
-
     
     /**
      * Create Export Parameters

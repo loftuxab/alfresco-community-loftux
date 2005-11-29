@@ -27,9 +27,9 @@ import javax.jcr.nodetype.NodeDefinition;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.PropertyDefinition;
 
-import org.alfresco.jcr.item.JCRMixinTypesProperty;
-import org.alfresco.jcr.item.JCRPrimaryTypeProperty;
 import org.alfresco.jcr.item.ValueImpl;
+import org.alfresco.jcr.item.property.JCRMixinTypesProperty;
+import org.alfresco.jcr.item.property.JCRPrimaryTypeProperty;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -47,6 +47,10 @@ public class NodeTypeImpl implements NodeType
 
     // The optional mix:referenceable specified by JCR
     public static QName MIX_REFERENCEABLE = QName.createQName(JCRNamespace.MIX_URI, "referenceable");
+    // The optional mix:lockable specified by JCR
+    public static QName MIX_LOCKABLE = QName.createQName(JCRNamespace.MIX_URI, "lockable");
+    // The optional mix:versionable specified by JCR
+    public static QName MIX_VERSIONABLE = QName.createQName(JCRNamespace.MIX_URI, "versionable");
 
     
     private NodeTypeManagerImpl typeManager;

@@ -52,16 +52,20 @@ import javax.jcr.version.VersionHistory;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.api.JCRNodeRef;
+import org.alfresco.jcr.dictionary.ClassMap;
 import org.alfresco.jcr.dictionary.NodeDefinitionImpl;
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
+import org.alfresco.jcr.item.property.PropertyResolver;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
+import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -605,11 +609,14 @@ public class NodeImpl extends ItemImpl implements Node
         int i = 0;
         for (QName aspect : aspects)
         {
-            nodeTypes[i++] = session.getTypeManager().getNodeTypeImpl(aspect); 
+            nodeTypes[i++] = session.getTypeManager().getNodeTypeImpl(aspect);
+            QName mixin = ClassMap.convertClassToType(aspect);
+            if (mixin != null)
+            {
+                nodeTypes[i++] = session.getTypeManager().getNodeTypeImpl(mixin);
+            }
         }
         
-        // Add mix:referenceable aspect (to represent the Alfresco sys:referenceable aspect)
-        nodeTypes[i] = session.getTypeManager().getNodeTypeImpl(NodeTypeImpl.MIX_REFERENCEABLE);
         return nodeTypes;
     }
 
@@ -618,21 +625,28 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean isNodeType(String nodeTypeName) throws RepositoryException
     {
-        QName name = QName.createQName(nodeTypeName, session.getNamespaceResolver());
+        QName nodeType = QName.createQName(nodeTypeName, session.getNamespaceResolver());
         
         // is it one of standard types
-        if (name.equals(NodeTypeImpl.MIX_REFERENCEABLE) || name.equals(NodeTypeImpl.NT_BASE))
+        if (nodeType.equals(NodeTypeImpl.MIX_REFERENCEABLE) || nodeType.equals(NodeTypeImpl.NT_BASE))
         {
             return true;
         }
 
+        // map JCR mixins to Alfresco mixins
+        QName nodeClass = ClassMap.convertTypeToClass(nodeType);
+        if (nodeClass == null)
+        {
+            nodeClass = nodeType;
+        }
+        
         // determine via class hierarchy
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
 
         // first, check the type
         QName type = nodeService.getType(nodeRef);
-        if (dictionaryService.isSubClass(name, type))
+        if (dictionaryService.isSubClass(nodeClass, type))
         {
             return true;
         }
@@ -641,7 +655,7 @@ public class NodeImpl extends ItemImpl implements Node
         Set<QName> aspects = nodeService.getAspects(nodeRef);
         for (QName aspect : aspects)
         {
-            if (dictionaryService.isSubClass(name, aspect))
+            if (dictionaryService.isSubClass(nodeClass, aspect))
             {
                 return true;
             }
@@ -656,18 +670,25 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void addMixin(String mixinName) throws NoSuchNodeTypeException, VersionException, ConstraintViolationException, LockException, RepositoryException
     {
-        // retrieve aspect definition
+        // map JCR mixins to Alfresco mixins
         QName mixin = QName.createQName(mixinName, session.getNamespaceResolver());
+        QName aspect = ClassMap.convertTypeToClass(mixin);
+        if (aspect == null)
+        {
+            aspect = mixin;
+        }
+        
+        // retrieve aspect definition
         DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
-        AspectDefinition aspectDef = dictionaryService.getAspect(mixin);
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspect);
         if (aspectDef == null)
         {
             throw new NoSuchNodeTypeException("Unknown mixin name '" + mixinName + "'");
         }
-        
+
         // apply aspect
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
-        nodeService.addAspect(nodeRef, mixin, null);
+        nodeService.addAspect(nodeRef, aspect, null);
     }
 
     /* (non-Javadoc)
@@ -675,10 +696,17 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void removeMixin(String mixinName) throws NoSuchNodeTypeException, VersionException, ConstraintViolationException, LockException, RepositoryException
     {
-        // retrieve aspect definition
+        // map JCR mixins to Alfresco mixins
         QName mixin = QName.createQName(mixinName, session.getNamespaceResolver());
+        QName aspect = ClassMap.convertTypeToClass(mixin);
+        if (aspect == null)
+        {
+            aspect = mixin;
+        }
+        
+        // retrieve aspect definition
         DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
-        AspectDefinition aspectDef = dictionaryService.getAspect(mixin);
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspect);
         if (aspectDef == null)
         {
             throw new NoSuchNodeTypeException("Unknown mixin name '" + mixinName + "'");
@@ -687,13 +715,13 @@ public class NodeImpl extends ItemImpl implements Node
         // check the node actually has the mixin
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         Set<QName> nodeAspects = nodeService.getAspects(nodeRef);
-        if (!nodeAspects.contains(mixin))
+        if (!nodeAspects.contains(aspect))
         {
             throw new NoSuchNodeTypeException("Node " + nodeRef.getId() + " does not have the mixin " + mixin);
         }
         
         // remove aspect
-        nodeService.removeAspect(nodeRef, mixin);
+        nodeService.removeAspect(nodeRef, aspect);
     }
 
     /* (non-Javadoc)
@@ -701,10 +729,17 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean canAddMixin(String mixinName) throws NoSuchNodeTypeException, RepositoryException
     {
-        // retrieve aspect definition
+        // map JCR mixins to Alfresco mixins
         QName mixin = QName.createQName(mixinName, session.getNamespaceResolver());
+        QName aspect = ClassMap.convertTypeToClass(mixin);
+        if (aspect == null)
+        {
+            aspect = mixin;
+        }
+        
+        // retrieve aspect definition
         DictionaryService dictionaryService = session.getRepositoryImpl().getServiceRegistry().getDictionaryService();
-        AspectDefinition aspectDef = dictionaryService.getAspect(mixin);
+        AspectDefinition aspectDef = dictionaryService.getAspect(aspect);
         if (aspectDef == null)
         {
             throw new NoSuchNodeTypeException("Unknown mixin name '" + mixinName + "'");
@@ -854,7 +889,25 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Lock lock(boolean isDeep, boolean isSessionScoped) throws UnsupportedRepositoryOperationException, LockException, AccessDeniedException, InvalidItemStateException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // note: alfresco does not yet support session scoped locks
+        if (isSessionScoped)
+        {
+            throw new UnsupportedRepositoryOperationException("Session scope locking is not supported.");
+        }
+        
+        // check this node is lockable
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE))
+        {
+            throw new LockException("Node " + nodeRef + " does is not lockable.");
+        }
+        
+        // lock the node
+        LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+        lockService.lock(nodeRef, LockType.WRITE_LOCK, 0, isDeep);
+
+        // return lock
+        return new LockImpl(this).getProxy();
     }
 
     /* (non-Javadoc)
@@ -862,7 +915,15 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Lock getLock() throws UnsupportedRepositoryOperationException, LockException, AccessDeniedException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // check this node is lockable
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE))
+        {
+            throw new LockException("Node " + nodeRef + " does is not lockable.");
+        }
+
+        // return lock
+        return new LockImpl(this).getProxy();
     }
 
     /* (non-Javadoc)
@@ -870,7 +931,16 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void unlock() throws UnsupportedRepositoryOperationException, LockException, AccessDeniedException, InvalidItemStateException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // check this node is lockable
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE))
+        {
+            throw new LockException("Node " + nodeRef + " does is not lockable.");
+        }
+
+        // unlock
+        LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+        lockService.unlock(nodeRef, true);
     }
 
     /* (non-Javadoc)
@@ -878,7 +948,8 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean holdsLock() throws RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // note: for now, alfresco doesn't distinguish between lock holder and locked
+        return isLocked();
     }
 
     /* (non-Javadoc)
@@ -886,7 +957,9 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean isLocked() throws RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+        LockStatus lockStatus = lockService.getLockStatus(getNodeRef());
+        return lockStatus.equals(LockStatus.LOCK_OWNER) || lockStatus.equals(LockStatus.LOCKED);
     }
 
     /* (non-Javadoc)
@@ -1022,7 +1095,7 @@ public class NodeImpl extends ItemImpl implements Node
      * 
      * @return  the node reference
      */
-    /*package*/ NodeRef getNodeRef()
+    public NodeRef getNodeRef()
     {
         return nodeRef;
     }

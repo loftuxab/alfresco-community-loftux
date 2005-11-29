@@ -27,11 +27,11 @@ import javax.jcr.Value;
 
 import org.alfresco.jcr.dictionary.JCRNamespace;
 import org.alfresco.jcr.dictionary.PropertyDefinitionImpl;
-import org.alfresco.jcr.item.JCRMixinTypesProperty;
-import org.alfresco.jcr.item.JCRPrimaryTypeProperty;
-import org.alfresco.jcr.item.JCRUUIDProperty;
 import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.item.PropertyImpl;
+import org.alfresco.jcr.item.property.JCRMixinTypesProperty;
+import org.alfresco.jcr.item.property.JCRPrimaryTypeProperty;
+import org.alfresco.jcr.item.property.JCRUUIDProperty;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;

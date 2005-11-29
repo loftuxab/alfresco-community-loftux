@@ -14,30 +14,32 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.item;
+package org.alfresco.jcr.item.property;
 
 import javax.jcr.RepositoryException;
 
 import org.alfresco.jcr.dictionary.JCRNamespace;
-import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.jcr.item.NodeImpl;
+import org.alfresco.jcr.item.PropertyImpl;
 import org.alfresco.service.namespace.QName;
 
+
 /**
- * Implementation for nt:base primaryType property
- * 
+ * Implementation for mix:referenceable uuid property
+
  * @author David Caruana
+ *
  */
-public class JCRPrimaryTypeProperty extends PropertyImpl
+public class JCRUUIDProperty extends PropertyImpl
 {
-    public static QName PROPERTY_NAME = QName.createQName(JCRNamespace.JCR_URI, "primaryType");
-    
+    public static QName PROPERTY_NAME = QName.createQName(JCRNamespace.JCR_URI, "uuid");
 
     /**
      * Construct
      * 
      * @param node
      */
-    public JCRPrimaryTypeProperty(NodeImpl node)
+    public JCRUUIDProperty(NodeImpl node)
     {
         super(node, PROPERTY_NAME);
     }
@@ -45,10 +47,8 @@ public class JCRPrimaryTypeProperty extends PropertyImpl
     @Override
     protected Object getPropertyValue() throws RepositoryException
     {
-        NodeImpl nodeImpl = getNodeImpl();
-        NodeService nodeService = nodeImpl.session.getRepositoryImpl().getServiceRegistry().getNodeService();
-        QName type = nodeService.getType(nodeImpl.getNodeRef());
-        return type.toPrefixString(nodeImpl.session.getNamespaceResolver());
+        NodeImpl node = getNodeImpl();
+        return node.getNodeRef().getId();
     }
     
 }

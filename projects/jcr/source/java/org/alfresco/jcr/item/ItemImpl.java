@@ -54,6 +54,16 @@ public abstract class ItemImpl implements Item
     }
     
     /**
+     * Get the Session implementation
+     * 
+     * @return session implementation
+     */
+    public SessionImpl getSessionImpl()
+    {
+        return session;
+    }
+    
+    /**
      * Get the Item Proxy
      * 
      * @return  the proxy

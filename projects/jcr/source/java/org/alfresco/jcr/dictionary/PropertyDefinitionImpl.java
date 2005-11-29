@@ -21,9 +21,9 @@ import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.PropertyDefinition;
 import javax.jcr.version.OnParentVersionAction;
 
-import org.alfresco.jcr.item.JCRMixinTypesProperty;
-import org.alfresco.jcr.item.JCRPrimaryTypeProperty;
 import org.alfresco.jcr.item.ValueImpl;
+import org.alfresco.jcr.item.property.JCRMixinTypesProperty;
+import org.alfresco.jcr.item.property.JCRPrimaryTypeProperty;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;

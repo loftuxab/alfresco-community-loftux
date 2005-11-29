@@ -14,30 +14,33 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.item;
+package org.alfresco.jcr.item.property;
 
 import javax.jcr.RepositoryException;
 
 import org.alfresco.jcr.dictionary.JCRNamespace;
+import org.alfresco.jcr.item.NodeImpl;
+import org.alfresco.jcr.item.PropertyImpl;
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 
-
 /**
- * Implementation for mix:referenceable uuid property
-
+ * Implementation for mix:lockable lockOwner property
+ * 
  * @author David Caruana
- *
  */
-public class JCRUUIDProperty extends PropertyImpl
+public class JCRLockOwnerProperty extends PropertyImpl
 {
-    public static QName PROPERTY_NAME = QName.createQName(JCRNamespace.JCR_URI, "uuid");
+    public static QName PROPERTY_NAME = QName.createQName(JCRNamespace.JCR_URI, "lockOwner");
+    
 
     /**
      * Construct
      * 
      * @param node
      */
-    public JCRUUIDProperty(NodeImpl node)
+    public JCRLockOwnerProperty(NodeImpl node)
     {
         super(node, PROPERTY_NAME);
     }
@@ -45,8 +48,10 @@ public class JCRUUIDProperty extends PropertyImpl
     @Override
     protected Object getPropertyValue() throws RepositoryException
     {
-        NodeImpl node = getNodeImpl();
-        return node.getNodeRef().getId();
+        NodeImpl nodeImpl = getNodeImpl();
+        NodeService nodeService = nodeImpl.getSessionImpl().getRepositoryImpl().getServiceRegistry().getNodeService();
+        String lockOwner = (String)nodeService.getProperty(nodeImpl.getNodeRef(), ContentModel.PROP_LOCK_OWNER);
+        return lockOwner;
     }
     
 }

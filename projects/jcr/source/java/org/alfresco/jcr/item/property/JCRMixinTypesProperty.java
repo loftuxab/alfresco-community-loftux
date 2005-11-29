@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.item;
+package org.alfresco.jcr.item.property;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,8 @@ import javax.jcr.RepositoryException;
 
 import org.alfresco.jcr.dictionary.JCRNamespace;
 import org.alfresco.jcr.dictionary.NodeTypeImpl;
+import org.alfresco.jcr.item.NodeImpl;
+import org.alfresco.jcr.item.PropertyImpl;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 
@@ -52,18 +54,18 @@ public class JCRMixinTypesProperty extends PropertyImpl
     {
         // get aspects from node
         NodeImpl nodeImpl = getNodeImpl();
-        NodeService nodeService = nodeImpl.session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        NodeService nodeService = nodeImpl.getSessionImpl().getRepositoryImpl().getServiceRegistry().getNodeService();
         Set<QName> aspects = nodeService.getAspects(nodeImpl.getNodeRef());
 
         // resolve against session namespace prefix resolver
         List<String> aspectNames = new ArrayList<String>(aspects.size() + 1);
         for (QName aspect : aspects)
         {
-            aspectNames.add(aspect.toPrefixString(nodeImpl.session.getNamespaceResolver()));
+            aspectNames.add(aspect.toPrefixString(nodeImpl.getSessionImpl().getNamespaceResolver()));
         }
         
         // add JCR referenceable
-        aspectNames.add(NodeTypeImpl.MIX_REFERENCEABLE.toPrefixString(nodeImpl.session.getNamespaceResolver()));
+        aspectNames.add(NodeTypeImpl.MIX_REFERENCEABLE.toPrefixString(nodeImpl.getSessionImpl().getNamespaceResolver()));
         
         return aspectNames; 
     }

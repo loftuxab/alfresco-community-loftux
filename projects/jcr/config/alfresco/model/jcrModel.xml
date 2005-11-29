@@ -46,7 +46,17 @@
          </properties>
       </aspect>
       
+      <aspect name="mix:lockable">
+         <properties>
+            <property name="jcr:lockOwner">
+               <type>d:text</type>
+            </property>
+            <property name="jcr:lockIsDeep">
+               <type>d:boolean</type>
+            </property>
+         </properties>            
+      </aspect>
+      
    </aspects>
-   
    
 </model>
