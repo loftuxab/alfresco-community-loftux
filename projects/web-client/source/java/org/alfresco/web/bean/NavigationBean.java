@@ -18,6 +18,7 @@ package org.alfresco.web.bean;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +31,13 @@ import org.alfresco.filesys.CIFSServer;
 import org.alfresco.filesys.server.filesys.DiskSharedDevice;
 import org.alfresco.filesys.smb.server.repo.ContentContext;
 import org.alfresco.filesys.smb.server.repo.ContentDiskInterface;
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.TemplateImageResolver;
+import org.alfresco.service.cmr.repository.TemplateNode;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.app.AlfrescoNavigationHandler;
@@ -247,6 +251,55 @@ public class NavigationBean
    }
    
    /**
+    * @return true if the current node has a template view available
+    */
+   public boolean getCurrentNodeHasTemplate()
+   {
+      boolean templateView = false;
+      Node node = getCurrentNode();
+      if (node.hasAspect(ContentModel.ASPECT_TEMPLATABLE))
+      {
+         NodeRef templateRef = (NodeRef)node.getProperties().get(ContentModel.PROP_TEMPLATE);
+         templateView = (templateRef != null && this.nodeService.exists(templateRef));
+      }
+      return templateView;
+   }
+   
+   /**
+    * @return the NodeRef.toString() for the current node template view if it has one set 
+    */
+   public String getCurrentNodeTemplate()
+   {
+      String strRef = null;
+      if (getCurrentNodeHasTemplate() == true)
+      {
+         strRef = getCurrentNode().getProperties().get(ContentModel.PROP_TEMPLATE).toString();
+      }
+      return strRef;
+   }
+   
+   /**
+    * Returns a model for use by a template on a space Dashboard page.
+    * 
+    * @return model containing current current space info.
+    */
+   public Map getTemplateModel()
+   {
+      HashMap model = new HashMap(1, 1.0f);
+      
+      FacesContext fc = FacesContext.getCurrentInstance();
+      TemplateNode spaceNode = new TemplateNode(getCurrentNode().getNodeRef(), Repository.getServiceRegistry(fc),
+            new TemplateImageResolver() {
+               public String resolveImagePathForName(String filename, boolean small) {
+                  return Utils.getFileTypeImage(filename, small);
+               }
+            });
+      model.put("space", spaceNode);
+      
+      return model;
+   }
+   
+   /**
     * Clear state so that the current node properties cache for the next time they are requested
     */
    public void resetCurrentNodeProperties()
@@ -385,6 +438,7 @@ public class NavigationBean
    {
       return this.dispatchContext;
    }
+   
    
    // ------------------------------------------------------------------------------
    // Navigation action event handlers

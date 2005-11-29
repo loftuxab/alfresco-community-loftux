@@ -24,14 +24,14 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="org.alfresco.web.ui.common.PanelGenerator" %>
 
-<r:page titleId="title_file_preview">
+<r:page titleId="title_space_details">
 
 <f:view>
    
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="preview-file">
+   <h:form acceptCharset="UTF-8" id="document-details">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -60,47 +60,22 @@
                <tr>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_4.gif)" width="4"></td>
                   <td bgcolor="#EEEEEE">
-                  
+                     
                      <%-- Status and Actions inner contents table --%>
                      <%-- Generally this consists of an icon, textual summary and actions for the current object --%>
                      <table cellspacing="4" cellpadding="0" width="100%">
                         <tr valign="top">
                            <td width="32">
-                              <img src="<%=request.getContextPath()%>/images/icons/preview_large.gif" width=32 height=32>
+                              <h:graphicImage url="/images/icons/preview_large.gif"/>
                            </td>
                            <td>
-                              <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
-                              <div class="mainTitle">
-                                 <h:outputText value="#{msg.preview_of}" /> '<h:outputText value="#{DocumentPreviewBean.name}" />'<r:lockIcon value="#{DocumentPreviewBean.node.nodeRef}" align="absmiddle" />
-                              </div>
-                              <div class="mainSubText"><h:outputText value="#{msg.previewdocument_description}" /></div>
-                           </td>
-                           <td bgcolor="#465F7D" width=1></td>
-                           <td width=100 style="padding-left:2px">
-                              <%-- Available Templates --%>
-                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.templates}" />
-                              
-                              <div style="padding-top:4px">
-                                 <%-- Templates drop-down selector --%>
-                                 <h:selectOneMenu id="template" value="#{DocumentPreviewBean.template}" onchange="document.forms['preview-file'].submit(); return true;">
-                                    <f:selectItems value="#{DocumentPreviewBean.templates}" />
-                                 </h:selectOneMenu>
-                              </div>
-                           </td>
-                           
-                           <%-- Navigation --%>
-                           <td bgcolor="#465F7D" width=1></td>
-                           <td width=100>
-                              <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.navigation}" /><br>
-                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{DocumentDetailsBean.nextItem}" action="nextItem">
-                                 <f:param name="id" value="#{DocumentPreviewBean.id}" />
-                              </a:actionLink>
-                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{DocumentDetailsBean.previousItem}" action="previousItem">
-                                 <f:param name="id" value="#{DocumentPreviewBean.id}" />
-                              </a:actionLink>
+                              <div class="mainSubTitle"><h:outputText value="#{SpaceDetailsBean.name}" /></div>
+                              <div class="mainTitle"><h:outputText value="#{msg.apply_dashboard}" /></div>
+                              <div class="mainSubText"><h:outputText value="#{msg.apply_dashboard_info}" /></div>
                            </td>
                         </tr>
                      </table>
+                     
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/statuspanel_6.gif)" width="4"></td>
                </tr>
@@ -112,18 +87,26 @@
                   <td><img src="<%=request.getContextPath()%>/images/parts/statuspanel_9.gif" width="4" height="9"></td>
                </tr>
                
-               <%-- Preview area --%>
+               <%-- Details --%>
                <tr valign=top>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
                   <td>
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
-                           <%-- Template component --%>
                            <td width="100%" valign="top">
-                              
-                              <%-- Get current template noderef and bind current document as model --%>
-                              <r:template template="#{DocumentPreviewBean.templateRef}" model="#{DocumentPreviewBean.templateModel}" />
-                              
+                              <% PanelGenerator.generatePanelStart(out, request.getContextPath(), "white", "white"); %>
+                              <table cellpadding="2" cellspacing="2" border="0" width="100%">
+                                 <tr>
+                                    <td><h:outputText value="#{msg.template}"/>:</td>
+                                    <td width=100%>
+                                       <%-- Templates drop-down selector --%>
+                                       <h:selectOneMenu value="#{SpaceDetailsBean.template}">
+                                          <f:selectItems value="#{SpaceDetailsBean.templates}" />
+                                       </h:selectOneMenu>
+                                    </td>
+                                 </tr>
+                              </table>
+                              <% PanelGenerator.generatePanelEnd(out, request.getContextPath(), "white"); %>
                            </td>
                            
                            <td valign="top">
@@ -131,7 +114,12 @@
                               <table cellpadding="1" cellspacing="1" border="0">
                                  <tr>
                                     <td align="center">
-                                       <h:commandButton value="#{msg.close}" action="browse" styleClass="wizardButton" />
+                                       <h:commandButton value="#{msg.ok}" action="#{SpaceDetailsBean.applyTemplate}" styleClass="wizardButton" />
+                                    </td>
+                                 </tr>
+                                 <tr>
+                                    <td align="center">
+                                       <h:commandButton value="#{msg.cancel}" action="showSpaceDetails" styleClass="wizardButton" />
                                     </td>
                                  </tr>
                               </table>
@@ -139,16 +127,6 @@
                            </td>
                         </tr>
                      </table>
-                  </td>
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
-               </tr>
-               
-               <%-- Error Messages --%>
-               <tr valign="top">
-                  <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_4.gif)" width="4"></td>
-                  <td>
-                     <%-- messages tag to show messages not handled by other specific message tags --%>
-                     <h:messages globalOnly="true" styleClass="errorMessage" layout="table" />
                   </td>
                   <td style="background-image: url(<%=request.getContextPath()%>/images/parts/whitepanel_6.gif)" width="4"></td>
                </tr>

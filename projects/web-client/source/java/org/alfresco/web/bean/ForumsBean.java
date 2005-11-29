@@ -460,7 +460,6 @@ public class ForumsBean implements IContextListener
                         // create our Node representation
                         MapNode node = new MapNode(nodeRef, this.nodeService, true);
                         node.addPropertyResolver("icon", this.browseBean.resolverSpaceIcon);
-                        node.addPropertyResolver("templatable", this.browseBean.resolverTemplatable);
                         
                         this.forums.add(node);
                      }
@@ -469,7 +468,6 @@ public class ForumsBean implements IContextListener
                         // create our Node representation
                         MapNode node = new MapNode(nodeRef, this.nodeService, true);
                         node.addPropertyResolver("icon", this.browseBean.resolverSpaceIcon);
-                        node.addPropertyResolver("templatable", this.browseBean.resolverTemplatable);
                         node.addPropertyResolver("replies", this.resolverReplies);
                         
                         this.topics.add(node);

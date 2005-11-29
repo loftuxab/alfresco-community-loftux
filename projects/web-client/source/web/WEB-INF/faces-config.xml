@@ -721,6 +721,10 @@
          <value>#{NavigationBean}</value>
       </managed-property>
       <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{NodeService}</value>
+      </managed-property>
+      <managed-property>
          <property-name>permissionService</property-name>
          <value>#{PermissionService}</value>
       </managed-property>
@@ -731,7 +735,32 @@
          Backing bean used by the document preview dialog
       </description>
       <managed-bean-name>DocumentPreviewBean</managed-bean-name>
-      <managed-bean-class>org.alfresco.web.bean.DocumentPreviewBean</managed-bean-class>
+      <managed-bean-class>org.alfresco.web.bean.preview.DocumentPreviewBean</managed-bean-class>
+      <managed-bean-scope>session</managed-bean-scope>
+      <managed-property>
+         <property-name>browseBean</property-name>
+         <value>#{BrowseBean}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>nodeService</property-name>
+         <value>#{NodeService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>searchService</property-name>
+         <value>#{SearchService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>navigator</property-name>
+         <value>#{NavigationBean}</value>
+      </managed-property>
+   </managed-bean>
+   
+   <managed-bean>
+      <description>
+         Backing bean used by the document preview dialog
+      </description>
+      <managed-bean-name>SpacePreviewBean</managed-bean-name>
+      <managed-bean-class>org.alfresco.web.bean.preview.SpacePreviewBean</managed-bean-class>
       <managed-bean-scope>session</managed-bean-scope>
       <managed-property>
          <property-name>browseBean</property-name>

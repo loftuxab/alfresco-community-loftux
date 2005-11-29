@@ -61,7 +61,6 @@ import org.alfresco.web.ui.repo.component.UISearchCustomProperties;
  */
 public class AdvancedSearchBean
 {
-   private static final String MIMETYPE_ALL = "_all";
    /**
     * Default constructor
     */

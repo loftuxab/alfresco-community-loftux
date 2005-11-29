@@ -17,6 +17,7 @@
 package org.alfresco.web.ui.repo.component.template;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 
 import org.alfresco.config.ConfigService;
+import org.alfresco.repo.template.DateCompareMethod;
 import org.alfresco.repo.template.HasAspectMethod;
 import org.alfresco.repo.template.I18NMessageMethod;
 import org.alfresco.service.ServiceRegistry;
@@ -216,9 +218,13 @@ public class UITemplate extends SelfRenderingComponent
             // supply the current user Node as "person"
             root.put("person", new TemplateNode(user.getPerson(), services, imageResolver));
             
+            // current date/time is useful to have and isn't supplied by FreeMarker by default
+            root.put("date", new Date());
+            
             // add custom method objects
             root.put("hasAspect", new HasAspectMethod());
             root.put("message", new I18NMessageMethod());
+            root.put("dateCompare", new DateCompareMethod());
             
             // merge models
             if (model instanceof Map)

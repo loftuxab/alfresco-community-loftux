@@ -31,7 +31,7 @@
    <%-- load a bundle of properties with I18N strings --%>
    <f:loadBundle basename="alfresco.messages.webclient" var="msg"/>
    
-   <h:form acceptCharset="UTF-8" id="preview-file">
+   <h:form acceptCharset="UTF-8" id="preview-space">
    
    <%-- Main outer table --%>
    <table cellspacing="0" cellpadding="2">
@@ -71,7 +71,7 @@
                            <td>
                               <div class="mainSubTitle"><h:outputText value="#{NavigationBean.nodeProperties.name}" /></div>
                               <div class="mainTitle">
-                                 <h:outputText value="#{msg.preview_of}" /> '<h:outputText value="#{DocumentPreviewBean.name}" />'<r:lockIcon value="#{DocumentPreviewBean.node.nodeRef}" align="absmiddle" />
+                                 <h:outputText value="#{msg.preview_of}" /> '<h:outputText value="#{SpacePreviewBean.name}" />'<r:lockIcon value="#{SpacePreviewBean.node.nodeRef}" align="absmiddle" />
                               </div>
                               <div class="mainSubText"><h:outputText value="#{msg.previewdocument_description}" /></div>
                            </td>
@@ -82,8 +82,8 @@
                               
                               <div style="padding-top:4px">
                                  <%-- Templates drop-down selector --%>
-                                 <h:selectOneMenu id="template" value="#{DocumentPreviewBean.template}" onchange="document.forms['preview-file'].submit(); return true;">
-                                    <f:selectItems value="#{DocumentPreviewBean.templates}" />
+                                 <h:selectOneMenu id="template" value="#{SpacePreviewBean.template}" onchange="document.forms['preview-space'].submit(); return true;">
+                                    <f:selectItems value="#{SpacePreviewBean.templates}" />
                                  </h:selectOneMenu>
                               </div>
                            </td>
@@ -92,11 +92,11 @@
                            <td bgcolor="#465F7D" width=1></td>
                            <td width=100>
                               <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.navigation}" /><br>
-                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{DocumentDetailsBean.nextItem}" action="nextItem">
-                                 <f:param name="id" value="#{DocumentPreviewBean.id}" />
+                              <a:actionLink value="#{msg.next_item}" image="/images/icons/NextItem.gif" padding="4" actionListener="#{SpaceDetailsBean.nextItem}" action="nextItem">
+                                 <f:param name="id" value="#{SpacePreviewBean.id}" />
                               </a:actionLink>
-                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{DocumentDetailsBean.previousItem}" action="previousItem">
-                                 <f:param name="id" value="#{DocumentPreviewBean.id}" />
+                              <a:actionLink value="#{msg.previous_item}" image="/images/icons/PreviousItem.gif" padding="4" actionListener="#{SpaceDetailsBean.previousItem}" action="previousItem">
+                                 <f:param name="id" value="#{SpacePreviewBean.id}" />
                               </a:actionLink>
                            </td>
                         </tr>
@@ -122,7 +122,7 @@
                            <td width="100%" valign="top">
                               
                               <%-- Get current template noderef and bind current document as model --%>
-                              <r:template template="#{DocumentPreviewBean.templateRef}" model="#{DocumentPreviewBean.templateModel}" />
+                              <r:template template="#{SpacePreviewBean.templateRef}" model="#{SpacePreviewBean.templateModel}" />
                               
                            </td>
                            

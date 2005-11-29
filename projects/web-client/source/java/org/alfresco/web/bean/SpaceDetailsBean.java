@@ -16,13 +16,30 @@
  */
 package org.alfresco.web.bean;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.TemplateImageResolver;
+import org.alfresco.service.cmr.repository.TemplateNode;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.data.IDataContainer;
+import org.alfresco.web.data.QuickSort;
+import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIActionLink;
 
 /**
@@ -32,6 +49,8 @@ import org.alfresco.web.ui.common.component.UIActionLink;
  */
 public class SpaceDetailsBean
 {
+   private static final String OUTCOME_RETURN = "showSpaceDetails";
+
    /** BrowseBean instance */
    private BrowseBean browseBean;
    
@@ -40,6 +59,12 @@ public class SpaceDetailsBean
    
    /** PermissionService bean reference */
    private PermissionService permissionService;
+   
+   /** NodeServuce bean reference */
+   private NodeService nodeService;
+   
+   /** Selected template Id */
+   private String template;
    
    
    // ------------------------------------------------------------------------------
@@ -61,6 +86,14 @@ public class SpaceDetailsBean
    public void setNavigator(NavigationBean navigator)
    {
       this.navigator = navigator;
+   }
+   
+   /**
+    * @param nodeService   The NodeService to set
+    */
+   public void setNodeService(NodeService nodeService)
+   {
+      this.nodeService = nodeService;
    }
    
    /**
@@ -101,9 +134,156 @@ public class SpaceDetailsBean
       return getSpace().getName();
    }
    
+   /**
+    * @return Returns the template Id.
+    */
+   public String getTemplate()
+   {
+      // return current template if it exists
+      NodeRef ref = (NodeRef)getSpace().getProperties().get(ContentModel.PROP_TEMPLATE);
+      return ref != null ? ref.getId() : this.template;
+   }
+
+   /**
+    * @param template The template Id to set.
+    */
+   public void setTemplate(String template)
+   {
+      this.template = template;
+   }
+   
+   /**
+    * @return true if the current document has the 'templatable' aspect applied and
+    *         references a template that currently exists in the system.
+    */
+   public boolean isTemplatable()
+   {
+      NodeRef templateRef = (NodeRef)getSpace().getProperties().get(ContentModel.PROP_TEMPLATE);
+      return (getSpace().hasAspect(ContentModel.ASPECT_TEMPLATABLE) &&
+              templateRef != null && nodeService.exists(templateRef));
+   }
+   
+   /**
+    * @return String of the NodeRef for the dashboard template used by the space if any 
+    */
+   public String getTemplateRef()
+   {
+      NodeRef ref = (NodeRef)getSpace().getProperties().get(ContentModel.PROP_TEMPLATE);
+      return ref != null ? ref.toString() : null;
+   }
+   
+   /**
+    * Returns a model for use by a template on the Space Details page.
+    * 
+    * @return model containing current current space info.
+    */
+   public Map getTemplateModel()
+   {
+      HashMap model = new HashMap(1, 1.0f);
+      
+      FacesContext fc = FacesContext.getCurrentInstance();
+      TemplateNode spaceNode = new TemplateNode(getSpace().getNodeRef(), Repository.getServiceRegistry(fc),
+            new TemplateImageResolver() {
+               public String resolveImagePathForName(String filename, boolean small) {
+                  return Utils.getFileTypeImage(filename, small);
+               }
+            });
+      model.put("space", spaceNode);
+      
+      return model;
+   }
+   
+   /**
+    * @return the list of available Content Templates that can be applied to the current document.
+    */
+   public SelectItem[] getTemplates()
+   {
+      // get the template from the special Content Templates folder
+      FacesContext context = FacesContext.getCurrentInstance();
+      String xpath = Application.getRootPath(context) + "/" + 
+            Application.getGlossaryFolderName(context) + "/" +
+            Application.getContentTemplatesFolderName(context) + "//*";
+      NodeRef rootNodeRef = this.nodeService.getRootNode(Repository.getStoreRef());
+      NamespaceService resolver = Repository.getServiceRegistry(context).getNamespaceService();
+      List<NodeRef> results = Repository.getServiceRegistry(context).getSearchService().selectNodes(
+            rootNodeRef, xpath, null, resolver, false);
+      
+      List<SelectItem> templates = new ArrayList<SelectItem>(results.size());
+      if (results.size() != 0)
+      {
+         DictionaryService dd = Repository.getServiceRegistry(context).getDictionaryService();
+         for (NodeRef ref : results)
+         {
+            Node childNode = new Node(ref);
+            if (dd.isSubClass(childNode.getType(), ContentModel.TYPE_CONTENT))
+            {
+               templates.add(new SelectItem(childNode.getId(), childNode.getName()));
+            }
+         }
+         
+         // make sure the list is sorted by the label
+         QuickSort sorter = new QuickSort(templates, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+         sorter.sort();
+      }
+      
+      return templates.toArray(new SelectItem[templates.size()]);
+   }
+   
    
    // ------------------------------------------------------------------------------
    // Action event handlers
+   
+   /**
+    * Action handler to apply the selected Template and Templatable aspect to the current Space
+    */
+   public String applyTemplate()
+   {
+      try
+      {
+         // apply the templatable aspect if required 
+         if (getSpace().hasAspect(ContentModel.ASPECT_TEMPLATABLE) == false)
+         {
+            this.nodeService.addAspect(getSpace().getNodeRef(), ContentModel.ASPECT_TEMPLATABLE, null);
+         }
+         
+         // get the selected template from the Template Picker
+         NodeRef templateRef = new NodeRef(Repository.getStoreRef(), this.template);
+         
+         // set the template NodeRef into the templatable aspect property
+         this.nodeService.setProperty(getSpace().getNodeRef(), ContentModel.PROP_TEMPLATE, templateRef); 
+         
+         // reset space details for next refresh of details page
+         getSpace().reset();
+      }
+      catch (Exception e)
+      {
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), e.getMessage()), e);
+      }
+      return OUTCOME_RETURN;
+   }
+   
+   /**
+    * Action handler to remove a dashboard template from the current Space
+    */
+   public String removeTemplate()
+   {
+      try
+      {
+         // clear template property
+         this.nodeService.setProperty(getSpace().getNodeRef(), ContentModel.PROP_TEMPLATE, null);
+         this.nodeService.removeAspect(getSpace().getNodeRef(), ContentModel.ASPECT_TEMPLATABLE);
+         
+         // reset space details for next refresh of details page
+         getSpace().reset();
+      }
+      catch (Exception e)
+      {
+         Utils.addErrorMessage(MessageFormat.format(Application.getMessage(
+               FacesContext.getCurrentInstance(), Repository.ERROR_GENERIC), e.getMessage()), e);
+      }
+      return OUTCOME_RETURN;
+   }
    
    /**
     * Navigates to next item in the list of Spaces
@@ -142,7 +322,7 @@ public class SpaceDetailsBean
                   this.browseBean.setupSpaceAction(next.getId(), false);
                }
             }
-         }
+        }
       }
    }
    

@@ -83,6 +83,9 @@ public class BrowseBean implements IContextListener
    // ------------------------------------------------------------------------------
    // Construction 
 
+   private static final String VIEWMODE_DASHBOARD = "dashboard";
+
+
    /**
     * Default Constructor
     */
@@ -161,6 +164,31 @@ public class BrowseBean implements IContextListener
    public void setBrowseViewMode(String browseViewMode)
    {
       this.browseViewMode = browseViewMode;
+   }
+   
+   /**
+    * @return Returns true if dashboard view is available for the current node.
+    */
+   public boolean isDashboardView()
+   {
+      return this.dashboardView;
+   }
+
+   /**
+    * @param dashboardView The dashboard view mode to set.
+    */
+   public void setDashboardView(boolean dashboardView)
+   {
+      this.dashboardView = dashboardView;
+      if (dashboardView == true)
+      {
+         FacesContext fc = FacesContext.getCurrentInstance();
+         fc.getApplication().getNavigationHandler().handleNavigation(fc, null, "dashboard");
+      }
+      else
+      {
+         navigateBrowseScreen();
+      }
    }
    
    /**
@@ -300,22 +328,6 @@ public class BrowseBean implements IContextListener
    }
    
    /**
-    * @return Returns the emptyContentMessage.
-    */
-   public String getEmptyContentMessage()
-   {
-      return this.emptyContentMessage;
-   }
-
-   /**
-    * @return Returns the emptySpacesMessage.
-    */
-   public String getEmptySpacesMessage()
-   {
-      return this.emptySpacesMessage;
-   }
-   
-   /**
     * Page accessed bean method to get the container nodes currently being browsed
     * 
     * @return List of container Node objects for the current browse location
@@ -390,11 +402,11 @@ public class BrowseBean implements IContextListener
       node.addPropertyResolver("url", this.resolverUrl);
       node.addPropertyResolver("fileType16", this.resolverFileType16);
       node.addPropertyResolver("fileType32", this.resolverFileType32);
-      node.addPropertyResolver("templatable", this.resolverTemplatable);
       node.addPropertyResolver("size", this.resolverSize);
       node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
       node.addPropertyResolver("checkIn", this.resolverCheckIn);
    }
+   
    
    // ------------------------------------------------------------------------------
    // IContextListener implementation 
@@ -423,29 +435,43 @@ public class BrowseBean implements IContextListener
       // get the view mode ID
       String viewMode = viewList.getValue().toString();
       
-      // set the page size based on the style of display
-      if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(viewMode))
-      {
-         setBrowsePageSize(this.clientConfig.getDetailsPageSize());
-      }
-      else if (RichListRenderer.IconViewRenderer.VIEWMODEID.equals(viewMode))
-      {
-         setBrowsePageSize(this.clientConfig.getIconsPageSize());
-      }
-      else if (RichListRenderer.ListViewRenderer.VIEWMODEID.equals(viewMode))
-      {
-         setBrowsePageSize(this.clientConfig.getListPageSize());
+      if (VIEWMODE_DASHBOARD.equals(viewMode) == false)
+      { 
+         // set the page size based on the style of display
+         if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(viewMode))
+         {
+            setBrowsePageSize(this.clientConfig.getDetailsPageSize());
+         }
+         else if (RichListRenderer.IconViewRenderer.VIEWMODEID.equals(viewMode))
+         {
+            setBrowsePageSize(this.clientConfig.getIconsPageSize());
+         }
+         else if (RichListRenderer.ListViewRenderer.VIEWMODEID.equals(viewMode))
+         {
+            setBrowsePageSize(this.clientConfig.getListPageSize());
+         }
+         else
+         {
+            // in case another view mode appears we should have a default
+            setBrowsePageSize(10);
+         }
+         if (logger.isDebugEnabled())
+            logger.debug("Browse view page size set to: " + getBrowsePageSize());
+         
+         // in case we left for dashboard screen
+         if (isDashboardView() == true)
+         {
+            setDashboardView(false);
+         }
+         
+         // push the view mode into the lists
+         setBrowseViewMode(viewMode);
       }
       else
       {
-         // in case another view mode appears we should have a default
-         setBrowsePageSize(10);
+         // special case for Dashboard view
+         setDashboardView(true);
       }
-      if (logger.isDebugEnabled())
-         logger.debug("Browse view page size set to: " + getBrowsePageSize());
-      
-      // push the view mode into the lists
-      setBrowseViewMode(viewMode);
    }
    
    
@@ -508,7 +534,6 @@ public class BrowseBean implements IContextListener
                      // create our Node representation
                      MapNode node = new MapNode(nodeRef, this.nodeService, true);
                      node.addPropertyResolver("icon", this.resolverSpaceIcon);
-                     node.addPropertyResolver("templatable", this.resolverTemplatable);
                      
                      this.containerNodes.add(node);
                   }
@@ -624,7 +649,6 @@ public class BrowseBean implements IContextListener
                         node.addPropertyResolver("path", this.resolverPath);
                         node.addPropertyResolver("displayPath", this.resolverDisplayPath);
                         node.addPropertyResolver("icon", this.resolverSpaceIcon);
-                        node.addPropertyResolver("templatable", this.resolverTemplatable);
                         
                         this.containerNodes.add(node);
                      }
@@ -690,6 +714,7 @@ public class BrowseBean implements IContextListener
          logger.debug("Time to query and build map nodes: " + (endTime - startTime) + "ms");
       }
    }
+   
    
    // ------------------------------------------------------------------------------
    // Property Resolvers
@@ -780,12 +805,6 @@ public class BrowseBean implements IContextListener
          QNameNodeMap props = (QNameNodeMap)node.getProperties();
          String icon = (String)props.getRaw("app:icon");
          return (icon != null ? icon : NewSpaceWizard.SPACE_ICON_DEFAULT);
-      }
-   };
-   
-   public NodePropertyResolver resolverTemplatable = new NodePropertyResolver() {
-      public Object get(Node node) {
-         return Boolean.valueOf(node.hasAspect(ContentModel.ASPECT_TEMPLATABLE));
       }
    };
    
@@ -1284,7 +1303,8 @@ public class BrowseBean implements IContextListener
       
       // set the current node Id ready for page refresh
       this.navigator.setCurrentNodeId(ref.getId());
-
+      
+      // set up the dispatch context for the navigation handler
       this.navigator.setupDispatchContext(new Node(ref));
       
       navigateBrowseScreen();
@@ -1347,6 +1367,7 @@ public class BrowseBean implements IContextListener
       fc.getApplication().getNavigationHandler().handleNavigation(fc, null, outcome);
    }
    
+   
    // ------------------------------------------------------------------------------
    // Inner classes
    
@@ -1381,7 +1402,7 @@ public class BrowseBean implements IContextListener
        * @see org.alfresco.web.ui.common.component.IBreadcrumbHandler#navigationOutcome(org.alfresco.web.ui.common.component.UIBreadcrumb)
        */
       @SuppressWarnings("unchecked")
-    public String navigationOutcome(UIBreadcrumb breadcrumb)
+      public String navigationOutcome(UIBreadcrumb breadcrumb)
       {
          // All browse breadcrumb element relate to a Node Id - when selected we
          // set the current node id
@@ -1463,6 +1484,6 @@ public class BrowseBean implements IContextListener
    /** The current browse view page size */
    private int browsePageSize;
    
-   private String emptySpacesMessage = null;
-   private String emptyContentMessage = null;
+   /** True if current space has a dashboard (template) view available */
+   private boolean dashboardView;
 }

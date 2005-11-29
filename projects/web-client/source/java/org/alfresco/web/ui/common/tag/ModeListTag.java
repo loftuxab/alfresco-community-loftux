@@ -52,6 +52,8 @@ public class ModeListTag extends HtmlComponentTag
       setStringProperty(component, "labelStyleClass", this.labelStyleClass);
       setStringProperty(component, "itemStyle", this.itemStyle);
       setStringProperty(component, "itemStyleClass", this.itemStyleClass);
+      setStringProperty(component, "disabledStyle", this.disabledStyle);
+      setStringProperty(component, "disabledStyleClass", this.disabledStyleClass);
       setStringProperty(component, "itemLinkStyle", this.itemLinkStyle);
       setStringProperty(component, "itemLinkStyleClass", this.itemLinkStyleClass);
       setStringProperty(component, "selectedStyle", this.selectedStyle);
@@ -80,6 +82,8 @@ public class ModeListTag extends HtmlComponentTag
       this.itemStyleClass = null;
       this.itemLinkStyle = null;
       this.itemLinkStyleClass = null;
+      this.disabledStyle = null;
+      this.disabledStyleClass = null;
       this.selectedStyle = null;
       this.selectedStyleClass = null;
       this.selectedLinkStyle = null;
@@ -295,6 +299,33 @@ public class ModeListTag extends HtmlComponentTag
    {
       this.disabled = disabled;
    }
+   
+   /**
+    * Set the disabledStyle
+    *
+    * @param disabledStyle     the disabledStyle
+    */
+   public void setDisabledStyle(String disabledStyle)
+   {
+      this.disabledStyle = disabledStyle;
+   }
+
+   /**
+    * Set the disabledStyleClass
+    *
+    * @param disabledStyleClass     the disabledStyleClass
+    */
+   public void setDisabledStyleClass(String disabledStyleClass)
+   {
+      this.disabledStyleClass = disabledStyleClass;
+   }
+
+
+   /** the disabledStyle */
+   private String disabledStyle;
+
+   /** the disabledStyleClass */
+   private String disabledStyleClass;
 
    /** the selectedImage */
    private String selectedImage;

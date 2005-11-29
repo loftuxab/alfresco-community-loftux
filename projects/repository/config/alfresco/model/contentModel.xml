@@ -292,7 +292,7 @@
          <title>Templatable</title>
          <properties>
             <property name="cm:template">
-               <title>Tempate</title>
+               <title>Template</title>
                <type>d:noderef</type>
                <mandatory>false</mandatory>
             </property>

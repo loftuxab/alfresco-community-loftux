@@ -144,14 +144,44 @@
                         <tr>
                            <td width="100%" valign="top">
                               <%-- wrapper comment used by the panel to add additional component facets --%>
-                              <h:column id="props-panel-facets">
+                              <h:panelGroup id="dashboard-panel-facets">
+                                 <f:facet name="title">
+                                    <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write" id="evalChange">
+                                       <a:actionLink id="actModify" value="#{msg.modify}" action="applyTemplate" showLink="false" image="/images/icons/preview.gif" style="padding-right:8px" />
+                                       <a:actionLink id="actRemove" value="#{msg.remove}" action="#{SpaceDetailsBean.removeTemplate}" showLink="false" image="/images/icons/delete.gif" />
+                                    </r:permissionEvaluator>
+                                 </f:facet>
+                              </h:panelGroup>
+                              <a:panel label="#{msg.dashboard_view}" id="dashboard-panel" progressive="true" facetsId="dashboard-panel-facets"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
+                                 <table width=100% cellspacing=0 cellpadding=0 border=0>
+                                    <tr>
+                                       <td align=left>
+                                          <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write" id="evalApply">
+                                             <a:actionLink id="actDashboard" value="#{msg.apply_dashboard}" rendered="#{SpaceDetailsBean.templatable == false}"
+                                                   action="applyTemplate" />
+                                          </r:permissionEvaluator>
+                                          <a:panel id="template-panel" rendered="#{SpaceDetailsBean.templatable == true}">
+                                             <div style="padding:4px;border: 1px dashed #cccccc">
+                                                <r:template id="dashboard" template="#{SpaceDetailsBean.templateRef}" model="#{SpaceDetailsBean.templateModel}" />
+                                             </div>
+                                          </a:panel>
+                                       </td>
+                                    </tr>
+                                 </table>
+                              </a:panel>
+                              
+                              <br/>
+                              
+                              <%-- wrapper comment used by the panel to add additional component facets --%>
+                              <h:panelGroup id="props-panel-facets">
                                  <f:facet name="title">
                                     <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write">
                                        <a:actionLink id="titleLink1" value="#{msg.modify}" showLink="false" image="/images/icons/Change_details.gif"
                                              action="editSpaceProperties" actionListener="#{EditSpaceDialog.startWizardForEdit}" />
                                     </r:permissionEvaluator>
                                  </f:facet>
-                              </h:column>
+                              </h:panelGroup>
                               <a:panel label="#{msg.properties}" id="properties-panel" facetsId="props-panel-facets"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE" progressive="true">
                                  <table cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -184,6 +214,7 @@
                               </a:panel>
                               
                               <br/>
+                              
                               <h:column id="rules-panel-facets">
                                  <f:facet name="title">
                                     <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write">

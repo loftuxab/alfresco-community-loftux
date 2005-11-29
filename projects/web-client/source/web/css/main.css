@@ -351,6 +351,11 @@ a.topToolbarLinkHighlight, a.topToolbarLinkHighlight:link, a.topToolbarLinkHighl
    border-width:1px;
 }
 
+.statusListDisabled
+{
+   color: #93a8b2;
+}
+
 .inlineAction
 {
    padding-right:3px;

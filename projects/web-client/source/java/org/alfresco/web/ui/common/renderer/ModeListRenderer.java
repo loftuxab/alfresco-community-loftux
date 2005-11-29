@@ -213,6 +213,8 @@ public class ModeListRenderer extends BaseRenderer
             else
             {
                out.write("<span");
+               outputAttribute(out, attrs.get("disabledStyleClass"), "class");
+               outputAttribute(out, attrs.get("disabledStyle"), "style");
             }
             
             // render style for the item link
