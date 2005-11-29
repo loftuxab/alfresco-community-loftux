@@ -757,6 +757,45 @@
     	</property>
     </bean>
     
+    
+    
+     <!-- Authentication Service -->
+    
+    <bean id="AuthenticationService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    		<value>org.alfresco.service.cmr.security.AuthenticationService</value>
+    	</property>
+    	<property name="target"><ref bean="authenticationServiceImpl"/></property>
+    	<property name="interceptorNames">
+    		<list>
+    		    <idref local="AuthenticationService_transaction" />
+                <idref local="exceptionTranslator" />
+                <idref bean="AuthenticationService_security" />
+    			<idref local="AuthenticationService_descriptor" />
+    		</list>
+    	</property>
+    </bean>
+
+    <bean id="AuthenticationService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="AuthenticationService_descriptor" parent="AlfrescoServiceDescriptor">
+    	<property name="interface">
+    		<value>org.alfresco.service.cmr.security.AuthenticationService</value>
+    	</property>
+    	<property name="description">
+    		<value>AuthenticationService Service</value>
+    	</property>
+    </bean>
+    
     <!-- Template Service -->
     <bean id="TemplateService" class="org.springframework.aop.framework.ProxyFactoryBean">
     	<property name="proxyInterfaces">

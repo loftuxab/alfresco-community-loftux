@@ -585,6 +585,12 @@
         </property>
     </bean>
    
+   <!-- =============================================== -->
+   <!-- The Authentication Service security interceptor -->
+   <!-- =============================================== -->
+   
+   <bean id="AuthenticationService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   
     <!-- =================== -->
     <!-- The Ownable Service -->
     <!-- =================== -->

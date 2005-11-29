@@ -84,6 +84,8 @@ public class AuthenticationTest extends TestCase
     private TicketComponent ticketComponent;
 
     private AuthenticationService authenticationService;
+    
+    private AuthenticationService pubAuthenticationService;
 
     private AuthenticationComponent authenticationComponent;
     
@@ -110,6 +112,7 @@ public class AuthenticationTest extends TestCase
         passwordEncoder = (MD4PasswordEncoder) ctx.getBean("passwordEncoder");
         ticketComponent = (TicketComponent) ctx.getBean("ticketComponent");
         authenticationService = (AuthenticationService) ctx.getBean("authenticationService");
+        pubAuthenticationService = (AuthenticationService) ctx.getBean("AuthenticationService");
         authenticationComponent = (AuthenticationComponent) ctx.getBean("authenticationComponent");
         permissionServiceSPI = (PermissionServiceSPI) ctx.getBean("permissionService");
         
@@ -602,6 +605,78 @@ public class AuthenticationTest extends TestCase
         // assertNull(dao.getUserOrNull("Andy"));
     }
 
+    
+    public void testPubAuthenticationService()
+    {
+        pubAuthenticationService.createAuthentication("GUEST", "".toCharArray());
+        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
+
+        // create an authentication object e.g. the user
+        pubAuthenticationService.createAuthentication("Andy", "auth1".toCharArray());
+
+        // authenticate with this user details
+        pubAuthenticationService.authenticate("Andy", "auth1".toCharArray());
+
+        // assert the user is authenticated
+        assertEquals(dao.getUserNamesAreCaseSensitive() ? "Andy" : "andy", authenticationService.getCurrentUserName());
+        // delete the user authentication object
+
+        pubAuthenticationService.clearCurrentSecurityContext();
+        pubAuthenticationService.deleteAuthentication("Andy");
+
+        // create a new authentication user object
+        pubAuthenticationService.createAuthentication("Andy", "auth2".toCharArray());
+        // change the password
+        pubAuthenticationService.setAuthentication("Andy", "auth3".toCharArray());
+        // authenticate again to assert password changed
+        pubAuthenticationService.authenticate("Andy", "auth3".toCharArray());
+
+        try
+        {
+            pubAuthenticationService.authenticate("Andy", "auth1".toCharArray());
+            assertNotNull(null);
+        }
+        catch (AuthenticationException e)
+        {
+
+        }
+        try
+        {
+            pubAuthenticationService.authenticate("Andy", "auth2".toCharArray());
+            assertNotNull(null);
+        }
+        catch (AuthenticationException e)
+        {
+
+        }
+
+        // get the ticket that represents the current user authentication
+        // instance
+        String ticket = pubAuthenticationService.getCurrentTicket();
+        // validate our ticket is still valid
+        pubAuthenticationService.validate(ticket);
+
+        // destroy the ticket instance
+        pubAuthenticationService.invalidateTicket(ticket);
+        try
+        {
+            pubAuthenticationService.validate(ticket);
+            assertNotNull(null);
+        }
+        catch (AuthenticationException e)
+        {
+
+        }
+
+        // clear any context and check we are no longer authenticated
+        pubAuthenticationService.clearCurrentSecurityContext();
+        assertNull(pubAuthenticationService.getCurrentUserName());
+
+        dao.deleteUser("Andy");
+        // assertNull(dao.getUserOrNull("Andy"));
+    }
+
+    
     public void testPassThroughLogin()
     {
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
