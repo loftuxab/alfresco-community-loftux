@@ -114,7 +114,7 @@ public class RepositoryImpl implements Repository
         descriptors.put(Repository.SPEC_NAME_DESC, "Content Repository API for Java(TM) Technology Specification");
         descriptors.put(Repository.SPEC_VERSION_DESC, "1.0");
         descriptors.put(Repository.LEVEL_1_SUPPORTED, "true");
-        descriptors.put(Repository.LEVEL_2_SUPPORTED, "true");
+//        descriptors.put(Repository.LEVEL_2_SUPPORTED, "true");
         descriptors.put(Repository.OPTION_TRANSACTIONS_SUPPORTED, "true");
         descriptors.put(Repository.OPTION_LOCKING_SUPPORTED, "true");
         descriptors.put(Repository.QUERY_XPATH_DOC_ORDER, "true");

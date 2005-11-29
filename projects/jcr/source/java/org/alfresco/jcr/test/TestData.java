@@ -48,6 +48,7 @@ public class TestData
     {
         ApplicationContext context = new ClassPathXmlApplicationContext("org/alfresco/jcr/test/test-context.xml");
         generateTestData(context, TEST_WORKSPACE);
+        System.out.println("Generated TCK test data to workspace: " + TEST_WORKSPACE);
     }
 
     /**
@@ -106,7 +107,12 @@ public class TestData
                 
                 PermissionService permissionService = (PermissionService)applicationContext.getBean(ServiceRegistry.PERMISSIONS_SERVICE.getLocalName());
                 NodeService nodeService = (NodeService)applicationContext.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
-                permissionService.setPermission(nodeService.getRootNode(storeRef), PermissionService.ALL_AUTHORITIES, PermissionService.ALL_PERMISSIONS, true);
+
+//                permissionService.setPermission(nodeService.getRootNode(storeRef), PermissionService.ALL_AUTHORITIES, PermissionService.ALL_PERMISSIONS, true);
+                permissionService.setPermission(nodeService.getRootNode(storeRef), "superuser", PermissionService.ALL_PERMISSIONS, true);
+                permissionService.setPermission(nodeService.getRootNode(storeRef), "anonymous", PermissionService.READ, true);
+                permissionService.setPermission(nodeService.getRootNode(storeRef), "user", PermissionService.READ, true);
+                permissionService.setPermission(nodeService.getRootNode(storeRef), "user", PermissionService.WRITE, true);
             }
             finally
             {

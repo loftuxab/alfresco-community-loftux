@@ -35,14 +35,9 @@ public class BaseJCRTest extends BaseSpringTest
     protected Repository repository;
     protected StoreRef storeRef;
     
-    protected AuthenticationComponent authenticationComponent;
-    
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
-        authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
-        authenticationComponent.setSystemUserAsCurrentUser();
-        
         storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         TestData.generateTestData(applicationContext, storeRef.getIdentifier());
         RepositoryImpl repositoryImpl = (RepositoryImpl)applicationContext.getBean(RepositoryFactory.REPOSITORY_BEAN);
@@ -53,6 +48,7 @@ public class BaseJCRTest extends BaseSpringTest
     @Override
     protected void onTearDownInTransaction()
     {
+        AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
         authenticationComponent.clearCurrentSecurityContext();
         super.onTearDownInTransaction();
     }

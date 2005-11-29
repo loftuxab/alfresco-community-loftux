@@ -69,6 +69,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
 import org.alfresco.service.cmr.view.Location;
@@ -419,7 +421,49 @@ public class SessionImpl implements Session
      */
     public void checkPermission(String absPath, String actions) throws AccessControlException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        // locate noderef for path
+        NodeService nodeService = getRepositoryImpl().getServiceRegistry().getNodeService();
+        NodeRef rootRef = nodeService.getRootNode(getWorkspaceStore());
+        NodeRef nodeRef = ItemResolver.getNodeRef(this, rootRef, absPath);
+        if (nodeRef == null)
+        {
+            throw new AccessControlException("Unable to determine access control for path " + absPath);
+        }
+        
+        // test each of the actions specified
+        PermissionService permissionService = getRepositoryImpl().getServiceRegistry().getPermissionService();
+        String[] checkActions = actions.split(",");
+        for (String checkAction : checkActions)
+        {
+            checkAction = checkAction.trim();
+            AccessStatus accessStatus = null;
+            if (checkAction.equals("add_node"))
+            {
+                accessStatus = permissionService.hasPermission(nodeRef, PermissionService.ADD_CHILDREN);
+            }
+            else if (checkAction.equals("set_property"))
+            {
+                accessStatus = permissionService.hasPermission(nodeRef, PermissionService.WRITE_PROPERTIES);
+            }
+            else if (checkAction.equals("remove"))
+            {
+                accessStatus = permissionService.hasPermission(nodeRef, PermissionService.DELETE);
+            }
+            else if (checkAction.equals("read"))
+            {
+                accessStatus = permissionService.hasPermission(nodeRef, PermissionService.READ);
+            }
+            else
+            {
+                throw new RepositoryException("Permission " + checkAction + " is unknown.");
+            }
+            
+            // abort if permission not granted
+            if (accessStatus == AccessStatus.DENIED)
+            {
+                throw new AccessControlException("Permission " + checkAction + " not granted on path " + absPath);
+            }
+        }
     }
 
     /* (non-Javadoc)
