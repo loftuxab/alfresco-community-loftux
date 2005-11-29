@@ -24,6 +24,7 @@ import org.alfresco.example.webservice.repository.UpdateResult;
 import org.alfresco.example.webservice.types.CML;
 import org.alfresco.example.webservice.types.CMLAddAspect;
 import org.alfresco.example.webservice.types.CMLCreate;
+import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.Node;
 import org.alfresco.example.webservice.types.ParentReference;
 import org.alfresco.example.webservice.types.Predicate;
@@ -31,6 +32,7 @@ import org.alfresco.example.webservice.types.Reference;
 import org.alfresco.example.webservice.types.Store;
 import org.alfresco.example.webservice.types.StoreEnum;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 
 /**
  * Web service sample 4
@@ -65,7 +67,9 @@ public class WebServiceSample4
         ParentReference parentReference = new ParentReference(ContentModel.ASSOC_CONTAINS.toString(), ContentModel.ASSOC_CONTAINS.toString());
         parentReference.setStore(store);
         parentReference.setUuid(folder.getUuid());
-        CMLCreate create = new CMLCreate("id1", parentReference, ContentModel.TYPE_CONTENT.toString(), null);        
+        String mimeType = MimetypeMap.MIMETYPE_TEXT_PLAIN;
+        NamedValue[] values = new NamedValue[]{new NamedValue(ContentModel.PROP_CONTENT.toString(), "contentUrl=|mimetype=" + mimeType + "|size=|encoding=UTF-8")};
+        CMLCreate create = new CMLCreate("id1", parentReference, ContentModel.TYPE_CONTENT.toString(), values);        
         CMLAddAspect addAspect = new CMLAddAspect(ContentModel.ASPECT_VERSIONABLE.toString(), null, null, "id1");
         CML cml = new CML();
         cml.setCreate(new CMLCreate[]{create});
@@ -88,6 +92,12 @@ public class WebServiceSample4
             if (destination != null)
             {
                 destinationId = destination.getUuid();
+            }
+            
+            if ("create".equals(updateResult.getStatement()) == true)
+            {
+                // Check that we can set some content
+                WebServiceSample3.getContentWebService().write(destination, "some content".getBytes());
             }
             
             System.out.println(

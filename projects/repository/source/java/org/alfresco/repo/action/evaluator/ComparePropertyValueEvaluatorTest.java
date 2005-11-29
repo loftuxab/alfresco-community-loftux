@@ -370,6 +370,20 @@ public class ComparePropertyValueEvaluatorTest extends BaseSpringTest
     }
     
     /**
+     * Test some combinations of test file names that had been failing 
+     */
+    public void testTempFileNames()
+    {
+        ActionConditionImpl condition = new ActionConditionImpl(GUID.generate(), ComparePropertyValueEvaluator.NAME);
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_PROPERTY, PROP_TEXT);
+        
+        condition.setParameterValue(ComparePropertyValueEvaluator.PARAM_VALUE, "~*.doc");
+        this.nodeService.setProperty(this.nodeRef, PROP_TEXT, "~1234.doc");
+        
+        assertTrue(this.evaluator.evaluate(condition, this.nodeRef));
+    }
+    
+    /**
      * Test comparison of properties that do not have a registered comparitor
      */
     public void testOtherComparison()

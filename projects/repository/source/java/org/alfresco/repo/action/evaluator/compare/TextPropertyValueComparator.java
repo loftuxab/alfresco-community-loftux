@@ -128,7 +128,11 @@ public class TextPropertyValueComparator implements PropertyValueComparator
         StringBuilder builder = new StringBuilder(matchText.length());
         for (char charValue : matchText.toCharArray()) 
         {
-            if (getEscapeCharList().contains(charValue) == true)
+            if (charValue == '*')
+            {
+                builder.append(".");
+            }
+            else if (getEscapeCharList().contains(charValue) == true)
             {
                 builder.append("\\");
             }
@@ -152,11 +156,19 @@ public class TextPropertyValueComparator implements PropertyValueComparator
     {
         if (ESCAPE_CHAR_LIST == null)
         {
+            //([{\^$|)?*+.
             ESCAPE_CHAR_LIST = new ArrayList<Character>(4);
             ESCAPE_CHAR_LIST.add('.');
             ESCAPE_CHAR_LIST.add('^');
-            ESCAPE_CHAR_LIST.add('*');
             ESCAPE_CHAR_LIST.add('$');
+            ESCAPE_CHAR_LIST.add('(');
+            ESCAPE_CHAR_LIST.add('[');
+            ESCAPE_CHAR_LIST.add('{');
+            ESCAPE_CHAR_LIST.add('\\');
+            ESCAPE_CHAR_LIST.add('|');
+            ESCAPE_CHAR_LIST.add(')');
+            ESCAPE_CHAR_LIST.add('?');
+            ESCAPE_CHAR_LIST.add('+');
         }
         return ESCAPE_CHAR_LIST;
     }
