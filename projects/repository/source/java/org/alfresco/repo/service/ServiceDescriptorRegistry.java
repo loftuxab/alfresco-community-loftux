@@ -37,6 +37,7 @@ import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.version.VersionService;
@@ -141,6 +142,14 @@ public class ServiceDescriptorRegistry
     public NodeService getNodeService()
     {
         return (NodeService)getService(NODE_SERVICE);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.repo.service.ServiceRegistry#getNodeService()
+     */
+    public AuthenticationService getAuthenticationService()
+    {
+        return (AuthenticationService)getService(AUTHENTICATION_SERVICE);
     }
 
     /* (non-Javadoc)

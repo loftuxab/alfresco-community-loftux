@@ -23,7 +23,7 @@
 
 	 <!-- Descriptor Service -->
 
-    <bean id="descriptorComponent" class="org.alfresco.repo.descriptor.DescriptorServiceImpl">
+    <bean id="descriptorComponent" class="org.alfresco.repo.descriptor.DescriptorServiceImpl" init-method="init">
        <property name="serverDescriptor">
 	       <value>classpath:alfresco/version.properties</value>
        </property>

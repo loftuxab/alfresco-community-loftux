@@ -62,7 +62,7 @@ public class XPathQueryImpl extends QueryImpl
         NodeService nodes = getSession().getRepositoryImpl().getServiceRegistry().getNodeService();
         NodeRef root = nodes.getRootNode(getSession().getWorkspaceStore());
         List<NodeRef> nodeRefs = search.selectNodes(root, getStatement(), null, getSession().getNamespaceResolver(), false, SearchService.LANGUAGE_JCR_XPATH);
-        return new NodeRefListQueryResultImpl(getSession(), nodeRefs);
+        return new NodeRefListQueryResultImpl(getSession(), nodeRefs).getProxy();
     }
 
     /* (non-Javadoc)

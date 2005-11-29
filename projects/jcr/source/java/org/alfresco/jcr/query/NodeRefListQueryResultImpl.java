@@ -25,11 +25,13 @@ import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.PropertyDefinition;
+import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.RowIterator;
 
 import org.alfresco.jcr.item.NodeRefNodeIteratorImpl;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -54,6 +56,9 @@ public class NodeRefListQueryResultImpl implements QueryResult
     /** Column Names */
     private Map<QName, PropertyDefinition> columns = null; 
     
+    /** Proxy */
+    private QueryResult proxy = null;
+    
     
     /**
      * Construct
@@ -65,6 +70,20 @@ public class NodeRefListQueryResultImpl implements QueryResult
         this.session = session;
         this.nodeRefs = nodeRefs;
         this.nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();        
+    }
+
+    /**
+     * Get proxied JCR Query Result
+     * 
+     * @return  proxy
+     */
+    public QueryResult getProxy()
+    {
+        if (proxy == null)
+        {
+            proxy = (QueryResult)JCRProxyFactory.create(this, QueryResult.class, session);
+        }
+        return proxy;
     }
 
     /* (non-Javadoc)
@@ -87,7 +106,7 @@ public class NodeRefListQueryResultImpl implements QueryResult
      */
     public RowIterator getRows() throws RepositoryException
     {
-        return new NodeRefRowIteratorImpl(session, getColumnDefinitions(), nodeRefs);
+        return new NodeRefRowIteratorImpl(session, getColumnDefinitions(), nodeRefs).getProxy();
     }
 
     /* (non-Javadoc)

@@ -30,9 +30,10 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.debug.NodeStoreInspector;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+
 
 public class TestData
 {
@@ -76,8 +77,7 @@ public class TestData
 
         try
         {
-            AuthenticationComponent authenticationComponent = (AuthenticationComponent) applicationContext
-                    .getBean("authenticationComponent");
+            AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
             authenticationComponent.setSystemUserAsCurrentUser();
 
             try
@@ -86,16 +86,11 @@ public class TestData
                 StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, workspaceName);
 
                 ImporterBootstrap bootstrap = new ImporterBootstrap();
-                bootstrap.setAuthenticationComponent((AuthenticationComponent) applicationContext
-                        .getBean("authenticationComponent"));
-                bootstrap.setImporterService((ImporterService) applicationContext
-                        .getBean(ServiceRegistry.IMPORTER_SERVICE.getLocalName()));
-                bootstrap.setNodeService((NodeService) applicationContext.getBean(ServiceRegistry.NODE_SERVICE
-                        .getLocalName()));
-                bootstrap.setNamespaceService((NamespaceService) applicationContext
-                        .getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName()));
-                bootstrap.setTransactionService((TransactionService) applicationContext
-                        .getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName()));
+                bootstrap.setAuthenticationComponent((AuthenticationComponent) applicationContext.getBean("authenticationComponent"));
+                bootstrap.setImporterService((ImporterService) applicationContext.getBean(ServiceRegistry.IMPORTER_SERVICE.getLocalName()));
+                bootstrap.setNodeService((NodeService) applicationContext.getBean(ServiceRegistry.NODE_SERVICE.getLocalName()));
+                bootstrap.setNamespaceService((NamespaceService) applicationContext.getBean(ServiceRegistry.NAMESPACE_SERVICE.getLocalName()));
+                bootstrap.setTransactionService((TransactionService) applicationContext.getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName()));
                 bootstrap.setStoreUrl(storeRef.toString());
 
                 List<Properties> views = new ArrayList<Properties>();
@@ -108,12 +103,9 @@ public class TestData
 
                 // Bootstrap clears security context
                 authenticationComponent.setSystemUserAsCurrentUser();
-                System.out.println(NodeStoreInspector.dumpNodeStore((NodeService) applicationContext
-                        .getBean(ServiceRegistry.NODE_SERVICE.getLocalName()), storeRef));
                 
-                PermissionService  permissionService = (PermissionService)applicationContext.getBean(ServiceRegistry.PERMISSIONS_SERVICE.getLocalName());
-                NodeService nodeService = (NodeService) applicationContext.getBean(ServiceRegistry.NODE_SERVICE
-                        .getLocalName());
+                PermissionService permissionService = (PermissionService)applicationContext.getBean(ServiceRegistry.PERMISSIONS_SERVICE.getLocalName());
+                NodeService nodeService = (NodeService)applicationContext.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
                 permissionService.setPermission(nodeService.getRootNode(storeRef), PermissionService.ALL_AUTHORITIES, PermissionService.ALL_PERMISSIONS, true);
             }
             finally

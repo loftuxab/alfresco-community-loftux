@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.Value;
@@ -103,8 +104,8 @@ public class PropertyMapRowImpl implements Row
         if (propertyName.equals(QueryManagerImpl.JCRPATH_COLUMN))
         {
             // derive path from node ref
-            NodeImpl nodeImpl = new NodeImpl(session, nodeRef);
-            value = new ValueImpl(session, PropertyType.STRING, nodeImpl.getPath());
+            Node node = new NodeImpl(session, nodeRef).getProxy();
+            value = new ValueImpl(session, PropertyType.STRING, node.getPath());
         }
         else if (propertyName.equals(QueryManagerImpl.JCRSCORE_COLUMN))
         {

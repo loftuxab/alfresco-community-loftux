@@ -48,7 +48,6 @@ public class BaseJCRTest extends BaseSpringTest
         RepositoryImpl repositoryImpl = (RepositoryImpl)applicationContext.getBean(RepositoryFactory.REPOSITORY_BEAN);
         repositoryImpl.setDefaultWorkspace(storeRef.getIdentifier());
         repository = repositoryImpl;
-        authenticationComponent.setSystemUserAsCurrentUser();
     }
 
     @Override

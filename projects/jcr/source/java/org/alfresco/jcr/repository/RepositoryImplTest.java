@@ -37,7 +37,7 @@ public class RepositoryImplTest extends BaseJCRTest
     public void testDescriptors()
     {
         String[] keys = repository.getDescriptorKeys();
-        assertEquals(10, keys.length);
+        assertEquals(12, keys.length);
         for (String key : keys)
         {
             String value = repository.getDescriptor(key);
@@ -45,16 +45,19 @@ public class RepositoryImplTest extends BaseJCRTest
         }
         
         assertNotNull(repository.getDescriptor(Repository.REP_NAME_DESC));
+        System.out.println(repository.getDescriptor(Repository.REP_NAME_DESC));
         assertNotNull(repository.getDescriptor(Repository.REP_VENDOR_DESC));
         assertNotNull(repository.getDescriptor(Repository.REP_VENDOR_URL_DESC));
         assertNotNull(repository.getDescriptor(Repository.REP_VERSION_DESC));
+        System.out.println(repository.getDescriptor(Repository.REP_VERSION_DESC));
         assertNotNull(repository.getDescriptor(Repository.SPEC_NAME_DESC));
         assertNotNull(repository.getDescriptor(Repository.SPEC_VERSION_DESC));
         assertEquals("true",  repository.getDescriptor(Repository.LEVEL_1_SUPPORTED));
+        assertEquals("true", repository.getDescriptor(Repository.LEVEL_2_SUPPORTED));
         assertEquals("true", repository.getDescriptor(Repository.OPTION_TRANSACTIONS_SUPPORTED));
+        assertEquals("true", repository.getDescriptor(Repository.OPTION_LOCKING_SUPPORTED));
         assertEquals("true", repository.getDescriptor(Repository.QUERY_XPATH_DOC_ORDER));
         assertEquals("true", repository.getDescriptor(Repository.QUERY_XPATH_POS_INDEX));
-        assertNull(repository.getDescriptor(Repository.LEVEL_2_SUPPORTED));
     }
     
 

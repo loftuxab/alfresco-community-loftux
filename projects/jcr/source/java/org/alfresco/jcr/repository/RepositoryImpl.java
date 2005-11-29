@@ -33,6 +33,8 @@ import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.descriptor.Descriptor;
+import org.alfresco.service.descriptor.DescriptorService;
 
 
 /**
@@ -45,26 +47,10 @@ public class RepositoryImpl implements Repository
     /** Empty Password, if not supplied */
     private final static char[] EMPTY_PASSWORD = "".toCharArray();
     
-    // TODO: Redirect to Alfresco "About" Service
     /** Repository Descriptors */
     private static final Map<String, String> descriptors = new HashMap<String, String>();
-    static
-    {
-        descriptors.put(Repository.REP_NAME_DESC, "Alfresco Content Repository");
-        descriptors.put(Repository.REP_VENDOR_DESC, "Alfresco");
-        descriptors.put(Repository.REP_VENDOR_URL_DESC, "http://www.alfresco.org");
-        descriptors.put(Repository.REP_VERSION_DESC, "1.0");
-        descriptors.put(Repository.SPEC_NAME_DESC, "Content Repository API for Java(TM) Technology Specification");
-        descriptors.put(Repository.SPEC_VERSION_DESC, "1.0");
-        descriptors.put(Repository.LEVEL_1_SUPPORTED, "true");
-        descriptors.put(Repository.OPTION_TRANSACTIONS_SUPPORTED, "true");
-        descriptors.put(Repository.OPTION_LOCKING_SUPPORTED, "true");
-        descriptors.put(Repository.QUERY_XPATH_DOC_ORDER, "true");
-        descriptors.put(Repository.QUERY_XPATH_POS_INDEX, "true");
-    }
 
     // Service dependencies
-    private AuthenticationService authenticationService;  // TODO: remove when moved to service registry
     private ServiceRegistry serviceRegistry;
     private String defaultWorkspace = null;
 
@@ -76,16 +62,6 @@ public class RepositoryImpl implements Repository
     // Dependency Injection
     //
     
-    /**
-     * Set the authentication service
-     * 
-     * @param authenticationService
-     */
-    public void setAuthenticationService(AuthenticationService authenticationService)
-    {
-        this.authenticationService = authenticationService;
-    }
-
     /**
      * Set the service registry
      * 
@@ -111,21 +87,38 @@ public class RepositoryImpl implements Repository
      */
     public void init()
     {
-        if (serviceRegistry == null || authenticationService == null)
+        if (serviceRegistry == null)
         {
             throw new IllegalStateException("Service Registry has not been specified.");
         }
+        
+        // initialise namespace registry
         namespaceRegistry = new NamespaceRegistryImpl(false, serviceRegistry.getNamespaceService());
-    }
-    
-    /**
-     * Get the authentication service
-     * 
-     * @return  the authentication service
-     */
-    public AuthenticationService getAuthenticationService()
-    {
-        return authenticationService;
+
+        // initialise descriptors
+        DescriptorService descriptorService = serviceRegistry.getDescriptorService();
+        Descriptor descriptor = descriptorService.getDescriptor();
+
+        String repNameDesc = "Alfresco Content Repository";
+        String edition = descriptor.getEdition();
+        if (edition != null && edition.length() > 0)
+        {
+            repNameDesc += " (" + edition + ")";
+        }
+        String repVersion = descriptor.getVersion();
+        
+        descriptors.put(Repository.REP_NAME_DESC, repNameDesc);
+        descriptors.put(Repository.REP_VENDOR_DESC, "Alfresco");
+        descriptors.put(Repository.REP_VENDOR_URL_DESC, "http://www.alfresco.org");
+        descriptors.put(Repository.REP_VERSION_DESC, repVersion);
+        descriptors.put(Repository.SPEC_NAME_DESC, "Content Repository API for Java(TM) Technology Specification");
+        descriptors.put(Repository.SPEC_VERSION_DESC, "1.0");
+        descriptors.put(Repository.LEVEL_1_SUPPORTED, "true");
+        descriptors.put(Repository.LEVEL_2_SUPPORTED, "true");
+        descriptors.put(Repository.OPTION_TRANSACTIONS_SUPPORTED, "true");
+        descriptors.put(Repository.OPTION_LOCKING_SUPPORTED, "true");
+        descriptors.put(Repository.QUERY_XPATH_DOC_ORDER, "true");
+        descriptors.put(Repository.QUERY_XPATH_POS_INDEX, "true");
     }
     
     /**
@@ -180,6 +173,7 @@ public class RepositoryImpl implements Repository
         }
 
         // authenticate user
+        AuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
         try
         {
             authenticationService.authenticate(username, password);

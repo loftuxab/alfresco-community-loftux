@@ -20,9 +20,11 @@ import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.query.QueryResult;
 
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.AbstractRangeIterator;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 
@@ -36,7 +38,6 @@ public class NodeRefNodeIteratorImpl extends AbstractRangeIterator
 {
     private SessionImpl sessionImpl;
     private List<NodeRef> nodeRefs;
-    
     
     /**
      * Construct

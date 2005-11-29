@@ -78,7 +78,7 @@ public class QueryManagerImpl implements QueryManager
             Constructor<? extends QueryImpl> constructor = queryClass.getConstructor(new Class[] { SessionImpl.class, String.class } );
             QueryImpl queryImpl = constructor.newInstance(new Object[] { session, statement } );
             queryImpl.isValidStatement();
-            return queryImpl;
+            return queryImpl.getProxy();
         }
         catch (InstantiationException e)
         {

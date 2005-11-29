@@ -134,6 +134,19 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
         return repoDescriptor;
     }
 
+    public void init()
+    {
+        // initialise descriptors
+        serverDescriptor = createServerDescriptor();
+        repoDescriptor = TransactionUtil.executeInUserTransaction(transactionService, new TransactionUtil.TransactionWork<Descriptor>()
+        {
+            public Descriptor doWork()
+            {
+                return createRepositoryDescriptor();
+            }
+        });
+    }
+    
     /**
      * @param event
      */
@@ -141,16 +154,6 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
     {
         if (event instanceof ContextRefreshedEvent)
         {
-            // initialise descriptors
-            serverDescriptor = createServerDescriptor();
-            repoDescriptor = TransactionUtil.executeInUserTransaction(transactionService, new TransactionUtil.TransactionWork<Descriptor>()
-            {
-                public Descriptor doWork()
-                {
-                    return createRepositoryDescriptor();
-                }
-            });
-            
             // log output of version initialised
             String serverVersion = serverDescriptor.getVersion();
             String serverEdition = serverDescriptor.getEdition();

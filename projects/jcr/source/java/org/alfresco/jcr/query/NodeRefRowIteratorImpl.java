@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.jcr.nodetype.PropertyDefinition;
+import javax.jcr.query.Query;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.AbstractRangeIterator;
+import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
@@ -41,6 +43,7 @@ public class NodeRefRowIteratorImpl extends AbstractRangeIterator implements Row
     private SessionImpl session;
     private Map<QName, PropertyDefinition> columns;
     private List<NodeRef> nodeRefs;
+    private RowIterator proxy = null;
     
     /**
      * Construct
@@ -56,6 +59,20 @@ public class NodeRefRowIteratorImpl extends AbstractRangeIterator implements Row
         this.nodeRefs = nodeRefs;
     }
 
+    /**
+     * Get proxied JCR Query
+     * 
+     * @return  proxy
+     */
+    public RowIterator getProxy()
+    {
+        if (proxy == null)
+        {
+            proxy = (RowIterator)JCRProxyFactory.create(this, RowIterator.class, session);
+        }
+        return proxy;
+    }
+    
     /* (non-Javadoc)
      * @see javax.jcr.query.RowIterator#nextRow()
      */

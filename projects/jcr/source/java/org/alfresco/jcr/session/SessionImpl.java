@@ -245,7 +245,7 @@ public class SessionImpl implements Session
      */
     public String getUserID()
     {
-        return getRepositoryImpl().getAuthenticationService().getCurrentUserName();
+        return getRepositoryImpl().getServiceRegistry().getAuthenticationService().getCurrentUserName();
     }
 
     /* (non-Javadoc)
@@ -521,7 +521,7 @@ public class SessionImpl implements Session
     {
         if (isLive())
         {
-            getRepositoryImpl().getAuthenticationService().invalidateTicket(getTicket());
+            getRepositoryImpl().getServiceRegistry().getAuthenticationService().invalidateTicket(getTicket());
             ticket = null;
         }
     }

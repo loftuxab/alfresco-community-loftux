@@ -130,7 +130,7 @@ public class JCRProxyFactory
                 String ticket = context.getTicket();
                 if (ticket != null)
                 {
-                    context.getRepositoryImpl().getAuthenticationService().validate(context.getTicket());
+                    context.getRepositoryImpl().getServiceRegistry().getAuthenticationService().validate(context.getTicket());
                 }
 
                 // invoke underlying service
@@ -163,7 +163,7 @@ public class JCRProxyFactory
             finally
             {
                 // clear authentication context
-                context.getRepositoryImpl().getAuthenticationService().clearCurrentSecurityContext();
+                context.getRepositoryImpl().getServiceRegistry().getAuthenticationService().clearCurrentSecurityContext();
             }
         }
     
