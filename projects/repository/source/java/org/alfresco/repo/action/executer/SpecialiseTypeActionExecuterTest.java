@@ -20,7 +20,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ActionImpl;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.BaseAlfrescoTest;
+import org.alfresco.util.BaseAlfrescoSpringTest;
 import org.alfresco.util.GUID;
 
 /**
@@ -28,7 +28,7 @@ import org.alfresco.util.GUID;
  * 
  * @author Roy Wetherall
  */
-public class SpecialiseTypeActionExecuterTest extends BaseAlfrescoTest
+public class SpecialiseTypeActionExecuterTest extends BaseAlfrescoSpringTest
 {    
     /**
      * The test node reference
