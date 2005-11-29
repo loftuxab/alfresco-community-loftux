@@ -159,6 +159,18 @@
             <ref bean="nodeService" />
         </property>
     </bean>
+    
+    <bean id="specialise-type" class="org.alfresco.repo.action.executer.SpecialiseTypeActionExecuter" parent="action-executer">
+        <property name="publicAction">
+           <value>false</value>
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+    </bean>
 
     <bean id="link-category" class="org.alfresco.repo.action.executer.LinkCategoryActionExecuter" parent="action-executer">
         <property name="nodeService">
