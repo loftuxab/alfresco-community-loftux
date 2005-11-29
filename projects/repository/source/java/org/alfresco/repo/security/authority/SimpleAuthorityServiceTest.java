@@ -64,7 +64,8 @@ public class SimpleAuthorityServiceTest extends TestCase
         pubAuthorityService = (AuthorityService) ctx.getBean("AuthorityService");
         personService = (PersonService) ctx.getBean("personService");
         authenticationDAO = (MutableAuthenticationDao) ctx.getBean("alfDaoImpl");
-        
+
+        this.authenticationComponent.setSystemUserAsCurrentUser();
 
         TransactionService transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE
                 .getLocalName());
@@ -100,7 +101,7 @@ public class SimpleAuthorityServiceTest extends TestCase
         authenticationComponent.setCurrentUser("andy");
         assertFalse(authorityService.hasAdminAuthority());
         assertFalse(pubAuthorityService.hasAdminAuthority());
-        assertEquals(0, authorityService.getAuthorities().size());
+        assertEquals(1, authorityService.getAuthorities().size());
     }
 
     public void testAdminUser()
@@ -108,12 +109,12 @@ public class SimpleAuthorityServiceTest extends TestCase
         authenticationComponent.setCurrentUser("admin");
         assertTrue(authorityService.hasAdminAuthority());
         assertTrue(pubAuthorityService.hasAdminAuthority());
-        assertEquals(1, authorityService.getAuthorities().size());
+        assertEquals(2, authorityService.getAuthorities().size());
 
         authenticationComponent.setCurrentUser("administrator");
         assertTrue(authorityService.hasAdminAuthority());
         assertTrue(pubAuthorityService.hasAdminAuthority());
-        assertEquals(1, authorityService.getAuthorities().size());
+        assertEquals(2, authorityService.getAuthorities().size());
     }
 
     public void testAuthorities()

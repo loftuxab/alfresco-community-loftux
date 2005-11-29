@@ -27,6 +27,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.filestore.FileContentWriter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
@@ -62,6 +63,7 @@ public class RoutingContentServiceTest extends BaseSpringTest
     private NodeService nodeService;
     private NodeRef rootNodeRef;
     private NodeRef contentNodeRef;
+    private AuthenticationComponent authenticationComponent;
     
     public RoutingContentServiceTest()
     {
@@ -74,6 +76,9 @@ public class RoutingContentServiceTest extends BaseSpringTest
         nodeService = (NodeService) applicationContext.getBean("dbNodeService");
         contentService = (ContentService) applicationContext.getBean(ServiceRegistry.CONTENT_SERVICE.getLocalName());
         this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
+        this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
+        
+        this.authenticationComponent.setSystemUserAsCurrentUser();
         // create a store and get the root node
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, getName());
         if (!nodeService.exists(storeRef))
@@ -94,6 +99,13 @@ public class RoutingContentServiceTest extends BaseSpringTest
                 ContentModel.TYPE_CONTENT,
                 properties);
         contentNodeRef = assocRef.getChildRef();
+    }
+    
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
     }
     
     private UserTransaction getUserTransaction()

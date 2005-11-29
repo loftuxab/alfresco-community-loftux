@@ -16,25 +16,20 @@
  */
 package org.alfresco.filesys.smb.server.repo;
 
-import junit.framework.TestCase;
-
 import org.alfresco.filesys.CIFSServer;
 import org.alfresco.filesys.server.filesys.DiskSharedDevice;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.util.ApplicationContextHelper;
-import org.springframework.context.ApplicationContext;
+import org.alfresco.util.BaseAlfrescoTestCase;
 
 /**
  * Checks that the required configuration details are obtainable from the CIFS components.
  * 
  * @author Derek Hulley
  */
-public class CifsIntegrationTest extends TestCase
+public class CifsIntegrationTest extends BaseAlfrescoTestCase
 {
-    /** the context to keep between tests */
-    public static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
     
     public void testGetServerName()
     {

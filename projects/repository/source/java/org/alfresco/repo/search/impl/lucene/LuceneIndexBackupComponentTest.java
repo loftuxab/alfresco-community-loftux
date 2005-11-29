@@ -19,6 +19,7 @@ package org.alfresco.repo.search.impl.lucene;
 import java.io.File;
 
 import org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory.LuceneIndexBackupComponent;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
@@ -39,12 +40,18 @@ public class LuceneIndexBackupComponentTest extends TestCase
     private LuceneIndexBackupComponent backupComponent;
     private File tempTargetDir;
     
+    private AuthenticationComponent authenticationComponent;
+    
     @Override
     public void setUp() throws Exception
     {
         TransactionService transactionService = (TransactionService) ctx.getBean("transactionComponent");
         NodeService nodeService = (NodeService) ctx.getBean("NodeService");
         LuceneIndexerAndSearcherFactory factory = (LuceneIndexerAndSearcherFactory) ctx.getBean("luceneIndexerAndSearcherFactory");
+        
+        this.authenticationComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
+        this.authenticationComponent.setSystemUserAsCurrentUser();
+        
         tempTargetDir = new File(TempFileProvider.getTempDir(), getName());
         tempTargetDir.mkdir();
         
@@ -53,6 +60,13 @@ public class LuceneIndexBackupComponentTest extends TestCase
         backupComponent.setFactory(factory);
         backupComponent.setNodeService(nodeService);
         backupComponent.setTargetLocation(tempTargetDir.toString());
+    }
+    
+    @Override
+    protected void tearDown() throws Exception
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.tearDown();
     }
     
     public void testBackup()

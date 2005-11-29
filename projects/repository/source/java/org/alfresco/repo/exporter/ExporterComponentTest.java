@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Collection;
 
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -46,6 +47,7 @@ public class ExporterComponentTest extends BaseSpringTest
     private ExporterService exporterService;
     private ImporterService importerService;
     private StoreRef storeRef;
+    private AuthenticationComponent authenticationComponent;
 
     
     @Override
@@ -59,9 +61,22 @@ public class ExporterComponentTest extends BaseSpringTest
 //        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 //        this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "test");
 //      this.storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+        
+        
+        
+        this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
+        
+        this.authenticationComponent.setSystemUserAsCurrentUser();
+        
         this.storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
     }
 
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
+    }
     
     public void testExport()
         throws Exception

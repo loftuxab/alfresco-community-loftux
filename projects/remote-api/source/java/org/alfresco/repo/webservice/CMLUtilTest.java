@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.webservice.repository.UpdateResult;
 import org.alfresco.repo.webservice.types.CML;
 import org.alfresco.repo.webservice.types.CMLAddAspect;
@@ -64,6 +65,7 @@ public class CMLUtilTest extends BaseSpringTest
     private NamespaceService namespaceService;
     private SearchService searchService;
     private NodeRef folderNodeRef;
+    private AuthenticationComponent authenticationComponent;
 
     @Override
     protected String[] getConfigLocations()
@@ -78,6 +80,9 @@ public class CMLUtilTest extends BaseSpringTest
         this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
         this.searchService = (SearchService)this.applicationContext.getBean("searchService");
         this.namespaceService = (NamespaceService)this.applicationContext.getBean("namespaceService");
+        this.authenticationComponent = (AuthenticationComponent) this.applicationContext.getBean("authenticationComponent");
+        
+        this.authenticationComponent.setSystemUserAsCurrentUser();
         
         // Create the store and get the root node
         this.testStoreRef = this.nodeService.createStore(
@@ -100,6 +105,13 @@ public class CMLUtilTest extends BaseSpringTest
                 ContentModel.ASSOC_CHILDREN,
                 ContentModel.ASSOC_CHILDREN,
                 ContentModel.TYPE_FOLDER).getChildRef();
+    }
+    
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
     }
     
     public void testMoreThanOneStatement()

@@ -35,6 +35,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.version.VersionType;
@@ -62,6 +63,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
     private AuthenticationService authenticationService;
     private LockService lockService;
     private TransactionService transactionService;
+    private PermissionService permissionService;
     
     /**
 	 * Data used by the tests
@@ -104,6 +106,7 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
         this.authenticationService = (AuthenticationService)this.applicationContext.getBean("authenticationService");
         this.lockService = (LockService)this.applicationContext.getBean("lockService");
         this.transactionService = (TransactionService)this.applicationContext.getBean("transactionComponent");
+        this.permissionService = (PermissionService)this.applicationContext.getBean("permissionService");
         authenticationService.clearCurrentSecurityContext();
 	
 		// Create the store and get the root node reference
@@ -136,6 +139,9 @@ public class CheckOutCheckInServiceImplTest extends BaseSpringTest
         TestWithUserUtils.createUser(this.userName, PWD, this.rootNodeRef, this.nodeService, this.authenticationService);
         TestWithUserUtils.authenticateUser(this.userName, PWD, this.rootNodeRef, this.authenticationService);
         this.userNodeRef = TestWithUserUtils.getCurrentUser(this.authenticationService);
+        
+        permissionService.setPermission(this.rootNodeRef, this.userName.toLowerCase(), PermissionService.ALL_PERMISSIONS, true);
+        permissionService.setPermission(this.nodeRef, this.userName.toLowerCase(), PermissionService.ALL_PERMISSIONS, true);
         
 	}
 	

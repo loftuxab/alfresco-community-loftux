@@ -13,8 +13,8 @@
 <beans>
     <bean id="authorityService" class="org.alfresco.repo.security.authority.SimpleAuthorityServiceImpl">
         <!-- Wiring up of services on which this service depends -->
-        <property name="authenticationService">
-            <ref bean="authenticationService" />
+        <property name="authenticationComponent">
+            <ref bean="authenticationComponent" />
         </property>
         <property name="personService">
             <ref bean="personService" />

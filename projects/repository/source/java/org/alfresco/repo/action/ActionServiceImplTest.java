@@ -45,6 +45,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.BaseAlfrescoSpringTest;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -52,31 +53,16 @@ import org.alfresco.util.BaseSpringTest;
  * 
  * @author Roy Wetherall
  */
-public class ActionServiceImplTest extends BaseSpringTest
+public class ActionServiceImplTest extends BaseAlfrescoSpringTest
 {
 	private static final String BAD_NAME = "badName";
-	
-	private NodeService nodeService;
-	private ActionService actionService;
-	private TransactionService transactionService;
-	private StoreRef testStoreRef;
-	private NodeRef rootNodeRef;
+    
 	private NodeRef nodeRef;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception
 	{
 		super.onSetUpInTransaction();
-		
-		this.nodeService = (NodeService)this.applicationContext.getBean("nodeService");
-		this.actionService = (ActionService)this.applicationContext.getBean("actionService");
-		this.transactionService = (TransactionService)this.applicationContext.getBean("transactionComponent");
-		
-        // Create the store and get the root node
-        this.testStoreRef = this.nodeService.createStore(
-                StoreRef.PROTOCOL_WORKSPACE, "Test_"
-                        + System.currentTimeMillis());
-        this.rootNodeRef = this.nodeService.getRootNode(this.testStoreRef);
 
         // Create the node used for tests
         this.nodeRef = this.nodeService.createNode(
@@ -95,7 +81,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 	 */
 	public void testGetActionDefinition()
 	{
-		ActionDefinition action = this.actionService.getActionDefinition(AddFeaturesActionExecuter.NAME);
+		ActionDefinition action = actionService.getActionDefinition(AddFeaturesActionExecuter.NAME);
 		assertNotNull(action);
 		assertEquals(AddFeaturesActionExecuter.NAME, action.getName());
 		
@@ -843,7 +829,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		action.setParameterValue(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
 		action.setParameterValue(MoveActionExecuter.PARAM_ASSOC_QNAME, ContentModel.ASSOC_CHILDREN);
 		// Create a bad node ref
-		NodeRef badNodeRef = new NodeRef(this.testStoreRef, "123123");
+		NodeRef badNodeRef = new NodeRef(this.storeRef, "123123");
 		action.setParameterValue(MoveActionExecuter.PARAM_DESTINATION_FOLDER, badNodeRef);
 		
 		try
@@ -893,7 +879,7 @@ public class ActionServiceImplTest extends BaseSpringTest
 		action.setParameterValue(MoveActionExecuter.PARAM_ASSOC_TYPE_QNAME, ContentModel.ASSOC_CHILDREN);
 		action.setParameterValue(MoveActionExecuter.PARAM_ASSOC_QNAME, ContentModel.ASSOC_CHILDREN);
 		// Create a bad node ref
-		NodeRef badNodeRef = new NodeRef(this.testStoreRef, "123123");
+		NodeRef badNodeRef = new NodeRef(this.storeRef, "123123");
 		action.setParameterValue(MoveActionExecuter.PARAM_DESTINATION_FOLDER, badNodeRef);
 		action.setTitle("title");
 		

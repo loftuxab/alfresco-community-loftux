@@ -17,6 +17,7 @@
 package org.alfresco.repo.descriptor;
 
 import org.alfresco.repo.importer.ImporterBootstrap;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -30,6 +31,7 @@ public class DescriptorServiceTest extends BaseSpringTest
     private NodeService nodeService;
     private ImporterBootstrap systemBootstrap;
     private StoreRef storeRef;
+    private AuthenticationComponent authenticationComponent;
     
     
     @Override
@@ -37,12 +39,27 @@ public class DescriptorServiceTest extends BaseSpringTest
     {
         nodeService = (NodeService)applicationContext.getBean(ServiceRegistry.NODE_SERVICE.getLocalName());
         systemBootstrap = (ImporterBootstrap)applicationContext.getBean("systemBootstrap");
-        storeRef = new StoreRef("system", "Test_" + System.currentTimeMillis());
         
+        storeRef = new StoreRef("system", "Test_" + System.currentTimeMillis());
         systemBootstrap.setStoreUrl(storeRef.toString());
         systemBootstrap.bootstrap();
+        
+        this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
+        
+        this.authenticationComponent.setSystemUserAsCurrentUser();
+        
+        
+      
+      
         System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
-    }    
+    } 
+    
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
+    }
     
     
     public void testDescriptor()

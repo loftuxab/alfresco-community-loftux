@@ -157,10 +157,10 @@
             <ref bean="ticketComponent" />
         </property>
         <property name="authenticationComponent">
-            <ref bean="authenticationComponent" />
+            <ref bean="authenticationComponentImpl" />
         </property>
         <property name="permissionServiceSPI">
-            <ref bean="permissionService" />
+            <ref bean="permissionServiceImpl" />
         </property>
     </bean>
 

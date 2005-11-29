@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.node.BaseNodeServiceTest;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -58,6 +59,7 @@ public class SearcherComponentTest extends TestCase
     private DictionaryService dictionaryService;
     private SearcherComponent searcher;
     private NodeService nodeService;
+    private AuthenticationComponent authenticationComponent;
     
     private NodeRef rootNodeRef;
     private UserTransaction txn;
@@ -68,6 +70,10 @@ public class SearcherComponentTest extends TestCase
         transactionService = serviceRegistry.getTransactionService();
         dictionaryService = BaseNodeServiceTest.loadModel(ctx);
         nodeService = serviceRegistry.getNodeService();
+        
+        this.authenticationComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
+        this.authenticationComponent.setSystemUserAsCurrentUser();
+        
         // get the indexer and searcher factory
         IndexerAndSearcher indexerAndSearcher = (IndexerAndSearcher) ctx.getBean("indexerAndSearcherFactory");
         searcher = new SearcherComponent();
@@ -88,6 +94,8 @@ public class SearcherComponentTest extends TestCase
         {
             txn.rollback();
         }
+        authenticationComponent.clearCurrentSecurityContext();
+        super.tearDown();
     }
 
     public void testNodeXPath() throws Exception

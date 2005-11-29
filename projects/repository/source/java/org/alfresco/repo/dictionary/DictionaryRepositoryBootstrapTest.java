@@ -16,9 +16,9 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.BaseAlfrescoTest;
+import org.alfresco.util.BaseAlfrescoSpringTest;
 
-public class DictionaryRepositoryBootstrapTest extends BaseAlfrescoTest
+public class DictionaryRepositoryBootstrapTest extends BaseAlfrescoSpringTest
 {
     public static final String TEMPLATE_MODEL_XML = 
         "<model name={0} xmlns=\"http://www.alfresco.org/model/dictionary/1.0\">" +

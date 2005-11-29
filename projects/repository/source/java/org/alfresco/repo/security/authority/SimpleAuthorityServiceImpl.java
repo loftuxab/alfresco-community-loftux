@@ -21,10 +21,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -49,7 +49,7 @@ public class SimpleAuthorityServiceImpl implements AuthorityService
 
     private Set<String> adminUsers;
 
-    private AuthenticationService authenticationService;
+    private AuthenticationComponent authenticationComponent;
 
     public SimpleAuthorityServiceImpl()
     {
@@ -72,15 +72,15 @@ public class SimpleAuthorityServiceImpl implements AuthorityService
      */
     public boolean hasAdminAuthority()
     {
-        String currentUserName = authenticationService.getCurrentUserName();
+        String currentUserName = authenticationComponent.getCurrentUserName();
         return ((currentUserName != null) && adminUsers.contains(currentUserName));
     }
 
     // IOC
 
-    public void setAuthenticationService(AuthenticationService authenticationService)
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
-        this.authenticationService = authenticationService;
+        this.authenticationComponent = authenticationComponent;
     }
 
     public void setAdminUsers(Set<String> adminUsers)
@@ -91,11 +91,12 @@ public class SimpleAuthorityServiceImpl implements AuthorityService
     public Set<String> getAuthorities()
     {
         Set<String> authorities = new HashSet<String>();
-        String currentUserName = authenticationService.getCurrentUserName();
+        String currentUserName = authenticationComponent.getCurrentUserName();
         if (adminUsers.contains(currentUserName))
         {
             authorities.addAll(adminSet);
         }
+        authorities.addAll(allSet);
         return authorities;
     }
 

@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -38,6 +39,7 @@ public class ImporterComponentTest extends BaseSpringTest
     private ImporterBootstrap importerBootstrap;
     private NodeService nodeService;
     private StoreRef storeRef;
+    private AuthenticationComponent authenticationComponent;
 
     
     @Override
@@ -48,10 +50,21 @@ public class ImporterComponentTest extends BaseSpringTest
         
         importerBootstrap = (ImporterBootstrap)applicationContext.getBean("importerBootstrap");
         
+        this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
+        
+        this.authenticationComponent.setSystemUserAsCurrentUser();
+        
         // Create the store
         this.storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
     }
 
+    
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
+    }
     
     public void testImport()
         throws Exception
@@ -70,6 +83,7 @@ public class ImporterComponentTest extends BaseSpringTest
         StoreRef bootstrapStoreRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         importerBootstrap.setStoreUrl(bootstrapStoreRef.toString());
         importerBootstrap.bootstrap();
+        authenticationComponent.setSystemUserAsCurrentUser();
         System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, bootstrapStoreRef));
     }
     

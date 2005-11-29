@@ -26,14 +26,14 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.BaseAlfrescoTest;
+import org.alfresco.util.BaseAlfrescoSpringTest;
 
 /**
  * Dictionary model type unit test
  * 
  * @author Roy Wetherall
  */
-public class DictionaryModelTypeTest extends BaseAlfrescoTest
+public class DictionaryModelTypeTest extends BaseAlfrescoSpringTest
 {
     /** QName of the test model */
     private static final QName TEST_MODEL_ONE = QName.createQName("{http://www.alfresco.org/test/testmodel1/1.0}testModelOne");

@@ -26,6 +26,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.node.BaseNodeServiceTest;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -87,6 +88,7 @@ public class IntegrityTest extends TestCase
     private NodeRef rootNodeRef;
     private PropertyMap allProperties;
     private UserTransaction txn;
+    private AuthenticationComponent authenticationComponent;
     
     public void setUp() throws Exception
     {
@@ -106,6 +108,9 @@ public class IntegrityTest extends TestCase
 
         serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         nodeService = serviceRegistry.getNodeService();
+        this.authenticationComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
+        
+        this.authenticationComponent.setSystemUserAsCurrentUser();
         
         // begin a transaction
         TransactionService transactionService = serviceRegistry.getTransactionService();
@@ -127,6 +132,7 @@ public class IntegrityTest extends TestCase
     
     public void tearDown() throws Exception
     {
+        authenticationComponent.clearCurrentSecurityContext();
         txn.rollback();
     }
 

@@ -29,6 +29,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
@@ -61,6 +62,8 @@ public class LockBehaviourImplTest extends BaseSpringTest
      */
     private AuthenticationService authenticationService;    
     
+    private PermissionService permissionService;
+    
     /**
      * Node references used in the tests
      */
@@ -88,6 +91,7 @@ public class LockBehaviourImplTest extends BaseSpringTest
         this.lockService = (LockService)applicationContext.getBean("lockService");
 		this.versionService = (VersionService)applicationContext.getBean("versionService");
         this.authenticationService = (AuthenticationService)applicationContext.getBean("authenticationService");
+        this.permissionService = (PermissionService)applicationContext.getBean("permissionService");
         authenticationService.clearCurrentSecurityContext();
         
         // Create the node properties
@@ -126,8 +130,11 @@ public class LockBehaviourImplTest extends BaseSpringTest
         // Stash the user node ref's for later use
         TestWithUserUtils.authenticateUser(BAD_USER_NAME, PWD, rootNodeRef, this.authenticationService);
         TestWithUserUtils.authenticateUser(GOOD_USER_NAME, PWD, rootNodeRef, this.authenticationService);  
+        
+        permissionService.setPermission(rootNodeRef, GOOD_USER_NAME.toLowerCase(), PermissionService.ALL_PERMISSIONS, true);
+        permissionService.setPermission(rootNodeRef, BAD_USER_NAME.toLowerCase(), PermissionService.READ, true);
     }   
-
+    
     /**
      * Test checkForLock (no user specified)
      */

@@ -46,6 +46,7 @@ import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.results.ChildAssocRefResultSet;
 import org.alfresco.repo.search.results.DetachedResultSet;
 import org.alfresco.repo.search.transaction.LuceneIndexLock;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -151,6 +152,8 @@ public class LuceneTest extends TestCase
 
     private UserTransaction testTX;
     
+    private AuthenticationComponent authenticationComponent;
+    
     private NodeRef[] documentOrder;
 
     public LuceneTest()
@@ -171,6 +174,9 @@ public class LuceneTest extends TestCase
         indexerAndSearcher = (LuceneIndexerAndSearcher) ctx.getBean("luceneIndexerAndSearcherFactory");
         transactionService = (TransactionService) ctx.getBean("transactionComponent");
         serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
+        
+        this.authenticationComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
+        this.authenticationComponent.setSystemUserAsCurrentUser();
 
         queryRegisterComponent.loadQueryCollection("testQueryRegister.xml");
 
@@ -312,10 +318,12 @@ public class LuceneTest extends TestCase
     @Override
     protected void tearDown() throws Exception
     {
+        
         if (testTX.getStatus() == Status.STATUS_ACTIVE)
         {
             testTX.rollback();
         }
+        authenticationComponent.clearCurrentSecurityContext();
         super.tearDown();
     }
 
@@ -452,6 +460,7 @@ public class LuceneTest extends TestCase
 
         public void run()
         {
+            authenticationComponent.setSystemUserAsCurrentUser();
             if (waiter != null)
             {
                 waiter.start();
@@ -484,6 +493,10 @@ public class LuceneTest extends TestCase
             {
                 e.printStackTrace();
                 System.exit(12);
+            }
+            finally
+            {
+                authenticationComponent.clearCurrentSecurityContext();
             }
             if (waiter != null)
             {

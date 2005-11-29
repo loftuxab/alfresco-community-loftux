@@ -27,6 +27,7 @@ import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.node.BaseNodeServiceTest;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -51,7 +52,7 @@ public class TemplateServiceImplTest extends TestCase
     private NodeService nodeService;
     private TransactionService transactionService;
     private ServiceRegistry serviceRegistry;
-    
+    private AuthenticationComponent authenticationComponent;
     
     /*
      * @see junit.framework.TestCase#setUp()
@@ -65,6 +66,9 @@ public class TemplateServiceImplTest extends TestCase
         nodeService = (NodeService)this.ctx.getBean("nodeService");
         templateService = (TemplateService)this.ctx.getBean("templateService");
         serviceRegistry = (ServiceRegistry)this.ctx.getBean("ServiceRegistry");
+        
+        this.authenticationComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
+        this.authenticationComponent.setSystemUserAsCurrentUser();
         
         DictionaryDAO dictionaryDao = (DictionaryDAO)ctx.getBean("dictionaryDAO");
         
@@ -86,6 +90,13 @@ public class TemplateServiceImplTest extends TestCase
         BaseNodeServiceTest.loadModel(ctx);
     }
 
+    @Override
+    protected void tearDown() throws Exception
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.tearDown();
+    }
+    
     public void testTemplates()
     {
         TransactionUtil.executeInUserTransaction(

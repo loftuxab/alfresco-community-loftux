@@ -34,6 +34,7 @@ import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.repo.dictionary.M2Type;
 import org.alfresco.repo.rule.RuleModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
@@ -73,6 +74,7 @@ public class CopyServiceImplTest extends BaseSpringTest
 	private ContentService contentService;
     private RuleService ruleService;
     private ActionService actionService;
+    private AuthenticationComponent authenticationComponent;
 	
 	/**
 	 * Data used by the tests
@@ -142,7 +144,10 @@ public class CopyServiceImplTest extends BaseSpringTest
 		this.contentService = (ContentService)this.applicationContext.getBean("contentService");
         this.ruleService = (RuleService)this.applicationContext.getBean("ruleService");
         this.actionService = (ActionService)this.applicationContext.getBean("actionService");
+        this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
 		
+        this.authenticationComponent.setSystemUserAsCurrentUser();
+        
 		// Create the test model
 		createTestModel();
 		
@@ -220,6 +225,13 @@ public class CopyServiceImplTest extends BaseSpringTest
 		this.destinationNodeRef = temp5.getChildRef();
 	}
 	
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
+    }
+    
 	/**
 	 * Helper method that creates a bag of properties for the test type
 	 * 

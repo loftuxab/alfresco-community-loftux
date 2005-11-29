@@ -20,6 +20,7 @@ import javax.jcr.Repository;
 
 import org.alfresco.jcr.repository.RepositoryFactory;
 import org.alfresco.jcr.repository.RepositoryImpl;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 
@@ -34,17 +35,29 @@ public class BaseJCRTest extends BaseSpringTest
     protected Repository repository;
     protected StoreRef storeRef;
     
+    protected AuthenticationComponent authenticationComponent;
     
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
+        authenticationComponent.setSystemUserAsCurrentUser();
+        
         storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         TestData.generateTestData(applicationContext, storeRef.getIdentifier());
         RepositoryImpl repositoryImpl = (RepositoryImpl)applicationContext.getBean(RepositoryFactory.REPOSITORY_BEAN);
         repositoryImpl.setDefaultWorkspace(storeRef.getIdentifier());
         repository = repositoryImpl;
+        authenticationComponent.setSystemUserAsCurrentUser();
     }
 
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
+    }
+    
     @Override
     protected String[] getConfigLocations()
     {

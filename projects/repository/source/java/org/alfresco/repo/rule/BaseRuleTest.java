@@ -25,6 +25,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.ComparePropertyValueEvaluator;
 import org.alfresco.repo.action.executer.AddFeaturesActionExecuter;
 import org.alfresco.repo.configuration.ConfigurableService;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
@@ -80,6 +81,7 @@ public class BaseRuleTest extends BaseSpringTest
     protected ContentService contentService;
     protected RuleService ruleService;
 	protected ConfigurableService configService;
+    protected AuthenticationComponent authenticationComponent;
 
     /**
      * Rule type used in tests
@@ -113,7 +115,10 @@ public class BaseRuleTest extends BaseSpringTest
         		.getBean("configurableService");
         this.actionService = (ActionService)this.applicationContext.getBean("actionService");
         this.transactionService = (TransactionService)this.applicationContext.getBean("transactionComponent");
+        this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
 
+        authenticationComponent.setSystemUserAsCurrentUser();
+        
         // Get the rule type
         this.ruleType = this.ruleService.getRuleType(RULE_TYPE_NAME);
 
@@ -128,6 +133,13 @@ public class BaseRuleTest extends BaseSpringTest
                 ContentModel.ASSOC_CHILDREN,
                 QName.createQName("{test}testnode"),
                 ContentModel.TYPE_CONTAINER).getChildRef();
+    }
+    
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
     }
 
     protected void addRulesAspect()

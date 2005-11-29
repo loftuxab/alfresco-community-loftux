@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -57,6 +58,8 @@ public class ConcurrentNodeServiceTest extends TestCase
     private TransactionService transactionService;
     private NodeRef rootNodeRef;
     private FullTextSearchIndexer luceneFTS;
+    
+    private AuthenticationComponent authenticationComponent;
 
     public ConcurrentNodeServiceTest()
     {
@@ -81,6 +84,9 @@ public class ConcurrentNodeServiceTest extends TestCase
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         transactionService = (TransactionService) ctx.getBean("transactionComponent");
         luceneFTS = (FullTextSearchIndexer) ctx.getBean("LuceneFullTextSearchIndexer");
+        this.authenticationComponent = (AuthenticationComponent)ctx.getBean("authenticationComponent");
+        
+        this.authenticationComponent.setSystemUserAsCurrentUser();
 
         // create a first store directly
         UserTransaction tx = transactionService.getUserTransaction();
@@ -90,6 +96,13 @@ public class ConcurrentNodeServiceTest extends TestCase
         tx.commit();
     }
 
+    @Override
+    protected void tearDown() throws Exception
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.tearDown();
+    }
+    
     protected Map<QName, ChildAssociationRef> buildNodeGraph() throws Exception
     {
         return BaseNodeServiceTest.buildNodeGraph(nodeService, rootNodeRef);

@@ -37,6 +37,7 @@ import org.alfresco.repo.domain.hibernate.NodeImpl;
 import org.alfresco.repo.node.db.NodeDaoService;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
@@ -54,6 +55,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -111,6 +113,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     protected PolicyComponent policyComponent;
     protected DictionaryService dictionaryService;
     protected TransactionService transactionService;
+    protected AuthenticationComponent authenticationComponent;
     protected NodeDaoService nodeDaoService;
     protected NodeService nodeService;
     /** populated during setup */
@@ -119,8 +122,12 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     @Override
     protected void onSetUpInTransaction() throws Exception
     {
+        super.onSetUpInTransaction();
         transactionService = (TransactionService) applicationContext.getBean("transactionComponent");
         policyComponent = (PolicyComponent) applicationContext.getBean("policyComponent");
+        authenticationComponent = (AuthenticationComponent) applicationContext.getBean("authenticationComponent");
+        
+        authenticationComponent.setSystemUserAsCurrentUser();
         
         DictionaryDAO dictionaryDao = (DictionaryDAO) applicationContext.getBean("dictionaryDAO");
         // load the system model
@@ -151,6 +158,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     @Override
     protected void onTearDownInTransaction()
     {
+        authenticationComponent.clearCurrentSecurityContext();
+        super.onTearDownInTransaction();
     }
 
 
