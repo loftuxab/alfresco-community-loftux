@@ -18,6 +18,8 @@ package org.alfresco.filesys.server.config;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.Provider;
 import java.security.Security;
@@ -40,6 +42,7 @@ import org.alfresco.filesys.ftp.InvalidPathException;
 import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.netbios.NetBIOSNameList;
 import org.alfresco.filesys.netbios.NetBIOSSession;
+import org.alfresco.filesys.netbios.RFCNetBIOSProtocol;
 import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
 import org.alfresco.filesys.server.NetworkServer;
 import org.alfresco.filesys.server.NetworkServerList;
@@ -983,10 +986,18 @@ public class ServerConfiguration
 
                 try
                 {
-
-                    // Convert to a network address and set the primary WINS server address
+                    // Convert to a network address and check if the WINS server is accessible
 
                     InetAddress winsAddr = InetAddress.getByName(addr);
+
+                    Socket winsSocket = new Socket();
+                    InetSocketAddress sockAddr = new InetSocketAddress( winsAddr, RFCNetBIOSProtocol.NAME_PORT);
+                    
+                    winsSocket.connect(sockAddr, 3000);
+                    winsSocket.close();
+                    
+                    // Set the primary WINS server address
+                    
                     setPrimaryWINSServer(winsAddr);
 
                     // Debug
@@ -997,6 +1008,11 @@ public class ServerConfiguration
                 catch (UnknownHostException ex)
                 {
                     throw new AlfrescoRuntimeException("Invalid auto WINS server address, " + addr);
+                }
+                catch (IOException ex)
+                {
+                    if ( logger.isDebugEnabled())
+                        logger.debug("Failed to connect to auto WINS server " + addr);
                 }
             }
         }
