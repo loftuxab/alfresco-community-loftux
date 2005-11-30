@@ -233,7 +233,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                         // Debug
 
-                        if (logger.isDebugEnabled() && hasDebug())
+                        if (logger.isDebugEnabled())
                             logger.debug("NetBIOS handler, processing " + req);
 
                         // Process the request
@@ -296,7 +296,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                         // Debug
 
-                        if (logger.isDebugEnabled() && hasDebug())
+                        if (logger.isDebugEnabled())
                             logger.debug("NetBIOS handler successful, " + req);
 
                         // Update the name record
@@ -421,7 +421,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                     // Debug
 
-                    if (logger.isDebugEnabled() && hasDebug())
+                    if (logger.isDebugEnabled())
                         logger.debug("  Add name " + (bcast ? "broadcast" : "WINS") + ", " + req);
                 }
             }
@@ -478,7 +478,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                     // Debug
 
-                    if (logger.isDebugEnabled() && hasDebug())
+                    if (logger.isDebugEnabled())
                         logger.debug("  Refresh name " + (bcast ? "broadcast" : "WINS") + ", " + req);
                 }
             }
@@ -534,7 +534,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                     // Debug
 
-                    if (logger.isDebugEnabled() && hasDebug())
+                    if (logger.isDebugEnabled())
                         logger.debug("  Delete name " + (bcast ? "broadcast" : "WINS") + ", " + req);
                 }
             }
@@ -605,7 +605,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                     // Debug
 
-                    if (logger.isDebugEnabled() && hasDebug())
+                    if (logger.isDebugEnabled())
                         logger.debug("NetBIOS name refresh wakeup ...");
 
                     // Check if there are any registered names that will expire in the next interval
@@ -634,7 +634,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
                                 // Debug
 
-                                if (logger.isDebugEnabled() && hasDebug())
+                                if (logger.isDebugEnabled())
                                     logger.debug("Queuing name refresh for " + nbName);
 
                                 // Queue a refresh request for the NetBIOS name
@@ -1107,7 +1107,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
         // Debug
 
-        if (logger.isDebugEnabled() && hasDebug())
+        if (logger.isDebugEnabled())
             logger.debug("%% Query name=" + searchName + ", type=" + NetBIOSName.TypeAsString(nameType) + ", len="
                     + len);
 
@@ -1126,7 +1126,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
             // Debug
 
-            if (logger.isDebugEnabled() && hasDebug())
+            if (logger.isDebugEnabled())
                 logger.debug("NetBIOS Name - " + nbName.getName() + ", len=" + nbName.getName().length() + ",type="
                         + NetBIOSName.TypeAsString(nbName.getType()));
 
@@ -1143,7 +1143,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
             // Debug
 
-            if (logger.isDebugEnabled() && hasDebug())
+            if (logger.isDebugEnabled())
                 logger.debug("%% Found name " + searchName + " in local name table : " + nbName.toString());
 
             // Build the name query response
@@ -1152,7 +1152,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
             // Debug
 
-            if (logger.isDebugEnabled() && hasDebug())
+            if (logger.isDebugEnabled())
             {
                 logger.debug("%% NetBIOS Reply to " + fromAddr.getHostAddress() + " :-");
                 pkt.DumpPacket(false);
@@ -1181,7 +1181,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
             // Debug
 
-            if (logger.isDebugEnabled() && hasDebug())
+            if (logger.isDebugEnabled())
                 logger.debug("%% Failed to find match for name " + searchName);
         }
     }
@@ -1213,7 +1213,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
         // Debug
 
-        if (logger.isDebugEnabled() && hasDebug())
+        if (logger.isDebugEnabled())
             logger.debug("%% Register name=" + regName + ", type=" + NetBIOSName.TypeAsString(nameType) + ", len="
                     + len);
 
@@ -1232,7 +1232,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
         // Debug
 
-        if (logger.isDebugEnabled() && hasDebug())
+        if (logger.isDebugEnabled())
             logger.debug("%% Added remote name " + nbName.toString() + " to remote names table");
     }
 
@@ -1263,7 +1263,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
         // Debug
 
-        if (logger.isDebugEnabled() && hasDebug())
+        if (logger.isDebugEnabled())
             logger
                     .debug("%% Release name=" + regName + ", type=" + NetBIOSName.TypeAsString(nameType) + ", len="
                             + len);
@@ -1283,7 +1283,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
         // Debug
 
-        if (logger.isDebugEnabled() && hasDebug())
+        if (logger.isDebugEnabled())
             logger.debug("%% Released remote name " + nbName.toString() + " from remote names table");
     }
 
@@ -1351,7 +1351,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
             // Debug
 
-            if (logger.isDebugEnabled() && hasDebug())
+            if (logger.isDebugEnabled())
                 logger.debug("%% Negative Name Registration name=" + nbName);
 
             // Inform listeners of the add name failure
@@ -1363,7 +1363,7 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
 
             // Debug
 
-            if (logger.isDebugEnabled() && hasDebug())
+            if (logger.isDebugEnabled())
                 logger.debug("%% Name Registration Successful name=" + req.getNetBIOSName().getName());
 
             // Inform listeners that the add name was successful
@@ -1621,6 +1621,18 @@ public class NetBIOSNameServer extends NetworkServer implements Runnable
                         processWack(nbPkt, fromAddr, fromPort);
                         break;
 
+                        // Refresh
+                        
+                    case NetBIOSPacket.REFRESH:
+                        processNameRegister(nbPkt, fromAddr, fromPort);
+                        break;
+                      
+                    // Multi-homed name registration
+                      
+                    case NetBIOSPacket.NAME_REGISTER_MULTI:
+                        processNameRegister(nbPkt, fromAddr, fromPort);
+                        break;
+                      
                     // Unknown opcode
 
                     default:

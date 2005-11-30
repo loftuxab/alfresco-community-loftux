@@ -39,6 +39,7 @@ public class NetBIOSPacket
     public static final int NAME_RELEASE = 0x06;
     public static final int WACK = 0x07;
     public static final int REFRESH = 0x08;
+    public static final int NAME_REGISTER_MULTI = 0x0F;
 
     public static final int RESP_QUERY = 0x10;
     public static final int RESP_REGISTER = 0x15;
