@@ -294,7 +294,7 @@ public class LoginBean
                   String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
                   if (args[0].equals(WebDAVServlet.WEBDAV_PREFIX))
                   {
-                     nodeRef = resolveWebDAVPath(fc, args, false);
+                     nodeRef = resolveWebDAVPath(fc, args);
                   }
                   else if (args.length == 3)
                   {
@@ -317,7 +317,7 @@ public class LoginBean
                   String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
                   if (args[0].equals(WebDAVServlet.WEBDAV_PREFIX))
                   {
-                     nodeRef = resolveWebDAVPath(fc, args, true);
+                     nodeRef = resolveWebDAVPath(fc, args);
                   }
                   else if (args.length == 3)
                   {
@@ -431,9 +431,8 @@ public class LoginBean
     * 
     * @param context Faces context
     * @param args The elements of the path to lookup
-    * @param isFolder Whether the path represents a folder
     */
-   private NodeRef resolveWebDAVPath(FacesContext context, String[] args, boolean isFolder)
+   private NodeRef resolveWebDAVPath(FacesContext context, String[] args)
    {
       NodeRef nodeRef = null;
 
@@ -455,7 +454,7 @@ public class LoginBean
          NodeRef companyHome = new NodeRef(Repository.getStoreRef(), 
                Application.getCompanyRootId());
          
-         file = this.fileFolderService.resolveNamePath(companyHome, paths, isFolder);
+         file = this.fileFolderService.resolveNamePath(companyHome, paths);
          nodeRef = file.getNodeRef();
       }
       catch (UnsupportedEncodingException uee)
