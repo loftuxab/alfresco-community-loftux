@@ -705,7 +705,34 @@ public class ContentDiskDriver implements DiskInterface
             ContentContext ctx = (ContentContext) tree.getContext();
             NodeRef deviceRootNodeRef = ctx.getRootNode();
             
-            String path = params.getPath(); 
+            String path = params.getPath();
+            
+            // If the state table is available then try to find the parent folder node for the new file
+            // to save having to walk the path
+          
+            if ( ctx.hasStateTable())
+            {
+                // See if the parent folder has a file state, we can avoid having to walk the path
+                
+                String[] paths = FileName.splitPath(path);
+                if ( paths[0] != null && paths[0].length() > 1)
+                {
+                    // Find the node ref for the folder being searched
+                    
+                    NodeRef nodeRef = getNodeForPath(tree, paths[0]);
+                    
+                    if ( nodeRef != null)
+                    {
+                        deviceRootNodeRef = nodeRef;
+                        path              = paths[1];
+                        
+                        // DEBUG
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Create file using cached noderef for path " + paths[0]);
+                    }
+                }
+            }
             
             // Create it - the path will be created, if necessary
             
@@ -792,6 +819,33 @@ public class ContentDiskDriver implements DiskInterface
             NodeRef deviceRootNodeRef = ctx.getRootNode();
             
             String path = params.getPath(); 
+            
+            // If the state table is available then try to find the parent folder node for the new folder
+            // to save having to walk the path
+          
+            if ( ctx.hasStateTable())
+            {
+                // See if the parent folder has a file state, we can avoid having to walk the path
+                
+                String[] paths = FileName.splitPath(path);
+                if ( paths[0] != null && paths[0].length() > 1)
+                {
+                    // Find the node ref for the folder being searched
+                    
+                    NodeRef nodeRef = getNodeForPath(tree, paths[0]);
+                    
+                    if ( nodeRef != null)
+                    {
+                        deviceRootNodeRef = nodeRef;
+                        path              = paths[1];
+                        
+                        // DEBUG
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Create file using cached noderef for path " + paths[0]);
+                    }
+                }
+            }
             
             // Create it - the path will be created, if necessary
             
