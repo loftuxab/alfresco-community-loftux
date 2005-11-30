@@ -719,6 +719,10 @@
          <to-view-id>/jsp/wizard/new-rule/action-import.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
+         <from-outcome>specialise-type</from-outcome>
+         <to-view-id>/jsp/wizard/new-rule/action-specialise-type.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
          <from-outcome>summary</from-outcome>
          <to-view-id>/jsp/wizard/new-rule/summary.jsp</to-view-id>
       </navigation-case>
@@ -798,6 +802,10 @@
       <navigation-case>
          <from-outcome>import</from-outcome>
          <to-view-id>/jsp/wizard/create-action/action-import.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>specialise-type</from-outcome>
+         <to-view-id>/jsp/wizard/create-action/action-specialise-type.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>summary</from-outcome>

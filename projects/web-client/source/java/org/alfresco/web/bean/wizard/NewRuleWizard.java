@@ -43,6 +43,7 @@ import org.alfresco.repo.action.evaluator.InCategoryEvaluator;
 import org.alfresco.repo.action.evaluator.IsSubTypeEvaluator;
 import org.alfresco.repo.action.executer.CheckInActionExecuter;
 import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
+import org.alfresco.repo.action.executer.SpecialiseTypeActionExecuter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionConditionDefinition;
@@ -1464,6 +1465,21 @@ public class NewRuleWizard extends BaseActionWizard
             NodeRef space = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
             String spaceName = Repository.getNameForNode(this.nodeService, space);
             summary.append("'").append(spaceName).append("'");
+         }
+         else if (SpecialiseTypeActionExecuter.NAME.equals(actionName) == true)
+         {
+             String label = null;
+             String objectType = (String)this.currentActionProperties.get(PROP_OBJECT_TYPE);
+             for (SelectItem item  : getObjectTypes())
+             {
+                if (item.getValue().equals(objectType) == true)
+                {
+                    label = item.getLabel();
+                    break;
+                }
+             }
+             
+             summary.append("'").append(label).append("'");
          }
 
          summaryResult = summary.toString();

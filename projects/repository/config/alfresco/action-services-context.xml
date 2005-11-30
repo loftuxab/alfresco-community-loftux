@@ -161,9 +161,6 @@
     </bean>
     
     <bean id="specialise-type" class="org.alfresco.repo.action.executer.SpecialiseTypeActionExecuter" parent="action-executer">
-        <property name="publicAction">
-           <value>false</value>
-        </property>
         <property name="nodeService">
             <ref bean="nodeService" />
         </property>

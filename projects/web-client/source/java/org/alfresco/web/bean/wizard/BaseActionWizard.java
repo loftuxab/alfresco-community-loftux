@@ -39,11 +39,14 @@ import org.alfresco.repo.action.executer.LinkCategoryActionExecuter;
 import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.action.executer.MoveActionExecuter;
 import org.alfresco.repo.action.executer.SimpleWorkflowActionExecuter;
+import org.alfresco.repo.action.executer.SpecialiseTypeActionExecuter;
 import org.alfresco.repo.action.executer.TransformActionExecuter;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.ActionDefinition;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
@@ -84,6 +87,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    public static final String PROP_MESSAGE = "message";
    public static final String PROP_SUBJECT = "subject";
    public static final String PROP_TO = "to";
+   public static final String PROP_OBJECT_TYPE = "objecttype";
    
    private static final Log logger = LogFactory.getLog(BaseActionWizard.class);
    private static final String IMPORT_ENCODING = "UTF-8";
@@ -102,6 +106,7 @@ public abstract class BaseActionWizard extends AbstractWizardBean
    protected List<SelectItem> encodings;
    protected Map<String, String> actionDescriptions;
    protected Map<String, Serializable> currentActionProperties;
+   protected List<SelectItem> objectTypes;
    
    /**
     * Initialises the wizard
@@ -330,6 +335,12 @@ public abstract class BaseActionWizard extends AbstractWizardBean
          NodeRef destNodeRef = (NodeRef)this.currentActionProperties.get(PROP_DESTINATION);
          actionParams.put(ImporterActionExecuter.PARAM_DESTINATION_FOLDER, destNodeRef);
       }
+      else if (this.action.equals(SpecialiseTypeActionExecuter.NAME) == true)
+      {
+          // add the specialisation type
+          String objectType = (String)this.currentActionProperties.get(PROP_OBJECT_TYPE);
+          actionParams.put(SpecialiseTypeActionExecuter.PARAM_TYPE_NAME, QName.createQName(objectType));
+      }
       
       return actionParams;
    }
@@ -437,6 +448,11 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       {
          NodeRef destNodeRef = (NodeRef)actionProps.get(ImporterActionExecuter.PARAM_DESTINATION_FOLDER);
          this.currentActionProperties.put(PROP_DESTINATION, destNodeRef);
+      }
+      else if (this.action.equals(SpecialiseTypeActionExecuter.NAME) == true)
+      {
+          QName specialiseType = (QName)actionProps.get(SpecialiseTypeActionExecuter.PARAM_TYPE_NAME);
+          this.currentActionProperties.put(PROP_OBJECT_TYPE, specialiseType.toString());
       }
    }
 
@@ -792,6 +808,86 @@ public abstract class BaseActionWizard extends AbstractWizardBean
       }
       
       return this.aspects;
+   }
+   
+   /**
+    * @return Returns a list of object types to allow the user to select from
+    */
+   public List<SelectItem> getObjectTypes()
+   {
+      if (this.objectTypes == null)
+      {
+         FacesContext context = FacesContext.getCurrentInstance();
+         
+         // add the well known object type to start with
+         this.objectTypes = new ArrayList<SelectItem>(5);
+         this.objectTypes.add(new SelectItem(ContentModel.TYPE_CONTENT.toString(), 
+               Application.getMessage(context, "content")));
+         
+         // add any configured content sub-types to the list
+         ConfigService svc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+               FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+         Config wizardCfg = svc.getConfig("Custom Content Types");
+         if (wizardCfg != null)
+         {
+            ConfigElement typesCfg = wizardCfg.getConfigElement("content-types");
+            if (typesCfg != null)
+            {               
+               for (ConfigElement child : typesCfg.getChildren())
+               {
+                  QName idQName = Repository.resolveToQName(child.getAttribute("name"));
+                  TypeDefinition typeDef = this.dictionaryService.getType(idQName);
+                  
+                  if (typeDef != null &&
+                      this.dictionaryService.isSubClass(typeDef.getName(), ContentModel.TYPE_CONTENT))
+                  {
+                     // look for a client localized string
+                     String label = null;
+                     String msgId = child.getAttribute("displayLabelId");
+                     if (msgId != null)
+                     {
+                        label = Application.getMessage(context, msgId);
+                     }
+                     
+                     // if there wasn't an externalized string look for one in the config
+                     if (label == null)
+                     {
+                        label = child.getAttribute("displayLabel");
+                     }
+   
+                     // if there wasn't a client based label try and get it from the dictionary
+                     if (label == null)
+                     {
+                        label = typeDef.getTitle();
+                     }
+                     
+                     // finally, just use the localname
+                     if (label == null)
+                     {
+                        label = idQName.getLocalName();
+                     }
+                     
+                     this.objectTypes.add(new SelectItem(idQName.toString(), label));
+                  }
+               }
+               
+               // make sure the list is sorted by the label
+               QuickSort sorter = new QuickSort(this.objectTypes, "label", true, IDataContainer.SORT_CASEINSENSITIVE);
+               sorter.sort();
+            }
+            else
+            {
+               logger.warn("Could not find 'content-types' configuration element");
+            }
+         }
+         else
+         {
+            logger.warn("Could not find 'Custom Content Types' configuration section");
+         }
+         
+      }
+      
+      return this.objectTypes;
    }
    
    /**
