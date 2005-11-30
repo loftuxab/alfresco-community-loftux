@@ -455,7 +455,8 @@ public class SessionImpl implements Session
             }
             else
             {
-                throw new RepositoryException("Permission " + checkAction + " is unknown.");
+                // fall-through check for alfresco specific permissions
+                accessStatus = permissionService.hasPermission(nodeRef, checkAction);
             }
             
             // abort if permission not granted
