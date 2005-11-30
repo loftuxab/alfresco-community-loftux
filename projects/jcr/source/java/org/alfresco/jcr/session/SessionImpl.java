@@ -626,10 +626,19 @@ public class SessionImpl implements Session
             throw new NoSuchWorkspaceException("A default workspace could not be established.");
         }
         
-        NodeService nodeService = getRepositoryImpl().getServiceRegistry().getNodeService();
-        List<StoreRef> stores = nodeService.getStores();
         StoreRef workspace = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, workspaceName);
-        if (stores.contains(workspace) == false)
+        NodeService nodeService = getRepositoryImpl().getServiceRegistry().getNodeService();
+        boolean exists = false;
+        try
+        {
+            exists = nodeService.exists(workspace);
+        }
+        catch(org.alfresco.repo.security.permissions.AccessDeniedException e)
+        {
+            // note: fallthrough - store does not exist
+        }
+        
+        if (!exists)
         {
             throw new NoSuchWorkspaceException("Workspace " + workspaceName + " does not exist.");
         }

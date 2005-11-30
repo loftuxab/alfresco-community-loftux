@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import javax.jcr.AccessDeniedException;
 import javax.jcr.RepositoryException;
 import javax.jcr.lock.LockException;
 import javax.jcr.nodetype.ConstraintViolationException;
@@ -153,7 +154,10 @@ public class JCRProxyFactory
                 {
                     throw new NoSuchNodeTypeException(cause);
                 }
-                // TODO: AccessDenied Exception
+                else if (cause instanceof org.alfresco.repo.security.permissions.AccessDeniedException)
+                {
+                    throw new AccessDeniedException(cause);
+                }
                 else if (cause instanceof AlfrescoRuntimeException)
                 {
                     throw new RepositoryException(cause);
