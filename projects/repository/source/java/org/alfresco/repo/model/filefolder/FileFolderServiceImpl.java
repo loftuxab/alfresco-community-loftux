@@ -491,7 +491,7 @@ public class FileFolderServiceImpl implements FileFolderService
                     true);
         }
         // changed the name property
-        nodeService.setProperty(sourceNodeRef, ContentModel.PROP_NAME, newName);
+        nodeService.setProperty(targetNodeRef, ContentModel.PROP_NAME, newName);
         
         // get the details after the operation
         FileInfo afterFileInfo = toFileInfo(targetNodeRef);
