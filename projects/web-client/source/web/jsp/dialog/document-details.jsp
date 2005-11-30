@@ -205,7 +205,7 @@
                      <table cellspacing="0" cellpadding="3" border="0" width="100%">
                         <tr>
                            <td width="100%" valign="top">
-                              <a:panel label="#{msg.preview}" id="preview-panel" progressive="true"
+                              <a:panel label="#{msg.view_links}" id="preview-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        expanded='#{DocumentDetailsBean.panels["preview-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
                                  <table width="100%" cellspacing="2" cellpadding="2" border="0" align="center">

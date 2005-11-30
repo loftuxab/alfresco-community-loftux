@@ -83,12 +83,7 @@ public class UIMenu extends SelfRenderingComponent
       // also output the javascript handlers used to hide the menu after a delay of non-use
       out.write("<br><div id='");
       out.write(menuId);
-      out.write("' onmouseover=\"javascript:_menuIn('");
-      out.write(menuId);
-      out.write("');\" onmouseout=\"javascript:_menuOut('");
-      out.write(menuId);
-      out.write("');\"");
-      out.write(" style=\"position:absolute;display:none;padding-left:2px;\">");
+      out.write("' style=\"position:absolute;display:none;padding-left:2px;\">");
       out.write("<table border=0 cellpadding=0");
       outputAttribute(out, getAttributes().get("itemSpacing"), "cellspacing");
       outputAttribute(out, getAttributes().get("menuStyle"), "style");

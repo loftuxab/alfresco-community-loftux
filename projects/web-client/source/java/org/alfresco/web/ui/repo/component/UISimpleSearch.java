@@ -193,9 +193,7 @@ public class UISimpleSearch extends UICommand
             bundle.getString(MSG_OPTIONS), "javascript:_toggleMenu(event, '_alfsearch');"));
       
       // dynamic DIV area containing search options
-      out.write("<br><div id='_alfsearch' style='position:absolute;display:none'" +
-                " onmouseover=\"javascript:_menuIn('_alfsearch');\"" +
-                " onmouseout=\"javascript:_menuOut('_alfsearch');\">");
+      out.write("<br><div id='_alfsearch' style='position:absolute;display:none'>");
       out.write("<table border=0 bgcolor='#eeeeee' style='border-top:thin solid #FFFFFF;border-left:thin solid #FFFFFF;border-right:thin solid #444444;border-bottom:thin solid #444444;' cellspacing=4 cellpadding=0>");
       
       // output each option - setting the current one to CHECKED
