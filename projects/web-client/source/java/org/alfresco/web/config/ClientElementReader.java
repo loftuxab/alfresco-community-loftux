@@ -55,6 +55,7 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ATTRIBUTE_LOCALE = "locale";
    public static final String ATTRIBUTE_NAME = "name";
    public static final String ELEMENT_HELPURL = "help-url";
+   public static final String ELEMENT_EDITLINKTYPE = "edit-link-type";
    public static final String ELEMENT_SEARCHMINIMUM = "search-minimum";
    public static final String ELEMENT_HOMESPACEPERMISSION = "home-space-permission";
    public static final String ELEMENT_ADVANCEDSEARCH = "advanced-search";
@@ -230,6 +231,13 @@ public class ClientElementReader implements ConfigElementReader
          if (helpUrl != null)
          {
             configElement.setHelpUrl(helpUrl.getTextTrim());
+         }
+         
+         // get the edit link type
+         Element editLinkType = element.element(ELEMENT_EDITLINKTYPE);
+         if (editLinkType != null)
+         {
+            configElement.setEditLinkType(editLinkType.getTextTrim());
          }
          
          // get the minimum number of characters for valid search string

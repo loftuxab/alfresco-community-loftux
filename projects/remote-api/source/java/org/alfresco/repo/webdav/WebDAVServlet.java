@@ -55,6 +55,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class WebDAVServlet extends HttpServlet
 {
+    public static final String WEBDAV_PREFIX = "webdav"; 
+    
     private static final long serialVersionUID = 6900069445027527165L;
 
     // Logging
@@ -230,23 +232,7 @@ public class WebDAVServlet extends HttpServlet
                 // Create the handler method
                 
                 method = (WebDAVMethod) methodClass.newInstance();
-                
-                // Check if user details are available
-                
-                WebDAVUser davUser = (WebDAVUser) request.getSession().getAttribute(AuthenticationFilter.AUTHENTICATION_USER);
-                NodeRef rootNode = m_rootNodeRef;
-                
-                if ( davUser != null && davUser.hasHomeNode())
-                {
-                    rootNode = davUser.getHomeNode();
-                    
-                    // DEBUG
-                    
-                    if ( logger.isDebugEnabled())
-                        logger.debug("Using user home space root node, " + davUser);
-                }
-                
-                method.setDetails(request, response, m_davHelper, rootNode);
+                method.setDetails(request, response, m_davHelper, m_rootNodeRef);
             }
             catch (Exception ex)
             {

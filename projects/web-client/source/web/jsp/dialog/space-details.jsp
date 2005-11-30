@@ -214,7 +214,24 @@
                               </a:panel>
                               
                               <br/>
+                              <a:panel label="#{msg.links}" id="preview-panel" progressive="true"
+                                       border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE">
+                                 <table width="100%" cellspacing="2" cellpadding="2" border="0" align="center">
+                                    <tr>
+                                       <td>
+                                          <a:actionLink value="#{msg.view_in_webdav}" href="#{SpaceDetailsBean.webdavUrl}" target="new" id="link1" />
+                                       </td>
+                                       <td>
+                                          <a:actionLink value="#{msg.view_in_cifs}" href="#{SpaceDetailsBean.cifsPath}" target="new" id="link2" />
+                                       </td>
+                                       <td>
+                                          <a:actionLink value="#{msg.details_page_bookmark}" href="#{SpaceDetailsBean.bookmarkUrl}" target="new" id="link3" />
+                                       </td>
+                                    </tr>
+                                 </table>
+                              </a:panel>
                               
+                              <br/>
                               <h:column id="rules-panel-facets">
                                  <f:facet name="title">
                                     <r:permissionEvaluator value="#{SpaceDetailsBean.space}" allow="Write">

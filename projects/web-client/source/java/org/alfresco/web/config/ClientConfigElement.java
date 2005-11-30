@@ -56,6 +56,7 @@ public class ClientConfigElement extends ConfigElementAdapter
    private int recentSpacesItems = 6;
    private int searchMinimum = 3;
    private String helpUrl = null;
+   private String editLinkType = null;
    private Map<String, String> localeMap = new HashMap<String, String>();
    private List<String> languages = new ArrayList<String>(8);
    private String homeSpacePermission = null;
@@ -392,6 +393,22 @@ public class ClientConfigElement extends ConfigElementAdapter
    /*package*/ void setHelpUrl(String helpUrl)
    {
       this.helpUrl = helpUrl;
+   }
+   
+   /**
+    * @return Returns the edit link type.
+    */
+   public String getEditLinkType()
+   {
+      return this.editLinkType;
+   }
+
+   /**
+    * @param editLinkType The edit link type to set.
+    */
+   /*package*/ void setEditLinkType(String editLinkType)
+   {
+      this.editLinkType = editLinkType;
    }
 
    /**

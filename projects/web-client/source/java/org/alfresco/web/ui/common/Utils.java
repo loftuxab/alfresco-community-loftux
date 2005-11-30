@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
@@ -36,15 +37,32 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.filesys.CIFSServer;
+import org.alfresco.filesys.server.filesys.DiskSharedDevice;
+import org.alfresco.filesys.smb.server.repo.ContentContext;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.webdav.WebDAVServlet;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.web.app.Application;
+import org.alfresco.web.app.servlet.DownloadContentServlet;
+import org.alfresco.web.app.servlet.ExternalAccessServlet;
+import org.alfresco.web.bean.NavigationBean;
 import org.alfresco.web.bean.repository.Node;
+import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.component.UIStatusMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.myfaces.renderkit.html.HtmlFormRendererBase;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Class containing misc helper methods used by the JSF components.
@@ -449,6 +467,117 @@ public final class Utils
       buf.append(";return false;");
       
       return buf.toString();
+   }
+   
+   /**
+    * Generates a URL for the given usage for the given node.
+    * 
+    * The supported values for the usage parameter are:
+    * 
+    * <ul>
+    * <li>http-download</li>
+    * <li>http-inline</li>
+    * <li>webdav</li>
+    * <li>cifs</li>
+    * <li>show-details</li>
+    * <li>ftp</li>
+    * </ul>
+    * 
+    * @param context Faces context
+    * @param node The node to generate the URL for
+    * @param usage What the URL is going to be used for 
+    * @return The URL for the requested usage without the context path
+    */
+   public static String generateURL(FacesContext context, Node node, String usage)
+   {
+      String url = null;
+      
+      if (usage.equalsIgnoreCase("webdav"))
+      {
+         // calculate a WebDAV URL for the given node
+         
+         FileFolderService fileFolderService = Repository.getServiceRegistry(
+               context).getFileFolderService();
+         try
+         {
+            List<FileInfo> paths = fileFolderService.getNamePath(null, node.getNodeRef());
+            User user = Application.getCurrentUser(context);
+            
+            // build up the webdav url
+            StringBuilder path = new StringBuilder("/").append(WebDAVServlet.WEBDAV_PREFIX);
+            
+            // build up the path skipping the first path as it is the root folder
+            boolean homeSpaceFound = false;
+            for (int x = 1; x < paths.size(); x++)
+            {
+               path.append("/").append(paths.get(x).getName());
+            }
+            
+            url = path.toString();
+         }
+         catch (Exception e)
+         {
+            if (logger.isWarnEnabled())
+               logger.warn("Failed to calculate webdav url", e);
+         }
+      }
+      else if (usage.equalsIgnoreCase("cifs"))
+      {
+         // calculate a CIFS path for the given node
+         
+         // get hold of the node service, cifsServer and navigation bean
+         NodeService nodeService = Repository.getServiceRegistry(context).getNodeService();
+         NavigationBean navBean = (NavigationBean)context.getExternalContext().
+               getSessionMap().get("NavigationBean");
+         CIFSServer cifsServer = (CIFSServer)FacesContextUtils.getRequiredWebApplicationContext(
+               context).getBean("cifsServer");
+
+         if (nodeService != null && navBean != null && cifsServer != null)
+         {
+            DiskSharedDevice diskShare = cifsServer.getConfiguration().getPrimaryFilesystem();
+            
+            if (diskShare != null)
+            {
+                ContentContext contentCtx = (ContentContext) diskShare.getContext();
+                NodeRef rootNode = contentCtx.getRootNode();
+                Path path = nodeService.getPath(node.getNodeRef());
+                url = Repository.getNamePath(nodeService, path, rootNode, "\\", 
+                      "file:///" + navBean.getCIFSServerPath(diskShare));
+            }
+         }
+      }
+      else if (usage.equalsIgnoreCase("http-download"))
+      {
+         url = DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName());
+      }
+      else if (usage.equalsIgnoreCase("http-inline"))
+      {
+         url = DownloadContentServlet.generateBrowserURL(node.getNodeRef(), node.getName());
+      }
+      else if (usage.equalsIgnoreCase("show-details"))
+      {
+         DictionaryService dd = Repository.getServiceRegistry(context).getDictionaryService();
+         
+         // default to showing details of content
+         String outcome = "showDocDetails";
+         
+         // if the node is a type of folder then make the outcome to show space details
+         if (dd.isSubClass(node.getType(), ContentModel.TYPE_FOLDER))
+         {
+            outcome = "showSpaceDetails";
+         }
+         
+         // build the url
+         url = ExternalAccessServlet.generateExternalURL(outcome, 
+               Repository.getStoreRef().getProtocol() + "/" + 
+               Repository.getStoreRef().getIdentifier() + "/" + node.getId());
+      }
+      else if (usage.equalsIgnoreCase("ftp"))
+      {
+         // not implemented yet!
+      }
+      
+      return url;
    }
    
    /**

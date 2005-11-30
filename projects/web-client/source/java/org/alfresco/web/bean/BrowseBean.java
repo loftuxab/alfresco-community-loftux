@@ -27,13 +27,15 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
+import org.alfresco.filesys.CIFSServer;
+import org.alfresco.filesys.server.filesys.DiskSharedDevice;
+import org.alfresco.filesys.smb.server.repo.ContentContext;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -68,7 +70,6 @@ import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.alfresco.web.ui.repo.component.UINodePath;
 import org.alfresco.web.ui.repo.component.UISimpleSearch;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
@@ -144,6 +145,14 @@ public class BrowseBean implements IContextListener
    public void setConfigService(ConfigService configService)
    {
       this.configService = configService;
+   }
+   
+   /**
+    * @param fileFolderService The FileFolderService to set.
+    */
+   public void setFileFolderService(FileFolderService fileFolderService)
+   {
+      this.fileFolderService = fileFolderService;
    }
    
    /**
@@ -405,6 +414,10 @@ public class BrowseBean implements IContextListener
       node.addPropertyResolver("size", this.resolverSize);
       node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
       node.addPropertyResolver("checkIn", this.resolverCheckIn);
+      node.addPropertyResolver("editLinkType", this.resolverEditLinkType);
+      
+      node.addPropertyResolver("webdavUrl", this.resolverWebdavUrl);
+      node.addPropertyResolver("cifsPath", this.resolverCifsPath);
    }
    
    
@@ -761,6 +774,20 @@ public class BrowseBean implements IContextListener
       }
    };
    
+   public NodePropertyResolver resolverWebdavUrl = new NodePropertyResolver() {
+      public Object get(Node node) 
+      {
+         return Utils.generateURL(FacesContext.getCurrentInstance(), node, "webdav"); 
+      }   
+   };
+   
+   public NodePropertyResolver resolverCifsPath = new NodePropertyResolver() {
+      public Object get(Node node)
+      {
+         return Utils.generateURL(FacesContext.getCurrentInstance(), node, "cifs");
+      }
+   };
+   
    public NodePropertyResolver resolverFileType16 = new NodePropertyResolver() {
       public Object get(Node node) {
          return Utils.getFileTypeImage(node.getName(), true);
@@ -808,6 +835,30 @@ public class BrowseBean implements IContextListener
       }
    };
    
+   public NodePropertyResolver resolverEditLinkType = new NodePropertyResolver() {
+      public Object get(Node node)
+      {
+         String editLinkType = null;
+         
+         // if the node is inline editable, the default http behaviour should 
+         // always be used otherwise the configured approach is used
+         if (node.hasAspect(ContentModel.ASPECT_INLINEEDITABLE))
+         {
+            editLinkType = "http";
+         }
+         else
+         {
+            editLinkType = clientConfig.getEditLinkType();
+            
+            if (editLinkType == null)
+            {
+               editLinkType = "http";
+            }
+         }
+         
+         return editLinkType;
+      }
+   };
    
    // ------------------------------------------------------------------------------
    // Navigation action event handlers
@@ -1440,9 +1491,12 @@ public class BrowseBean implements IContextListener
    /** The DictionaryService bean reference */
    private DictionaryService dictionaryService;
    
+   /** The file folder service */
+   private FileFolderService fileFolderService;
+   
    /** ConfigService bean reference */
    private ConfigService configService;
-   
+
    /** Client configuration object */
    private ClientConfigElement clientConfig = null;
    

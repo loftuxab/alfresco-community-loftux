@@ -106,6 +106,10 @@
          
          <!-- the URL to the client Help file -->
          <help-url>http://www.alfresco.org/mediawiki/index.php/Client_Help</help-url>
+         
+         <!-- the type of edit link to use, NOTE: inline editable will always take precedence -->
+         <!-- can be: http|webdav|cifs -->
+         <edit-link-type>http</edit-link-type>
       </client>
    </config>
    
@@ -301,7 +305,7 @@
    
    <config evaluator="string-compare" condition="Custom Folder Types">
       <folder-types>
-         <type name="fm:forums" icon="/images/icons/forums_large.gif" descriptionMsgId="forums_desc" />
+         <!-- <type name="fm:forums" icon="/images/icons/forums_large.gif" descriptionMsgId="forums_desc" /> -->
       </folder-types>
    </config>
       

@@ -135,6 +135,36 @@ public class SpaceDetailsBean
    }
    
    /**
+    * Returns the WebDAV URL for the current document
+    * 
+    * @return The WebDAV url
+    */
+   public String getWebdavUrl()
+   {
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), "webdav");
+   }
+
+   /**
+    * Returns the URL to access the details page for the current document
+    * 
+    * @return The bookmark URL
+    */
+   public String getBookmarkUrl()
+   {
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), "show-details");
+   }
+   
+   /**
+    * Returns the CIFS path for the current document
+    * 
+    * @return The CIFS path
+    */
+   public String getCifsPath()
+   {
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), "cifs");
+   }
+
+   /**
     * @return Returns the template Id.
     */
    public String getTemplate()

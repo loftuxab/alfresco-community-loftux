@@ -509,26 +509,11 @@ public class NavigationBean
       }
    }
    
-   
-   // ------------------------------------------------------------------------------
-   // Private helpers
-   
-   /**
-    * Initialise default values from client configuration
-    */
-   private void initFromClientConfig()
-   {
-      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
-            ClientConfigElement.CONFIG_ELEMENT_ID);
-      
-      this.helpUrl = clientConfig.getHelpUrl();
-   }
-   
    /**
     * @param diskShare Filesystem shared device
     * @return CIFS server path as network style string label
     */
-   private String getCIFSServerPath(DiskSharedDevice diskShare)
+   public String getCIFSServerPath(DiskSharedDevice diskShare)
    {
       if (this.cifsServerPath == null)
       {
@@ -549,6 +534,19 @@ public class NavigationBean
       return this.cifsServerPath;
    }
    
+   // ------------------------------------------------------------------------------
+   // Private helpers
+   
+   /**
+    * Initialise default values from client configuration
+    */
+   private void initFromClientConfig()
+   {
+      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
+            ClientConfigElement.CONFIG_ELEMENT_ID);
+      
+      this.helpUrl = clientConfig.getHelpUrl();
+   }
    
    // ------------------------------------------------------------------------------
    // Inner classes

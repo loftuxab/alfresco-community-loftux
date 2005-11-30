@@ -26,7 +26,7 @@
 
 <%@ page buffer="64kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
-
+   
 <r:page titleId="title_browse">
 
 <f:view>
@@ -436,9 +436,21 @@
                            </f:facet>
                            <r:permissionEvaluator value="#{r}" allow="Write">
                               <a:booleanEvaluator value="#{(r.locked == false && r.workingCopy == false) || r.owner == true}">
-                                 <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
-                                    <f:param name="id" value="#{r.id}" />
-                                 </a:actionLink>
+                                 <a:booleanEvaluator value="#{r.editLinkType == 'http'}">
+                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" actionListener="#{CheckinCheckoutBean.editFile}">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                 </a:booleanEvaluator>
+                                 <a:booleanEvaluator value="#{r.editLinkType == 'webdav'}">
+                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" href="#{r.webdavUrl}" target="new">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                 </a:booleanEvaluator>
+                                 <a:booleanEvaluator value="#{r.editLinkType == 'cifs'}">
+                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" href="#{r.cifsPath}" target="new">
+                                       <f:param name="id" value="#{r.id}" />
+                                    </a:actionLink>
+                                 </a:booleanEvaluator>
                               </a:booleanEvaluator>
                            </r:permissionEvaluator>
                            <r:permissionEvaluator value="#{r}" allow="CheckOut">

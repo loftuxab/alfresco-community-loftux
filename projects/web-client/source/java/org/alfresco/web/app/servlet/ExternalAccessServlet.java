@@ -37,7 +37,9 @@ import org.apache.commons.logging.LogFactory;
  * displayed. The JSF "outcome" must equate to a global navigation rule or it will not be displayed.
  * Servlet URL is of the form:
  * <p>
- * <pre>http://<server>/alfresco/navigate/<outcome>[/<workspace>/<store>/<nodeId>]</pre>
+ * <code>http://&lt;server&gt;/alfresco/navigate/&lt;outcome&gt;[/&lt;workspace&gt;/&lt;store&gt;/&lt;nodeId&gt;]</code> or <br/>
+ * <code>http://&lt;server&gt;/alfresco/navigate/&lt;outcome&gt;[/webdav/&lt;path/to/node&gt;]</code>
+ * </p>
  * 
  * @author Kevin Roast
  */
@@ -54,7 +56,7 @@ public class ExternalAccessServlet extends HttpServlet
    protected void service(HttpServletRequest req, HttpServletResponse res)
       throws ServletException, IOException
    {
-      AuthenticationHelper.authenticate(getServletContext(), req, res);
+      boolean alreadyAuthenticated = AuthenticationHelper.authenticate(getServletContext(), req, res);
       
       // The URL contains multiple parts
       // /alfresco/navigate/<outcome>
@@ -81,21 +83,24 @@ public class ExternalAccessServlet extends HttpServlet
          tokens[i] = t.nextToken();
       }
       
-      // clear the User object from the Session - this will force a relogin
-      // we do this so the outcome from the login page can then be changed
-      req.getSession().removeAttribute(AuthenticationHelper.AUTHENTICATION_USER);
-      
-      if (logger.isDebugEnabled())
-        logger.debug("Removing User session - will redirect via login page...");
-      
       // set the session variable so the login bean knows which outcome to use
       req.getSession().setAttribute(LoginBean.LOGIN_OUTCOME_KEY, outcome);
       
       // set the args if any
       req.getSession().setAttribute(LoginBean.LOGIN_OUTCOME_ARGS, tokens);
       
-      // redirect to root URL will force the login page to appear via the Authentication Filter
-      res.sendRedirect(req.getContextPath());
+      if (alreadyAuthenticated)
+      {
+         // clear the User object from the Session - this will force a relogin
+         // we do this so the outcome from the login page can then be changed
+         req.getSession().removeAttribute(AuthenticationHelper.AUTHENTICATION_USER);
+         
+         if (logger.isDebugEnabled())
+           logger.debug("Removing User session - will redirect via login page...");
+         
+         // redirect to root URL will force the login page to appear via the Authentication Filter
+         res.sendRedirect(req.getContextPath());
+      }
    }
    
    /**

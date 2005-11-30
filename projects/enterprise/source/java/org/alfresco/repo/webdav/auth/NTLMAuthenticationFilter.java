@@ -536,7 +536,7 @@ public class NTLMAuthenticationFilter implements Filter
         
         // Check if we are using cached details for the authentication
         
-        if ( ntlmDetails != null && ntlmDetails.hasNTLMHashedPassword())
+        if ( user != null && ntlmDetails != null && ntlmDetails.hasNTLMHashedPassword())
         {
             // Check if the received NTLM hashed password matches the cached password
             

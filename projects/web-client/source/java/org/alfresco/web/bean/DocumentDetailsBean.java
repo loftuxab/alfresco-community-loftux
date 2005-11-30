@@ -154,7 +154,47 @@ public class DocumentDetailsBean
     */
    public String getBrowserUrl()
    {
-      return DownloadContentServlet.generateBrowserURL(getDocument().getNodeRef(), getDocument().getName());
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "http-inline");
+   }
+
+   /**
+    * Returns the download URL to the content for the current document
+    *  
+    * @return Download url to the current document
+    */
+   public String getDownloadUrl()
+   {
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "http-download");
+   }
+   
+   /**
+    * Returns the WebDAV URL for the current document
+    * 
+    * @return The WebDAV url
+    */
+   public String getWebdavUrl()
+   {
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "webdav");
+   }
+   
+   /**
+    * Returns the URL to access the details page for the current document
+    * 
+    * @return The bookmark URL
+    */
+   public String getBookmarkUrl()
+   {
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "show-details");
+   }
+   
+   /**
+    * Returns the CIFS path for the current document
+    * 
+    * @return The CIFS path
+    */
+   public String getCifsPath()
+   {
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "cifs");
    }
    
    /**

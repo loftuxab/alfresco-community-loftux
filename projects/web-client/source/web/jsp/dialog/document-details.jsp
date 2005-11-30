@@ -208,10 +208,24 @@
                               <a:panel label="#{msg.preview}" id="preview-panel" progressive="true"
                                        border="white" bgcolor="white" titleBorder="blue" titleBgcolor="#D3E6FE"
                                        expanded='#{DocumentDetailsBean.panels["preview-panel"]}' expandedActionListener="#{DocumentDetailsBean.expandPanel}">
-                                 <table width=100% cellspacing=0 cellpadding=0 border=0>
+                                 <table width="100%" cellspacing="2" cellpadding="2" border="0" align="center">
                                     <tr>
-                                       <td align=left>
-                                          <a:actionLink value="#{msg.view_in_browser}" href="#{DocumentDetailsBean.browserUrl}" id="link1" />
+                                       <td>
+                                          <a:actionLink value="#{msg.view_in_browser}" href="#{DocumentDetailsBean.browserUrl}" target="new" id="link1" />
+                                       </td>
+                                       <td>
+                                          <a:actionLink value="#{msg.view_in_webdav}" href="#{DocumentDetailsBean.webdavUrl}" target="new" id="link2" />
+                                       </td>
+                                       <td>
+                                          <a:actionLink value="#{msg.view_in_cifs}" href="#{DocumentDetailsBean.cifsPath}" target="new" id="link3" />
+                                       </td>
+                                    </tr>
+                                    <tr>
+                                       <td>
+                                          <a:actionLink value="#{msg.download_content}" href="#{DocumentDetailsBean.downloadUrl}" target="new" id="link4" />
+                                       </td>
+                                       <td>
+                                          <a:actionLink value="#{msg.details_page_bookmark}" href="#{DocumentDetailsBean.bookmarkUrl}" target="new" id="link5" />
                                        </td>
                                     </tr>
                                  </table>
@@ -371,7 +385,7 @@
                                     </a:column>
                                     
                                     <%-- Version notes columns --%>
-                                    <a:column id="col2" style="text-align:left">
+                                    <a:column id="col2" width="200" style="text-align:left">
                                        <f:facet name="header">
                                           <a:sortLink label="#{msg.notes}" value="notes" styleClass="header"/>
                                        </f:facet>
@@ -387,7 +401,7 @@
                                     </a:column>
                                     
                                     <%-- Created Date column for details view mode --%>
-                                    <a:column id="col4" style="text-align:left">
+                                    <a:column id="col4" style="text-align:left; white-space:nowrap">
                                        <f:facet name="header">
                                           <a:sortLink label="#{msg.date}" value="versionDate" styleClass="header"/>
                                        </f:facet>

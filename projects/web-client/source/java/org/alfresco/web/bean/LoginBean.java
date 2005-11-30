@@ -17,7 +17,10 @@
 package org.alfresco.web.bean;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,11 +32,14 @@ import javax.faces.model.SelectItem;
 import javax.faces.validator.ValidatorException;
 import javax.portlet.PortletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationException;
+import org.alfresco.repo.webdav.WebDAVServlet;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -46,7 +52,8 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.repository.User;
 import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * JSF Managed Bean. Backs the "login.jsp" view to provide the form fields used
@@ -98,6 +105,14 @@ public class LoginBean
    public void setConfigService(ConfigService configService)
    {
       this.configService = configService;
+   }
+   
+   /**
+    * @param fileFolderService          The FileFolderService to set.
+    */
+   public void setFileFolderService(FileFolderService fileFolderService)
+   {
+      this.fileFolderService = fileFolderService;
    }
 
    /**
@@ -274,11 +289,21 @@ public class LoginBean
                // setup is required for certain outcome requests
                if (OUTCOME_DOCDETAILS.equals(externalOutcome))
                {
+                  NodeRef nodeRef = null;
+                  
                   String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
-                  if (args.length == 3)
+                  if (args[0].equals(WebDAVServlet.WEBDAV_PREFIX))
+                  {
+                     nodeRef = resolveWebDAVPath(fc, args, false);
+                  }
+                  else if (args.length == 3)
                   {
                      StoreRef storeRef = new StoreRef(args[0], args[1]);
-                     NodeRef nodeRef = new NodeRef(storeRef, args[2]);
+                     nodeRef = new NodeRef(storeRef, args[2]);
+                  }
+                  
+                  if (nodeRef != null)
+                  {
                      // setup the Document on the browse bean
                      // TODO: the browse bean should accept a full
                      // NodeRef - not just an ID
@@ -287,11 +312,21 @@ public class LoginBean
                }
                else if (OUTCOME_SPACEDETAILS.equals(externalOutcome))
                {
+                  NodeRef nodeRef = null;
+                  
                   String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
-                  if (args.length == 3)
+                  if (args[0].equals(WebDAVServlet.WEBDAV_PREFIX))
+                  {
+                     nodeRef = resolveWebDAVPath(fc, args, true);
+                  }
+                  else if (args.length == 3)
                   {
                      StoreRef storeRef = new StoreRef(args[0], args[1]);
-                     NodeRef nodeRef = new NodeRef(storeRef, args[2]);
+                     nodeRef = new NodeRef(storeRef, args[2]);
+                  }
+                  
+                  if (nodeRef != null)
+                  {
                      // setup the Space on the browse bean
                      // TODO: the browse bean should accept a full
                      // NodeRef - not just an ID
@@ -388,11 +423,63 @@ public class LoginBean
       return alfrescoAuth ? "logout" : "relogin";
    }
 
+   // ------------------------------------------------------------------------------
+   // Private helpers
+   
+   /**
+    * Resolves the given path elements to a NodeRef in the current repository
+    * 
+    * @param context Faces context
+    * @param args The elements of the path to lookup
+    * @param isFolder Whether the path represents a folder
+    */
+   private NodeRef resolveWebDAVPath(FacesContext context, String[] args, boolean isFolder)
+   {
+      NodeRef nodeRef = null;
+
+      List<String> paths = new ArrayList<String>(args.length-1);
+      
+      FileInfo file = null;
+      try
+      {
+         // create a list of path elements (decode the URL as we go)
+         for (int x = 1; x < args.length; x++)
+         {
+            paths.add(URLDecoder.decode(args[x], "UTF-8"));
+         }
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Attempting to resolve webdav path to NodeRef: " + paths);
+         
+         // get the company home node to start the search from
+         NodeRef companyHome = new NodeRef(Repository.getStoreRef(), 
+               Application.getCompanyRootId());
+         
+         file = this.fileFolderService.resolveNamePath(companyHome, paths, isFolder);
+         nodeRef = file.getNodeRef();
+      }
+      catch (UnsupportedEncodingException uee)
+      {
+         if (logger.isWarnEnabled())
+            logger.warn("Failed to resolve webdav path", uee);
+         
+         nodeRef = null;
+      }
+      catch (FileNotFoundException fne)
+      {
+         if (logger.isWarnEnabled())
+            logger.debug("Failed to resolve webdav path", fne);
+         
+         nodeRef = null;
+      }
+      
+      return nodeRef;
+   }
    
    // ------------------------------------------------------------------------------
    // Private data
 
-   private static final Logger logger = Logger.getLogger(LoginBean.class);
+   private static final Log logger = LogFactory.getLog(LoginBean.class);
    
    /** I18N messages */
    private static final String MSG_ERROR_MISSING = "error_login_missing";
@@ -433,4 +520,7 @@ public class LoginBean
 
    /** ConfigService bean reference */
    private ConfigService configService;
+   
+   /** FileFolderService bean reference */
+   private FileFolderService fileFolderService;
 }

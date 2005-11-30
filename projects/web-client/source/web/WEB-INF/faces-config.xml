@@ -41,6 +41,10 @@
          <property-name>configService</property-name>
          <value>#{configService}</value>
       </managed-property>
+      <managed-property>
+         <property-name>fileFolderService</property-name>
+         <value>#{FileFolderService}</value>
+      </managed-property>
    </managed-bean>
    
    <managed-bean>
@@ -102,6 +106,10 @@
       <managed-property>
          <property-name>configService</property-name>
          <value>#{configService}</value>
+      </managed-property>
+      <managed-property>
+         <property-name>fileFolderService</property-name>
+         <value>#{FileFolderService}</value>
       </managed-property>
    </managed-bean>
 
