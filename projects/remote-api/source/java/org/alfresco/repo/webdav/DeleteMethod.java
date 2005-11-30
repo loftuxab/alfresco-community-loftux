@@ -16,12 +16,14 @@
  */
 package org.alfresco.repo.webdav;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 
 /**
  * Implements the WebDAV DELETE method
@@ -30,67 +32,66 @@ import org.alfresco.service.cmr.repository.NodeService;
  */
 public class DeleteMethod extends WebDAVMethod
 {
-   /**
-    * Default constructor
-    */
-   public DeleteMethod()
-   {
-   }
-   
-   /**
-    * Parse the request headers
-    * 
-    * @exception WebDAVServerException
-    */
-   protected void parseRequestHeaders() throws WebDAVServerException
-   {
-      // Nothing to do in this method
-   }
-   
-   /**
-    * Parse the request body
-    * 
-    * @exception WebDAVServerException
-    */
-   protected void parseRequestBody() throws WebDAVServerException
-   {
-      // Nothing to do in this method
-   }   
-   
-   /**
-    * Execute the request
-    * 
-    * @exception WebDAVServerException
-    */
-   protected void executeImpl() throws WebDAVServerException
-   {
-       NodeService nodeService = getNodeService();
-       
-       try
-       {
-           // Find the node to be deleted
-           
-           NodeRef node = getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), m_request.getServletPath());
-           
-           if ( node != null)
-               nodeService.deleteNode( node);
-           else
-               throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
-       }
-       catch ( AccessDeniedException ex)
-       {
-       
-           // Return a forbidden status
-           
-           throw new WebDAVServerException(HttpServletResponse.SC_UNAUTHORIZED, ex);
-       }
-       catch (AlfrescoRuntimeException ex)
-       {
-           // TODO: Check for locked status and return different status code
-           
-           // Convert error to a server error
-           
-           throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
-       }
-   }
+    /**
+     * Default constructor
+     */
+    public DeleteMethod()
+    {
+    }
+
+    /**
+     * Parse the request headers
+     * 
+     * @exception WebDAVServerException
+     */
+    protected void parseRequestHeaders() throws WebDAVServerException
+    {
+        // Nothing to do in this method
+    }
+
+    /**
+     * Parse the request body
+     * 
+     * @exception WebDAVServerException
+     */
+    protected void parseRequestBody() throws WebDAVServerException
+    {
+        // Nothing to do in this method
+    }
+
+    /**
+     * Execute the request
+     * 
+     * @exception WebDAVServerException
+     */
+    protected void executeImpl() throws WebDAVServerException, Exception
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("WebDAV DELETE: " + getPath());
+        }
+        
+        FileFolderService fileFolderService = getFileFolderService();
+
+        NodeRef rootNodeRef = getRootNodeRef();
+
+        String path = getPath();
+        List<String> pathElements = getDAVHelper().splitAllPaths(path);
+        FileInfo fileInfo = null;
+        try
+        {
+            // get the node to delete
+            fileInfo = fileFolderService.resolveNamePath(rootNodeRef, pathElements);
+        }
+        catch (FileNotFoundException e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Node not found: " + getPath());
+            }
+            throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
+        }
+        // delete it
+        fileFolderService.delete(fileInfo.getNodeRef());
+    }
 }

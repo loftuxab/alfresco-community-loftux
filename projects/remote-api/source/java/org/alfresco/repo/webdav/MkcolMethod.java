@@ -18,9 +18,11 @@ package org.alfresco.repo.webdav;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.w3c.dom.Document;
 
 /**
@@ -69,69 +71,63 @@ public class MkcolMethod extends WebDAVMethod
      * 
      * @exception WebDAVServerException
      */
-    protected void executeImpl() throws WebDAVServerException
+    protected void executeImpl() throws WebDAVServerException, Exception
     {
-        NodeService nodeService = getNodeService();
-        int fsts = WebDAVHelper.NotExist;
+        FileFolderService fileFolderService = getFileFolderService();
 
+        // see if it exists
         try
         {
-            // Check if the path exists
-
-            fsts = getDAVHelper().getPathStatus(getRootNodeRef(), getPath());
-
-            // If the folder already exists, or is a file then return an error
-
-            if (fsts != WebDAVHelper.NotExist)
-            {
-                throw new WebDAVServerException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
-
-            // Trim the last path component and check if the parent path exists
-
-            String parentPath = getPath();
-            int lastPos = parentPath.lastIndexOf(WebDAVHelper.PathSeperator);
-            
-            NodeRef parentNode = null;
-
-            if ( lastPos == 0)
-            {
-                // Create new folder at root
-
-                parentPath = WebDAVHelper.PathSeperator;
-                parentNode = getRootNodeRef();
-            }
-            else if (lastPos != -1)
-            {
-                // Trim the last path component
-
-                parentPath = parentPath.substring(0, lastPos + 1);
-                parentNode = getDAVHelper().getNodeForPath(getRootNodeRef(), parentPath, m_request.getServletPath());
-            }
-            else
-            {
-                // Looks like a bad path
-
-                throw new WebDAVServerException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
-
-            // Get the new folder name
-
-            String folderName = getPath().substring(lastPos + 1);
-
-            // Create the new folder node
-
-            getDAVHelper().createNode(parentNode, folderName, false);
-
-            // Return a success status
-
-            m_response.setStatus(HttpServletResponse.SC_CREATED);
+            getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), getServletPath());
+            // already exists
+            throw new WebDAVServerException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
-        catch (AlfrescoRuntimeException ex)
+        catch (FileNotFoundException e)
         {
-            // Convert to a server error
-
-            throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            // it doesn't exist
         }
+        
+        // Trim the last path component and check if the parent path exists
+        String parentPath = getPath();
+        int lastPos = parentPath.lastIndexOf(WebDAVHelper.PathSeperator);
+        
+        NodeRef parentNodeRef = null;
+
+        if ( lastPos == 0)
+        {
+            // Create new folder at root
+
+            parentPath = WebDAVHelper.PathSeperator;
+            parentNodeRef = getRootNodeRef();
+        }
+        else if (lastPos != -1)
+        {
+            // Trim the last path component
+            parentPath = parentPath.substring(0, lastPos + 1);
+            try
+            {
+                FileInfo parentFileInfo = getDAVHelper().getNodeForPath(getRootNodeRef(), parentPath, m_request.getServletPath());
+                parentNodeRef = parentFileInfo.getNodeRef();
+            }
+            catch (FileNotFoundException e)
+            {
+                // parent path is missing
+                throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
+            }
+        }
+        else
+        {
+            // Looks like a bad path
+            throw new WebDAVServerException(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        }
+
+        // Get the new folder name
+        String folderName = getPath().substring(lastPos + 1);
+
+        // Create the new folder node
+        fileFolderService.create(parentNodeRef, folderName, ContentModel.TYPE_FOLDER);
+
+        // Return a success status
+        m_response.setStatus(HttpServletResponse.SC_CREATED);
     }
 }

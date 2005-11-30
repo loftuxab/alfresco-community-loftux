@@ -16,29 +16,25 @@
  */
 package org.alfresco.repo.webdav;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.permissions.AccessDeniedException;
-import org.alfresco.service.cmr.repository.ContentData;
-import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.model.FileExistsException;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 
 /**
  * Implements the WebDAV PUT method
  * 
- * @author gavinc
+ * @author Gavin Cornwell
  */
 public class PutMethod extends WebDAVMethod
 {
     // Request parameters
-    
     private String m_strLockToken = null;
     private String m_strContentType = null;
     private boolean m_expectHeaderPresent = false;
@@ -86,101 +82,67 @@ public class PutMethod extends WebDAVMethod
      * 
      * @exception WebDAVServerException
      */
-    protected void executeImpl() throws WebDAVServerException
+    protected void executeImpl() throws WebDAVServerException, Exception
     {
-        NodeService nodeService = getNodeService();
-        ContentService contentService = getContentService();
+        FileFolderService fileFolderService = getFileFolderService();
 
-        int fsts = WebDAVHelper.NotExist;
-
+        // Get the status for the request path
+        FileInfo contentNodeInfo = null;
+        boolean created = false;
         try
         {
-
-            // Get the status for the request path
-
-            fsts = getDAVHelper().getPathStatus(getRootNodeRef(), getPath());
-            NodeRef contentNode = null;
-
-            // Check that we are not trying to do this on a collection
-
-            if (fsts == WebDAVHelper.FolderExists)
+            contentNodeInfo = getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), getServletPath());
+            // make sure that we are not trying to use a folder
+            if (contentNodeInfo.isFolder())
             {
-                // Return an error status
-
                 throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
             }
-            else if ( fsts == WebDAVHelper.FileExists)
-            {
-                // Get an existing node, if available
-                
-                contentNode = getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), m_request.getServletPath());
-            }
-            else
-            {
-                // Split the path into path and file name
-    
-                String[] paths = getDAVHelper().splitPath(getPath());
-    
-                if (paths[1] == null)
-                {
-                    // Bad path
-    
-                    throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
-                }
-    
-                // Get the parent folder node
-    
-                NodeRef parentNode = getDAVHelper().getNodeForPath(getRootNodeRef(), paths[0], m_request.getServletPath());
-    
-                // Create a new node or version
-    
-                contentNode = getDAVHelper().createNode(parentNode, paths[1], true);
-            }
-
-            // Access the content
-
-            ContentWriter contentWriter = contentService.getWriter(contentNode, ContentModel.PROP_CONTENT, true);
-            
-            // Get the input stream from the request data
-            
-            InputStream input = m_request.getInputStream();
-
-            // Write the new data to the content node, close the stream
-            
-            contentWriter.putContent(input);
-            input.close();
-
-            // Update the content type, if specified
-
-            if (m_strContentType != null)
-            {
-                nodeService.setProperty(contentNode, ContentModel.PROP_CONTENT, new ContentData(null, m_strContentType, 0L, "UTF-8"));
-            }
-
-            // Set the response status, depending if the node existed or not
-
-            m_response.setStatus(fsts == WebDAVHelper.FolderExists ? HttpServletResponse.SC_NO_CONTENT
-                    : HttpServletResponse.SC_CREATED);
         }
-        catch (IOException ex)
+        catch (FileNotFoundException e)
         {
-            // Convert the error to a server error
-
-            throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            // the file doesn't exist - create it
+            String[] paths = getDAVHelper().splitPath(getPath());
+            try
+            {
+                FileInfo parentNodeInfo = getDAVHelper().getNodeForPath(getRootNodeRef(), paths[0], getServletPath());
+                // create file
+                contentNodeInfo = fileFolderService.create(parentNodeInfo.getNodeRef(), paths[1], ContentModel.TYPE_CONTENT);
+                created = true;
+            }
+            catch (FileNotFoundException ee)
+            {
+                // bad path
+                throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
+            }
+            catch (FileExistsException ee)
+            {
+                // bad path
+                throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
+            }
         }
-        catch (AccessDeniedException ex)
+        
+        // Access the content
+        ContentWriter writer = fileFolderService.getWriter(contentNodeInfo.getNodeRef());
+        // set content properties
+        if (m_strContentType != null)
         {
-            // Return an access denied status
-            
-            throw new WebDAVServerException(HttpServletResponse.SC_UNAUTHORIZED, ex);
+            writer.setMimetype(m_strContentType);
         }
-        catch (AlfrescoRuntimeException ex)
+        else
         {
-            // TODO: Check for locking errors
-
-            // Convert the error to a server error
-
-            throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            String guessedMimetype = getServiceRegistry().getMimetypeService().guessMimetype(contentNodeInfo.getName());
+            writer.setMimetype(guessedMimetype);
         }
+        // use default encoding
+        writer.setEncoding("UTF-8");
+
+        // Get the input stream from the request data
+        InputStream input = m_request.getInputStream();
+
+        // Write the new data to the content node
+        writer.putContent(input);
+
+        // Set the response status, depending if the node existed or not
+        m_response.setStatus(created ? HttpServletResponse.SC_CREATED : HttpServletResponse.SC_NO_CONTENT);
     }
 }

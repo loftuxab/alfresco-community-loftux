@@ -18,6 +18,8 @@ package org.alfresco.service.cmr.model;
 
 import java.util.List;
 
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
@@ -142,19 +144,25 @@ public interface FileFolderService
     public FileInfo create(NodeRef parentNodeRef, String name, QName typeQName) throws FileExistsException;
     
     /**
+     * Delete a file or folder
+     * 
+     * @param nodeRef the node to delete
+     */
+    public void delete(NodeRef nodeRef);
+    
+    /**
      * Checks for the presence of, and creates as necessary, the folder structure in the provided path.
      * <p>
-     * If the path could not be created, then <code>false</code> is returned.  Note that an empty name list
-     * will always return <code>true</code> as there is nothing to do.
+     * If the path could not be created, then <code>null</code> is returned.  Note that an empty name list
+     * will always return the <code>null</code>.
      * 
      * @param parentNodeRef the node under which the path will be created
      * @param pathElements the folder name path to create
      * @param folderTypeQName the types of nodes to create.  This must be a valid subtype of
      *      {@link org.alfresco.model.ContentModel#TYPE_FOLDER they folder type}.
-     * @return Returns true if the folder structure exists after the call, false if it could not
-     *      be created
+     * @return Returns the info of the last folder in the path or null if it could not be created
      */
-    public boolean makeFolders(NodeRef parentNodeRef, List<String> pathElements, QName folderTypeQName);
+    public FileInfo makeFolders(NodeRef parentNodeRef, List<String> pathElements, QName folderTypeQName);
     
     /**
      * Get the file or folder names from the root down to and including the node provided.
@@ -191,4 +199,8 @@ public interface FileFolderService
      * @return Returns the file info or null if the node does not represent a file or folder
      */
     public FileInfo getFileInfo(NodeRef nodeRef);
+    
+    public ContentReader getReader(NodeRef nodeRef);
+    
+    public ContentWriter getWriter(NodeRef nodeRef);
 }

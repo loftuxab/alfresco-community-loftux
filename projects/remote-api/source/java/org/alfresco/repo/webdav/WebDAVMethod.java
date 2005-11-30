@@ -28,8 +28,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.transaction.TransactionUtil;
+import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -109,23 +113,53 @@ public abstract class WebDAVMethod
     public void execute() throws WebDAVServerException
     {
         // Parse the HTTP headers
-
         parseRequestHeaders();
 
         // Parse the HTTP body
-
         parseRequestBody();
-
-        // Execute the method
-
-        executeImpl();
+        
+        TransactionWork<WebDAVServerException> executeWork = new TransactionWork<WebDAVServerException>()
+        {
+            public WebDAVServerException doWork() throws Exception
+            {
+                executeImpl();
+                return null;
+            }
+        };
+        try
+        {
+            // Execute the method
+            TransactionService transactionService = getTransactionService();
+            TransactionUtil.executeInUserTransaction(transactionService, executeWork);
+        }
+        catch (AccessDeniedException e)
+        {
+            // Return a forbidden status
+            throw new WebDAVServerException(HttpServletResponse.SC_UNAUTHORIZED, e);
+        }
+        catch (Throwable e)
+        {
+            Throwable cause = e.getCause();
+            if (cause instanceof WebDAVServerException)
+            {
+                throw (WebDAVServerException) cause;
+            }
+            else
+            {
+                // Convert error to a server error
+                throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            }
+        }
     }
 
     /**
      * Access the content repository to satisfy the request and generates the appropriate WebDAV
      * response.
+     * 
+     * @throws WebDAVServerException a general server exception
+     * @throws Exception any unhandled exception
      */
-    protected abstract void executeImpl() throws WebDAVServerException;
+    protected abstract void executeImpl() throws WebDAVServerException, Exception;
 
     /**
      * Parses the given request body represented as an XML document and sets any necessary context
@@ -272,6 +306,14 @@ public abstract class WebDAVMethod
     {
         return m_davHelper.getNodeService();
     }
+    
+    /**
+     * @return Returns the general file/folder manipulation service
+     */
+    protected final FileFolderService getFileFolderService()
+    {
+        return m_davHelper.getFileFolderService();
+    }
 
     /**
      * Convenience method to return the content service
@@ -311,6 +353,14 @@ public abstract class WebDAVMethod
     protected final AuthenticationService getAuthenticationService()
     {
         return m_davHelper.getAuthenticationService();
+    }
+    
+    /**
+     * @return Returns the path of the servlet
+     */
+    protected final String getServletPath()
+    {
+        return m_request.getServletPath();
     }
     
     /**
@@ -367,8 +417,6 @@ public abstract class WebDAVMethod
      */
     protected void generateLockDiscoveryXML(XMLWriter xml, NodeRef lockNode) throws Exception
     {
-        Object lockData = null;
-
         Attributes nullAttr= getDAVHelper().getNullAttributes();
         
         if (lockNode != null)

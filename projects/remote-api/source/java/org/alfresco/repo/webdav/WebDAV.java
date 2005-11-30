@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -307,8 +308,20 @@ public class WebDAV
             throw new AlfrescoRuntimeException("No mapping for WebDAV property " + davPropName);
         
         //  Return the property value
-        
-        return props.get( propName);
+        Object value = props.get(propName);
+        if (value instanceof ContentData)
+        {
+            ContentData contentData = (ContentData) value;
+            if (davPropName.equals(WebDAV.XML_GET_CONTENT_TYPE))
+            {
+                value = contentData.getMimetype();
+            }
+            else if (davPropName.equals(WebDAV.XML_GET_CONTENT_LENGTH))
+            {
+                value = new Long(contentData.getSize());
+            }
+        }
+        return value;
     }
     
     

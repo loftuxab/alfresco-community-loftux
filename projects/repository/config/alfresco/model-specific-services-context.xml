@@ -9,6 +9,7 @@
       <property name="nodeService"><ref bean="nodeService" /></property>
       <property name="copyService"><ref bean="copyService" /></property>
       <property name="searchService"><ref bean="searchService" /></property>
+      <property name="contentService"><ref bean="contentService" /></property>
    </bean>
 
 </beans>

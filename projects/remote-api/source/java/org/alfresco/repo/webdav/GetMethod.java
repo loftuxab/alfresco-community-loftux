@@ -17,28 +17,23 @@
 package org.alfresco.repo.webdav;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.permissions.AccessDeniedException;
-import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.repository.datatype.TypeConverter;
-import org.alfresco.service.namespace.QName;
 
 /**
  * Implements the WebDAV GET method
@@ -140,117 +135,79 @@ public class GetMethod extends WebDAVMethod
      * 
      * @exception WebDAVServerException
      */
-    protected void executeImpl() throws WebDAVServerException
+    protected void executeImpl() throws WebDAVServerException, Exception
     {
-        NodeService nodeService = getNodeService();
-        NodeRef pathNode = null;
+        FileFolderService fileFolderService = getFileFolderService();
+        NodeRef rootNodeRef = getRootNodeRef();
+        String path = getPath();
+        String servletPath = getServletPath();
 
-        TypeConverter typeConv = DefaultTypeConverter.INSTANCE;
-        
+        FileInfo nodeInfo = null;
         try
         {
-            // Get the node for the path
-
-            pathNode = getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), m_request.getServletPath());
-
-            // Check if the node is valid
-
-            if (pathNode == null)
-            {
-                // Path not found
-
-                throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
-            }
-
-            // Check if the node is a folder
-
-            else if (getDAVHelper().isFolderNode(pathNode))
-            {
-                // Check if content is required, if so then return a directory listing for the
-                // folder node
-
-                if (m_returnContent == true)
-                {
-                    // Generate a folder listing
-
-                    generateDirectoryListing(pathNode);
-                }
-                else
-                {
-                    throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
-                }
-            }
-            else
-            {
-                // Return the node details, and content if requested, check that the node passes the
-                // pre-conditions
-
-                Map<QName, Serializable> props = nodeService.getProperties(pathNode);
-
-                checkPreConditions(pathNode, props);
-
-                // Build the response header
-
-                m_response.setHeader(WebDAV.HEADER_ETAG, getDAVHelper().makeQuotedETag(pathNode));
-
-                Object value = props.get(ContentModel.PROP_MODIFIED);
-                if (value != null)
-                {
-                    long modDate = typeConv.longValue(value);
-                    m_response.setHeader(WebDAV.HEADER_LAST_MODIFIED, WebDAV.formatHeaderDate(modDate));
-                }
-
-                ContentData contentData = (ContentData) props.get(ContentModel.PROP_CONTENT);
-                if (contentData != null)
-                {
-                    m_response.setHeader(WebDAV.HEADER_CONTENT_LENGTH, "" + contentData.getSize());
-                    m_response.setHeader(WebDAV.HEADER_CONTENT_TYPE, contentData.getMimetype());
-                }
-
-                // Check if the content was requested
-
-                if (m_returnContent == true)
-                {
-                    // Access the content
-
-                    ContentService contentService = getContentService();
-                    ContentReader contentReader = contentService.getReader(pathNode, ContentModel.PROP_CONTENT);
-
-                    // Read the content
-
-                    contentReader.getContent(m_response.getOutputStream());
-                }
-            }
+            nodeInfo = getDAVHelper().getNodeForPath(rootNodeRef, path, servletPath);
         }
-        catch (AccessDeniedException ex)
+        catch (FileNotFoundException e)
         {
-            // Return an access denied status
-            
-            throw new WebDAVServerException(HttpServletResponse.SC_UNAUTHORIZED, ex);
+            throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
         }
         
-        catch (IOException ex)
+        // Check if the node is a folder
+        if (nodeInfo.isFolder())
         {
-            throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            // is content required
+            if (!m_returnContent)
+            {
+                // it is a folder and no content is required
+                throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
+            }
+            // Generate a folder listing
+            generateDirectoryListing(nodeInfo);
         }
-        catch (AlfrescoRuntimeException ex)
+        else
         {
-            throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            NodeRef pathNodeRef = nodeInfo.getNodeRef();
+            // Return the node details, and content if requested, check that the node passes the pre-conditions
+
+            checkPreConditions(nodeInfo);
+
+            // Build the response header
+            m_response.setHeader(WebDAV.HEADER_ETAG, getDAVHelper().makeQuotedETag(pathNodeRef));
+
+            Date modifiedDate = nodeInfo.getModifiedDate();
+            if (modifiedDate != null)
+            {
+                long modDate = DefaultTypeConverter.INSTANCE.longValue(modifiedDate);
+                m_response.setHeader(WebDAV.HEADER_LAST_MODIFIED, WebDAV.formatHeaderDate(modDate));
+            }
+
+            ContentReader reader = fileFolderService.getReader(nodeInfo.getNodeRef());
+            if (reader != null)
+            {
+                // there is content associated with the node
+                m_response.setHeader(WebDAV.HEADER_CONTENT_LENGTH, "" + reader.getSize());
+                m_response.setHeader(WebDAV.HEADER_CONTENT_TYPE, reader.getMimetype());
+                
+                if (m_returnContent)
+                {
+                    // copy the content to the response output stream
+                    reader.getContent(m_response.getOutputStream());
+                }
+            }
         }
     }
 
     /**
      * Checks the If header conditions
      * 
-     * @param node NodeRef
-     * @param props Map<QName, Serializable>
+     * @param nodeInfo the node to check
      * @throws WebDAVServerException if a pre-condition is not met
      */
-    private void checkPreConditions(NodeRef node, Map<QName, Serializable> props) throws WebDAVServerException
+    private void checkPreConditions(FileInfo nodeInfo) throws WebDAVServerException
     {
         // Make an etag for the node
 
-        String strETag = getDAVHelper().makeQuotedETag(node);
+        String strETag = getDAVHelper().makeQuotedETag(nodeInfo.getNodeRef());
         TypeConverter typeConv = DefaultTypeConverter.INSTANCE;
 
         // Check the If-Match header, don't send any content back if none of the tags in
@@ -279,9 +236,9 @@ public class GetMethod extends WebDAVMethod
 
         if (m_ifModifiedSince != null && ifNoneMatchTags == null)
         {
-            Object modVal = getNodeService().getProperty(node, ContentModel.PROP_MODIFIED);
+            Date lastModifiedDate = nodeInfo.getModifiedDate();
 
-            long fileLastModified = modVal != null ? typeConv.longValue(modVal) : 0L;
+            long fileLastModified = lastModifiedDate != null ? typeConv.longValue(lastModifiedDate) : 0L;
             long modifiedSince = m_ifModifiedSince.getTime();
 
             if (fileLastModified != 0L && fileLastModified <= modifiedSince)
@@ -294,9 +251,9 @@ public class GetMethod extends WebDAVMethod
 
         if (m_ifUnModifiedSince != null)
         {
-            Object modVal = getNodeService().getProperty(node, ContentModel.PROP_MODIFIED);
+            Date lastModifiedDate = nodeInfo.getModifiedDate();
 
-            long fileLastModified = modVal != null ? typeConv.longValue(modVal) : 0L;
+            long fileLastModified = lastModifiedDate != null ? typeConv.longValue(lastModifiedDate) : 0L;
             long unModifiedSince = m_ifUnModifiedSince.getTime();
 
             if (fileLastModified >= unModifiedSince)
@@ -328,41 +285,36 @@ public class GetMethod extends WebDAVMethod
     /**
      * Generates a HTML representation of the contents of the path represented by the given node
      * 
-     * @param node NodeRef
+     * @param fileInfo the file to use
      */
-    private void generateDirectoryListing(NodeRef node)
+    private void generateDirectoryListing(FileInfo fileInfo)
     {
+        FileFolderService fileFolderService = getFileFolderService();
         Writer writer = null;
-        TypeConverter typeConv = DefaultTypeConverter.INSTANCE;
 
         try
         {
             writer = m_response.getWriter();
 
             // Get the list of child nodes for the parent node
-
-            List<NodeRef> childNodes = getDAVHelper().getChildNodes(node);
+            List<FileInfo> childNodeInfos = fileFolderService.list(fileInfo.getNodeRef());
 
             // Send back the start of the HTML
-
             writer.write("<html><head><title>Alfresco Content Repository</title>");
             writer.write("<style>");
             writer.write("body { font-family: Arial, Helvetica; font-size: 12pt; background-color: white; }\n");
             writer.write("table { font-family: Arial, Helvetica; font-size: 12pt; background-color: white; }\n");
             writer.write(".listingTable { border: solid black 1px; }\n");
             writer.write(".textCommand { font-family: verdana; font-size: 10pt; }\n");
-            writer
-                    .write(".textLocation { font-family: verdana; font-size: 11pt; font-weight: bold; color: #2a568f; }\n");
+            writer.write(".textLocation { font-family: verdana; font-size: 11pt; font-weight: bold; color: #2a568f; }\n");
             writer.write(".textData { font-family: verdana; font-size: 10pt; }\n");
-            writer
-                    .write(".tableHeading { font-family: verdana; font-size: 10pt; font-weight: bold; color: white; background-color: #2a568f; }\n");
+            writer.write(".tableHeading { font-family: verdana; font-size: 10pt; font-weight: bold; color: white; background-color: #2a568f; }\n");
             writer.write(".rowOdd { background-color: #eeeeee; }\n");
             writer.write(".rowEven { background-color: #dddddd; }\n");
             writer.write("</style></head>\n");
             writer.flush();
 
             // Send back the table heading
-
             writer.write("<body>\n");
             writer.write("<table cellspacing='2' cellpadding='3' border='0' width='100%'>\n");
             writer.write("<tr><td colspan='3' class='textLocation'>Directory listing for ");
@@ -377,15 +329,12 @@ public class GetMethod extends WebDAVMethod
             writer.write("</tr>");
 
             // Get the URL for the root path
-
             String rootURL = WebDAV.getURLForPath(m_request, getPath(), true);
             if (rootURL.endsWith(WebDAVHelper.PathSeperator) == false)
                 rootURL = rootURL + WebDAVHelper.PathSeperator;
 
-            // Start with a link to the parent folder so we can navigate back up, unless we are at
-            // the root level
-
-            if (node.equals(getRootNodeRef()) == false)
+            // Start with a link to the parent folder so we can navigate back up, unless we are at the root level
+            if (fileInfo.getNodeRef().equals(getRootNodeRef()) == false)
             {
                 writer.write("<tr class='rowOdd'>");
                 writer.write("<td class='textData'><a href=\"");
@@ -401,18 +350,12 @@ public class GetMethod extends WebDAVMethod
             }
 
             // Send back what we have generated so far
-
             writer.flush();
             int rowId = 0;
 
-            for (NodeRef curNode : childNodes)
+            for (FileInfo childNodeInfo : childNodeInfos)
             {
-                // Get the properties for the node
-
-                Map<QName, Serializable> props = getNodeService().getProperties(curNode);
-
                 // Output the details for the current node
-
                 writer.write("<tr class='");
                 if (rowId++ % 2 == 0)
                 {
@@ -425,8 +368,7 @@ public class GetMethod extends WebDAVMethod
                 writer.write("'><td class='textData'><a href=\"");
                 writer.write(rootURL);
 
-                Object prop = props.get(ContentModel.PROP_NAME);
-                String fname = typeConv.convert(String.class, prop);
+                String fname = childNodeInfo.getName();
 
                 writer.write(fname);
                 writer.write("\">");
@@ -434,30 +376,38 @@ public class GetMethod extends WebDAVMethod
                 writer.write("</a>");
 
                 writer.write("</td><td class='textData'>");
-                if (getDAVHelper().isFolderNode(curNode))
+                if (fileInfo.isFolder())
                 {
                     writer.write(formatSize("0"));
                 }
                 else
                 {
-                    ContentData contentData = (ContentData) props.get(ContentModel.PROP_CONTENT);
+                    ContentReader reader = fileFolderService.getReader(childNodeInfo.getNodeRef());
                     long fsize = 0L;
-                    if ( contentData != null)
-                        fsize = contentData.getSize();
+                    if ( reader != null)
+                    {
+                        fsize = reader.getSize();
+                    }
                     writer.write(formatSize("" + fsize));
                 }
                 writer.write("</td><td class='textData'>");
 
-                prop = props.get(ContentModel.PROP_MODIFIED);
-
-                writer.write(prop != null ? WebDAV.formatHeaderDate(typeConv.longValue(prop)) : "");
+                Date modifiedDate = childNodeInfo.getModifiedDate();
+                if (modifiedDate != null)
+                {
+                    writer.write(WebDAV.formatHeaderDate(DefaultTypeConverter.INSTANCE.longValue(modifiedDate)));
+                }
+                else
+                {
+                    writer.write("");
+                }
                 writer.write("</td>");
 
                 writer.write("</tr>\n");
                 writer.flush();
             }
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             logger.error(e);
 

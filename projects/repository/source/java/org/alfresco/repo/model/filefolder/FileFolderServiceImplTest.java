@@ -34,6 +34,8 @@ import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -388,11 +390,12 @@ public class FileFolderServiceImplTest extends TestCase
         namePath.add("C");
         namePath.add("D");
         
-        boolean success = fileFolderService.makeFolders(rootNodeRef, namePath, ContentModel.TYPE_FOLDER);
-        assertTrue("First makeFolder failed", success);
+        FileInfo lastFileInfo = fileFolderService.makeFolders(rootNodeRef, namePath, ContentModel.TYPE_FOLDER);
+        assertNotNull("First makeFolder failed", lastFileInfo);
         // check that a repeat works
-        success = fileFolderService.makeFolders(rootNodeRef, namePath, ContentModel.TYPE_FOLDER);
-        assertTrue("Repeat makeFolders failed", success);
+        FileInfo lastFileInfoAgain = fileFolderService.makeFolders(rootNodeRef, namePath, ContentModel.TYPE_FOLDER);
+        assertNotNull("Repeat makeFolders failed", lastFileInfoAgain);
+        assertEquals("Repeat created new leaf", lastFileInfo.getNodeRef(), lastFileInfoAgain.getNodeRef());
         // check that it worked
         List<FileInfo> checkInfos = fileFolderService.search(rootNodeRef, "D", false, true, true);
         assertEquals("Expected to find a result", 1, checkInfos.size());
@@ -448,5 +451,32 @@ public class FileFolderServiceImplTest extends TestCase
         FileInfo fileInfoCheck = fileFolderService.resolveNamePath(workingRootNodeRef, pathElements);
         assertNotNull("File info not found", fileInfoCheck);
         assertEquals("Path not resolved to correct node", fileInfo.getNodeRef(), fileInfoCheck.getNodeRef());
+    }
+    
+    public void testGetReaderWriter() throws Exception
+    {
+        FileInfo dirInfo = getByName(NAME_L0_FOLDER_A, true);
+        try
+        {
+            fileFolderService.getWriter(dirInfo.getNodeRef());
+            fail("Failed to detect content write to folder");
+        }
+        catch (RuntimeException e)
+        {
+            // expected
+        }
+        
+        FileInfo fileInfo = getByName(NAME_L1_FILE_A, false);
+        
+        ContentWriter writer = fileFolderService.getWriter(fileInfo.getNodeRef());
+        assertNotNull("Writer is null", writer);
+        // write some content
+        String content = "ABC";
+        writer.putContent(content);
+        // read the content
+        ContentReader reader = fileFolderService.getReader(fileInfo.getNodeRef());
+        assertNotNull("Reader is null", reader);
+        String checkContent = reader.getContentString();
+        assertEquals("Content mismatch", content, checkContent);
     }
 }

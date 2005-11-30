@@ -18,10 +18,10 @@ package org.alfresco.repo.webdav;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockStatus;
-import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 
 /**
  * Implements the WebDAV UNLOCK method
@@ -30,180 +30,147 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public class UnlockMethod extends WebDAVMethod
 {
-   private String m_strLockToken = null;
-   
-   /**
-    * Default constructor
-    */
-   public UnlockMethod()
-   {
-   }
+    private String m_strLockToken = null;
 
-   /**
-    * Return the lock token of an existing lock
-    * 
-    * @return String
-    */
-   protected final String getLockToken()
-   {
-       return m_strLockToken;
-   }
-   
-   /**
-    * Parse the request headers
-    * 
-    * @exception WebDAVServerException
-    */
-   protected void parseRequestHeaders() throws WebDAVServerException
-   {
-      // Get the lock token, if any
-       
-      String strLockTokenHeader = m_request.getHeader(WebDAV.HEADER_LOCK_TOKEN);
-      
-      // DEBUG
-      
-      if (logger.isDebugEnabled())
-         logger.debug("Parsing Lock-Token header: " + strLockTokenHeader);
+    /**
+     * Default constructor
+     */
+    public UnlockMethod()
+    {
+    }
 
-      // Validate the lock token
-      
-      if (strLockTokenHeader != null && strLockTokenHeader.startsWith("<") &&
-          strLockTokenHeader.endsWith(">"))
-      {
-         try
-         {
-            m_strLockToken = strLockTokenHeader.substring(WebDAV.OPAQUE_LOCK_TOKEN.length()+1, 
-                                                          strLockTokenHeader.length()-1);
-         }
-         catch (IndexOutOfBoundsException e)
-         {
-            logger.warn("Failed to parse If header: " + strLockTokenHeader);
-         }
-      }
-   
-      // If there is no token this is a bad request so send an error back
-      
-      if (m_strLockToken == null)
-      {
-         throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
-      }
-   }
-   
-   /**
-    * Parse the request body
-    * 
-    * @exception WebDAVServerException
-    */
-   protected void parseRequestBody() throws WebDAVServerException
-   {
-      // Nothing to do in this method
-   }   
-   
-   /**
-    * Exceute the request
-    * 
-    * @exception WebDAVServerException
-    */
-   protected void executeImpl() throws WebDAVServerException
-   {
-       try
-       {
-           // Check if the path exists
+    /**
+     * Return the lock token of an existing lock
+     * 
+     * @return String
+     */
+    protected final String getLockToken()
+    {
+        return m_strLockToken;
+    }
 
-           NodeRef lockNode = getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), m_request.getServletPath());
+    /**
+     * Parse the request headers
+     * 
+     * @exception WebDAVServerException
+     */
+    protected void parseRequestHeaders() throws WebDAVServerException
+    {
+        // Get the lock token, if any
+        String strLockTokenHeader = m_request.getHeader(WebDAV.HEADER_LOCK_TOKEN);
 
-           // DEBUG
-           
-           if ( logger.isDebugEnabled())
-               logger.debug("Lock node=" + lockNode + ", token=" + getLockToken() + ", path=" + getPath());
-           
-           // Check if the node exists
-           
-           if ( lockNode == null)
-           {
-               // Return an error
-               
-               throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
-           }
+        // DEBUG
+        if (logger.isDebugEnabled())
+            logger.debug("Parsing Lock-Token header: " + strLockTokenHeader);
 
-           // Parse the lock token
-           
-           String[] lockInfo = WebDAV.parseLockToken(getLockToken());
-           if ( lockInfo == null)
-           {
-               // Bad lock token
-               
-               throw new WebDAVServerException(HttpServletResponse.SC_PRECONDITION_FAILED);
-           }
-           
-           // Get the lock status for the node
+        // Validate the lock token
+        if (strLockTokenHeader != null && strLockTokenHeader.startsWith("<") && strLockTokenHeader.endsWith(">"))
+        {
+            try
+            {
+                m_strLockToken = strLockTokenHeader.substring(
+                        WebDAV.OPAQUE_LOCK_TOKEN.length() + 1,
+                        strLockTokenHeader.length() - 1);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                logger.warn("Failed to parse If header: " + strLockTokenHeader);
+            }
+        }
 
-           LockService lockService = getDAVHelper().getLockService();
-           //String nodeId   = lockInfo[0];
-           //String userName = lockInfo[1];
-           
-           LockStatus lockSts = lockService.getLockStatus(lockNode);
-           
-           if ( lockSts == LockStatus.LOCK_OWNER)
-           {
-               // Unlock the node
-               
-               lockService.unlock(lockNode);
-               
-               // Indicate that the unlock was successful
-               
-               m_response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        // If there is no token this is a bad request so send an error back
+        if (m_strLockToken == null)
+        {
+            throw new WebDAVServerException(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
 
-               // DEBUG
-               
-               if ( logger.isDebugEnabled())
-                   logger.debug("Unlock token=" + getLockToken() + " Successful");
-           }
-           else if ( lockSts == LockStatus.NO_LOCK)
-           {
-               // DEBUG
-               
-               if ( logger.isDebugEnabled())
-                   logger.debug("Unlock token=" + getLockToken() + " Not locked");
-               
-               // Node is not locked
-               
-               throw new WebDAVServerException(HttpServletResponse.SC_PRECONDITION_FAILED);
-           }
-           else if ( lockSts == LockStatus.LOCKED)
-           {
-               // DEBUG
-               
-               if ( logger.isDebugEnabled())
-                   logger.debug("Unlock token=" + getLockToken() + " Not lock owner");
-               
-               // Node is locked but not by this user
-               
-               throw new WebDAVServerException(HttpServletResponse.SC_PRECONDITION_FAILED);
-           }
-           else if ( lockSts == LockStatus.LOCK_EXPIRED)
-           {
-               // DEBUG
-               
-               if ( logger.isDebugEnabled())
-                   logger.debug("Unlock token=" + getLockToken() + " Lock expired");
-               
-               // Return a success status
-               
-               m_response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-           }
-       }
-       catch (AlfrescoRuntimeException ex)
-       {
-           // Convert to a server error
+    /**
+     * Parse the request body
+     * 
+     * @exception WebDAVServerException
+     */
+    protected void parseRequestBody() throws WebDAVServerException
+    {
+        // Nothing to do in this method
+    }
 
-           throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
-       }
-       catch (Exception ex)
-       {
-           // Convert to a server error
+    /**
+     * Exceute the request
+     * 
+     * @exception WebDAVServerException
+     */
+    protected void executeImpl() throws WebDAVServerException
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Lock node; path=" + getPath() + ", token=" + getLockToken());
+        }
 
-           throw new WebDAVServerException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
-       }
-   }   
+        FileInfo lockNodeInfo = null;
+        try
+        {
+            lockNodeInfo = getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), getServletPath());
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new WebDAVServerException(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+        // Parse the lock token
+        String[] lockInfo = WebDAV.parseLockToken(getLockToken());
+        if (lockInfo == null)
+        {
+            // Bad lock token
+            throw new WebDAVServerException(HttpServletResponse.SC_PRECONDITION_FAILED);
+        }
+
+        // Get the lock status for the node
+        LockService lockService = getDAVHelper().getLockService();
+        // String nodeId = lockInfo[0];
+        // String userName = lockInfo[1];
+
+        LockStatus lockSts = lockService.getLockStatus(lockNodeInfo.getNodeRef());
+        if (lockSts == LockStatus.LOCK_OWNER)
+        {
+            // Unlock the node
+            lockService.unlock(lockNodeInfo.getNodeRef());
+
+            // Indicate that the unlock was successful
+            m_response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+
+            // DEBUG
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Unlock token=" + getLockToken() + " Successful");
+            }
+        }
+        else if (lockSts == LockStatus.NO_LOCK)
+        {
+            // DEBUG
+            if (logger.isDebugEnabled())
+                logger.debug("Unlock token=" + getLockToken() + " Not locked");
+
+            // Node is not locked
+            throw new WebDAVServerException(HttpServletResponse.SC_PRECONDITION_FAILED);
+        }
+        else if (lockSts == LockStatus.LOCKED)
+        {
+            // DEBUG
+            if (logger.isDebugEnabled())
+                logger.debug("Unlock token=" + getLockToken() + " Not lock owner");
+
+            // Node is locked but not by this user
+            throw new WebDAVServerException(HttpServletResponse.SC_PRECONDITION_FAILED);
+        }
+        else if (lockSts == LockStatus.LOCK_EXPIRED)
+        {
+            // DEBUG
+            if (logger.isDebugEnabled())
+                logger.debug("Unlock token=" + getLockToken() + " Lock expired");
+
+            // Return a success status
+            m_response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        }
+    }
 }

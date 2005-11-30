@@ -16,8 +16,15 @@
  */
 package org.alfresco.repo.model.filefolder;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Map;
+
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Common file information implementation.
@@ -28,16 +35,16 @@ public class FileInfoImpl implements FileInfo
 {
     private NodeRef nodeRef;
     private boolean isFolder;
-    private String name;
+    private Map<QName, Serializable> properties;
 
     /**
      * Package-level constructor
      */
-    /* package */ FileInfoImpl(NodeRef nodeRef, boolean isFolder, String name)
+    /* package */ FileInfoImpl(NodeRef nodeRef, boolean isFolder, Map<QName, Serializable> nodeProperties)
     {
         this.nodeRef = nodeRef;
         this.isFolder = isFolder;
-        this.name = name;
+        this.properties = nodeProperties;
     }
     
     @Override
@@ -45,7 +52,7 @@ public class FileInfoImpl implements FileInfo
     {
         StringBuilder sb = new StringBuilder(80);
         sb.append("FileInfo")
-          .append("[name=").append(name)
+          .append("[name=").append(getName())
           .append(", isFolder=").append(isFolder)
           .append(", nodeRef=").append(nodeRef)
           .append("]");
@@ -64,6 +71,16 @@ public class FileInfoImpl implements FileInfo
 
     public String getName()
     {
-        return name;
+        return (String) properties.get(ContentModel.PROP_NAME);
+    }
+
+    public Date getCreatedDate()
+    {
+        return DefaultTypeConverter.INSTANCE.convert(Date.class, properties.get(ContentModel.PROP_CREATED));
+    }
+
+    public Date getModifiedDate()
+    {
+        return DefaultTypeConverter.INSTANCE.convert(Date.class, properties.get(ContentModel.PROP_MODIFIED));
     }
 }

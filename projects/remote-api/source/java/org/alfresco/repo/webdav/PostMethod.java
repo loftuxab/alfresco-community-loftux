@@ -19,14 +19,14 @@ package org.alfresco.repo.webdav;
 /**
  * Implements the WebDAV POST method
  * 
- * @author gavinc
+ * @author Gavin Cornwell
  */
 public class PostMethod extends PutMethod
 {
-   /**
-    * Default constructor
-    */
-   public PostMethod()
-   {
-   }   
+    /**
+     * Default constructor
+     */
+    public PostMethod()
+    {
+    }
 }

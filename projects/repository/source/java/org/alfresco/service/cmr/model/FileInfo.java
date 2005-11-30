@@ -16,6 +16,8 @@
  */
 package org.alfresco.service.cmr.model;
 
+import java.util.Date;
+
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
@@ -39,4 +41,14 @@ public interface FileInfo
      * @return Returns the name of the file or folder within the parent folder
      */
     public String getName();
+    
+    /**
+     * @return Returns the date the node was created
+     */
+    public Date getCreatedDate();
+    
+    /**
+     * @return Returns the modified date
+     */
+    public Date getModifiedDate();
 }

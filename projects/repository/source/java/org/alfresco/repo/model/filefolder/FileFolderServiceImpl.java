@@ -33,6 +33,9 @@ import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -89,6 +92,7 @@ public class FileFolderServiceImpl implements FileFolderService
     private NodeService nodeService;
     private CopyService copyService;
     private SearchService searchService;
+    private ContentService contentService;
     
     /**
      * Default constructor
@@ -122,6 +126,11 @@ public class FileFolderServiceImpl implements FileFolderService
         this.searchService = searchService;
     }
     
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+
     public void init()
     {
         PARAMS_ANY_NAME[0] = new QueryParameterDefImpl(
@@ -156,13 +165,12 @@ public class FileFolderServiceImpl implements FileFolderService
     {
         // get the file attributes
         Map<QName, Serializable> properties = nodeService.getProperties(nodeRef);
-        String name = (String) properties.get(ContentModel.PROP_NAME);
         // is it a folder
         QName typeQName = nodeService.getType(nodeRef);
         boolean isFolder = isFolder(typeQName);
         
         // construct the file info and add to the results
-        FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, name);
+        FileInfo fileInfo = new FileInfoImpl(nodeRef, isFolder, properties);
         // done
         return fileInfo;
     }
@@ -538,13 +546,18 @@ public class FileFolderServiceImpl implements FileFolderService
         }
         return fileInfo;
     }
+    
+    public void delete(NodeRef nodeRef)
+    {
+        nodeService.deleteNode(nodeRef);
+    }
 
-    public boolean makeFolders(NodeRef parentNodeRef, List<String> pathElements, QName folderTypeQName)
+    public FileInfo makeFolders(NodeRef parentNodeRef, List<String> pathElements, QName folderTypeQName)
     {
         if (pathElements.size() == 0)
         {
             // nothing to do
-            return true;
+            return null;
         }
         
         // make sure that the folder is correct
@@ -556,6 +569,7 @@ public class FileFolderServiceImpl implements FileFolderService
         
         NodeRef currentParentRef = parentNodeRef;
         // just loop and create if necessary
+        FileInfo lastFileInfo = null;
         for (String pathElement : pathElements)
         {
             try
@@ -563,6 +577,7 @@ public class FileFolderServiceImpl implements FileFolderService
                 // not present - make it
                 FileInfo createdFileInfo = create(currentParentRef, pathElement, folderTypeQName);
                 currentParentRef = createdFileInfo.getNodeRef();
+                lastFileInfo = createdFileInfo;
             }
             catch (FileExistsException e)
             {
@@ -571,13 +586,14 @@ public class FileFolderServiceImpl implements FileFolderService
                 if (fileInfos.size() == 0)
                 {
                     // ? It must have been removed
-                    return false;
+                    return null;
                 }
                 currentParentRef = fileInfos.get(0).getNodeRef();
+                lastFileInfo = fileInfos.get(0);
             }
         }
         // done
-        return true;
+        return lastFileInfo;
     }
 
     public List<FileInfo> getNamePath(NodeRef rootNodeRef, NodeRef nodeRef) throws FileNotFoundException
@@ -711,5 +727,25 @@ public class FileFolderServiceImpl implements FileFolderService
         {
             return null;
         }
+    }
+
+    public ContentReader getReader(NodeRef nodeRef)
+    {
+        FileInfo fileInfo = toFileInfo(nodeRef);
+        if (fileInfo.isFolder())
+        {
+            throw new InvalidTypeException("Unable to get a content reader for a folder: " + fileInfo);
+        }
+        return contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
+    }
+
+    public ContentWriter getWriter(NodeRef nodeRef)
+    {
+        FileInfo fileInfo = toFileInfo(nodeRef);
+        if (fileInfo.isFolder())
+        {
+            throw new InvalidTypeException("Unable to get a content writer for a folder: " + fileInfo);
+        }
+        return contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
     }
 }

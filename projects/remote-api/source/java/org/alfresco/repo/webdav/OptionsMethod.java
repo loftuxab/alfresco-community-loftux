@@ -16,12 +16,13 @@
  */
 package org.alfresco.repo.webdav;
 
-import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.model.FileNotFoundException;
 
 /**
  * Implements the WebDAV OPTIONS method
  * 
- * @author gavinc
+ * @author Gavin Cornwell
  */
 public class OptionsMethod extends WebDAVMethod
 {
@@ -67,30 +68,24 @@ public class OptionsMethod extends WebDAVMethod
      */
     protected void executeImpl() throws WebDAVServerException
     {
-        NodeService nodeService = getNodeService();
-        int fsts = WebDAVHelper.FolderExists;
-
+        boolean isFolder;
         try
         {
-            // Get the path status
-
-            fsts = getDAVHelper().getPathStatus(getRootNodeRef(), getPath());
+            FileInfo fileInfo = getDAVHelper().getNodeForPath(getRootNodeRef(), getPath(), getServletPath());
+            isFolder = fileInfo.isFolder();
         }
-        catch (Exception e)
+        catch (FileNotFoundException e)
         {
-            // Do nothing just return the default for collections
+            // Do nothing; just default to a folder
+            isFolder = true;
         }
-
         // Add the header to advertise the level of support the server has
-
         m_response.addHeader(DAV_HEADER, DAV_HEADER_CONTENT);
 
         // Add the proprietary Microsoft header to make Microsoft clients behave
-
         m_response.addHeader(MS_HEADER, DAV_HEADER);
 
         // Add the header to show what methods are allowed
-
-        m_response.addHeader(ALLOW_HEADER, fsts == WebDAVHelper.FolderExists ? COLLECTION_METHODS : FILE_METHODS);
+        m_response.addHeader(ALLOW_HEADER, isFolder ? COLLECTION_METHODS : FILE_METHODS);
     }
 }
