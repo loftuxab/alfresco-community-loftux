@@ -16,6 +16,7 @@
  */
 package org.alfresco.repo.transaction;
 
+import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.service.transaction.TransactionService;
@@ -124,7 +125,17 @@ public class TransactionUtil
             // transaction
             txn.begin();
             result = transactionWork.doWork();
-            txn.commit();
+            // rollback or commit
+            if (txn.getStatus() == Status.STATUS_MARKED_ROLLBACK)
+            {
+                // something caused the transaction to be marked for rollback
+                txn.rollback();
+            }
+            else
+            {
+                // transaction should still commit
+                txn.commit();
+            }
         }
         catch (Throwable exception)
         {
