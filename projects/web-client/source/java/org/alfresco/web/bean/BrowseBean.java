@@ -733,27 +733,13 @@ public class BrowseBean implements IContextListener
    
    public NodePropertyResolver resolverCancelCheckOut = new NodePropertyResolver() {
       public Object get(Node node) {
-         if (node.hasPermission(null))
-         {
-            return Repository.isNodeOwner(node, lockService) && node.hasPermission(PermissionService.WRITE);
-         }
-         else
-         {
-            return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CANCEL_CHECK_OUT);
-         }
+         return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CANCEL_CHECK_OUT);
       }
    };
    
    public NodePropertyResolver resolverCheckIn = new NodePropertyResolver() {
       public Object get(Node node) {
-         if (node.hasPermission(null))
-         {
-            return Repository.isNodeOwner(node, lockService) && node.hasPermission(PermissionService.WRITE);
-         }
-         else
-         {
-            return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CHECK_IN);
-         }
+         return node.hasAspect(ContentModel.ASPECT_WORKING_COPY) && node.hasPermission(PermissionService.CHECK_IN);
       }
    };
    
