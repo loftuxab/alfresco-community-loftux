@@ -203,4 +203,29 @@
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.webclient}/build/assemble" />
    </target>
 
+   <!-- *************** -->
+   <!-- Utility targets -->
+   <!-- *************** -->
+
+   <target name="load" depends="init" description="Utility support to load data and report performance: loads a directory in one transaction">
+<!--
+      <subant target="incremental">
+         <property name="server" value="tomcat"/>
+         <filelist refid="files.project.build"/>
+      </subant>
+-->
+      <java classname="org.alfresco.repo.importer.FileImporterTest" fork="true">
+         <classpath refid="classpath.unit.test" />
+         <!-- The store into which to load -->
+         <arg value="workspace://SpacesStore" />
+         <!-- The path of the load point -->
+         <arg value="app:company_home" />
+         <!-- The file or folder to load up -->
+         <arg value="W:\content-repository\projects\repository\source\java\org\alfresco" />
+         <!-- The import subdirectory -->
+         <arg value="import-test-1-" />
+         <!-- The number of repeats -->
+         <arg value="1" />
+      </java>
+   </target>
 </project>

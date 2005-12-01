@@ -188,7 +188,7 @@ public class FileImporterTest extends TestCase
 
         int grandTotal = 0;
         int count = 0;
-        int target = 1000;
+        int target = Integer.parseInt(args[4]);
         while (count < target)
         {
             File directory = TempFileProvider.getTempDir();
@@ -198,7 +198,6 @@ public class FileImporterTest extends TestCase
             count++;
             FileImporterTest test = new FileImporterTest();
             test.setUp();
-
             
             test.authenticationComponent.setSystemUserAsCurrentUser();
             TransactionService transactionService = test.serviceRegistry.getTransactionService();
@@ -230,7 +229,7 @@ public class FileImporterTest extends TestCase
                 }
 
                 long start = System.nanoTime();
-                int importCount = test.createFileImporter().loadNamedFile(location.get(0), new File(args[2]), true, "import-1-"+count);
+                int importCount = test.createFileImporter().loadNamedFile(location.get(0), new File(args[2]), true, args[3]+count);
                 grandTotal += importCount;
                 long end = System.nanoTime();
                 long first = end-start;
@@ -309,5 +308,6 @@ public class FileImporterTest extends TestCase
             }
             //System.exit(exitCode);
         }
+        System.exit(0);
     }
 }
