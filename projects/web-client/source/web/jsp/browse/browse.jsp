@@ -442,14 +442,10 @@
                                     </a:actionLink>
                                  </a:booleanEvaluator>
                                  <a:booleanEvaluator value="#{r.editLinkType == 'webdav'}">
-                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" href="#{r.webdavUrl}" target="new">
-                                       <f:param name="id" value="#{r.id}" />
-                                    </a:actionLink>
+                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" onclick="javascript:openDoc('#{r.webdavUrl}');" />
                                  </a:booleanEvaluator>
                                  <a:booleanEvaluator value="#{r.editLinkType == 'cifs'}">
-                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" href="#{r.cifsPath}" target="new">
-                                       <f:param name="id" value="#{r.id}" />
-                                    </a:actionLink>
+                                    <a:actionLink value="#{msg.edit}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" href="#{r.cifsPath}" target="new" />
                                  </a:booleanEvaluator>
                               </a:booleanEvaluator>
                            </r:permissionEvaluator>

@@ -277,6 +277,31 @@ public class UIActionLink extends UICommand
       this.target = target;
    }
    
+   /**
+    * Returns the onclick handler
+    * 
+    * @return The onclick handler
+    */
+   public String getOnclick()
+   {
+      ValueBinding vb = getValueBinding("onclick");
+      if (vb != null)
+      {
+         this.onclick = (String)vb.getValue(getFacesContext());
+      }
+      
+      return this.onclick;
+   }
+
+   /**
+    * Sets the onclick handler
+    * 
+    * @param onclick The onclick handler
+    */
+   public void setOnclick(String onclick)
+   {
+      this.onclick = onclick;
+   }
    
    // ------------------------------------------------------------------------------
    // Private data
@@ -298,6 +323,9 @@ public class UIActionLink extends UICommand
    
    /** the target reference */
    private String target = null;
+   
+   /** the onclick handler */
+   private String onclick = null;
    
    /** Map of child param name/values pairs */
    private Map<String, String> params = null;

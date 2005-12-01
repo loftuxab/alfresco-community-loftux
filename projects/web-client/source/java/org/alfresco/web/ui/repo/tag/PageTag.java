@@ -36,10 +36,11 @@ public class PageTag extends TagSupport
 {
    private static final long serialVersionUID = 8142765393181557228L;
    
-   private final static String SCRIPTS_1 = "<script language=\"JavaScript1.2\" src=\"";
-   private final static String SCRIPTS_2 = "/scripts/menu.js\"></script>\n";
-   private final static String STYLES_1  = "<link rel=\"stylesheet\" href=\"";
-   private final static String STYLES_2  = "/css/main.css\" TYPE=\"text/css\">\n";
+   private final static String SCRIPTS_START = "<script language=\"JavaScript1.2\" src=\"";
+   private final static String SCRIPTS_MENU = "/scripts/menu.js\"></script>\n";
+   private final static String SCRIPTS_WEBDAV = "/scripts/webdav.js\"></script>\n";
+   private final static String STYLES_START  = "<link rel=\"stylesheet\" href=\"";
+   private final static String STYLES_MAIN  = "/css/main.css\" TYPE=\"text/css\">\n";
    private final static String ALF_URL   = "http://www.alfrescosoftware.com";
    private final static String ALF_LOGO  = "/images/logo/alfresco_logo.gif";
    private final static String ALF_TEXT  = "Content managed by Alfresco";
@@ -124,12 +125,15 @@ public class PageTag extends TagSupport
          }
          
          String reqPath = ((HttpServletRequest)pageContext.getRequest()).getContextPath();
-         out.write(SCRIPTS_1);
+         out.write(SCRIPTS_START);
          out.write(reqPath);
-         out.write(SCRIPTS_2);
-         out.write(STYLES_1);
+         out.write(SCRIPTS_MENU);
+         out.write(SCRIPTS_START);
          out.write(reqPath);
-         out.write(STYLES_2);
+         out.write(SCRIPTS_WEBDAV);
+         out.write(STYLES_START);
+         out.write(reqPath);
+         out.write(STYLES_MAIN);
       }
       catch (IOException ioe)
       {

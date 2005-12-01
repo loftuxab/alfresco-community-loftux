@@ -56,6 +56,7 @@ public class ActionLinkTag extends HtmlComponentTag
       setStringProperty(component, "href", this.href);
       setStringProperty(component, "value", this.value);
       setStringProperty(component, "target", this.target);
+      setStringProperty(component, "onclick", this.onclick);
       
       // TODO: Add image width/height properties
    }
@@ -75,6 +76,7 @@ public class ActionLinkTag extends HtmlComponentTag
       this.padding = null;
       this.href = null;
       this.target = null;
+      this.onclick = null;
    }
    
    /**
@@ -167,6 +169,15 @@ public class ActionLinkTag extends HtmlComponentTag
       this.target = target;
    }
 
+   /**
+    * Sets the onclick handler
+    * 
+    * @param onclick The onclick handler
+    */
+   public void setOnclick(String onclick)
+   {
+      this.onclick = onclick;
+   }
 
    /** the target */
    private String target;
@@ -194,4 +205,7 @@ public class ActionLinkTag extends HtmlComponentTag
    
    /** the href link */
    private String href;
+   
+   /** the onclick handler */
+   private String onclick;
 }
