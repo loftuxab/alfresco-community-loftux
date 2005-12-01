@@ -12,6 +12,7 @@
             <extension display="Initialization Values">ini</extension>
             <extension display="Windows Batch Script">bat</extension>
             <extension display="Unix Shell Script">sh</extension>
+            <extension display="Log">log</extension>
          </mimetype>
          <mimetype mimetype="text/html" display="HTML">
             <!-- first extension will be default unless otherwise specified -->
