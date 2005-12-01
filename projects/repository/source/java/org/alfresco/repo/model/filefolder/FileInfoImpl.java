@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.namespace.QName;
@@ -40,11 +41,11 @@ public class FileInfoImpl implements FileInfo
     /**
      * Package-level constructor
      */
-    /* package */ FileInfoImpl(NodeRef nodeRef, boolean isFolder, Map<QName, Serializable> nodeProperties)
+    /* package */ FileInfoImpl(NodeRef nodeRef, boolean isFolder, Map<QName, Serializable> properties)
     {
         this.nodeRef = nodeRef;
         this.isFolder = isFolder;
-        this.properties = nodeProperties;
+        this.properties = properties;
     }
     
     @Override
@@ -82,5 +83,15 @@ public class FileInfoImpl implements FileInfo
     public Date getModifiedDate()
     {
         return DefaultTypeConverter.INSTANCE.convert(Date.class, properties.get(ContentModel.PROP_MODIFIED));
+    }
+    
+    public ContentData getContentData()
+    {
+        return DefaultTypeConverter.INSTANCE.convert(ContentData.class, properties.get(ContentModel.PROP_CONTENT));
+    }
+
+    public Map<QName, Serializable> getProperties()
+    {
+        return properties;
     }
 }

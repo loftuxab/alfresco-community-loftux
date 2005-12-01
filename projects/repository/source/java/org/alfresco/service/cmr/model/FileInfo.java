@@ -16,12 +16,18 @@
  */
 package org.alfresco.service.cmr.model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
- * Common file information.
+ * Common file information.  The implementations may store the properties for the lifetime
+ * of this instance; i.e. the values are transient and can be used as read-only values for
+ * a short time only.
  * 
  * @author Derek Hulley
  */
@@ -51,4 +57,16 @@ public interface FileInfo
      * @return Returns the modified date
      */
     public Date getModifiedDate();
+    
+    /**
+     * Get the content data.  This is only valid for {@link #isFolder() files}.
+     * 
+     * @return Returns the content data
+     */
+    public ContentData getContentData();
+    
+    /**
+     * @return Returns all the node properties
+     */
+    public Map<QName, Serializable> getProperties();
 }
