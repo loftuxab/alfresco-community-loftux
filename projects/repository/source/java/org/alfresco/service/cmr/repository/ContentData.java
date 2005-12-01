@@ -99,17 +99,17 @@ public class ContentData implements Serializable
      * Constructs a new instance using the existing one as a template, but replacing the
      * mimetype
      * 
-     * @param existing and existing set of content data
+     * @param existing an existing set of content data, null to use default values
      * @param mimetype the mimetype to set
      * @return Returns a new, immutable instance of the data
      */
     public static ContentData setMimetype(ContentData existing, String mimetype)
     {
         ContentData ret = new ContentData(
-                existing.contentUrl,
+                existing == null ? null : existing.contentUrl,
                 mimetype,
-                existing.size,
-                existing.encoding);
+                existing == null ? 0L : existing.size,
+                existing == null ? "UTF-8" : existing.encoding);
         // done
         return ret;
     }
