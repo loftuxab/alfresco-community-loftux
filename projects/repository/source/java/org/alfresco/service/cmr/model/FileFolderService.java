@@ -153,14 +153,14 @@ public interface FileFolderService
     /**
      * Checks for the presence of, and creates as necessary, the folder structure in the provided path.
      * <p>
-     * If the path could not be created, then <code>null</code> is returned.  Note that an empty name list
-     * will always return the <code>null</code>.
+     * An empty path list is not allowed as it would be impossible to necessarily return file info
+     * for the parent node - it might not be a folder node.
      * 
      * @param parentNodeRef the node under which the path will be created
-     * @param pathElements the folder name path to create
+     * @param pathElements the folder name path to create - may not be empty
      * @param folderTypeQName the types of nodes to create.  This must be a valid subtype of
      *      {@link org.alfresco.model.ContentModel#TYPE_FOLDER they folder type}.
-     * @return Returns the info of the last folder in the path or null if it could not be created
+     * @return Returns the info of the last folder in the path.
      */
     public FileInfo makeFolders(NodeRef parentNodeRef, List<String> pathElements, QName folderTypeQName);
     
