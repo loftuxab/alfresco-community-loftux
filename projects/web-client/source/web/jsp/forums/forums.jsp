@@ -82,13 +82,16 @@
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren" id="eval1">
-                                    <a:actionLink value="#{msg.create_forum}" image="/images/icons/create_forum.gif" padding="4" action="createForum" actionListener="#{CreateForumDialog.startWizard}" id="link1" />
+                                    <a:actionLink value="#{msg.create_forums}" image="/images/icons/create_forum.gif" padding="4" action="createForums" actionListener="#{CreateForumsDialog.startWizard}" id="link1" />
                                  </r:permissionEvaluator>
-                                 <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" padding="4" action="showForumsDetails" actionListener="#{BrowseBean.setupSpaceAction}" id="link2">
+                                 <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren" id="eval2">
+                                    <a:actionLink value="#{msg.create_forum}" image="/images/icons/create_forum.gif" padding="4" action="createForum" actionListener="#{CreateForumDialog.startWizard}" id="link2" />
+                                 </r:permissionEvaluator>
+                                 <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" padding="4" action="showForumsDetails" actionListener="#{BrowseBean.setupSpaceAction}" id="link3">
                                     <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param1" />
                                  </a:actionLink>
-                                 <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="Delete" id="eval2">
-                                    <a:actionLink value="#{msg.delete_forums}" image="/images/icons/delete.gif" padding="4" action="deleteForums" actionListener="#{BrowseBean.setupDeleteAction}" id="link3">
+                                 <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="Delete" id="eval3">
+                                    <a:actionLink value="#{msg.delete_forums}" image="/images/icons/delete.gif" padding="4" action="deleteForums" actionListener="#{BrowseBean.setupDeleteAction}" id="link4">
                                        <f:param name="id" value="#{NavigationBean.currentNodeId}" id="param2" />
                                     </a:actionLink>
                                  </r:permissionEvaluator>
@@ -224,11 +227,11 @@
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
                            <r:permissionEvaluator value="#{r}" allow="Delete">
-                              <a:actionLink value="#{msg.delete_forum}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteForum" actionListener="#{BrowseBean.setupDeleteAction}">
+                              <a:actionLink value="#{msg.delete}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deleteSpace" actionListener="#{BrowseBean.setupDeleteAction}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </r:permissionEvaluator>
-                           <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" showLink="false" styleClass="inlineAction" action="showForumDetails" actionListener="#{BrowseBean.setupSpaceAction}">
+                           <a:actionLink value="#{msg.view_details}" image="/images/icons/View_details.gif" showLink="false" styleClass="inlineAction" action="showSpaceDetails" actionListener="#{BrowseBean.setupSpaceAction}">
                               <f:param name="id" value="#{r.id}" />
                            </a:actionLink>
                         </a:column>
