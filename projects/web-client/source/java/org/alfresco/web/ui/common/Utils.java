@@ -470,111 +470,121 @@ public final class Utils
    }
    
    /**
+    * Enum representing the client URL type to generate
+    */
+   public enum URLMode {HTTP_DOWNLOAD, HTTP_INLINE, WEBDAV, CIFS, SHOW_DETAILS, FTP}
+   
+   /**
     * Generates a URL for the given usage for the given node.
     * 
-    * The supported values for the usage parameter are:
-    * 
-    * <ul>
-    * <li>http-download</li>
-    * <li>http-inline</li>
-    * <li>webdav</li>
-    * <li>cifs</li>
-    * <li>show-details</li>
-    * <li>ftp</li>
-    * </ul>
+    * The supported values for the usage parameter are of URLMode enum type
+    * @see URLMode
     * 
     * @param context Faces context
     * @param node The node to generate the URL for
     * @param usage What the URL is going to be used for 
     * @return The URL for the requested usage without the context path
     */
-   public static String generateURL(FacesContext context, Node node, String usage)
+   public static String generateURL(FacesContext context, Node node, URLMode usage)
    {
       String url = null;
       
-      if (usage.equalsIgnoreCase("webdav"))
+      switch (usage)
       {
-         // calculate a WebDAV URL for the given node
-         
-         FileFolderService fileFolderService = Repository.getServiceRegistry(
-               context).getFileFolderService();
-         try
+         case WEBDAV:
          {
-            List<FileInfo> paths = fileFolderService.getNamePath(null, node.getNodeRef());
-            User user = Application.getCurrentUser(context);
-            
-            // build up the webdav url
-            StringBuilder path = new StringBuilder("/").append(WebDAVServlet.WEBDAV_PREFIX);
-            
-            // build up the path skipping the first path as it is the root folder
-            boolean homeSpaceFound = false;
-            for (int x = 1; x < paths.size(); x++)
+            // calculate a WebDAV URL for the given node
+            FileFolderService fileFolderService = Repository.getServiceRegistry(
+                  context).getFileFolderService();
+            try
             {
-               path.append("/").append(paths.get(x).getName());
+               List<FileInfo> paths = fileFolderService.getNamePath(null, node.getNodeRef());
+               User user = Application.getCurrentUser(context);
+               
+               // build up the webdav url
+               StringBuilder path = new StringBuilder("/").append(WebDAVServlet.WEBDAV_PREFIX);
+               
+               // build up the path skipping the first path as it is the root folder
+               boolean homeSpaceFound = false;
+               for (int x = 1; x < paths.size(); x++)
+               {
+                  path.append("/").append(paths.get(x).getName());
+               }
+               
+               url = path.toString();
+            }
+            catch (Exception e)
+            {
+               if (logger.isWarnEnabled())
+                  logger.warn("Failed to calculate webdav url", e);
+            }
+            break;
+         }
+         
+         case CIFS:
+         {
+            // calculate a CIFS path for the given node
+            
+            // get hold of the node service, cifsServer and navigation bean
+            NodeService nodeService = Repository.getServiceRegistry(context).getNodeService();
+            NavigationBean navBean = (NavigationBean)context.getExternalContext().
+                  getSessionMap().get("NavigationBean");
+            CIFSServer cifsServer = (CIFSServer)FacesContextUtils.getRequiredWebApplicationContext(
+                  context).getBean("cifsServer");
+   
+            if (nodeService != null && navBean != null && cifsServer != null)
+            {
+               DiskSharedDevice diskShare = cifsServer.getConfiguration().getPrimaryFilesystem();
+               
+               if (diskShare != null)
+               {
+                   ContentContext contentCtx = (ContentContext) diskShare.getContext();
+                   NodeRef rootNode = contentCtx.getRootNode();
+                   Path path = nodeService.getPath(node.getNodeRef());
+                   url = Repository.getNamePath(nodeService, path, rootNode, "\\", 
+                         "file:///" + navBean.getCIFSServerPath(diskShare));
+               }
+            }
+            break;
+         }
+         
+         case HTTP_DOWNLOAD:
+         {
+            url = DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName());
+            break;
+         }
+         
+         case HTTP_INLINE:
+         {
+            url = DownloadContentServlet.generateBrowserURL(node.getNodeRef(), node.getName());
+            break;
+         }
+         
+         case SHOW_DETAILS:
+         {
+            DictionaryService dd = Repository.getServiceRegistry(context).getDictionaryService();
+            
+            // default to showing details of content
+            String outcome = "showDocDetails";
+            
+            // if the node is a type of folder then make the outcome to show space details
+            if (dd.isSubClass(node.getType(), ContentModel.TYPE_FOLDER))
+            {
+               outcome = "showSpaceDetails";
             }
             
-            url = path.toString();
+            // build the url
+            url = ExternalAccessServlet.generateExternalURL(outcome, 
+                  Repository.getStoreRef().getProtocol() + "/" + 
+                  Repository.getStoreRef().getIdentifier() + "/" + node.getId());
+            break;
          }
-         catch (Exception e)
+         
+         case FTP:
          {
-            if (logger.isWarnEnabled())
-               logger.warn("Failed to calculate webdav url", e);
+            // not implemented yet!
+            break;
          }
-      }
-      else if (usage.equalsIgnoreCase("cifs"))
-      {
-         // calculate a CIFS path for the given node
-         
-         // get hold of the node service, cifsServer and navigation bean
-         NodeService nodeService = Repository.getServiceRegistry(context).getNodeService();
-         NavigationBean navBean = (NavigationBean)context.getExternalContext().
-               getSessionMap().get("NavigationBean");
-         CIFSServer cifsServer = (CIFSServer)FacesContextUtils.getRequiredWebApplicationContext(
-               context).getBean("cifsServer");
-
-         if (nodeService != null && navBean != null && cifsServer != null)
-         {
-            DiskSharedDevice diskShare = cifsServer.getConfiguration().getPrimaryFilesystem();
-            
-            if (diskShare != null)
-            {
-                ContentContext contentCtx = (ContentContext) diskShare.getContext();
-                NodeRef rootNode = contentCtx.getRootNode();
-                Path path = nodeService.getPath(node.getNodeRef());
-                url = Repository.getNamePath(nodeService, path, rootNode, "\\", 
-                      "file:///" + navBean.getCIFSServerPath(diskShare));
-            }
-         }
-      }
-      else if (usage.equalsIgnoreCase("http-download"))
-      {
-         url = DownloadContentServlet.generateDownloadURL(node.getNodeRef(), node.getName());
-      }
-      else if (usage.equalsIgnoreCase("http-inline"))
-      {
-         url = DownloadContentServlet.generateBrowserURL(node.getNodeRef(), node.getName());
-      }
-      else if (usage.equalsIgnoreCase("show-details"))
-      {
-         DictionaryService dd = Repository.getServiceRegistry(context).getDictionaryService();
-         
-         // default to showing details of content
-         String outcome = "showDocDetails";
-         
-         // if the node is a type of folder then make the outcome to show space details
-         if (dd.isSubClass(node.getType(), ContentModel.TYPE_FOLDER))
-         {
-            outcome = "showSpaceDetails";
-         }
-         
-         // build the url
-         url = ExternalAccessServlet.generateExternalURL(outcome, 
-               Repository.getStoreRef().getProtocol() + "/" + 
-               Repository.getStoreRef().getIdentifier() + "/" + node.getId());
-      }
-      else if (usage.equalsIgnoreCase("ftp"))
-      {
-         // not implemented yet!
       }
       
       return url;

@@ -40,6 +40,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.data.QuickSort;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.Utils.URLMode;
 import org.alfresco.web.ui.common.component.UIActionLink;
 
 /**
@@ -141,7 +142,7 @@ public class SpaceDetailsBean
     */
    public String getWebdavUrl()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), "webdav");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), URLMode.CIFS);
    }
 
    /**
@@ -151,7 +152,7 @@ public class SpaceDetailsBean
     */
    public String getBookmarkUrl()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), "show-details");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), URLMode.SHOW_DETAILS);
    }
    
    /**
@@ -161,7 +162,7 @@ public class SpaceDetailsBean
     */
    public String getCifsPath()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), "cifs");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), URLMode.CIFS);
    }
 
    /**

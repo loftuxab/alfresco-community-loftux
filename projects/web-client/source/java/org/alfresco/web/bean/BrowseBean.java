@@ -59,6 +59,7 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewSpaceWizard;
 import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.Utils.URLMode;
 import org.alfresco.web.ui.common.component.IBreadcrumbHandler;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIBreadcrumb;
@@ -415,7 +416,6 @@ public class BrowseBean implements IContextListener
       node.addPropertyResolver("cancelCheckOut", this.resolverCancelCheckOut);
       node.addPropertyResolver("checkIn", this.resolverCheckIn);
       node.addPropertyResolver("editLinkType", this.resolverEditLinkType);
-      
       node.addPropertyResolver("webdavUrl", this.resolverWebdavUrl);
       node.addPropertyResolver("cifsPath", this.resolverCifsPath);
    }
@@ -777,14 +777,14 @@ public class BrowseBean implements IContextListener
    public NodePropertyResolver resolverWebdavUrl = new NodePropertyResolver() {
       public Object get(Node node) 
       {
-         return Utils.generateURL(FacesContext.getCurrentInstance(), node, "webdav"); 
+         return Utils.generateURL(FacesContext.getCurrentInstance(), node, URLMode.WEBDAV); 
       }   
    };
    
    public NodePropertyResolver resolverCifsPath = new NodePropertyResolver() {
       public Object get(Node node)
       {
-         return Utils.generateURL(FacesContext.getCurrentInstance(), node, "cifs");
+         return Utils.generateURL(FacesContext.getCurrentInstance(), node, URLMode.CIFS);
       }
    };
    
@@ -838,18 +838,13 @@ public class BrowseBean implements IContextListener
    public NodePropertyResolver resolverEditLinkType = new NodePropertyResolver() {
       public Object get(Node node)
       {
-         String editLinkType = null;
+         String editLinkType = "http";
          
          // if the node is inline editable, the default http behaviour should 
          // always be used otherwise the configured approach is used
-         if (node.hasAspect(ContentModel.ASPECT_INLINEEDITABLE))
-         {
-            editLinkType = "http";
-         }
-         else
+         if (node.hasAspect(ContentModel.ASPECT_INLINEEDITABLE) == false)
          {
             editLinkType = clientConfig.getEditLinkType();
-            
             if (editLinkType == null)
             {
                editLinkType = "http";
@@ -859,6 +854,7 @@ public class BrowseBean implements IContextListener
          return editLinkType;
       }
    };
+   
    
    // ------------------------------------------------------------------------------
    // Navigation action event handlers

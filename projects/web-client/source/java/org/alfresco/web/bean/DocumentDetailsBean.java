@@ -54,6 +54,7 @@ import org.alfresco.web.bean.repository.Node;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.bean.wizard.NewRuleWizard;
 import org.alfresco.web.ui.common.Utils;
+import org.alfresco.web.ui.common.Utils.URLMode;
 import org.alfresco.web.ui.common.component.UIActionLink;
 import org.alfresco.web.ui.common.component.UIPanel.ExpandedEvent;
 import org.apache.log4j.Logger;
@@ -154,7 +155,7 @@ public class DocumentDetailsBean
     */
    public String getBrowserUrl()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "http-inline");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), URLMode.HTTP_INLINE);
    }
 
    /**
@@ -164,7 +165,7 @@ public class DocumentDetailsBean
     */
    public String getDownloadUrl()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "http-download");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), URLMode.HTTP_DOWNLOAD);
    }
    
    /**
@@ -174,7 +175,7 @@ public class DocumentDetailsBean
     */
    public String getWebdavUrl()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "webdav");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), URLMode.WEBDAV);
    }
    
    /**
@@ -184,7 +185,7 @@ public class DocumentDetailsBean
     */
    public String getBookmarkUrl()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "show-details");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), URLMode.SHOW_DETAILS);
    }
    
    /**
@@ -194,7 +195,7 @@ public class DocumentDetailsBean
     */
    public String getCifsPath()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), "cifs");
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getDocument(), URLMode.CIFS);
    }
    
    /**
