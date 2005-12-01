@@ -1387,11 +1387,8 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                 {
                     if (strValue != null)
                     {
-                        // String strValue =
-                        // ValueConverter.convert(String.class,
-                        // value);
-                        // TODO: Need to add with the correct language based
-                        // analyser
+                        // String strValue = ValueConverter.convert(String.class, value);
+                        // TODO: Need to add with the correct language based analyser
 
                         if (isContent)
                         {
@@ -1410,19 +1407,12 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                     {
                                         ContentWriter writer = contentService.getTempWriter();
                                         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-                                        writer.setEncoding("UTF-8"); // this
-                                        // is
-                                        // what the
-                                        // analyzers
-                                        // expect on
-                                        // the
-                                        // stream
+                                        // this is what the analyzers expect on the stream
+                                        writer.setEncoding("UTF-8");
                                         try
                                         {
                                             contentService.transform(reader, writer);
-                                            // point the reader to the
-                                            // new-written
-                                            // content
+                                            // point the reader to the new-written content
                                             reader = writer.getReader();
                                         }
                                         catch (NoTransformerException e)
@@ -1453,8 +1443,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                             doc.add(Field.Text(attributeName, NOT_INDEXED_TRANSFORMATION_FAILED));
                                         }
                                     }
-                                    // add the text field using the stream from
-                                    // the
+                                    // add the text field using the stream from the
                                     // reader, but only if the reader is valid
                                     if (readerReady)
                                     {
@@ -1491,9 +1480,7 @@ public class LuceneIndexerImpl extends LuceneBase implements LuceneIndexer
                                 }
 
                                 else
-                                // URL not present (null reader) or no content
-                                // at
-                                // the URL (file missing)
+                                // URL not present (null reader) or no content at the URL (file missing)
                                 {
                                     // log it
                                     if (s_logger.isDebugEnabled())
