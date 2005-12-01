@@ -410,35 +410,27 @@ public final class FileName
      */
     public static String[] splitPath(String path, char sep, String[] list)
     {
+        if (path == null)
+            throw new IllegalArgumentException("Path may not be null");
 
         // Create an array of strings to hold the path and file name strings
-
         String[] pathStr = list;
         if (pathStr == null)
-            pathStr = new String[2];
+            pathStr = new String[] {"", ""};
 
         // Check if the path is valid
-
-        if (path != null && path.length() > 0)
+        if (path.length() > 0)
         {
-
-            // Check if the path has a trailing seperator, if so then there is no
-            // file name.
-
+            // Check if the path has a trailing seperator, if so then there is no file name.
             int pos = path.lastIndexOf(sep);
-
             if (pos == -1 || pos == (path.length() - 1))
             {
-
                 // Set the path string in the returned string array
-
                 pathStr[0] = path;
             }
             else
             {
-
                 // Split the path into directory list and file name strings
-
                 pathStr[1] = path.substring(pos + 1);
 
                 if (pos == 0)
@@ -447,17 +439,8 @@ public final class FileName
                     pathStr[0] = path.substring(0, pos);
             }
         }
-        else
-        {
-
-            // Set the directory and file name to empty strings
-
-            pathStr[0] = "";
-            pathStr[1] = "";
-        }
 
         // Return the path strings
-
         return pathStr;
     }
 
