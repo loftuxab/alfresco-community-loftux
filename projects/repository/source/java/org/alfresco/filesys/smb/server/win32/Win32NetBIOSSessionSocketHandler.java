@@ -26,7 +26,9 @@ import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
 import org.alfresco.filesys.netbios.win32.WinsockError;
 import org.alfresco.filesys.netbios.win32.WinsockNetBIOSException;
 import org.alfresco.filesys.server.config.ServerConfiguration;
+import org.alfresco.filesys.smb.mailslot.HostAnnouncer;
 import org.alfresco.filesys.smb.mailslot.Win32NetBIOSHostAnnouncer;
+import org.alfresco.filesys.smb.mailslot.WinsockNetBIOSHostAnnouncer;
 import org.alfresco.filesys.smb.server.PacketHandler;
 import org.alfresco.filesys.smb.server.SMBServer;
 import org.alfresco.filesys.smb.server.SMBSrvSession;
@@ -847,8 +849,26 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler imple
 
                 // Create a host announcer
 
-                Win32NetBIOSHostAnnouncer hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, config
-                        .getDomainName(), config.getWin32HostAnnounceInterval());
+                HostAnnouncer hostAnnouncer = null;
+
+                String domain = config.getDomainName();
+                int intvl = config.getWin32HostAnnounceInterval();
+                
+                if ( config.useWinsockNetBIOS())
+                {
+                    // Create a Winsock NetBIOS announcer
+                    
+                    hostAnnouncer = new WinsockNetBIOSHostAnnouncer(sessHandler, domain, intvl);
+                }
+                else
+                {
+                    // Create a Win32 Netbios() API announcer
+                    
+                    hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, domain, intvl);
+                }
+                
+                // Enable announcer debug
+                
                 hostAnnouncer.setDebug(sockDbg);
 
                 // Add the host announcer to the SMB/CIFS server list
@@ -928,8 +948,26 @@ public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler imple
 
                         // Create a host announcer
 
-                        Win32NetBIOSHostAnnouncer hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, config
-                                .getDomainName(), config.getWin32HostAnnounceInterval());
+                        HostAnnouncer hostAnnouncer = null;
+
+                        String domain = config.getDomainName();
+                        int intvl = config.getWin32HostAnnounceInterval();
+                        
+                        if ( config.useWinsockNetBIOS())
+                        {
+                            // Create a Winsock NetBIOS announcer
+                            
+                            hostAnnouncer = new WinsockNetBIOSHostAnnouncer(sessHandler, domain, intvl);
+                        }
+                        else
+                        {
+                            // Create a Win32 Netbios() API announcer
+                            
+                            hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, domain, intvl);
+                        }
+                        
+                        // Enable announcer debug
+                        
                         hostAnnouncer.setDebug(sockDbg);
 
                         // Add the host announcer to the SMB/CIFS server list

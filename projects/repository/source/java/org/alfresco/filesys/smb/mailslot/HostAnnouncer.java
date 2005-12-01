@@ -33,7 +33,7 @@ public abstract class HostAnnouncer extends Thread
 
     // Debug logging
 
-    private static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.mailslot");
+    protected static final Log logger = LogFactory.getLog("org.alfresco.smb.protocol.mailslot");
 
     // Shutdown announcement interval and message count
 

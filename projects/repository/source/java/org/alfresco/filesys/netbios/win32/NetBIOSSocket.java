@@ -27,6 +27,12 @@ import org.alfresco.filesys.netbios.NetBIOSName;
  */
 public class NetBIOSSocket
 {
+    //  Socket types
+    
+    private static final int TypeNormal     = 0;
+    private static final int TypeListener   = 1;
+    private static final int TypeDatagram   = 2;
+    
     //  Flag to indicate if the NetBIOS socket interface has been initialized
     
     private static boolean _nbSocketInit;
@@ -43,9 +49,9 @@ public class NetBIOSSocket
     
     private NetBIOSName m_nbName;
     
-    // Flag to indicate if this is a listener socket
+    // Socket type
     
-    private boolean m_listenerSocket;
+    private int m_socketType;
     
     /**
      * Initialize the Winsock NetBIOS interface
@@ -125,7 +131,33 @@ public class NetBIOSSocket
         
         // Return the NetBIOS socket
         
-        return new NetBIOSSocket(lana, sockPtr, nbName, true);
+        return new NetBIOSSocket(lana, sockPtr, nbName, TypeListener);
+    }
+    
+    /**
+     * Create a NetBIOS datagram socket to send out mailslot announcements on the specified LANA
+     * 
+     * @param lana int
+     * @return NetBIOSSocket
+     * @exception NetBIOSSocketException
+     * @exception WinsockNetBIOSException
+     */
+    public static final NetBIOSSocket createDatagramSocket(int lana)
+        throws WinsockNetBIOSException, NetBIOSSocketException
+    {
+        // Initialize the Winsock NetBIOS interface
+        
+        initializeSockets();
+        
+        // Create a new NetBIOS socket
+        
+        int sockPtr = Win32NetBIOS.CreateDatagramSocket(lana);
+        if ( sockPtr == 0)
+            throw new NetBIOSSocketException("Failed to create NetBIOS datagram socket");
+        
+        // Return the NetBIOS socket
+        
+        return new NetBIOSSocket(lana, sockPtr, null, TypeDatagram);
     }
     
     /**
@@ -134,15 +166,15 @@ public class NetBIOSSocket
      * @param lana int
      * @param sockPtr int
      * @param nbName NetBIOSName
-     * @param listener boolean
+     * @param sockerType int
      */
-    private NetBIOSSocket(int lana, int sockPtr, NetBIOSName nbName, boolean listener)
+    private NetBIOSSocket(int lana, int sockPtr, NetBIOSName nbName, int socketType)
     {
         m_lana   = lana;
         m_nbName = nbName;
         m_socket = sockPtr;
         
-        m_listenerSocket = listener;
+        m_socketType = socketType;
     }
     
     /**
@@ -156,13 +188,23 @@ public class NetBIOSSocket
     }
 
     /**
+     * Determine if this is a datagram socket
+     * 
+     * @return boolean
+     */
+    public final boolean isDatagramSocket()
+    {
+        return m_socketType == TypeDatagram ? true : false;
+    }
+    
+    /**
      * Determine if this is a listener type socket
      * 
      * @return boolean
      */
     public final boolean isListener()
     {
-        return m_listenerSocket;
+        return m_socketType == TypeListener ? true : false;
     }
     
     /**
@@ -208,6 +250,11 @@ public class NetBIOSSocket
     public final int write(byte[] buf, int off, int len)
         throws WinsockNetBIOSException
     {
+        // Check if this is a datagram socket
+        
+        if ( isDatagramSocket())
+            throw new WinsockNetBIOSException("Write not allowed for datagram socket");
+        
         return Win32NetBIOS.SendSocket( getSocket(), buf, off, len);
     }
     
@@ -223,7 +270,33 @@ public class NetBIOSSocket
     public final int read(byte[] buf, int off, int maxLen)
         throws WinsockNetBIOSException
     {
+        // Check if this is a datagram socket
+        
+        if ( isDatagramSocket())
+            throw new WinsockNetBIOSException("Read not allowed for datagram socket");
+        
         return Win32NetBIOS.ReceiveSocket( getSocket(), buf, off, maxLen);
+    }
+    
+    /**
+     * Send a datagram to a group name
+     * 
+     * @param toName NetBIOSName
+     * @param buf byte[]
+     * @param off int
+     * @param len int
+     * @return int
+     * @exception WinsockNetBIOSException
+     */
+    public final int sendDatagram(NetBIOSName toName, byte[] buf, int off, int len)
+        throws WinsockNetBIOSException
+    {
+        // Check if this is a datagram socket
+        
+        if ( isDatagramSocket() == false)
+            throw new WinsockNetBIOSException("Not a datagram type socket");
+        
+        return Win32NetBIOS.SendSocketDatagram( getSocket(), toName.getNetBIOSName(), buf, off, len);
     }
     
     /**
@@ -254,7 +327,7 @@ public class NetBIOSSocket
         
         // Return the new NetBIOS socket session
         
-        return new NetBIOSSocket(getLana(), sessSockPtr, new NetBIOSName(callerName, 0), false);
+        return new NetBIOSSocket(getLana(), sessSockPtr, new NetBIOSName(callerName, 0), TypeNormal);
     }
     
     /**
@@ -293,7 +366,11 @@ public class NetBIOSSocket
         str.append("[LANA:");
         str.append(getLana());
         str.append(",Name:");
-        str.append(getName());
+        if ( getName() != null)
+            str.append(getName());
+        else
+            str.append("<None>");
+        
         str.append(",Socket:");
         if ( hasSocket())
         {
@@ -302,9 +379,19 @@ public class NetBIOSSocket
         }
         else
             str.append("<None>");
-        
-        if ( isListener())
-            str.append(",Listener");
+
+        switch( m_socketType)
+        {
+        case TypeNormal:
+            str.append("Session");
+            break;
+        case TypeListener:
+            str.append("Listener");
+            break;
+        case TypeDatagram:
+            str.append("Datagram");
+            break;
+        }
         
         str.append("]");
             

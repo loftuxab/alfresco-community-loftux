@@ -607,6 +607,16 @@ public class Win32NetBIOS
         throws WinsockNetBIOSException;
     
     /**
+     * Create a NetBIOS datagram socket
+     * 
+     * @param lana int
+     * @return int
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native int CreateDatagramSocket(int lana)
+        throws WinsockNetBIOSException;
+    
+    /**
      * Bind a NetBIOS socket to a name to listen for incoming sessions
      * 
      * @param sockPtr int
@@ -627,7 +637,6 @@ public class Win32NetBIOS
     protected static native int ListenSocket(int sockPtr, byte[] callerName)
         throws WinsockNetBIOSException;
 
-    
     /**
      * Close a NetBIOS socket
      * 
@@ -648,11 +657,11 @@ public class Win32NetBIOS
     protected static native int SendSocket(int sockPtr, byte[] buf, int off, int len)
         throws WinsockNetBIOSException;
 
-    
     /**
      * Receive data on a session socket
      * 
      * @param sockPtr int
+     * @param toName byte[]
      * @param buf byte[]
      * @param off int
      * @param maxLen int
@@ -662,6 +671,19 @@ public class Win32NetBIOS
     protected static native int ReceiveSocket(int sockPtr, byte[] buf, int off, int maxLen)
         throws WinsockNetBIOSException;
 
+    /**
+     * Send data on a datagram socket
+     * 
+     * @param sockPtr int
+     * @param toName byte[]
+     * @param buf byte[]
+     * @param off int
+     * @param len int
+     * @return int
+     * @exception WinsockNetBIOSException   If a Winsock error occurs
+     */
+    protected static native int SendSocketDatagram(int sockPtr, byte[] toName, byte[] buf, int off, int len)
+        throws WinsockNetBIOSException;
     
     /**
      * Wait for a network address change event, block until a change occurs or the Winsock NetBIOS

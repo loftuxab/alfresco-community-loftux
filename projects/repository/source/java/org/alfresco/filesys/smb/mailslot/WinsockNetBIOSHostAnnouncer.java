@@ -18,24 +18,30 @@ package org.alfresco.filesys.smb.mailslot;
 
 import org.alfresco.filesys.netbios.NetBIOSName;
 import org.alfresco.filesys.netbios.win32.NetBIOS;
+import org.alfresco.filesys.netbios.win32.NetBIOSSocket;
 import org.alfresco.filesys.netbios.win32.Win32NetBIOS;
 import org.alfresco.filesys.smb.server.win32.Win32NetBIOSSessionSocketHandler;
 
 /**
+ * Winsock NetBIOS Host Announcer Class
+ * 
  * <p>
  * The host announcer class periodically broadcasts a host announcement datagram to inform other
  * Windows networking hosts of the local hosts existence and capabilities.
+ * 
  * <p>
- * The Win32 NetBIOS host announcer sends out the announcements using datagrams sent via the Win32
- * Netbios() Netapi32 call.
+ * The Win32 NetBIOS host announcer sends out the announcements using datagrams sent via Winsock calls.
  */
-public class Win32NetBIOSHostAnnouncer extends HostAnnouncer
+public class WinsockNetBIOSHostAnnouncer extends HostAnnouncer
 {
-
     // Associated session handler
 
-    Win32NetBIOSSessionSocketHandler m_handler;
+    private Win32NetBIOSSessionSocketHandler m_handler;
 
+    // Winsock NetBIOS datagram socket
+    
+    private NetBIOSSocket m_dgramSocket;
+    
     /**
      * Create a host announcer.
      * 
@@ -43,7 +49,7 @@ public class Win32NetBIOSHostAnnouncer extends HostAnnouncer
      * @param domain Domain name to announce to
      * @param intval Announcement interval, in minutes
      */
-    public Win32NetBIOSHostAnnouncer(Win32NetBIOSSessionSocketHandler handler, String domain, int intval)
+    public WinsockNetBIOSHostAnnouncer(Win32NetBIOSSessionSocketHandler handler, String domain, int intval)
     {
 
         // Save the handler
@@ -68,26 +74,19 @@ public class Win32NetBIOSHostAnnouncer extends HostAnnouncer
     }
 
     /**
-     * Return the host name NetBIOS number
-     * 
-     * @return int
-     */
-    public final int getNameNumber()
-    {
-        return m_handler.getNameNumber();
-    }
-
-    /**
      * Initialize the host announcer.
      * 
      * @exception Exception
      */
     protected void initialize() throws Exception
     {
-
         // Set the thread name
 
-        setName("Win32HostAnnouncer_L" + getLana());
+        setName("WinsockHostAnnouncer_L" + getLana());
+        
+        // Create the Winsock NetBIOS datagram socket
+        
+        m_dgramSocket = NetBIOSSocket.createDatagramSocket(getLana());
     }
 
     /**
@@ -114,12 +113,11 @@ public class Win32NetBIOSHostAnnouncer extends HostAnnouncer
         // Build the destination NetBIOS name using the domain/workgroup name
 
         NetBIOSName destNbName = new NetBIOSName(getDomain(), NetBIOSName.MasterBrowser, false);
-        byte[] destName = destNbName.getNetBIOSName();
 
         // Send the host announce datagram via the Win32 Netbios() API call
 
-        int sts = Win32NetBIOS.SendDatagram(getLana(), getNameNumber(), destName, buf, 0, len);
-        if ( sts != NetBIOS.NRC_GoodRet)
-            logger.debug("Win32NetBIOS host announce error " + NetBIOS.getErrorString( -sts));
+        int sts = m_dgramSocket.sendDatagram(destNbName, buf, 0, len);
+        if ( sts != len)
+            logger.debug("WinsockNetBIOS host announce error");
     }
 }
