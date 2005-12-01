@@ -17,6 +17,9 @@
 package org.alfresco.repo.webdav;
 
 import java.io.InputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +29,7 @@ import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Implements the WebDAV PUT method
@@ -108,6 +112,12 @@ public class PutMethod extends WebDAVMethod
                 // create file
                 contentNodeInfo = fileFolderService.create(parentNodeInfo.getNodeRef(), paths[1], ContentModel.TYPE_CONTENT);
                 created = true;
+                
+                // apply the titled aspect - title and description
+                Map<QName, Serializable> titledProps = new HashMap<QName, Serializable>(3, 1.0f);
+                titledProps.put(ContentModel.PROP_TITLE, paths[1]);
+                titledProps.put(ContentModel.PROP_DESCRIPTION, "");
+                getNodeService().addAspect(contentNodeInfo.getNodeRef(), ContentModel.ASPECT_TITLED, titledProps);
             }
             catch (FileNotFoundException ee)
             {
