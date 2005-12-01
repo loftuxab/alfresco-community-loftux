@@ -112,7 +112,7 @@ public class JCRProxyFactory
             try
             {
                 // test for existence of transaction
-                if (!(method.equals("login") || method.equals("logout")))
+                if (!(method.getName().equals("login") || method.getName().equals("logout")))
                 {        
                     String trxId = AlfrescoTransactionSupport.getTransactionId();
                     if (trxId == null)
