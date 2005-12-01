@@ -20,6 +20,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import javax.transaction.UserTransaction;
+
 import org.alfresco.config.ConfigElement;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filesys.server.SrvSession;
@@ -156,69 +158,108 @@ public class ContentDiskDriver implements DiskInterface
      */
     public DeviceContext createContext(ConfigElement cfg) throws DeviceContextException
     {
-        // Get the store
+        // Wrap the initialization in a transaction
         
-        ConfigElement storeElement = cfg.getChild(KEY_STORE);
-        if (storeElement == null || storeElement.getValue() == null || storeElement.getValue().length() == 0)
-        {
-            throw new DeviceContextException("Device missing init value: " + KEY_STORE);
-        }
-        String storeValue = storeElement.getValue();
-        StoreRef storeRef = new StoreRef(storeValue);
-        
-        // Connect to the repo and ensure that the store exists
-        
-        if (!unprotectedNodeService.exists(storeRef))
-        {
-            throw new DeviceContextException("Store not created prior to application startup: " + storeRef);
-        }
-        NodeRef storeRootNodeRef = unprotectedNodeService.getRootNode(storeRef);
-        
-        // Get the root path
-        
-        ConfigElement rootPathElement = cfg.getChild(KEY_ROOT_PATH);
-        if (rootPathElement == null || rootPathElement.getValue() == null || rootPathElement.getValue().length() == 0)
-        {
-            throw new DeviceContextException("Device missing init value: " + KEY_ROOT_PATH);
-        }
-        String rootPath = rootPathElement.getValue();
-        
-        // Find the root node for this device
-        
-        List<NodeRef> nodeRefs = unprotectedSearchService.selectNodes(
-                storeRootNodeRef, rootPath, null, namespaceService, false);
-        
-        NodeRef rootNodeRef = null;
-        
-        if (nodeRefs.size() > 1)
-        {
-            throw new DeviceContextException("Multiple possible roots for device: \n" +
-                    "   root path: " + rootPath + "\n" +
-                    "   results: " + nodeRefs);
-        }
-        else if (nodeRefs.size() == 0)
-        {
-            // nothing found
-            throw new DeviceContextException("No root found for device: \n" +
-                    "   root path: " + rootPath);
-        }
-        else
-        {
-            // we found a node
-            rootNodeRef = nodeRefs.get(0);
-        }
-        
-        // Create the context
-        
-        ContentContext context = new ContentContext(storeValue, rootPath, rootNodeRef);
+        UserTransaction tx = transactionService.getUserTransaction(true);
 
-        // Default the filesystem to look like an 80Gb sized disk with 90% free space
+        ContentContext context = null;
         
-        context.setDiskInformation(new SrvDiskInfo(2560, 64, 512, 2304));
-        
-        // Set parameters
-        
-        context.setFilesystemAttributes(FileSystem.CasePreservedNames);
+        try
+        {
+            // Start the transaction
+            
+            if ( tx != null)
+                tx.begin();
+            
+            // Get the store
+            
+            ConfigElement storeElement = cfg.getChild(KEY_STORE);
+            if (storeElement == null || storeElement.getValue() == null || storeElement.getValue().length() == 0)
+            {
+                throw new DeviceContextException("Device missing init value: " + KEY_STORE);
+            }
+            String storeValue = storeElement.getValue();
+            StoreRef storeRef = new StoreRef(storeValue);
+            
+            // Connect to the repo and ensure that the store exists
+            
+            if (!unprotectedNodeService.exists(storeRef))
+            {
+                throw new DeviceContextException("Store not created prior to application startup: " + storeRef);
+            }
+            NodeRef storeRootNodeRef = unprotectedNodeService.getRootNode(storeRef);
+            
+            // Get the root path
+            
+            ConfigElement rootPathElement = cfg.getChild(KEY_ROOT_PATH);
+            if (rootPathElement == null || rootPathElement.getValue() == null || rootPathElement.getValue().length() == 0)
+            {
+                throw new DeviceContextException("Device missing init value: " + KEY_ROOT_PATH);
+            }
+            String rootPath = rootPathElement.getValue();
+            
+            // Find the root node for this device
+            
+            List<NodeRef> nodeRefs = unprotectedSearchService.selectNodes(
+                    storeRootNodeRef, rootPath, null, namespaceService, false);
+            
+            NodeRef rootNodeRef = null;
+            
+            if (nodeRefs.size() > 1)
+            {
+                throw new DeviceContextException("Multiple possible roots for device: \n" +
+                        "   root path: " + rootPath + "\n" +
+                        "   results: " + nodeRefs);
+            }
+            else if (nodeRefs.size() == 0)
+            {
+                // nothing found
+                throw new DeviceContextException("No root found for device: \n" +
+                        "   root path: " + rootPath);
+            }
+            else
+            {
+                // we found a node
+                rootNodeRef = nodeRefs.get(0);
+            }
+
+            // Commit the transaction
+            
+            tx.commit();
+            tx = null;
+            
+            // Create the context
+            
+            context = new ContentContext(storeValue, rootPath, rootNodeRef);
+
+            // Default the filesystem to look like an 80Gb sized disk with 90% free space
+            
+            context.setDiskInformation(new SrvDiskInfo(2560, 64, 512, 2304));
+            
+            // Set parameters
+            
+            context.setFilesystemAttributes(FileSystem.CasePreservedNames);
+        }
+        catch (Exception ex)
+        {
+            logger.error("Error during create context", ex);
+        }
+        finally
+        {
+            // If there is an active transaction then roll it back
+            
+            if ( tx != null)
+            {
+                try
+                {
+                    tx.rollback();
+                }
+                catch (Exception ex)
+                {
+                    logger.warn("Failed to rollback transaction", ex);
+                }
+            }                
+        }
         
         // Return the context for this shared filesystem
         

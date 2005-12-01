@@ -55,7 +55,6 @@ import org.alfresco.filesys.server.filesys.NotifyChange;
 import org.alfresco.filesys.server.filesys.SearchContext;
 import org.alfresco.filesys.server.filesys.TreeConnection;
 import org.alfresco.filesys.server.filesys.TreeConnectionHash;
-import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -3074,10 +3073,6 @@ public class FTPSrvSession extends SrvSession implements Runnable
      */
     public void run()
     {
-        // Transaction used to wrap all processing
-        
-        UserTransaction tx = null;
-        TransactionService transactionService = getFTPServer().getConfiguration().getTransactionService();
         
         try
         {
@@ -3149,14 +3144,10 @@ public class FTPSrvSession extends SrvSession implements Runnable
                 if (logger.isDebugEnabled() && hasDebug(DBG_PKTTYPE))
                     logger.debug("Cmd " + ftpReq);
 
-                // Create a transaction for the request
-                
-                tx = transactionService.getUserTransaction();
-                tx.begin();
-                
                 // Parse the received command, and validate
 
                 ftpReq.setCommandLine(cmd);
+                m_reqCount++;
 
                 switch (ftpReq.isCommand())
                 {
@@ -3360,20 +3351,23 @@ public class FTPSrvSession extends SrvSession implements Runnable
                                 + FTPCommand.getCommandName(ftpReq.isCommand()) + " in " + duration + "ms");
                 }
 
-                // Commit the transaction
+                // Check for an active transaction, and commit it
                 
-                if ( tx != null)
+                if ( hasUserTransaction())
                 {
                     try
                     {
                         // Commit the transaction
-                        
-                        tx.commit();
-                        tx = null;
+
+                        UserTransaction trans = getUserTransaction();
+                        trans.commit();
                     }
-                    catch (Exception ex)
+                    catch ( Exception ex)
                     {
-                        logger.warn("Failed to rollback transaction", ex);
+                        // Debug
+                        
+                        if ( logger.isDebugEnabled())
+                            logger.debug("Error committing transaction", ex);
                     }
                 }
                 
@@ -3401,12 +3395,11 @@ public class FTPSrvSession extends SrvSession implements Runnable
         {
             // If there is an active transaction then roll it back
             
-            if ( tx != null)
+            if ( hasUserTransaction())
             {
                 try
                 {
-                    tx.rollback();
-                    tx = null;
+                    getUserTransaction().rollback();
                 }
                 catch (Exception ex)
                 {

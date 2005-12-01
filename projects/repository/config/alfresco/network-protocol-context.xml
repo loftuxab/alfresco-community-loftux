@@ -48,51 +48,20 @@
       </constructor-arg>
    </bean>
 
-   <!-- Filesystem Interface -->   
-   <bean id="contentDiskDriver" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="proxyInterfaces">
-         <value>org.alfresco.filesys.server.filesys.DiskInterface</value>
-      </property>
-      <property name="transactionManager"><ref bean="transactionManager"/></property>
-      <property name="target">
-         <bean class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
-            <constructor-arg>
-               <ref bean="cifsHelper" />
-            </constructor-arg>
-            <property name="transactionService"><ref bean="transactionComponent" /></property>
-            <property name="nodeService"><ref bean="NodeService" /></property>
-            <property name="unprotectedNodeService"><ref bean="nodeService" /></property>
-            <property name="unprotectedSearchService"><ref bean="searchService" /></property>
-            <property name="namespaceService"><ref bean="namespaceService" /></property>
-            <property name="contentService"><ref bean="ContentService" /></property>
-            <property name="permissionService"><ref bean="permissionService"/></property>
-         </bean>
-      </property>
-      <property name="transactionAttributes">
-         <props>
-            <prop key="*exist">${server.transaction.mode.readOnly}</prop>
-            <prop key="get*">${server.transaction.mode.readOnly}</prop>
-            <prop key="is*">${server.transaction.mode.readOnly}</prop>
-            <prop key="read*">${server.transaction.mode.readOnly}</prop>
-            <prop key="seek*">${server.transaction.mode.readOnly}</prop>
-            <prop key="start*">${server.transaction.mode.readOnly}</prop>
-            <prop key="*">${server.transaction.mode.default}</prop>
-         </props>
-      </property>
-      <!-- only enable for debugging
-      <property name="postInterceptors">
-         <list>
-            <ref bean="methodCallLogAdvice" />
-            <bean class="org.alfresco.util.perf.PerformanceMonitorAdvice" >
-               <constructor-arg>
-                  <value>contentDiskDriver</value>
-               </constructor-arg>
-            </bean>
-         </list>
-      </property>
-      -->
+   <!-- Filesystem Interface -->
+   <bean id="contentDiskDriver" class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
+         <constructor-arg>
+            <ref bean="cifsHelper" />
+         </constructor-arg>
+         <property name="transactionService"><ref bean="transactionComponent" /></property>
+         <property name="nodeService"><ref bean="NodeService" /></property>
+         <property name="unprotectedNodeService"><ref bean="nodeService" /></property>
+         <property name="unprotectedSearchService"><ref bean="searchService" /></property>
+         <property name="namespaceService"><ref bean="namespaceService" /></property>
+         <property name="contentService"><ref bean="ContentService" /></property>
+         <property name="permissionService"><ref bean="permissionService"/></property>
    </bean>
-
+   
    <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">
       <property name="dictionaryService"><ref bean="dictionaryService" /></property>
       <property name="nodeService"><ref bean="NodeService" /></property>

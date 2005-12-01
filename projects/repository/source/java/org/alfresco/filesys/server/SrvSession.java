@@ -92,6 +92,12 @@ public abstract class SrvSession
     private UserTransaction m_transaction;
     private boolean m_readOnlyTrans;
     
+    // Request and transaction counts
+    
+    protected int m_reqCount;
+    protected int m_transCount;
+    protected int m_transConvCount;
+    
     /**
      * Class constructor
      * 
@@ -485,6 +491,7 @@ public abstract class SrvSession
                 try
                 {
                     m_transaction.commit();
+                    m_transConvCount++;
                 }
                 catch ( Exception ex)
                 {
@@ -511,6 +518,8 @@ public abstract class SrvSession
                 created = true;
                 
                 m_readOnlyTrans = readOnly;
+                
+                m_transCount++;
             }
             catch (Exception ex)
             {

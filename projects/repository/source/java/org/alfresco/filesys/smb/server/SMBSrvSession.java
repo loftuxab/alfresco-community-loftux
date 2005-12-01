@@ -1481,16 +1481,11 @@ public class SMBSrvSession extends SrvSession implements Runnable
     {
         try
         {
-
             // Debug
 
             if (logger.isDebugEnabled() && hasDebug(SMBSrvSession.DBG_NEGOTIATE))
                 logger.debug("Server session started");
 
-            // Get the transaction service
-            
-            TransactionService transactionService = getSMBServer().getConfiguration().getTransactionService();
-            
             // The server session loops until the NetBIOS hangup state is set.
 
             while (m_state != SMBSrvSessionState.NBHANGUP)
@@ -1523,9 +1518,9 @@ public class SMBSrvSession extends SrvSession implements Runnable
 
                 m_smbPkt.setReceivedLength(m_rxlen);
 
-                // Start a transaction
-                
-                beginTransaction(transactionService, false);
+                // Update the request count
+        
+                m_reqCount++;
                 
                 // Process the received packet
 
@@ -1610,7 +1605,7 @@ public class SMBSrvSession extends SrvSession implements Runnable
         {
             // If there is an active transaction then roll it back
             
-            if ( hasTransaction())
+            if ( hasUserTransaction())
             {
                 try
                 {
