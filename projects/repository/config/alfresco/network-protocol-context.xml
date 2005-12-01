@@ -62,11 +62,8 @@
             <property name="transactionService"><ref bean="transactionComponent" /></property>
             <property name="nodeService"><ref bean="NodeService" /></property>
             <property name="unprotectedNodeService"><ref bean="nodeService" /></property>
-            <property name="searchService"><ref bean="SearchService" /></property>
             <property name="unprotectedSearchService"><ref bean="searchService" /></property>
-            <property name="dictionaryService"><ref bean="dictionaryService" /></property>
             <property name="namespaceService"><ref bean="namespaceService" /></property>
-            <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
             <property name="contentService"><ref bean="ContentService" /></property>
             <property name="permissionService"><ref bean="permissionService"/></property>
          </bean>
@@ -96,87 +93,12 @@
       -->
    </bean>
 
-   <bean id="contentDiskDriverNoTransactions" class="org.alfresco.filesys.smb.server.repo.ContentDiskDriver" >
-         <constructor-arg>
-            <ref bean="cifsHelper" />
-         </constructor-arg>
-         <property name="nodeService"><ref bean="nodeService" /></property>
-         <property name="searchService"><ref bean="searchService" /></property>
-         <property name="dictionaryService"><ref bean="dictionaryService" /></property>
-         <property name="namespaceService"><ref bean="namespaceService" /></property>
-         <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
-         <property name="contentService"><ref bean="contentService" /></property>
-   </bean>
-   
-   <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper" init-method="init">
+   <bean id="cifsHelper" class="org.alfresco.filesys.smb.server.repo.CifsHelper">
       <property name="dictionaryService"><ref bean="dictionaryService" /></property>
-      <property name="namespaceService"><ref bean="namespaceService" /></property>
       <property name="nodeService"><ref bean="NodeService" /></property>
-      <property name="contentService"><ref bean="ContentService" /></property>
-      <property name="searchService"><ref bean="SearchService" /></property>
+      <property name="fileFolderService"><ref bean="FileFolderService" /></property>
       <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
       <property name="permissionService"><ref bean="permissionService"/></property>
-      <!--
-      <property name="filePathCache">
-         <bean class="org.alfresco.filesys.server.filesys.cache.FilePathCache" >
-            <property name="policyComponent">
-               <ref bean="policyComponent" />
-            </property>
-            <property name="fileStatesCache" >
-               <ref bean="fileStatesCache" />
-            </property>
-            <property name="pathResultsCache" >
-               <ref bean="pathResultsCache" />
-            </property>
-         </bean>
-      </property>
-      -->
-   </bean>
-
-   <bean name="fileStatesCache" class="org.alfresco.repo.cache.TransactionalCache">
-      <property name="cacheManager" >
-         <ref bean="ehCacheManager" />
-      </property>
-      <property name="name">
-         <value>cifs.transactional.fileStatesCache</value>
-      </property>
-      <property name="maxCacheSize">
-         <value>20000</value>
-      </property>
-      <property name="sharedCache">
-         <bean class="org.alfresco.repo.cache.EhCacheAdapter">
-            <property name="cache">
-               <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
-                  <property name="cacheName">
-                     <value>cifs.shared.fileStatesCache</value>
-                  </property>
-               </bean>
-            </property>
-         </bean>
-      </property>
-   </bean>
-   
-   <bean name="pathResultsCache" class="org.alfresco.repo.cache.TransactionalCache">
-      <property name="cacheManager" >
-         <ref bean="ehCacheManager" />
-      </property>
-      <property name="name">
-         <value>cifs.transactional.pathResultsCache</value>
-      </property>
-      <property name="maxCacheSize">
-         <value>20000</value>
-      </property>
-      <property name="sharedCache">
-         <bean class="org.alfresco.repo.cache.EhCacheAdapter">
-            <property name="cache">
-               <bean class="org.springframework.cache.ehcache.EhCacheFactoryBean" >
-                  <property name="cacheName">
-                     <value>cifs.shared.pathResultsCache</value>
-                  </property>
-               </bean>
-            </property>
-         </bean>
-      </property>
    </bean>
    
 </beans>

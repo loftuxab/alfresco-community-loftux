@@ -19,12 +19,9 @@ package org.alfresco.filesys.smb.server.repo;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.SearchContext;
-import org.alfresco.filesys.server.filesys.cache.FilePathCache;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,7 +36,6 @@ public class ContentSearchContext extends SearchContext
 {
     private static final Log logger = LogFactory.getLog(ContentSearchContext.class);
 
-    private TransactionService transactionService;
     private CifsHelper cifsHelper;
     private List<NodeRef> results;
     private int index = -1;
@@ -58,19 +54,16 @@ public class ContentSearchContext extends SearchContext
      * @return Returns a search context with the results of the search
      */
     public static ContentSearchContext search(
-            TransactionService transactionService,
             CifsHelper cifsHelper,
             NodeRef searchRootNodeRef,
             String searchStr,
             int attributes)
     {
-        boolean isFile = (FileAttribute.Directory & attributes) == 0;
-        
         // perform the search
         List<NodeRef> results = cifsHelper.getNodeRefs(searchRootNodeRef, searchStr);
         
         // build the search context to store the results
-        ContentSearchContext searchCtx = new ContentSearchContext(transactionService, cifsHelper, results, searchStr);
+        ContentSearchContext searchCtx = new ContentSearchContext(cifsHelper, results, searchStr);
         
         // done
         if (logger.isDebugEnabled())
@@ -86,14 +79,12 @@ public class ContentSearchContext extends SearchContext
      * @see ContentSearchContext#search(FilePathCache, NodeRef, String, int)
      */
     private ContentSearchContext(
-            TransactionService transactionService,
             CifsHelper cifsHelper,
             List<NodeRef> results,
             String searchStr)
     {
         super();
         super.setSearchString(searchStr);
-        this.transactionService = transactionService;
         this.cifsHelper = cifsHelper;
         this.results = results;
     }
@@ -136,7 +127,7 @@ public class ContentSearchContext extends SearchContext
 
         try
         {
-            FileInfo nextInfo = cifsHelper.getFileInformation(nextNodeRef, "", true);
+            FileInfo nextInfo = cifsHelper.getFileInformation(nextNodeRef, "");
             // copy to info handle
             info.copyFrom(nextInfo);
             

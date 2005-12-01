@@ -54,7 +54,6 @@ public class ContentNetworkFile extends NetworkFile
     
     private NodeService nodeService;
     private ContentService contentService;
-    private CifsHelper cifsHelper;
     private NodeRef nodeRef;
     /** keeps track of the read/write access */
     private FileChannel channel;
@@ -89,7 +88,7 @@ public class ContentNetworkFile extends NetworkFile
         // TODO: Check access writes and compare to write requirements
         
         // create the file
-        ContentNetworkFile netFile = new ContentNetworkFile(nodeService, contentService, cifsHelper, nodeRef, path);
+        ContentNetworkFile netFile = new ContentNetworkFile(nodeService, contentService, nodeRef, path);
         // set relevant parameters
         if (params.isReadOnlyAccess())
         {
@@ -104,7 +103,7 @@ public class ContentNetworkFile extends NetworkFile
         FileInfo fileInfo;
         try
         {
-            fileInfo = cifsHelper.getFileInformation(nodeRef, "", true);
+            fileInfo = cifsHelper.getFileInformation(nodeRef, "");
         }
         catch (FileNotFoundException e)
         {
@@ -143,13 +142,12 @@ public class ContentNetworkFile extends NetworkFile
         return netFile;
     }
 
-    private ContentNetworkFile(NodeService nodeService, ContentService contentService, CifsHelper cifsHelper, NodeRef nodeRef, String name)
+    private ContentNetworkFile(NodeService nodeService, ContentService contentService, NodeRef nodeRef, String name)
     {
         super(name);
         setFullName(name);
         this.nodeService = nodeService;
         this.contentService = contentService;
-        this.cifsHelper = cifsHelper;
         this.nodeRef = nodeRef;
     }
     

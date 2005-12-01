@@ -18,9 +18,7 @@ package org.alfresco.filesys.smb.server.repo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -30,7 +28,6 @@ import org.alfresco.filesys.server.core.DeviceContextException;
 import org.alfresco.filesys.server.filesys.AccessDeniedException;
 import org.alfresco.filesys.server.filesys.AccessMode;
 import org.alfresco.filesys.server.filesys.DiskInterface;
-import org.alfresco.filesys.server.filesys.FileExistsException;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
 import org.alfresco.filesys.server.filesys.FileOpenParams;
@@ -43,13 +40,8 @@ import org.alfresco.filesys.server.filesys.SrvDiskInfo;
 import org.alfresco.filesys.server.filesys.TreeConnection;
 import org.alfresco.filesys.smb.SharingMode;
 import org.alfresco.filesys.smb.server.repo.FileState.FileStateStatus;
-import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.NodeLockedException;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -57,7 +49,6 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,13 +70,10 @@ public class ContentDiskDriver implements DiskInterface
     private CifsHelper cifsHelper;
     private TransactionService transactionService;
     private NamespaceService namespaceService;
-    private DictionaryService dictionaryService;
     private NodeService nodeService;
     private NodeService unprotectedNodeService;
-    private SearchService searchService;
     private SearchService unprotectedSearchService;
     private ContentService contentService;
-    private MimetypeService mimetypeService;
     private PermissionService permissionService;
 
     /**
@@ -104,22 +92,6 @@ public class ContentDiskDriver implements DiskInterface
     public void setContentService(ContentService contentService)
     {
         this.contentService = contentService;
-    }
-
-    /**
-     * @param dictionaryService the dictionary service
-     */
-    public void setDictionaryService(DictionaryService dictionaryService)
-    {
-        this.dictionaryService = dictionaryService;
-    }
-
-    /**
-     * @param mimetypeService the mimetype service
-     */
-    public void setMimetypeService(MimetypeService mimetypeService)
-    {
-        this.mimetypeService = mimetypeService;
     }
 
     /**
@@ -144,14 +116,6 @@ public class ContentDiskDriver implements DiskInterface
     public void setUnprotectedNodeService(NodeService nodeService)
     {
         this.unprotectedNodeService = nodeService;
-    }
-
-    /**
-     * @param searchService the search service
-     */
-    public void setSearchService(SearchService searchService)
-    {
-        this.searchService = searchService;
     }
 
     /**
@@ -301,7 +265,7 @@ public class ContentDiskDriver implements DiskInterface
             {
                 // Get the file information for the node
                 
-                finfo = cifsHelper.getFileInformation(nodeRef, true);
+                finfo = cifsHelper.getFileInformation(nodeRef);
 
                 // DEBUG
                 
@@ -336,11 +300,9 @@ public class ContentDiskDriver implements DiskInterface
                 
                 session.beginTransaction(transactionService, true);
                 
-                boolean includeName = (path.length() > 0);
-                finfo = cifsHelper.getFileInformation(infoParentNodeRef, infoPath, includeName);
+                finfo = cifsHelper.getFileInformation(infoParentNodeRef, infoPath);
                 
                 // DEBUG
-                
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Getting file information: \n" +
@@ -350,7 +312,6 @@ public class ContentDiskDriver implements DiskInterface
             }
 
             // Return the file information
-            
             return finfo;
         }
         catch (FileNotFoundException e)
@@ -442,7 +403,7 @@ public class ContentDiskDriver implements DiskInterface
             
             // Start the search
             
-            SearchContext searchCtx = ContentSearchContext.search(transactionService, cifsHelper, searchRootNodeRef,
+            SearchContext searchCtx = ContentSearchContext.search(cifsHelper, searchRootNodeRef,
                     searchFileSpec, attributes);
             
             // done
@@ -1147,7 +1108,6 @@ public class ContentDiskDriver implements DiskInterface
     public void renameFile(SrvSession sess, TreeConnection tree, String oldName, String newName) throws IOException
     {
         // Create the transaction
-        
         sess.beginTransaction(transactionService, false);
         
         try
@@ -1156,85 +1116,21 @@ public class ContentDiskDriver implements DiskInterface
             
             ContentContext ctx = (ContentContext) tree.getContext();
             
-            // Check that the target node doesn't exist
-            
-            int newNodeSts = fileExists(sess, tree, newName);
-
-            if ( newNodeSts != FileStatus.NotExist)
-            {
-                // Destination file/folder already exists
-                
-                throw new FileExistsException();
-            }
-
             // Get the file/folder to move
-            
             NodeRef nodeToMoveRef = getNodeForPath(tree, oldName);
-            ChildAssociationRef nodeToMoveAssoc = nodeService.getPrimaryParent(nodeToMoveRef);
             
             // Get the new target folder - it must be a folder
-            
             String[] splitPaths = FileName.splitPath(newName);
             NodeRef targetFolderRef = getNodeForPath(tree, splitPaths[0]);
-            
-            if (!cifsHelper.isDirectory(targetFolderRef))
-            {
-                throw new AlfrescoRuntimeException("Cannot move not into anything but a folder: \n" +
-                        "   device root: " + ctx.getRootNode() + "\n" +
-                        "   old path: " + oldName + "\n" +
-                        "   new path: " + newName);
-            }
-            
-            // We escape the local name of the path so that it conforms to the general standard of being
-            // an escaped version of the name property
-            
-            QName newAssocQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(splitPaths[1]));
-            
-            // Move it
-            
-            nodeService.moveNode(nodeToMoveRef, targetFolderRef, nodeToMoveAssoc.getTypeQName(), newAssocQName);
-            
-            // Set the properties
-            
-            Map<QName, Serializable> properties = nodeService.getProperties(nodeToMoveRef);
-            properties.put(ContentModel.PROP_NAME, splitPaths[1]);
-            
-            if (!cifsHelper.isDirectory(nodeToMoveRef))
-            {
-                // reguess the mimetype in case the extension has changed
-                
-                String mimetype = mimetypeService.guessMimetype(splitPaths[1]);
-                
-                // get the current content properties
-                
-                ContentData contentData = (ContentData) properties.get(ContentModel.PROP_CONTENT);
-                if (contentData == null)
-                {
-                    contentData = new ContentData(
-                            null,
-                            mimetype,
-                            0L,
-                            "UTF-8");
-                }
-                else
-                {
-                    contentData = new ContentData(
-                            contentData.getContentUrl(),
-                            mimetype,
-                            contentData.getSize(),
-                            contentData.getEncoding());
-                }
-                properties.put(ContentModel.PROP_CONTENT, contentData);
-            }
-            nodeService.setProperties(nodeToMoveRef, properties);
+            String name = splitPaths[1];                                    // the new file or folder name
 
             // Update the state table
-            
+            boolean relinked = false;
             if ( ctx.hasStateTable())
             {
                 // Check if the file rename can be relinked to a previous version
                 
-                if ( cifsHelper.isDirectory(nodeToMoveRef) == false)
+                if ( !cifsHelper.isDirectory(nodeToMoveRef) )
                 {
                     // Check if there is a renamed file state for the new file name
                     
@@ -1250,7 +1146,8 @@ public class ContentDiskDriver implements DiskInterface
                         // Relink the new version of the file data to the previously renamed node so that it
                         // picks up version history and other settings.
                         
-                        cifsHelper.relinkNode( renState.getNodeRef(), nodeToMoveRef);
+                        cifsHelper.relinkNode( renState.getNodeRef(), nodeToMoveRef, targetFolderRef, name);
+                        relinked = true;
 
                         // Link the node ref for the associated rename state
                         
@@ -1314,6 +1211,11 @@ public class ContentDiskDriver implements DiskInterface
                         ctx.getStateTable().renameFileState(newName, fstate);
                     }
                 }
+            }
+            
+            if (!relinked)
+            {
+                cifsHelper.move(nodeToMoveRef, targetFolderRef, name);
             }
 
             // DEBUG
@@ -1533,8 +1435,18 @@ public class ContentDiskDriver implements DiskInterface
             // Try and get the node ref from an in memory file state
             
             FileState fstate = ctx.getStateTable().findFileState(path);
-            if ( fstate != null && fstate.hasNodeRef() && fstate.exists())
-                return fstate.getNodeRef();
+            if ( fstate != null && fstate.hasNodeRef() && fstate.exists() )
+            {
+                // check that the node exists
+                if (nodeService.exists(fstate.getNodeRef()))
+                {
+                    return fstate.getNodeRef();
+                }
+                else
+                {
+                    ctx.getStateTable().removeFileState(path);
+                }
+            }
         }
         
         // Search the repository for the node

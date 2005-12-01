@@ -20,8 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -32,27 +31,17 @@ import org.alfresco.filesys.server.filesys.FileAttribute;
 import org.alfresco.filesys.server.filesys.FileExistsException;
 import org.alfresco.filesys.server.filesys.FileInfo;
 import org.alfresco.filesys.server.filesys.FileName;
-import org.alfresco.filesys.server.filesys.cache.FilePathCache;
-import org.alfresco.filesys.server.filesys.cache.FileState;
-import org.alfresco.filesys.util.WildCard;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.search.QueryParameterDefImpl;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentData;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
-import org.alfresco.service.cmr.search.QueryParameterDefinition;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.SearchLanguageConversion;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,39 +53,15 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CifsHelper
 {
-    // Constants
-    //
-    // XPath query strings for wildcard and specific file/folder searches
-    
-    private final String xpathQueryWildcard = "./*[like(@cm:name, $cm:name, false) and not (subtypeOf($cm:systemfoldertype)) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
-    private final String xpathQueryFile = "./*[lower-case(@cm:name) = lower-case($cm:name) and not (subtypeOf($cm:systemfoldertype)) and (subtypeOf($cm:foldertype) or subtypeOf($cm:filetype))]";
-        
     // Logging
     private static Log logger = LogFactory.getLog(CifsHelper.class);
     
-    // File state caching
-    private FilePathCache filePathCache;
-
     // Services
-    private NamespaceService namespaceService;
     private DictionaryService dictionaryService;
     private NodeService nodeService;
-    private ContentService contentService;
-    private SearchService searchService;
+    private FileFolderService fileFolderService;
     private MimetypeService mimetypeService;
     private PermissionService permissionService;
-    
-    // Query data types and fixed parameter types
-    private DataTypeDefinition dataType;
-    
-    private QName cmName;
-    private QName cmSystemFolderType;
-    private QName cmFolderType;
-    private QName cmFileType;
-    
-    private QueryParameterDefinition systemFolderType;
-    private QueryParameterDefinition fileType;
-    private QueryParameterDefinition folderType;
     
     /**
      * Class constructor
@@ -110,31 +75,16 @@ public class CifsHelper
         this.dictionaryService = dictionaryService;
     }
     
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
-    }
-    
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
+
+    public void setFileFolderService(FileFolderService fileFolderService)
+    {
+        this.fileFolderService = fileFolderService;
+    }
     
-    public void setContentService(ContentService contentService)
-    {
-        this.contentService = contentService;
-    }
-
-    public void setSearchService(SearchService searchService)
-    {
-        this.searchService = searchService;
-    }
-
-    public void setFilePathCache(FilePathCache filePathCache)
-    {
-        this.filePathCache = filePathCache;
-    }
-
     public void setMimetypeService(MimetypeService mimetypeService)
     {
         this.mimetypeService = mimetypeService;
@@ -145,26 +95,6 @@ public class CifsHelper
         this.permissionService = permissionService;
     }
 
-    /**
-     * Post-property set initialization
-     */
-    public void init()
-    {
-        // Get the text data type
-        dataType = dictionaryService.getDataType(DataTypeDefinition.TEXT);
-        
-        // Generate the parameter names for searches
-        cmName = QName.createQName("cm:name", namespaceService);
-        cmSystemFolderType = QName.createQName("cm:systemfoldertype", namespaceService);
-        cmFileType = QName.createQName("cm:filetype", namespaceService);
-        cmFolderType = QName.createQName("cm:foldertype", namespaceService);
-        
-        // Create the fixed search parameter definitions
-        systemFolderType = new QueryParameterDefImpl( cmSystemFolderType, dataType, true, ContentModel.TYPE_SYSTEM_FOLDER.toString());
-        fileType   = new QueryParameterDefImpl( cmFileType, dataType, true, ContentModel.TYPE_CONTENT.toString());
-        folderType = new QueryParameterDefImpl( cmFolderType, dataType, true, ContentModel.TYPE_FOLDER.toString());
-    }
-    
     /**
      * @param serviceRegistry for repo connection
      * @param nodeRef
@@ -195,37 +125,16 @@ public class CifsHelper
      * 
      * @param pathRootNodeRef
      * @param path
-     * @param includeName
      * @return Returns the existing node reference
      * @throws FileNotFoundException
      */
-    public FileInfo getFileInformation(
-            NodeRef pathRootNodeRef,
-            String path,
-            boolean includeName)
-            throws FileNotFoundException
+    public FileInfo getFileInformation(NodeRef pathRootNodeRef, String path) throws FileNotFoundException
     {
-        // check the cache for its state
-        FileState fileState = (filePathCache == null) ? null : filePathCache.getExistingFileState(pathRootNodeRef, path);
-        if (fileState != null)
-        {
-            // it was cached, and we know it exists
-            return fileState.getFileInfo();
-        }
-        
         // get the node being referenced
         NodeRef nodeRef = getNodeRef(pathRootNodeRef, path);
 
-        // nothing cached
-        FileInfo fileInfo = getFileInformation(nodeRef, includeName);
-                
-        // put the results back into the cache
-        fileState = new FileState(nodeRef, fileInfo);
-        if(filePathCache != null)
-        {
-           filePathCache.setFileState(pathRootNodeRef, path, fileState);
-        }
-        
+        FileInfo fileInfo = getFileInformation(nodeRef);
+
         return fileInfo;
     }
 
@@ -237,24 +146,22 @@ public class CifsHelper
      * 
      * @param nodeRef the node that the path is relative to
      * @param path the path to get info for
-     * @param includeName if the name property is to be carried into the filesystem
      * @return Returns the file information pertinent to the node
      * @throws FileNotFoundException if the path refers to a non-existent file
      */
-    public FileInfo getFileInformation(
-            NodeRef nodeRef,
-            boolean includeName)
-            throws FileNotFoundException
+    public FileInfo getFileInformation(NodeRef nodeRef) throws FileNotFoundException
     {
+        // get the file info
+        org.alfresco.service.cmr.model.FileInfo fileFolderInfo = fileFolderService.getFileInfo(nodeRef);
+        
         // retrieve required properties and create file info
-        Map<QName, Serializable> nodeProperties = nodeService.getProperties(nodeRef);
         FileInfo fileInfo = new FileInfo();
         
         // unset all attribute flags
         int fileAttributes = 0;
         fileInfo.setFileAttributes(fileAttributes);
         
-        if (isDirectory(nodeRef))
+        if (fileFolderInfo.isFolder())
         {
             // add directory attribute
             fileAttributes |= FileAttribute.Directory;
@@ -262,6 +169,7 @@ public class CifsHelper
         }
         else
         {
+            Map<QName, Serializable> nodeProperties = fileFolderInfo.getProperties();
             // get the file size
             ContentData contentData = (ContentData) nodeProperties.get(ContentModel.PROP_CONTENT);
             long size = 0L;
@@ -272,42 +180,32 @@ public class CifsHelper
             fileInfo.setSize(size);
             
             // Set the allocation size by rounding up the size to a 512 byte block boundary
-
             if ( size > 0)
                 fileInfo.setAllocationSize((size + 512L) & 0xFFFFFFFFFFFFFE00L);
         }
         
         // created
-        Object propCreated = nodeProperties.get(ContentModel.PROP_CREATED);
-        if (propCreated != null)
+        Date createdDate = fileFolderInfo.getCreatedDate();
+        if (createdDate != null)
         {
-            long created = DefaultTypeConverter.INSTANCE.longValue(propCreated);
+            long created = DefaultTypeConverter.INSTANCE.longValue(createdDate);
             fileInfo.setCreationDateTime(created);
         }
         // modified
-        Object propModified = nodeProperties.get(ContentModel.PROP_MODIFIED);
-        if (propModified != null)
+        Date modifiedDate = fileFolderInfo.getModifiedDate();
+        if (modifiedDate != null)
         {
-            long modified = DefaultTypeConverter.INSTANCE.longValue(propModified);
+            long modified = DefaultTypeConverter.INSTANCE.longValue(modifiedDate);
             fileInfo.setModifyDateTime(modified);
         }
-        // name (only relevant if the path had something on it)
-        if (includeName)
+        // name
+        String name = fileFolderInfo.getName();
+        if (name != null)
         {
-            Object propName = nodeProperties.get(ContentModel.PROP_NAME);
-            if (propName != null)
-            {
-                String name = DefaultTypeConverter.INSTANCE.convert(String.class, propName);
-                fileInfo.setFileName(name);
-            }
-        }
-        else
-        {
-            fileInfo.setFileName("");
+            fileInfo.setFileName(name);
         }
         
         // read/write access
-        
         if ( permissionService.hasPermission(nodeRef, PermissionService.WRITE) == AccessStatus.DENIED)
             fileInfo.setFileAttributes(fileInfo.getFileAttributes() + FileAttribute.ReadOnly);
         
@@ -334,77 +232,54 @@ public class CifsHelper
      */
     public NodeRef createNode(NodeRef rootNodeRef, String path, boolean isFile) throws FileExistsException
     {
-        NodeRef currentNodeRef = rootNodeRef;
-            
-        // split the directory path up into its constituents
+        // split the path up into its constituents
         StringTokenizer tokenizer = new StringTokenizer(path, FileName.DOS_SEPERATOR_STR, false);
-        
-        // walk the directories, creating them on the fly if required
+        List<String> folderPathElements = new ArrayList<String>(10);
+        String name = null;
         while (tokenizer.hasMoreTokens())
         {
             String pathElement = tokenizer.nextToken();
             
-            // determine whether we are searching for a file or directory
-            boolean lastToken = !tokenizer.hasMoreTokens();
-            boolean fileToken = (isFile && lastToken);
-            QName typeQName = fileToken ? ContentModel.TYPE_CONTENT : ContentModel.TYPE_FOLDER;
-            
-            String encodedPath = QName.createValidLocalName(pathElement);
-            // check if the node exists
-            try
+            if (!tokenizer.hasMoreTokens())
             {
-                // will throw FileNotFound if no node matches
-                NodeRef existingNodeRef = getNodeRef(currentNodeRef, pathElement);
-                // the existence of the node is only an issue if we are on the last token, i.e. there
-                // will be a name clash
-                if (lastToken)
-                {
-                    throw new FileExistsException("Directory or file exists: \n" +
-                            "   device root: " + rootNodeRef + "\n" +
-                            "   path: " + path + "\n" +
-                            "   existing dir: " + existingNodeRef);
-                }
-                else
-                {
-                    // directory exists, but we are either creating a file or have more folders to go
-                    // move onto the existing folder node
-                    currentNodeRef = existingNodeRef;
-                }
+                // the last token becomes the name
+                name = pathElement;
             }
-            catch (FileNotFoundException e)
+            else
             {
-                // we can go ahead and create the node as it doesn't exist
-                // set properties
-                Map<QName, Serializable> properties = new HashMap<QName, Serializable>(5);
-                properties.put(ContentModel.PROP_NAME, pathElement);   // the path element acts as the full name
-                if (fileToken)
-                {
-                    String mimetype = mimetypeService.guessMimetype(pathElement);
-                    properties.put(ContentModel.PROP_CONTENT, new ContentData(null, mimetype, 0L, "UTF-8"));
-                }
-                // create node
-                ChildAssociationRef assocRef = nodeService.createNode(
-                        currentNodeRef,
-                        ContentModel.ASSOC_CONTAINS,
-                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, encodedPath),
-                        typeQName,
-                        properties);
-                currentNodeRef = assocRef.getChildRef();
-                
-                // the title and description will be set automatically
-                nodeService.addAspect(currentNodeRef, ContentModel.ASPECT_UIFACETS, null);
+                // add the path element to the parent folder path
+                folderPathElements.add(pathElement);
             }
         }
-        // done
-        if (logger.isDebugEnabled())
+        // ensure that the folder path exists
+        NodeRef parentFolderNodeRef = rootNodeRef;
+        if (folderPathElements.size() > 0)
         {
-            logger.debug("Created node: \n" +
-                    "   device root: " + rootNodeRef + "\n" +
-                    "   path: " + path + "\n" +
-                    "   is file: " + isFile + "\n" +
-                    "   new node: " + currentNodeRef);
+            parentFolderNodeRef = fileFolderService.makeFolders(
+                    rootNodeRef,
+                    folderPathElements,
+                    ContentModel.TYPE_FOLDER).getNodeRef();
         }
-        return currentNodeRef;
+        // add the file or folder
+        QName typeQName = isFile ? ContentModel.TYPE_CONTENT : ContentModel.TYPE_FOLDER;
+        try
+        {
+            NodeRef nodeRef = fileFolderService.create(parentFolderNodeRef, name, typeQName).getNodeRef();
+            // done
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Created node: \n" +
+                        "   device root: " + rootNodeRef + "\n" +
+                        "   path: " + path + "\n" +
+                        "   is file: " + isFile + "\n" +
+                        "   new node: " + nodeRef);
+            }
+            return nodeRef;
+        }
+        catch (org.alfresco.service.cmr.model.FileExistsException e)
+        {
+            throw new FileExistsException(path);
+        }
     }
 
     private void addDescendents(List<NodeRef> pathRootNodeRefs, Stack<String> pathElements, List<NodeRef> results)
@@ -454,55 +329,16 @@ public class CifsHelper
                     "   Path Element: " + pathElement);
         }
         
-        // First check the cache to see if there are any results for this path query
-        List<NodeRef> cachedResults = (filePathCache == null) ? null : filePathCache.getPathResults(pathRootNodeRef, pathElement);
-        if (cachedResults != null)
+        // do the lookup
+        List<org.alfresco.service.cmr.model.FileInfo> childInfos = fileFolderService.search(pathRootNodeRef, pathElement, false);
+        // convert to noderefs
+        List<NodeRef> results = new ArrayList<NodeRef>(childInfos.size());
+        for (org.alfresco.service.cmr.model.FileInfo info : childInfos)
         {
-            // the cache had results for good or bad
-            return cachedResults;
+            results.add(info.getNodeRef());
         }
-        
-        // Perform the search
-        
-        boolean wildcardSearch = WildCard.containsWildcards(pathElement);
-        String xpathQuery = null;
-        
-        if (wildcardSearch)
-        {
-            // escape the path element
-            pathElement = SearchLanguageConversion.escapeForXPathLike(pathElement);
-            
-            // fix up wildcard matches for like function
-            pathElement = pathElement.replace('*', '%');
-            
-            // use the like function (do not match FTS)
-            xpathQuery = xpathQueryWildcard;
-        }
-        else
-        {
-            xpathQuery = xpathQueryFile;
-        }
-
-        // create the query parameters
-        QueryParameterDefinition[] params = new QueryParameterDefinition[4];
-        params[0] = new QueryParameterDefImpl(
-                cmName,
-                dictionaryService.getDataType(DataTypeDefinition.TEXT),
-                true,
-                pathElement);
-        params[1] = systemFolderType;
-        params[2] = folderType;
-        params[3] = fileType; 
-    
-        // execute the query
-        List<NodeRef> nodes = searchService.selectNodes(
-                pathRootNodeRef,
-                xpathQuery,
-                params,
-                namespaceService,
-                false);
         // done
-        return nodes;
+        return results;
     }
 
     /**
@@ -520,14 +356,6 @@ public class CifsHelper
      */
     public List<NodeRef> getNodeRefs(NodeRef pathRootNodeRef, String path)
     {
-        // first check the cache to see if there are any results for this path query
-        List<NodeRef> cachedResults = (filePathCache == null) ? null : filePathCache.getPathResults(pathRootNodeRef, path);
-        if (cachedResults != null)
-        {
-            // the cache had results for good or bad
-            return cachedResults;
-        }
-        
         // tokenize the path and push into a stack in reverse order so that
         // the root directory gets popped first
         StringTokenizer tokenizer = new StringTokenizer(path, FileName.DOS_SEPERATOR_STR, false);
@@ -552,12 +380,6 @@ public class CifsHelper
         
         // kick off the path walking
         addDescendents(pathRootNodeRefs, pathElements, results); 
-        
-        // cache the search results
-        if(filePathCache != null)
-        {
-            filePathCache.setPathResults(pathRootNodeRef, path, results);
-        }
         
         // done
         if (logger.isDebugEnabled())
@@ -600,61 +422,73 @@ public class CifsHelper
     /**
      * Relink the content data from a new node to an existing node to preserve the version history.
      * 
-     * @param oldNode NodeRef
-     * @param newNode NodeRef
+     * @param oldNodeRef NodeRef
+     * @param newNodeRef NodeRef
      */
-    public void relinkNode(NodeRef oldNode, NodeRef newNode)
+    public void relinkNode(NodeRef tempNodeRef, NodeRef nodeToMoveRef, NodeRef newParentNodeRef, String newName)
+            throws FileNotFoundException, FileExistsException
     {
         // Get the properties for the old and new nodes
+        org.alfresco.service.cmr.model.FileInfo tempFileInfo = fileFolderService.getFileInfo(tempNodeRef);
+        org.alfresco.service.cmr.model.FileInfo fileToMoveInfo = fileFolderService.getFileInfo(nodeToMoveRef);
         
-        Map<QName, Serializable> oldProperties = nodeService.getProperties(oldNode);
-        Map<QName, Serializable> newProperties = nodeService.getProperties(newNode);
-
         // Save the current name of the old node
-        
-        String oldName = (String) oldProperties.get(ContentModel.PROP_NAME);
-        
-        // Link the new content into the old node, and reset the old nodes name to the new nodes name
-        
-        oldProperties.put(ContentModel.PROP_NAME, newProperties.get(ContentModel.PROP_NAME));
-        
-        if (! isDirectory(oldNode))
+        String tempName = tempFileInfo.getName();
+
+        try
         {
-            // Replace the content of the old node with the new version
-            
-            ContentData contentData = (ContentData) newProperties.get(ContentModel.PROP_CONTENT);
-            if (contentData == null)
-            {
-                // Guess the mimetype from the file extension
-                
-                String mimetype = mimetypeService.guessMimetype((String) newProperties.get(ContentModel.PROP_NAME));
-                
-                // Create empty content
-                
-                contentData = new ContentData(
-                        null,
-                        mimetype,
-                        0L,
-                        "UTF-8");
-            }
-            else
-            {
-                contentData = new ContentData(
-                        contentData.getContentUrl(),
-                        contentData.getMimetype(),
-                        contentData.getSize(),
-                        contentData.getEncoding());
-            }
-            oldProperties.put(ContentModel.PROP_CONTENT, contentData);
+            // rename temp file to the new name
+            fileFolderService.rename(tempNodeRef, newName);
+            // rename new file to old name
+            fileFolderService.rename(nodeToMoveRef, tempName);
+        }
+        catch (org.alfresco.service.cmr.model.FileNotFoundException e)
+        {
+            throw new FileNotFoundException(e.getMessage());
+        }
+        catch (org.alfresco.service.cmr.model.FileExistsException e)
+        {
+            throw new FileExistsException(e.getMessage());
         }
         
-        // Update the old node with the new content and original name
-        
-        nodeService.setProperties(oldNode, oldProperties);
-        
-        // Rename the new node to the old name
-        
-        newProperties.put(ContentModel.PROP_NAME, oldName);
-        nodeService.setProperties(newNode, newProperties);
-     }
+        if (!tempFileInfo.isFolder() && !fileToMoveInfo.isFolder())
+        {
+            // swap the content between the two
+            ContentData oldContentData = tempFileInfo.getContentData();
+            if (oldContentData == null)
+            {
+                String mimetype = mimetypeService.guessMimetype(tempName);
+                oldContentData = ContentData.setMimetype(null, mimetype);
+            }
+            ContentData newContentData = fileToMoveInfo.getContentData();
+            if (newContentData == null)
+            {
+                String mimetype = mimetypeService.guessMimetype(newName);
+                newContentData = ContentData.setMimetype(null, mimetype);
+            }
+            
+            nodeService.setProperty(tempNodeRef, ContentModel.PROP_CONTENT, newContentData);
+            nodeService.setProperty(nodeToMoveRef, ContentModel.PROP_CONTENT, oldContentData);
+        }
+    }
+    
+    public void move(NodeRef nodeToMoveRef, NodeRef newParentNodeRef, String newName) throws FileExistsException
+    {
+        try
+        {
+            fileFolderService.move(nodeToMoveRef, newParentNodeRef, newName);
+        }
+        catch (org.alfresco.service.cmr.model.FileExistsException e)
+        {
+            throw new FileExistsException(newName);
+        }
+        catch (Throwable e)
+        {
+            throw new AlfrescoRuntimeException("Move failed: \n" +
+                    "   node to move: " + nodeToMoveRef + "\n" +
+                    "   new parent: " + newParentNodeRef + "\n" +
+                    "   new name: " + newName,
+                    e);
+        }
+    }
 }
