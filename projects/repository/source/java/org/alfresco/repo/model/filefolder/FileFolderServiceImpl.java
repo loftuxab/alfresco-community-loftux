@@ -19,6 +19,7 @@ package org.alfresco.repo.model.filefolder;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,13 @@ import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
@@ -93,6 +96,7 @@ public class FileFolderServiceImpl implements FileFolderService
     private CopyService copyService;
     private SearchService searchService;
     private ContentService contentService;
+    private MimetypeService mimetypeService;
     
     /**
      * Default constructor
@@ -129,6 +133,11 @@ public class FileFolderServiceImpl implements FileFolderService
     public void setContentService(ContentService contentService)
     {
         this.contentService = contentService;
+    }
+
+    public void setMimetypeService(MimetypeService mimetypeService)
+    {
+        this.mimetypeService = mimetypeService;
     }
 
     public void init()
@@ -509,9 +518,10 @@ public class FileFolderServiceImpl implements FileFolderService
     public FileInfo create(NodeRef parentNodeRef, String name, QName typeQName) throws FileExistsException
     {
         // file or folder
+        boolean isFolder = false;
         try
         {
-            isFolder(typeQName);
+            isFolder = isFolder(typeQName);
         }
         catch (InvalidTypeException e)
         {
@@ -521,13 +531,21 @@ public class FileFolderServiceImpl implements FileFolderService
         // check for existing file or folder
         checkExists(parentNodeRef, name);
         
+        // set up initial properties
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(11);
+        properties.put(ContentModel.PROP_NAME, (Serializable) name);
+        if (!isFolder)
+        {
+            // guess a mimetype based on the filename
+            String mimetype = mimetypeService.guessMimetype(name);
+            ContentData contentData = new ContentData(null, mimetype, 0L, "UTF-8");
+            properties.put(ContentModel.PROP_CONTENT, contentData);
+        }
+        
         // create the node
         QName qname = QName.createQName(
                 NamespaceService.CONTENT_MODEL_1_0_URI,
                 QName.createValidLocalName(name));
-        Map<QName, Serializable> properties = Collections.singletonMap(
-                ContentModel.PROP_NAME,
-                (Serializable) name);
         ChildAssociationRef assocRef = nodeService.createNode(
                 parentNodeRef,
                 ContentModel.ASSOC_CONTAINS,
@@ -556,8 +574,7 @@ public class FileFolderServiceImpl implements FileFolderService
     {
         if (pathElements.size() == 0)
         {
-            // nothing to do
-            return null;
+            throw new IllegalArgumentException("Path element list is empty");
         }
         
         // make sure that the folder is correct
@@ -586,7 +603,7 @@ public class FileFolderServiceImpl implements FileFolderService
                 if (fileInfos.size() == 0)
                 {
                     // ? It must have been removed
-                    return null;
+                    throw new AlfrescoRuntimeException("Path element has just been removed: " + pathElement);
                 }
                 currentParentRef = fileInfos.get(0).getNodeRef();
                 lastFileInfo = fileInfos.get(0);
