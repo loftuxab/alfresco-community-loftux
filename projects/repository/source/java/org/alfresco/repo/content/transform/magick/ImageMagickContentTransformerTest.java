@@ -16,11 +16,12 @@
  */
 package org.alfresco.repo.content.transform.magick;
 
+import java.util.Collections;
+
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.content.transform.ContentTransformer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.alfresco.util.exec.RuntimeExec;
 
 /**
  * @see org.alfresco.repo.content.transform.magick.JMagickContentTransformer
@@ -29,15 +30,17 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ImageMagickContentTransformerTest extends AbstractContentTransformerTest
 {
-    private static final Log logger = LogFactory.getLog(ImageMagickContentTransformerTest.class);
-
     private ImageMagickContentTransformer transformer;
     
     public void onSetUpInTransaction() throws Exception
     {
+        RuntimeExec executer = new RuntimeExec();
+        executer.setCommand("imconvert.exe ${source} ${options} ${target}");
+        executer.setDefaultProperties(Collections.singletonMap("options", ""));
+        
         transformer = new ImageMagickContentTransformer();
         transformer.setMimetypeMap(mimetypeMap);
-        transformer.setConvertCommand("imconvert.exe ${source} ${options} ${target}");
+        transformer.setExecuter(executer);
         transformer.init();
     }
     

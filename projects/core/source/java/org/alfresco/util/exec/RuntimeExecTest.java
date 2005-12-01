@@ -16,6 +16,12 @@
  */
 package org.alfresco.util.exec;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.alfresco.util.exec.RuntimeExec.ExecutionResult;
+
 import junit.framework.TestCase;
 
 /**
@@ -30,13 +36,57 @@ public class RuntimeExecTest extends TestCase
      */
     public void testStreams() throws Exception
     {
-        RuntimeExec exec = new RuntimeExec("find");
-        int retCode = exec.execute();
+        RuntimeExec exec = new RuntimeExec();
+        exec.setCommand("find");
+        ExecutionResult ret = exec.execute();
+        assertTrue("Expected error code", ret.getExitValue() != 0);
         
-        String out = exec.getStdOut();
-        String err = exec.getStdErr();
+        String out = ret.getStdOut();
+        String err = ret.getStdErr();
         
         assertTrue("Didn't expect any non-error output", out.length() == 0);
         assertTrue("No error output found", err.length() > 0);
+    }
+    
+    public void testWithProperties() throws Exception
+    {
+        RuntimeExec exec = new RuntimeExec();
+
+        // set the command
+        Map<String, String> commandMap = new HashMap<String, String>(3, 1.0f);
+        commandMap.put("Windows XP", "dir \"${path}\"");
+        commandMap.put("Linux", "ls '${path}'");
+        commandMap.put("*", "wibble ${path}");
+        exec.setCommandMap(commandMap);
+        
+        // set the default properties
+        Map<String, String> defaultProperties = new HashMap<String, String>(1, 1.0f);
+        defaultProperties.put("path", ".");
+        exec.setDefaultProperties(defaultProperties);
+        
+        // check that the command lines generated are correct
+        String defaultCommand = exec.getCommand();
+        String dynamicCommand = exec.getCommand(Collections.singletonMap("path", "./"));
+        // check
+        String os = System.getProperty("os.name");
+        String defaultCommandCheck = null;
+        String dynamicCommandCheck = null;
+        if (os.equals("Windows XP"))
+        {
+            defaultCommandCheck = "dir \".\"";
+            dynamicCommandCheck = "dir \"./\"";
+        }
+        else if (os.equals("Linux"))
+        {
+            defaultCommandCheck = "ls '.'";
+            dynamicCommandCheck = "ls './'";
+        }
+        else
+        {
+            defaultCommandCheck = "wibble .";
+            dynamicCommandCheck = "wibble ./";
+        }
+        assertEquals("Default command for OS " + os + " is incorrect", defaultCommandCheck, defaultCommand);
+        assertEquals("Dynamic command for OS " + os + " is incorrect", dynamicCommandCheck, dynamicCommand);
     }
 }

@@ -17,6 +17,7 @@
 package org.alfresco.repo.content.transform.magick;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -26,8 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Makes use of the {@link http://www.textmining.org/ TextMining} library to
- * perform conversions from MSWord documents to text.
+ * Executes a statement to implement 
  * 
  * @author Derek Hulley
  */
@@ -36,28 +36,23 @@ public class ImageMagickContentTransformer extends AbstractImageMagickContentTra
     /** the command options, such as <b>--resize</b>, etc. */
     public static final String KEY_OPTIONS = "options";
     /** source variable name */
-    private static final String VAR_OPTIONS = "${options}";
-    /** source variable regex */
-    private static final String VAR_OPTIONS_REGEX = "\\$\\{options\\}";
+    public static final String VAR_OPTIONS = "options";
     /** source variable name */
-    private static final String VAR_SOURCE = "${source}";
-    /** source variable regex */
-    private static final String VAR_SOURCE_REGEX = "\\$\\{source\\}";
+    public static final String VAR_SOURCE = "source";
     /** target variable name */
-    private static final String VAR_TARGET = "${target}";
-    /** target variable regex */
-    private static final String VAR_TARGET_REGEX = "\\$\\{target\\}";
+    public static final String VAR_TARGET = "target";
     
     private static final Log logger = LogFactory.getLog(ImageMagickContentTransformer.class);
-    
-    private String convertCommand;
+
+    /** the system command executer */
+    private RuntimeExec executer;
     
     public ImageMagickContentTransformer()
     {
     }
     
     /**
-     * Set the convertCommand or the command that must be executed in order to run
+     * Set the runtime command executer that must be executed in order to run
      * <b>ImageMagick</b>.  Whether or not this is the full path to the convertCommand
      * or just the convertCommand itself depends the environment setup.
      * <p>
@@ -68,19 +63,11 @@ public class ImageMagickContentTransformer extends AbstractImageMagickContentTra
      *    convert ${source} ${target}
      * </pre>
      *  
-     * @param convertCommand
+     * @param executer the system command executer
      */
-    public void setConvertCommand(String executable)
+    public void setExecuter(RuntimeExec executer)
     {
-        if (!executable.contains(VAR_SOURCE) ||
-                !executable.contains(VAR_TARGET) ||
-                !executable.contains(VAR_OPTIONS))
-        {
-            throw new AlfrescoRuntimeException
-                    ("Missing variables from ImageMagick convertCommand: " +
-                            "imconvert ${source} ${options} ${target} variables");
-        }
-        this.convertCommand = executable;
+        this.executer = executer;
     }
 
     /**
@@ -90,9 +77,9 @@ public class ImageMagickContentTransformer extends AbstractImageMagickContentTra
      */
     public void init()
     {
-        if (convertCommand == null)
+        if (executer == null)
         {
-            throw new AlfrescoRuntimeException("Executable not set");
+            throw new AlfrescoRuntimeException("System runtime executer not set");
         }
         super.init();
     }
@@ -102,44 +89,22 @@ public class ImageMagickContentTransformer extends AbstractImageMagickContentTra
      */
     protected void transformInternal(File sourceFile, File targetFile, Map<String, Object> options) throws Exception
     {
-        // grab any convert options
-        String convertOptions = (String) options.get(KEY_OPTIONS);
-        if (convertOptions == null)
-        {
-            convertOptions = "";
-        }
+        Map<String, String> properties = new HashMap<String, String>(5);
+        // set properties
+        properties.put(KEY_OPTIONS, (String) options.get(KEY_OPTIONS));
+        properties.put(VAR_SOURCE, sourceFile.getAbsolutePath());
+        properties.put(VAR_TARGET, targetFile.getAbsolutePath());
         
-        String sourceFilename = sourceFile.getAbsolutePath();
-        String targetFilename = targetFile.getAbsolutePath();
-        // avoid regex replacement issue
-        if (File.separatorChar == '\\')
-        {
-            sourceFilename = sourceFilename.replace('\\', '/');
-            targetFilename = targetFilename.replace('\\', '/');
-        }
-        
-        // substitute the variables for the filenames
-        String exe = convertCommand.replaceAll(VAR_SOURCE_REGEX, sourceFilename);
-        exe = exe.replaceAll(VAR_TARGET_REGEX, targetFilename);
-        exe = exe.replaceAll(VAR_OPTIONS_REGEX, convertOptions);
-        
-        // convert back
-        if (File.separatorChar == '\\')
-        {
-            exe = exe.replace('/', '\\');
-        }
-       
         // execute the statement
-        RuntimeExec exec = new RuntimeExec(exe);
-        int retVal = exec.execute();
-        if (retVal != 0 && exec.getStdErr() != null && exec.getStdErr().length() > 0)
+        RuntimeExec.ExecutionResult result = executer.execute(properties);
+        if (result.getExitValue() != 0 && result.getStdErr() != null && result.getStdErr().length() > 0)
         {
-            throw new ContentIOException("Failed to perform ImageMagick transformation: \n" + exec);
+            throw new ContentIOException("Failed to perform ImageMagick transformation: \n" + result);
         }
         // success
         if (logger.isDebugEnabled())
         {
-            logger.debug("ImageMagic executed successfully: \n" + exec);
+            logger.debug("ImageMagic executed successfully: \n" + executer);
         }
     }
 }

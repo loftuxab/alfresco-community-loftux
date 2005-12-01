@@ -224,15 +224,24 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
      */
     private String transformName(String original, String originalMimetype, String newMimetype)
     {
-        String transformed = original;
-        String originalExtension = mimetypeService.getExtension(originalMimetype);
-        String newExtension = mimetypeService.getExtension(newMimetype);
-        int ext = original.lastIndexOf(originalExtension);
-        if (ext != -1)
+        // get the current extension
+        int dotIndex = original.lastIndexOf('.');
+        StringBuilder sb = new StringBuilder(original.length());
+        if (dotIndex > -1)
         {
-            transformed = original.substring(0, ext) + newExtension;
+            // we found it
+            sb.append(original.substring(0, dotIndex));
         }
-        return transformed;
+        else
+        {
+            // no extension
+            sb.append(original);
+        }
+        // add the new extension
+        String newExtension = mimetypeService.getExtension(newMimetype);
+        sb.append('.').append(newExtension);
+        // done
+        return sb.toString();
     }
     
 }

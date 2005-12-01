@@ -37,8 +37,24 @@
       <property name="mimetypeMap">
          <ref bean="mimetypeMap" />
       </property>
-      <property name="convertCommand">
-         <value>imconvert "${source}" ${options} "${target}"</value>
+      <property name="executer">
+         <bean class="org.alfresco.util.exec.RuntimeExec">
+            <property name="commandMap">
+                <map>
+                    <entry key="Windows XP">
+                        <value>imconvert "${source}" ${options} "${target}"</value>
+                    </entry>
+                    <entry key="*">
+                        <value>imconvert '${source}' ${options} '${target}'</value>
+                    </entry>
+                </map>
+            </property>
+            <property name="defaultProperties">
+                <props>
+                    <prop key="options"></prop>
+                </props>
+            </property>
+         </bean>
       </property>
    </bean>
 
