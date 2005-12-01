@@ -8,7 +8,8 @@
       <property name="dictionaryService"><ref bean="dictionaryService" /></property>
       <property name="nodeService"><ref bean="nodeService" /></property>
       <property name="copyService"><ref bean="copyService" /></property>
-      <property name="searchService"><ref bean="searchService" /></property>
+      <!-- NOTE: using Big SearchService until AR-279 is completed -->
+      <property name="searchService"><ref bean="SearchService" /></property>
       <property name="contentService"><ref bean="contentService" /></property>
       <property name="mimetypeService"><ref bean="mimetypeMap" /></property>
    </bean>
