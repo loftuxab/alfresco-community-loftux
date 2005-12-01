@@ -121,11 +121,6 @@ public class NewSpaceWizard extends AbstractWizardBean
          tx = Repository.getUserTransaction(FacesContext.getCurrentInstance());
          tx.begin();
 
-         // some common resources
-         QName qname = QName.createQName(
-               NamespaceService.CONTENT_MODEL_1_0_URI,
-               QName.createValidLocalName(this.name));
-
          if (this.editMode)
          {
             // update the existing node in the repository
