@@ -32,10 +32,12 @@ import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -205,28 +207,28 @@ public class ComparePropertyValueEvaluator extends ActionConditionEvaluatorAbstr
                     contentProperty = ContentPropertyName.valueOf(contentPropertyString);
                 }
                 
-                // Get the content reader
-                ContentReader contentReader = this.contentService.getReader(actionedUponNodeRef, propertyQName);
-                if (contentReader != null)
+                // Get the content data
+                if (propertyValue != null)
                 {
+                    ContentData contentData = DefaultTypeConverter.INSTANCE.convert(ContentData.class, propertyValue);
                     switch (contentProperty)
                     {
                         case ENCODING:
                         {
                             propertyTypeQName = DataTypeDefinition.TEXT;
-                            propertyValue = contentReader.getEncoding();
+                            propertyValue = contentData.getEncoding();
                             break;
                         }
                         case SIZE:
                         {
                             propertyTypeQName = DataTypeDefinition.LONG;
-                            propertyValue = contentReader.getSize();
+                            propertyValue = contentData.getSize();
                             break;
                         }
                         case MIME_TYPE:
                         {
                             propertyTypeQName = DataTypeDefinition.TEXT;
-                            propertyValue = contentReader.getMimetype();
+                            propertyValue = contentData.getMimetype();
                             break;
                         }
                     }
