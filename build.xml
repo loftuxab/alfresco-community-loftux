@@ -208,14 +208,15 @@
    <!-- *************** -->
 
    <target name="load" depends="init" description="Utility support to load data and report performance: loads a directory in one transaction">
-<!--
       <subant target="incremental">
          <property name="server" value="tomcat"/>
          <filelist refid="files.project.build"/>
       </subant>
--->
       <java classname="org.alfresco.repo.importer.FileImporterTest" fork="true">
          <classpath refid="classpath.unit.test" />
+         <jvmarg value ="-server"/>
+         <jvmarg value ="-Xmx512m"/>
+         <jvmarg value ="-Xms512m"/>
          <!-- The store into which to load -->
          <arg value="workspace://SpacesStore" />
          <!-- The path of the load point -->
