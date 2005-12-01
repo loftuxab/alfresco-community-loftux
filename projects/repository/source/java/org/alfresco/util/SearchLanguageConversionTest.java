@@ -62,6 +62,19 @@ public class SearchLanguageConversionTest extends TestCase
                 good);
     }
     
+    public void testEscapeLucene()
+    {
+        String good = SearchLanguageConversion.escapeForLucene(BAD_STRING);
+        assertEquals("Escaping for regex failed",
+                "\\\\ | \\! \\\" £ " +
+                "$ % \\^ & \\* \\( " +
+                "\\) _ \\{ \\} \\[ \\] " +
+                "@ # \\~ ' \\: ; " +
+                ", . < > \\+ \\? " +
+                "/ \\\\\\\\ \\\\\\* \\\\\\? \\\\_",
+                good);
+    }
+    
     public void testConvertXPathLikeToRegex()
     {
         String good = SearchLanguageConversion.convertXPathLikeToRegex(BAD_STRING);

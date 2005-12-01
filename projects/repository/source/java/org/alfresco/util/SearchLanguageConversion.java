@@ -73,6 +73,17 @@ public class SearchLanguageConversion
     }
     
     /**
+     * Escape a string according to the <b>Lucene</b> query syntax.
+     * 
+     * @param str the string to escape
+     * @return Returns the escaped string
+     */
+    public static String escapeForLucene(String str)
+    {
+        return escape(DEF_LUCENE, str);
+    }
+    
+    /**
      * Generic escaping using the language definition
      */
     private static String escape(LanguageDefinition def, String str)
