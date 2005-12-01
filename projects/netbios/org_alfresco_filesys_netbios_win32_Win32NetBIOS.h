@@ -9,7 +9,6 @@ extern "C" {
 #endif
 #undef org_alfresco_filesys_netbios_win32_Win32NetBIOS_FindNameBufferLen
 #define org_alfresco_filesys_netbios_win32_Win32NetBIOS_FindNameBufferLen 33L
-/* Inaccessible static: m_loadDLLException */
 /*
  * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
  * Method:    AddName
@@ -172,6 +171,14 @@ JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_Crea
 
 /*
  * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    CreateDatagramSocket
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_CreateDatagramSocket
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
  * Method:    BindSocket
  * Signature: (I[B)I
  */
@@ -209,6 +216,14 @@ JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_Send
  */
 JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_ReceiveSocket
   (JNIEnv *, jclass, jint, jbyteArray, jint, jint);
+
+/*
+ * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+ * Method:    SendSocketDatagram
+ * Signature: (I[B[BII)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_SendSocketDatagram
+  (JNIEnv *, jclass, jint, jbyteArray, jbyteArray, jint, jint);
 
 /*
  * Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS

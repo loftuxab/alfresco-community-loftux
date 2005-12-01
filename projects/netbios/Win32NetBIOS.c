@@ -983,7 +983,6 @@ JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_Init
 	if ( _shutdownEvent != 0)
 		WSACloseEvent(_shutdownEvent);
 	_shutdownEvent = WSACreateEvent();
-	
 }
 
 /*
@@ -1015,8 +1014,6 @@ JNIEXPORT void JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_Shut
 JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_CreateSocket
 	(JNIEnv* jnienv, jclass jthis, jint lana)
 {
-	int noDelay = 1;
-
 	/*
 	 * Create a NetBIOS socket
 	 */
@@ -1029,6 +1026,34 @@ JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_Crea
 
 	if ( nbSocket == INVALID_SOCKET)
 		throwWinsockException(jnienv, WSAGetLastError(), "CreateSocket");
+
+	/*
+	 * Return the new socket
+	 */
+
+	return (jint) nbSocket;
+}
+
+/*
+* Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+* Method:    CreateDatagramSocket
+* Signature: (I)I
+*/
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_CreateDatagramSocket
+	(JNIEnv* jnienv, jclass jthis, jint lana)
+{
+	/*
+	 * Create a NetBIOS datagram socket
+	 */
+
+	SOCKET nbSocket = socket(AF_NETBIOS, SOCK_DGRAM, -lana);
+
+	/*
+	 * Check for an error
+	 */
+
+	if ( nbSocket == INVALID_SOCKET)
+		throwWinsockException(jnienv, WSAGetLastError(), "CreateDatagramSocket");
 
 	/*
 	 * Return the new socket
@@ -1209,6 +1234,58 @@ JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_Rece
 
 	/*
 	 * Return the actual length of data received
+	 */
+
+	return sts;
+}
+
+/*
+* Class:     org_alfresco_filesys_netbios_win32_Win32NetBIOS
+* Method:    SendSocketDatagram
+* Signature: (I[B[BII)I
+*/
+JNIEXPORT jint JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_SendSocketDatagram
+	(JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray jtoName, jbyteArray jbuf, jint off, jint len)
+{
+	jbyte* pName = NULL;
+	jbyte* pBuffer = NULL;
+	int sts = 0;
+	SOCKADDR_NB groupAddr;
+	SOCKET sock = 0;
+
+	/*
+	 * Access the to name
+	 */
+
+	pName = (*jnienv)->GetByteArrayElements(jnienv, jtoName, 0);
+	SET_NETBIOS_SOCKADDR(&groupAddr, NETBIOS_GROUP_NAME, pName, pName[15]);
+	
+	(*jnienv)->ReleaseByteArrayElements(jnienv, jtoName, pName, 0);
+
+	/*
+	 * Access the send buffer
+	 */
+
+	pBuffer = (*jnienv)->GetByteArrayElements(jnienv, jbuf, 0);
+
+	/*
+	 * Send a datagram
+	 */
+
+	sock = (SOCKET) sockPtr;
+	sts = sendto( sock, (const char*) (pBuffer + off), len, 0, (struct sockaddr*) &groupAddr, sizeof(groupAddr));
+
+	/*
+	 * Release the Java buffer and return the sent data length
+	 */
+
+	(*jnienv)->ReleaseByteArrayElements(jnienv, jbuf, pBuffer, 0);
+
+	if ( sts == SOCKET_ERROR)
+		throwWinsockException(jnienv, WSAGetLastError(), "SendSocketDatagram");
+
+	/*
+	 * Return the actual length of data written
 	 */
 
 	return sts;
