@@ -479,7 +479,8 @@ public class NTLMAuthenticationFilter implements Filter
         
         // Check if cached logon details are available
         
-        if ( ntlmDetails != null && ntlmDetails.hasType2Message() && ntlmDetails.hasNTLMHashedPassword())
+        if ( ntlmDetails != null && ntlmDetails.hasType2Message() && ntlmDetails.hasNTLMHashedPassword() &&
+                ntlmDetails.hasAuthenticationToken())
         {
             // Get the authentication server type2 response
             
@@ -614,7 +615,7 @@ public class NTLMAuthenticationFilter implements Filter
         
         // Check if we are using cached details for the authentication
         
-        if ( ntlmDetails != null && ntlmDetails.hasNTLMHashedPassword())
+        if ( user != null && ntlmDetails != null && ntlmDetails.hasNTLMHashedPassword())
         {
             // Check if the received NTLM hashed password matches the cached password
             
@@ -770,7 +771,7 @@ public class NTLMAuthenticationFilter implements Filter
             {
                 // Get user details for the authenticated user
                 
-                m_authComponent.setCurrentUser(userName);
+                m_authComponent.setCurrentUser(userName.toLowerCase());
                 
                 // The user name used may be a different case to the NTLM supplied user name, read the current
                 // user and use that name
