@@ -142,7 +142,7 @@ public class SpaceDetailsBean
     */
    public String getWebdavUrl()
    {
-      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), URLMode.CIFS);
+      return Utils.generateURL(FacesContext.getCurrentInstance(), getSpace(), URLMode.WEBDAV);
    }
 
    /**
