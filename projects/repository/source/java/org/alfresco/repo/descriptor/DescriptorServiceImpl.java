@@ -154,13 +154,16 @@ public class DescriptorServiceImpl implements DescriptorService, ApplicationList
     {
         if (event instanceof ContextRefreshedEvent)
         {
-            // log output of version initialised
-            String serverVersion = serverDescriptor.getVersion();
-            String serverEdition = serverDescriptor.getEdition();
-            String repoVersion = repoDescriptor.getVersion();
-            
-            if (logger.isInfoEnabled())                
-                logger.info("Alfresco started (" + serverEdition + ") - v" + serverVersion + "; repository v" + repoVersion);
+            if (serverDescriptor != null)
+            {
+                // log output of version initialised
+                String serverVersion = serverDescriptor.getVersion();
+                String serverEdition = serverDescriptor.getEdition();
+                String repoVersion = repoDescriptor.getVersion();
+                
+                if (logger.isInfoEnabled())                
+                    logger.info("Alfresco started (" + serverEdition + ") - v" + serverVersion + "; repository v" + repoVersion);
+            }
         }
     }
     
