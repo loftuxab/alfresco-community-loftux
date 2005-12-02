@@ -38,14 +38,14 @@
          <ref bean="mimetypeMap" />
       </property>
       <property name="executer">
-         <bean class="org.alfresco.util.exec.RuntimeExec">
+         <bean name="transformer.ImageMagick.Command" class="org.alfresco.util.exec.RuntimeExec">
             <property name="commandMap">
                 <map>
-                    <entry key="Windows XP">
-                        <value>imconvert "${source}" ${options} "${target}"</value>
+                    <entry key="Linux">
+                        <value>imconvert '${source}' ${options} '${target}'</value>
                     </entry>
                     <entry key="*">
-                        <value>imconvert '${source}' ${options} '${target}'</value>
+                        <value>imconvert "${source}" ${options} "${target}"</value>
                     </entry>
                 </map>
             </property>
