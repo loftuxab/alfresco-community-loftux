@@ -82,7 +82,7 @@ public interface NodeService
     public NodeRef getRootNode(StoreRef storeRef) throws InvalidStoreRefException;
 
     /**
-     * @see #createNode(NodeRef, QName, QName, QName, Map<QName,Serializable>)
+     * @see #createNode(NodeRef, QName, QName, QName, Map)
      */
     public ChildAssociationRef createNode(
             NodeRef parentRef,
