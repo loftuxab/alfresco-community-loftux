@@ -969,9 +969,9 @@ public class ServerConfiguration
             NetBIOSSession.setWINSServer(primaryWINS);
         }
 
-        // Check if WINS is configured, if we are running on Windows
+        // Check if WINS is configured, if we are running on Windows and socket based NetBIOS is enabled
 
-        else if (getPlatformType() == PlatformType.WINDOWS)
+        else if (hasNetBIOSSMB() && getPlatformType() == PlatformType.WINDOWS)
         {
             // Get the WINS server list
 
