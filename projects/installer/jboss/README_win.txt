@@ -1,8 +1,8 @@
 ====================
-Alfresco 1.0 Release
+Alfresco 1.1 Release
 ====================
 
-Welcome to the Alfresco 1.0 Release.
+Welcome to the Alfresco 1.1 Release.
 
 
 ===================
