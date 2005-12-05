@@ -42,7 +42,7 @@
             <property name="commandMap">
                 <map>
                     <entry key="Linux">
-                        <value>imconvert '${source}' ${options} '${target}'</value>
+                        <value>imconvert ${source} ${options} ${target}</value>
                     </entry>
                     <entry key="*">
                         <value>imconvert "${source}" ${options} "${target}"</value>

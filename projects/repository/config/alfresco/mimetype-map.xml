@@ -21,6 +21,9 @@
             <extension>shtml</extension>
             <extension>body</extension>
          </mimetype>
+         <mimetype mimetype="application/xhtml+xml" display="XHTML">
+            <extension default="true">xhtml</extension>
+         </mimetype>
          <mimetype mimetype="application/postscript" display="Postscript">
             <!-- extension display will be same as mimetype's unless specified otherwise -->
             <extension>ai</extension>

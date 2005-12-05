@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -42,6 +43,9 @@ public abstract class BaseAlfrescoTestCase extends TestCase
     /** the context to keep between tests */
     public static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
+    /** the service registry */
+    protected ServiceRegistry serviceRegistry;
+    
     /** The node service */
     protected NodeService nodeService;
     
@@ -66,6 +70,8 @@ public abstract class BaseAlfrescoTestCase extends TestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+        // get the service register
+        this.serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         //Get a reference to the node service
         this.nodeService = (NodeService)ctx.getBean("NodeService");
         this.contentService = (ContentService)ctx.getBean("ContentService");

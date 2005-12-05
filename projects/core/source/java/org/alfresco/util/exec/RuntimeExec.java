@@ -299,13 +299,14 @@ public class RuntimeExec
             
             StringBuilder sb = new StringBuilder(128);
             sb.append("Execution result: \n")
+              .append("   os:         ").append(System.getProperty(KEY_OS_NAME)).append("\n")
               .append("   command:    ").append(command).append("\n")
               .append("   exit code:  ").append(exitValue).append("\n")
               .append("   out:        ").append(out).append("\n")
               .append("   err:        ").append(err);
             return sb.toString();
         }
-    
+        
         public int getExitValue()
         {
             return exitValue;
