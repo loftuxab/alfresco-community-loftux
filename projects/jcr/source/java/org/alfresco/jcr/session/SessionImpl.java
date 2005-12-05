@@ -123,6 +123,11 @@ public class SessionImpl implements Session
     /** Session Proxy */
     private Session proxy = null;
     
+    /** Thread Local Session */
+    // Note: For now, we're only allowing one active (i.e. logged in) Session per-thread
+    private static ThreadLocal<SessionImpl> sessions = new ThreadLocal<SessionImpl>();
+    
+    
     /**
      * Construct
      * 
@@ -143,6 +148,7 @@ public class SessionImpl implements Session
         this.typeManager = new NodeTypeManagerImpl(this, namespaceResolver.getNamespaceService());
         this.valueFactory = new ValueFactoryImpl(this);
         this.workspaceStore = getWorkspaceStore(workspaceName);
+        registerActiveSession(this);
     }
 
     /**
@@ -227,6 +233,34 @@ public class SessionImpl implements Session
     public StoreRef getWorkspaceStore()
     {
         return workspaceStore;
+    }
+    
+    /**
+     * Allow Session Login
+     * 
+     * @return  true => yes, allow login
+     */
+    public static boolean allowLogin()
+    {
+        return sessions.get() == null;
+    }
+    
+    /**
+     * Register active session
+     * 
+     * @param session
+     */
+    private void registerActiveSession(SessionImpl session)
+    {
+        sessions.set(session);
+    }
+    
+    /**
+     * De-register current active session
+     */
+    public void deregisterActiveSession()
+    {
+        sessions.set(null);
     }
     
     
@@ -568,6 +602,7 @@ public class SessionImpl implements Session
         {
             getRepositoryImpl().getServiceRegistry().getAuthenticationService().invalidateTicket(getTicket());
             ticket = null;
+            deregisterActiveSession();
         }
     }
 

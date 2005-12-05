@@ -33,6 +33,7 @@ import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.lock.NodeLockedException;
+import org.alfresco.service.cmr.security.AuthenticationService;
 
 
 /**
@@ -71,7 +72,8 @@ public class JCRProxyFactory
     private static class SessionContextInvocationHandler implements InvocationHandler
     {
         private Object target;
-        private SessionImpl context;
+        private SessionImpl session;
+        private AuthenticationService authenticationService;
 
         /**
          * Constuct.
@@ -82,7 +84,8 @@ public class JCRProxyFactory
         private SessionContextInvocationHandler(Object target, SessionImpl context)
         {
             this.target = target;
-            this.context = context;
+            this.session = context;
+            this.authenticationService = session.getRepositoryImpl().getServiceRegistry().getAuthenticationService();
         }
         
         /* (non-Javadoc)
@@ -108,39 +111,48 @@ public class JCRProxyFactory
                 return false;
             }
 
-            // Ensure invocation is under correct context
             try
             {
-                // test for existence of transaction
-                if (!(method.getName().equals("login") || method.getName().equals("logout")))
-                {        
-                    String trxId = AlfrescoTransactionSupport.getTransactionId();
-                    if (trxId == null)
+                // establish authentication context 
+                String username = authenticationService.getCurrentUserName();
+
+                try
+                {
+                    // setup authentication context, if one does not exist (for example, in remote case)
+                    if (username == null)
                     {
-                        throw new RepositoryException("Session must be used within the context of a transaction.");
-                        
-                        // TODO: Check that session is tied to single transaction
-                        //if (!trxId.equals(context.getTransactionId()))
-                        //{
-                        //    throw new RepositoryException("Cannot use session in transaction " + trxId + " as it is tied to transaction " + context.getTransactionId());
-                        //}
+                        authenticationService.validate(session.getTicket());
+                    }
+                    
+                    // test for existence of transaction
+                    if (!(method.getName().equals("login") || method.getName().equals("logout")))
+                    {        
+                        String trxId = AlfrescoTransactionSupport.getTransactionId();
+                        if (trxId == null)
+                        {
+                            throw new RepositoryException("Session must be used within the context of a transaction.");
+                        }
+                    }
+
+                    // invoke underlying service
+                    return method.invoke(target, args);
+                }
+                catch (InvocationTargetException e)
+                {
+                    Throwable cause = e.getCause();
+                    throw cause;
+                }
+                finally
+                {
+                    // cleanup authentication context (only if one didn't exist before)
+                    if (username == null)
+                    {
+                        authenticationService.clearCurrentSecurityContext();
                     }
                 }
-                
-                // test authentication
-                String ticket = context.getTicket();
-                if (ticket != null)
-                {
-                    context.getRepositoryImpl().getServiceRegistry().getAuthenticationService().validate(context.getTicket());
-                }
-
-                // invoke underlying service
-                return method.invoke(target, args);
             }
-            catch (InvocationTargetException e)
+            catch(Throwable cause)
             {
-                Throwable cause = e.getCause();
-                
                 // Map Alfresco exceptions to JCR exceptions
                 if (cause instanceof IntegrityException)
                 {
@@ -163,11 +175,6 @@ public class JCRProxyFactory
                     throw new RepositoryException(cause);
                 }
                 throw cause;
-            }
-            finally
-            {
-                // clear authentication context
-                context.getRepositoryImpl().getServiceRegistry().getAuthenticationService().clearCurrentSecurityContext();
             }
         }
     

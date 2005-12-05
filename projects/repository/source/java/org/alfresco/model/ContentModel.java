@@ -190,13 +190,5 @@ public interface ContentModel
     static final QName ASSOC_MEMBER = QName.createQName(USER_MODEL_URI, "member");
     static final QName PROP_MEMBERS = QName.createQName(USER_MODEL_URI, "members");
     
-    //
-    // Version Model Definitions
-    //
-
-    static final String VERSION_MODEL_URI = "http://www.alfresco.org/model/version/1.0";
-    static final String VERSION_MODEL_PREFIX = "ver";
-    
-    
     
 }

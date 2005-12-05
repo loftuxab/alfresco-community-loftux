@@ -63,7 +63,7 @@ public class NodeServiceImpl implements NodeService, VersionModel
     /**
      * The name of the spoofed root association
      */
-    private static final QName rootAssocName = QName.createQName(ContentModel.VERSION_MODEL_URI, "versionedState");
+    private static final QName rootAssocName = QName.createQName(VersionModel.NAMESPACE_URI, "versionedState");
 	
     /**
      * The db node service, used as the version store implementation
@@ -518,8 +518,10 @@ public class NodeServiceImpl implements NodeService, VersionModel
      */
     public Path getPath(NodeRef nodeRef) throws InvalidNodeRefException
     {
-        // This operation is not supported for a verion store
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);       
+        ChildAssociationRef childAssocRef = getPrimaryParent(nodeRef);
+        Path path = new Path();
+        path.append(new Path.ChildAssocElement(childAssocRef));
+        return path;        
     }
     
     /**
@@ -527,8 +529,9 @@ public class NodeServiceImpl implements NodeService, VersionModel
      */
     public List<Path> getPaths(NodeRef nodeRef, boolean primaryOnly) throws InvalidNodeRefException
     {
-        // This operation is not supported for a verion store
-        throw new UnsupportedOperationException(MSG_UNSUPPORTED);
+        List<Path> paths = new ArrayList<Path>(1);
+        paths.add(getPath(nodeRef));
+        return paths;
     }
 
     public List<NodeRef> selectNodes(NodeRef contextNode, String XPath, QueryParameterDefinition[] parameters, NamespacePrefixResolver namespacePrefixResolver, boolean followAllParentLinks)

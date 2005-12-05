@@ -15,6 +15,10 @@
          <title>WIKI Page</title>
          <parent>cm:content</parent>
          <properties>
+            <property name="wiki:restrict">
+               <type>d:boolean</type>
+               <default>false</default>
+            </property>
             <property name="wiki:category">
                <type>d:text</type>
                <multiple>true</multiple>

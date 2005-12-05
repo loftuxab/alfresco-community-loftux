@@ -25,6 +25,7 @@ import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.Property;
 import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.jcr.Value;
@@ -32,9 +33,19 @@ import javax.jcr.Workspace;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
+import javax.jcr.version.Version;
+import javax.jcr.version.VersionHistory;
+import javax.jcr.version.VersionIterator;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.jcr.api.JCRNodeRef;
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.transaction.TransactionService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -55,25 +66,39 @@ public class WIKIExample
     public static void main(String[] args)
         throws Exception
     {
-        // setup Spring and Transaction Service
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/alfresco/jcr/example/wiki-context.xml");
-        ServiceRegistry registry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        TransactionService trxService = (TransactionService)registry.getTransactionService();
+        //
+        // Repository Initialisation
+        //
         
-        // retrieve Repository (here it's via programmatic approach, but it could also be injected)
+        // access the Alfresco JCR Repository (here it's via programmatic approach, but it could also be injected)
+        System.out.println("Initialising Repository access...");
+
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/alfresco/jcr/example/wiki-context.xml");
         Repository repository = (Repository)context.getBean("JCR.Repository");
-    
-        // login to workspace
-        // Note: Default workspace is the one used by Alfresco Web Client which contains all the Spaces
-        //       and their documents
+
+        // login to workspace (here we rely on the default workspace defined by JCR.Repository bean)
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
+        // access the Alfresco transaction service
+        ServiceRegistry registry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
+        TransactionService trxService = (TransactionService)registry.getTransactionService();
+
+        
+        //
+        // Create a WIKI structure
+        //
+        // Note: Here we're using the Alfresco Content Model and custom WIKI model to create
+        //       WIKI pages and Content that are accessible via the Alfresco Web Client
+        //
+        
         // start a transaction for creating the wiki structure
         UserTransaction trx1 = trxService.getUserTransaction();
         trx1.begin();
     
         try
         {
+            System.out.println("Creating WIKI...");
+            
             // first, access the company home
             Node rootNode = session.getRootNode();
             System.out.println("Root node: path=" + rootNode.getPath() + ", type=" + rootNode.getPrimaryNodeType().getName());
@@ -85,30 +110,39 @@ public class WIKIExample
             {
                 Node encyclopedia = companyHome.getNode("wiki:encyclopedia");
                 encyclopedia.remove();
+                System.out.println("Existing WIKI found and removed");
             }
             catch(PathNotFoundException e)
             {
                // doesn't exist, no need to remove                
             }
 
-            // create WIKI structure
+            // create the root WIKI folder
             Node encyclopedia = companyHome.addNode("wiki:encyclopedia", "cm:folder");
             encyclopedia.setProperty("cm:name", "WIKI Encyclopedia");
             encyclopedia.setProperty("cm:description", "");
+
+            // create first wiki page
             Node page1 = encyclopedia.addNode("wiki:entry1", "wiki:page");
             page1.setProperty("cm:name", "Rose");
             page1.setProperty("cm:description", "");
             page1.setProperty("cm:title", "The rose");
             page1.setProperty("cm:content", "A rose is a flowering shrub.");
             page1.setProperty("wiki:category", new String[] {"flower", "plant", "rose"});
+
+            // enable versioning capability for page 1
+            page1.addMixin("cm:versionable");
+
+            // create second wiki page
             Node page2 = encyclopedia.addNode("wiki:entry2", "wiki:page");
             page2.setProperty("cm:name", "Shakespeare");
             page2.setProperty("cm:description", "");
             page2.setProperty("cm:title", "William Shakespeare");
             page2.setProperty("cm:content", "A famous poet who likes roses.");
+            page2.setProperty("wiki:restrict", true);
             page2.setProperty("wiki:category", new String[] {"poet"});
             
-            // create a WIKI image
+            // create an image (note: we're using an input stream to allow setting of binary content)
             Node contentNode = encyclopedia.addNode("wiki:image", "cm:content");
             contentNode.setProperty("cm:name", "Dog");
             contentNode.setProperty("cm:description", "");
@@ -118,51 +152,47 @@ public class WIKIExample
             
             session.save();
             trx1.commit();
+            
+            System.out.println("WIKI created");
         }
         catch(Throwable e /* note: catch throwable for demonstration purposes only */)
         {
             trx1.rollback();
         }
 
+        
+        //
+        // Access the WIKI structure
+        //
+        
         // start a transaction for accessing the wiki structure
         UserTransaction trx2 = trxService.getUserTransaction();
         trx2.begin();
     
         try
         {
-            // access the wiki directly from root node
+            System.out.println("Accessing WIKI...");
+            
+            // access a wiki node directly from root node (by path and by UUID)
             Node rootNode = session.getRootNode();
             Node encyclopedia = rootNode.getNode("app:company_home/wiki:encyclopedia");
             Node direct = session.getNodeByUUID(encyclopedia.getUUID());
-            System.out.println("Found encyclopedia correctly: " + encyclopedia.equals(direct));
+            System.out.println("Found WIKI root correctly: " + encyclopedia.equals(direct));
 
             // access a wiki property directly from root node
             Node entry1 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry1");
             String title = entry1.getProperty("cm:title").getString();
-            System.out.println("Entry 1 Title: " + title);
+            System.out.println("Found WIKI page 1 title: " + title);
             Calendar modified = entry1.getProperty("cm:modified").getDate();
-            System.out.println("Entry 1 Last modified: " + modified.getTime());
+            System.out.println("Found WIKI page 1 last modified date: " + modified.getTime());
 
             // browse all wiki entries
-            System.out.println("Browse results:");
+            System.out.println("WIKI browser:");
             NodeIterator entries = encyclopedia.getNodes();
             while (entries.hasNext())
             {
                 Node entry = entries.nextNode();
-
-                System.out.println(entry.getName());
-                System.out.println(entry.getProperty("cm:title").getString());
-                System.out.println(entry.getPath());
-                if (entry.getPrimaryNodeType().getName().equals("wiki:page"))
-                {
-                    System.out.println(entry.getProperty("cm:content").getString());
-                    Property categoryProperty = entry.getProperty("wiki:category");
-                    Value[] categories = categoryProperty.getValues();
-                    for (Value category : categories)
-                    {
-                        System.out.println("Category: " + category.getString());
-                    }
-                }
+                outputContentNode(entry);
             }            
 
             // perform a search
@@ -176,27 +206,191 @@ public class WIKIExample
             while (it.hasNext())
             {
                 Node n = it.nextNode();
-                System.out.println(n.getName());
-                System.out.println(n.getProperty("cm:title").getString());
-                if (n.getPrimaryNodeType().getName().equals("wiki:page"))
-                {
-                    System.out.println(n.getProperty("cm:content").getString());
-                }
+                outputContentNode(n);
             }            
 
             // export content
             File outputFile = new File("systemview.xml");
             FileOutputStream out = new FileOutputStream(outputFile);
             session.exportSystemView("/app:company_home/wiki:encyclopedia", out, false, false);
-            System.out.println("Encyclopedia exported");
+            System.out.println("WIKI exported");
         }
         finally
         {
             trx2.rollback();
         }
 
+        
+        //
+        // Advanced Usage
+        //
+        // 1) Auto-version on update and version history retrieval
+        // 2) Permission checks
+        //
+        
+        // start a transaction for advanced operations
+        UserTransaction trx3 = trxService.getUserTransaction();
+        trx3.begin();
+    
+        try
+        {
+            //
+            // Version WIKI Page 1
+            //
+            
+            // first, access the page
+            Node rootNode = session.getRootNode();
+            Node entry1 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry1");
+
+            // update the properties and content
+            entry1.setProperty("cm:title", "The Rose");
+            entry1.setProperty("cm:content", "A rose is a flowering shrub of the genus Rosa.");
+            Value[] categories = entry1.getProperty("wiki:category").getValues();
+            Value[] newCategories = new Value[categories.length + 1];
+            System.arraycopy(categories, 0, newCategories, 0, categories.length);
+            newCategories[categories.length] = session.getValueFactory().createValue("poet");
+            entry1.setProperty("wiki:category", newCategories);
+            
+            session.save();
+            trx3.commit();
+            
+            System.out.println("Versioned WIKI Page 1");
+        }
+        catch(Throwable e /* note: catch throwable for demonstration purposes only */)
+        {
+            trx3.rollback();
+        }
+
+        // start a transaction for advanced operations
+        UserTransaction trx4 = trxService.getUserTransaction();
+        trx4.begin();
+    
+        try
+        {
+            //
+            // Browse WIKI Page 1 Version History
+            //
+            
+            // first, access the page
+            Node rootNode = session.getRootNode();
+            Node entry1 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry1");
+
+            // retrieve the history for thte page
+            VersionHistory versionHistory = entry1.getVersionHistory();
+            VersionIterator versionIterator = versionHistory.getAllVersions();
+
+            // for each version, output the node as it was versioned 
+            while (versionIterator.hasNext())
+            {
+                Version version = versionIterator.nextVersion();
+                NodeIterator nodeIterator = version.getNodes();
+
+                while (nodeIterator.hasNext())
+                {
+                    Node versionedNode = nodeIterator.nextNode();
+                    System.out.println(" Version: " + version.getCreated().getTime());
+                    outputContentNode(versionedNode);
+                }
+            }
+            
+            
+            //
+            // Permission Checks
+            //
+
+            System.out.println("Testing Permissions:");
+            
+            // check for JCR 'read' permission
+            session.checkPermission("app:company_home/wiki:encyclopedia/wiki:entry1", "read");
+            System.out.println("Session has 'read' permission on app:company_home/wiki:encyclopedia/wiki:entry1");
+
+            // check for Alfresco 'Take Ownership' permission
+            session.checkPermission("app:company_home/wiki:encyclopedia/wiki:entry1", PermissionService.TAKE_OWNERSHIP);
+            System.out.println("Session has 'take ownership' permission on app:company_home/wiki:encyclopedia/wiki:entry1");            
+        }
+        finally
+        {
+            trx4.rollback();
+        }
+
+
+        //
+        // Mixing JCR and Alfresco API calls
+        //
+        // Provide mimetype for WIKI content properties
+        //
+
+        // start a transaction for creating the wiki structure
+        UserTransaction trx5 = trxService.getUserTransaction();
+        trx5.begin();
+        
+        try
+        {
+            // set the mime type on both WIKI pages and Image
+            Node rootNode = session.getRootNode();
+            Node entry1 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry1");
+            setMimetype(registry, entry1, "cm:content", MimetypeMap.MIMETYPE_TEXT_PLAIN); 
+            Node entry2 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry2");
+            setMimetype(registry, entry2, "cm:content", MimetypeMap.MIMETYPE_TEXT_PLAIN); 
+            Node image = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:image");
+            setMimetype(registry, image, "cm:content", MimetypeMap.MIMETYPE_IMAGE_GIF); 
+
+            // save the changes
+            session.save();
+            trx5.commit();
+            
+            System.out.println("Updated WIKI mimetypes via Alfresco calls");
+        }
+        catch(Throwable e /* note: catch throwable for demonstration purposes only */)
+        {
+            trx5.rollback();
+        }
+            
         // logout
         session.logout();
+        System.out.println("Logout successful");
+        
+        System.exit(0);
     }
 
+    
+    private static void outputContentNode(Node node)
+        throws RepositoryException
+    {
+        // output common content properties
+        System.out.println(" Node " + node.getUUID());
+        System.out.println("  title: " + node.getProperty("cm:title").getString());
+        
+        // output properties specific to WIKI page
+        if (node.getPrimaryNodeType().getName().equals("wiki:page"))
+        {
+            System.out.println("  content: " + node.getProperty("cm:content").getString());
+            System.out.println("  restrict: " + node.getProperty("wiki:restrict").getString());
+            
+            // output multi-value property
+            Property categoryProperty = node.getProperty("wiki:category");
+            Value[] categories = categoryProperty.getValues();
+            for (Value category : categories)
+            {
+                System.out.println("  category: " + category.getString());
+            }
+        }
+    }
+
+    
+    private static void setMimetype(ServiceRegistry registry, Node node, String propertyName, String mimeType)
+        throws RepositoryException
+    {
+        // convert the JCR Node to an Alfresco Node Reference
+        NodeRef nodeRef = JCRNodeRef.getNodeRef(node);
+
+        // retrieve the Content Property (represented as a ContentData object in Alfresco)
+        NodeService nodeService = registry.getNodeService();
+        ContentData content = (ContentData)nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
+        
+        // update the Mimetype
+        content = ContentData.setMimetype(content, mimeType);
+        nodeService.setProperty(nodeRef, ContentModel.PROP_CONTENT, content);
+    }
+    
 }

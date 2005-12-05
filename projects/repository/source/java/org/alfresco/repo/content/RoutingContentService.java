@@ -199,13 +199,11 @@ public class RoutingContentService implements ContentService
     public ContentReader getReader(NodeRef nodeRef, QName propertyQName)
     {
         // ensure that the node property is of type content
-        QName nodeType = nodeService.getType(nodeRef);
-        PropertyDefinition contentPropDef = dictionaryService.getProperty(nodeType, propertyQName);
+        PropertyDefinition contentPropDef = dictionaryService.getProperty(propertyQName);
         if (contentPropDef == null || !contentPropDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
         {
             throw new InvalidTypeException("The node property must be of type content: \n" +
                     "   node: " + nodeRef + "\n" +
-                    "   node type: " + nodeType + "\n" +
                     "   property name: " + propertyQName + "\n" +
                     "   property type: " + ((contentPropDef == null) ? "unknown" : contentPropDef.getDataType()),
                     propertyQName);

@@ -58,6 +58,8 @@ import org.alfresco.jcr.dictionary.NodeTypeImpl;
 import org.alfresco.jcr.item.property.PropertyResolver;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.jcr.version.VersionHistoryImpl;
+import org.alfresco.jcr.version.VersionImpl;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
@@ -72,6 +74,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.Path.Element;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.ParameterCheck;
@@ -873,7 +876,17 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public VersionHistory getVersionHistory() throws UnsupportedRepositoryOperationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // check this node is versionable (in the alfresco sense for now)
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
+        {
+            throw new UnsupportedRepositoryOperationException("Node " + nodeRef + " is not versionable");
+        }
+
+        // construct version history
+        VersionService versionService = session.getRepositoryImpl().getServiceRegistry().getVersionService();
+        org.alfresco.service.cmr.version.VersionHistory versionHistory = versionService.getVersionHistory(nodeRef);
+        return new VersionHistoryImpl(session, versionHistory).getProxy();
     }
 
     /* (non-Javadoc)
@@ -881,7 +894,18 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Version getBaseVersion() throws UnsupportedRepositoryOperationException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // check this node is versionable (in the alfresco sense for now)
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
+        {
+            throw new UnsupportedRepositoryOperationException("Node " + nodeRef + " is not versionable");
+        }
+
+        // construct version
+        VersionService versionService = session.getRepositoryImpl().getServiceRegistry().getVersionService();
+        org.alfresco.service.cmr.version.VersionHistory versionHistory = versionService.getVersionHistory(nodeRef);
+        org.alfresco.service.cmr.version.Version version = versionService.getCurrentVersion(nodeRef);
+        return new VersionImpl(new VersionHistoryImpl(session, versionHistory), version).getProxy();
     }
 
     /* (non-Javadoc)

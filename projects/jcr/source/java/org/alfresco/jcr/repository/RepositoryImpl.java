@@ -57,7 +57,7 @@ public class RepositoryImpl implements Repository
     // Services
     private NamespaceRegistryImpl namespaceRegistry = null;
     
-    
+
     //
     // Dependency Injection
     //
@@ -162,6 +162,12 @@ public class RepositoryImpl implements Repository
     public Session login(Credentials credentials, String workspaceName)
         throws LoginException, NoSuchWorkspaceException, RepositoryException
     {
+        // only allow one active session
+        if (!SessionImpl.allowLogin())
+        {
+            throw new RepositoryException("Only one active session is allowed per thread.");
+        }
+        
         // extract username and password
         // TODO: determine support for general Credentials
         String username = null;
@@ -191,9 +197,6 @@ public class RepositoryImpl implements Repository
             SessionImpl sessionImpl = new SessionImpl(this, ticket, sessionWorkspace, getAttributes(credentials));
             Session session = sessionImpl.getProxy();
     
-            // clear the security context for this thread
-            authenticationService.clearCurrentSecurityContext();
-
             // the session is ready
             return session;
         }
