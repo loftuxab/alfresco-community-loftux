@@ -4,7 +4,7 @@
    <!-- ** Initialisation/Configuration ** -->
    <!-- ********************************** -->
 
-   <property name="dir.common" value="${basedir}/build-scripts" />
+   <property name="dir.common" value="${basedir}" />
    <import file="${dir.common}/common-init.xml" />
 
    <target name="init" depends="common-init.init">
