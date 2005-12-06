@@ -277,8 +277,6 @@ public class QueryInfoPacker
         {
             buf.putLong(NTTime.toNTTime(info.getAccessDateTime()));
         }
-        else if (info.hasModifyDateTime())
-            buf.putLong(NTTime.toNTTime(info.getModifyDateTime()));
         else
             buf.putZeros(8);
 

@@ -316,6 +316,8 @@ public class ContentDiskDriver implements DiskInterface
             
             // If the required node was not in the state cache, the parent folder node might be
             
+            session.beginTransaction(transactionService, true);
+            
             if ( finfo == null)
             {
                 String[] paths = FileName.splitPath(path);
@@ -338,8 +340,6 @@ public class ContentDiskDriver implements DiskInterface
                 }
             
                 // Access the repository to get the file information
-                
-                session.beginTransaction(transactionService, true);
                 
                 finfo = cifsHelper.getFileInformation(infoParentNodeRef, infoPath);
                 
@@ -411,6 +411,10 @@ public class ContentDiskDriver implements DiskInterface
             String searchFileSpec = searchPath;
             NodeRef searchRootNodeRef = ctx.getRootNode();
             
+            // Create the transaction
+            
+            sess.beginTransaction(transactionService, true);
+            
             // If the state table is available see if we can speed up the search using either cached
             // file information or find the folder node to be searched without having to walk the path
           
@@ -437,10 +441,6 @@ public class ContentDiskDriver implements DiskInterface
                     }
                 }
             }
-            
-            // Create the transaction
-            
-            sess.beginTransaction(transactionService, true);
             
             // Start the search
             

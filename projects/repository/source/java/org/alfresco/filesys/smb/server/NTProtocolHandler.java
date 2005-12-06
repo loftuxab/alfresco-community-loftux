@@ -5439,7 +5439,7 @@ public class NTProtocolHandler extends CoreProtocolHandler
         // implement the optional NTFS
         // streams interface then return an error status, not supported.
 
-        if (fileName.indexOf(FileOpenParams.StreamSeparator) != -1)
+        if ( FileName.containsStreamName(fileName))
         {
 
             // Check if the driver implements the NTFS streams interface and it is enabled
@@ -5459,9 +5459,6 @@ public class NTProtocolHandler extends CoreProtocolHandler
 
             if (streams == false)
             {
-
-                // Return a file not found error
-
                 m_sess.sendErrorResponseSMB(SMBStatus.NTObjectNameInvalid, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
                 return;
             }
@@ -5721,16 +5718,19 @@ public class NTProtocolHandler extends CoreProtocolHandler
         else
             prms.packLong(0);
 
+        if ( netFile.hasAccessDate())
+            prms.packLong(NTTime.toNTTime(netFile.getAccessDate()));
+        else
+            prms.packLong(0);
+        
         if (netFile.hasModifyDate())
         {
             long modDate = NTTime.toNTTime(netFile.getModifyDate());
             prms.packLong(modDate);
             prms.packLong(modDate);
-            prms.packLong(modDate);
         }
         else
         {
-            prms.packLong(0); // Last access time
             prms.packLong(0); // Last write time
             prms.packLong(0); // Change time
         }

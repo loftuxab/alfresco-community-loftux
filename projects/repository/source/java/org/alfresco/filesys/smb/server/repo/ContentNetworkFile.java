@@ -131,6 +131,15 @@ public class ContentNetworkFile extends NetworkFile
         if ( fileInfo.hasAccessDateTime())
             netFile.setAccessDate(fileInfo.getAccessDateTime());
         
+        // Set the file attributes
+        
+        netFile.setAttributes(fileInfo.getFileAttributes());
+
+        // If the file is read-only then only allow read access
+        
+        if ( netFile.isReadOnly())
+            netFile.setGrantedAccess(NetworkFile.READONLY);
+        
         // done
         if (logger.isDebugEnabled())
         {
