@@ -13,27 +13,13 @@
    <!-- ************************************** -->
    <wsdl:import namespace="http://www.alfresco.org/ws/model/content/1.0" location="types.xsd"/>
    <wsdl:types>
-      <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/content/1.0" xmlns="http://www.w3.org/2001/XMLSchema">
-         <element name="describe">
-            <complexType>
-               <sequence>
-                  <element name="items" type="cms:Predicate"/>
-               </sequence>
-            </complexType>
-         </element>
-         
-         <element name="describeResponse">
-            <complexType>
-               <sequence>
-                  <element name="describeReturn" type="cms:Content" maxOccurs="unbounded" minOccurs="0"/>
-               </sequence>
-            </complexType>
-         </element>
-         
+      <schema elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/content/1.0" xmlns="http://www.w3.org/2001/XMLSchema">         
+       
          <element name="read">
             <complexType>
                <sequence>
-                  <element name="node" type="cms:Reference"/>
+                  <element name="items" type="cms:Predicate"/>
+                  <element name="property" type="xsd:string"/>
                </sequence>
             </complexType>
          </element>
@@ -41,7 +27,7 @@
          <element name="readResponse">
             <complexType>
                <sequence>
-                  <element name="readReturn" type="content:ReadResult"/>
+                  <element name="content" type="content:Content" maxOccurs="unbounded" minOccurs="0"/>
                </sequence>
             </complexType>
          </element>
@@ -50,64 +36,34 @@
             <complexType>
                <sequence>
                   <element name="node" type="cms:Reference"/>
+                  <element name="property" type="xsd:string"/>
                   <element name="content" type="xsd:base64Binary"/>
+                  <element name="format" type="cms:ContentFormat"/>
                </sequence>
             </complexType>
          </element>
          
          <element name="writeResponse">
             <complexType>
-               <sequence/>
-            </complexType>
-         </element>
-         
-         <element name="create">
-            <complexType>
                <sequence>
-                  <element name="parent" type="cms:ParentReference"/>
-                  <element name="name" type="xsd:string"/>
-                  <element name="format" type="cms:ContentFormat"/>
-                  <element name="content" type="xsd:base64Binary"/>
+                  <element name="content" type="content:Content"/>
                </sequence>
             </complexType>
          </element>
          
-         <element name="createResponse">
-            <complexType>
-               <sequence>
-                  <element name="createReturn" type="cms:Content"/>
-               </sequence>
-            </complexType>
-         </element>
-         
-         <element name="delete">
+         <element name="clear">
             <complexType>
                <sequence>
                   <element name="items" type="cms:Predicate"/>
+                  <element name="property" type="xsd:string"/>
                </sequence>
             </complexType>
          </element>
          
-         <element name="deleteResponse">
+         <element name="clearResponse">
             <complexType>
                <sequence>
-                  <element name="deleteReturn" type="cms:Reference" maxOccurs="unbounded" minOccurs="0"/>
-               </sequence>
-            </complexType>
-         </element>
-         
-         <element name="exists">
-            <complexType>
-               <sequence>
-                  <element name="items" type="cms:Predicate"/>
-               </sequence>
-            </complexType>
-         </element>
-         
-         <element name="existsResponse">
-            <complexType>
-               <sequence>
-                  <element name="existsReturn" type="content:ExistsResult" maxOccurs="unbounded" minOccurs="0"/>
+                  <element name="content" type="content:Content" maxOccurs="unbounded" minOccurs="0"/>
                </sequence>
             </complexType>
          </element>
@@ -120,22 +76,16 @@
          </complexType>
          <element name="ContentSegment" type="content:ContentSegment"/>
          
-         <complexType name="ReadResult">
-            <sequence>
-               <element name="url" type="xsd:string"/>
-               <element name="content" type="cms:Content"/>
-            </sequence>
-         </complexType>
-         <element name="ReadResult" type="content:ReadResult"/>
-         
-         <complexType name="ExistsResult">
-            <sequence>
-               <element name="content" type="cms:Reference"/>
-               <element name="exists" type="xsd:boolean"/>
-               <element name="length" type="xsd:long"/>
-            </sequence>
-         </complexType>
-         <element name="ExistsResult" type="content:ExistsResult"/>
+	    <complexType name="Content">
+			<sequence>
+			    <element name="node" type="cms:Reference"></element>
+			    <element name="property" type="xsd:string"></element>
+				<element name="length" type="xsd:long"></element>
+				<element name="format" type="cms:ContentFormat" nillable="true"></element>
+				<element name="url" type="xsd:string" nillable="true"></element>    				
+			</sequence>
+	    </complexType>
+	    <element name="Content" type="content:Content"/>
          
          <complexType name="ContentFault">
             <sequence>
@@ -146,14 +96,6 @@
          <element name="ContentFault" type="content:ContentFault"/>
       </schema>
    </wsdl:types>
-   
-   <wsdl:message name="describeRequest">
-      <wsdl:part element="content:describe" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="describeResponse">
-      <wsdl:part element="content:describeResponse" name="parameters"/>
-   </wsdl:message>
    
    <wsdl:message name="readRequest">
       <wsdl:part element="content:read" name="parameters"/>
@@ -171,28 +113,12 @@
       <wsdl:part element="content:writeResponse" name="parameters"/>
    </wsdl:message>
    
-   <wsdl:message name="createRequest">
-      <wsdl:part element="content:create" name="parameters"/>
+   <wsdl:message name="clearRequest">
+      <wsdl:part element="content:clear" name="parameters"/>
    </wsdl:message>
    
-   <wsdl:message name="createResponse">
-      <wsdl:part element="content:createResponse" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="deleteRequest">
-      <wsdl:part element="content:delete" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="deleteResponse">
-      <wsdl:part element="content:deleteResponse" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="existsRequest">
-      <wsdl:part element="content:exists" name="parameters"/>
-   </wsdl:message>
-   
-   <wsdl:message name="existsResponse">
-      <wsdl:part element="content:existsResponse" name="parameters"/>
+   <wsdl:message name="clearResponse">
+      <wsdl:part element="content:clearResponse" name="parameters"/>
    </wsdl:message>
    
    <wsdl:message name="ContentFault">
@@ -200,12 +126,6 @@
    </wsdl:message>
    
    <wsdl:portType name="ContentServiceSoapPort">
-      <wsdl:operation name="describe">
-         <wsdl:documentation>Describes one or more content streams.</wsdl:documentation>
-         <wsdl:input message="content:describeRequest" name="describeRequest"/>
-         <wsdl:output message="content:describeResponse" name="describeResponse"/>
-         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
-      </wsdl:operation>
       <wsdl:operation name="read">
          <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
          <wsdl:input message="content:readRequest" name="readRequest"/>
@@ -218,40 +138,15 @@
          <wsdl:output message="content:writeResponse"/>
          <wsdl:fault message="content:ContentFault" name="ContentFault"/>
       </wsdl:operation>
-      <wsdl:operation name="create">
-         <wsdl:documentation>Creates new content in the repository.</wsdl:documentation>
-         <wsdl:input message="content:createRequest"/>
-         <wsdl:output message="content:createResponse"/>
-         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
-      </wsdl:operation>
-      <wsdl:operation name="delete">
-         <wsdl:documentation>Deletes content from the repository.</wsdl:documentation>
-         <wsdl:input message="content:deleteRequest"/>
-         <wsdl:output message="content:deleteResponse"/>
-         <wsdl:fault message="content:ContentFault" name="ContentFault"/>
-      </wsdl:operation>
-      <wsdl:operation name="exists">
-         <wsdl:documentation>Determines whether content exists in the repository.</wsdl:documentation>
-         <wsdl:input message="content:existsRequest"/>
-         <wsdl:output message="content:existsResponse"/>
+      <wsdl:operation name="clear">
+         <wsdl:documentation>Clears content from the repository.</wsdl:documentation>
+         <wsdl:input message="content:clearRequest"/>
+         <wsdl:output message="content:clearResponse"/>
          <wsdl:fault message="content:ContentFault" name="ContentFault"/>
       </wsdl:operation>
    </wsdl:portType>
    
    <wsdl:binding name="ContentServiceSoapBinding" type="content:ContentServiceSoapPort">      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-      <wsdl:operation name="describe">
-         <wsdl:documentation>Describes one or more content streams.</wsdl:documentation>
-         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/describe"/>
-         <wsdl:input>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:output>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:output>
-         <wsdl:fault name="ContentFault">
-            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
-         </wsdl:fault>
-      </wsdl:operation>
       <wsdl:operation name="read">
          <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
          <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/read"/>
@@ -278,9 +173,9 @@
             <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
          </wsdl:fault>
       </wsdl:operation>
-      <wsdl:operation name="create">
-         <wsdl:documentation>Creates new content in the repository.</wsdl:documentation>
-         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/create"/>
+      <wsdl:operation name="clear">
+         <wsdl:documentation>Clears content from the repository.</wsdl:documentation>
+         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/clear"/>
          <wsdl:input>
             <wsdlsoap:body use="literal"/>
          </wsdl:input>
@@ -290,33 +185,7 @@
          <wsdl:fault name="ContentFault">
             <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
          </wsdl:fault>
-      </wsdl:operation>
-      <wsdl:operation name="delete">
-         <wsdl:documentation>Deletes content from the repository.</wsdl:documentation>
-         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/delete"/>
-         <wsdl:input>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:output>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:output>
-         <wsdl:fault name="ContentFault">
-            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
-         </wsdl:fault>
-      </wsdl:operation>
-      <wsdl:operation name="exists">
-         <wsdl:documentation>Determines whether content exists in the repository.</wsdl:documentation>
-         <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/exists"/>
-         <wsdl:input>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:output>
-            <wsdlsoap:body use="literal"/>
-         </wsdl:output>
-         <wsdl:fault name="ContentFault">
-            <wsdlsoap:fault namespace="http://www.alfresco.org/ws/service/content/1.0" use="literal" name="ContentFault"/>
-         </wsdl:fault>
-      </wsdl:operation>
+      </wsdl:operation>      
     </wsdl:binding>
 
    <wsdl:service name="ContentService">

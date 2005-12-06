@@ -38,26 +38,64 @@
       $client->addHeader($securityHeader);
    }
 
+   /**
+    * Create a SOAP value for a Store object
+    */
    function getStoreSOAPValue($store)
    {
-      $scheme =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}scheme', '{http://www.alfresco.org/ws/model/content/1.0}StoreEnum', $store->scheme);
-      $address =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}address', false, $store->address);
-      return new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}store', false, $v=array($scheme, $address));
+      // If the store is null make sure the scheme and address are also null
+      $scheme = null;
+      $address = null;
+      if ($store != null)
+      {
+         $scheme = $store->scheme;
+         $address = $store->address;
+      }
+
+      // Create the store soap value
+      $params = array(
+              new SOAP_Value('scheme', 'StoreEnum', $scheme),
+              new SOAP_Value('address', false, $address)
+      );
+      return new SOAP_Value('store', false, $params);
+
    }
 
    function getQuerySOAPValue($statement, $language)
    {
-      $language =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}language', '{http://www.alfresco.org/ws/model/content/1.0}QueryLanguageEnum', $language);
-      $statement =& new SOAP_Value('{http://www.alfresco.org/ws/model/content/1.0}statement', false, $statement);
-      return new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}query', false, $v=array($language, $statement));
+      $params = array(
+              new SOAP_Value('language', 'QueryLanguageEnum', $language),
+              new SOAP_Value('statement', false, $statement)
+      );
+      return new SOAP_Value('query', false, $params);
    }
 
-   function getReferenceSOAPValue($reference)
+   function getReferenceSOAPValue($reference, $name='reference')
    {
-      $store_value = getStoreSOAPValue($reference->store);
-      $uuid =& new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}uuid', false, $reference->uuid);
-      $path =& new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}path', false, $reference->path);
-      return new SOAP_Value('{http://www.alfresco.org/ws/service/repository/1.0}reference', false, $v=array($store_value, $uuid, $path));
+      $params = array(
+              getStoreSOAPValue($reference->store),
+              new SOAP_Value('uuid', false, $reference->uuid),
+              new SOAP_Value('path', false, $reference->path)
+      );
+      
+      return new SOAP_Value($name, false, $params);
+   }
+   
+   function getPredicateSOAPValue($references, $store, $query_statement, $query_language)
+   {
+       $params = array();
+       if ($references != null)
+       {
+          foreach ($references as $reference)
+          {
+             $params[] = getReferenceSOAPValue($reference, 'nodes');
+          }
+       }
+
+       $params[] = getStoreSOAPValue($store);
+       $params[] = getQuerySOAPValue($query_statement, $query_language);
+
+       return new SOAP_Value('items', false, $params);
    }
 
 ?>

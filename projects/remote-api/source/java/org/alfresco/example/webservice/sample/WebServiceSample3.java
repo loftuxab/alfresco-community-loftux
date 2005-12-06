@@ -26,13 +26,20 @@ import javax.xml.rpc.ServiceException;
 import org.alfresco.example.webservice.authentication.AuthenticationResult;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceLocator;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceSoapBindingStub;
+import org.alfresco.example.webservice.content.Content;
 import org.alfresco.example.webservice.content.ContentServiceLocator;
 import org.alfresco.example.webservice.content.ContentServiceSoapBindingStub;
-import org.alfresco.example.webservice.content.ReadResult;
-import org.alfresco.example.webservice.types.Content;
+import org.alfresco.example.webservice.repository.UpdateResult;
+import org.alfresco.example.webservice.types.CML;
+import org.alfresco.example.webservice.types.CMLCreate;
 import org.alfresco.example.webservice.types.ContentFormat;
+import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.ParentReference;
+import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Reference;
+import org.alfresco.example.webservice.types.Store;
+import org.alfresco.example.webservice.types.StoreEnum;
+import org.alfresco.model.ContentModel;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 
@@ -68,22 +75,29 @@ public class WebServiceSample3
         ContentServiceSoapBindingStub contentService = getContentWebService();        
         
         // Create new content in the respository
-        Reference newContentReference = createNewContent(contentService, INITIAL_CONTENT);
+        Reference newContentReference = createNewContent(contentService, "sampleThreeFileOne.txt", INITIAL_CONTENT);
         
         // Read the newly added content from the respository
-        ReadResult readResult = contentService.read(newContentReference);
+        Store store = new Store(StoreEnum.workspace, "SpacesStore");
+        Content[] readResult = contentService.read(
+                                            new Predicate(new Reference[]{newContentReference}, store, null), 
+                                            ContentModel.PROP_CONTENT.toString());
+        Content content = readResult[0];
         
         // Get the content from the download servlet using the URL and display it
         System.out.println("The newly added content is:");
-        System.out.println(getContentAsString(WebServiceSample1.currentTicket, readResult.getUrl()));
+        System.out.println(getContentAsString(WebServiceSample1.currentTicket, content.getUrl()));
         
         // Update the content with something new
-        contentService.write(newContentReference, UPDATED_CONTENT.getBytes());
+        contentService.write(newContentReference, ContentModel.PROP_CONTENT.toString(), UPDATED_CONTENT.getBytes(), null);
         
         // Now output the updated content
-        ReadResult readResult2 = contentService.read(newContentReference);
+        Content[] readResult2 = contentService.read(
+                                            new Predicate(new Reference[]{newContentReference}, store, null), 
+                                            ContentModel.PROP_CONTENT.toString());
+        Content content2 = readResult2[0];
         System.out.println("The updated content is:");
-        System.out.println(getContentAsString(WebServiceSample1.currentTicket, readResult2.getUrl()));
+        System.out.println(getContentAsString(WebServiceSample1.currentTicket, content2.getUrl()));
         
         // End the session
         authenticationService.endSession();
@@ -112,7 +126,7 @@ public class WebServiceSample3
      * @return                  a reference to the created content node
      * @throws Exception        
      */
-    public static Reference createNewContent(ContentServiceSoapBindingStub contentService, String content) 
+    public static Reference createNewContent(ContentServiceSoapBindingStub contentService, String name, String contentString) 
         throws Exception
     {
         // First we'll use the previous sample to get hold of a reference to a space that we can create the content within
@@ -127,11 +141,17 @@ public class WebServiceSample3
         // Define the content format for the content we are adding
         ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
         
-        // Add the content to the repository
-        Content newContent = contentService.create(parentReference, "myDocument.txt", contentFormat, content.getBytes());
+        NamedValue[] properties = new NamedValue[]{new NamedValue(ContentModel.PROP_NAME.toString(), name)};
+        CMLCreate create = new CMLCreate("1", parentReference, ContentModel.TYPE_CONTENT.toString(), properties);
+        CML cml = new CML();
+        cml.setCreate(new CMLCreate[]{create});
+        UpdateResult[] result = WebServiceSample1.getRepositoryWebService().update(cml);     
+        
+        Reference newContentNode = result[0].getDestination();
+        Content content = contentService.write(newContentNode, ContentModel.PROP_CONTENT.toString(), contentString.getBytes(), contentFormat);
         
         // Get a reference to the newly created content
-        return newContent.getReference();
+        return content.getNode();
     }
     
     /**

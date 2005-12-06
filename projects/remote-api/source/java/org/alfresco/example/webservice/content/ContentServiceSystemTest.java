@@ -17,209 +17,137 @@
 package org.alfresco.example.webservice.content;
 
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
-import org.alfresco.example.webservice.types.Content;
+import org.alfresco.example.webservice.repository.UpdateResult;
+import org.alfresco.example.webservice.types.CML;
+import org.alfresco.example.webservice.types.CMLCreate;
 import org.alfresco.example.webservice.types.ContentFormat;
+import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.ParentReference;
 import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Reference;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ContentServiceSystemTest extends BaseWebServiceSystemTest
 {
-   private static Log logger = LogFactory.getLog(ContentServiceSystemTest.class);
    private static final String CONTENT = "This is a small piece of content to test the create service call";
    private static final String UPDATED_CONTENT = "This is some updated content to test the write service call";
    
-   private static String newContentId;
    private String fileName = "unit-test.txt";
    
-   /**
-    * Tests the create content service method
-    * 
-    * @throws Exception
-    */
-   public void testCreate() throws Exception
+   public void testContentService() 
+       throws Exception
    {
-      // get the root node (hard code for now until we have a way to query for the root node)
-      ParentReference parent = getFolderParentReference(ContentModel.ASSOC_CONTAINS);
-      
-      // Create the content
-      String mimetype = "text/plain";
-      Content content = this.contentService.create(parent, this.fileName, new ContentFormat(mimetype, "UTF-8"), CONTENT.getBytes());
-      
-      // Check the content
-      assertNotNull("Returned content should not be null", content);
-      assertNotNull("Format should not be null", content.getFormat());
-      assertEquals("Mimetype should match what was sent", mimetype, content.getFormat().getMimetype());
-      newContentId = content.getReference().getUuid();
-      logger.debug("Created new content with id: " + newContentId);
-   }
-   
-   /**
-    * Tests the read method
-    * 
-    * @throws Exception
-    */
-   public void testRead() throws Exception
-   {      
-      if (newContentId == null)
-      {
-         fail("Failed to locate id of " + this.fileName);
-      }
-      
-      Reference node = new Reference();
-      node.setStore(getStore());
-      node.setUuid(newContentId);
-      
-      ReadResult result = this.contentService.read(node);
-      assertNotNull("read result should not be null", result);
-      logger.debug("url for download is: " + result.getUrl());
-      assertNotNull("Url to read content from must not be null", result.getUrl());
-      
-      // make sure length is reported as the same as the content used to create the file
-      assertEquals("Content length's don't match", CONTENT.length(), result.getContent().getLength());
-   }
-   
-   /**
-    * Tests the write service method
-    *
-    * @throws Exception
-    */
-   public void testWrite() throws Exception
-   {
-      if (newContentId == null)
-      {
-         fail("Failed to locate id of " + this.fileName);
-      }
-      
-      Reference node = new Reference();
-      node.setStore(getStore());
-      node.setUuid(newContentId);
-      
-      this.contentService.write(node, UPDATED_CONTENT.getBytes());
-
-      ReadResult result = this.contentService.read(node);
-      assertNotNull("read result should not be null", result);
-      assertNotNull("Url to read content from must not be null", result.getUrl());
-      
-      long contentLength = result.getContent().getLength();
-      assertEquals("Content length's don't match", UPDATED_CONTENT.length(), contentLength);
-      assertTrue("Content length of update content should not be the same as the previous content length",
-            contentLength != CONTENT.length());
-      
-      /* TODO: At some point we will have to provide the login credentials 
-               for the download servlet (auth filter); it needs to look for a ticket
-               on the URL */
-               
-      // read the contents of the URL and make sure they match
-      String contentValue = getContentAsString(result.getUrl());
-      
-      // make sure the content in the repository is correct
-      logger.debug("Content from repository: " + contentValue);
-      assertEquals("Content does not match", UPDATED_CONTENT, contentValue);
-   }
-   
-   /**
-    * Tests the exists service method
-    * 
-    * @throws Exception
-    */
-   public void testExists() throws Exception
-   {
-      if (newContentId == null)
-      {
-         fail("Failed to locate id of " + this.fileName);
-      }
-      
-      // create the predicate representation of the content
-      Reference ref = new Reference();
-      ref.setStore(getStore());
-      ref.setUuid(newContentId);
-      Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
-      
-      ExistsResult[] existsResult = this.contentService.exists(predicate);
-      assertNotNull("exists result should not be null", existsResult);
-      
-      // we only added one object so there should only be one result!
-      assertTrue("There should be one result", existsResult.length == 1);
-      assertTrue("The node should have existed", existsResult[0].isExists());
-      assertTrue("Content length should match", existsResult[0].getLength() == UPDATED_CONTENT.length());
-   }
-   
-   /**
-    * Tests the describe service method
-    * 
-    * @throws Exception
-    */
-   public void testDescribe() throws Exception
-   {
-      if (newContentId == null)
-      {
-         fail("Failed to locate id of " + this.fileName);
-      }
-      
-      // create the predicate representation of the content
-      Reference ref = new Reference();
-      ref.setStore(getStore());
-      ref.setUuid(newContentId);
-      Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
-      
-      Content[] contentDesc = this.contentService.describe(predicate);
-      assertNotNull("describe result should not be null", contentDesc);
-      
-      // we only added one object so there should only be one result!
-      assertTrue("There should be one result", contentDesc.length == 1);
-      
-      // dump all the results
-      Content content = contentDesc[0];
-      String id = content.getReference().getUuid();
-      String type = content.getType();
-      String mimetype = content.getFormat().getMimetype();
-      String encoding = content.getFormat().getEncoding();
-      long length = content.getLength();
-      if (logger.isDebugEnabled())
-      {
-         logger.debug("id = " + id);
-         logger.debug("type = " + type);
-         logger.debug("mimetype = " + mimetype);
-         logger.debug("encoding = " + encoding);
-         logger.debug("length = " + length);
-      }
-      
-      // do some sanity checking
-      assertEquals("The id is incorrect", newContentId, id);
-      assertEquals("The type is incorrect", "{http://www.alfresco.org/model/content/1.0}content", type);
-      assertEquals("The mimetype is incorrect", "text/plain", mimetype);
-      assertEquals("The encoding is incorrect", "UTF-8", encoding);
-      assertEquals("The length is incorrect", UPDATED_CONTENT.length(), length);
-   }
-   
-   /**
-    * Tests the delete service method
-    * 
-    * @throws Exception
-    */
-   public void testDelete() throws Exception
-   {
-      if (newContentId == null)
-      {
-         fail("Failed to locate id of " + this.fileName);
-      }
-      
-      // create the predicate representation of the content
-      Reference ref = new Reference();
-      ref.setStore(getStore());
-      ref.setUuid(newContentId);
-      Predicate predicate = new Predicate(new Reference[] {ref}, null, null);
-      
-      Reference[] refs = this.contentService.delete(predicate);
-      assertNotNull("delete result should not be null", refs);
-      
-      // now check that the node no longer exists
-      ExistsResult[] existsResult = this.contentService.exists(predicate);
-      assertNotNull("exists result should not be null", existsResult);
-      assertFalse("The node should no longer exist", existsResult[0].isExists());
+       ParentReference parentRef = new ParentReference();
+       parentRef.setStore(getStore());
+       parentRef.setUuid(getRootNodeReference().getUuid());
+       parentRef.setAssociationType(ContentModel.ASSOC_CHILDREN.toString());
+       parentRef.setChildName(ContentModel.ASSOC_CHILDREN.toString());
+       
+       NamedValue[] properties = new NamedValue[]{new NamedValue(ContentModel.PROP_NAME.toString(), this.fileName)};
+       CMLCreate create = new CMLCreate("1", parentRef, ContentModel.TYPE_CONTENT.toString(), properties);
+       CML cml = new CML();
+       cml.setCreate(new CMLCreate[]{create});
+       UpdateResult[] result = this.repositoryService.update(cml);     
+       
+       Reference newContentNode = result[0].getDestination();       
+       String property = ContentModel.PROP_CONTENT.toString();
+       Predicate predicate = new Predicate(new Reference[]{newContentNode}, getStore(), null);
+              
+       // First check a node that has no content set
+       Content[] contents1 = this.contentService.read(predicate, property);
+       assertNotNull(contents1);
+       assertEquals(1, contents1.length);
+       Content content1 = contents1[0];
+       assertNotNull(content1);
+       assertEquals(0, content1.getLength());
+       assertEquals(newContentNode.getUuid(), content1.getNode().getUuid());
+       assertEquals(property, content1.getProperty());
+       assertNull(content1.getUrl());
+       assertNull(content1.getFormat());
+       
+       // Write content 
+       Content content2 = this.contentService.write(newContentNode, property, CONTENT.getBytes(), new ContentFormat(MimetypeMap.MIMETYPE_TEXT_PLAIN, "UTF-8"));
+       assertNotNull(content2);
+       assertTrue((content2.getLength() > 0));
+       assertEquals(newContentNode.getUuid(), content2.getNode().getUuid());
+       assertEquals(property, content2.getProperty());
+       assertNotNull(content2.getUrl());
+       assertNotNull(content2.getFormat());       
+       ContentFormat format2 = content2.getFormat();
+       assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, format2.getMimetype());
+       assertEquals("UTF-8", format2.getEncoding());
+       assertEquals(CONTENT, getContentAsString(content2.getUrl()));
+              
+       // Read content
+       Content[] contents3 = this.contentService.read(predicate, property);
+       assertNotNull(contents3);
+       assertEquals(1, contents3.length);
+       Content content3 = contents3[0];
+       assertNotNull(content3);
+       assertTrue((content3.getLength() > 0));
+       assertEquals(newContentNode.getUuid(), content3.getNode().getUuid());
+       assertEquals(property, content3.getProperty());
+       assertNotNull(content3.getUrl());
+       assertNotNull(content3.getFormat());       
+       ContentFormat format3 = content3.getFormat();
+       assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, format3.getMimetype());
+       assertEquals("UTF-8", format3.getEncoding());
+       assertEquals(CONTENT, getContentAsString(content3.getUrl()));
+       
+       // Update content
+       Content content4 = this.contentService.write(newContentNode, property, UPDATED_CONTENT.getBytes(), new ContentFormat(MimetypeMap.MIMETYPE_TEXT_CSS, "UTF-8"));
+       assertNotNull(content4);
+       assertTrue((content4.getLength() > 0));
+       assertEquals(newContentNode.getUuid(), content4.getNode().getUuid());
+       assertEquals(property, content4.getProperty());
+       assertNotNull(content4.getUrl());
+       assertNotNull(content4.getFormat());       
+       ContentFormat format4 = content4.getFormat();
+       assertEquals(MimetypeMap.MIMETYPE_TEXT_CSS, format4.getMimetype());
+       assertEquals("UTF-8", format4.getEncoding());
+       assertEquals(UPDATED_CONTENT, getContentAsString(content4.getUrl()));
+       
+       // Read updated content
+       Content[] contents5 = this.contentService.read(predicate, property);
+       assertNotNull(contents5);
+       assertEquals(1, contents5.length);
+       Content content5 = contents5[0];
+       assertNotNull(content5);
+       assertTrue((content5.getLength() > 0));
+       assertEquals(newContentNode.getUuid(), content5.getNode().getUuid());
+       assertEquals(property, content5.getProperty());
+       assertNotNull(content5.getUrl());
+       assertNotNull(content5.getFormat());       
+       ContentFormat format5 = content5.getFormat();
+       assertEquals(MimetypeMap.MIMETYPE_TEXT_CSS, format5.getMimetype());
+       assertEquals("UTF-8", format5.getEncoding());
+       assertEquals(UPDATED_CONTENT, getContentAsString(content5.getUrl()));
+       
+       // Clear content
+       Content[] contents6 = this.contentService.clear(predicate, property);
+       assertNotNull(contents6);
+       assertEquals(1, contents6.length);
+       Content content6 = contents6[0];
+       assertNotNull(content6);
+       assertEquals(0, content6.getLength());
+       assertEquals(newContentNode.getUuid(), content6.getNode().getUuid());
+       assertEquals(property, content6.getProperty());
+       assertNull(content6.getUrl());
+       assertNull(content6.getFormat());
+       
+       // Read cleared content
+       Content[] contents7 = this.contentService.read(predicate, property);
+       assertNotNull(contents7);
+       assertEquals(1, contents7.length);
+       Content content7 = contents7[0];
+       assertNotNull(content7);
+       assertEquals(0, content7.getLength());
+       assertEquals(newContentNode.getUuid(), content7.getNode().getUuid());
+       assertEquals(property, content7.getProperty());
+       assertNull(content7.getUrl());
+       assertNull(content7.getFormat());
    }
 }

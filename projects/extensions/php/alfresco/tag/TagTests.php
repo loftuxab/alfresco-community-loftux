@@ -27,11 +27,6 @@
          return "bold";
       }
 
-      public function is_container_tag()
-      {
-         return false;
-      }
-
       public function do_tag()
       {
          return "<b>".$this->body."</b>";
@@ -43,11 +38,6 @@
       public static function get_name()
       {
          return "italic";
-      }
-
-      public function is_container_tag()
-      {
-         return false;
       }
 
       public function do_tag()

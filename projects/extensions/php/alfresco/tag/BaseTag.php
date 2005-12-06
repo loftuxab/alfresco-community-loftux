@@ -39,11 +39,18 @@ abstract class BaseTag
       }
    }
 
+   public function before_do_tag()
+   {
+   }
+
    abstract public static function get_name();
 
-   abstract public function is_container_tag();
-
    abstract public function do_tag();
+   
+   public function is_tag_complete()
+   {
+      return true;
+   }
 
    public function add_child($child)
    {

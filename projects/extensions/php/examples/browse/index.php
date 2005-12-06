@@ -22,8 +22,8 @@
    require_once('alfresco/RepositoryService.php');
    require_once('alfresco/ContentService.php');
    require_once('alfresco/AuthenticationService.php');
-   require_once('alfresco/Store.php');
-   require_once('alfresco/Reference.php');
+   require_once('alfresco/type/Store.php');
+   require_once('alfresco/type/Reference.php');
    require_once('alfresco/tag/TagFramework.php');
    require_once('alfresco/tag/CommonTags.php');
 
@@ -83,7 +83,7 @@
       $result = null;
       if ($current_type == "{http://www.alfresco.org/model/content/1.0}content")
       {
-         $read_result = $content_service->read(new Reference($store, $current_id));
+         $read_result = $content_service->read(array(new Reference($store, $current_id)), "{http://www.alfresco.org/model/content/1.0}content");
          $result = $read_result->url."?ticket=".$auth_details->getTicket();
       }
       else

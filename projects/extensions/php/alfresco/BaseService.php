@@ -18,7 +18,7 @@
 */
 
 require_once('alfresco/webservice/WebServiceUtils.php');
-require_once('alfresco/AuthenticationDetails.php');
+require_once('alfresco/type/AuthenticationDetails.php');
 
 class BaseService
 {
@@ -55,6 +55,7 @@ class BaseService
                $exception_message = $result->userinfo->RepositoryFault->message;
             }
          }
+         error_log("An error was encountered when calling web service: ".$exception_message);
          throw new Exception($exception_message);
       }
    }

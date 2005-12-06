@@ -10,32 +10,17 @@ package org.alfresco.example.webservice.content;
 public interface ContentServiceSoapPort extends java.rmi.Remote {
 
     /**
-     * Describes one or more content streams.
-     */
-    public org.alfresco.example.webservice.types.Content[] describe(org.alfresco.example.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
-
-    /**
      * Retrieves content from the repository.
      */
-    public org.alfresco.example.webservice.content.ReadResult read(org.alfresco.example.webservice.types.Reference node) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
+    public org.alfresco.example.webservice.content.Content[] read(org.alfresco.example.webservice.types.Predicate items, java.lang.String property) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
 
     /**
      * Writes content to the repository.
      */
-    public void write(org.alfresco.example.webservice.types.Reference node, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
+    public org.alfresco.example.webservice.content.Content write(org.alfresco.example.webservice.types.Reference node, java.lang.String property, byte[] content, org.alfresco.example.webservice.types.ContentFormat format) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
 
     /**
-     * Creates new content in the repository.
+     * Clears content from the repository.
      */
-    public org.alfresco.example.webservice.types.Content create(org.alfresco.example.webservice.types.ParentReference parent, java.lang.String name, org.alfresco.example.webservice.types.ContentFormat format, byte[] content) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
-
-    /**
-     * Deletes content from the repository.
-     */
-    public org.alfresco.example.webservice.types.Reference[] delete(org.alfresco.example.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
-
-    /**
-     * Determines whether content exists in the repository.
-     */
-    public org.alfresco.example.webservice.content.ExistsResult[] exists(org.alfresco.example.webservice.types.Predicate items) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
+    public org.alfresco.example.webservice.content.Content[] clear(org.alfresco.example.webservice.types.Predicate items, java.lang.String property) throws java.rmi.RemoteException, org.alfresco.example.webservice.content.ContentFault;
 }

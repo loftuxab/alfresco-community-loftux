@@ -56,7 +56,7 @@ function callback($buffer)
    return parse_buffer($buffer);
 }
 
-function parse_buffer($buffer, $process_body=true, $parent_tag=null)
+function parse_buffer($buffer, $parent_tag=null)
 {
    global $PHP_TAG;
 
@@ -69,17 +69,16 @@ function parse_buffer($buffer, $process_body=true, $parent_tag=null)
       // Output the content's up to the tag
       $result .= substr($buffer, $offset, $start_pos-$offset);
 
-      if ($parent_tag != null && $process_body == true)
-      {
-         // Check the parent tag for the process body flag
-         $process_body = !$parent_tag->is_container_tag();
-      }
-
       // Parse the tag
-      $tag = parse_tag($buffer, $start_pos, $process_body, $parent_tag);
+      $buffer_orig = $buffer;
+      $start_pos_orig = $start_pos;
+      $parent_tag_org = $parent_tag;
 
-      if ($process_body == true)
+      $tag = parse_tag($buffer, $start_pos, $parent_tag);
+      $result .= $tag->do_tag();
+      while ($tag->is_tag_complete() == false)
       {
+         $tag = parse_tag($buffer_orig, $start_pos_orig, $parent_tag_org);
          $result .= $tag->do_tag();
       }
 
@@ -126,7 +125,7 @@ function parse_name($buffer, &$offset)
    return $tag_name;
 }
 
-function parse_tag($buffer, $start_pos, $process_body, $parent_tag)
+function parse_tag($buffer, $start_pos, $parent_tag)
 {
    // Include the required global values
    global $PHP_TAG;
@@ -190,8 +189,14 @@ function parse_tag($buffer, $start_pos, $process_body, $parent_tag)
             // Get the body
             $body = substr($buffer, $offset, $end_tag_pos - $offset);
 
-            // Parse the body for inner tags
-            $tag->body = parse_buffer($body, $process_body, $tag);
+            // Parse the body for inner tags (loop if not complete)
+            $tag->before_do_tag();
+            $tag->body = parse_buffer($body, $tag);
+            //while ($tag->is_tag_complete() == false)
+            //{
+            //   $tag->before_do_tag();
+            //   $tag->body .= parse_buffer($body, $tag);
+            //}
 
             // Adjust the offset value
             $offset = $end_tag_pos + strlen($end_tag);
@@ -272,8 +277,6 @@ function parse_attribute($buffer, &$offset)
    }
 
    ignore_white_space($buffer, $offset);
-
-   print($attribute_name."=".$attribute_value."<br>");
 
    return array($attribute_name, $attribute_value);
 }

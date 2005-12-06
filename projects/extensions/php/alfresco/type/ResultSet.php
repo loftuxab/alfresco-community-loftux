@@ -1,11 +1,25 @@
 <?php
 
+$result_set_id = 1;
+$result_sets = array();
+
 class ResultSet
 {
+   private $id = 0;
    private $row_count = 0;
    private $rows = array();
    private $query_session;
    private $meta_data;
+
+   public function __construct()
+   {
+      global $result_set_id, $result_sets;
+
+      $this->id = $result_set_id;
+      $result_set_id += 1;
+
+      $result_sets[$this->id] = $this;
+   }
 
    public static function createResultSet($webservice_query_result)
    {
@@ -42,17 +56,22 @@ class ResultSet
       return $result_set;
    }
 
-   function querySession()
+   public function id()
+   {
+      return $this->id;
+   }
+
+   public function querySession()
    {
       return $this->query_session;
    }
 
-   function rowCount()
+   public function rowCount()
    {
       return $this->row_count;
    }
 
-   function rows()
+   public function rows()
    {
       return $this->rows;
    }

@@ -381,13 +381,6 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Content");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.example.webservice.types.Content.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ContentFormat");
             cachedSerQNames.add(qName);
             cls = org.alfresco.example.webservice.types.ContentFormat.class;

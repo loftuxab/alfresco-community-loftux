@@ -20,6 +20,7 @@
 require_once('alfresco/BaseService.php');
 require_once('alfresco/webservice/WebServiceUtils.php');
 require_once('alfresco/webservice/ContentWebService.php');
+require_once('alfresco/type/Content.php');
 
 class ContentService extends BaseService
 {
@@ -28,18 +29,26 @@ class ContentService extends BaseService
       parent::__construct($auth_details);
       $this->web_service = new ContentWebService();
    }
-   
-   public function read($reference)
+
+   public function read($references, $property)
    {
-     // Make the web service call
+      // Make the web service call
       $this->addSecurityHeader();
-      $result = $this->web_service->read(getReferenceSOAPValue($reference));
+      $result = $this->web_service->read(
+              getPredicateSOAPValue($references, null, null, null), 
+              new SOAP_Value('property', 'stirng', $property));
+
+      // Check for any errors
       $this->checkForError($result);
-      
-      // TODO marhsall the result into a helpful object
-      
+
+      // TODO map the results to a list of content objects ...
+
       return $result;
    }
+
+   //public function read($store, $query_statement, $query_language, $property)
+   //{
+   //}
 }
 
 ?>

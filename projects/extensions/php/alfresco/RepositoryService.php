@@ -18,8 +18,8 @@
 */
 
 require_once('alfresco/BaseService.php');
-require_once('alfresco/Store.php');
-require_once('alfresco/ResultSet.php');
+require_once('alfresco/type/Store.php');
+require_once('alfresco/type/ResultSet.php');
 require_once('alfresco/webservice/WebServiceUtils.php');
 require_once('alfresco/webservice/RepositoryWebService.php');
 

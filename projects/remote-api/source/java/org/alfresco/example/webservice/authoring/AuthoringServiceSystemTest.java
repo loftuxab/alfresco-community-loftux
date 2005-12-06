@@ -22,7 +22,7 @@ import javax.xml.rpc.ServiceException;
 import junit.framework.AssertionFailedError;
 
 import org.alfresco.example.webservice.BaseWebServiceSystemTest;
-import org.alfresco.example.webservice.content.ReadResult;
+import org.alfresco.example.webservice.content.Content;
 import org.alfresco.example.webservice.types.ContentFormat;
 import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.ParentReference;
@@ -30,6 +30,7 @@ import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Reference;
 import org.alfresco.example.webservice.types.Version;
 import org.alfresco.example.webservice.types.VersionHistory;
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.namespace.QName;
 import org.apache.axis.EngineConfiguration;
@@ -198,7 +199,8 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         
         // Check the origianl Node
         assertNotNull(origionalNode);
-        ReadResult readResult = this.contentService.read(origionalNode);
+        Content[] contents = this.contentService.read(new Predicate(new Reference[]{origionalNode}, getStore(), null), ContentModel.PROP_CONTENT.toString());
+        Content readResult = contents[0];
         assertNotNull(readResult);
         String checkedInContent = getContentAsString(readResult.getUrl());
         assertNotNull(checkedInContent);
@@ -323,7 +325,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         // TODO some more tests ...
         
         // Update the content
-        this.contentService.write(reference, SECOND_VERSION_CONTENT.getBytes());
+        this.contentService.write(reference, ContentModel.PROP_CONTENT.toString(), SECOND_VERSION_CONTENT.getBytes(), null);
         
         // Create another version
         VersionResult versionResult2 = this.authoringService.createVersion(predicate, getVersionComments(), false);
@@ -331,18 +333,19 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         assertEquals(1, versionResult2.getNodes().length);
         assertEquals(1, versionResult2.getVersions().length);
         Version version2 = versionResult2.getVersions()[0];
-        assertEquals("1.2", version2.getLabel());
+        assertEquals("1.3", version2.getLabel());
         // TODO check commentaries
         // TODO check creator
         
         // Check the version history
         VersionHistory versionHistory2 = this.authoringService.getVersionHistory(reference);
         assertNotNull(versionHistory2);
-        assertEquals(3, versionHistory2.getVersions().length);
+        assertEquals(4, versionHistory2.getVersions().length);
         // TODO some more tests ...
         
         // Confirm the current content of the node
-        ReadResult readResult1 = this.contentService.read(reference);
+        Content[] contents = this.contentService.read(new Predicate(new Reference[]{reference}, getStore(), null), ContentModel.PROP_CONTENT.toString());
+        Content readResult1 = contents[0];
         String content1 = getContentAsString(readResult1.getUrl());
         assertEquals(SECOND_VERSION_CONTENT, content1);
         
@@ -350,7 +353,8 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         this.authoringService.revertVersion(reference, "1.0");
         
         // Confirm that the state of the node has been reverted
-        ReadResult readResult2 = this.contentService.read(reference);
+        Content[] contents2 = this.contentService.read(new Predicate(new Reference[]{reference}, getStore(), null), ContentModel.PROP_CONTENT.toString());
+        Content readResult2 = contents2[0];
         String content2 = getContentAsString(readResult2.getUrl());
         assertEquals(INITIAL_VERSION_CONTENT, content2);
         

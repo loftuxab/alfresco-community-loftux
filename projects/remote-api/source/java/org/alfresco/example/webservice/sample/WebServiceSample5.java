@@ -26,16 +26,21 @@ import org.alfresco.example.webservice.authentication.AuthenticationServiceSoapB
 import org.alfresco.example.webservice.authoring.AuthoringServiceLocator;
 import org.alfresco.example.webservice.authoring.AuthoringServiceSoapBindingStub;
 import org.alfresco.example.webservice.authoring.CheckoutResult;
+import org.alfresco.example.webservice.content.Content;
 import org.alfresco.example.webservice.content.ContentServiceSoapBindingStub;
-import org.alfresco.example.webservice.content.ReadResult;
 import org.alfresco.example.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.alfresco.example.webservice.types.CML;
 import org.alfresco.example.webservice.types.CMLAddAspect;
+import org.alfresco.example.webservice.types.ContentFormat;
 import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Reference;
+import org.alfresco.example.webservice.types.Store;
+import org.alfresco.example.webservice.types.StoreEnum;
 import org.alfresco.example.webservice.types.Version;
 import org.alfresco.example.webservice.types.VersionHistory;
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 
@@ -71,7 +76,7 @@ public class WebServiceSample5
         AuthoringServiceSoapBindingStub authoringService = WebServiceSample5.getAuthoringWebService();
         
         // Get a reference to a newly created content
-        Reference contentReference = WebServiceSample3.createNewContent(contentService, INITIAL_CONTENT);
+        Reference contentReference = WebServiceSample3.createNewContent(contentService, "SampleFiveFileOne.txt", INITIAL_CONTENT);
         
         // Add the versionable aspect to the newly created content.  This will allows the content to be versioned
         makeVersionable(repositoryService, contentReference);
@@ -84,7 +89,8 @@ public class WebServiceSample5
         Reference workingCopyReference = checkOutResult.getWorkingCopies()[0];
         
         // Update the content of the working copy
-        contentService.write(workingCopyReference, UPDATED_CONTENT.getBytes());
+        ContentFormat format = new ContentFormat(MimetypeMap.MIMETYPE_TEXT_PLAIN, "UTF-8");
+        contentService.write(workingCopyReference, ContentModel.PROP_CONTENT.toString(), UPDATED_CONTENT.getBytes(), format);
         
         // Now check the working copy in with a description of the change made that will be recorded in the version history
         Predicate predicate = new Predicate(new Reference[]{workingCopyReference}, null, null);
@@ -92,9 +98,13 @@ public class WebServiceSample5
         authoringService.checkin(predicate, comments, false);
         
         // Output the updated content
-        ReadResult readResult = contentService.read(contentReference);
+        Store store = new Store(StoreEnum.workspace, "SpacesStore");
+        Content[] readResult = contentService.read(
+                        new Predicate(new Reference[]{contentReference}, store, null), 
+                        ContentModel.PROP_CONTENT.toString());
+        Content content = readResult[0];
         System.out.println("This is the checked-in content:");
-        System.out.println(WebServiceSample3.getContentAsString(WebServiceSample1.currentTicket, readResult.getUrl()));
+        System.out.println(WebServiceSample3.getContentAsString(WebServiceSample1.currentTicket, content.getUrl()));
         
         // Get the version history
         System.out.println("The version history:");

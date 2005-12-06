@@ -28,10 +28,16 @@ import junit.framework.AssertionFailedError;
 import org.alfresco.example.webservice.authentication.AuthenticationResult;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceLocator;
 import org.alfresco.example.webservice.authentication.AuthenticationServiceSoapBindingStub;
+import org.alfresco.example.webservice.content.Content;
 import org.alfresco.example.webservice.content.ContentServiceLocator;
 import org.alfresco.example.webservice.content.ContentServiceSoapBindingStub;
-import org.alfresco.example.webservice.types.Content;
+import org.alfresco.example.webservice.repository.RepositoryServiceLocator;
+import org.alfresco.example.webservice.repository.RepositoryServiceSoapBindingStub;
+import org.alfresco.example.webservice.repository.UpdateResult;
+import org.alfresco.example.webservice.types.CML;
+import org.alfresco.example.webservice.types.CMLCreate;
 import org.alfresco.example.webservice.types.ContentFormat;
+import org.alfresco.example.webservice.types.NamedValue;
 import org.alfresco.example.webservice.types.ParentReference;
 import org.alfresco.example.webservice.types.Predicate;
 import org.alfresco.example.webservice.types.Reference;
@@ -70,6 +76,7 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
     private Reference rootNodeReference;
     private Reference contentReference;
     
+    protected RepositoryServiceSoapBindingStub repositoryService;
     protected ContentServiceSoapBindingStub contentService;
 
     public BaseWebServiceSystemTest()
@@ -80,6 +87,10 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
             this.contentService = (ContentServiceSoapBindingStub)new ContentServiceLocator(config).getContentService();
             assertNotNull(this.contentService);
             this.contentService.setTimeout(60000);
+            
+            this.repositoryService = (RepositoryServiceSoapBindingStub)new RepositoryServiceLocator(config).getRepositoryService();
+            assertNotNull(this.repositoryService);
+            this.repositoryService.setTimeout(60000);
         }
         catch (Exception e)
         {
@@ -185,20 +196,21 @@ public abstract class BaseWebServiceSystemTest extends BaseTest
         parentRef.setAssociationType(ContentModel.ASSOC_CHILDREN.toString());
         parentRef.setChildName(ContentModel.ASSOC_CHILDREN.toString());
         
-        // TODO sort out the assoc type and name stuff here ....
-             
-        String mimetype = "text/plain";
-        Content content = this.contentService.create(
-                parentRef, 
-                name, 
-                new ContentFormat(mimetype, "UTF-8"),
-                contentValue.getBytes());
+        NamedValue[] properties = new NamedValue[]{new NamedValue(ContentModel.PROP_NAME.toString(), name)};
+        CMLCreate create = new CMLCreate("1", parentRef, ContentModel.TYPE_CONTENT.toString(), properties);
+        CML cml = new CML();
+        cml.setCreate(new CMLCreate[]{create});
+        UpdateResult[] result = this.repositoryService.update(cml);     
+        
+        Reference newContentNode = result[0].getDestination();
+        
+        Content content = this.contentService.write(newContentNode, ContentModel.PROP_CONTENT.toString(), contentValue.getBytes(), new ContentFormat("text/plain", "UTF-8"));
                 
         assertNotNull(content);
         assertNotNull(content.getFormat());
-        assertEquals(mimetype, content.getFormat().getMimetype());
+        assertEquals("text/plain", content.getFormat().getMimetype());
         
-        return content.getReference();
+        return content.getNode();
     }    
     
     /**

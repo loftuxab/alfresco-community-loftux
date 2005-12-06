@@ -29,11 +29,6 @@
          return "form";
       }
 
-      public function is_container_tag()
-      {
-         return false;
-      }
-
       public function do_tag()
       {
          $result = "<form name='main_form' id='main_form' method='post' action='".$this->attributes['action']."'>";
@@ -47,11 +42,6 @@
       public static function get_name()
       {
          return "input";
-      }
-
-      public function is_container_tag()
-      {
-         return false;
       }
 
       public function do_tag()
@@ -79,12 +69,7 @@
       {
          return "error";
       }
-
-      public function is_container_tag()
-      {
-         return false;
-      }
-
+      
       public function do_tag()
       {
          $result = "";
