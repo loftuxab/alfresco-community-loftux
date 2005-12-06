@@ -937,7 +937,7 @@ public class PermissionModel implements ModelDAO, InitializingBean
                             + PermissionService.ALL_PERMISSIONS);
         }
         uniqueMap.put(PermissionService.ALL_PERMISSIONS, new SimplePermissionReference(QName.createQName(
-                NamespaceService.DEFAULT_URI, PermissionService.ALL_PERMISSIONS), PermissionService.ALL_PERMISSIONS));
+                NamespaceService.SECURITY_MODEL_1_0_URI, PermissionService.ALL_PERMISSIONS), PermissionService.ALL_PERMISSIONS));
 
     }
 

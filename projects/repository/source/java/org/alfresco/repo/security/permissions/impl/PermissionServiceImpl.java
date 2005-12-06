@@ -38,6 +38,8 @@ import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
 import org.apache.commons.logging.Log;
@@ -53,6 +55,10 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class PermissionServiceImpl implements PermissionServiceSPI, InitializingBean
 {
+    
+    static SimplePermissionReference OLD_ALL_PERMISSIONS_REFERENCE = new SimplePermissionReference(QName.createQName(
+            NamespaceService.SECURITY_MODEL_1_0_URI, PermissionService.ALL_PERMISSIONS), PermissionService.ALL_PERMISSIONS);
+    
 
     private static Log log = LogFactory.getLog(PermissionServiceImpl.class);
 
@@ -340,6 +346,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         // doing the test
         Set<PermissionReference> available = modelDAO.getAllPermissions(nodeRef);
         available.add(getAllPermissionReference());
+        available.add(OLD_ALL_PERMISSIONS_REFERENCE);
 
         if (!(available.contains(perm)))
         {
@@ -364,7 +371,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
         QName typeQname = nodeService.getType(nodeRef);
         Set<QName> aspectQNames = nodeService.getAspects(nodeRef);
 
-        NodeTest nt = new NodeTest(perm, typeQname, aspectQNames);
+        NodeTest nt = new NodeTest(perm.equals(OLD_ALL_PERMISSIONS_REFERENCE) ? getAllPermissionReference() : perm, typeQname, aspectQNames);
         boolean result = nt.evaluate(authorisations, nodeRef);
         if (log.isDebugEnabled())
         {
@@ -540,6 +547,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
             // All permissions are treated specially.
             granters = modelDAO.getGrantingPermissions(required);
             granters.add(getAllPermissionReference());
+            granters.add(OLD_ALL_PERMISSIONS_REFERENCE);
         }
 
         /**
@@ -809,7 +817,7 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
 
                         // All permission excludes all permissions available for
                         // the node.
-                        if (pe.getPermissionReference().equals(getAllPermissionReference()))
+                        if (pe.getPermissionReference().equals(getAllPermissionReference()) || pe.getPermissionReference().equals(OLD_ALL_PERMISSIONS_REFERENCE))
                         {
                             for (PermissionReference deny : modelDAO.getAllPermissions(nodeRef))
                             {
@@ -982,6 +990,8 @@ public class PermissionServiceImpl implements PermissionServiceSPI, Initializing
     {
         return getPermissionReference(ALL_PERMISSIONS);
     }
+    
+    
 
     public String getPermission(PermissionReference permissionReference)
     {

@@ -99,7 +99,7 @@
         <composite-id>
             <key-property name="typeUri" type="string" length="100" column="type_uri"/>
             <key-property name="typeName" type="string" length="100" column="type_name"/>
-            <key-property name="name" type="string" length="100" column="name"/>
+            <key-property name="name" type="string" length="100" column="name"  />
         </composite-id>
     </class>
     

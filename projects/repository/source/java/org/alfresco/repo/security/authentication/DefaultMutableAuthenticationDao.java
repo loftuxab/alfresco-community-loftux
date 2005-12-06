@@ -33,6 +33,7 @@ import org.springframework.dao.DataAccessException;
 public class DefaultMutableAuthenticationDao implements MutableAuthenticationDao
 {
     
+    
     /**
      * Create a user with the given userName and password
      * 

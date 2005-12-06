@@ -70,6 +70,12 @@ public interface NamespaceService extends NamespacePrefixResolver
     /** Alfresco View Namespace Prefix */
     public static final String REPOSITORY_VIEW_PREFIX = "view";
     
+    /** Alfresco security URI */
+    public static final String SECURITY_MODEL_1_0_URI = "http://www.alfresco.org/model/security/1.0";
+    
+    /** Alfresco security Prefix */
+    public static final String SECURITY_MODEL_PREFIX = "security";
+    
     
     /**
      * Register a prefix for namespace uri. 
