@@ -66,7 +66,7 @@
 
    <filter>
       <filter-name>Authentication Filter</filter-name>
-      <filter-class>org.alfresco.web.app.servlet.AuthenticationFilter</filter-class>
+      <filter-class>org.alfresco.web.app.servlet.NTLMAuthenticationFilter</filter-class>
       
       <!-- For NTLM authentication support use the following filter -->
       <!-- (Enterprise version only)                                -->
@@ -82,7 +82,7 @@
 
    <filter>
       <filter-name>WebDAV Authentication Filter</filter-name>
-      <filter-class>org.alfresco.repo.webdav.auth.AuthenticationFilter</filter-class>
+      <filter-class>org.alfresco.repo.webdav.auth.NTLMAuthenticationFilter</filter-class>
       
       <!-- For NTLM authentication support use the following filter -->
       <!-- (Enterprise version only)                                -->
@@ -96,6 +96,15 @@
       <url-pattern>/faces/*</url-pattern>
    </filter-mapping>
    
+   <!-- For NTLM authentication support enable the following mapping -->
+   <!-- (Enterprise version only)                                    -->
+   <!--
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/navigate/*</url-pattern>
+   </filter-mapping>
+   -->
+         
    <filter-mapping>
       <filter-name>Mode Detection Filter</filter-name>
       <url-pattern>/faces/*</url-pattern>
