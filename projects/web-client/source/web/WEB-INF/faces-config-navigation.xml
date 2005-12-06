@@ -49,6 +49,10 @@
          <from-outcome>showSpaceDetails</from-outcome>
          <to-view-id>/jsp/dialog/space-details.jsp</to-view-id>
       </navigation-case>
+      <navigation-case>
+         <from-outcome>dashboard</from-outcome>
+         <to-view-id>/jsp/browse/dashboard.jsp</to-view-id>
+      </navigation-case>
    </navigation-rule>
    
    <!-- rule to get to the Advanced Search page from anywhere -->
@@ -153,10 +157,6 @@
       <navigation-case>
          <from-outcome>previewSpace</from-outcome>
          <to-view-id>/jsp/dialog/preview-space.jsp</to-view-id>
-      </navigation-case>
-      <navigation-case>
-         <from-outcome>dashboard</from-outcome>
-         <to-view-id>/jsp/browse/dashboard.jsp</to-view-id>
       </navigation-case>
    </navigation-rule>
    

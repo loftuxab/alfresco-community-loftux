@@ -98,6 +98,14 @@ public class LoginBean
    {
       this.browseBean = browseBean;
    }
+   
+   /**
+    * @param navigator The NavigationBean to set.
+    */
+   public void setNavigator(NavigationBean navigator)
+   {
+      this.navigator = navigator;
+   }
 
    /**
     * @param configService              The ConfigService to set.
@@ -282,7 +290,7 @@ public class LoginBean
             {
                // TODO: This is a quick solution. It would be better to specify the (identifier?)
                // of a handler class that would be responsible for processing specific outcome arguments.
-
+               
                if (logger.isDebugEnabled())
                   logger.debug("External outcome found: " + externalOutcome);
                
@@ -305,8 +313,7 @@ public class LoginBean
                   if (nodeRef != null)
                   {
                      // setup the Document on the browse bean
-                     // TODO: the browse bean should accept a full
-                     // NodeRef - not just an ID
+                     // TODO: the browse bean should accept a full NodeRef - not just an ID
                      this.browseBean.setupContentAction(nodeRef.getId(), true);
                   }
                }
@@ -328,12 +335,37 @@ public class LoginBean
                   if (nodeRef != null)
                   {
                      // setup the Space on the browse bean
-                     // TODO: the browse bean should accept a full
-                     // NodeRef - not just an ID
+                     // TODO: the browse bean should accept a full NodeRef - not just an ID
                      this.browseBean.setupSpaceAction(nodeRef.getId(), true);
                   }
                }
-
+               else if (OUTCOME_BROWSE.equals(externalOutcome))
+               {
+                  String[] args = (String[]) fc.getExternalContext().getSessionMap().get(LOGIN_OUTCOME_ARGS);
+                  if (args != null)
+                  {
+                     NodeRef nodeRef = null;
+                     int offset = 0;
+                     if (args.length >= 3)
+                     {
+                        offset = args.length - 3;
+                        StoreRef storeRef = new StoreRef(args[0+offset], args[1+offset]);
+                        nodeRef = new NodeRef(storeRef, args[2+offset]);
+                        
+                        // setup the ref as current Id in the global navigation bean
+                        this.navigator.setCurrentNodeId(nodeRef.getId());
+                        
+                        // check for view mode first argument
+                        if (args[0].equals(LOGIN_ARG_TEMPLATE))
+                        {
+                           this.browseBean.setDashboardView(true);
+                           // the above call will auto-navigate to the correct outcome - so we don't!
+                           externalOutcome = null;
+                        }
+                     }
+                  }
+               }
+               
                fc.getExternalContext().getSessionMap().remove(LOGIN_OUTCOME_KEY);
                return externalOutcome;
             }
@@ -423,6 +455,7 @@ public class LoginBean
       return alfrescoAuth ? "logout" : "relogin";
    }
 
+   
    // ------------------------------------------------------------------------------
    // Private helpers
    
@@ -475,6 +508,7 @@ public class LoginBean
       return nodeRef;
    }
    
+   
    // ------------------------------------------------------------------------------
    // Private data
 
@@ -495,6 +529,9 @@ public class LoginBean
 
    public final static String OUTCOME_DOCDETAILS   = "showDocDetails";
    public final static String OUTCOME_SPACEDETAILS = "showSpaceDetails";
+   public final static String OUTCOME_BROWSE       = "browse";
+   
+   private static final String LOGIN_ARG_TEMPLATE  = "template";
 
    /** user name */
    private String username = null;
@@ -516,6 +553,9 @@ public class LoginBean
 
    /** The BrowseBean reference */
    private BrowseBean browseBean;
+   
+   /** The NavigationBean bean reference */
+   private NavigationBean navigator;
 
    /** ConfigService bean reference */
    private ConfigService configService;
