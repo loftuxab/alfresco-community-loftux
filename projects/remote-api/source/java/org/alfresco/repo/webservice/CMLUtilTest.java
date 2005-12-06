@@ -30,6 +30,7 @@ import org.alfresco.repo.webservice.types.CMLCreate;
 import org.alfresco.repo.webservice.types.CMLCreateAssociation;
 import org.alfresco.repo.webservice.types.CMLDelete;
 import org.alfresco.repo.webservice.types.CMLMove;
+import org.alfresco.repo.webservice.types.CMLRemoveAspect;
 import org.alfresco.repo.webservice.types.CMLRemoveAssociation;
 import org.alfresco.repo.webservice.types.CMLRemoveChild;
 import org.alfresco.repo.webservice.types.CMLUpdate;
@@ -143,7 +144,7 @@ public class CMLUtilTest extends BaseSpringTest
         //System.out.println(NodeStoreInspector.dumpNodeStore(this.nodeService, this.testStoreRef));
     }
     
-    public void testAddAspect()
+    public void testAddRemoveAspect()
     {
         CMLAddAspect addAspect = new CMLAddAspect();
         addAspect.setAspect(ContentModel.ASPECT_VERSIONABLE.toString());
@@ -164,6 +165,25 @@ public class CMLUtilTest extends BaseSpringTest
         assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE));
         
         // TODO should test with properties set as well
+        
+        CMLRemoveAspect removeAspect = new CMLRemoveAspect();
+        removeAspect.setAspect(ContentModel.ASPECT_VERSIONABLE.toString());
+        removeAspect.setWhere(createPredicate(this.nodeRef));
+        
+        CML cml2 = new CML();
+        cml2.setRemoveAspect(new CMLRemoveAspect[]{removeAspect});
+        
+        UpdateResult[] results2 = this.cmlUtil.executeCML(cml2);
+        assertNotNull(results2);
+        assertEquals(1, results2.length);
+        
+        UpdateResult result2 = results2[0];
+        assertEquals("removeAspect", result2.getStatement());
+        assertNotNull(result2.getDestination());
+        assertNotNull(result2.getSource());
+        
+        assertFalse(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE));
+        
     }
     
     public void testUpdate()

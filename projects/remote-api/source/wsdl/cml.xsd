@@ -36,6 +36,15 @@
 				</xsd:complexType>
 			</xsd:element>
 			
+			<xsd:element name="removeAspect" maxOccurs="unbounded" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="aspect" type="cms:Name"></xsd:element>
+						<xsd:group ref="cml:Where"></xsd:group>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			
 			<xsd:element name="update" maxOccurs="unbounded" minOccurs="0">
 				<xsd:complexType>
 					<xsd:sequence>

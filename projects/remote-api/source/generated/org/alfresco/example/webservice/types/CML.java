@@ -10,6 +10,7 @@ package org.alfresco.example.webservice.types;
 public class CML  implements java.io.Serializable {
     private org.alfresco.example.webservice.types.CMLCreate[] create;
     private org.alfresco.example.webservice.types.CMLAddAspect[] addAspect;
+    private org.alfresco.example.webservice.types.CMLRemoveAspect[] removeAspect;
     private org.alfresco.example.webservice.types.CMLUpdate[] update;
     private org.alfresco.example.webservice.types.CMLDelete[] delete;
     private org.alfresco.example.webservice.types.CMLMove[] move;
@@ -25,6 +26,7 @@ public class CML  implements java.io.Serializable {
     public CML(
            org.alfresco.example.webservice.types.CMLCreate[] create,
            org.alfresco.example.webservice.types.CMLAddAspect[] addAspect,
+           org.alfresco.example.webservice.types.CMLRemoveAspect[] removeAspect,
            org.alfresco.example.webservice.types.CMLUpdate[] update,
            org.alfresco.example.webservice.types.CMLDelete[] delete,
            org.alfresco.example.webservice.types.CMLMove[] move,
@@ -35,6 +37,7 @@ public class CML  implements java.io.Serializable {
            org.alfresco.example.webservice.types.CMLRemoveAssociation[] removeAssociation) {
            this.create = create;
            this.addAspect = addAspect;
+           this.removeAspect = removeAspect;
            this.update = update;
            this.delete = delete;
            this.move = move;
@@ -99,6 +102,34 @@ public class CML  implements java.io.Serializable {
 
     public void setAddAspect(int i, org.alfresco.example.webservice.types.CMLAddAspect _value) {
         this.addAspect[i] = _value;
+    }
+
+
+    /**
+     * Gets the removeAspect value for this CML.
+     * 
+     * @return removeAspect
+     */
+    public org.alfresco.example.webservice.types.CMLRemoveAspect[] getRemoveAspect() {
+        return removeAspect;
+    }
+
+
+    /**
+     * Sets the removeAspect value for this CML.
+     * 
+     * @param removeAspect
+     */
+    public void setRemoveAspect(org.alfresco.example.webservice.types.CMLRemoveAspect[] removeAspect) {
+        this.removeAspect = removeAspect;
+    }
+
+    public org.alfresco.example.webservice.types.CMLRemoveAspect getRemoveAspect(int i) {
+        return this.removeAspect[i];
+    }
+
+    public void setRemoveAspect(int i, org.alfresco.example.webservice.types.CMLRemoveAspect _value) {
+        this.removeAspect[i] = _value;
     }
 
 
@@ -343,6 +374,9 @@ public class CML  implements java.io.Serializable {
             ((this.addAspect==null && other.getAddAspect()==null) || 
              (this.addAspect!=null &&
               java.util.Arrays.equals(this.addAspect, other.getAddAspect()))) &&
+            ((this.removeAspect==null && other.getRemoveAspect()==null) || 
+             (this.removeAspect!=null &&
+              java.util.Arrays.equals(this.removeAspect, other.getRemoveAspect()))) &&
             ((this.update==null && other.getUpdate()==null) || 
              (this.update!=null &&
               java.util.Arrays.equals(this.update, other.getUpdate()))) &&
@@ -394,6 +428,17 @@ public class CML  implements java.io.Serializable {
                  i<java.lang.reflect.Array.getLength(getAddAspect());
                  i++) {
                 java.lang.Object obj = java.lang.reflect.Array.get(getAddAspect(), i);
+                if (obj != null &&
+                    !obj.getClass().isArray()) {
+                    _hashCode += obj.hashCode();
+                }
+            }
+        }
+        if (getRemoveAspect() != null) {
+            for (int i=0;
+                 i<java.lang.reflect.Array.getLength(getRemoveAspect());
+                 i++) {
+                java.lang.Object obj = java.lang.reflect.Array.get(getRemoveAspect(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -510,6 +555,14 @@ public class CML  implements java.io.Serializable {
         elemField.setFieldName("addAspect");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", "addAspect"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>addAspect"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        elemField.setMaxOccursUnbounded(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("removeAspect");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", "removeAspect"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>removeAspect"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);

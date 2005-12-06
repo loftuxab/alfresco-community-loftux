@@ -31,6 +31,7 @@ import org.alfresco.repo.webservice.types.CMLCreate;
 import org.alfresco.repo.webservice.types.CMLCreateAssociation;
 import org.alfresco.repo.webservice.types.CMLDelete;
 import org.alfresco.repo.webservice.types.CMLMove;
+import org.alfresco.repo.webservice.types.CMLRemoveAspect;
 import org.alfresco.repo.webservice.types.CMLRemoveAssociation;
 import org.alfresco.repo.webservice.types.CMLRemoveChild;
 import org.alfresco.repo.webservice.types.CMLUpdate;
@@ -53,6 +54,7 @@ public class CMLUtil
 {
     private static final String CREATE = "create";
     private static final String ADD_ASPECT = "addAspect";
+    private static final String REMOVE_ASPECT = "removeAspect";
     private static final String UPDATE = "update";
     private static final String DELETE = "delete";
     private static final String MOVE = "move";
@@ -115,6 +117,16 @@ public class CMLUtil
             for (CMLAddAspect addAspect : addAspects)
             {
                 executeCMLAddAspect(addAspect, context, results);
+            }
+        }
+        
+        // Execeute remove aspect
+        CMLRemoveAspect[] removeAspects = cml.getRemoveAspect();
+        if (removeAspects != null)
+        {
+            for (CMLRemoveAspect removeAspect : removeAspects)
+            {
+                executeCMLRemoveAspect(removeAspect, context, results);
             }
         }
         
@@ -289,6 +301,24 @@ public class CMLUtil
             // Create the result
             results.add(createResult(ADD_ASPECT, nodeRef, nodeRef));
         }        
+    }
+    
+    private void executeCMLRemoveAspect(CMLRemoveAspect removeAspect, ExecutionContext context, List<UpdateResult> results)
+    {
+        // Get the node refs
+        List<NodeRef> nodeRefs = getNodeRefList(removeAspect.getWhere_id(), removeAspect.getWhere(), context); 
+        
+        // Get the aspect name 
+        QName aspectQName = QName.createQName(removeAspect.getAspect());
+        
+        for (NodeRef nodeRef : nodeRefs)        
+        {
+            // Add the aspect
+            this.nodeService.removeAspect(nodeRef, aspectQName);
+            
+            // Create the result
+            results.add(createResult(REMOVE_ASPECT, nodeRef, nodeRef));
+        } 
     }
     
     private List<NodeRef> getNodeRefList(String id, Predicate predicate, ExecutionContext context)

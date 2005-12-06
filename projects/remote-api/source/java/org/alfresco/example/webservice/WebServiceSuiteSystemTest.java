@@ -25,12 +25,14 @@ import org.alfresco.example.webservice.authoring.AuthoringServiceSystemTest;
 import org.alfresco.example.webservice.classification.ClassificationServiceSystemTest;
 import org.alfresco.example.webservice.content.ContentServiceSystemTest;
 import org.alfresco.example.webservice.repository.RepositoryServiceSystemTest;
+import org.alfresco.repo.webservice.CMLUtilTest;
 
 public class WebServiceSuiteSystemTest extends TestSuite
 {
     public static Test suite() 
     {
         TestSuite suite = new TestSuite();
+        suite.addTestSuite(CMLUtilTest.class);
         suite.addTestSuite(AuthenticationServiceSystemTest.class);
         suite.addTestSuite(AuthoringServiceSystemTest.class);
         suite.addTestSuite(ClassificationServiceSystemTest.class);
