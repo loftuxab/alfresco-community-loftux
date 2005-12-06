@@ -28,6 +28,7 @@ import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -554,18 +555,7 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
      */
     public void testGetPath()
     {
-        try
-        {
-            this.lightWeightVersionStoreNodeService.getPath(this.dummyNodeRef);
-            fail("This operation is not supported.");
-        }
-        catch (UnsupportedOperationException exception)
-        {
-            if (exception.getMessage() != MSG_ERR)
-            {
-                fail("Unexpected exception raised during method excution: " + exception.getMessage());
-            }
-        }
+        Path path = this.lightWeightVersionStoreNodeService.getPath(this.dummyNodeRef);
     }
     
     /**
@@ -573,19 +563,6 @@ public class NodeServiceImplTest extends BaseVersionStoreTest
      */
     public void testGetPaths()
     {
-        try
-        {
-            this.lightWeightVersionStoreNodeService.getPaths(
-                    this.dummyNodeRef,
-                    false);
-            fail("This operation is not supported.");
-        }
-        catch (UnsupportedOperationException exception)
-        {
-            if (exception.getMessage() != MSG_ERR)
-            {
-                fail("Unexpected exception raised during method excution: " + exception.getMessage());
-            }
-        }
+        List<Path> paths = this.lightWeightVersionStoreNodeService.getPaths(this.dummyNodeRef, false);
     }
 }
