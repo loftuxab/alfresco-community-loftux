@@ -250,12 +250,20 @@ public class RuntimeExecutableContentTransformer extends AbstractContentTransfor
         reader.getContent(sourceFile);
 
         // execute the transformation command
-        ExecutionResult result = transformCommand.execute(properties);
+        ExecutionResult result = null;
+        try
+        {
+            result = transformCommand.execute(properties);
+        }
+        catch (Throwable e)
+        {
+            throw new ContentIOException("Transformation failed during command execution: \n" + transformCommand, e);
+        }
         
         // check
         if (isFailureCode(result.getExitValue()))
         {
-            throw new ContentIOException("Transformation failed: \n" + result);
+            throw new ContentIOException("Transformation failed - status indicates an error: \n" + result);
         }
         
         // check that the file was created

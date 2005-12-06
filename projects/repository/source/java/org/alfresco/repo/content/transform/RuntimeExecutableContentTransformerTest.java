@@ -46,8 +46,8 @@ public class RuntimeExecutableContentTransformerTest extends BaseAlfrescoTestCas
         // the command to execute
         RuntimeExec transformCommand = new RuntimeExec();
         Map<String, String> commandMap = new HashMap<String, String>(5);
-        commandMap.put("Windows XP", "cmd /c copy /Y \"${source}\" \"${target}\"");
-        commandMap.put("*", "mv -f ${source} ${target}");
+        commandMap.put("Linux", "mv -f ${source} ${target}");
+        commandMap.put("*", "cmd /c copy /Y \"${source}\" \"${target}\"");
         transformCommand.setCommandMap(commandMap);
         transformer.setTransformCommand(transformCommand);
         transformer.setMimetypeService(serviceRegistry.getMimetypeService());
