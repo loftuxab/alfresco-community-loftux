@@ -1,6 +1,6 @@
 <project name="enterprise" default="build">
 
-   <path id="path.common" path="${basedir}/../.."/>
+   <path id="path.common" path="${basedir}/../../common"/>
    <property name="dir.common" refid="path.common"/>
    <!-- explicitly load the web client properties file so we can add to the list of required faces config files -->
    <property file="${dir.common}/projects/web-client/project.properties" />

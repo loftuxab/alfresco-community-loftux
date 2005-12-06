@@ -1,6 +1,6 @@
 <project name="remote-api" default="build">
 
-    <path id="path.common" path="${basedir}/../.." />
+   <path id="path.common" path="${basedir}/../../common"/>
     <property name="dir.common" refid="path.common" />
     <import file="${dir.common}/common.xml" />
 

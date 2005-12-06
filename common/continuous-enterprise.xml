@@ -1,4 +1,4 @@
-<project name="continuous-enterprise" default="continuous">
+<project name="continuous-enterprise" default="continuous" >
 
    <!-- ********************************** -->
    <!-- ** Initialisation/Configuration ** -->

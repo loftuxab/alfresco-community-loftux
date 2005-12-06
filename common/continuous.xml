@@ -1,10 +1,10 @@
-<project name="continuous" default="continuous">
+<project name="continuous" default="continuous" >
 
    <!-- ********************************** -->
    <!-- ** Initialisation/Configuration ** -->
    <!-- ********************************** -->
 
-   <property name="dir.common" value="${basedir}" />
+   <property name="dir.common" value="${basedir}/build-scripts" />
    <import file="${dir.common}/common-init.xml" />
 
    <target name="init" depends="common-init.init">

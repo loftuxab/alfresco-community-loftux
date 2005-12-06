@@ -1,4 +1,4 @@
-<project name="alfresco-enterprise" default="build-tomcat">
+<project name="alfresco-enterprise" default="build-tomcat" >
 
    <!-- ********************************** -->
    <!-- ** Initialisation/Configuration ** -->
@@ -13,7 +13,7 @@
       <property name="dir.project.enterprise" value="${dir.name.projects}/${dir.name.enterprise}" />
       <property name="file.deploy" value="${dir.project.enterprise}/build/dist/${file.name.war.alfresco}" />
 
-      <filelist id="files.project.build" dir="."
+      <filelist id="files.project.build" dir=".."
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
