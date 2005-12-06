@@ -98,6 +98,7 @@ public class RepositoryImplTest extends BaseJCRTest
         {
             Session session = repository.login(good, getWorkspace());
             assertNotNull(session);
+            session.logout();
         }
         catch (LoginException e)
         {
@@ -106,10 +107,12 @@ public class RepositoryImplTest extends BaseJCRTest
 
         try
         {
-            repository.login(good, null);
+            Session session = repository.login(good, null);
+            session.logout();
         }
         catch (NoSuchWorkspaceException e)
         {
+            fail("Failed to detect default workspace");
         }
     }
     
