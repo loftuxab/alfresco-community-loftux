@@ -32,26 +32,33 @@ import org.alfresco.config.element.ConfigElementAdapter;
 public class ClientConfigElement extends ConfigElementAdapter
 {
    public static final String CONFIG_ELEMENT_ID = "client";
+   public static final String VIEW_DETAILS = "details";
+   public static final String VIEW_ICONS = "icons";
+   public static final String VIEW_LIST = "list";
+   public static final String VIEW_BUBBLE = "bubble";
+   
+   private static final String SEPARATOR = ":";
    
    // defaults for any config values not supplied
-   private int listPageSize = 10;
-   private int detailsPageSize = 10;
-   private int iconsPageSize = 9;
-   private String defaultView = "icons";
+   private int defaultPageSize = 10;
+   private String defaultView = "details";
+   private String defaultSortColumn = "name";
+   private String defaultSortOrder = "ascending";
    
-   private int forumsListPageSize = 20;
-   private int forumsDetailsPageSize = 20;
-   private int forumsIconsPageSize = 20;
-   private String defaultForumsView = "list";
+   // list to store all the configured views
+   private List<String> views = new ArrayList<String>(4);
 
-   private int forumDetailsPageSize = 20;
-   private int forumBubblePageSize = 20;
-   private String defaultForumView = "details";
-
-   private int topicDetailsPageSize = 20;
-   private int topicBubblePageSize = 20;
-   private String defaultTopicView = "details";
-   private String defaultTopicSortDir = "ascending";
+   // map to store all the default views 
+   private Map<String, String> defaultViews = new HashMap<String, String>(4);
+   
+   // map to store all default pages sizes for configured client views
+   private Map<String, Integer> pagesSizes = new HashMap<String, Integer>(10);
+   
+   // map to store default sort columns for configured views
+   private Map<String, String> sortColumns = new HashMap<String, String>(4);
+   
+   // list of pages that have been configured to have ascending sorts
+   private List<String> descendingSorts = new ArrayList<String>(1);
    
    private int recentSpacesItems = 6;
    private int searchMinimum = 3;
@@ -69,6 +76,12 @@ public class ClientConfigElement extends ConfigElementAdapter
    public ClientConfigElement()
    {
       super(CONFIG_ELEMENT_ID);
+      
+      // add the default page sizes to the map
+      this.pagesSizes.put(VIEW_DETAILS, defaultPageSize);
+      this.pagesSizes.put(VIEW_LIST, defaultPageSize);
+      this.pagesSizes.put(VIEW_ICONS, 9);
+      this.pagesSizes.put(VIEW_BUBBLE, 5);
    }
    
    /**
@@ -88,251 +101,149 @@ public class ClientConfigElement extends ConfigElementAdapter
    {
       return null;
    }
-   
-   /**
-    * @return Returns the defaultView.
-    */
-   public String getDefaultView()
-   {
-      return this.defaultView;
-   }
 
    /**
-    * @param defaultView The defaultView to set.
-    */
-   /*package*/ void setDefaultView(String defaultView)
-   {
-      this.defaultView = defaultView;
-   }
-
-   /**
-    * @return Returns the detailsPageSize.
-    */
-   public int getDetailsPageSize()
-   {
-      return this.detailsPageSize;
-   }
-
-   /**
-    * @param detailsPageSize The detailsPageSize to set.
-    */
-   /*package*/ void setDetailsPageSize(int detailsPageSize)
-   {
-      this.detailsPageSize = detailsPageSize;
-   }
-
-   /**
-    * @return Returns the iconsPageSize.
-    */
-   public int getIconsPageSize()
-   {
-      return this.iconsPageSize;
-   }
-
-   /**
-    * @param iconsPageSize The iconsPageSize to set.
-    */
-   /*package*/ void setIconsPageSize(int iconsPageSize)
-   {
-      this.iconsPageSize = iconsPageSize;
-   }
-
-   /**
-    * @return Returns the listPageSize.
-    */
-   public int getListPageSize()
-   {
-      return this.listPageSize;
-   }
-
-   /**
-    * @param listPageSize The listPageSize to set.
-    */
-   /*package*/ void setListPageSize(int listPageSize)
-   {
-      this.listPageSize = listPageSize;
-   }
-   
-   /**
-    * @return Returns the defaultForumsView.
-    */
-   public String getDefaultForumsView()
-   {
-      return this.defaultForumsView;
-   }
-
-   /**
-    * @param defaultForumsView The defaultForumsView to set.
-    */
-   /*package*/ void setDefaultForumsView(String defaultForumsView)
-   {
-      this.defaultForumsView = defaultForumsView;
-   }
-
-   /**
-    * @return Returns the forumsDetailsPageSize.
-    */
-   public int getForumsDetailsPageSize()
-   {
-      return this.forumsDetailsPageSize;
-   }
-
-   /**
-    * @param forumsDetailsPageSize The forumsDetailsPageSize to set.
-    */
-   /*package*/ void setForumsDetailsPageSize(int forumsDetailsPageSize)
-   {
-      this.forumsDetailsPageSize = forumsDetailsPageSize;
-   }
-
-   /**
-    * @return Returns the forumsIconsPageSize.
-    */
-   public int getForumsIconsPageSize()
-   {
-      return this.forumsIconsPageSize;
-   }
-
-   /**
-    * @param forumsIconsPageSize The forumsIconsPageSize to set.
-    */
-   /*package*/ void setForumsIconsPageSize(int forumsIconsPageSize)
-   {
-      this.forumsIconsPageSize = forumsIconsPageSize;
-   }
-
-   /**
-    * @return Returns the forumsListPageSize.
-    */
-   public int getForumsListPageSize()
-   {
-      return this.forumsListPageSize;
-   }
-
-   /**
-    * @param forumsListPageSize The forumsListPageSize to set.
-    */
-   /*package*/ void setForumsListPageSize(int forumsListPageSize)
-   {
-      this.forumsListPageSize = forumsListPageSize;
-   }
-
-   /**
-    * @return Returns the defaultForumView.
-    */
-   public String getDefaultForumView()
-   {
-      return this.defaultForumView;
-   }
-
-   /**
-    * @param defaultForumView The defaultForumView to set.
-    */
-   /*package*/ void setDefaultForumView(String defaultForumView)
-   {
-      this.defaultForumView = defaultForumView;
-   }
-
-   /**
-    * @return Returns the forumDetailsPageSize.
-    */
-   public int getForumDetailsPageSize()
-   {
-      return this.forumDetailsPageSize;
-   }
-
-   /**
-    * @param forumDetailsPageSize The forumDetailsPageSize to set.
-    */
-   /*package*/ void setForumDetailsPageSize(int forumDetailsPageSize)
-   {
-      this.forumDetailsPageSize = forumDetailsPageSize;
-   }
-
-   /**
-    * @return Returns the forumBubblePageSize.
-    */
-   public int getForumBubblePageSize()
-   {
-      return this.forumBubblePageSize;
-   }
-
-   /**
-    * @param forumBubblePageSize The forumBubblePageSize to set.
-    */
-   /*package*/ void setForumBubblePageSize(int forumBubblePageSize)
-   {
-      this.forumBubblePageSize = forumBubblePageSize;
-   }
-
-   /**
-    * @return Returns the defaultTopicView.
-    */
-   public String getDefaultTopicView()
-   {
-      return this.defaultTopicView;
-   }
-
-   /**
-    * @param defaultTopicView The defaultTopicView to set.
-    */
-   /*package*/ void setDefaultTopicView(String defaultTopicView)
-   {
-      this.defaultTopicView = defaultTopicView;
-   }
-
-   /**
-    * @return Returns the topicDetailsPageSize.
-    */
-   public int getTopicDetailsPageSize()
-   {
-      return this.topicDetailsPageSize;
-   }
-
-   /**
-    * @param topicDetailsPageSize The topicDetailsPageSize to set.
-    */
-   /*package*/ void setTopicDetailsPageSize(int topicDetailsPageSize)
-   {
-      this.topicDetailsPageSize = topicDetailsPageSize;
-   }
-
-   /**
-    * @return Returns the topicBubblePageSize.
-    */
-   public int getTopicBubblePageSize()
-   {
-      return this.topicBubblePageSize;
-   }
-
-   /**
-    * @param topicBubblePageSize The topicBubblePageSize to set.
-    */
-   /*package*/ void setTopicBubblePageSize(int topicBubblePageSize)
-   {
-      this.topicBubblePageSize = topicBubblePageSize;
-   }
-   
-   /**
-    * Returns the default sort direction for the topic view
+    * Adds a configured view
     * 
-    * @return descending or ascending
+    * @param renderer The implementation class of the view (the renderer)
     */
-   public String getDefaultTopicSortDir()
+   public void addView(String renderer)
    {
-      return this.defaultTopicSortDir;
+      this.views.add(renderer);
+   }
+   
+   /**
+    * Returns a map of configured views for the client
+    * 
+    * @return List of the implementation classes for the configured views
+    */
+   public List<String> getViews()
+   {
+      return this.views;
+   }
+   
+   /**
+    * Adds a default view setting
+    * 
+    * @param page The page to set the default view for
+    * @param view The view name that will be the default
+    */
+   public void addDefaultView(String page, String view)
+   {
+      this.defaultViews.put(page, view);
+   }
+   
+   /**
+    * Returns the default view for the given page
+    * 
+    * @param page The page to get the default view for
+    * @return The defualt view, if there isn't a configured default for the
+    *         given page 'details' will be returned
+    */
+   public String getDefaultView(String page)
+   {
+      String view = this.defaultViews.get(page);
+      
+      if (view == null)
+      {
+         view = this.defaultView;
+      }
+      
+      return view;
+   }
+   
+   /**
+    * Adds a configured page size to the internal store
+    * 
+    * @param page The name of the page i.e. browse, forums etc.
+    * @param view The name of the view the size is for i.e. details, icons etc.
+    * @param size The size of the page
+    */
+   public void addDefaultPageSize(String page, String view, int size)
+   {
+      this.pagesSizes.put(page + SEPARATOR + view, new Integer(size));
+   }
+   
+   /**
+    * Returns the page size for the given page and view combination
+    * 
+    * @param page The name of the page i.e. browse, forums etc.
+    * @param view The name of the view the size is for i.e. details, icons etc.
+    * @return The size of the requested page, if the combination doesn't exist
+    *         the default for the view will be used, if the view doesn't exist either
+    *         10 will be returned.
+    */
+   public int getDefaultPageSize(String page, String view)
+   {
+      Integer pageSize = this.pagesSizes.get(page + SEPARATOR + view);
+      
+      // try just the view if the combination isn't present
+      if (pageSize == null)
+      {
+         pageSize = this.pagesSizes.get(view);
+         
+         // if the view is not present either default to 10
+         if (pageSize == null)
+         {
+            pageSize = new Integer(10);
+         }
+      }
+      
+      return pageSize.intValue();
    }
 
    /**
-    * Sets the default sort direction for the topic view 
+    * Adds a default sorting column for the given page 
     * 
-    * @param defaultTopicSortDir either descending or ascending
+    * @param page The name of the page i.e. browse, forums etc.
+    * @param column The name of the column to initially sort by
     */
-   /*package*/ void setDefaultTopicSortDir(String defaultTopicSortDir)
+   public void addDefaultSortColumn(String page, String column)
    {
-      this.defaultTopicSortDir = defaultTopicSortDir;
+      this.sortColumns.put(page, column);
    }
-
+   
+   /**
+    * Returns the default sort column for the given page
+    * 
+    * @param page The name of the page i.e. browse, forums etc.
+    * @return The name of the column to sort by, name is returned if 
+    *         the page is not found
+    */
+   public String getDefaultSortColumn(String page)
+   {
+      String column = this.sortColumns.get(page);
+      
+      if (column == null)
+      {
+         column = this.defaultSortColumn;
+      }
+      
+      return column;
+   }
+   
+   /**
+    * Sets the given page as using descending sorts
+    * 
+    * @param page The name of the page i.e. browse, forums etc.
+    */
+   public void addDescendingSort(String page)
+   {
+      this.descendingSorts.add(page);
+   }
+   
+   /**
+    * Determines whether the given page has been
+    * configured to use descending sorting by default
+    * 
+    * @param page The name of the page i.e. browse, forums etc.
+    * @return true if the page should use descending sorts
+    */
+   public boolean hasDescendingSort(String page)
+   {
+      return this.descendingSorts.contains(page);
+   }
+   
    /**
     * @return Returns the recentSpacesItems.
     */

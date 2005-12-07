@@ -136,27 +136,56 @@
                            <h:outputFormat value="#{msg.no_posts}" escape="false" />
                         </f:facet>
                         
-                        <%-- Primary column for details view mode --%>
-                        <a:column primary="true" width="200" style="padding:2px;text-align:left" rendered="#{ForumsBean.topicViewMode == 'details'}">
+                        <%-- Content column for all view modes --%>
+                        <a:column primary="true" width="200" style="padding:2px;text-align:left">
                            <f:facet name="header">
-                              <%-- <a:sortLink label="#{msg.post}" value="name" mode="case-insensitive" styleClass="header"/> --%>
                               <h:outputText value="#{msg.post}" />
                            </f:facet>
                            <h:outputText value="#{r.message}" />
                         </a:column>
                         
-                        <%-- Author column for all view modes --%>
-                        <a:column style="text-align:left">
+                        <%-- Author column for the details view mode --%>
+                        <a:column style="text-align:left" rendered="#{ForumsBean.topicViewMode == 'details'}">
                            <f:facet name="header">
                               <a:sortLink label="#{msg.author}" value="creator" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.creator}" />
                         </a:column>
                         
-                        <%-- Created Date column for details view mode --%>
-                        <a:column style="text-align:left; white-space:nowrap" rendered="#{ForumsBean.topicViewMode == 'details'}">
+                        <%-- Posted time column for details view mode --%>
+                        <a:column style="text-align:left; white-space:nowrap" 
+                                  rendered="#{ForumsBean.topicViewMode == 'details'}">
                            <f:facet name="header">
                               <a:sortLink label="#{msg.posted}" value="created" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.created}">
+                              <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
+                           </h:outputText>
+                        </a:column>
+                        
+                        <%-- topic name column for bubble view mode --%>
+                        <a:column style="text-align:left;" 
+                                  rendered="#{ForumsBean.topicViewMode == 'bubble'}">
+                           <f:facet name="header">
+                              <h:outputText value="#{msg.post}:" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{NavigationBean.nodeProperties.name}" />
+                        </a:column>
+                        
+                        <%-- reply to column for bubble view mode --%>
+                        <a:column style="text-align:left;" 
+                                  rendered="#{ForumsBean.topicViewMode == 'bubble' && r.replyTo != null}">
+                           <f:facet name="header">
+                              <h:outputText value="#{msg.reply_to}:" styleClass="header"/>
+                           </f:facet>
+                           <h:outputText value="#{r.replyTo}" />
+                        </a:column>
+                        
+                        <%-- Posted time column for bubble view mode --%>
+                        <a:column style="text-align:left; white-space:nowrap" 
+                                  rendered="#{ForumsBean.topicViewMode == 'bubble'}">
+                           <f:facet name="header">
+                              <h:outputText value="#{msg.on}:" styleClass="header"/>
                            </f:facet>
                            <h:outputText value="#{r.created}">
                               <a:convertXMLDate type="both" pattern="#{msg.date_time_pattern}" />
@@ -169,13 +198,15 @@
                               <h:outputText value="#{msg.actions}"/>
                            </f:facet>
                            <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren">
-                              <a:actionLink value="#{msg.post_reply}" image="/images/icons/post_reply.gif" showLink="false" styleClass="inlineAction" action="createReply" actionListener="#{CreatePostDialog.startWizard}">
+                              <a:actionLink value="#{msg.post_reply}" image="/images/icons/post_reply.gif" showLink="false" styleClass="inlineAction" action="createReply" actionListener="#{CreateReplyDialog.startWizard}">
                                  <f:param name="id" value="#{r.id}" />
                               </a:actionLink>
                            </r:permissionEvaluator>
-                           <a:actionLink value="#{msg.edit_post}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" action="editPost" actionListener="#{BrowseBean.setupContentAction}">
-                              <f:param name="id" value="#{r.id}" />
-                           </a:actionLink>
+                           <r:permissionEvaluator value="#{r}" allow="Write">
+                              <a:actionLink value="#{msg.edit_post}" image="/images/icons/edit_icon.gif" showLink="false" styleClass="inlineAction" action="editPost" actionListener="#{BrowseBean.setupContentAction}">
+                                 <f:param name="id" value="#{r.id}" />
+                              </a:actionLink>
+                           </r:permissionEvaluator>
                            <r:permissionEvaluator value="#{r}" allow="Delete">
                               <a:actionLink value="#{msg.delete_post}" image="/images/icons/delete.gif" showLink="false" styleClass="inlineAction" action="deletePost" actionListener="#{BrowseBean.setupDeleteAction}">
                                  <f:param name="id" value="#{r.id}" />

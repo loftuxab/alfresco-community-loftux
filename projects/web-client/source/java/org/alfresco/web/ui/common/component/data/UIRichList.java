@@ -26,12 +26,16 @@ import javax.faces.context.FacesContext;
 import javax.faces.el.ValueBinding;
 import javax.transaction.UserTransaction;
 
-import org.apache.log4j.Logger;
-
+import org.alfresco.config.ConfigService;
+import org.alfresco.web.app.Application;
 import org.alfresco.web.bean.repository.Repository;
+import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.data.IDataContainer;
 import org.alfresco.web.ui.common.renderer.data.IRichListRenderer;
 import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * @author Kevin Roast
@@ -47,18 +51,38 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    public UIRichList()
    {
       setRendererType("org.alfresco.faces.RichListRenderer");
+
       
-      // the standard set of view renderers
-      IRichListRenderer renderer;
+      IRichListRenderer test = new RichListRenderer.IconViewRenderer();
       
-      renderer = new RichListRenderer.IconViewRenderer();
-      UIRichList.viewRenderers.put(renderer.getViewModeID(), renderer);
+      // get the list of views from the client configuration
+      ConfigService configSvc = (ConfigService)FacesContextUtils.getRequiredWebApplicationContext(
+            FacesContext.getCurrentInstance()).getBean(Application.BEAN_CONFIG_SERVICE);
+      ClientConfigElement clientConfig = (ClientConfigElement)configSvc.getGlobalConfig().
+            getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
+      List<String> views = clientConfig.getViews();
       
-      renderer = new RichListRenderer.DetailsViewRenderer();
-      UIRichList.viewRenderers.put(renderer.getViewModeID(), renderer);
-      
-      renderer = new RichListRenderer.ListViewRenderer();
-      UIRichList.viewRenderers.put(renderer.getViewModeID(), renderer);
+      // instantiate each renderer and add to the list
+      for (String view : views)
+      {
+         try
+         {
+            Class clazz = Class.forName(view);
+            IRichListRenderer renderer = (IRichListRenderer)clazz.newInstance();
+            UIRichList.viewRenderers.put(renderer.getViewModeID(), renderer);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Added view '" + renderer.getViewModeID() + 
+                            "' to UIRichList");
+         }
+         catch (Exception e)
+         {
+            if (logger.isWarnEnabled())
+            {
+               logger.warn("Failed to create renderer: " + view, e);
+            }
+         }
+      }
    }
 
 
@@ -150,7 +174,7 @@ public class UIRichList extends UIComponentBase implements IDataContainer
       this.sortColumn = null;
       this.sortDescending = true;
       this.initialSortColumn = null;
-      this.initialSortDescending = true;
+      this.initialSortDescending = false;
    }
    
    /**
@@ -419,8 +443,8 @@ public class UIRichList extends UIComponentBase implements IDataContainer
          this.pageCount = 1;
          this.maxRowIndex = (rowCount - 1);
       }
-      if (s_logger.isDebugEnabled())
-         s_logger.debug("Bound datasource: PageSize: " + pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
+      if (logger.isDebugEnabled())
+         logger.debug("Bound datasource: PageSize: " + pageSize + "; CurrentPage: " + this.currentPage + "; RowIndex: " + this.rowIndex + "; MaxRowIndex: " + this.maxRowIndex + "; RowCount: " + rowCount);
    }
    
    /**
@@ -503,12 +527,12 @@ public class UIRichList extends UIComponentBase implements IDataContainer
    private String viewMode = null;
    private int pageSize = -1;
    private String initialSortColumn = null;
-   private boolean initialSortDescending = true;
+   private boolean initialSortDescending = false;
    
    // transient component state that exists during a single page refresh only
    private int rowIndex = -1;
    private int maxRowIndex = -1;
    private int pageCount = 1;
    
-   private static Logger s_logger = Logger.getLogger(IDataContainer.class);
+   private static Log logger = LogFactory.getLog(IDataContainer.class);
 }

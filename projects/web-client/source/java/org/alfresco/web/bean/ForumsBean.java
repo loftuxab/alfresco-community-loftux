@@ -16,20 +16,24 @@
  */
 package org.alfresco.web.bean;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.context.ResponseWriter;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.config.ConfigService;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.ForumModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -47,10 +51,11 @@ import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.config.ClientConfigElement;
 import org.alfresco.web.ui.common.Utils;
 import org.alfresco.web.ui.common.component.UIModeList;
+import org.alfresco.web.ui.common.component.data.UIColumn;
 import org.alfresco.web.ui.common.component.data.UIRichList;
-import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
+import org.alfresco.web.ui.common.renderer.data.IRichListRenderer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Bean providing properties and behaviour for the forums screens.
@@ -59,16 +64,16 @@ import org.apache.log4j.Priority;
  */
 public class ForumsBean implements IContextListener
 {
-   private static Logger logger = Logger.getLogger(ForumsBean.class);
+   private static Log logger = LogFactory.getLog(ForumsBean.class);
+   private static final String PAGE_NAME_FORUMS = "forums";
+   private static final String PAGE_NAME_FORUM = "forum";
+   private static final String PAGE_NAME_TOPIC = "topic"; 
    
    /** The NodeService to be used by the bean */
    private NodeService nodeService;
    
    /** The ContentService to be used by the bean */
    private ContentService contentService;
-   
-   /** ConfigService bean reference */
-   private ConfigService configService;
    
    /** The DictionaryService bean reference */
    private DictionaryService dictionaryService;
@@ -102,13 +107,13 @@ public class ForumsBean implements IContextListener
    private String forumViewMode;
    
    /** The current forum view page size */
-   private int forumPageSize = 20;
+   private int forumPageSize;
    
    /** The current topic view mode - set to a well known IRichListRenderer identifier */
    private String topicViewMode;
    
    /** The current topic view page size */
-   private int topicPageSize = 20;
+   private int topicPageSize;
    
    // ------------------------------------------------------------------------------
    // Construction 
@@ -119,6 +124,8 @@ public class ForumsBean implements IContextListener
    public ForumsBean()
    {
       UIContextService.getInstance(FacesContext.getCurrentInstance()).registerBean(this);
+      
+      initFromClientConfig();
    }
    
    // ------------------------------------------------------------------------------
@@ -151,14 +158,6 @@ public class ForumsBean implements IContextListener
    }
    
    /**
-    * @param configService The ConfigService to set.
-    */
-   public void setConfigService(ConfigService configService)
-   {
-      this.configService = configService;
-   }
-   
-   /**
     * Sets the BrowseBean instance to use to retrieve the current document
     * 
     * @param browseBean BrowseBean instance
@@ -184,7 +183,11 @@ public class ForumsBean implements IContextListener
       this.forumsRichList = forumsRichList;
       if (this.forumsRichList != null)
       {
-         this.forumsRichList.setInitialSortColumn("name");
+         // set the initial sort column and direction
+         this.forumsRichList.setInitialSortColumn(
+               clientConfig.getDefaultSortColumn(PAGE_NAME_FORUMS));
+         this.forumsRichList.setInitialSortDescending(
+               clientConfig.hasDescendingSort(PAGE_NAME_FORUMS));
       }
    }
    
@@ -201,11 +204,6 @@ public class ForumsBean implements IContextListener
     */
    public String getForumsViewMode()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
-      
       return this.forumsViewMode;
    }
    
@@ -222,11 +220,6 @@ public class ForumsBean implements IContextListener
     */
    public int getForumsPageSize()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
-      
       return this.forumsPageSize;
    }
    
@@ -247,14 +240,11 @@ public class ForumsBean implements IContextListener
       
       if (this.topicRichList != null)
       {
-         this.topicRichList.setInitialSortColumn("created");
-         
-         // set the initial sort direction
-         if (this.clientConfig != null)
-         {
-            String sortDir = this.clientConfig.getDefaultTopicSortDir();
-            this.topicRichList.setInitialSortDescending("descending".equalsIgnoreCase(sortDir));
-         }
+         // set the initial sort column and direction
+         this.topicRichList.setInitialSortColumn(
+               clientConfig.getDefaultSortColumn(PAGE_NAME_TOPIC));
+         this.topicRichList.setInitialSortDescending(
+               clientConfig.hasDescendingSort(PAGE_NAME_TOPIC));
       }
    }
    
@@ -271,11 +261,6 @@ public class ForumsBean implements IContextListener
     */
    public String getTopicViewMode()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
-      
       return this.topicViewMode;
    }
    
@@ -292,11 +277,6 @@ public class ForumsBean implements IContextListener
     */
    public int getTopicPageSize()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
-      
       return this.topicPageSize;
    }
    
@@ -317,7 +297,11 @@ public class ForumsBean implements IContextListener
       
       if (this.forumRichList != null)
       {
-         this.forumRichList.setInitialSortColumn("name");
+         // set the initial sort column and direction
+         this.forumRichList.setInitialSortColumn(
+               clientConfig.getDefaultSortColumn(PAGE_NAME_FORUM));
+         this.forumRichList.setInitialSortDescending(
+               clientConfig.hasDescendingSort(PAGE_NAME_FORUM));
       }
    }
    
@@ -334,11 +318,6 @@ public class ForumsBean implements IContextListener
     */
    public String getForumViewMode()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
-      
       return this.forumViewMode;
    }
    
@@ -355,11 +334,6 @@ public class ForumsBean implements IContextListener
     */
    public int getForumPageSize()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
-      
       return this.forumPageSize;
    }
    
@@ -479,6 +453,7 @@ public class ForumsBean implements IContextListener
                         
                         this.browseBean.setupDataBindingProperties(node);
                         node.addPropertyResolver("message", this.resolverContent);
+                        node.addPropertyResolver("replyTo", this.resolverReplyTo);
                         
                         this.posts.add(node);
                      }
@@ -486,7 +461,7 @@ public class ForumsBean implements IContextListener
                }
                else
                {
-                  if (logger.isEnabledFor(Priority.WARN))
+                  if (logger.isWarnEnabled())
                      logger.warn("Found invalid object in database: id = " + nodeRef + ", type = " + type);
                }
             }
@@ -539,7 +514,11 @@ public class ForumsBean implements IContextListener
          this.forumsRichList.setValue(null);
          if (this.forumsRichList.getInitialSortColumn() == null)
          {
-            this.forumsRichList.setInitialSortColumn("name");
+            // set the initial sort column and direction
+            this.forumsRichList.setInitialSortColumn(
+                  clientConfig.getDefaultSortColumn(PAGE_NAME_FORUMS));
+            this.forumsRichList.setInitialSortDescending(
+                  clientConfig.hasDescendingSort(PAGE_NAME_FORUMS));
          }
       }
       
@@ -548,7 +527,11 @@ public class ForumsBean implements IContextListener
          this.forumRichList.setValue(null);
          if (this.forumRichList.getInitialSortColumn() == null)
          {
-            this.forumRichList.setInitialSortColumn("name");
+            // set the initial sort column and direction
+            this.forumRichList.setInitialSortColumn(
+                  clientConfig.getDefaultSortColumn(PAGE_NAME_FORUM));
+            this.forumRichList.setInitialSortDescending(
+                  clientConfig.hasDescendingSort(PAGE_NAME_FORUM));
          }
       }
       
@@ -557,14 +540,11 @@ public class ForumsBean implements IContextListener
          this.topicRichList.setValue(null);
          if (this.topicRichList.getInitialSortColumn() == null)
          {
-            this.topicRichList.setInitialSortColumn("created");
-            
-            // set the initial sort direction
-            if (this.clientConfig != null)
-            {
-               String sortDir = this.clientConfig.getDefaultTopicSortDir();
-               this.topicRichList.setInitialSortDescending("descending".equalsIgnoreCase(sortDir));
-            }
+            // set the initial sort column and direction
+            this.topicRichList.setInitialSortColumn(
+                  clientConfig.getDefaultSortColumn(PAGE_NAME_TOPIC));
+            this.topicRichList.setInitialSortDescending(
+                  clientConfig.hasDescendingSort(PAGE_NAME_TOPIC));
          }
       }
       
@@ -600,13 +580,13 @@ public class ForumsBean implements IContextListener
     */
    public void forumViewModeChanged(ActionEvent event)
    {
-//      UIModeList viewList = (UIModeList)event.getComponent();
+      UIModeList viewList = (UIModeList)event.getComponent();
       
       // get the view mode ID
-//      String viewMode = viewList.getValue().toString();
+      String viewMode = viewList.getValue().toString();
       
       // push the view mode into the lists
-//      setForumViewMode(viewMode);
+      setForumViewMode(viewMode);
    }
    
    /**
@@ -616,15 +596,13 @@ public class ForumsBean implements IContextListener
     */
    public void topicViewModeChanged(ActionEvent event)
    {
-      // TODO: enable when we have the bubble view plugged in
-      
-//      UIModeList viewList = (UIModeList)event.getComponent();
+      UIModeList viewList = (UIModeList)event.getComponent();
       
       // get the view mode ID
-//      String viewMode = viewList.getValue().toString();
+      String viewMode = viewList.getValue().toString();
       
       // push the view mode into the lists
-//      setTopicViewMode(viewMode);
+      setTopicViewMode(viewMode);
    }
    
    // ------------------------------------------------------------------------------
@@ -660,6 +638,31 @@ public class ForumsBean implements IContextListener
       }
    };
    
+   public NodePropertyResolver resolverReplyTo = new NodePropertyResolver() {
+      public Object get(Node node) 
+      {
+         // determine if this node is a reply to another post, if so find
+         // the creator of the original poster
+         
+         String replyTo = null;
+         
+         List<AssociationRef> assocs = nodeService.getTargetAssocs(node.getNodeRef(),
+               ContentModel.ASSOC_REFERENCES);
+         
+         // there should only be one association, if there is more than one
+         // just get the first one
+         if (assocs.size() > 0)
+         {
+            AssociationRef assoc = assocs.get(0); 
+            NodeRef target = assoc.getTargetRef();
+            Node targetNode = new Node(target);
+            replyTo = (String)targetNode.getProperties().get("creator");
+         }
+         
+         return replyTo;
+      }
+   };
+   
    // ------------------------------------------------------------------------------
    // Private helpers
    
@@ -668,60 +671,24 @@ public class ForumsBean implements IContextListener
     */
    private void initFromClientConfig()
    {
-      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
-            ClientConfigElement.CONFIG_ELEMENT_ID);
+      this.clientConfig = (ClientConfigElement)Application.getConfigService(
+            FacesContext.getCurrentInstance()).getGlobalConfig().
+            getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
       
-      this.forumsViewMode = clientConfig.getDefaultForumsView();
+      // get the defaults for the forums page
+      this.forumsViewMode = clientConfig.getDefaultView(PAGE_NAME_FORUMS);
+      this.forumsPageSize = this.clientConfig.getDefaultPageSize(PAGE_NAME_FORUMS,
+            this.forumsViewMode);
       
-      if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(this.forumsViewMode))
-      {
-         this.forumsPageSize = this.clientConfig.getForumsDetailsPageSize();
-      }
-      else if (RichListRenderer.IconViewRenderer.VIEWMODEID.equals(this.forumsViewMode))
-      {
-         this.forumsPageSize = this.clientConfig.getForumsIconsPageSize();
-      }
-      else if (RichListRenderer.ListViewRenderer.VIEWMODEID.equals(this.forumsViewMode))
-      {
-         this.forumsPageSize = this.clientConfig.getForumsListPageSize();
-      }
-      else
-      {
-         // in case another view mode appears we should have a default
-         this.forumsPageSize = 20;
-      }
+      // get the default for the forum page
+      this.forumViewMode = clientConfig.getDefaultView(PAGE_NAME_FORUM);
+      this.forumPageSize = this.clientConfig.getDefaultPageSize(PAGE_NAME_FORUM, 
+            this.forumViewMode);
       
-      this.forumViewMode = clientConfig.getDefaultForumView();
-      
-      if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(this.forumViewMode))
-      {
-         this.forumPageSize = this.clientConfig.getForumDetailsPageSize();
-      }
-//      else if (RichListRenderer.ForumBubbleViewRenderer.VIEWMODEID.equals(this.forumViewMode))
-//      {
-//         this.forumPageSize = this.clientConfig.getForumBubblePageSize();
-//      }
-      else
-      {
-         // in case another view mode appears we should have a default
-         this.forumPageSize = 20;
-      }
-      
-      this.topicViewMode = clientConfig.getDefaultTopicView();
-      
-      if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(this.topicViewMode))
-      {
-         this.topicPageSize = this.clientConfig.getTopicDetailsPageSize();
-      }
-//      else if (RichListRenderer.TopicBubbleViewRenderer.VIEWMODEID.equals(this.topicViewMode))
-//      {
-//         this.topicPageSize = this.clientConfig.getTopicBubblePageSize();
-//      }
-      else
-      {
-         // in case another view mode appears we should have a default
-         this.topicPageSize = 20;
-      }
+      // get the default for the topic page
+      this.topicViewMode = clientConfig.getDefaultView(PAGE_NAME_TOPIC);
+      this.topicPageSize = this.clientConfig.getDefaultPageSize(PAGE_NAME_TOPIC, 
+            this.topicViewMode);
       
       if (logger.isDebugEnabled())
       {
@@ -731,6 +698,283 @@ public class ForumsBean implements IContextListener
          logger.debug("Set default forum page size to: " + this.forumPageSize);
          logger.debug("Set default topic view mode to: " + this.topicViewMode);
          logger.debug("Set default topic page size to: " + this.topicPageSize);
+      }
+   }
+   
+   /**
+    * Class to implement a bubble view for the RichList component used in the topics screen
+    * 
+    * @author gavinc
+    */
+   public static class TopicBubbleViewRenderer implements IRichListRenderer
+   {
+      public static final String VIEWMODEID = "bubble";
+      
+      /**
+       * @see org.alfresco.web.ui.common.renderer.data.IRichListRenderer#getViewModeID()
+       */
+      public String getViewModeID()
+      {
+         return VIEWMODEID;
+      }
+      
+      /**
+       * @see org.alfresco.web.ui.common.renderer.data.IRichListRenderer#renderListBefore(javax.faces.context.FacesContext, org.alfresco.web.ui.common.component.data.UIColumn[])
+       */
+      public void renderListBefore(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
+      {
+         // nothing to do
+      }
+      
+      /**
+       * @see org.alfresco.web.ui.common.renderer.data.IRichListRenderer#renderListRow(javax.faces.context.FacesContext, org.alfresco.web.ui.common.component.data.UIColumn[], java.lang.Object)
+       */
+      public void renderListRow(FacesContext context, UIRichList richList, UIColumn[] columns, Object row)
+            throws IOException
+      {
+         ResponseWriter out = context.getResponseWriter();
+         
+         // find primary column (which must exist) and the actions column (which doesn't 
+         // have to exist)
+         UIColumn primaryColumn = null;
+         UIColumn actionsColumn = null;
+         for (int i = 0; i < columns.length; i++)
+         {
+            if (columns[i].isRendered())
+            {
+               if (columns[i].getPrimary())
+               {
+                  primaryColumn = columns[i];
+               }
+               else if (columns[i].getActions())
+               {
+                  actionsColumn = columns[i];
+               }
+            }
+         }
+         
+         if (primaryColumn == null)
+         {
+            if (logger.isWarnEnabled())
+               logger.warn("No primary column found for RichList definition: " + richList.getId());
+         }
+         
+         out.write("<tr>");
+         
+         Node node = (Node)row;
+         if (node.getProperties().get("replyTo") == null)
+         {
+            renderNewPostBubble(context, out, node, primaryColumn, actionsColumn, columns);
+         }
+         else
+         {
+            renderReplyToBubble(context, out, node, primaryColumn, actionsColumn, columns);
+         }
+         
+         out.write("</tr>");
+         
+         // add a little padding
+         out.write("<tr><td><div style='padding:3px'></div></td></tr>");
+      }
+      
+      /**
+       * @see org.alfresco.web.ui.common.renderer.data.IRichListRenderer#renderListAfter(javax.faces.context.FacesContext, org.alfresco.web.ui.common.component.data.UIColumn[])
+       */
+      public void renderListAfter(FacesContext context, UIRichList richList, UIColumn[] columns)
+            throws IOException
+      {
+         ResponseWriter out = context.getResponseWriter();
+         
+         out.write("<tr><td colspan='99' align='right'>");
+         for (Iterator i = richList.getChildren().iterator(); i.hasNext(); /**/)
+         {
+            // output all remaining child components that are not UIColumn
+            UIComponent child = (UIComponent)i.next();
+            if (child instanceof UIColumn == false)
+            {
+               Utils.encodeRecursive(context, child);
+            }
+         }
+         out.write("</td></tr>");
+      }
+      
+      /**
+       * Renders the new post speech bubble
+       * 
+       * @param context Faces context
+       * @param out The response writer
+       * @param node The Node for the row being rendered
+       * @param primaryColumn The primary column containing the message content
+       * @param actionsColumn The actions column containing all the actions
+       * @param columns All configured columns
+       */
+      private void renderNewPostBubble(FacesContext context, ResponseWriter out, Node node, 
+            UIColumn primaryColumn, UIColumn actionsColumn, UIColumn[] columns) throws IOException
+      {
+         out.write("<td><table border='0' cellpadding='0' cellspacing='0' width='100%'><tr>");
+         out.write("<td><img src='");
+         out.write(context.getExternalContext().getRequestContextPath());
+         out.write("/images/icons/user_large.gif'/><br/>");
+         out.write((String)node.getProperties().get("creator"));
+         out.write("</td><td width='100%'>");
+         renderBubble(context, out, "orange", "#FCC75E", primaryColumn, actionsColumn, columns);
+         out.write("</td><td><div style='width:32px;' /></td></table></td>");
+      }
+      
+      /**
+       * Renders the reply to post speech bubble
+       * 
+       * @param context Faces context
+       * @param out The response writer
+       * @param node The Node for the row being rendered
+       * @param primaryColumn The primary column containing the message content
+       * @param actionsColumn The actions column containing all the actions
+       * @param columns All configured columns
+       */
+      private void renderReplyToBubble(FacesContext context, ResponseWriter out, Node node, 
+            UIColumn primaryColumn, UIColumn actionsColumn, UIColumn[] columns) throws IOException
+      {
+         out.write("<td width='100%'><table border='0' cellpadding='0' cellspacing='0' width='100%'><tr>");
+         out.write("<td><div style='width:32px;' /></td><td width='100%'>");
+         renderBubble(context, out, "yellow", "#FFF5A3", primaryColumn, actionsColumn, columns);
+         out.write("</td><td><img src='");
+         out.write(context.getExternalContext().getRequestContextPath());
+         out.write("/images/icons/user_large.gif'/><br/>");
+         out.write((String)node.getProperties().get("creator"));
+         out.write("</td></table></td>");
+      }
+
+      /**
+       * Renders the speech bubble
+       * 
+       * @param context Faces context
+       * @param out The response writer
+       * @param colour The colour of the bubble
+       * @param titleBgColour The colour of the background of the title area (#rrggbb)
+       * @param primaryColumn The primary column containing the message content
+       * @param actionsColumn The actions column containing all the actions
+       * @param columns All configured columns
+       */
+      private void renderBubble(FacesContext context, ResponseWriter out,
+            String colour, String titleBgColour, 
+            UIColumn primaryColumn, UIColumn actionsColumn, UIColumn[] columns)
+            throws IOException
+      {
+         String contextPath = context.getExternalContext().getRequestContextPath();
+         
+         out.write("<table border='0' cellpadding='0' cellspacing='0' width='100%'><tr>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("header_1.gif) no-repeat #FFFFFF;' width='24' height='24'></td>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("header_2.gif) repeat-x ");
+         out.write(titleBgColour);
+         out.write("'>");
+         
+         // render the header area with the configured columns
+         out.write("<table width='100%' cellpadding='2' cellspacing='2' border='0'><tr>");
+         
+         for (int i = 0; i < columns.length; i++)
+         {
+            UIColumn column = columns[i];
+            
+            if (column.isRendered() == true &&
+                column.getPrimary() == false && 
+                column.getActions() == false)
+            {
+               // render the column header as the label
+               UIComponent header = column.getFacet("header");
+               if (header != null)
+               {
+                  out.write("<td><nobr><b>");
+                  Utils.encodeRecursive(context, header);
+                  out.write("</nobr></b></td>");
+               }
+               
+               // render the contents of the column
+               if (column.getChildCount() != 0)
+               {
+                  out.write("<td><nobr>");
+                  Utils.encodeRecursive(context, column);
+                  out.write("</nobr></td>");
+               }
+            }
+         }
+         
+         // render the actions column
+         out.write("<td align='right' width='100%'>");
+         if (actionsColumn != null && actionsColumn.getChildCount() != 0)
+         {
+            Utils.encodeRecursive(context, actionsColumn);
+         }
+         out.write("</td></tr></table>");
+         
+         out.write("</td>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("header_3.gif) no-repeat #FFFFFF;' width='24' height='24'></td>");
+         out.write("</tr></tr>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_1.gif) no-repeat #FFFFFF;' width='24' height='13'></td>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_2.gif) repeat-x #FFFFFF;'></td>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_3.gif) no-repeat #FFFFFF;' width='24' height='13'></td>");
+         out.write("</tr><tr>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_4.gif) repeat-y #FFFFFF;' width='24' height='13'></td>");
+         out.write("<td>");
+         
+         // render the primary column
+         if (primaryColumn != null && primaryColumn.getChildCount() != 0)
+         {
+            Utils.encodeRecursive(context, primaryColumn);
+         }
+         
+         out.write("</td>");
+         
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_6.gif) repeat-y #FFFFFF;' width='24' height='13'></td>");
+         out.write("</tr><tr>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_7.gif) no-repeat #FFFFFF;' width='24' height='13'></td>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_8.gif) repeat-x #FFFFFF;'></td>");
+         out.write("<td style='background: url(");
+         out.write(contextPath);
+         out.write("/images/parts/");
+         out.write(colour);
+         out.write("body_9.gif) no-repeat #FFFFFF;' width='24' height='13'></td>");
+         out.write("</tr></table>");
       }
    }
 }

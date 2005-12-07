@@ -24,6 +24,8 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
 import org.alfresco.web.config.ClientConfigElement.CustomProperty;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
 
 /**
@@ -33,22 +35,12 @@ import org.dom4j.Element;
  */
 public class ClientElementReader implements ConfigElementReader
 {
-   public static final String ELEMENT_CLIENT = "client";
+   public static final String ELEMENT_VIEWS = "views";
+   public static final String ELEMENT_VIEW = "view";
+   public static final String ELEMENT_VIEWDEFAULTS = "view-defaults";
    public static final String ELEMENT_PAGESIZE = "page-size";
-   public static final String ELEMENT_BROWSE = "browse";
-   public static final String ELEMENT_FORUMS = "forums";
-   public static final String ELEMENT_FORUM = "forum";
-   public static final String ELEMENT_TOPIC = "topic";
-   public static final String ELEMENT_LIST = "list";
-   public static final String ELEMENT_DETAILS = "details";
-   public static final String ELEMENT_ICONS = "icons";
-   public static final String ELEMENT_BUBBLE = "bubble";
-   public static final String ELEMENT_LINEAR = "linear";
-   public static final String ELEMENT_DEFAULTVIEW = "default-view";
-   public static final String ELEMENT_DEFAULTFORUMSVIEW = "default-forums-view";
-   public static final String ELEMENT_DEFAULTFORUMVIEW = "default-forum-view";
-   public static final String ELEMENT_DEFAULTTOPICVIEW = "default-topic-view";
-   public static final String ELEMENT_DEFAULTTOPICSORTDIR = "default-topic-sort-direction";
+   public static final String ELEMENT_SORTCOLUMN = "sort-column";
+   public static final String ELEMENT_SORTDESCENDING = "sort-descending";
    public static final String ELEMENT_RECENTSPACESITEMS = "recent-spaces-items";
    public static final String ELEMENT_LANGUAGES = "languages";
    public static final String ELEMENT_LANGUAGE = "language";
@@ -67,9 +59,12 @@ public class ClientElementReader implements ConfigElementReader
    public static final String ATTRIBUTE_PROPERTY = "property";
    public static final String ATTRIBUTE_ASPECT = "aspect";
    
+   private static Log logger = LogFactory.getLog(ClientElementReader.class);
+   
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
     */
+   @SuppressWarnings("unchecked")
    public ConfigElement parse(Element element)
    {
       ClientConfigElement configElement = null;
@@ -77,90 +72,67 @@ public class ClientElementReader implements ConfigElementReader
       if (element != null)
       {
          String name = element.getName();
-         if (name.equals(ELEMENT_CLIENT) == false)
+         if (name.equals(ClientConfigElement.CONFIG_ELEMENT_ID) == false)
          {
             throw new ConfigException("ClientElementReader can only parse " +
-                  ELEMENT_CLIENT + "elements, the element passed was '" + name + "'");
+                  ClientConfigElement.CONFIG_ELEMENT_ID + "elements, the element passed was '" + 
+                  name + "'");
          }
          
          configElement = new ClientConfigElement();
          
-         // get the page size sub-element
-         Element pageSize = element.element(ELEMENT_PAGESIZE);
-         if (pageSize != null)
+         // get the configured views
+         Element views = element.element(ELEMENT_VIEWS);
+         if (views != null)
          {
-            // get the config for the browse view
-            Element browseView = pageSize.element(ELEMENT_BROWSE);
-            if (browseView != null)
+            Iterator<Element> renderers = views.elementIterator(ELEMENT_VIEW);
+            while (renderers.hasNext())
             {
-               Element viewPageSize = pageSize.element(ELEMENT_LIST);
-               if (viewPageSize != null)
-               {
-                  configElement.setListPageSize(Integer.parseInt(viewPageSize.getTextTrim()));
-               }
-               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
-               if (detailsPageSize != null)
-               {
-                  configElement.setDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
-               }
-               Element iconsPageSize = pageSize.element(ELEMENT_ICONS);
-               if (iconsPageSize != null)
-               {
-                  configElement.setIconsPageSize(Integer.parseInt(iconsPageSize.getTextTrim()));
-               }
+               Element renderer = renderers.next();
+               configElement.addView(renderer.getTextTrim());
             }
-            
-            // get the config for the forums view
-            Element forumsView = pageSize.element(ELEMENT_FORUMS);
-            if (forumsView != null)
+         }
+         
+         // get all the view related default settings
+         Element viewDefaults = element.element(ELEMENT_VIEWDEFAULTS);
+         if (viewDefaults != null)
+         {
+            Iterator<Element> pages = viewDefaults.elementIterator();
+            while (pages.hasNext())
             {
-               Element viewPageSize = pageSize.element(ELEMENT_LIST);
-               if (viewPageSize != null)
+               Element page = pages.next();
+               String pageName = page.getName();
+               
+               // get the default view mode for the page
+               Element defaultView = page.element(ELEMENT_VIEW);
+               if (defaultView != null)
                {
-                  configElement.setForumsListPageSize(Integer.parseInt(viewPageSize.getTextTrim()));
+                  String viewName = defaultView.getTextTrim();
+                  configElement.addDefaultView(pageName, viewName);
                }
-               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
-               if (detailsPageSize != null)
+               
+               // get the initial sort column
+               Element sortColumn = page.element(ELEMENT_SORTCOLUMN);
+               if (sortColumn != null)
                {
-                  configElement.setForumsDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
+                  String column = sortColumn.getTextTrim();
+                  configElement.addDefaultSortColumn(pageName, column);
                }
-               Element iconsPageSize = pageSize.element(ELEMENT_ICONS);
-               if (iconsPageSize != null)
+               
+               // get the sort descending option
+               Element sortDesc = page.element(ELEMENT_SORTDESCENDING);
+               if (sortDesc != null)
                {
-                  configElement.setForumsIconsPageSize(Integer.parseInt(iconsPageSize.getTextTrim()));
+                  Boolean descending = new Boolean(sortDesc.getTextTrim());
+                  if (descending.booleanValue() == true)
+                  { 
+                     configElement.addDescendingSort(pageName);
+                  }
                }
-            }
-            
-            // get the config for the forum view
-            Element forumView = pageSize.element(ELEMENT_FORUM);
-            if (forumView != null)
-            {
-               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
-               if (detailsPageSize != null)
-               {
-                  configElement.setForumDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
-               }
-               Element bubblePageSize = pageSize.element(ELEMENT_BUBBLE);
-               if (bubblePageSize != null)
-               {
-                  configElement.setForumBubblePageSize(Integer.parseInt(bubblePageSize.getTextTrim()));
-               }
-            }
-            
-            // get the config for the topic view
-            Element topicView = pageSize.element(ELEMENT_TOPIC);
-            if (topicView != null)
-            {
-               Element detailsPageSize = pageSize.element(ELEMENT_DETAILS);
-               if (detailsPageSize != null)
-               {
-                  configElement.setTopicDetailsPageSize(Integer.parseInt(detailsPageSize.getTextTrim()));
-               }
-               Element bubblePageSize = pageSize.element(ELEMENT_BUBBLE);
-               if (bubblePageSize != null)
-               {
-                  configElement.setTopicBubblePageSize(Integer.parseInt(bubblePageSize.getTextTrim()));
-               }
+               
+               // process the page-size element
+               processPageSizeElement(page.element(ELEMENT_PAGESIZE), 
+                     pageName, configElement);
             }
          }
          
@@ -182,41 +154,6 @@ public class ClientElementReader implements ConfigElementReader
                   configElement.addLanguage(localeCode, label);
                }
             }
-         }
-         
-         // get the default view mode
-         Element defaultView = element.element(ELEMENT_DEFAULTVIEW);
-         if (defaultView != null)
-         {
-            configElement.setDefaultView(defaultView.getTextTrim());
-         }
-         
-         // get the default forums view mode
-         Element defaultForumsView = element.element(ELEMENT_DEFAULTFORUMSVIEW);
-         if (defaultForumsView != null)
-         {
-            configElement.setDefaultForumsView(defaultForumsView.getTextTrim());
-         }
-         
-         // get the default forum view mode
-         Element defaultForumView = element.element(ELEMENT_DEFAULTFORUMVIEW);
-         if (defaultForumView != null)
-         {
-            configElement.setDefaultForumView(defaultForumView.getTextTrim());
-         }
-         
-         // get the default topic view mode
-         Element defaultTopicView = element.element(ELEMENT_DEFAULTTOPICVIEW);
-         if (defaultTopicView != null)
-         {
-            configElement.setDefaultTopicView(defaultTopicView.getTextTrim());
-         }
-         
-         // get the default topic sort direction
-         Element defaultTopicSortDir = element.element(ELEMENT_DEFAULTTOPICSORTDIR);
-         if (defaultTopicSortDir != null)
-         {
-            configElement.setDefaultTopicSortDir(defaultTopicSortDir.getTextTrim());
          }
          
          // get the recent space max items
@@ -290,5 +227,41 @@ public class ClientElementReader implements ConfigElementReader
       }
       
       return configElement;
+   }
+   
+   /**
+    * Processes a page-size element
+    * 
+    * @param pageSizeElement The element to process
+    * @param page The page the page-size element belongs to
+    * @param configElement The config element being populated
+    */
+   @SuppressWarnings("unchecked")
+   private void processPageSizeElement(Element pageSizeElement, String page, 
+         ClientConfigElement configElement)
+   {
+      if (pageSizeElement != null)
+      {
+         Iterator<Element> views = pageSizeElement.elementIterator();
+         while (views.hasNext())
+         {
+            Element view = views.next();
+            String viewName = view.getName();
+            String pageSize = view.getTextTrim();
+            try
+            {
+               configElement.addDefaultPageSize(page, viewName, Integer.parseInt(pageSize));
+            }
+            catch (NumberFormatException nfe)
+            {
+               if (logger.isWarnEnabled())
+               {
+                  logger.warn("Failed to set page size for view '" + viewName + 
+                        "' in page '" + page + "' as '" + pageSize + 
+                        "' is an invalid number!");
+               }
+            }
+         }
+      }
    }
 }

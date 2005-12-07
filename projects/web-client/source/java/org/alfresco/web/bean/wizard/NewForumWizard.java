@@ -17,14 +17,12 @@
  */
 package org.alfresco.web.bean.wizard;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.faces.context.FacesContext;
 
 import org.alfresco.model.ForumModel;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.web.ui.common.component.UIListItem;
 
 /**
@@ -93,24 +91,13 @@ public class NewForumWizard extends NewSpaceWizard
       
       return this.forumIcons;
    }
-   
-   /**
-    * @see org.alfresco.web.bean.wizard.NewSpaceWizard#addSubTypeEditedProperties(java.util.Map)
-    */
-   @Override
-   protected void addSubTypeEditedProperties(Map<QName, Serializable> props)
-   {
-//      props.put(ForumModel.PROP_STATUS, this.forumStatus);
-   }
 
    /**
-    * @see org.alfresco.web.bean.wizard.NewSpaceWizard#getSubTypeCreationProperties()
+    * @see org.alfresco.web.bean.wizard.NewSpaceWizard#performCustomProcessing(javax.faces.context.FacesContext)
     */
    @Override
-   protected Map<QName, Serializable> getSubTypeCreationProperties()
+   protected void performCustomProcessing(FacesContext context)
    {
-      Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-//      props.put(ForumModel.PROP_STATUS, this.forumStatus);
-      return props;
+      // add or update the ForumModel.PROP_STATUS property depending on the editMode
    }
 }

@@ -77,6 +77,9 @@ public abstract class BaseContentWizard extends AbstractWizardBean
    protected ContentService contentService;
    protected DictionaryService dictionaryService;
    
+   // the NodeRef of the node created during finish
+   protected NodeRef createdNode;
+   
    /**
     * Save the specified content using the currently set wizard attributes
     * 
@@ -200,7 +203,13 @@ public abstract class BaseContentWizard extends AbstractWizardBean
             {
                writer.putContent(strContent);
             }
+            
+            // remember the created node now
+            this.createdNode = fileNodeRef;
          }
+         
+         // give subclasses a chance to perform custom processing before committing
+         performCustomProcessing();
          
          // commit the transaction
          tx.commit();
@@ -590,5 +599,13 @@ public abstract class BaseContentWizard extends AbstractWizardBean
       }
       
       return objType;
+   }
+   
+   /**
+    * Performs any processing sub classes may wish to do before commit is called
+    */
+   protected void performCustomProcessing()
+   {
+      // used by subclasses if necessary
    }
 }

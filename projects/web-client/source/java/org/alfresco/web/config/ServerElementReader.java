@@ -28,7 +28,6 @@ import org.dom4j.Element;
  */
 public class ServerElementReader implements ConfigElementReader
 {
-   public static final String ELEMENT_SERVER = "server";
    public static final String ELEMENT_ERROR_PAGE = "error-page";
    public static final String ELEMENT_LOGIN_PAGE = "login-page";
    
@@ -42,11 +41,11 @@ public class ServerElementReader implements ConfigElementReader
       if (element != null)
       {
          String name = element.getName();
-         if (name.equals(ELEMENT_SERVER) == false)
+         if (name.equals(ServerConfigElement.CONFIG_ELEMENT_ID) == false)
          {
             throw new ConfigException("ServerElementReader can only parse " +
-                  ELEMENT_SERVER + "elements, " + "the element passed was '" + 
-                  name + "'");
+                  ServerConfigElement.CONFIG_ELEMENT_ID + "elements, " + 
+                  "the element passed was '" + name + "'");
          }
          
          configElement = new ServerConfigElement();

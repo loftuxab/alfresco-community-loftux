@@ -50,47 +50,52 @@
             </custom-properties>
          </advanced-search>
          
-         <!-- the maximum page size for each view mode in the client screens -->
-         <page-size>
+         <!-- the views available in the client -->
+         <views>
+            <view>org.alfresco.web.ui.common.renderer.data.RichListRenderer$DetailsViewRenderer</view>
+            <view>org.alfresco.web.ui.common.renderer.data.RichListRenderer$IconViewRenderer</view>
+            <view>org.alfresco.web.ui.common.renderer.data.RichListRenderer$ListViewRenderer</view>
+            <view>org.alfresco.web.bean.ForumsBean$TopicBubbleViewRenderer</view>
+         </views>
+         
+         <!-- default values for the views available in the client -->
+         <view-defaults>
             <browse>
-               <list>10</list>
-               <details>10</details>
-               <icons>9</icons>
+               <!-- allowable values: list|details|icons -->
+               <view>icons</view>
+               <page-size>
+                  <list>10</list>
+                  <details>10</details>
+                  <icons>9</icons>
+               </page-size>
             </browse>
             <forums>
-               <list>20</list>
-               <details>20</details>
-               <icons>20</icons>
+               <!-- allowable values: list|details|icons -->
+               <view>list</view>
+               <page-size>
+                  <list>20</list>
+                  <details>20</details>
+                  <icons>20</icons>
+               </page-size>
             </forums>
             <forum>
-               <details>20</details>
-               <bubble>20</bubble>
+               <!-- allowable values: details -->
+               <view>details</view>
+               <page-size>
+                  <details>20</details>
+               </page-size>
             </forum>
             <topic>
-               <details>20</details>
-               <bubble>20</bubble>
+               <!-- allowable values: details|bubble -->
+               <view>bubble</view>
+               <sort-column>created</sort-column>
+               <sort-descending>true</sort-descending>
+               <page-size>
+                  <bubble>5</bubble>
+                  <details>20</details>
+               </page-size>
             </topic>
-         </page-size>
-         
-         <!-- the default view mode in the browse screen -->
-         <!-- can be: list|details|icons -->
-         <default-view>icons</default-view>
-         
-         <!-- the default view mode in the forums screen -->
-         <!-- can be: list|details|icons -->
-         <default-forums-view>list</default-forums-view>
-         
-         <!-- the default view mode in the forum screen -->
-         <!-- can be: details|bubble -->
-         <default-forum-view>details</default-forum-view>
-         
-         <!-- the default view mode in the topic screen -->
-         <!-- can be: details|bubble -->
-         <default-topic-view>details</default-topic-view>
-         
-         <!-- the default sort direction for the topic view -->
-         <!-- can be: descending|ascending -->
-         <default-topic-sort-direction>ascending</default-topic-sort-direction>
+         </view-defaults>
          
          <!-- the maximum number of items to show in the recent spaces shelf component -->
          <recent-spaces-items>6</recent-spaces-items>
@@ -302,13 +307,12 @@
       <content-types>
          <!-- <type name="my:sop" /> -->
       	<type name="cm:dictionaryModel"/>
-         <!-- <type name="fm:post" /> -->
       </content-types>
    </config>
    
    <config evaluator="string-compare" condition="Custom Folder Types">
       <folder-types>
-         <!-- <type name="fm:forums" icon="/images/icons/forums_large.gif" descriptionMsgId="forums_desc" /> -->
+         <type name="fm:forums" icon="/images/icons/forums_large.gif" descriptionMsgId="forums_desc" />
       </folder-types>
    </config>
       

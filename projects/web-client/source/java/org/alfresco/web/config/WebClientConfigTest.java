@@ -26,7 +26,6 @@ import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
 import org.alfresco.web.config.PropertySheetConfigElement.ItemConfig;
-import org.alfresco.web.config.PropertySheetConfigElement.PropertyConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -177,12 +176,67 @@ public class WebClientConfigTest extends BaseTest
       svc.init();
       
       // get the global config and from that the server config
-      ServerConfigElement serverConfig = (ServerConfigElement)svc.getGlobalConfig().getConfigElement("server");
+      ServerConfigElement serverConfig = (ServerConfigElement)svc.getGlobalConfig().
+         getConfigElement(ServerConfigElement.CONFIG_ELEMENT_ID);
       assertNotNull("server config should not be null", serverConfig);
       
       String errorPage = serverConfig.getErrorPage();
-      logger.info("error page = " + errorPage);
       assertTrue("error page should be '/jsp/error.jsp'", errorPage.equals("/jsp/error.jsp"));
+   }
+   
+   /**
+    * Tests the custom client configuration objects 
+    */
+   public void testClientConfig()
+   {
+      // setup the config service
+      String configFiles = getResourcesDir() + "test-config.xml";
+      XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
+      svc.init();
+      
+      // get the global config and from that the client config
+      ClientConfigElement clientConfig = (ClientConfigElement)svc.getGlobalConfig().
+         getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
+      assertNotNull("client config should not be null", clientConfig);
+      
+      List<String> views = clientConfig.getViews();
+      assertEquals("There should be 2 configured views", 2, views.size());
+      String renderer = views.get(1);
+      assertEquals("Renderer for the icons view should be 'org.alfresco.web.ui.common.renderer.data.RichListRenderer.IconViewRenderer'", 
+            "org.alfresco.web.ui.common.renderer.data.RichListRenderer.IconViewRenderer", renderer);
+      
+      String defaultView = clientConfig.getDefaultView("topic");
+      assertEquals("Default view for topic should be 'bubble'", "bubble", defaultView);
+      
+      // get the defualt view for something that doesn't exist
+      defaultView = clientConfig.getDefaultView("not-there");
+      assertEquals("Default view for missing view should be 'details'", "details", defaultView);
+      
+      // get the default page size for the forum details view
+      int pageSize = clientConfig.getDefaultPageSize("forum", "details");
+      assertEquals("Page size for forum details should be 20", 20, pageSize);
+      
+      // get the defualt page size for a non existent view
+      pageSize = clientConfig.getDefaultPageSize("not", "there");
+      assertEquals("Page size for forum details should be 10", 10, pageSize);
+      
+      // get the default page size for a non existent screen and valid view
+      pageSize = clientConfig.getDefaultPageSize("not-there", "icons");
+      assertEquals("Page size for icons view should be 9", 9, pageSize);
+      
+      // test the sort column
+      String column = clientConfig.getDefaultSortColumn("browse");
+      assertEquals("Sort column for browse should be 'name'", "name", column);
+      
+      column = clientConfig.getDefaultSortColumn("topic");
+      assertEquals("Sort column for topic should be 'created'", "created", column);
+      
+      // test the sorting direction
+      boolean sortDescending = clientConfig.hasDescendingSort("browse");
+      assertFalse("browse screen should use an ascending sort", sortDescending);
+      
+      sortDescending = clientConfig.hasDescendingSort("topic");
+      assertTrue("topic screen should use a descending sort", sortDescending);
    }
    
    /**

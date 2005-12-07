@@ -338,5 +338,5 @@ public class UISortLink extends UICommand
    private String tooltip;
    
    /** true for descending sort, false for ascending */
-   private boolean descending = true;
+   private boolean descending = false;
 }

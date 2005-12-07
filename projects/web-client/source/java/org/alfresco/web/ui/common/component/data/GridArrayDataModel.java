@@ -57,10 +57,10 @@ public class GridArrayDataModel implements IGridDataModel
     * Sort the data set using the specified sort parameters
     * 
     * @param column        Column to sort
-    * @param bAscending    True for ascending sort, false for descending
+    * @param descending    True for descending sort, false for ascending
     * @param mode          Sort mode to use (see IDataContainer constants)
     */
-   public void sort(String column, boolean bAscending, String mode)
+   public void sort(String column, boolean descending, String mode)
    {
    }
    

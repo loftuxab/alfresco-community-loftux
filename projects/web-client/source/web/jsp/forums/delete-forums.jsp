@@ -116,7 +116,7 @@
                                  </a:panel>
                                  <tr>
                                     <td class="mainSubTitle">
-                                       <h:outputFormat value="#{msg.delete_forums_confirm}">
+                                       <h:outputFormat value="#{msg.delete_space_confirm}">
                                           <f:param value="#{BrowseBean.actionSpace.name}"/>
                                        </h:outputFormat>
                                     </td>

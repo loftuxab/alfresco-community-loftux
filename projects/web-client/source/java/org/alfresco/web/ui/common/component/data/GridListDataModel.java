@@ -61,14 +61,14 @@ public class GridListDataModel implements IGridDataModel
     * Sort the data set using the specified sort parameters
     * 
     * @param column        Column to sort
-    * @param bAscending    True for ascending sort, false for descending
+    * @param descending    True for descending sort, false for ascending
     * @param mode          Sort mode to use (see IDataContainer constants)
     */
-   public void sort(String column, boolean bAscending, String mode)
+   public void sort(String column, boolean descending, String mode)
    {
       try
       {
-         QuickSort sorter = new QuickSort(this.data, column, bAscending, mode);
+         QuickSort sorter = new QuickSort(this.data, column, !descending, mode);
          sorter.sort();
       }
       catch (Exception err)

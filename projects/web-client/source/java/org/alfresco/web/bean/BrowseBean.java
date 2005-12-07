@@ -27,10 +27,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.transaction.UserTransaction;
 
-import org.alfresco.config.ConfigService;
-import org.alfresco.filesys.CIFSServer;
-import org.alfresco.filesys.server.filesys.DiskSharedDevice;
-import org.alfresco.filesys.smb.server.repo.ContentContext;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
@@ -66,7 +62,6 @@ import org.alfresco.web.ui.common.component.UIBreadcrumb;
 import org.alfresco.web.ui.common.component.UIModeList;
 import org.alfresco.web.ui.common.component.UIStatusMessage;
 import org.alfresco.web.ui.common.component.data.UIRichList;
-import org.alfresco.web.ui.common.renderer.data.RichListRenderer;
 import org.alfresco.web.ui.repo.component.IRepoBreadcrumbHandler;
 import org.alfresco.web.ui.repo.component.UINodeDescendants;
 import org.alfresco.web.ui.repo.component.UINodePath;
@@ -86,7 +81,7 @@ public class BrowseBean implements IContextListener
    // Construction 
 
    private static final String VIEWMODE_DASHBOARD = "dashboard";
-
+   private static final String PAGE_NAME_BROWSE = "browse";
 
    /**
     * Default Constructor
@@ -94,6 +89,8 @@ public class BrowseBean implements IContextListener
    public BrowseBean()
    {
       UIContextService.getInstance(FacesContext.getCurrentInstance()).registerBean(this);
+      
+      initFromClientConfig();
    }
    
    
@@ -141,14 +138,6 @@ public class BrowseBean implements IContextListener
    }
    
    /**
-    * @param configService The ConfigService to set.
-    */
-   public void setConfigService(ConfigService configService)
-   {
-      this.configService = configService;
-   }
-   
-   /**
     * @param fileFolderService The FileFolderService to set.
     */
    public void setFileFolderService(FileFolderService fileFolderService)
@@ -161,10 +150,6 @@ public class BrowseBean implements IContextListener
     */
    public String getBrowseViewMode()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
       return this.browseViewMode;
    }
    
@@ -206,10 +191,6 @@ public class BrowseBean implements IContextListener
     */
    public int getBrowsePageSize()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
       return this.browsePageSize;
    }
    
@@ -226,10 +207,6 @@ public class BrowseBean implements IContextListener
     */
    public int getMinimumSearchLength()
    {
-      if (this.clientConfig == null)
-      {
-         initFromClientConfig();
-      }
       return this.clientConfig.getSearchMinimum();
    }
    
@@ -273,7 +250,10 @@ public class BrowseBean implements IContextListener
       this.contentRichList = browseRichList;
       if (this.contentRichList != null)
       {
-         this.contentRichList.setInitialSortColumn("name");
+         this.contentRichList.setInitialSortColumn(
+               this.clientConfig.getDefaultSortColumn(PAGE_NAME_BROWSE));
+         this.contentRichList.setInitialSortDescending(
+               this.clientConfig.hasDescendingSort(PAGE_NAME_BROWSE));
       }
    }
    
@@ -293,7 +273,11 @@ public class BrowseBean implements IContextListener
       this.spacesRichList = detailsRichList;
       if (this.spacesRichList != null)
       {
-         this.spacesRichList.setInitialSortColumn("name");
+         // set the initial sort column and direction
+         this.spacesRichList.setInitialSortColumn(
+               this.clientConfig.getDefaultSortColumn(PAGE_NAME_BROWSE));
+         this.spacesRichList.setInitialSortDescending(
+               this.clientConfig.hasDescendingSort(PAGE_NAME_BROWSE));
       }
    }
    
@@ -451,27 +435,13 @@ public class BrowseBean implements IContextListener
       if (VIEWMODE_DASHBOARD.equals(viewMode) == false)
       { 
          // set the page size based on the style of display
-         if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(viewMode))
-         {
-            setBrowsePageSize(this.clientConfig.getDetailsPageSize());
-         }
-         else if (RichListRenderer.IconViewRenderer.VIEWMODEID.equals(viewMode))
-         {
-            setBrowsePageSize(this.clientConfig.getIconsPageSize());
-         }
-         else if (RichListRenderer.ListViewRenderer.VIEWMODEID.equals(viewMode))
-         {
-            setBrowsePageSize(this.clientConfig.getListPageSize());
-         }
-         else
-         {
-            // in case another view mode appears we should have a default
-            setBrowsePageSize(10);
-         }
+         setBrowsePageSize(this.clientConfig.getDefaultPageSize(PAGE_NAME_BROWSE, 
+               viewMode));
+         
          if (logger.isDebugEnabled())
             logger.debug("Browse view page size set to: " + getBrowsePageSize());
          
-         // in case we left for dashboard screen
+         // in case we left for dashboard 
          if (isDashboardView() == true)
          {
             setDashboardView(false);
@@ -1253,28 +1223,13 @@ public class BrowseBean implements IContextListener
     */
    private void initFromClientConfig()
    {
-      this.clientConfig = (ClientConfigElement)this.configService.getGlobalConfig().getConfigElement(
-            ClientConfigElement.CONFIG_ELEMENT_ID);
+      this.clientConfig = (ClientConfigElement)Application.getConfigService(
+            FacesContext.getCurrentInstance()).getGlobalConfig().
+            getConfigElement(ClientConfigElement.CONFIG_ELEMENT_ID);
       
-      this.browseViewMode = clientConfig.getDefaultView();
-      
-      if (RichListRenderer.DetailsViewRenderer.VIEWMODEID.equals(this.browseViewMode))
-      {
-         this.browsePageSize = this.clientConfig.getDetailsPageSize();
-      }
-      else if (RichListRenderer.IconViewRenderer.VIEWMODEID.equals(this.browseViewMode))
-      {
-         this.browsePageSize = this.clientConfig.getIconsPageSize();
-      }
-      else if (RichListRenderer.ListViewRenderer.VIEWMODEID.equals(this.browseViewMode))
-      {
-         this.browsePageSize = this.clientConfig.getListPageSize();
-      }
-      else
-      {
-         // in case another view mode appears we should have a default
-         this.browsePageSize = 10;
-      }
+      this.browseViewMode = clientConfig.getDefaultView(PAGE_NAME_BROWSE);
+      this.browsePageSize = clientConfig.getDefaultPageSize(PAGE_NAME_BROWSE, 
+            this.browseViewMode);
    }
    
    /**
@@ -1489,9 +1444,6 @@ public class BrowseBean implements IContextListener
    
    /** The file folder service */
    private FileFolderService fileFolderService;
-   
-   /** ConfigService bean reference */
-   private ConfigService configService;
 
    /** Client configuration object */
    private ClientConfigElement clientConfig = null;

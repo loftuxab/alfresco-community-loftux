@@ -26,6 +26,8 @@ import org.alfresco.config.element.ConfigElementAdapter;
  */
 public class ServerConfigElement extends ConfigElementAdapter
 {
+   public static final String CONFIG_ELEMENT_ID = "server";
+   
    private String errorPage;
    private String loginPage;
    
@@ -34,7 +36,7 @@ public class ServerConfigElement extends ConfigElementAdapter
     */
    public ServerConfigElement()
    {
-      super("server");
+      super(CONFIG_ELEMENT_ID);
    }
    
    /**

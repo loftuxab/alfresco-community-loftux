@@ -950,7 +950,7 @@
       </navigation-case>
       <navigation-case>
          <from-outcome>createReply</from-outcome>
-         <to-view-id>/jsp/forums/create-post.jsp</to-view-id>
+         <to-view-id>/jsp/forums/create-reply.jsp</to-view-id>
       </navigation-case>
       <navigation-case>
          <from-outcome>deletePost</from-outcome>
@@ -1028,6 +1028,18 @@
    
    <navigation-rule>
       <from-view-id>/jsp/forums/create-post.jsp</from-view-id>
+      <navigation-case>
+         <from-outcome>cancel</from-outcome>
+         <to-view-id>/jsp/forums/topic.jsp</to-view-id>
+      </navigation-case>
+      <navigation-case>
+         <from-outcome>finish</from-outcome>
+         <to-view-id>/jsp/forums/topic.jsp</to-view-id>
+      </navigation-case>
+   </navigation-rule>
+   
+   <navigation-rule>
+      <from-view-id>/jsp/forums/create-reply.jsp</from-view-id>
       <navigation-case>
          <from-outcome>cancel</from-outcome>
          <to-view-id>/jsp/forums/topic.jsp</to-view-id>

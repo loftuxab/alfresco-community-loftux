@@ -136,9 +136,6 @@ public class NewSpaceWizard extends AbstractWizardBean
             properties.put(ContentModel.PROP_ICON, this.icon);
             properties.put(ContentModel.PROP_DESCRIPTION, this.description);
             
-            // extension point for subclasses to update type specific properties
-            this.addSubTypeEditedProperties(properties);
-            
             // apply properties
             this.nodeService.setProperties(nodeRef, properties);
          }
@@ -180,9 +177,6 @@ public class NewSpaceWizard extends AbstractWizardBean
                if (logger.isDebugEnabled())
                   logger.debug("Added uifacets aspect with properties: " + uiFacetsProps);
                
-               // extension point for subclasses to add type specific properties to the node
-               addSubTypeProps(nodeRef, getSubTypeCreationProperties());
-               
                // remember the created node
                this.createdNode = nodeRef;
             }
@@ -204,9 +198,6 @@ public class NewSpaceWizard extends AbstractWizardBean
                if (logger.isDebugEnabled())
                   logger.debug("Copied space with id of " + sourceNode.getId() + " to " + this.name);
                
-               // extension point for subclasses to add type specific properties to the node
-               addSubTypeProps(copiedNode, getSubTypeCreationProperties());
-               
                // remember the created node
                this.createdNode = copiedNode;
             }
@@ -225,9 +216,6 @@ public class NewSpaceWizard extends AbstractWizardBean
                
                if (logger.isDebugEnabled())
                   logger.debug("Copied template space with id of " + sourceNode.getId() + " to " + this.name);
-               
-               // extension point for subclasses to add type specific properties to the node
-               addSubTypeProps(copiedNode, getSubTypeCreationProperties());
                
                // remember the created node
                this.createdNode = copiedNode;
@@ -259,6 +247,9 @@ public class NewSpaceWizard extends AbstractWizardBean
                }
             }
          }
+         
+         // give subclasses a chance to perform custom processing before committing
+         performCustomProcessing(context);
          
          // commit the transaction
          tx.commit();
@@ -1000,45 +991,12 @@ public class NewSpaceWizard extends AbstractWizardBean
    }
    
    /**
-    * Method that can be overridden by subclasses to add any extra properties
-    * that may belong to the subtype of space.
+    * Performs any processing sub classes may wish to do before commit is called
     * 
-    * @param props The set of properties to update
+    * @param context Faces context
     */
-   protected void addSubTypeEditedProperties(Map<QName, Serializable> props)
+   protected void performCustomProcessing(FacesContext context)
    {
-      // do nothing in here, subclasses can override if necessary
-   }
-   
-   /**
-    * Method that can be overridden by subclasses to return any custom
-    * properties for the subtype that need to be saved
-    * 
-    * @return Set of custom properties to use at creation time
-    */
-   protected Map<QName, Serializable> getSubTypeCreationProperties()
-   {
-      return null;
-   }
-   
-   /**
-    * Adds the given custom properties to the given NodeRef
-    * 
-    * @param nodeRef The node to add the properties to
-    * @param customProps The custom properties
-    */
-   private void addSubTypeProps(NodeRef nodeRef, Map<QName, Serializable> customProps)
-   {
-      if (customProps != null)
-      {
-         for (QName qname : customProps.keySet())
-         {
-            this.nodeService.setProperty(nodeRef, qname, customProps.get(qname));
-         
-            if (logger.isDebugEnabled())
-               logger.debug("Added sub type property (name=" + qname.toString() + 
-                            " value=" + customProps.get(qname));
-         }
-      }
+      // used by subclasses if necessary
    }
 }

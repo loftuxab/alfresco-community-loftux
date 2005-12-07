@@ -78,11 +78,11 @@
                                  <div class="mainSubText"><h:outputText value="#{NavigationBean.nodeProperties.description}" id="msg4" /></div>
                               </td>
                               <td bgcolor="#465F7D" width=1></td>
-                              <td width=110 style="padding-left:2px">
+                              <td width=130 style="padding-left:2px">
                                  <%-- Current object actions --%>
                                  <h:outputText style="padding-left:20px" styleClass="mainSubTitle" value="#{msg.actions}" id="msg5" /><br>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren" id="eval1">
-                                    <a:actionLink value="#{msg.create_forums}" image="/images/icons/create_forum.gif" padding="4" action="createForums" actionListener="#{CreateForumsDialog.startWizard}" id="link1" />
+                                    <a:actionLink value="#{msg.create_forums}" image="/images/icons/create_forums.gif" padding="4" action="createForums" actionListener="#{CreateForumsDialog.startWizard}" id="link1" />
                                  </r:permissionEvaluator>
                                  <r:permissionEvaluator value="#{NavigationBean.currentNode}" allow="CreateChildren" id="eval2">
                                     <a:actionLink value="#{msg.create_forum}" image="/images/icons/create_forum.gif" padding="4" action="createForum" actionListener="#{CreateForumDialog.startWizard}" id="link2" />

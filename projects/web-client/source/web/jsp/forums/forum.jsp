@@ -101,7 +101,6 @@
                               <a:modeList itemSpacing="3" iconColumnWidth="20" selectedStyleClass="statusListHighlight" selectedImage="/images/icons/Details.gif"
                                     value="#{ForumsBean.forumViewMode}" actionListener="#{ForumsBean.forumViewModeChanged}">
                                  <a:listItem value="details" label="#{msg.details_view}" />
-                                 <a:listItem value="bubble" label="#{msg.bubble_view}" />
                               </a:modeList>
                            </td>
                         </tr>
