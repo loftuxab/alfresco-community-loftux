@@ -16,7 +16,6 @@
  */
 package org.alfresco.service.cmr.dictionary;
 
-import java.util.List;
 
 /**
  * Read-only definition of a Type
@@ -25,9 +24,6 @@ import java.util.List;
  */
 public interface TypeDefinition extends ClassDefinition
 {
-    /**
-     * @return  the default aspects associated with this type
-     */
-    public List<AspectDefinition> getDefaultAspects();
+
     
 }

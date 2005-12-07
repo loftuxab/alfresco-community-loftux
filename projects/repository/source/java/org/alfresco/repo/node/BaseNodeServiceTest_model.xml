@@ -242,6 +242,7 @@
    </types>
    
    <aspects>
+   
       <aspect name="test:titled">
          <title>Titled</title>
          <properties>
@@ -257,11 +258,27 @@
             <property name="test:description">
                <type>d:text</type>
             </property>
-         </properties>
+         </properties>         
+         <mandatory-aspects>
+            <aspect>test:mandatoryaspect</aspect>
+         </mandatory-aspects>
       </aspect>
+      
       <aspect name="test:marker">
-         <title>Marker Aspect</title>
+         <title>Marker Aspect</title>     
+         <mandatory-aspects>
+            <aspect>test:marker2</aspect>
+         </mandatory-aspects>
       </aspect>
+      
+      <aspect name="test:marker2">
+         <title>Marker Aspect 2</title>
+      </aspect>
+      
+      <aspect name="test:mandatoryaspect">
+         <title>Mandatory Aspect</title>
+      </aspect>
+      
       <aspect name="test:withDefaultValue">
          <title>Marker Aspect</title>
          <properties>
@@ -271,6 +288,7 @@
             </property>
          </properties>
       </aspect>
+      
    </aspects>
 
 </model>

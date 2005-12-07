@@ -72,15 +72,15 @@
             </structure>
          </collection>
       </structure>
-   </mapping>
-
-   <mapping name="type" class="org.alfresco.repo.dictionary.M2Type" extends="org.alfresco.repo.dictionary.M2Class">
-      <structure map-as="org.alfresco.repo.dictionary.M2Class"/>
       <structure name="mandatory-aspects" usage="optional">
          <collection field="mandatoryAspects" factory="org.alfresco.repo.dictionary.M2Model.createList">
             <value name="aspect"/>
          </collection>
       </structure>
+   </mapping>
+
+   <mapping name="type" class="org.alfresco.repo.dictionary.M2Type" extends="org.alfresco.repo.dictionary.M2Class">
+      <structure map-as="org.alfresco.repo.dictionary.M2Class"/>      
    </mapping>
       
    <mapping name="aspect" class="org.alfresco.repo.dictionary.M2Aspect"  extends="org.alfresco.repo.dictionary.M2Class">

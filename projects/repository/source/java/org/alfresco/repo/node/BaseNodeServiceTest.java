@@ -85,6 +85,8 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
     public static final QName TYPE_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
     public static final QName ASPECT_QNAME_TEST_TITLED = QName.createQName(NAMESPACE, "titled");
     public static final QName ASPECT_QNAME_TEST_MARKER = QName.createQName(NAMESPACE, "marker");
+    public static final QName ASPECT_QNAME_TEST_MARKER2 = QName.createQName(NAMESPACE, "marker2");
+    public static final QName ASPECT_QNAME_MANDATORY = QName.createQName(NAMESPACE, "mandatoryaspect");
     public static final QName PROP_QNAME_TEST_TITLE = QName.createQName(NAMESPACE, "title");
     public static final QName PROP_QNAME_TEST_CONTENT = QName.createQName(NAMESPACE, "content");
     public static final QName ASSOC_TYPE_QNAME_TEST_CHILDREN = ContentModel.ASSOC_CHILDREN;
@@ -1313,6 +1315,26 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         this.nodeService.addAspect(nodeRef2, ASPECT_QNAME_WITH_DEFAULT_VALUE, prop2);
         assertEquals("notDefaultValue", this.nodeService.getProperty(nodeRef2, PROP_QNAME_PROP2));
                 
+    }
+    
+    public void testMandatoryAspects()
+    {
+        NodeRef nodeRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("testDefaultValues"),
+                TYPE_QNAME_TEST_CONTENT).getChildRef();
+        
+        // Check that the required mandatory aspects have been applied
+        assertTrue(this.nodeService.hasAspect(nodeRef, ASPECT_QNAME_TEST_TITLED));
+        assertTrue(this.nodeService.hasAspect(nodeRef, ASPECT_QNAME_MANDATORY));
+        
+        // Add an aspect with dependacies
+        this.nodeService.addAspect(nodeRef, ASPECT_QNAME_TEST_MARKER, null);
+        
+        // Check that the dependant aspect has been applied
+        assertTrue(this.nodeService.hasAspect(nodeRef, ASPECT_QNAME_TEST_MARKER));
+        assertTrue(this.nodeService.hasAspect(nodeRef, ASPECT_QNAME_TEST_MARKER2));        
     }
     
     private void garbageCollect() throws Exception

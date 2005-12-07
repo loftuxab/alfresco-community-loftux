@@ -17,10 +17,13 @@
 package org.alfresco.repo.dictionary;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -49,6 +52,9 @@ import org.alfresco.service.namespace.QName;
     private Map<QName, AssociationDefinition> associations = new HashMap<QName, AssociationDefinition>();
     private Map<QName, AssociationDefinition> inheritedAssociations = new HashMap<QName, AssociationDefinition>();
     private Map<QName, ChildAssociationDefinition> inheritedChildAssociations = new HashMap<QName, ChildAssociationDefinition>();
+    private List<AspectDefinition> defaultAspects = new ArrayList<AspectDefinition>();
+    private List<QName> defaultAspectNames = new ArrayList<QName>();
+    private List<AspectDefinition> inheritedDefaultAspects = new ArrayList<AspectDefinition>();
     
 
     /**
@@ -137,6 +143,16 @@ import org.alfresco.service.namespace.QName;
             }
             propertyOverrides.put(overrideName, override);
         }
+        
+        // Resolve qualified names
+        for (String aspectName : m2Class.getMandatoryAspects())
+        {
+            QName name = QName.createQName(aspectName, resolver);
+            if (!defaultAspectNames.contains(name))
+            {
+                defaultAspectNames.add(name);
+            }
+        }
     }
     
     @Override
@@ -168,6 +184,16 @@ import org.alfresco.service.namespace.QName;
         for (AssociationDefinition def : associations.values())
         {
             ((M2AssociationDefinition)def).resolveDependencies(query);
+        }
+        
+        for (QName aspectName : defaultAspectNames)
+        {
+            AspectDefinition aspect = query.getAspect(aspectName);
+            if (aspect == null)
+            {
+                throw new DictionaryException("Mandatory aspect " + aspectName.toPrefixString() + " of class " + name.toPrefixString() + " is not found");
+            }
+            defaultAspects.add(aspect);
         }
     }
     
@@ -226,6 +252,21 @@ import org.alfresco.service.namespace.QName;
             if (def instanceof ChildAssociationDefinition)
             {
                 inheritedChildAssociations.put(def.getName(), (ChildAssociationDefinition)def);
+            }
+        }
+        
+        // Build list of inherited default aspects
+        if (parentClass != null)
+        {
+            inheritedDefaultAspects.addAll(parentClass.getDefaultAspects());
+        }
+        
+        // Append list of defined default aspects
+        for (AspectDefinition def : defaultAspects)
+        {
+            if (!inheritedDefaultAspects.contains(def))
+            {
+                inheritedDefaultAspects.add(def);
             }
         }
     }
@@ -322,6 +363,14 @@ import org.alfresco.service.namespace.QName;
     public Map<QName, AssociationDefinition> getAssociations()
     {
         return Collections.unmodifiableMap(inheritedAssociations);
+    }
+    
+    /**
+     * @see org.alfresco.service.cmr.dictionary.ClassDefinition#getDefaultAspects()
+     */
+    public List<AspectDefinition> getDefaultAspects()
+    {
+        return inheritedDefaultAspects;
     }
 
     /* (non-Javadoc)

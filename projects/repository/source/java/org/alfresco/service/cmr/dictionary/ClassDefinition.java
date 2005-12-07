@@ -17,6 +17,7 @@
 package org.alfresco.service.cmr.dictionary;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.service.namespace.QName;
@@ -95,5 +96,10 @@ public interface ClassDefinition
      * @return the associations including inherited ones
      */
     // TODO: public Map<QName, AssociationDefinition> getTargetAssociations();
+    
+    /**
+     * @return  the default aspects associated with this type
+     */
+    public List<AspectDefinition> getDefaultAspects();
     
 }

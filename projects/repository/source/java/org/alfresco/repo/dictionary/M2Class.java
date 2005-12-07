@@ -36,7 +36,7 @@ public abstract class M2Class
     private List<M2Property> properties = new ArrayList<M2Property>();
     private List<M2PropertyOverride> propertyOverrides = new ArrayList<M2PropertyOverride>();
     private List<M2ClassAssociation> associations = new ArrayList<M2ClassAssociation>();
-    
+    private List<String> mandatoryAspects = new ArrayList<String>();
 
     /*package*/ M2Class()
     {
@@ -212,5 +212,22 @@ public abstract class M2Class
         }
         return null;
     }
+    
+    public void addMandatoryAspect(String name)
+    {
+        mandatoryAspects.add(name);
+    }
+    
+    
+    public void removeMandatoryAspect(String name)
+    {
+        mandatoryAspects.remove(name);
+    }
+    
+
+    public List<String> getMandatoryAspects()
+    {
+        return Collections.unmodifiableList(mandatoryAspects);
+    } 
     
 }

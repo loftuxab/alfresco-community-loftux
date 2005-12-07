@@ -277,7 +277,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         addDefaultPropertyValues(nodeTypeDef, properties);
         
         // Add the default aspects to the node
-        addDefaultAspect(nodeTypeDef, node, childAssocRef.getChildRef(), properties);                
+        addDefaultAspects(nodeTypeDef, node, childAssocRef.getChildRef(), properties);                
         
         // set the properties - it is a new node so only set properties if there are any
         if (properties.size() > 0)
@@ -298,10 +298,10 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
      * 
      * @param nodeTypeDef
      */
-    private void addDefaultAspect(TypeDefinition nodeTypeDef, Node node, NodeRef nodeRef, Map<QName, Serializable> properties)
+    private void addDefaultAspects(ClassDefinition classDefinition, Node node, NodeRef nodeRef, Map<QName, Serializable> properties)
     {
         // get the mandatory aspects for the node type
-        List<AspectDefinition> defaultAspectDefs = nodeTypeDef.getDefaultAspects();
+        List<AspectDefinition> defaultAspectDefs = classDefinition.getDefaultAspects();
         
         // add all the aspects to the node
         Set<QName> nodeAspects = node.getAspects();
@@ -311,6 +311,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
             nodeAspects.add(defaultAspectDef.getName());
             addDefaultPropertyValues(defaultAspectDef, properties);
             invokeOnAddAspect(nodeRef, defaultAspectDef.getName());
+            
+            // Now add any default aspects for this aspect
+            addDefaultAspects(defaultAspectDef, node, nodeRef, properties);
         }
     }
     
@@ -428,7 +431,7 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // Add the default aspects to the node (update the properties with any new default values)
         Map<QName, Serializable> properties = this.getProperties(nodeRef);
-        addDefaultAspect(nodeTypeDef, node, nodeRef, properties);
+        addDefaultAspects(nodeTypeDef, node, nodeRef, properties);
         this.setProperties(nodeRef, properties);
         
         // Invoke policies
@@ -467,6 +470,9 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         
         // Set any default property values that appear on the aspect
         addDefaultPropertyValues(aspectDef, nodeProperties);
+        
+        // Add any dependant aspect
+        addDefaultAspects(aspectDef, node, nodeRef, nodeProperties);
         
         // Set the property values back on the node
         setProperties(nodeRef, nodeProperties);
