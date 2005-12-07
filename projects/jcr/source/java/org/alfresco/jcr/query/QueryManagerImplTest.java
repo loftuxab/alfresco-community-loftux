@@ -28,7 +28,14 @@ public class QueryManagerImplTest extends BaseJCRTest
         superuserSession = repository.login(superuser, getWorkspace());
     }
     
-    
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        superuserSession.logout();
+        super.onTearDownInTransaction();
+    }
+
+
     public void testQuery()
         throws Exception
     {

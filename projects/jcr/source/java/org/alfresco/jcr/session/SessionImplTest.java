@@ -32,7 +32,6 @@ import org.alfresco.jcr.test.BaseJCRTest;
 public class SessionImplTest extends BaseJCRTest
 {
     protected Session superuserSession;
-    protected Session readuserSession;
     
     @Override
     protected void onSetUpInTransaction() throws Exception
@@ -43,11 +42,13 @@ public class SessionImplTest extends BaseJCRTest
         superuser.setAttribute("attr1", "superuserValue");
         superuser.setAttribute("attr2", new Integer(1));
         superuserSession = repository.login(superuser, getWorkspace());
-
-        SimpleCredentials readuser = new SimpleCredentials("anonymous", "".toCharArray());
-        readuser.setAttribute("attr1", "readuserValue");
-        readuser.setAttribute("attr2", new Integer(2));
-        readuserSession = repository.login(readuser, getWorkspace());
+    }
+    
+    @Override
+    protected void onTearDownInTransaction()
+    {
+        superuserSession.logout();
+        super.onTearDownInTransaction();
     }
     
     public void testRepository()
@@ -64,11 +65,6 @@ public class SessionImplTest extends BaseJCRTest
             String userId = superuserSession.getUserID();
             assertNotNull(userId);
             assertEquals("superuser", userId);
-        }
-        {
-            String userId = readuserSession.getUserID();
-            assertNotNull(userId);
-            assertEquals("anonymous", userId);
         }
     }
 
@@ -87,19 +83,6 @@ public class SessionImplTest extends BaseJCRTest
             String value3 = (String)superuserSession.getAttribute("unknown");
             assertNull(value3);
         }
-        {
-            String[] names = readuserSession.getAttributeNames();
-            assertNotNull(names);
-            assertEquals(2, names.length);
-            String value1 = (String)readuserSession.getAttribute("attr1");
-            assertNotNull(value1);
-            assertEquals("readuserValue", value1);
-            Integer value2 = (Integer)readuserSession.getAttribute("attr2");
-            assertNotNull(value2);
-            assertEquals(new Integer(2), value2);
-            String value3 = (String)readuserSession.getAttribute("unknown");
-            assertNull(value3);
-        }
     }
     
     public void testLogout()
@@ -110,6 +93,6 @@ public class SessionImplTest extends BaseJCRTest
         isLive = superuserSession.isLive();
         assertFalse(isLive);
     }
-    
+
 }
 
