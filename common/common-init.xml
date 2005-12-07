@@ -13,7 +13,7 @@
         <property environment="env" />
         <property file="${user.home}/user-override.properties" />
         <property file="project-override.properties" />
-        <property file="projects/repository/config/alfresco/version.properties" />
+        <property file="${dir.common}/../projects/repository/config/alfresco/version.properties" />
         <property file="${dir.common}/common.properties" />
         <property file="project.properties" />
 
