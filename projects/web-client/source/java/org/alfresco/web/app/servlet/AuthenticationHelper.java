@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.i18n.I18NUtil;
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.portlet.AlfrescoFacesPortlet;
@@ -78,7 +79,14 @@ public final class AuthenticationHelper
       // setup the authentication context
       WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
       AuthenticationService auth = (AuthenticationService)ctx.getBean("authenticationService");
-      auth.validate(ticket);
+      try
+      {
+         auth.validate(ticket);
+      }
+      catch (AuthenticationException authErr)
+      {
+         return false;
+      }
       
       // Set the current locale
       I18NUtil.setLocale(Application.getLanguage(httpRequest.getSession()));

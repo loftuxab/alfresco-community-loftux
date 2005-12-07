@@ -38,7 +38,6 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
@@ -49,28 +48,45 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * Servlet responsible for streaming node content from the repo directly to the reponse stream.
+ * Servlet responsible for streaming node content from the repo directly to the response stream.
  * The appropriate mimetype is calculated based on filename extension.
  * <p>
  * The URL to the servlet should be generated thus:
  * <pre>/alfresco/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
  * or
  * <pre>/alfresco/download/direct/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf</pre>
- * 
+ * <p>
  * The store protocol, followed by the store ID, followed by the content Node Id
- * the last part is used for mimetype calculation and browser default filename.
+ * the last element is used for mimetype calculation and browser default filename.
+ * <p>
  * The 'attach' or 'direct' element is used to indicate whether to display the stream directly
- * in the browser or download it as a file attachment.  By default, the download assumes that
- * the content is on the {@link org.alfresco.model.ContentModel#PROP_CONTENT content property}.<br>
- * If you want to get the content of a specific node and property, use the 'get' option,
- * providing the workspace, node ID AND the qualified name of the property.  No file extension is
- * necessary as the information can be fetched from the node itself.
+ * in the browser or download it as a file attachment.
+ * <p>
+ * By default, the download assumes that the content is on the
+ * {@link org.alfresco.model.ContentModel#PROP_CONTENT content property}.<br>
+ * To retrieve the content of a specific model property, use a 'property' arg, providing the workspace,
+ * node ID AND the qualified name of the property.
+ * <p>
+ * The URL may be followed by a valid ticket argument for authentication: ?ticket=1234567890 
  * 
  * @author Kevin Roast
  */
 public class DownloadContentServlet extends HttpServlet
 {
    private static final long serialVersionUID = -4558907921887235966L;
+   
+   private static Log logger = LogFactory.getLog(DownloadContentServlet.class);
+   
+   private static final String DOWNLOAD_URL  = "/download/attach/{0}/{1}/{2}/{3}";
+   private static final String BROWSER_URL   = "/download/direct/{0}/{1}/{2}/{3}";
+   
+   private static final String MIMETYPE_OCTET_STREAM = "application/octet-stream";
+   
+   private static final String MSG_ERROR_CONTENT_MISSING = "error_content_missing";
+   
+   private static final String ARG_PROPERTY = "property";
+   private static final String ARG_ATTACH   = "attach";
+   private static final String ARG_TICKET   = "ticket";
    
    /**
     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -86,15 +102,14 @@ public class DownloadContentServlet extends HttpServlet
          // /alfresco/download/attach/workspace/SpacesStore/0000-0000-0000-0000/myfile.pdf
          // the protocol, followed by the store, followed by the Id
          // the last part is only used for mimetype and browser use
-         // may be followed by valid ticket for external use: ?ticket=1234567890 
+         // may be followed by valid ticket for pre-authenticated usage: ?ticket=1234567890 
          String uri = req.getRequestURI();
-         String params = req.getQueryString();
          
          if (logger.isDebugEnabled())
-            logger.debug("Processing URL: " + uri + (params != null ? ("?" + params) : ""));
+            logger.debug("Processing URL: " + uri + (req.getQueryString() != null ? ("?" + req.getQueryString()) : ""));
          
          // see if a ticket has been supplied
-         String ticket = req.getParameter("ticket");
+         String ticket = req.getParameter(ARG_TICKET);
          if (ticket == null || ticket.length() == 0)
          {
             if (AuthenticationHelper.authenticate(getServletContext(), req, res) == false)
@@ -110,7 +125,6 @@ public class DownloadContentServlet extends HttpServlet
             AuthenticationHelper.authenticate(getServletContext(), req, res, ticket);
          }
          
-         WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
          // TODO: add compression here?
          //       see http://servlets.com/jservlet2/examples/ch06/ViewResourceCompress.java for example
          //       only really needed if we don't use the built in compression of the servlet container
@@ -124,7 +138,7 @@ public class DownloadContentServlet extends HttpServlet
          t.nextToken();    // skip servlet name
          
          String attachToken = t.nextToken();
-         boolean attachment = attachToken.equals("attach");
+         boolean attachment = attachToken.equals(ARG_ATTACH);
          
          StoreRef storeRef = new StoreRef(t.nextToken(), t.nextToken());
          String id = t.nextToken();
@@ -132,7 +146,7 @@ public class DownloadContentServlet extends HttpServlet
          
          // get property qualified name
          QName propertyQName = null;
-         String property = req.getParameter("property");
+         String property = req.getParameter(ARG_PROPERTY);
          if (property == null || property.length() == 0)
          {
              propertyQName = ContentModel.PROP_CONTENT;
@@ -159,25 +173,25 @@ public class DownloadContentServlet extends HttpServlet
             res.setHeader("Content-Disposition", "attachment;filename=\"" + URLDecoder.decode(filename, "UTF-8") + '"');
          }
          
-         // get the content mimetype from the node properties
+         // get the services we need to retrieve the content
+         WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
          ServiceRegistry serviceRegistry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
-         NodeService nodeService = serviceRegistry.getNodeService();
          ContentService contentService = serviceRegistry.getContentService();
-
+         
          // get the content reader
          ContentReader reader = contentService.getReader(nodeRef, propertyQName);
          // ensure that it is safe to use
          reader = FileContentReader.getSafeContentReader(
-                 reader,
-                 Application.getMessage(req.getSession(), "error_content_missing"),
-                 nodeRef, reader);
+                    reader,
+                    Application.getMessage(req.getSession(), MSG_ERROR_CONTENT_MISSING),
+                    nodeRef, reader);
          
          String mimetype = reader.getMimetype();
          // fall back if unable to resolve mimetype property
          if (mimetype == null || mimetype.length() == 0)
          {
             MimetypeService mimetypeMap = serviceRegistry.getMimetypeService();
-            mimetype = "application/octet-stream";
+            mimetype = MIMETYPE_OCTET_STREAM;
             int extIndex = filename.lastIndexOf('.');
             if (extIndex != -1)
             {
@@ -202,10 +216,8 @@ public class DownloadContentServlet extends HttpServlet
          {
             if (e.getMessage().contains("ClientAbortException"))
             {
-                // the client cut the connection - our mission was accomplished apart from a little error message
-               logger.error("Client aborted stream read: \n" +
-                       "   node: " + nodeRef + "\n" +
-                       "   content: " + reader);
+               // the client cut the connection - our mission was accomplished apart from a little error message
+               logger.error("Client aborted stream read:\n   node: " + nodeRef + "\n   content: " + reader);
             }
             else
             {
@@ -282,10 +294,4 @@ public class DownloadContentServlet extends HttpServlet
       
       return url;
    }
-
-   
-   private static Log logger = LogFactory.getLog(DownloadContentServlet.class);
-   
-   private static final String DOWNLOAD_URL  = "/download/attach/{0}/{1}/{2}/{3}";
-   private static final String BROWSER_URL   = "/download/direct/{0}/{1}/{2}/{3}";
 }

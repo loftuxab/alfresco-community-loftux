@@ -59,7 +59,7 @@ public interface TemplateService
      * Return a TemplateProcessor instance for the specified engine name.
      * Note that the processor instance is NOT thread safe!
      * 
-     * @param engine       Name of the template engine to get or null if not found
+     * @param engine       Name of the template engine to get or null for default
      * 
      * @return TemplateProcessor
      */

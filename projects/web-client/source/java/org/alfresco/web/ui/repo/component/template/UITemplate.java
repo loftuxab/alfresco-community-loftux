@@ -199,7 +199,7 @@ public class UITemplate extends SelfRenderingComponent
          if (getEngine().equals(ENGINE_DEFAULT))
          {
             // create FreeMarker default model and merge
-            Map root = new HashMap(7, 1.0f);
+            Map root = new HashMap(11, 1.0f);
             
             FacesContext context = FacesContext.getCurrentInstance();
             ServiceRegistry services = Repository.getServiceRegistry(context);

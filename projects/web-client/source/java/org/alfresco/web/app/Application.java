@@ -213,9 +213,9 @@ public class Application
    /**
     * @return Returns the User object representing the currently logged in user
     */
-   public static User getCurrentUser(ServletContext context)
+   public static User getCurrentUser(HttpSession session)
    {
-      return (User)context.getAttribute(AuthenticationHelper.AUTHENTICATION_USER);
+      return (User)session.getAttribute(AuthenticationHelper.AUTHENTICATION_USER);
    }
    
    /**
