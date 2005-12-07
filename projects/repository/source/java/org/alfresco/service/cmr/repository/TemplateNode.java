@@ -18,13 +18,17 @@ package org.alfresco.service.cmr.repository;
 
 import java.io.Serializable;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.template.NamePathResultsMap;
 import org.alfresco.repo.template.XPathResultsMap;
 import org.alfresco.service.ServiceRegistry;
@@ -58,7 +62,8 @@ public final class TemplateNode implements Serializable
     private static Log logger = LogFactory.getLog(TemplateNode.class);
     
     private final static String NAMESPACE_BEGIN = "" + QName.NAMESPACE_BEGIN;
-    private final static String BROWSER_URL = "/download/direct/{0}/{1}/{2}/{3}";
+    private final static String CONTENT_DEFAULT_URL = "/download/direct/{0}/{1}/{2}/{3}";
+    private final static String CONTENT_PROP_URL    = "/download/direct/{0}/{1}/{2}/{3}?property={4}";
     
     /** The children of this node */
     private List<TemplateNode> children = null;
@@ -241,7 +246,7 @@ public final class TemplateNode implements Serializable
         {
             Map<QName, Serializable> props = this.services.getNodeService().getProperties(this.nodeRef);
             
-            for (QName qname: props.keySet())
+            for (QName qname : props.keySet())
             {
                 Serializable propValue = props.get(qname);
                 if (propValue instanceof NodeRef)
@@ -249,6 +254,12 @@ public final class TemplateNode implements Serializable
                     // NodeRef object properties are converted to new TemplateNode objects
                     // so they can be used as objects within a template
                     propValue = new TemplateNode(((NodeRef)propValue), this.services, this.imageResolver);
+                }
+                else if (propValue instanceof ContentData)
+                {
+                    // ContentData object properties are converted to TemplateContentData objects
+                    // so the content and other properties of those objects can be accessed
+                    propValue = new TemplateContentData((ContentData)propValue, qname);
                 }
                 this.properties.put(qname.toString(), propValue);
             }
@@ -333,28 +344,6 @@ public final class TemplateNode implements Serializable
     }
     
     /**
-     * @return the content String for this node
-     */
-    public String getContent()
-    {
-        ContentService contentService = this.services.getContentService();
-        ContentReader reader = contentService.getReader(this.nodeRef, ContentModel.PROP_CONTENT);
-        return reader != null ? reader.getContentString() : "";
-    }
-    
-    /**
-     * @return url to the content stream for this node
-     */
-    public String getUrl()
-    {
-        return MessageFormat.format(BROWSER_URL, new Object[] {
-            nodeRef.getStoreRef().getProtocol(),
-            nodeRef.getStoreRef().getIdentifier(),
-            nodeRef.getId(),
-            name} );
-    }
-    
-    /**
      * @return FreeMarker NodeModel for the XML content of this node, or null if no parsable XML found
      */
     public NodeModel getXmlNodeModel()
@@ -379,7 +368,14 @@ public final class TemplateNode implements Serializable
     {
         if (displayPath == null)
         {
-            displayPath = this.services.getNodeService().getPath(this.nodeRef).toDisplayPath(this.services.getNodeService());
+            try
+            {
+                displayPath = this.services.getNodeService().getPath(this.nodeRef).toDisplayPath(this.services.getNodeService());
+            }
+            catch (AccessDeniedException err)
+            {
+                displayPath = "";
+            }
         }
         
         return displayPath;
@@ -475,13 +471,45 @@ public final class TemplateNode implements Serializable
     }
     
     /**
-     * @return The mimetype encoding for content attached to the node.
+     * @return the content String for this node from the default content property
+     *         (@see ContentModel.PROP_CONTENT)
+     */
+    public String getContent()
+    {
+        ContentService contentService = this.services.getContentService();
+        ContentReader reader = contentService.getReader(this.nodeRef, ContentModel.PROP_CONTENT);
+        return reader != null ? reader.getContentString() : "";
+    }
+    
+    /**
+     * @return url to the content stream for this node for the default content property
+     *         (@see ContentModel.PROP_CONTENT)
+     */
+    public String getUrl()
+    {
+        try
+        {
+            return MessageFormat.format(CONTENT_DEFAULT_URL, new Object[] {
+                    nodeRef.getStoreRef().getProtocol(),
+                    nodeRef.getStoreRef().getIdentifier(),
+                    nodeRef.getId(),
+                    URLEncoder.encode(getName(), "US-ASCII") } );
+        }
+        catch (UnsupportedEncodingException err)
+        {
+            throw new TemplateException("Failed to encode content URL for node: " + nodeRef, err);
+        }
+    }
+    
+    /**
+     * @return The mimetype encoding for content attached to the node from the default content property
+     *         (@see ContentModel.PROP_CONTENT)
      */
     public String getMimetype()
     {
         if (mimetype == null)
         {
-            ContentData content = (ContentData)this.getProperties().get(ContentModel.PROP_CONTENT);
+            TemplateContentData content = (TemplateContentData)this.getProperties().get(ContentModel.PROP_CONTENT);
             if (content != null)
             {
                 mimetype = content.getMimetype();
@@ -492,13 +520,14 @@ public final class TemplateNode implements Serializable
     }
     
     /**
-     * @return The size in bytes of the content attached to the node.
+     * @return The size in bytes of the content attached to the node from the default content property
+     *         (@see ContentModel.PROP_CONTENT)
      */
     public long getSize()
     {
         if (size == null)
         {
-            ContentData content = (ContentData)this.getProperties().get(ContentModel.PROP_CONTENT);
+            TemplateContentData content = (TemplateContentData)this.getProperties().get(ContentModel.PROP_CONTENT);
             if (content != null)
             {
                 size = content.getSize();
@@ -524,12 +553,62 @@ public final class TemplateNode implements Serializable
         if (this.services.getNodeService().exists(nodeRef))
         {
             return "Node Type: " + getType() + 
-            "\nNode Properties: " + this.getProperties().toString() + 
-            "\nNode Aspects: " + this.getAspects().toString();
+                   "\nNode Properties: " + this.getProperties().toString() + 
+                   "\nNode Aspects: " + this.getAspects().toString();
         }
         else
         {
             return "Node no longer exists: " + nodeRef;
         }
+    }
+    
+    
+    /**
+     * Inner class wrapping and providing access to a ContentData property 
+     */
+    public class TemplateContentData implements Serializable
+    {
+        public TemplateContentData(ContentData contentData, QName property)
+        {
+            this.contentData = contentData;
+            this.property = property;
+        }
+        
+        public String getContent()
+        {
+            ContentService contentService = services.getContentService();
+            ContentReader reader = contentService.getReader(nodeRef, property);
+            return reader != null ? reader.getContentString() : "";
+        }
+        
+        public String getUrl()
+        {
+            try
+            {
+                return MessageFormat.format(CONTENT_PROP_URL, new Object[] {
+                       nodeRef.getStoreRef().getProtocol(),
+                       nodeRef.getStoreRef().getIdentifier(),
+                       nodeRef.getId(),
+                       URLEncoder.encode(getName(), "US-ASCII"),
+                       URLEncoder.encode(property.toString(), "US-ASCII") } );
+            }
+            catch (UnsupportedEncodingException err)
+            {
+                throw new TemplateException("Failed to encode content URL for node: " + nodeRef, err);
+            }
+        }
+        
+        public long getSize()
+        {
+            return contentData.getSize();
+        }
+        
+        public String getMimetype()
+        {
+            return contentData.getMimetype();
+        }
+        
+        private ContentData contentData;
+        private QName property;
     }
 }

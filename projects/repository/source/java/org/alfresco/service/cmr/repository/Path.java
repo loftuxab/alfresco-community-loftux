@@ -22,6 +22,7 @@ import java.util.LinkedList;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.ISO9075;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 
@@ -197,7 +198,15 @@ public final class Path implements Iterable<Path.Element>, Serializable
                 ChildAssociationRef elementRef = ((ChildAssocElement)element).getRef();
                 if (elementRef.getParentRef() != null)
                 {
-                    Serializable nameProp = nodeService.getProperty(elementRef.getChildRef(), ContentModel.PROP_NAME);
+                    Serializable nameProp = null;
+                    try
+                    {
+                        nameProp = nodeService.getProperty(elementRef.getChildRef(), ContentModel.PROP_NAME);
+                    }
+                    catch (AccessDeniedException err)
+                    {
+                        // unable to access this property on the path - so we cannot display it's name
+                    }
                     if (nameProp != null)
                     {
                         // use the name property if we find it

@@ -247,7 +247,7 @@ public class DownloadContentServlet extends HttpServlet
       }
       catch (UnsupportedEncodingException uee)
       {
-         throw new AlfrescoRuntimeException("Failed to encode URL for node with id: " + ref.getId(), uee);
+         throw new AlfrescoRuntimeException("Failed to encode content URL for node: " + ref, uee);
       }
       
       return url;
@@ -265,11 +265,22 @@ public class DownloadContentServlet extends HttpServlet
     */
    public final static String generateBrowserURL(NodeRef ref, String name)
    {
-      return MessageFormat.format(BROWSER_URL, new Object[] {
-            ref.getStoreRef().getProtocol(),
-            ref.getStoreRef().getIdentifier(),
-            ref.getId(),
-            name} );
+      String url = null;
+      
+      try
+      {
+         url = MessageFormat.format(BROWSER_URL, new Object[] {
+                  ref.getStoreRef().getProtocol(),
+                  ref.getStoreRef().getIdentifier(),
+                  ref.getId(),
+                  URLEncoder.encode(name, "US-ASCII") } );
+      }
+      catch (UnsupportedEncodingException uee)
+      {
+         throw new AlfrescoRuntimeException("Failed to encode content URL for node: " + ref, uee);
+      }
+      
+      return url;
    }
 
    
