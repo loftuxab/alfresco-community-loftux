@@ -240,6 +240,11 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         {      
             properties = new HashMap<QName, Serializable>();
         }
+        else
+        {
+            // Copy the incomming property map since we may need to modify it later
+            properties = new HashMap<QName, Serializable>(properties);
+        }
 		
 		// Invoke policy behaviour
 		invokeBeforeUpdateNode(parentRef);
@@ -317,6 +322,12 @@ public class DbNodeServiceImpl extends AbstractNodeServiceImpl
         }
     }
     
+    /**
+     * Sets the default property values
+     * 
+     * @param classDefinition
+     * @param properties
+     */
     private void addDefaultPropertyValues(ClassDefinition classDefinition, Map<QName, Serializable> properties)
     {
         for (Map.Entry<QName, Serializable> entry : classDefinition.getDefaultValues().entrySet())

@@ -11,6 +11,12 @@
    </config>
    <!-- End Example -->
    
+   <config evaluator="node-type" condition="dictionaryModel">
+      <property-sheet>      
+		<show-property name="modelActive"/>
+      </property-sheet>
+   </config>
+   
    <config evaluator="aspect-name" condition="complianceable">
       <property-sheet>
          <show-property name="removeAfter"/>

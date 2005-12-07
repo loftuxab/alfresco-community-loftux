@@ -176,6 +176,12 @@
          <override from-outcome="showSpaceDetails" to-view-id="/jsp/forums/topic-details.jsp" />
       </navigation>
    </config>
+   
+   <config evaluator="node-type" condition="dictionaryModel">
+      <property-sheet>      
+	     <show-property name="modelActive"/>
+      </property-sheet>
+   </config>
 
    <!-- Example client config for type defined in exampleModel.xml -->   
    <config evaluator="node-type" condition="my:sop">
