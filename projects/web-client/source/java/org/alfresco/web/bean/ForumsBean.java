@@ -40,6 +40,9 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.QueryParameterDefinition;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.Application;
 import org.alfresco.web.app.context.IContextListener;
@@ -77,6 +80,12 @@ public class ForumsBean implements IContextListener
    
    /** The DictionaryService bean reference */
    private DictionaryService dictionaryService;
+   
+   /** The SearchService bean reference. */
+   private SearchService searchService;
+   
+   /** The NamespaceService bean reference. */
+   private NamespaceService namespaceService;
    
    /** The browse bean */
    private BrowseBean browseBean;
@@ -157,6 +166,22 @@ public class ForumsBean implements IContextListener
       this.dictionaryService = dictionaryService;
    }
    
+   /**
+    * @param searchService The SearchService to set.
+    */
+   public void setSearchService(SearchService searchService)
+   {
+      this.searchService = searchService;
+   }
+
+   /**
+    * @param namespaceService The NamespaceService to set.
+    */
+   public void setNamespaceService(NamespaceService namespaceService)
+   {
+      this.namespaceService = namespaceService;
+   }
+
    /**
     * Sets the BrowseBean instance to use to retrieve the current document
     * 
@@ -611,9 +636,24 @@ public class ForumsBean implements IContextListener
    public NodePropertyResolver resolverReplies = new NodePropertyResolver() {
       public Object get(Node node) 
       {
-         // TODO: query the node for the number of posts inside the topic
+         // query for the number of posts within the given node
+         String repliesXPath = "./*[(subtypeOf('" + ForumModel.TYPE_POST + "'))]";         
+         List<NodeRef> replies = searchService.selectNodes(
+                node.getNodeRef(),
+                repliesXPath,
+                new QueryParameterDefinition[] {},
+                namespaceService,
+                false);
          
-         return "1";
+         // reduce the count by 1 as one of the posts will be the initial post
+         int noReplies = replies.size() - 1;
+         
+         if (noReplies < 0)
+         {
+            noReplies = 0;
+         }
+         
+         return new Integer(noReplies);
       }
    };
    
