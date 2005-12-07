@@ -31,8 +31,6 @@ import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.TempFileProvider;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Makes use of the OpenOffice Uno interfaces to convert the content.
@@ -43,8 +41,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UnoContentTransformer extends AbstractContentTransformer
 {
-    private static final Log logger = LogFactory.getLog(UnoContentTransformer.class);
-    
     /** map of <tt>DocumentFormat</tt> instances keyed by mimetype conversion */
     private static Map<ContentTransformerRegistry.TransformationKey, DocumentFormatWrapper> formatsByConversion;
     
@@ -107,7 +103,7 @@ public class UnoContentTransformer extends AbstractContentTransformer
 //        DocumentFormat.XML_WRITER_WEB
     }
     
-    private MimetypeMap mimetypeMap;
+    private String connectionUrl = UnoConnection.DEFAULT_CONNECTION_STRING;
     private UnoConnection connection;
     private boolean isConnected;
 
@@ -117,41 +113,28 @@ public class UnoContentTransformer extends AbstractContentTransformer
      * 
      * @see UnoConnection#DEFAULT_CONNECTION_STRING
      */
-    public UnoContentTransformer(MimetypeMap mimetypeMap)
+    public UnoContentTransformer()
     {
-        this(mimetypeMap, UnoConnection.DEFAULT_CONNECTION_STRING);
     }
-    
-//    /**
-//     * Construct a transformer that will fetch its configuration from the given
-//     * service.
-//     * 
-//     * @param configService a service containing the required configuration
-//     */
-//    public UnoContentTransformer(ConfigService configService)
-//    {
-//        // get the connection string from the service
-//        init
-//    }
-    
+
     /**
-     * Constructs a transformer that uses the given url to establish
-     * a connection.
+     * Override the default connection URL with a new one.
      * 
-     * @param unoConnectionUrl the Uno server connection URL
+     * @param connectionUrl the connection string
+     * 
+     * @see UnoConnection#DEFAULT_CONNECTION_STRING
      */
-    public UnoContentTransformer(MimetypeMap mimetypeMap, String unoConnectionUrl)
+    public void setConnectionUrl(String connectionUrl)
     {
-        this.mimetypeMap = mimetypeMap;
-        init(unoConnectionUrl);
+        this.connectionUrl = connectionUrl;
     }
-    
+
     /**
-     * @param unoConnectionUrl the URL of the Uno server
+     * Perform bean initialization
      */
-    private synchronized void init(String unoConnectionUrl)
+    public synchronized void init()
     {
-        connection = new UnoConnection(unoConnectionUrl);
+        connection = new UnoConnection(connectionUrl);
         // attempt to make an connection
         try
         {
@@ -222,10 +205,12 @@ public class UnoContentTransformer extends AbstractContentTransformer
         String targetMimetype = getMimetype(writer);
 
         // create temporary files to convert from and to
-        File tempFromFile = TempFileProvider.createTempFile("UnoContentTransformer",
-                "." + mimetypeMap.getExtension(sourceMimetype));
-        File tempToFile = TempFileProvider.createTempFile("UnoContentTransformer",
-                "." + mimetypeMap.getExtension(targetMimetype));
+        File tempFromFile = TempFileProvider.createTempFile(
+                "UnoContentTransformer",
+                "." + getMimetypeService().getExtension(sourceMimetype));
+        File tempToFile = TempFileProvider.createTempFile(
+                "UnoContentTransformer",
+                "." + getMimetypeService().getExtension(targetMimetype));
         // download the content from the source reader
         reader.getContent(tempFromFile);
         

@@ -17,8 +17,6 @@
 package org.alfresco.repo.content.transform;
 
 import org.alfresco.repo.content.MimetypeMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @see org.alfresco.repo.content.transform.UnoContentTransformer
@@ -29,13 +27,12 @@ public class UnoContentTransformerTest extends AbstractContentTransformerTest
 {
     private static String MIMETYPE_RUBBISH = "text/rubbish";
     
-    private static final Log logger = LogFactory.getLog(UnoContentTransformerTest.class);
-
     private UnoContentTransformer transformer;
     
     public void onSetUpInTransaction() throws Exception
     {
-        transformer = new UnoContentTransformer(mimetypeMap);
+        transformer = new UnoContentTransformer();
+        transformer.setMimetypeService(mimetypeMap);
     }
     
     /**

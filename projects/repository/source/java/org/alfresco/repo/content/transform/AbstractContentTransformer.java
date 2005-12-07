@@ -24,12 +24,16 @@ import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.MimetypeService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides basic services for {@link org.alfresco.repo.content.transform.ContentTransformer}
  * implementations.
+ * <p>
+ * This class maintains the performance measures for the transformers as well, making sure that
+ * there is an extra penalty for transformers that fail regularly.
  * 
  * @author Derek Hulley
  */
@@ -37,6 +41,7 @@ public abstract class AbstractContentTransformer implements ContentTransformer
 {
     private static final Log logger = LogFactory.getLog(AbstractContentTransformer.class);
     
+    private MimetypeService mimetypeService;
     private double averageTime = 0.0;
     private long count = 0L;
     
@@ -48,6 +53,24 @@ public abstract class AbstractContentTransformer implements ContentTransformer
         averageTime = 0.0;
     }
     
+    /**
+     * Helper setter of the mimetype service.  This is not always required.
+     * 
+     * @param mimetypeService
+     */
+    public void setMimetypeService(MimetypeService mimetypeService)
+    {
+        this.mimetypeService = mimetypeService;
+    }
+
+    /**
+     * @return Returns the mimetype helper
+     */
+    protected MimetypeService getMimetypeService()
+    {
+        return mimetypeService;
+    }
+
     @Override
     public String toString()
     {
@@ -156,6 +179,11 @@ public abstract class AbstractContentTransformer implements ContentTransformer
         }
         catch (Throwable e)
         {
+            // Make sure that this transformation gets set back i.t.o. time taken.
+            // This will ensure that transformers that compete for the same transformation
+            // will be prejudiced against transformers that tend to fail
+            recordTime(10000);   // 10 seconds, i.e. rubbish
+            
             throw new ContentIOException("Content conversion failed: \n" +
                     "   reader: " + reader + "\n" +
                     "   writer: " + writer + "\n" +
