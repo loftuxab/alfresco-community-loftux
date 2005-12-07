@@ -69,8 +69,6 @@ public class ContentTransformerRegistryTest extends AbstractContentTransformerTe
         {
             bytes[i] = (byte)i;
         }
-        String string = new String(bytes, "UTF-8");
-        
         List<ContentTransformer> transformers = new ArrayList<ContentTransformer>(5);
         // create some dummy transformers for reliability tests
         transformers.add(new DummyTransformer(A, B, 0.3, 10L));
