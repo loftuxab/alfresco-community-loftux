@@ -25,7 +25,7 @@ import org.alfresco.service.namespace.QName;
  * @author David Caruana
  *
  */
-/*package*/ class NodeItemContext extends ElementContext
+public class NodeItemContext extends ElementContext
 {
     private NodeContext nodeContext;
     
@@ -36,7 +36,7 @@ import org.alfresco.service.namespace.QName;
      * @param dictionary
      * @param importer
      */
-    NodeItemContext(QName elementName, NodeContext nodeContext)
+    public NodeItemContext(QName elementName, NodeContext nodeContext)
     {
         super(elementName, nodeContext.getDictionaryService(), nodeContext.getImporter());
         this.nodeContext = nodeContext;

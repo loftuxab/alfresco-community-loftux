@@ -30,6 +30,7 @@ import javax.jcr.SimpleCredentials;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.dictionary.NamespaceRegistryImpl;
 import org.alfresco.jcr.session.SessionImpl;
+import org.alfresco.repo.importer.ImporterComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.security.AuthenticationService;
@@ -52,6 +53,7 @@ public class RepositoryImpl implements Repository
 
     // Service dependencies
     private ServiceRegistry serviceRegistry;
+    private ImporterComponent importerComponent;
     private String defaultWorkspace = null;
 
     // Services
@@ -70,6 +72,16 @@ public class RepositoryImpl implements Repository
     public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
         this.serviceRegistry = serviceRegistry;
+    }
+    
+    /**
+     * Set the Importer Component
+     * 
+     * @param importerComponent
+     */
+    public void setImporterComponent(ImporterComponent importerComponent)
+    {
+        this.importerComponent = importerComponent;
     }
     
     /**
@@ -131,6 +143,16 @@ public class RepositoryImpl implements Repository
         return serviceRegistry;
     }
 
+    /**
+     * Get the importer component
+     * 
+     * @return  the importer component
+     */
+    public ImporterComponent getImporterComponent()
+    {
+        return importerComponent;
+    }
+    
     /**
      * Get the Namespace Registry
      */

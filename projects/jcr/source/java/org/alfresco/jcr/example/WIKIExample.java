@@ -209,11 +209,18 @@ public class WIKIExample
                 outputContentNode(n);
             }            
 
-            // export content
-            File outputFile = new File("systemview.xml");
-            FileOutputStream out = new FileOutputStream(outputFile);
-            session.exportSystemView("/app:company_home/wiki:encyclopedia", out, false, false);
+            // export content (system view format)
+            File systemView = new File("systemview.xml");
+            FileOutputStream systemViewOut = new FileOutputStream(systemView);
+            session.exportSystemView("/app:company_home/wiki:encyclopedia", systemViewOut, false, false);
+            
+            // export content (document view format)
+            File docView = new File("docview.xml");
+            FileOutputStream docViewOut = new FileOutputStream(docView);
+            session.exportDocumentView("/app:company_home/wiki:encyclopedia", docViewOut, false, false);
+            
             System.out.println("WIKI exported");
+
         }
         finally
         {

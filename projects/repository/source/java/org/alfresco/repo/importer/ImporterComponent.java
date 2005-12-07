@@ -63,6 +63,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
+import org.xml.sax.ContentHandler;
 
 
 /**
@@ -163,7 +164,7 @@ public class ImporterComponent
     public void importView(Reader viewReader, Location location, ImporterBinding binding, ImporterProgress progress)
     {
         NodeRef nodeRef = getNodeRef(location, binding);
-        performImport(nodeRef, location.getChildAssocType(), viewReader, new DefaultStreamHandler(), binding, progress);       
+        parserImport(nodeRef, location.getChildAssocType(), viewReader, new DefaultStreamHandler(), binding, progress);       
     }
 
     /* (non-Javadoc)
@@ -174,7 +175,7 @@ public class ImporterComponent
         importHandler.startImport();
         Reader dataFileReader = importHandler.getDataStream(); 
         NodeRef nodeRef = getNodeRef(location, binding);
-        performImport(nodeRef, location.getChildAssocType(), dataFileReader, importHandler, binding, progress);
+        parserImport(nodeRef, location.getChildAssocType(), dataFileReader, importHandler, binding, progress);
         importHandler.endImport();
     }
     
@@ -219,35 +220,6 @@ public class ImporterComponent
         // TODO: Check Node actually exists
         
         return nodeRef;
-    }
-    
-    /**
-     * Perform the actual import
-     * 
-     * @param nodeRef node reference to import under
-     * @param childAssocType the child association type to import under
-     * @param inputStream the input stream to import from
-     * @param streamHandler the content property import stream handler
-     * @param binding import configuration
-     * @param progress import progress
-     */
-    private void performImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportPackageHandler streamHandler, ImporterBinding binding, ImporterProgress progress)
-    {
-        ParameterCheck.mandatory("Node Reference", nodeRef);
-        ParameterCheck.mandatory("View Reader", viewReader);
-        ParameterCheck.mandatory("Stream Handler", streamHandler);
-        
-        try
-        {
-            Importer defaultImporter = new DefaultImporter(nodeRef, childAssocType, binding, streamHandler, progress);
-            defaultImporter.start();
-            viewParser.parse(viewReader, defaultImporter);
-            defaultImporter.end();
-        }
-        finally
-        {
-            behaviourFilter.enableAllBehaviours();
-        }
     }
     
     /**
@@ -306,11 +278,54 @@ public class ImporterComponent
     }
     
     /**
+     * Perform the actual import
+     * 
+     * @param nodeRef node reference to import under
+     * @param childAssocType the child association type to import under
+     * @param inputStream the input stream to import from
+     * @param streamHandler the content property import stream handler
+     * @param binding import configuration
+     * @param progress import progress
+     */
+    public void parserImport(NodeRef nodeRef, QName childAssocType, Reader viewReader, ImportPackageHandler streamHandler, ImporterBinding binding, ImporterProgress progress)
+    {
+        ParameterCheck.mandatory("Node Reference", nodeRef);
+        ParameterCheck.mandatory("View Reader", viewReader);
+        ParameterCheck.mandatory("Stream Handler", streamHandler);
+        
+        Importer nodeImporter = new NodeImporter(nodeRef, childAssocType, binding, streamHandler, progress);
+        try
+        {
+            nodeImporter.start();
+            viewParser.parse(viewReader, nodeImporter);
+            nodeImporter.end();
+        }
+        finally
+        {
+            nodeImporter.error(null);
+        }
+    }
+    
+    
+    public ContentHandler handlerImport(NodeRef nodeRef, QName childAssocType, ImportContentHandler handler, ImporterBinding binding, ImporterProgress progress)
+    {
+        ParameterCheck.mandatory("Node Reference", nodeRef);
+
+        DefaultContentHandler defaultHandler = new DefaultContentHandler(handler);
+        ImportPackageHandler streamHandler = new ContentHandlerStreamHandler(defaultHandler);
+        Importer nodeImporter = new NodeImporter(nodeRef, childAssocType, binding, streamHandler, progress);
+        defaultHandler.setImporter(nodeImporter);
+        return defaultHandler;        
+    }
+    
+    
+    
+    /**
      * Default Importer strategy
      * 
      * @author David Caruana
      */
-    private class DefaultImporter
+    private class NodeImporter
         implements Importer
     {
         private NodeRef rootRef;
@@ -333,7 +348,7 @@ public class ImporterComponent
          * @param binding
          * @param progress
          */
-        private DefaultImporter(NodeRef rootRef, QName rootAssocType, ImporterBinding binding, ImportPackageHandler streamHandler, ImporterProgress progress)
+        private NodeImporter(NodeRef rootRef, QName rootAssocType, ImporterBinding binding, ImportPackageHandler streamHandler, ImporterProgress progress)
         {
             this.rootRef = rootRef;
             this.rootAssocType = rootAssocType;
@@ -604,6 +619,15 @@ public class ImporterComponent
                     behaviourFilter.enableBehaviours(importedRef.context.getNodeRef());
                 }
             }
+        }
+
+        /*
+         *  (non-Javadoc)
+         * @see org.alfresco.repo.importer.Importer#error(java.lang.Throwable)
+         */
+        public void error(Throwable e)
+        {
+            behaviourFilter.enableAllBehaviours();
         }
         
         /**
@@ -930,4 +954,55 @@ public class ImporterComponent
         }
     }
 
+    /**
+     * Default Import Stream Handler
+     * 
+     * @author David Caruana
+     */
+    private static class ContentHandlerStreamHandler
+        implements ImportPackageHandler
+    {
+        private ImportContentHandler handler;
+
+        /**
+         * Construct
+         * 
+         * @param handler
+         */
+        private ContentHandlerStreamHandler(ImportContentHandler handler)
+        {
+            this.handler = handler;
+        }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportPackageHandler#startImport()
+         */
+        public void startImport()
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportStreamHandler#importStream(java.lang.String)
+         */
+        public InputStream importStream(String content)
+        {
+            return handler.importStream(content);
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportPackageHandler#getDataStream()
+         */
+        public Reader getDataStream()
+        {
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImportPackageHandler#endImport()
+         */
+        public void endImport()
+        {
+        }
+    }
+    
 }

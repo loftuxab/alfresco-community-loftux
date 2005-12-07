@@ -27,7 +27,7 @@ import org.alfresco.service.namespace.QName;
  * @author David Caruana
  *
  */
-/*package*/ class ElementContext
+public class ElementContext
 {
     // Dictionary Service
     private DictionaryService dictionary;
@@ -46,7 +46,7 @@ import org.alfresco.service.namespace.QName;
      * @param elementName
      * @param progress
      */
-    /*package*/ ElementContext(QName elementName, DictionaryService dictionary, Importer importer)
+    public ElementContext(QName elementName, DictionaryService dictionary, Importer importer)
     {
         this.elementName = elementName;
         this.dictionary = dictionary;
@@ -56,7 +56,7 @@ import org.alfresco.service.namespace.QName;
     /**
      * @return  the element name
      */
-    /*package*/ QName getElementName()
+    public QName getElementName()
     {
         return elementName;
     }
@@ -64,7 +64,7 @@ import org.alfresco.service.namespace.QName;
     /**
      * @return  the dictionary service
      */
-    /*package*/ DictionaryService getDictionaryService()
+    public DictionaryService getDictionaryService()
     {
         return dictionary;
     }
@@ -72,7 +72,7 @@ import org.alfresco.service.namespace.QName;
     /**
      * @return  the importer
      */
-    /*package*/ Importer getImporter()
+    public Importer getImporter()
     {
         return importer;
     }

@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.export;
+package org.alfresco.jcr.exporter;
 
 import java.io.IOException;
 import java.io.InputStream;

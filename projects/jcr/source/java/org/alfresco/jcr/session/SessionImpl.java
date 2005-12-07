@@ -48,11 +48,13 @@ import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.version.VersionException;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.dictionary.JCRNamespacePrefixResolver;
 import org.alfresco.jcr.dictionary.NamespaceRegistryImpl;
 import org.alfresco.jcr.dictionary.NodeTypeManagerImpl;
-import org.alfresco.jcr.export.JCRDocumentXMLExporter;
-import org.alfresco.jcr.export.JCRSystemXMLExporter;
+import org.alfresco.jcr.exporter.JCRDocumentXMLExporter;
+import org.alfresco.jcr.exporter.JCRSystemXMLExporter;
+import org.alfresco.jcr.importer.JCRImportHandler;
 import org.alfresco.jcr.item.ItemImpl;
 import org.alfresco.jcr.item.ItemResolver;
 import org.alfresco.jcr.item.JCRPath;
@@ -61,6 +63,7 @@ import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.item.ValueFactoryImpl;
 import org.alfresco.jcr.repository.RepositoryImpl;
 import org.alfresco.jcr.util.JCRProxyFactory;
+import org.alfresco.repo.importer.ImporterComponent;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockType;
@@ -73,14 +76,19 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
+import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
+import org.alfresco.util.debug.NodeStoreInspector;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 
 /**
@@ -506,7 +514,19 @@ public class SessionImpl implements Session
      */
     public ContentHandler getImportContentHandler(String parentAbsPath, int uuidBehavior) throws PathNotFoundException, ConstraintViolationException, VersionException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        // locate noderef for path
+        NodeService nodeService = getRepositoryImpl().getServiceRegistry().getNodeService();
+        NodeRef rootRef = nodeService.getRootNode(getWorkspaceStore());
+        NodeRef nodeRef = ItemResolver.getNodeRef(this, rootRef, parentAbsPath);
+        if (nodeRef == null)
+        {
+            throw new PathNotFoundException("Parent path " + parentAbsPath + " does not exist.");
+        }
+        
+        // create content handler for import
+        JCRImportHandler jcrImportHandler = new JCRImportHandler(this);
+        ImporterComponent importerComponent = getRepositoryImpl().getImporterComponent();
+        return importerComponent.handlerImport(nodeRef, null, jcrImportHandler, null, null);
     }
 
     /* (non-Javadoc)
@@ -514,7 +534,33 @@ public class SessionImpl implements Session
      */
     public void importXML(String parentAbsPath, InputStream in, int uuidBehavior) throws IOException, PathNotFoundException, ItemExistsException, ConstraintViolationException, VersionException, InvalidSerializedDataException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        ContentHandler handler = getImportContentHandler(parentAbsPath, uuidBehavior);
+
+        try
+        {
+            XMLReader parser = XMLReaderFactory.createXMLReader();
+            parser.setContentHandler(handler);
+            parser.setFeature("http://xml.org/sax/features/namespaces", true);
+            parser.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
+            parser.parse(new InputSource(in));
+            
+            // debug purposes only
+            NodeService nodeService = getRepositoryImpl().getServiceRegistry().getNodeService();
+            System.out.println((NodeStoreInspector.dumpNodeStore(nodeService, getWorkspaceStore())));
+        }    
+        catch (SAXException se)
+        {
+            // check for wrapped repository exception
+            Exception e = se.getException();
+            if (e != null && e instanceof AlfrescoRuntimeException)
+            {
+                throw (AlfrescoRuntimeException) e;
+            }
+            else
+            {
+                throw new InvalidSerializedDataException("Failed to import provided xml stream", se);
+            }
+        }
     }
 
     /* (non-Javadoc)

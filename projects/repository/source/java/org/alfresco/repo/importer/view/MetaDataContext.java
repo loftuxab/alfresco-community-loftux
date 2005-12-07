@@ -27,7 +27,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author David Caruana
  */
-/*package*/ class MetaDataContext extends ElementContext
+public class MetaDataContext extends ElementContext
 {
     
     private Map<QName, String> properties = new HashMap<QName, String>();
@@ -40,7 +40,7 @@ import org.alfresco.service.namespace.QName;
      * @param dictionary
      * @param importer
      */
-    MetaDataContext(QName elementName, ElementContext context)
+    public MetaDataContext(QName elementName, ElementContext context)
     {
         super(elementName, context.getDictionaryService(), context.getImporter());
     }

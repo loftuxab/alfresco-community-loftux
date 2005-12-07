@@ -44,7 +44,7 @@ import org.alfresco.service.namespace.QName;
  * @author David Caruana
  *
  */
-/*package*/ class NodeContext extends ElementContext
+public class NodeContext extends ElementContext
     implements ImportNode
 {
     private ParentContext parentContext;
@@ -64,7 +64,7 @@ import org.alfresco.service.namespace.QName;
      * @param parentContext
      * @param typeDef
      */
-    /*package*/ NodeContext(QName elementName, ParentContext parentContext, TypeDefinition typeDef)
+    public NodeContext(QName elementName, ParentContext parentContext, TypeDefinition typeDef)
     {
         super(elementName, parentContext.getDictionaryService(), parentContext.getImporter());
         this.parentContext = parentContext;
@@ -86,6 +86,16 @@ import org.alfresco.service.namespace.QName;
     {
         return typeDef;
     }
+
+    /**
+     * Set Type Definition
+     * 
+     * @param typeDef
+     */
+    public void setTypeDefinition(TypeDefinition typeDef)
+    {
+        this.typeDef = typeDef;
+    }
     
     /* (non-Javadoc)
      * @see org.alfresco.repo.importer.ImportNode#getNodeRef()
@@ -98,7 +108,7 @@ import org.alfresco.service.namespace.QName;
     /**
      * @param nodeRef  the node ref
      */
-    /*package*/ void setNodeRef(NodeRef nodeRef)
+    public void setNodeRef(NodeRef nodeRef)
     {
         this.nodeRef = nodeRef;
     }
@@ -114,7 +124,7 @@ import org.alfresco.service.namespace.QName;
     /**
      * @param childName  the child name
      */
-    /*package*/ void setChildName(String childName)
+    public void setChildName(String childName)
     {
         this.childName = childName;
     }
@@ -125,7 +135,7 @@ import org.alfresco.service.namespace.QName;
      * 
      * @param property
      */
-    /*package*/ void addPropertyCollection(QName property)
+    public void addPropertyCollection(QName property)
     {
         // Do not import properties of sys:referenceable or cm:versionable
         // TODO: Make this configurable...
@@ -152,7 +162,7 @@ import org.alfresco.service.namespace.QName;
      * @param property  the property name
      * @param value  the property value
      */
-    /*package*/ void addProperty(QName property, String value)
+    public void addProperty(QName property, String value)
     {
         // Do not import properties of sys:referenceable or cm:versionable
         // TODO: Make this configurable...
@@ -196,7 +206,7 @@ import org.alfresco.service.namespace.QName;
      * @param property  property name
      * @param datatype  property datatype
      */
-    /*package*/ void addDatatype(QName property, DataTypeDefinition datatype)
+    public void addDatatype(QName property, DataTypeDefinition datatype)
     {
         propertyDatatypes.put(property, datatype);
     }
@@ -222,7 +232,7 @@ import org.alfresco.service.namespace.QName;
      * 
      * @param aspect  the aspect
      */
-    /*package*/ void addAspect(AspectDefinition aspect)
+    public void addAspect(AspectDefinition aspect)
     {
         nodeAspects.put(aspect.getName(), aspect);
     }
@@ -242,7 +252,7 @@ import org.alfresco.service.namespace.QName;
      * @param defName
      * @return the dictionary definition
      */
-    /*package*/ Object determineDefinition(QName defName)
+    public Object determineDefinition(QName defName)
     {
         Object def = determineAspect(defName);
         if (def == null)
@@ -262,7 +272,7 @@ import org.alfresco.service.namespace.QName;
      * @param defName
      * @return
      */
-    /*package*/ AspectDefinition determineAspect(QName defName)
+    public AspectDefinition determineAspect(QName defName)
     {
         AspectDefinition def = null;
         if (nodeAspects.containsKey(defName) == false)
@@ -278,7 +288,7 @@ import org.alfresco.service.namespace.QName;
      * @param defName
      * @return
      */
-    /*package*/ PropertyDefinition determineProperty(QName defName)
+    public PropertyDefinition determineProperty(QName defName)
     {
         PropertyDefinition def = null;
         if (nodeProperties.containsKey(defName) == false)
@@ -308,7 +318,7 @@ import org.alfresco.service.namespace.QName;
      * @param defName
      * @return
      */
-    /*package*/ AssociationDefinition determineAssociation(QName defName)
+    public AssociationDefinition determineAssociation(QName defName)
     {
         AssociationDefinition def = null;
         if (nodeChildAssocs.containsKey(defName) == false)
@@ -324,7 +334,7 @@ import org.alfresco.service.namespace.QName;
     @Override
     public String toString()
     {
-        return "NodeContext[childName=" + getChildName() + ",type=" + typeDef.getName() + ",nodeRef=" + nodeRef + 
+        return "NodeContext[childName=" + getChildName() + ",type=" + (typeDef == null ? "null" : typeDef.getName()) + ",nodeRef=" + nodeRef + 
             ",aspects=" + nodeAspects.values() + ",parentContext=" + parentContext.toString() + "]";
     }
     

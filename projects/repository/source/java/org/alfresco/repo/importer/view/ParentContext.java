@@ -37,7 +37,7 @@ import org.alfresco.service.namespace.QName;
  * @author David Caruana
  *
  */
-/*package*/ class ParentContext extends ElementContext
+public class ParentContext extends ElementContext
     implements ImportParent
 {
     private NodeRef parentRef;
@@ -54,12 +54,25 @@ import org.alfresco.service.namespace.QName;
      * @param parentRef
      * @param assocType
      */
-    /*package*/ ParentContext(QName elementName, DictionaryService dictionary, Importer importer)
+    public ParentContext(QName elementName, DictionaryService dictionary, Importer importer)
     {
         super(elementName, dictionary, importer);
         parentRef = importer.getRootRef();
         assocType = importer.getRootAssocType();
     }
+    
+    /**
+     * Construct (with unknown child association) 
+     * 
+     * @param elementName
+     * @param parent
+     */
+    public ParentContext(QName elementName, NodeContext parent)
+    {
+        super(elementName, parent.getDictionaryService(), parent.getImporter());
+        parentRef = parent.getNodeRef();
+    }
+    
     
     /**
      * Construct 
@@ -68,9 +81,9 @@ import org.alfresco.service.namespace.QName;
      * @param parent
      * @param childDef
      */
-    /*package*/ ParentContext(QName elementName, NodeContext parent, ChildAssociationDefinition childDef)
+    public ParentContext(QName elementName, NodeContext parent, ChildAssociationDefinition childDef)
     {
-        super(elementName, parent.getDictionaryService(), parent.getImporter());
+        this(elementName, parent);
         
         // Ensure association is valid for node
         Set<QName> allAspects = new HashSet<QName>();

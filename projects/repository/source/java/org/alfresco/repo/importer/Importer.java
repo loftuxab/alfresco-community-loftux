@@ -50,6 +50,11 @@ public interface Importer
     public void end();
 
     /**
+     * Signal import error
+     */
+    public void error(Throwable e);
+    
+    /**
      * Import meta-data
      */
     public void importMetaData(Map<QName, String> properties);

@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package org.alfresco.jcr.export;
+package org.alfresco.jcr.exporter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,17 +56,17 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class JCRSystemXMLExporter implements Exporter
 {
-    private final static String NODE_LOCALNAME = "node";
-    private final static String NAME_LOCALNAME = "name";
-    private final static String PROPERTY_LOCALNAME = "property";
-    private final static String TYPE_LOCALNAME = "type";
-    private final static String VALUE_LOCALNAME = "value";
+    public final static String NODE_LOCALNAME = "node";
+    public final static String NAME_LOCALNAME = "name";
+    public final static String PROPERTY_LOCALNAME = "property";
+    public final static String TYPE_LOCALNAME = "type";
+    public final static String VALUE_LOCALNAME = "value";
     
-    private static QName NODE_QNAME; 
-    private static QName NAME_QNAME;
-    private static QName PROPERTY_QNAME;
-    private static QName TYPE_QNAME;
-    private static QName VALUE_QNAME;
+    public final static QName NODE_QNAME = QName.createQName(JCRNamespace.SV_URI, NODE_LOCALNAME);
+    public final static QName NAME_QNAME = QName.createQName(JCRNamespace.SV_URI, NAME_LOCALNAME);
+    public final static QName PROPERTY_QNAME = QName.createQName(JCRNamespace.SV_URI, PROPERTY_LOCALNAME);
+    public final static QName TYPE_QNAME = QName.createQName(JCRNamespace.SV_URI, TYPE_LOCALNAME);
+    public final static QName VALUE_QNAME = QName.createQName(JCRNamespace.SV_URI, VALUE_LOCALNAME);
     
     private SessionImpl session;
     private ContentHandler contentHandler;
@@ -85,12 +85,6 @@ public class JCRSystemXMLExporter implements Exporter
     {
         this.session = session;
         this.contentHandler = contentHandler;
-        
-        NODE_QNAME = QName.createQName(JCRNamespace.SV_URI, NODE_LOCALNAME);
-        NAME_QNAME = QName.createQName(JCRNamespace.SV_URI, NAME_LOCALNAME);
-        PROPERTY_QNAME = QName.createQName(JCRNamespace.SV_URI, PROPERTY_LOCALNAME);
-        TYPE_QNAME = QName.createQName(JCRNamespace.SV_URI, TYPE_LOCALNAME);
-        VALUE_QNAME = QName.createQName(JCRNamespace.SV_URI, VALUE_LOCALNAME);
     }
     
     
