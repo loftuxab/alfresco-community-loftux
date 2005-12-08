@@ -27,6 +27,10 @@ public class SysViewImportTest extends BaseJCRTest
         super.onTearDownInTransaction();
     }
 
+    public void testDummy()
+    {
+    }
+    
     public void xtestImport()
         throws Exception
     {
