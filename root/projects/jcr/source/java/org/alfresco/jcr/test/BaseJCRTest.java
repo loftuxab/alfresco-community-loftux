@@ -21,8 +21,10 @@ import javax.jcr.Repository;
 import org.alfresco.jcr.repository.RepositoryFactory;
 import org.alfresco.jcr.repository.RepositoryImpl;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.debug.NodeStoreInspector;
 
 
 /**
@@ -32,7 +34,9 @@ import org.alfresco.util.BaseSpringTest;
  */
 public class BaseJCRTest extends BaseSpringTest
 {
+    private RepositoryImpl repositoryImpl;
     protected Repository repository;
+    
     protected StoreRef storeRef;
     
     @Override
@@ -40,7 +44,7 @@ public class BaseJCRTest extends BaseSpringTest
     {
         storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         TestData.generateTestData(applicationContext, storeRef.getIdentifier());
-        RepositoryImpl repositoryImpl = (RepositoryImpl)applicationContext.getBean(RepositoryFactory.REPOSITORY_BEAN);
+        repositoryImpl = (RepositoryImpl)applicationContext.getBean(RepositoryFactory.REPOSITORY_BEAN);
         repositoryImpl.setDefaultWorkspace(storeRef.getIdentifier());
         repository = repositoryImpl;
     }
@@ -48,8 +52,12 @@ public class BaseJCRTest extends BaseSpringTest
     @Override
     protected void onTearDownInTransaction()
     {
-        AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
-        authenticationComponent.clearCurrentSecurityContext();
+        // debug purposes only
+        NodeService nodeService = repositoryImpl.getServiceRegistry().getNodeService();
+        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
+
+//        AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
+//        authenticationComponent.clearCurrentSecurityContext();
         super.onTearDownInTransaction();
     }
     

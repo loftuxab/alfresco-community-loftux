@@ -76,12 +76,10 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
-import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
-import org.alfresco.util.debug.NodeStoreInspector;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.xml.sax.ContentHandler;
@@ -543,10 +541,6 @@ public class SessionImpl implements Session
             parser.setFeature("http://xml.org/sax/features/namespaces", true);
             parser.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
             parser.parse(new InputSource(in));
-            
-            // debug purposes only
-            NodeService nodeService = getRepositoryImpl().getServiceRegistry().getNodeService();
-            System.out.println((NodeStoreInspector.dumpNodeStore(nodeService, getWorkspaceStore())));
         }    
         catch (SAXException se)
         {

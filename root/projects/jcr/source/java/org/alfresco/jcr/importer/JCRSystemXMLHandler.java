@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2005 Alfresco, Inc.
+ *
+ * Licensed under the Mozilla Public License version 1.1 
+ * with a permitted attribution clause. You may obtain a
+ * copy of the License at
+ *
+ *   http://www.alfresco.org/legal/license.txt
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the
+ * License.
+ */
 package org.alfresco.jcr.importer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
@@ -30,67 +49,114 @@ import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.Base64;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 
+/**
+ * Alfresco implementation of a System View Import Content Handler
+ * 
+ * @author David Caruana
+ */
 public class JCRSystemXMLHandler implements ImportContentHandler
 {
-
     private Importer importer;
-    
     private SessionImpl session;
     private NamespacePrefixResolver importResolver;
     private Stack<ElementContext> contextStack = new Stack<ElementContext>();
     
-    
+
+    /**
+     * Construct
+     * 
+     * @param session  JCR Session
+     * @param importResolver  Namespace Resolver for the Import
+     */
     public JCRSystemXMLHandler(SessionImpl session, NamespacePrefixResolver importResolver)
     {
         this.session = session;
         this.importResolver = importResolver;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportContentHandler#setImporter(org.alfresco.repo.importer.Importer)
+     */
     public void setImporter(Importer importer)
     {
         this.importer = importer;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.alfresco.repo.importer.ImportContentHandler#importStream(java.lang.String)
+     */
     public InputStream importStream(String content)
     {
-        // TODO Auto-generated method stub
-        return null;
+        File contentFile = new File(content);
+        try
+        {
+            FileInputStream contentStream = new FileInputStream(contentFile);
+            return new Base64.InputStream(contentStream, Base64.DECODE | Base64.DONT_BREAK_LINES);
+        }
+        catch (FileNotFoundException e)
+        {
+            throw new ImporterException("Failed to retrieve import input stream on temporary content file " + content);
+        }
     }
 
-    
-    
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#setDocumentLocator(org.xml.sax.Locator)
+     */
     public void setDocumentLocator(Locator locator)
     {
-        // TODO Auto-generated method stub
-        
+        // NOOP
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#startDocument()
+     */
     public void startDocument() throws SAXException
     {
+        // NOOP
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#endDocument()
+     */
     public void endDocument() throws SAXException
     {
+        // NOOP
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
+     */
     public void startPrefixMapping(String prefix, String uri) throws SAXException
     {
-        // TODO Auto-generated method stub
-        
+        // NOOP
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
+     */
     public void endPrefixMapping(String prefix) throws SAXException
     {
-        // TODO Auto-generated method stub
-        
+        // NOOP
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     */
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
     {
         try
@@ -98,10 +164,6 @@ public class JCRSystemXMLHandler implements ImportContentHandler
             // construct qname for element
             QName elementName = QName.createQName(qName, importResolver);
     
-            //
-            // process sv:node element
-            //
-            
             if (JCRSystemXMLExporter.NODE_QNAME.equals(elementName))
             {
                 processStartNode(elementName, atts);
@@ -121,24 +183,60 @@ public class JCRSystemXMLHandler implements ImportContentHandler
         }
     }
     
-    private void processStartValue(QName elementName, Attributes atts)
+    /**
+     * Process start of Node Element
+     *  
+     * @param elementName
+     * @param atts
+     * @throws InvalidSerializedDataException
+     */
+    private void processStartNode(QName elementName, Attributes atts)
         throws InvalidSerializedDataException
     {
-        // establish correct context
-        ElementContext context = contextStack.peek();
-        if (!(context instanceof PropertyContext))
+        ParentContext parentContext = null;
+        if (contextStack.empty())
         {
-            throw new InvalidSerializedDataException("Element " + elementName + " not expected.");
+            // create root parent context
+            parentContext = new ParentContext(elementName, session.getRepositoryImpl().getServiceRegistry().getDictionaryService(), importer);
         }
-        PropertyContext property = (PropertyContext)context;
-        property.addValue();
+        else
+        {
+            NodeContext parentNode = (NodeContext)contextStack.peek();
+            
+            // if we haven't yet imported the node before its children, do so now
+            if (parentNode.getNodeRef() == null)
+            {
+                NodeRef nodeRef = importer.importNode(parentNode);
+                parentNode.setNodeRef(nodeRef);
+            }
+
+            // create parent context
+            parentContext = new ParentContext(elementName, parentNode);
+        }
         
-        ValueContext value = new ValueContext(elementName, property);
-        contextStack.push(value);
+        // create node context
+        // NOTE: we don't yet know its type (we have to wait for a property)
+        NodeContext nodeContext = new NodeContext(elementName, parentContext, null);
+
+        // establish node child name
+        String name = atts.getValue(JCRSystemXMLExporter.NAME_QNAME.toPrefixString(importResolver));
+        if (name == null)
+        {
+            throw new InvalidSerializedDataException("Mandatory sv:name attribute of element sv:node not present.");
+        }
+        nodeContext.setChildName(name);
+
+        // record new node
+        contextStack.push(nodeContext);
     }
-    
-    
-    
+
+    /**
+     * Process start of Property element
+     * 
+     * @param elementName
+     * @param atts
+     * @throws InvalidSerializedDataException
+     */
     private void processStartProperty(QName elementName, Attributes atts)
         throws InvalidSerializedDataException
     {
@@ -149,7 +247,7 @@ public class JCRSystemXMLHandler implements ImportContentHandler
             throw new InvalidSerializedDataException("Element " + elementName + " not expected.");
         }
         NodeContext parentNode = (NodeContext)context;
-
+    
         // establish property name
         String name = atts.getValue(JCRSystemXMLExporter.NAME_QNAME.toPrefixString(importResolver));
         if (name == null)
@@ -178,56 +276,39 @@ public class JCRSystemXMLHandler implements ImportContentHandler
         PropertyContext propertyContext = new PropertyContext(elementName, parentNode, propertyName, dataType);
         contextStack.push(propertyContext);
     }
-    
 
-    
-    
-    private void processStartNode(QName elementName, Attributes atts)
+    /**
+     * Process start of Value element
+     * 
+     * @param elementName
+     * @param atts
+     * @throws InvalidSerializedDataException
+     */
+    private void processStartValue(QName elementName, Attributes atts)
         throws InvalidSerializedDataException
     {
-        ParentContext parentContext = null;
-        if (contextStack.empty())
+        // establish correct context
+        ElementContext context = contextStack.peek();
+        if (!(context instanceof PropertyContext))
         {
-            // create root parent context
-            parentContext = new ParentContext(elementName, session.getRepositoryImpl().getServiceRegistry().getDictionaryService(), importer);
+            throw new InvalidSerializedDataException("Element " + elementName + " not expected.");
         }
-        else
-        {
-            NodeContext parentNode = (NodeContext)contextStack.peek();
-            
-            // if we haven't yet imported the node before its children, do so now
-            if (parentNode.getNodeRef() == null)
-            {
-                NodeRef nodeRef = importer.importNode(parentNode);
-                parentNode.setNodeRef(nodeRef);
-            }
-
-            // create parent context
-            parentContext = new ParentContext(elementName, parentNode);
-        }
+        PropertyContext property = (PropertyContext)context;
+        property.startValue();
         
-        // create node context
-        // note: we don't yet know its type (we have to wait for a property)
-        NodeContext nodeContext = new NodeContext(elementName, parentContext, null);
-
-        // establish node child name
-        String name = atts.getValue(JCRSystemXMLExporter.NAME_QNAME.toPrefixString(importResolver));
-        if (name == null)
-        {
-            throw new InvalidSerializedDataException("Mandatory sv:name attribute of element sv:node not present.");
-        }
-        nodeContext.setChildName(name);
-
-        // record new node
-        contextStack.push(nodeContext);
+        ValueContext value = new ValueContext(elementName, property);
+        contextStack.push(value);
     }
-    
-    
-    
+
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+     */
     public void endElement(String uri, String localName, String qName) throws SAXException
     {
         try
         {
+            // ensure context matches parse
             ElementContext context = (ElementContext)contextStack.peek();
             QName elementName = QName.createQName(qName, importResolver);
             if (!context.getElementName().equals(elementName))
@@ -235,13 +316,8 @@ public class JCRSystemXMLHandler implements ImportContentHandler
                 throw new InvalidSerializedDataException("Expected element " + context.getElementName() + " but was " + elementName);
             }
     
-            //
-            // process sv:node element
-            //
-            
             if (JCRSystemXMLExporter.NODE_QNAME.equals(elementName))
             {
-                // import node, if not already imported (this will be the case when no child nodes exist)
                 processEndNode((NodeContext)context);
             }
             else if (JCRSystemXMLExporter.PROPERTY_QNAME.equals(elementName))
@@ -250,7 +326,7 @@ public class JCRSystemXMLHandler implements ImportContentHandler
             }
             else if (JCRSystemXMLExporter.VALUE_QNAME.equals(elementName))
             {
-                // NOOP
+                processEndValue((ValueContext)context);
             }
     
             // cleanup
@@ -262,7 +338,32 @@ public class JCRSystemXMLHandler implements ImportContentHandler
         }
     }
 
-
+    /**
+     * Process end of Node element
+     *
+     * @param node
+     */
+    private void processEndNode(NodeContext node)
+    {
+        // import node, if not already imported (this will be the case when no child nodes exist)
+        NodeRef nodeRef = node.getNodeRef();
+        if (nodeRef == null)
+        {
+            nodeRef = node.getImporter().importNode(node);
+            node.setNodeRef(nodeRef);
+        }
+        
+        // signal end of node
+        node.getImporter().childrenImported(nodeRef);
+    }
+    
+    /**
+     * Process end of Property element
+     * 
+     * @param context
+     * @throws InvalidSerializedDataException
+     * @throws RepositoryException
+     */
     private void processEndProperty(PropertyContext context)
         throws InvalidSerializedDataException, RepositoryException
     {
@@ -301,22 +402,37 @@ public class JCRSystemXMLHandler implements ImportContentHandler
             for (StringBuffer value : values)
             {
                 QName aspectQName = QName.createQName(value.toString(), importResolver);
-                AspectDefinition aspectDef = context.getDictionaryService().getAspect(aspectQName);
-                if (aspectDef == null)
+                
+                // ignore JCR specific aspects
+                if (!(JCRNamespace.JCR_URI.equals(aspectQName.getNamespaceURI()) ||
+                      JCRNamespace.MIX_URI.equals(aspectQName.getNamespaceURI())))
                 {
-                    throw new InvalidTypeException(aspectQName);
+                    AspectDefinition aspectDef = context.getDictionaryService().getAspect(aspectQName);
+                    if (aspectDef == null)
+                    {
+                        throw new InvalidTypeException(aspectQName);
+                    }
+                    context.getNode().addAspect(aspectDef);
                 }
-                context.getNode().addAspect(aspectDef);
             }
         }
         else if (JCRUUIDProperty.PROPERTY_NAME.equals(propertyName))
         {
             // TODO: Implement when other import UUID behaviours are supported
-        }        
+        }   
+
+        //
+        // Note: ignore JCR specific properties
+        //
+        
         else if (JCRNamespace.JCR_URI.equals(propertyName.getNamespaceURI()))
         {
-            // Note: Ignore JCR specific properties
         }
+        
+        //
+        // process all other properties
+        //
+        
         else
         {
             // apply the property values to the node
@@ -345,37 +461,29 @@ public class JCRSystemXMLHandler implements ImportContentHandler
             List<StringBuffer> values = context.getValues();
             for (StringBuffer value : values)
             {
-                if (dataType.equals(DataTypeDefinition.CONTENT))
-                {
-                    // TODO: ...
-                }
-                else
-                {
-                    // first, cast value to appropriate type (using JCR converters)
-                    Serializable objVal = (Serializable)session.getTypeConverter().convert(dataTypeDef, value.toString());
-                    String strValue = DefaultTypeConverter.INSTANCE.convert(String.class, objVal);
-                    node.addProperty(propertyName, strValue);
-                }
+                // first, cast value to appropriate type (using JCR converters)
+                Serializable objVal = (Serializable)session.getTypeConverter().convert(dataTypeDef, value.toString());
+                String strValue = DefaultTypeConverter.INSTANCE.convert(String.class, objVal);
+                node.addProperty(propertyName, strValue);
             }
         }
     }
-    
-    
-    private void processEndNode(NodeContext node)
+
+    /**
+     * Process end of value element
+     * 
+     * @param context
+     */    
+    private void processEndValue(ValueContext context)
     {
-        // import node, if not already imported (this will be the case when no child nodes exist)
-        NodeRef nodeRef = node.getNodeRef();
-        if (nodeRef == null)
-        {
-            nodeRef = node.getImporter().importNode(node);
-            node.setNodeRef(nodeRef);
-        }
-        
-        // signal end of node
-        node.getImporter().childrenImported(nodeRef);
+        PropertyContext property = context.getProperty();
+        property.endValue();
     }
 
-    
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#characters(char[], int, int)
+     */
     public void characters(char[] ch, int start, int length) throws SAXException
     {
         ElementContext context = (ElementContext)contextStack.peek();
@@ -386,6 +494,10 @@ public class JCRSystemXMLHandler implements ImportContentHandler
         }
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#ignorableWhitespace(char[], int, int)
+     */
     public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException
     {
         ElementContext context = (ElementContext)contextStack.peek();
@@ -396,35 +508,44 @@ public class JCRSystemXMLHandler implements ImportContentHandler
         }
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#processingInstruction(java.lang.String, java.lang.String)
+     */
     public void processingInstruction(String target, String data) throws SAXException
     {
-        // TODO Auto-generated method stub
-        
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ContentHandler#skippedEntity(java.lang.String)
+     */
     public void skippedEntity(String name) throws SAXException
     {
-        // TODO Auto-generated method stub
-        
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
+     */
     public void warning(SAXParseException exception) throws SAXException
     {
-        // TODO Auto-generated method stub
-        
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
+     */
     public void error(SAXParseException exception) throws SAXException
     {
-        // TODO Auto-generated method stub
-        
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
+     */
     public void fatalError(SAXParseException exception) throws SAXException
     {
-        // TODO Auto-generated method stub
-        
     }
-
 
 }
