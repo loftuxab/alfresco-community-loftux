@@ -136,14 +136,34 @@ Closing the Alfresco Server
 
 Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 
+===========================
+Upgrading from V1.0 to V1.1
+===========================
+
+In V1.1 some of the configuration has been changed.
+In order to deploy V1.1 over the top of an existing V1 installation the following steps must be taken:
+
+Note: Your existing Database and 'alf_data' directory will be preserved.
+
+*** Any Configuration changes that you have made need to be noted. ***
+
+*** Tomcat ***
+For Tomcat, the 'alfresco' directory within 'Tomcat\webapps' needs to be deleted
+Copy the V1.1 'alfresco.war' file into 'Tomcat\webapps' - either from downloading the WAR or the Tomcat Bundle
+Start Tomcat, so that the 'alfresco' directory within 'Tomcat\webapps' is created
+Stop Tomcat
+Modify any configuration files that need changing
+Start Tomcat and enjoy using Alfresco V1.1
+
 
 =====================
 Using the CIFS Server
 =====================
 
-To enable the CIFS server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin' 
+To enable the CIFS server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin'
 needs to be copied into a folder on the system path, such as 'c:\windows\system32'.  The 
 Alfresco server will need to be re-started once the dll has been copied.
+Or you could add 'C:\alfresco\bin' to your path.
 
 Once the Alfresco server is running, it should be possible to connect to it by mapping a
 drive to it.  The name to use for the mapping is based on the name of the server on which
@@ -177,7 +197,8 @@ Image Manipulation
 ==================
 
 To enable image manipulation on a Windows platform, the 'imconvert.exe' in
-'C:\alfresco\bin' needs to be copied into a folder on the system path, such as 'C:\windows\system32'. 
+'C:\alfresco\bin' needs to be copied into a folder on the system path, such as 'C:\windows\system32'.
+Or you could add 'C:\alfresco\bin' to your path.
 
 
 ================

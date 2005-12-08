@@ -141,6 +141,25 @@ Closing the Alfresco Server
 Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 
 
+===========================
+Upgrading from V1.0 to V1.1
+===========================
+
+In V1.1 some of the configuration has been changed.
+In order to deploy V1.1 over the top of an existing V1 installation the following steps must be taken:
+
+Note: Your existing Database and 'alf_data' directory will be preserved.
+
+*** Any Configuration changes that you have made need to be noted. ***
+
+*** Jboss ***
+For Jboss the 'Jboss\server\default\deploy\' and the 'Jboss\server\default\config\alfresco' directories need to be deleted.
+Copy the V1.1 'alfresco.war' file from the V1.1 Jboss Bundle into 'Jboss\server\default\deploy\'
+Copy the V1.1 'alfresco' config directory ('Jboss\server\default\config\alfresco') from the V1.1 Jboss Bundle into your existing 'Jboss\server\default\config\alfresco' directory
+Modify any configuration files that need changing
+Start Jboss and enjoy using Alfresco V1.1
+
+
 =====================
 Using the CIFS Server
 =====================

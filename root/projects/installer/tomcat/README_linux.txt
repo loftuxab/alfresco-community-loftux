@@ -128,6 +128,26 @@ Closing the Alfresco Server
 Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 
 
+===========================
+Upgrading from V1.0 to V1.1
+===========================
+
+In V1.1 some of the configuration has been changed.
+In order to deploy V1.1 over the top of an existing V1 installation the following steps must be taken:
+
+Note: Your existing Database and 'alf_data' directory will be preserved.
+
+*** Any Configuration changes that you have made need to be noted. ***
+
+*** Tomcat ***
+For Tomcat, the 'alfresco' directory within 'Tomcat/webapps' needs to be deleted
+Copy the V1.1 'alfresco.war' file into 'Tomcat/webapps' - either from downloading the WAR or the Tomcat Bundle
+Start Tomcat, so that the 'alfresco' directory within 'Tomcat/webapps' is created
+Stop Tomcat
+Modify any configuration files that need changing
+Start Tomcat and enjoy using Alfresco V1.1
+
+
 =====================
 Using the CIFS Server
 =====================
@@ -203,6 +223,13 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
   http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
   or remove the transformer references completely if you don't require them:
   http://www.alfresco.org/forums/viewtopic.php?t=90
+  We have also noted cases on some distributions and configurations of Linux 
+  where imconvert is configured correctly but you recieve the 'Failed to execute command: imconvert ...'
+  error. This can be solved in some instances by editing the 'content-services-context.xml' 
+  and removing the quotes around the imconvert command:
+  <value>imconvert '${source}' ${options} '${target}'</value>
+  to:
+  <value>imconvert ${source} ${options} ${target}</value>
 
 - If you see this error on server startup:
   ERROR [protocol] FTP Socket error
