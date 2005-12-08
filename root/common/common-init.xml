@@ -11,9 +11,11 @@
         </tstamp>
 
         <property environment="env" />
+        <path id="path.root" path="${dir.common}/.."/>
+        <property name="dir.root" refid="path.root"/>
         <property file="${user.home}/user-override.properties" />
         <property file="project-override.properties" />
-        <property file="${dir.common}/../projects/repository/config/alfresco/version.properties" />
+        <property file="${dir.root}/projects/repository/config/alfresco/version.properties" />
         <property file="${dir.common}/common.properties" />
         <property file="project.properties" />
 
@@ -53,6 +55,7 @@
     <target name="dump-properties" depends="init">
         <echo level="info">ant.project.name = ${ant.project.name}</echo>
         <echo level="info">basedir = ${basedir}</echo>
+        <echo level="info">dir.root = ${dir.root}</echo>
         <echo level="info">user.home = ${user.home}</echo>
         <echo level="info">version.number = ${version.number}</echo>
         <echo level="info">home.jboss = ${home.jboss}</echo>

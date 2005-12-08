@@ -201,11 +201,11 @@
       <mkdir dir="${dir.dist}" />
       
       <zip destfile="${dir.dist}/${file.name.dist.src}.zip">
-         <zipfileset dir="${dir.common}/.." excludes="${excludes.dist.src}" />
+         <zipfileset dir="${dir.root}" excludes="${excludes.dist.src}" />
       </zip>
       
       <tar destfile="${dir.dist}/${file.name.dist.src}.tar" longfile="gnu">
-         <tarfileset dir="${dir.common}/.." excludes="${excludes.dist.src}" />
+         <tarfileset dir="${dir.root}" excludes="${excludes.dist.src}" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.src}.tar.gz" src="${dir.dist}/${file.name.dist.src}.tar" />
       <delete file="${dir.dist}/${file.name.dist.src}.tar" />

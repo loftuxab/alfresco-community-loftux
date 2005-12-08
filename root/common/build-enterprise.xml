@@ -11,9 +11,9 @@
    <target name="init" depends="common-init.init">
       <property name="dir.name.enterprise" value="enterprise" />
       <property name="dir.project.enterprise" value="${dir.name.projects}/${dir.name.enterprise}" />
-      <property name="file.deploy" value="../${dir.project.enterprise}/build/dist/${file.name.war.alfresco}" />
+      <property name="file.deploy" value="${dir.root}/${dir.project.enterprise}/build/dist/${file.name.war.alfresco}" />
 
-      <filelist id="files.project.build" dir=".."
+      <filelist id="files.project.build" dir="${dir.root}"
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
@@ -31,12 +31,12 @@
 
    <!-- override the drop-database target to also delete the enterprise index files -->
    <target name="drop-database" depends="alfresco.drop-database">
-      <delete quiet="yes" includeEmptyDirs="true" dir="../${dir.project.enterprise}/alf_data" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.root}/${dir.project.enterprise}/alf_data" />
    </target>
    
    <!-- override the clean-war target so we remove the assemble folder -->
    <target name="clean-war" depends="alfresco.clean-war">
-      <delete quiet="yes" includeEmptyDirs="true" dir="../${dir.project.enterprise}/build/assemble" />
+      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.root}/${dir.project.enterprise}/build/assemble" />
    </target>
    
 </project>
