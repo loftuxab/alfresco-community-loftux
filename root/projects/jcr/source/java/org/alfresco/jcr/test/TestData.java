@@ -49,6 +49,7 @@ public class TestData
         ApplicationContext context = new ClassPathXmlApplicationContext("org/alfresco/jcr/test/test-context.xml");
         generateTestData(context, TEST_WORKSPACE);
         System.out.println("Generated TCK test data to workspace: " + TEST_WORKSPACE);
+        System.exit(0);
     }
 
     /**

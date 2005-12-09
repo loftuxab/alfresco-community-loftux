@@ -147,7 +147,7 @@ public class JCRImportHandler implements ImportContentHandler
             }
             else
             {
-                // TODO: doc view handler
+                targetHandler = new JCRDocXMLHandler(session, namespaceContext);
             }
             targetHandler.setImporter(importer);
             targetHandler.startDocument();
@@ -325,7 +325,10 @@ public class JCRImportHandler implements ImportContentHandler
                 {
                     prefix = NamespaceService.DEFAULT_PREFIX;
                 }
-                throw new org.alfresco.service.namespace.NamespaceException("Namespace URI " + namespaceURI + " not registered.");
+                else
+                {
+                    throw new org.alfresco.service.namespace.NamespaceException("Namespace URI " + namespaceURI + " not registered.");
+                }
             }
             List<String> prefixes = new ArrayList<String>(1);
             prefixes.add(prefix);

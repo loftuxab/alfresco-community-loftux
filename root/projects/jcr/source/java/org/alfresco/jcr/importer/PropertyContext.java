@@ -31,6 +31,7 @@ import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ISO9075;
 import org.alfresco.util.TempFileProvider;
 
 
@@ -169,6 +170,12 @@ public class PropertyContext extends ElementContext
             {
                 throw new ImporterException("Failed to create temporary content holder for property " + propertyName, e);
             }
+        }
+        else
+        {
+            // decode value
+            StringBuffer buffer = values.get(values.size() -1);
+            values.set(values.size() -1, new StringBuffer(ISO9075.decode(buffer.toString())));
         }
     }
     

@@ -26,6 +26,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 
+import org.alfresco.jcr.dictionary.JCRNamespace;
 import org.alfresco.jcr.item.NodeImpl;
 import org.alfresco.jcr.item.PropertyImpl;
 import org.alfresco.jcr.item.property.JCRMixinTypesProperty;
@@ -41,6 +42,7 @@ import org.alfresco.service.cmr.view.ExporterContext;
 import org.alfresco.service.cmr.view.ExporterException;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Base64;
+import org.alfresco.util.ISO9075;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -214,8 +216,9 @@ public class JCRDocumentXMLExporter implements Exporter
             {
                 Object value = currentValues.get(i);
                 String strValue = (value instanceof Collection) ? getCollectionValue((Collection)value) : getValue(value);
-                attrs.addAttribute(currentProperties.get(i).getNamespaceURI(), currentProperties.get(i).getLocalName(),
-                    toPrefixString(currentProperties.get(i)), null, strValue);
+                QName propName = currentProperties.get(i);
+                propName = encodeQName(propName);
+                attrs.addAttribute(propName.getNamespaceURI(), propName.getLocalName(), toPrefixString(propName), null, strValue);
             }
             
             // emit node element
@@ -366,19 +369,21 @@ public class JCRDocumentXMLExporter implements Exporter
     private QName getNodeName(NodeRef nodeRef)
     {
         // establish name of node
-        String childName;
+        QName childQName = null;
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         NodeRef rootNode = nodeService.getRootNode(nodeRef.getStoreRef());
         if (rootNode.equals(nodeRef))
         {
-            childName = "jcr:root";
+            childQName = QName.createQName(JCRNamespace.JCR_URI, "root");
         }
         else
         {
             Path path = nodeService.getPath(nodeRef);
-            childName = path.last().getElementString();
+            String childName = path.last().getElementString();
+            childQName = QName.createQName(childName);
+            childQName = encodeQName(childQName);
         }
-        QName childQName = QName.createQName(childName);
+        
         return childQName;
     }
     
@@ -394,6 +399,7 @@ public class JCRDocumentXMLExporter implements Exporter
         String strValue = session.getTypeConverter().convert(String.class, value);
         return encodeBlanks(strValue);
     }
+    
     
     /**
      * Get multi-valued property
@@ -417,7 +423,18 @@ public class JCRDocumentXMLExporter implements Exporter
         }
         return buffer.toString();
     }
-    
+
+    /**
+     * Encode Name for Document View Output
+     * 
+     * @param name  name to encode
+     * @return  encoded name
+     */
+    private QName encodeQName(QName name)
+    {
+        return QName.createQName(name.getNamespaceURI(), ISO9075.encode(name.getLocalName()));
+    }
+
     /**
      * Encode blanks in value
      * 
@@ -428,5 +445,5 @@ public class JCRDocumentXMLExporter implements Exporter
     {
         return value.replaceAll(" ", "_x0020_");    
     }
-
+    
 }

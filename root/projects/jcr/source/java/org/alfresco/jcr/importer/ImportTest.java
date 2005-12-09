@@ -24,7 +24,7 @@ import org.alfresco.jcr.test.BaseJCRTest;
 import org.springframework.core.io.ClassPathResource;
 
 
-public class SysViewImportTest extends BaseJCRTest
+public class ImportTest extends BaseJCRTest
 {
     protected Session superuserSession;
 
@@ -44,7 +44,7 @@ public class SysViewImportTest extends BaseJCRTest
         superuserSession.logout();
     }
     
-    public void testImport()
+    public void testSysImport()
         throws Exception
     {
         ClassPathResource sysview = new ClassPathResource("org/alfresco/jcr/test/sysview.xml");
@@ -52,6 +52,16 @@ public class SysViewImportTest extends BaseJCRTest
         
         // TODO: Perform import tests
         
+        //setComplete();
+    }
+
+    public void testDocImport()
+        throws Exception
+    {
+        ClassPathResource sysview = new ClassPathResource("org/alfresco/jcr/test/docview.xml");
+        superuserSession.importXML("/testroot", sysview.getInputStream(), ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
+        
+        // TODO: Perform import tests
         
         //setComplete();
     }
