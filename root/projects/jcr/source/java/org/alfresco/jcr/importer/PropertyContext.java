@@ -135,7 +135,7 @@ public class PropertyContext extends ElementContext
         if (propertyType.equals(DataTypeDefinition.CONTENT))
         {            
             // create temporary file to hold content
-            File tempFile = TempFileProvider.createTempFile("import", "bin");
+            File tempFile = TempFileProvider.createTempFile("import", ".tmp");
             try
             {
                 FileWriter tempWriter = new FileWriter(tempFile);
