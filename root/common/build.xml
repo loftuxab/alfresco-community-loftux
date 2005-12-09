@@ -54,7 +54,7 @@
          <filelist refid="files.project.build"/>
       </subant>
       <subant target="compile-taglibdocs">
-         <filelist dir="." files="${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}"/>
+         <filelist dir="${dir.product.root}" files="${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}"/>
       </subant>  
 
       <mkdir dir="${dir.javadoc}"/>
