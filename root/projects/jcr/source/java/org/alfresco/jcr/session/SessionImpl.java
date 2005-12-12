@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.jcr.AccessDeniedException;
 import javax.jcr.Credentials;
+import javax.jcr.ImportUUIDBehavior;
 import javax.jcr.InvalidItemStateException;
 import javax.jcr.InvalidSerializedDataException;
 import javax.jcr.Item;
@@ -76,6 +77,8 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.ExporterService;
+import org.alfresco.service.cmr.view.ImporterBinding;
+import org.alfresco.service.cmr.view.ImporterException;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
@@ -524,7 +527,7 @@ public class SessionImpl implements Session
         // create content handler for import
         JCRImportHandler jcrImportHandler = new JCRImportHandler(this);
         ImporterComponent importerComponent = getRepositoryImpl().getImporterComponent();
-        return importerComponent.handlerImport(nodeRef, null, jcrImportHandler, null, null);
+        return importerComponent.handlerImport(nodeRef, null, jcrImportHandler, new JCRImportBinding(uuidBehavior), null);
     }
 
     /* (non-Javadoc)
@@ -769,4 +772,56 @@ public class SessionImpl implements Session
         return parameters;
     }
 
+    /**
+     * JCR Session Import Binding
+     */
+    private class JCRImportBinding implements ImporterBinding
+    {
+        private ImporterBinding.UUID_BINDING  uuidBinding;
+
+        /**
+         * Construct
+         * 
+         * @param uuidBehaviour   JCR Import UUID Behaviour
+         */
+        private JCRImportBinding(int uuidBehaviour)
+        {
+            switch (uuidBehaviour)
+            {
+                case ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW:
+                    uuidBinding = ImporterBinding.UUID_BINDING.CREATE_NEW;
+                    break;
+                case ImportUUIDBehavior.IMPORT_UUID_COLLISION_REMOVE_EXISTING:
+                    uuidBinding = ImporterBinding.UUID_BINDING.REMOVE_EXISTING;
+                    break;
+                case ImportUUIDBehavior.IMPORT_UUID_COLLISION_REPLACE_EXISTING:
+                    uuidBinding = ImporterBinding.UUID_BINDING.REPLACE_EXISTING;
+                    break;
+                case ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW:
+                    uuidBinding = ImporterBinding.UUID_BINDING.THROW_ON_COLLISION;
+                    break;
+                 default:
+                    throw new ImporterException("Unknown Import UUID Behaviour: " + uuidBehaviour);
+            }
+        }
+
+        /*
+         *  (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImporterBinding#getUUIDBinding()
+         */
+        public UUID_BINDING getUUIDBinding()
+        {
+            return uuidBinding;
+        }
+
+        /*
+         *  (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImporterBinding#getValue(java.lang.String)
+         */
+        public String getValue(String key)
+        {
+            return null;
+        }
+    }
+    
 }

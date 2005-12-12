@@ -227,7 +227,7 @@ public class JCRDocXMLHandler implements ImportContentHandler
                 }
                 else if (JCRUUIDProperty.PROPERTY_NAME.equals(propName))
                 {
-                    // TODO: Implement when other import UUID behaviours are supported
+                    node.setUUID(value);
                 }   
 
                 //

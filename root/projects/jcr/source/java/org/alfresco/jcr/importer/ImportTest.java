@@ -17,6 +17,7 @@
 package org.alfresco.jcr.importer;
 
 import javax.jcr.ImportUUIDBehavior;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
@@ -49,10 +50,6 @@ public class ImportTest extends BaseJCRTest
     {
         ClassPathResource sysview = new ClassPathResource("org/alfresco/jcr/test/sysview.xml");
         superuserSession.importXML("/testroot", sysview.getInputStream(), ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
-        
-        // TODO: Perform import tests
-        
-        //setComplete();
     }
 
     public void testDocImport()
@@ -60,10 +57,22 @@ public class ImportTest extends BaseJCRTest
     {
         ClassPathResource sysview = new ClassPathResource("org/alfresco/jcr/test/docview.xml");
         superuserSession.importXML("/testroot", sysview.getInputStream(), ImportUUIDBehavior.IMPORT_UUID_CREATE_NEW);
-        
-        // TODO: Perform import tests
-        
-        //setComplete();
+    }
+
+    public void testThrowCollision()
+        throws Exception
+    {
+        ClassPathResource sysview = new ClassPathResource("org/alfresco/jcr/test/docview.xml");
+        superuserSession.importXML("/testroot", sysview.getInputStream(), ImportUUIDBehavior.IMPORT_UUID_COLLISION_REMOVE_EXISTING);
+
+        try
+        {
+            superuserSession.importXML("/testroot", sysview.getInputStream(), ImportUUIDBehavior.IMPORT_UUID_COLLISION_THROW);
+            fail("Failed to catch UUID collision");
+        }
+        catch(RepositoryException e)
+        {
+        }
     }
 
 }

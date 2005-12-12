@@ -418,11 +418,12 @@ public class JCRSystemXMLHandler implements ImportContentHandler
         }
         else if (JCRUUIDProperty.PROPERTY_NAME.equals(propertyName))
         {
-            // TODO: Implement when other import UUID behaviours are supported
+            StringBuffer value = context.getValues().get(0);
+            context.getNode().setUUID(value.toString());
         }   
 
         //
-        // Note: ignore JCR specific properties
+        // Note: ignore all other JCR specific properties
         //
         
         else if (JCRNamespace.JCR_URI.equals(propertyName.getNamespaceURI()))

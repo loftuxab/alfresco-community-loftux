@@ -254,7 +254,7 @@ public class WorkspaceImpl implements Workspace
      */
     public ContentHandler getImportContentHandler(String parentAbsPath, int uuidBehavior) throws PathNotFoundException, ConstraintViolationException, VersionException, LockException, AccessDeniedException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        return session.getImportContentHandler(parentAbsPath, uuidBehavior);
     }
 
     /* (non-Javadoc)
@@ -262,7 +262,7 @@ public class WorkspaceImpl implements Workspace
      */
     public void importXML(String parentAbsPath, InputStream in, int uuidBehavior) throws IOException, PathNotFoundException, ItemExistsException, ConstraintViolationException, InvalidSerializedDataException, LockException, AccessDeniedException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        session.importXML(parentAbsPath, in, uuidBehavior);
     }
 
 }
