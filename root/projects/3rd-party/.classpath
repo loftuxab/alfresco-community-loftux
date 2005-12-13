@@ -26,7 +26,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/sandbox.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/juh.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/openoffice/unoil.jar"/>
-	<classpathentry exported="true" sourcepath="src/pdfbox_src.zip" kind="lib" path="lib/pdfbox-0.7.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.7.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xpp3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-bind.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bcel.jar"/>
