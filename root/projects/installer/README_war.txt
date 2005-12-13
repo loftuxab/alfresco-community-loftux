@@ -1,8 +1,8 @@
-====================
-Alfresco 1.1 Release
-====================
+======================
+Alfresco 1.1.1 Release
+======================
 
-Welcome to the Alfresco 1.1 Release.
+Welcome to the Alfresco 1.1.1 Release.
 
 
 ===================
@@ -122,12 +122,12 @@ Shut down your application server.  You may also wish to stop the OpenOffice pro
 the command for this depends on your platform.
 
 
-===========================
-Upgrading from V1.0 to V1.1
-===========================
+=============================
+Upgrading from V1.0 to V1.1.1
+=============================
 
-In V1.1 some of the configuration has been changed.
-In order to deploy V1.1 over the top of an existing V1 installation the following steps must be taken:
+In V1.1.1 some of the configuration has been changed.
+In order to deploy V1.1.1 over the top of an existing V1.0 installation the following steps must be taken:
 
 Note: Your existing Database and 'alf_data' directory will be preserved.
 
@@ -139,14 +139,14 @@ Copy the V1.1 'alfresco.war' file into 'Tomcat/webapps' - either from downloadin
 Start Tomcat, so that the 'alfresco' directory within 'Tomcat/webapps' is created
 Stop Tomcat
 Modify any configuration files that need changing
-Start Tomcat and enjoy using Alfresco V1.1
+Start Tomcat
 
 *** Jboss ***
 For Jboss the 'Jboss/server/default/deploy/' and the 'Jboss/server/default/config/alfresco' directories need to be deleted.
 Copy the V1.1 'alfresco.war' file from the V1.1 Jboss Bundle into 'Jboss/server/default/deploy/'
 Copy the V1.1 'alfresco' config directory ('Jboss/server/default/config/alfresco') from the V1.1 Jboss Bundle into your existing 'Jboss/server/default/config/alfresco' directory
 Modify any configuration files that need changing
-Start Jboss and enjoy using Alfresco V1.1
+Start Jboss
 
 
 =====================

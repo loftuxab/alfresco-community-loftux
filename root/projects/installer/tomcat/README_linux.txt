@@ -1,8 +1,8 @@
-====================
-Alfresco 1.1 Release
-====================
+======================
+Alfresco 1.1.1 Release
+======================
 
-Welcome to the Alfresco 1.1 Release.
+Welcome to the Alfresco 1.1.1 Release.
 
 
 ===================
@@ -129,11 +129,11 @@ Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 
 
 ===========================
-Upgrading from V1.0 to V1.1
+Upgrading from V1.0 to V1.1.1
 ===========================
 
-In V1.1 some of the configuration has been changed.
-In order to deploy V1.1 over the top of an existing V1 installation the following steps must be taken:
+In V1.1.1 some of the configuration has been changed.
+In order to deploy V1.1.1 over the top of an existing V1 installation the following steps must be taken:
 
 Note: Your existing Database and 'alf_data' directory will be preserved.
 
@@ -141,11 +141,11 @@ Note: Your existing Database and 'alf_data' directory will be preserved.
 
 *** Tomcat ***
 For Tomcat, the 'alfresco' directory within 'Tomcat/webapps' needs to be deleted
-Copy the V1.1 'alfresco.war' file into 'Tomcat/webapps' - either from downloading the WAR or the Tomcat Bundle
+Copy the V1.1.1 'alfresco.war' file into 'Tomcat/webapps' - either from downloading the WAR or the Tomcat Bundle
 Start Tomcat, so that the 'alfresco' directory within 'Tomcat/webapps' is created
 Stop Tomcat
 Modify any configuration files that need changing
-Start Tomcat and enjoy using Alfresco V1.1
+Start Tomcat and enjoy using Alfresco V1.1.1
 
 
 =====================
