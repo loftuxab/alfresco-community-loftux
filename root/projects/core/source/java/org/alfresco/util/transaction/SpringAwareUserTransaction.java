@@ -138,7 +138,7 @@ public class SpringAwareUserTransaction
     {
         return true;
     }
-
+    
     /**
      * @see #NAME
      */
@@ -441,4 +441,12 @@ public class SpringAwareUserTransaction
             logger.debug("Rolled back user transaction: " + this);
         }
     }
+    
+    @Override
+    protected String methodIdentification(Method method)
+    {
+        // note: override for debugging purposes - this method called by Spring
+        return NAME;
+    }
+    
 }
