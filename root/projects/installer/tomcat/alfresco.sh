@@ -2,6 +2,8 @@
 # Start or stop Alfresco server
 # Set the following to where Tomcat is installed
 APPSERVER=/opt/alfresco/tomcat
+# Set any default JVM values
+JAVA_OPTS=-Xmx512m
 #
 if [ "$1" = "start" ]; then
   "$APPSERVER"/bin/startup.sh
