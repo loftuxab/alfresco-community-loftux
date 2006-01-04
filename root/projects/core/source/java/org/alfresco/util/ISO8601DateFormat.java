@@ -154,7 +154,7 @@ public class ISO8601DateFormat
             }
             else
             {
-                throw new IndexOutOfBoundsException("dfsf");
+                throw new IndexOutOfBoundsException("Invalid time zone indicator " + timezoneIndicator);
             }
             TimeZone timezone = TimeZone.getTimeZone(timezoneId);
             if (!timezone.getID().equals(timezoneId))
