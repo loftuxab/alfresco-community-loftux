@@ -1,8 +1,8 @@
 ======================
-Alfresco 1.1.2 Release
+Alfresco 1.2.0 Release
 ======================
 
-Welcome to the Alfresco 1.1.2 Release.
+Welcome to the Alfresco 1.2.0 Release.
 
 
 ===================
@@ -136,12 +136,12 @@ Closing the Alfresco Server
 
 Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 
-===========================
-Upgrading from V1.0 to V1.1.2
-===========================
+=============================
+Upgrading from V1.x to V1.2.0
+=============================
 
-In V1.1.2 some of the configuration has been changed.
-In order to deploy V1.1.2 over the top of an existing V1 installation the following steps must be taken:
+In V1.2.0 some of the configuration has been changed.
+In order to deploy V1.2.0 over the top of an existing V1 installation the following steps must be taken:
 
 Note: Your existing Database and 'alf_data' directory will be preserved.
 
@@ -149,11 +149,11 @@ Note: Your existing Database and 'alf_data' directory will be preserved.
 
 *** Tomcat ***
 For Tomcat, the 'alfresco' directory within 'Tomcat\webapps' needs to be deleted
-Copy the V1.1.2 'alfresco.war' file into 'Tomcat\webapps' - either from downloading the WAR or the Tomcat Bundle
+Copy the V1.2.0 'alfresco.war' file into 'Tomcat\webapps' - either from downloading the WAR or the Tomcat Bundle
 Start Tomcat, so that the 'alfresco' directory within 'Tomcat\webapps' is created
 Stop Tomcat
 Modify any configuration files that need changing
-Start Tomcat and enjoy using Alfresco V1.1.2
+Start Tomcat and enjoy using Alfresco V1.2.0
 
 
 =====================
