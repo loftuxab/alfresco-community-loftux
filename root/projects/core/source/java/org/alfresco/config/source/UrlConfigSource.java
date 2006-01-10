@@ -91,6 +91,7 @@ public class UrlConfigSource extends BaseConfigSource
         }
         else
         {
+            sourceString = sourceUrl;
             configSource = new ClassPathConfigSource(sourceString);
         }
         
