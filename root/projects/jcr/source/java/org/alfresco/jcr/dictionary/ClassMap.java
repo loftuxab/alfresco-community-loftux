@@ -16,12 +16,15 @@
  */
 package org.alfresco.jcr.dictionary;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.jcr.RepositoryException;
 
+import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 
@@ -49,6 +52,21 @@ public class ClassMap
         AlfrescoToJCR.put(ContentModel.ASPECT_LOCKABLE, NodeTypeImpl.MIX_LOCKABLE);
         AlfrescoToJCR.put(ContentModel.ASPECT_VERSIONABLE, NodeTypeImpl.MIX_VERSIONABLE);
     }
+
+    /** Map of JCR to Alfresco "Add Aspect" Behaviours */
+    private static Map<QName, AddMixin> addMixin = new HashMap<QName, AddMixin>();
+    static
+    {
+        addMixin.put(ContentModel.ASPECT_VERSIONABLE, new VersionableMixin());
+    }
+    
+    /** Map of JCR to Alfresco "Remove Aspect" Behaviours */
+    private static Map<QName, RemoveMixin> removeMixin = new HashMap<QName, RemoveMixin>();
+    static
+    {
+        removeMixin.put(ContentModel.ASPECT_VERSIONABLE, new VersionableMixin());
+    }
+
     
     /**
      * Convert an Alfresco Class to a JCR Type
@@ -74,4 +92,48 @@ public class ClassMap
         return JCRToAlfresco.get(alfrescoClass);
     }
 
+    /**
+     * Get 'Add Mixin' JCR behaviour
+     * 
+     * @param alfrescoClass
+     * @return  AddMixin behaviour
+     */
+    public static AddMixin getAddMixin(QName alfrescoClass)
+    {
+        return addMixin.get(alfrescoClass);
+    }
+    
+    /**
+     * Get 'Remove Mixin' JCR behaviour
+     * 
+     * @param alfrescoClass
+     * @return RemoveMixin behaviour
+     */
+    public static RemoveMixin getRemoveMixin(QName alfrescoClass)
+    {
+        return removeMixin.get(alfrescoClass);
+    }
+    
+    /**
+     * Add Mixin Behaviour
+     * 
+     * Encapsulates mapping of JCR behaviour to Alfresco
+     */
+    public interface AddMixin
+    {
+        public Map<QName, Serializable> preAddMixin(SessionImpl session, NodeRef nodeRef);
+        public void postAddMixin(SessionImpl session, NodeRef nodeRef);
+    }
+
+    /**
+     * Remove Mixin Behaviour
+     * 
+     * Encapsulates mapping of JCR behaviour to Alfresco
+     */
+    public interface RemoveMixin
+    {
+        public void preRemoveMixin(SessionImpl session, NodeRef nodeRef);
+        public void postRemoveMixin(SessionImpl session, NodeRef nodeRef);
+    }
+    
 }

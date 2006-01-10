@@ -17,6 +17,7 @@
 package org.alfresco.jcr.item;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -61,6 +62,7 @@ import org.alfresco.jcr.util.JCRProxyFactory;
 import org.alfresco.jcr.version.VersionHistoryImpl;
 import org.alfresco.jcr.version.VersionImpl;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
@@ -72,6 +74,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.Path.Element;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.version.VersionService;
@@ -690,8 +693,11 @@ public class NodeImpl extends ItemImpl implements Node
         }
 
         // apply aspect
+        ClassMap.AddMixin addMixin = ClassMap.getAddMixin(aspect);
+        Map<QName, Serializable> initialProperties = addMixin.preAddMixin(session, nodeRef);
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
-        nodeService.addAspect(nodeRef, aspect, null);
+        nodeService.addAspect(nodeRef, aspect, initialProperties);
+        addMixin.postAddMixin(session, nodeRef);
     }
 
     /* (non-Javadoc)
@@ -724,7 +730,10 @@ public class NodeImpl extends ItemImpl implements Node
         }
         
         // remove aspect
+        ClassMap.RemoveMixin removeMixin = ClassMap.getRemoveMixin(aspect);
+        removeMixin.preRemoveMixin(session, nodeRef);
         nodeService.removeAspect(nodeRef, aspect);
+        removeMixin.postRemoveMixin(session, nodeRef);
     }
 
     /* (non-Javadoc)
@@ -780,7 +789,33 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Version checkin() throws VersionException, UnsupportedRepositoryOperationException, InvalidItemStateException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // check this node is versionable
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
+        {
+            throw new UnsupportedRepositoryOperationException("Node " + nodeRef + " is not versionable");
+        }
+
+        Version version = null;
+        if (!isCheckedOut())
+        {
+            // return current version
+            version = getBaseVersion();
+        }
+        else
+        {
+            // create a new version snapshot
+            VersionService versionService = session.getRepositoryImpl().getServiceRegistry().getVersionService();
+            org.alfresco.service.cmr.version.Version versionNode = versionService.createVersion(nodeRef, null);
+            org.alfresco.service.cmr.version.VersionHistory versionHistory = versionService.getVersionHistory(nodeRef);
+            version = new VersionImpl(new VersionHistoryImpl(session, versionHistory), versionNode).getProxy();
+            
+            // set to 'read only'
+            LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+            lockService.lock(nodeRef, LockType.READ_ONLY_LOCK);
+        }
+        
+        return version;
     }
 
     /* (non-Javadoc)
@@ -788,7 +823,19 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void checkout() throws UnsupportedRepositoryOperationException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // check this node is versionable
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
+        {
+            throw new UnsupportedRepositoryOperationException("Node " + nodeRef + " is not versionable");
+        }
+
+        // remove 'read only' lock
+        if (!isCheckedOut())
+        {
+            LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+            lockService.unlock(nodeRef);
+        }
     }
 
     /* (non-Javadoc)
@@ -836,7 +883,25 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public boolean isCheckedOut() throws RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
+        {
+            // it's not versionable, therefore it's checked-out and writable
+            // TODO: Do not yet take into consideration versionable ancestor
+            return true;
+        }
+
+        // it's versionable, use the lock to determine if it's checked-out
+        LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+        LockType lockType = lockService.getLockType(nodeRef);
+        if (lockType == null)
+        {
+            // it's not locked at all
+            return true;
+        }
+
+        // it's only checked-in when a read-only locked
+        return (lockType.equals(LockType.READ_ONLY_LOCK)) ? false : true;
     }
 
     /* (non-Javadoc)
@@ -844,7 +909,33 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void restore(String versionName, boolean removeExisting) throws VersionException, ItemExistsException, UnsupportedRepositoryOperationException, LockException, InvalidItemStateException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        // check this node is versionable
+        NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
+        if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
+        {
+            throw new UnsupportedRepositoryOperationException("Node " + nodeRef + " is not versionable");
+        }
+
+        // retrieve version for label
+        VersionService versionService = session.getRepositoryImpl().getServiceRegistry().getVersionService();
+        org.alfresco.service.cmr.version.VersionHistory versionHistory = versionService.getVersionHistory(nodeRef);
+        org.alfresco.service.cmr.version.Version version = versionHistory.getVersion(versionName);
+        if (version == null)
+        {
+            throw new VersionException("Version name " + versionName + " does not exist in the version history of node " + nodeRef);
+        }
+
+        // unlock if necessary
+        LockService lockService = session.getRepositoryImpl().getServiceRegistry().getLockService();
+        LockType lockType = lockService.getLockType(nodeRef);
+        if (lockType != null)
+        {
+            lockService.unlock(nodeRef);
+        }
+        
+        // revert to version
+        versionService.revert(nodeRef, version);
+        lockService.lock(nodeRef, LockType.READ_ONLY_LOCK);
     }
 
     /* (non-Javadoc)
@@ -852,7 +943,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public void restore(Version version, boolean removeExisting) throws VersionException, ItemExistsException, UnsupportedRepositoryOperationException, LockException, RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        restore(version.getName(), removeExisting);
     }
 
     /* (non-Javadoc)
@@ -876,7 +967,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public VersionHistory getVersionHistory() throws UnsupportedRepositoryOperationException, RepositoryException
     {
-        // check this node is versionable (in the alfresco sense for now)
+        // check this node is versionable
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
         {
@@ -894,7 +985,7 @@ public class NodeImpl extends ItemImpl implements Node
      */
     public Version getBaseVersion() throws UnsupportedRepositoryOperationException, RepositoryException
     {
-        // check this node is versionable (in the alfresco sense for now)
+        // check this node is versionable
         NodeService nodeService = session.getRepositoryImpl().getServiceRegistry().getNodeService();
         if (!nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE))
         {

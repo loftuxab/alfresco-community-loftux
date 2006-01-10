@@ -130,9 +130,6 @@ public class WIKIExample
             page1.setProperty("cm:content", "A rose is a flowering shrub.");
             page1.setProperty("wiki:category", new String[] {"flower", "plant", "rose"});
 
-            // enable versioning capability for page 1
-            page1.addMixin("cm:versionable");
-
             // create second wiki page
             Node page2 = encyclopedia.addNode("wiki:entry2", "wiki:page");
             page2.setProperty("cm:name", "Shakespeare");
@@ -155,9 +152,10 @@ public class WIKIExample
             
             System.out.println("WIKI created");
         }
-        catch(Throwable e /* note: catch throwable for demonstration purposes only */)
+        catch(Exception e /* note: catch exception for demonstration purposes only */)
         {
             trx1.rollback();
+            throw e;
         }
 
         
@@ -231,11 +229,11 @@ public class WIKIExample
         //
         // Advanced Usage
         //
-        // 1) Auto-version on update and version history retrieval
+        // 1) Check-out / Check-in and version history retrieval
         // 2) Permission checks
         //
         
-        // start a transaction for advanced operations
+        // start a transaction for creating new version
         UserTransaction trx3 = trxService.getUserTransaction();
         trx3.begin();
     
@@ -249,23 +247,34 @@ public class WIKIExample
             Node rootNode = session.getRootNode();
             Node entry1 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry1");
 
+            // enable versioning capability
+            entry1.addMixin("mix:versionable");
+
             // update the properties and content
-            entry1.setProperty("cm:title", "The Rose");
+            entry1.setProperty("cm:title", "The Rise");
             entry1.setProperty("cm:content", "A rose is a flowering shrub of the genus Rosa.");
             Value[] categories = entry1.getProperty("wiki:category").getValues();
             Value[] newCategories = new Value[categories.length + 1];
             System.arraycopy(categories, 0, newCategories, 0, categories.length);
             newCategories[categories.length] = session.getValueFactory().createValue("poet");
             entry1.setProperty("wiki:category", newCategories);
+
+            // and checkin the changes
+            entry1.checkin();
+
+            // checkout, fix wiki title and checkin again
+            entry1.checkout();
+            entry1.setProperty("cm:title", "The Rose");
+            entry1.checkin();
             
-            session.save();
             trx3.commit();
             
             System.out.println("Versioned WIKI Page 1");
         }
-        catch(Throwable e /* note: catch throwable for demonstration purposes only */)
+        catch(Exception e /* note: catch exception for demonstration purposes only */)
         {
             trx3.rollback();
+            throw e;
         }
 
         // start a transaction for advanced operations
@@ -295,7 +304,8 @@ public class WIKIExample
                 while (nodeIterator.hasNext())
                 {
                     Node versionedNode = nodeIterator.nextNode();
-                    System.out.println(" Version: " + version.getCreated().getTime());
+                    System.out.println(" Version: " + version.getName());
+                    System.out.println(" Created: " + version.getCreated().getTime());
                     outputContentNode(versionedNode);
                 }
             }
@@ -335,8 +345,13 @@ public class WIKIExample
         {
             // set the mime type on both WIKI pages and Image
             Node rootNode = session.getRootNode();
+            
+            // note: we have to checkout entry1 first - it's versioned
             Node entry1 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry1");
-            setMimetype(registry, entry1, "cm:content", MimetypeMap.MIMETYPE_TEXT_PLAIN); 
+            entry1.checkout();
+            setMimetype(registry, entry1, "cm:content", MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            entry1.checkin();
+            
             Node entry2 = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:entry2");
             setMimetype(registry, entry2, "cm:content", MimetypeMap.MIMETYPE_TEXT_PLAIN); 
             Node image = rootNode.getNode("app:company_home/wiki:encyclopedia/wiki:image");
@@ -348,9 +363,10 @@ public class WIKIExample
             
             System.out.println("Updated WIKI mimetypes via Alfresco calls");
         }
-        catch(Throwable e /* note: catch throwable for demonstration purposes only */)
+        catch(Exception e /* note: catch exception for demonstration purposes only */)
         {
             trx5.rollback();
+            throw e;
         }
             
         // logout

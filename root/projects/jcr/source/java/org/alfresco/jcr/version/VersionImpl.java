@@ -448,7 +448,7 @@ public class VersionImpl implements Version
 
     public String getName() throws RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();
+        return version.getVersionLabel();
     }
 
     public Item getAncestor(int depth) throws ItemNotFoundException, AccessDeniedException, RepositoryException
