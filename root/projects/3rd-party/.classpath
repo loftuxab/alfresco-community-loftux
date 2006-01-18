@@ -15,7 +15,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/quartz.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
-	<classpathentry exported="true" sourcepath="src/spring-1.2-mod-src.zip" kind="lib" path="lib/spring.jar"/>
+	<classpathentry exported="true" sourcepath="src/spring-1.2.6-src.zip" kind="lib" path="lib/spring.jar"/>
 	<classpathentry exported="true" sourcepath="src/spring-mock_src.zip" kind="lib" path="lib/spring-mock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/standard.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/portlet-api-lib.jar"/>

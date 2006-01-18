@@ -1,7 +1,0 @@
-224a225
-> 		Collections.sort(synchs, synchronizationComparator);
-239,242d239
-< // ALFRESCO addition start
-< 		// sort
-< 		Collections.sort(synchs, synchronizationComparator);
-< // ALFRESCO addition end
