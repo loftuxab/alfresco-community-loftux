@@ -26,18 +26,19 @@ import org.alfresco.webservice.content.Content;
  * @author Roy Wetherall
  */
 public class ContentUtils
-{
-   //private static ContentUtils instance = null;
-    
-   // public static ContentUtils getInstance()
-   // {
-   //     if (instance == null)
-   //     {
-   //         instance = new ContentUtils();
-   //     }
-   //     
-   //     return instance;
-   // }
+{   
+    public static byte[] convertToByteArray(InputStream inputStream) throws Exception
+    {
+        byte[] result = null;
+        
+        if (inputStream.available() > 0)
+        {
+            result = new byte[inputStream.available()];        
+            inputStream.read(result);;
+        }     
+        
+        return result;
+    }
     
     public static String getContentAsString(Content content)
     {

@@ -22,7 +22,6 @@ import org.alfresco.webservice.action.Action;
 import org.alfresco.webservice.classification.AppliedCategory;
 import org.alfresco.webservice.classification.CategoriesResult;
 import org.alfresco.webservice.classification.ClassificationServiceSoapBindingStub;
-import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
 import org.alfresco.webservice.types.CMLCreate;
@@ -59,9 +58,8 @@ public class ClassificationServiceSystemTest extends BaseWebServiceSystemTest
         if (ClassificationServiceSystemTest.categoriesLoaded == false)
         {
             // Import categories into the new store
-            InputStream viewStream = getClass().getClassLoader().getResourceAsStream("alfresco/resources/test.acp");
-            byte[] byteArray = new byte[40000];
-            viewStream.read(byteArray);
+            InputStream viewStream = getClass().getClassLoader().getResourceAsStream("test_resources/test.acp");
+            byte[] byteArray = ContentUtils.convertToByteArray(viewStream);
             
             // Create the node that will contain the category import file
             ParentReference categoryParentRef = new ParentReference(Constants.ASSOC_CHILDREN, "{test}testContent");
@@ -80,10 +78,6 @@ public class ClassificationServiceSystemTest extends BaseWebServiceSystemTest
                     Constants.PROP_CONTENT, 
                     byteArray, 
                     new ContentFormat("application/acp", "UTF-8"));
-            
-            // Check the category contents
-            //Content[] contents = this.contentService.read(new Predicate(new Reference[]{categoryReference}, BaseWebServiceSystemTest.store, null), Constants.PROP_CONTENT);
-            //System.out.println(ContentUtils.getContentAsString(contents[0]));
             
             // Create an action to import the categories
             String rootNodeRef = store.getScheme().getValue() + "://" + store.getAddress() + "/" + rootReference.getUuid();

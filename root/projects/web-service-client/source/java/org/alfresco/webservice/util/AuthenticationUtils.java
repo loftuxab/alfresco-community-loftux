@@ -54,24 +54,6 @@ public class AuthenticationUtils implements CallbackHandler
     /** Thread local containing the current ticket */
     private static ThreadLocal<String> currentTicket = new ThreadLocal<String>();
     
-    /** Singleton instance */
-//    private static AuthenticationUtils instance = null;
-//    
-//    /**
-//     * Get the singleton instance
-//     * 
-//     * @return
-//     */
-//    public static AuthenticationUtils getInstance()
-//    {
-//        if (instance == null)
-//        {
-//            instance = new AuthenticationUtils();
-//        }
-//        
-//        return instance;
-//    }
-    
     /**
      * Start a session
      * 

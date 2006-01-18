@@ -16,6 +16,8 @@
  */
 package org.alfresco.webservice.test;
 
+import java.io.InputStream;
+
 import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
@@ -149,5 +151,26 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        assertNull(content7.getFormat());
    }
    
-   // TODO need to test uploading a real file or three!!
+   public void testUploadContentFromFile() throws Exception
+   {
+       ParentReference parentRef = new ParentReference();
+       parentRef.setStore(BaseWebServiceSystemTest.store);
+       parentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+       parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
+       parentRef.setChildName(Constants.ASSOC_CHILDREN);
+       
+       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "quick.doc")};
+       CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
+       CML cml = new CML();
+       cml.setCreate(new CMLCreate[]{create});
+       UpdateResult[] result = this.repositoryService.update(cml);     
+       
+       Reference newContentNode = result[0].getDestination();              
+       ContentFormat format = new ContentFormat("application/msword", "UTF-8");  
+       
+       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("test_resources/quick.doc");
+       byte[] bytes = ContentUtils.convertToByteArray(viewStream);
+       
+       this.contentService.write(newContentNode, Constants.PROP_CONTENT, bytes, format);
+   }
 }

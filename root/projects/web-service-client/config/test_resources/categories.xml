@@ -1,15 +1,13 @@
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0"
            xmlns:cm="http://www.alfresco.org/model/content/1.0">
 
-	<cm:category_root view:childName="cm:categoryRoot">
-		<cm:name>categories</cm:name>
+   <cm:category_root view:childName="cm:categoryRoot">
+	   <cm:name>categories</cm:name>
 		<cm:categories>
 
 			<!-- Software Document Classification -->
 			<cm:category view:childName="cm:generalclassifiable">
-                <cm:name>General</cm:name>
-				<cm:subcategories>
-                <cm:category>
+
 				<cm:name>Software Document Classification</cm:name>
 				<cm:subcategories>
 					<cm:category>
@@ -40,7 +38,7 @@
 						</cm:subcategories>
 					</cm:category>
 				</cm:subcategories>
-          </cm:category>
+         </cm:category>
 
 
 			    <!-- Languages -->
@@ -55,7 +53,6 @@
 							</cm:category>
 							<cm:category>
 								<cm:name>American English</cm:name>
-							</cm:category>
 							</cm:category>
 						</cm:subcategories>
 					</cm:category>
