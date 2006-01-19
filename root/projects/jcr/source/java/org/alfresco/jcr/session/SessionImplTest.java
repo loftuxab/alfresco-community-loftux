@@ -45,7 +45,7 @@ public class SessionImplTest extends BaseJCRTest
     }
     
     @Override
-    protected void onTearDownInTransaction()
+    protected void onTearDownInTransaction() throws Exception
     {
         superuserSession.logout();
         super.onTearDownInTransaction();

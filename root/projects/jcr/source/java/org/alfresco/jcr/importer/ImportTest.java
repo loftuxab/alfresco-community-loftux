@@ -39,7 +39,7 @@ public class ImportTest extends BaseJCRTest
     }
     
     @Override
-    protected void onTearDownInTransaction()
+    protected void onTearDownInTransaction() throws Exception
     {
         super.onTearDownInTransaction();
         superuserSession.logout();

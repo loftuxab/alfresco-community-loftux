@@ -20,7 +20,6 @@ import javax.jcr.Repository;
 
 import org.alfresco.jcr.repository.RepositoryFactory;
 import org.alfresco.jcr.repository.RepositoryImpl;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
@@ -50,7 +49,7 @@ public class BaseJCRTest extends BaseSpringTest
     }
 
     @Override
-    protected void onTearDownInTransaction()
+    protected void onTearDownInTransaction() throws Exception
     {
         // debug purposes only
         NodeService nodeService = repositoryImpl.getServiceRegistry().getNodeService();
