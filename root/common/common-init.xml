@@ -53,6 +53,12 @@
     <!-- **************************** -->
 
     <target name="dump-properties" depends="init">
+        <antcall target="dump-env-properties" />
+        <antcall target="dump-dir-properties" />
+        <antcall target="dump-file-properties" />
+    </target>
+   
+    <target name="dump-env-properties" depends="init">
         <echo level="info">ant.project.name = ${ant.project.name}</echo>
         <echo level="info">basedir = ${basedir}</echo>
         <echo level="info">dir.product.root = ${dir.product.root}</echo>
@@ -60,8 +66,7 @@
         <echo level="info">version.number = ${version.number}</echo>
         <echo level="info">home.jboss = ${home.jboss}</echo>
         <echo level="info">home.tomcat = ${home.tomcat}</echo>
-        <antcall target="dump-dir-properties" />
-        <antcall target="dump-file-properties" />
+        <echo level="info">ant.home = ${ant.home}</echo>
     </target>
 
     <target name="dump-dir-properties" depends="init">

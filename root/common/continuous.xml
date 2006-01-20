@@ -34,11 +34,10 @@
       <move file="${dir.dist}/${file.name.dist.src}.tar.gz" tofile="${dir.dist}/${file.name.dist.src.nightly}.tar.gz"/>
       
       <ant antfile="${file.name.build}" target="compile-docs"/>
-      <!--<antcall target="generate-checksums"/>-->
    </target>
 
    <target name="distribute" 
-           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-source, generate-checksums"
+           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-source, distribute-php"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init" 
@@ -190,6 +189,25 @@
          <fileset dir="${dir.project.installer}" includes="*.sql,licenses/**,AlfrescoTest.pdf, README_war.txt" />
          <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}"/>
       </copy>
+   </target>
+   
+   <!-- ***************** -->
+   <!-- ** PHP targets ** -->
+   <!-- ***************** -->
+   
+   <target name="distribute-php" depends="init"
+           description="Creates the PHP distribution file for all platforms">
+      <mkdir dir="${dir.dist}" />
+      
+      <zip destfile="${dir.dist}/${file.name.dist.php}.zip">
+         <zipfileset dir="${dir.php}" />
+      </zip>
+      
+      <tar destfile="${dir.dist}/${file.name.dist.php}.tar" longfile="gnu">
+         <tarfileset dir="${dir.php}" />
+      </tar>
+      <gzip zipfile="${dir.dist}/${file.name.dist.php}.tar.gz" src="${dir.dist}/${file.name.dist.php}.tar" />
+      <delete file="${dir.dist}/${file.name.dist.php}.tar" />
    </target>
    
    <!-- ******************** -->
