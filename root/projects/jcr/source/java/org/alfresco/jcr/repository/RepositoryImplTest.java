@@ -60,9 +60,7 @@ public class RepositoryImplTest extends BaseJCRTest
         assertEquals("true", repository.getDescriptor(Repository.QUERY_XPATH_POS_INDEX));
     }
     
-
-    public void testLogin()
-        throws RepositoryException
+    public void testBadUsernameLogin() throws Exception
     {
         SimpleCredentials badUser = new SimpleCredentials("baduser", "".toCharArray());
         try
@@ -73,7 +71,10 @@ public class RepositoryImplTest extends BaseJCRTest
         catch (LoginException e)
         {
         }
-        
+    }
+    
+    public void testBadPwdLogin() throws Exception
+    {
         SimpleCredentials badPwd = new SimpleCredentials("superuser", "badpwd".toCharArray());
         try
         {
@@ -83,7 +84,10 @@ public class RepositoryImplTest extends BaseJCRTest
         catch (LoginException e)
         {
         }
-        
+    }
+    
+    public void testNoCredentialsLogin() throws Exception
+    {
         try
         {
             repository.login();
@@ -92,7 +96,11 @@ public class RepositoryImplTest extends BaseJCRTest
         catch (LoginException e)
         {
         }
-        
+    }
+
+    public void testLogin()
+        throws RepositoryException
+    {
         SimpleCredentials good = new SimpleCredentials("superuser", "".toCharArray());
         try
         {

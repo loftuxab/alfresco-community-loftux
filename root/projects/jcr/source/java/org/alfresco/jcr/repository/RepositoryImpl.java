@@ -109,7 +109,7 @@ public class RepositoryImpl implements Repository
 
         // initialise descriptors
         DescriptorService descriptorService = serviceRegistry.getDescriptorService();
-        Descriptor descriptor = descriptorService.getDescriptor();
+        Descriptor descriptor = descriptorService.getServerDescriptor();
 
         String repNameDesc = "Alfresco Content Repository";
         String edition = descriptor.getEdition();

@@ -25,7 +25,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.debug.NodeStoreInspector;
 
-
 /**
  * Base JCR Test
  * 
