@@ -37,7 +37,7 @@ public class RuntimeExecTest extends TestCase
     public void testStreams() throws Exception
     {
         RuntimeExec exec = new RuntimeExec();
-        exec.setCommand("find");
+        exec.setCommand("aaaaaaaaaaaa");
         ExecutionResult ret = exec.execute();
         assertTrue("Expected error code", ret.getExitValue() != 0);
         
