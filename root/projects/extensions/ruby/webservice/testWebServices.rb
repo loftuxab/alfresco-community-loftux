@@ -34,7 +34,7 @@ obj = RepositoryServiceSoapPort.new()
 # obj.wiredump_dev = STDERR
 
 # Get the ticket
-startSessionParams = StartSession.new("rwetherall", "31vegaleg")
+startSessionParams = StartSession.new("admin", "admin")
 startSessionResponce = authenticationService.startSession(startSessionParams)
 ticket = startSessionResponce.startSessionReturn.ticket
 
@@ -42,7 +42,7 @@ ticket = startSessionResponce.startSessionReturn.ticket
 print "Ticket: " + ticket + "\n";
 
 # Add the security header
-obj.headerhandler << WSSecurityHandler.new(ticket, "rwetherall")
+obj.headerhandler << WSSecurityHandler.new(ticket, "admin")
 
 # Get the stores
 getStoresResult = obj.getStores(GetStores.new());
