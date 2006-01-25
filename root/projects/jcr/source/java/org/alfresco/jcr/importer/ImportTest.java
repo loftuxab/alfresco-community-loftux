@@ -30,18 +30,18 @@ public class ImportTest extends BaseJCRTest
     protected Session superuserSession;
 
     @Override
-    protected void onSetUpInTransaction() throws Exception
+    protected void setUp() throws Exception
     {
-        super.onSetUpInTransaction();
+        super.setUp();
         
         SimpleCredentials superuser = new SimpleCredentials("superuser", "".toCharArray());
         superuserSession = repository.login(superuser, getWorkspace());
     }
     
     @Override
-    protected void onTearDownInTransaction() throws Exception
+    protected void tearDown() throws Exception
     {
-        super.onTearDownInTransaction();
+        super.tearDown();
         superuserSession.logout();
     }
     

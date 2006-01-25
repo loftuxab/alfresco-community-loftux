@@ -30,7 +30,6 @@ import javax.jcr.nodetype.NoSuchNodeTypeException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.session.SessionImpl;
 import org.alfresco.repo.node.integrity.IntegrityException;
-import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
 import org.alfresco.service.cmr.lock.NodeLockedException;
 import org.alfresco.service.cmr.security.AuthenticationService;
@@ -119,18 +118,11 @@ public class JCRProxyFactory
                 try
                 {
                     // setup authentication context, if one does not exist (for example, in remote case)
-                    if (username == null)
+                    if (!method.getName().equals("logout"))
                     {
-                        authenticationService.validate(session.getTicket());
-                    }
-                    
-                    // test for existence of transaction
-                    if (!(method.getName().equals("login") || method.getName().equals("logout")))
-                    {        
-                        String trxId = AlfrescoTransactionSupport.getTransactionId();
-                        if (trxId == null)
+                        if (username == null)
                         {
-                            throw new RepositoryException("Session must be used within the context of a transaction.");
+                            authenticationService.validate(session.getTicket());
                         }
                     }
 

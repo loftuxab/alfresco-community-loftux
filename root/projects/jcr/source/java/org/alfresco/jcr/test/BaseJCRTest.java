@@ -18,56 +18,40 @@ package org.alfresco.jcr.test;
 
 import javax.jcr.Repository;
 
+import junit.framework.TestCase;
+
 import org.alfresco.jcr.repository.RepositoryFactory;
 import org.alfresco.jcr.repository.RepositoryImpl;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.debug.NodeStoreInspector;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Base JCR Test
  * 
  * @author David Caruana
  */
-public class BaseJCRTest extends BaseSpringTest
+public class BaseJCRTest extends TestCase
 {
     private RepositoryImpl repositoryImpl;
     protected Repository repository;
-    
     protected StoreRef storeRef;
     
+    private static ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:org/alfresco/jcr/test/test-context.xml");
+    
+    protected String getWorkspace()
+    {
+        return storeRef.getIdentifier();
+    }
+
     @Override
-    protected void onSetUpInTransaction() throws Exception
+    protected void setUp() throws Exception
     {
         storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         TestData.generateTestData(applicationContext, storeRef.getIdentifier());
         repositoryImpl = (RepositoryImpl)applicationContext.getBean(RepositoryFactory.REPOSITORY_BEAN);
         repositoryImpl.setDefaultWorkspace(storeRef.getIdentifier());
         repository = repositoryImpl;
-    }
-
-    @Override
-    protected void onTearDownInTransaction() throws Exception
-    {
-        // debug purposes only
-        NodeService nodeService = repositoryImpl.getServiceRegistry().getNodeService();
-        System.out.println(NodeStoreInspector.dumpNodeStore(nodeService, storeRef));
-
-//        AuthenticationComponent authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
-//        authenticationComponent.clearCurrentSecurityContext();
-        super.onTearDownInTransaction();
-    }
-    
-    @Override
-    protected String[] getConfigLocations()
-    {
-        return new String[] {"classpath:org/alfresco/jcr/test/test-context.xml"};
-    }
-    
-    protected String getWorkspace()
-    {
-        return storeRef.getIdentifier();
     }
 
 }

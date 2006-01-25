@@ -51,6 +51,10 @@ public class RepositoryImpl implements Repository
     /** Repository Descriptors */
     private static final Map<String, String> descriptors = new HashMap<String, String>();
 
+    /** Thread Local Session */
+    // Note: For now, we're only allowing one active (i.e. logged in) Session per-thread
+    private static ThreadLocal<SessionImpl> sessions = new ThreadLocal<SessionImpl>();
+    
     // Service dependencies
     private ServiceRegistry serviceRegistry;
     private ImporterComponent importerComponent;
@@ -126,9 +130,8 @@ public class RepositoryImpl implements Repository
         descriptors.put(Repository.SPEC_NAME_DESC, "Content Repository API for Java(TM) Technology Specification");
         descriptors.put(Repository.SPEC_VERSION_DESC, "1.0");
         descriptors.put(Repository.LEVEL_1_SUPPORTED, "true");
-//        descriptors.put(Repository.LEVEL_2_SUPPORTED, "true");
+        descriptors.put(Repository.LEVEL_2_SUPPORTED, "true");
         descriptors.put(Repository.OPTION_TRANSACTIONS_SUPPORTED, "true");
-        descriptors.put(Repository.OPTION_LOCKING_SUPPORTED, "true");
         descriptors.put(Repository.QUERY_XPATH_DOC_ORDER, "true");
         descriptors.put(Repository.QUERY_XPATH_POS_INDEX, "true");
     }
@@ -184,12 +187,6 @@ public class RepositoryImpl implements Repository
     public Session login(Credentials credentials, String workspaceName)
         throws LoginException, NoSuchWorkspaceException, RepositoryException
     {
-        // only allow one active session
-        if (!SessionImpl.allowLogin())
-        {
-            throw new RepositoryException("Only one active session is allowed per thread.");
-        }
-        
         // extract username and password
         // TODO: determine support for general Credentials
         String username = null;
@@ -200,30 +197,36 @@ public class RepositoryImpl implements Repository
             password = ((SimpleCredentials)credentials).getPassword();
         }
 
-        // authenticate user
-        AuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
-        try
-        {
-            authenticationService.authenticate(username, password);
-        }
-        catch(AuthenticationException e)
-        {
-            throw new LoginException("Alfresco Repository failed to authenticate credentials", e);
-        }
-
         try
         {
             // construct the session
-            String sessionWorkspace = (workspaceName == null) ? defaultWorkspace : workspaceName;
+            SessionImpl sessionImpl = new SessionImpl(this);
+            registerSession(sessionImpl);
+            
+            // authenticate user
+            AuthenticationService authenticationService = getServiceRegistry().getAuthenticationService();
+            try
+            {
+                authenticationService.authenticate(username, password);
+            }
+            catch(AuthenticationException e)
+            {
+                deregisterSession();
+                throw new LoginException("Alfresco Repository failed to authenticate credentials", e);
+            }
+            
+            // initialise the session
             String ticket = authenticationService.getCurrentTicket();
-            SessionImpl sessionImpl = new SessionImpl(this, ticket, sessionWorkspace, getAttributes(credentials));
+            String sessionWorkspace = (workspaceName == null) ? defaultWorkspace : workspaceName;
+            sessionImpl.init(ticket, sessionWorkspace, getAttributes(credentials));
+
+            // session is now ready
             Session session = sessionImpl.getProxy();
-    
-            // the session is ready
             return session;
         }
         catch(AlfrescoRuntimeException e)
         {
+            deregisterSession();
             throw new RepositoryException(e);
         }
     }
@@ -277,5 +280,31 @@ public class RepositoryImpl implements Repository
         return attributes;
     }
     
+    /**
+     * Register active session
+     * 
+     * @param session
+     */
+    private void registerSession(SessionImpl session)
+        throws RepositoryException
+    {
+        // only allow one active session
+        if (sessions.get() != null)
+        {
+            throw new RepositoryException("Only one active session is allowed per thread.");
+        }
+        
+        // record session in current thread
+        sessions.set(session);
+    }
+
+    /**
+     * De-register current active session
+     */
+    public void deregisterSession()
+    {
+        // remove session from current thread
+        sessions.set(null);
+    }
     
 }

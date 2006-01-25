@@ -48,6 +48,12 @@ import javax.jcr.lock.LockException;
 import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.version.VersionException;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jcr.dictionary.JCRNamespacePrefixResolver;
@@ -105,9 +111,6 @@ public class SessionImpl implements Session
     /** Transaction Id */
     private String trxId;
     
-    /** Authenticated ticket */
-    private String ticket;
-    
     /** Session Attributes */
     private Map<String, Object> attributes;
     
@@ -131,35 +134,53 @@ public class SessionImpl implements Session
     
     /** Session Proxy */
     private Session proxy = null;
+
+    /** Session Isolation Strategy */
+    private SessionIsolation sessionIsolation = null;
     
-    /** Thread Local Session */
-    // Note: For now, we're only allowing one active (i.e. logged in) Session per-thread
-    private static ThreadLocal<SessionImpl> sessions = new ThreadLocal<SessionImpl>();
+    /** Authenticated ticket */
+    private String ticket = null;
     
     
     /**
      * Construct
      * 
      * @param repository  parent repository
-     * @param ticket  authenticated ticket
-     * @param workspaceName  workspace name
-     * @param attributes  session attributes
      * @throws NoSuchWorkspaceException
      */
-    public SessionImpl(RepositoryImpl repository, String ticket, String workspaceName, Map<String, Object> attributes)
-        throws NoSuchWorkspaceException, RepositoryException
+    public SessionImpl(RepositoryImpl repository)
     {
+        // intialise session
         this.repository = repository;
-        this.ticket = ticket;
-        this.attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
         this.typeConverter = new JCRTypeConverter(this);
         this.namespaceResolver = new NamespaceRegistryImpl(true, new JCRNamespacePrefixResolver(repository.getServiceRegistry().getNamespaceService()));
         this.typeManager = new NodeTypeManagerImpl(this, namespaceResolver.getNamespaceService());
         this.valueFactory = new ValueFactoryImpl(this);
-        this.workspaceStore = getWorkspaceStore(workspaceName);
-        registerActiveSession(this);
     }
 
+    /**
+     * Initialise Session
+     * 
+     * @param ticket  authentication ticket
+     * @param workspaceName  workspace name
+     * @param attributes  session attributes
+     * @throws RepositoryException
+     */
+    public void init(String ticket, String workspaceName, Map<String, Object> attributes)
+        throws RepositoryException
+    {
+        // create appropriate strategy for handling session isolation
+        // TODO: Support full session isolation as described in the JCR specification
+        String trxId = AlfrescoTransactionSupport.getTransactionId();
+        sessionIsolation = (trxId == null) ? new InnerTransaction() : new OuterTransaction();
+        sessionIsolation.begin();
+
+        // initialise the session
+        this.ticket = ticket;
+        this.attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
+        this.workspaceStore = getWorkspaceStore(workspaceName);
+    }
+    
     /**
      * Create proxied Session
      * 
@@ -242,34 +263,6 @@ public class SessionImpl implements Session
     public StoreRef getWorkspaceStore()
     {
         return workspaceStore;
-    }
-    
-    /**
-     * Allow Session Login
-     * 
-     * @return  true => yes, allow login
-     */
-    public static boolean allowLogin()
-    {
-        return sessions.get() == null;
-    }
-    
-    /**
-     * Register active session
-     * 
-     * @param session
-     */
-    private void registerActiveSession(SessionImpl session)
-    {
-        sessions.set(session);
-    }
-    
-    /**
-     * De-register current active session
-     */
-    public void deregisterActiveSession()
-    {
-        sessions.set(null);
     }
     
     
@@ -432,7 +425,9 @@ public class SessionImpl implements Session
      */
     public void save() throws AccessDeniedException, ItemExistsException, ConstraintViolationException, InvalidItemStateException, VersionException, LockException, NoSuchNodeTypeException, RepositoryException
     {
-        AlfrescoTransactionSupport.flush();        
+        sessionIsolation.commit();
+        // Note: start a new transaction for subsequent session changes
+        sessionIsolation.begin();
     }
 
     /* (non-Javadoc)
@@ -440,7 +435,13 @@ public class SessionImpl implements Session
      */
     public void refresh(boolean keepChanges) throws RepositoryException
     {
-        throw new UnsupportedRepositoryOperationException();        
+        if (keepChanges)
+        {
+            throw new UnsupportedRepositoryOperationException("Keep changes is not supported.");
+        }
+        sessionIsolation.rollback();
+        // Note: start a new transaction for subsequent session changes
+        sessionIsolation.begin();
     }
 
     /* (non-Javadoc)
@@ -643,9 +644,20 @@ public class SessionImpl implements Session
     {
         if (isLive())
         {
+            // invalidate authentication
             getRepositoryImpl().getServiceRegistry().getAuthenticationService().invalidateTicket(getTicket());
             ticket = null;
-            deregisterActiveSession();
+            
+            // clean up resources
+            try
+            {
+                sessionIsolation.rollback();
+            }
+            catch(RepositoryException e)
+            {
+                // force logout
+            }
+            repository.deregisterSession();
         }
     }
 
@@ -832,5 +844,130 @@ public class SessionImpl implements Session
             return false;
         }
     }
+
+    //
+    // Session / Transaction Management
+    //
+
+    /**
+     * Strategy for handling Session Isolation
+     */
+    private interface SessionIsolation
+    {
+        // Start transaction
+        public void begin() throws RepositoryException;
+        
+        // Commit transaction
+        public void commit() throws RepositoryException;
+        
+        // Rollback transaction
+        public void rollback() throws RepositoryException;
+    }
+
     
+    /**
+     * Implementation of session isolation which relies on an outer transaction
+     * to control the isolation boundary.
+     * 
+     * @author davidc
+     */
+    private class OuterTransaction implements SessionIsolation
+    {
+        /* (non-Javadoc)
+         * @see org.alfresco.jcr.session.SessionImpl.SessionIsolation#begin()
+         */
+        public void begin() throws RepositoryException
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.jcr.session.SessionImpl.SessionIsolation#commit()
+         */
+        public void commit() throws RepositoryException
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.jcr.session.SessionImpl.SessionIsolation#rollback()
+         */
+        public void rollback() throws RepositoryException
+        {
+        }
+    }
+    
+    /**
+     * Session isolation strategy which uses transactions to control the isolation.
+     * 
+     * @author davidc
+     */
+    private class InnerTransaction implements SessionIsolation
+    {
+        private UserTransaction userTransaction = null;
+
+        /* (non-Javadoc)
+         * @see org.alfresco.jcr.session.SessionImpl.SessionIsolation#begin()
+         */
+        public void begin()
+            throws RepositoryException
+        {
+            try
+            {
+                UserTransaction trx = repository.getServiceRegistry().getTransactionService().getUserTransaction();
+                trx.begin();
+                userTransaction = trx;
+            }
+            catch (NotSupportedException e)
+            {
+                throw new RepositoryException("Failed to start Repository transaction", e);
+            }
+            catch (SystemException e)
+            {
+                throw new RepositoryException("Failed to start Repository transaction", e);
+            }
+        }
+    
+        /* (non-Javadoc)
+         * @see org.alfresco.jcr.session.SessionImpl.SessionIsolation#commit()
+         */
+        public void commit()
+            throws RepositoryException
+        {
+            try
+            {
+                userTransaction.commit();
+            }
+            catch (HeuristicRollbackException e)
+            {
+                throw new RepositoryException("Failed to commit Repository transaction", e);
+            }
+            catch (HeuristicMixedException e)
+            {
+                throw new RepositoryException("Failed to commit Repository transaction", e);
+            }
+            catch (RollbackException e)
+            {
+                throw new RepositoryException("Failed to commit Repository transaction", e);
+            }
+            catch (SystemException e)
+            {
+                throw new RepositoryException("Failed to commit Repository transaction", e);
+            }
+        }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.jcr.session.SessionImpl.SessionIsolation#rollback()
+         */
+        public void rollback()
+            throws RepositoryException
+        {
+            try
+            {
+                userTransaction.rollback();
+            }
+            catch (SystemException e)
+            {
+                throw new RepositoryException("Failed to rollback Repository transaction", e);
+            }
+        }
+    }
 }

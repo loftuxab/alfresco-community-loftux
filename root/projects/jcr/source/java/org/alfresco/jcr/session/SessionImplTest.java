@@ -34,9 +34,9 @@ public class SessionImplTest extends BaseJCRTest
     protected Session superuserSession;
     
     @Override
-    protected void onSetUpInTransaction() throws Exception
+    protected void setUp() throws Exception
     {
-        super.onSetUpInTransaction();
+        super.setUp();
         
         SimpleCredentials superuser = new SimpleCredentials("superuser", "".toCharArray());
         superuser.setAttribute("attr1", "superuserValue");
@@ -45,10 +45,10 @@ public class SessionImplTest extends BaseJCRTest
     }
     
     @Override
-    protected void onTearDownInTransaction() throws Exception
+    protected void tearDown() throws Exception
     {
         superuserSession.logout();
-        super.onTearDownInTransaction();
+        super.tearDown();
     }
     
     public void testRepository()

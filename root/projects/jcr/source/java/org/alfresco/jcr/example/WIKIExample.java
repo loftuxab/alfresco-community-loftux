@@ -71,19 +71,11 @@ public class WIKIExample
         //
         
         // access the Alfresco JCR Repository (here it's via programmatic approach, but it could also be injected)
-        System.out.println("Initialising Repository access...");
+        System.out.println("Initialising Repository...");
 
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/alfresco/jcr/example/wiki-context.xml");
         Repository repository = (Repository)context.getBean("JCR.Repository");
 
-        // login to workspace (here we rely on the default workspace defined by JCR.Repository bean)
-        Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-
-        // access the Alfresco transaction service
-        ServiceRegistry registry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        TransactionService trxService = (TransactionService)registry.getTransactionService();
-
-        
         //
         // Create a WIKI structure
         //
@@ -91,14 +83,13 @@ public class WIKIExample
         //       WIKI pages and Content that are accessible via the Alfresco Web Client
         //
         
-        // start a transaction for creating the wiki structure
-        UserTransaction trx1 = trxService.getUserTransaction();
-        trx1.begin();
-    
+        // login to workspace (here we rely on the default workspace defined by JCR.Repository bean)
+        Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+
         try
         {
             System.out.println("Creating WIKI...");
-            
+
             // first, access the company home
             Node rootNode = session.getRootNode();
             System.out.println("Root node: path=" + rootNode.getPath() + ", type=" + rootNode.getPrimaryNodeType().getName());
@@ -148,24 +139,19 @@ public class WIKIExample
             contentNode.setProperty("cm:content", resource.getInputStream());
             
             session.save();
-            trx1.commit();
-            
             System.out.println("WIKI created");
         }
-        catch(Exception e /* note: catch exception for demonstration purposes only */)
+        finally
         {
-            trx1.rollback();
-            throw e;
+            session.logout();
         }
-
         
         //
         // Access the WIKI structure
         //
         
-        // start a transaction for accessing the wiki structure
-        UserTransaction trx2 = trxService.getUserTransaction();
-        trx2.begin();
+        // login to workspace (here we rely on the default workspace defined by JCR.Repository bean)
+        session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
     
         try
         {
@@ -222,20 +208,16 @@ public class WIKIExample
         }
         finally
         {
-            trx2.rollback();
+            session.logout();
         }
 
         
         //
         // Advanced Usage
         //
+
         // 1) Check-out / Check-in and version history retrieval
-        // 2) Permission checks
-        //
-        
-        // start a transaction for creating new version
-        UserTransaction trx3 = trxService.getUserTransaction();
-        trx3.begin();
+        session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
     
         try
         {
@@ -267,20 +249,17 @@ public class WIKIExample
             entry1.setProperty("cm:title", "The Rose");
             entry1.checkin();
             
-            trx3.commit();
-            
+            session.save();
             System.out.println("Versioned WIKI Page 1");
         }
-        catch(Exception e /* note: catch exception for demonstration purposes only */)
+        finally
         {
-            trx3.rollback();
-            throw e;
+            session.logout();
         }
 
-        // start a transaction for advanced operations
-        UserTransaction trx4 = trxService.getUserTransaction();
-        trx4.begin();
-    
+        // 2) Permission checks
+        session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+        
         try
         {
             //
@@ -327,7 +306,7 @@ public class WIKIExample
         }
         finally
         {
-            trx4.rollback();
+            session.logout();
         }
 
 
@@ -337,12 +316,13 @@ public class WIKIExample
         // Provide mimetype for WIKI content properties
         //
 
-        // start a transaction for creating the wiki structure
-        UserTransaction trx5 = trxService.getUserTransaction();
-        trx5.begin();
+        session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
         
         try
         {
+            // Retrieve the Alfresco Repository Service Registry
+            ServiceRegistry registry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
+            
             // set the mime type on both WIKI pages and Image
             Node rootNode = session.getRootNode();
             
@@ -359,20 +339,15 @@ public class WIKIExample
 
             // save the changes
             session.save();
-            trx5.commit();
-            
             System.out.println("Updated WIKI mimetypes via Alfresco calls");
         }
-        catch(Exception e /* note: catch exception for demonstration purposes only */)
+        finally
         {
-            trx5.rollback();
-            throw e;
+            session.logout();
         }
             
-        // logout
-        session.logout();
-        System.out.println("Logout successful");
-        
+        // exit
+        System.out.println("Completed successfully.");
         System.exit(0);
     }
 
