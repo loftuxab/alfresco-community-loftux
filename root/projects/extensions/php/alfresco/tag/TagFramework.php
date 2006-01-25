@@ -17,7 +17,6 @@
   License.
 */
 
-include_once "classes.inc";
 include_once "alfresco/tag/BaseTag.php";
 
 // TODO need to put this lot in a service class ...

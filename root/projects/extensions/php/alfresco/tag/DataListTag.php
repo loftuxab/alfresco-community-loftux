@@ -1,6 +1,5 @@
 <?php
 
-require_once "classes.inc";
 require_once "alfresco/type/ResultSet.php";
 
 class DataListTag extends BaseTag
