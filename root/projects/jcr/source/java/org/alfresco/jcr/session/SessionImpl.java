@@ -822,6 +822,15 @@ public class SessionImpl implements Session
         {
             return null;
         }
+
+        /*
+         *  (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImporterBinding#searchWithinTransaction()
+         */
+        public boolean allowReferenceWithinTransaction()
+        {
+            return false;
+        }
     }
     
 }
