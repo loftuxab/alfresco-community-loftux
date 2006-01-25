@@ -42,6 +42,7 @@ public class VersionableMixin implements ClassMap.AddMixin, ClassMap.RemoveMixin
     {
         // switch off auto-versioning
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(ContentModel.PROP_INITIAL_VERSION, false);
         properties.put(ContentModel.PROP_AUTO_VERSION, false);
         return properties;
     }
