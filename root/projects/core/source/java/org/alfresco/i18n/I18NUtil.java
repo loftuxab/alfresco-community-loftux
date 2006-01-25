@@ -132,20 +132,20 @@ public class I18NUtil
      * @param params        format parameters
      * @return              the localised string, null if not found
      */
-    public static String getMessage(String messageKey, Object[] params)
+    public static String getMessage(String messageKey, Object ... params)
     {
-        return getMessage(messageKey, params, getLocale());
+        return getMessage(messageKey, getLocale(), params);
     }
     
     /**
      * Get a localised message string, parameterized using standard MessageFormatter.
      * 
      * @param messageKey        the message key
-     * @param params            the localised message string
      * @param locale            override current locale
+     * @param params            the localised message string
      * @return                  the localaised string, null if not found
      */
-    public static String getMessage(String messageKey, Object[] params, Locale locale)
+    public static String getMessage(String messageKey, Locale locale, Object ... params)
     {
         String message = getMessage(messageKey, locale);
         if (message != null && params != null)

@@ -95,6 +95,6 @@ public class I18NUtilTest extends TestCase
         assertEquals(VALUE_FR_PARAMS, I18NUtil.getMessage(MSG_PARAMS, new Object[]{PARAM_VALUE}));       
         
         // Check values when overriding the locale    
-        assertEquals(VALUE_PARAMS, I18NUtil.getMessage(MSG_PARAMS, new Object[]{PARAM_VALUE}, Locale.getDefault()));
+        assertEquals(VALUE_PARAMS, I18NUtil.getMessage(MSG_PARAMS, Locale.getDefault(), new Object[]{PARAM_VALUE}));
     }
 }
