@@ -24,20 +24,22 @@ import java.util.TimeZone;
 
 /**
  * Formatting support for ISO 8601 dates
- * 
- * sYYYY-MM-DDThh:mm:ss.sssTZD
- * 
+ * <pre>
+ *    sYYYY-MM-DDThh:mm:ss.sssTZD
+ * </pre>
  * where:
- *   sYYYY  Four-digit year with optional leading positive (‘+’) or negative (‘-’) sign. 
+ * <ul>
+ *   <li>sYYYY  Four-digit year with optional leading positive (<b>+</b>) or negative (<b>-</b>) sign. 
  *          A negative sign indicates a year BCE. The absence of a sign or the presence of a 
  *          positive sign indicates a year CE (for example, -0055 would indicate the year 55 BCE, 
- *          while +1969 and 1969 indicate the year 1969 CE).
- *   MM     Two-digit month (01 = January, etc.)
- *   DD     Two-digit day of month (01 through 31)
- *   hh     Two digits of hour (00 through 23)
- *   mm     Two digits of minute (00 through 59)
- *   ss.sss Seconds, to three decimal places (00.000 through 59.999)
- *   TZD    Time zone designator (either Z for Zulu, i.e. UTC, or +hh:mm or -hh:mm, i.e. an offset from UTC)
+ *          while +1969 and 1969 indicate the year 1969 CE).</li>
+ *   <li>MM     Two-digit month (01 = January, etc.)</li>
+ *   <li>DD     Two-digit day of month (01 through 31)</li>
+ *   <li>hh     Two digits of hour (00 through 23)</li>
+ *   <li>mm     Two digits of minute (00 through 59)</li>
+ *   <li>ss.sss Seconds, to three decimal places (00.000 through 59.999)</li>
+ *   <li>TZD    Time zone designator (either Z for Zulu, i.e. UTC, or +hh:mm or -hh:mm, i.e. an offset from UTC)</li>
+ * </ul>
  */
 public class ISO8601DateFormat
 {
