@@ -102,6 +102,7 @@ public class AuthenticationUtils implements CallbackHandler
             }
             catch (RemoteException exception)
             {
+                exception.printStackTrace();
                 throw new WebServiceException("Error ending session.", exception);
             }
         }

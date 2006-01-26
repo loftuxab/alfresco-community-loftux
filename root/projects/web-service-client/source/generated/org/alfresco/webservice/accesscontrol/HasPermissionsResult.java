@@ -5,20 +5,20 @@
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package org.alfresco.repo.webservice.accesscontrol;
+package org.alfresco.webservice.accesscontrol;
 
 public class HasPermissionsResult  implements java.io.Serializable {
-    private org.alfresco.repo.webservice.types.Reference reference;
+    private org.alfresco.webservice.types.Reference reference;
     private java.lang.String permission;
-    private org.alfresco.repo.webservice.accesscontrol.AccessStatus accessStatus;
+    private org.alfresco.webservice.accesscontrol.AccessStatus accessStatus;
 
     public HasPermissionsResult() {
     }
 
     public HasPermissionsResult(
-           org.alfresco.repo.webservice.types.Reference reference,
+           org.alfresco.webservice.types.Reference reference,
            java.lang.String permission,
-           org.alfresco.repo.webservice.accesscontrol.AccessStatus accessStatus) {
+           org.alfresco.webservice.accesscontrol.AccessStatus accessStatus) {
            this.reference = reference;
            this.permission = permission;
            this.accessStatus = accessStatus;
@@ -30,7 +30,7 @@ public class HasPermissionsResult  implements java.io.Serializable {
      * 
      * @return reference
      */
-    public org.alfresco.repo.webservice.types.Reference getReference() {
+    public org.alfresco.webservice.types.Reference getReference() {
         return reference;
     }
 
@@ -40,7 +40,7 @@ public class HasPermissionsResult  implements java.io.Serializable {
      * 
      * @param reference
      */
-    public void setReference(org.alfresco.repo.webservice.types.Reference reference) {
+    public void setReference(org.alfresco.webservice.types.Reference reference) {
         this.reference = reference;
     }
 
@@ -70,7 +70,7 @@ public class HasPermissionsResult  implements java.io.Serializable {
      * 
      * @return accessStatus
      */
-    public org.alfresco.repo.webservice.accesscontrol.AccessStatus getAccessStatus() {
+    public org.alfresco.webservice.accesscontrol.AccessStatus getAccessStatus() {
         return accessStatus;
     }
 
@@ -80,7 +80,7 @@ public class HasPermissionsResult  implements java.io.Serializable {
      * 
      * @param accessStatus
      */
-    public void setAccessStatus(org.alfresco.repo.webservice.accesscontrol.AccessStatus accessStatus) {
+    public void setAccessStatus(org.alfresco.webservice.accesscontrol.AccessStatus accessStatus) {
         this.accessStatus = accessStatus;
     }
 

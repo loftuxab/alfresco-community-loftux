@@ -27,6 +27,13 @@ import org.alfresco.webservice.content.Content;
  */
 public class ContentUtils
 {   
+    /**
+     * Convert an input stream to a byte array
+     * 
+     * @param inputStream   the input stream
+     * @return              the byte array
+     * @throws Exception
+     */
     public static byte[] convertToByteArray(InputStream inputStream) throws Exception
     {
         byte[] result = null;
@@ -40,6 +47,12 @@ public class ContentUtils
         return result;
     }
     
+    /**
+     * Get the content from the download servlet as a string
+     * 
+     * @param content   the content object
+     * @return          the content as a string
+     */
     public static String getContentAsString(Content content)
     {
         // Get the url and the ticket

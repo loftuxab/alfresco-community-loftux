@@ -105,7 +105,8 @@ public class WebServiceSample3 implements WebServiceSampleConfig
         throws Exception
     {
         // First we'll use the previous sample to get hold of a reference to a space that we can create the content within
-        Reference reference = WebServiceSample2.executeSearch();                
+        Reference reference = WebServiceSample2.executeSearch();
+        //Reference reference = new Reference(STORE, null, "/app:company_home");
         
         // Create a parent reference, this contains information about the association we are createing to the new content and the
         // parent of the new content (the space retrived from the search)

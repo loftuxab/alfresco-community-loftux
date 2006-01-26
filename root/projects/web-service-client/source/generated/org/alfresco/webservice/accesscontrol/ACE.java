@@ -1,52 +1,52 @@
 /**
- * HasPermissionsResult.java
+ * ACE.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package org.alfresco.repo.webservice.accesscontrol;
+package org.alfresco.webservice.accesscontrol;
 
-public class HasPermissionsResult  implements java.io.Serializable {
-    private org.alfresco.repo.webservice.types.Reference reference;
+public class ACE  implements java.io.Serializable {
+    private java.lang.String authority;
     private java.lang.String permission;
-    private org.alfresco.repo.webservice.accesscontrol.AccessStatus accessStatus;
+    private org.alfresco.webservice.accesscontrol.AccessStatus accessStatus;
 
-    public HasPermissionsResult() {
+    public ACE() {
     }
 
-    public HasPermissionsResult(
-           org.alfresco.repo.webservice.types.Reference reference,
+    public ACE(
+           java.lang.String authority,
            java.lang.String permission,
-           org.alfresco.repo.webservice.accesscontrol.AccessStatus accessStatus) {
-           this.reference = reference;
+           org.alfresco.webservice.accesscontrol.AccessStatus accessStatus) {
+           this.authority = authority;
            this.permission = permission;
            this.accessStatus = accessStatus;
     }
 
 
     /**
-     * Gets the reference value for this HasPermissionsResult.
+     * Gets the authority value for this ACE.
      * 
-     * @return reference
+     * @return authority
      */
-    public org.alfresco.repo.webservice.types.Reference getReference() {
-        return reference;
+    public java.lang.String getAuthority() {
+        return authority;
     }
 
 
     /**
-     * Sets the reference value for this HasPermissionsResult.
+     * Sets the authority value for this ACE.
      * 
-     * @param reference
+     * @param authority
      */
-    public void setReference(org.alfresco.repo.webservice.types.Reference reference) {
-        this.reference = reference;
+    public void setAuthority(java.lang.String authority) {
+        this.authority = authority;
     }
 
 
     /**
-     * Gets the permission value for this HasPermissionsResult.
+     * Gets the permission value for this ACE.
      * 
      * @return permission
      */
@@ -56,7 +56,7 @@ public class HasPermissionsResult  implements java.io.Serializable {
 
 
     /**
-     * Sets the permission value for this HasPermissionsResult.
+     * Sets the permission value for this ACE.
      * 
      * @param permission
      */
@@ -66,28 +66,28 @@ public class HasPermissionsResult  implements java.io.Serializable {
 
 
     /**
-     * Gets the accessStatus value for this HasPermissionsResult.
+     * Gets the accessStatus value for this ACE.
      * 
      * @return accessStatus
      */
-    public org.alfresco.repo.webservice.accesscontrol.AccessStatus getAccessStatus() {
+    public org.alfresco.webservice.accesscontrol.AccessStatus getAccessStatus() {
         return accessStatus;
     }
 
 
     /**
-     * Sets the accessStatus value for this HasPermissionsResult.
+     * Sets the accessStatus value for this ACE.
      * 
      * @param accessStatus
      */
-    public void setAccessStatus(org.alfresco.repo.webservice.accesscontrol.AccessStatus accessStatus) {
+    public void setAccessStatus(org.alfresco.webservice.accesscontrol.AccessStatus accessStatus) {
         this.accessStatus = accessStatus;
     }
 
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof HasPermissionsResult)) return false;
-        HasPermissionsResult other = (HasPermissionsResult) obj;
+        if (!(obj instanceof ACE)) return false;
+        ACE other = (ACE) obj;
         if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
@@ -96,9 +96,9 @@ public class HasPermissionsResult  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.reference==null && other.getReference()==null) || 
-             (this.reference!=null &&
-              this.reference.equals(other.getReference()))) &&
+            ((this.authority==null && other.getAuthority()==null) || 
+             (this.authority!=null &&
+              this.authority.equals(other.getAuthority()))) &&
             ((this.permission==null && other.getPermission()==null) || 
              (this.permission!=null &&
               this.permission.equals(other.getPermission()))) &&
@@ -116,8 +116,8 @@ public class HasPermissionsResult  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getReference() != null) {
-            _hashCode += getReference().hashCode();
+        if (getAuthority() != null) {
+            _hashCode += getAuthority().hashCode();
         }
         if (getPermission() != null) {
             _hashCode += getPermission().hashCode();
@@ -131,14 +131,14 @@ public class HasPermissionsResult  implements java.io.Serializable {
 
     // Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(HasPermissionsResult.class, true);
+        new org.apache.axis.description.TypeDesc(ACE.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "HasPermissionsResult"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "ACE"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("reference");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "reference"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"));
+        elemField.setFieldName("authority");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "authority"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();

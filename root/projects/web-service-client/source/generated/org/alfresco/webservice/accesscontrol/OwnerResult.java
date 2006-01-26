@@ -1,78 +1,70 @@
 /**
- * GetPermissionsResult.java
+ * OwnerResult.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package org.alfresco.repo.webservice.accesscontrol;
+package org.alfresco.webservice.accesscontrol;
 
-public class GetPermissionsResult  implements java.io.Serializable {
-    private org.alfresco.repo.webservice.types.Reference reference;
-    private java.lang.String[] permissions;
+public class OwnerResult  implements java.io.Serializable {
+    private org.alfresco.webservice.types.Reference reference;
+    private java.lang.String owner;
 
-    public GetPermissionsResult() {
+    public OwnerResult() {
     }
 
-    public GetPermissionsResult(
-           org.alfresco.repo.webservice.types.Reference reference,
-           java.lang.String[] permissions) {
+    public OwnerResult(
+           org.alfresco.webservice.types.Reference reference,
+           java.lang.String owner) {
            this.reference = reference;
-           this.permissions = permissions;
+           this.owner = owner;
     }
 
 
     /**
-     * Gets the reference value for this GetPermissionsResult.
+     * Gets the reference value for this OwnerResult.
      * 
      * @return reference
      */
-    public org.alfresco.repo.webservice.types.Reference getReference() {
+    public org.alfresco.webservice.types.Reference getReference() {
         return reference;
     }
 
 
     /**
-     * Sets the reference value for this GetPermissionsResult.
+     * Sets the reference value for this OwnerResult.
      * 
      * @param reference
      */
-    public void setReference(org.alfresco.repo.webservice.types.Reference reference) {
+    public void setReference(org.alfresco.webservice.types.Reference reference) {
         this.reference = reference;
     }
 
 
     /**
-     * Gets the permissions value for this GetPermissionsResult.
+     * Gets the owner value for this OwnerResult.
      * 
-     * @return permissions
+     * @return owner
      */
-    public java.lang.String[] getPermissions() {
-        return permissions;
+    public java.lang.String getOwner() {
+        return owner;
     }
 
 
     /**
-     * Sets the permissions value for this GetPermissionsResult.
+     * Sets the owner value for this OwnerResult.
      * 
-     * @param permissions
+     * @param owner
      */
-    public void setPermissions(java.lang.String[] permissions) {
-        this.permissions = permissions;
-    }
-
-    public java.lang.String getPermissions(int i) {
-        return this.permissions[i];
-    }
-
-    public void setPermissions(int i, java.lang.String _value) {
-        this.permissions[i] = _value;
+    public void setOwner(java.lang.String owner) {
+        this.owner = owner;
     }
 
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof GetPermissionsResult)) return false;
-        GetPermissionsResult other = (GetPermissionsResult) obj;
+        if (!(obj instanceof OwnerResult)) return false;
+        OwnerResult other = (OwnerResult) obj;
         if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
@@ -84,9 +76,9 @@ public class GetPermissionsResult  implements java.io.Serializable {
             ((this.reference==null && other.getReference()==null) || 
              (this.reference!=null &&
               this.reference.equals(other.getReference()))) &&
-            ((this.permissions==null && other.getPermissions()==null) || 
-             (this.permissions!=null &&
-              java.util.Arrays.equals(this.permissions, other.getPermissions())));
+            ((this.owner==null && other.getOwner()==null) || 
+             (this.owner!=null &&
+              this.owner.equals(other.getOwner())));
         __equalsCalc = null;
         return _equals;
     }
@@ -101,16 +93,8 @@ public class GetPermissionsResult  implements java.io.Serializable {
         if (getReference() != null) {
             _hashCode += getReference().hashCode();
         }
-        if (getPermissions() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getPermissions());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getPermissions(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
+        if (getOwner() != null) {
+            _hashCode += getOwner().hashCode();
         }
         __hashCodeCalc = false;
         return _hashCode;
@@ -118,10 +102,10 @@ public class GetPermissionsResult  implements java.io.Serializable {
 
     // Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(GetPermissionsResult.class, true);
+        new org.apache.axis.description.TypeDesc(OwnerResult.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "GetPermissionsResult"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "OwnerResult"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("reference");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "reference"));
@@ -129,12 +113,10 @@ public class GetPermissionsResult  implements java.io.Serializable {
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("permissions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "permissions"));
+        elemField.setFieldName("owner");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "owner"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
-        elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
     }
 

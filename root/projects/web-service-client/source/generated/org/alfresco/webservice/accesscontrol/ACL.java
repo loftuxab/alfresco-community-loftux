@@ -1,78 +1,101 @@
 /**
- * GetPermissionsResult.java
+ * ACL.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package org.alfresco.repo.webservice.accesscontrol;
+package org.alfresco.webservice.accesscontrol;
 
-public class GetPermissionsResult  implements java.io.Serializable {
-    private org.alfresco.repo.webservice.types.Reference reference;
-    private java.lang.String[] permissions;
+public class ACL  implements java.io.Serializable {
+    private org.alfresco.webservice.types.Reference reference;
+    private boolean inheritPermissions;
+    private org.alfresco.webservice.accesscontrol.ACE[] aces;
 
-    public GetPermissionsResult() {
+    public ACL() {
     }
 
-    public GetPermissionsResult(
-           org.alfresco.repo.webservice.types.Reference reference,
-           java.lang.String[] permissions) {
+    public ACL(
+           org.alfresco.webservice.types.Reference reference,
+           boolean inheritPermissions,
+           org.alfresco.webservice.accesscontrol.ACE[] aces) {
            this.reference = reference;
-           this.permissions = permissions;
+           this.inheritPermissions = inheritPermissions;
+           this.aces = aces;
     }
 
 
     /**
-     * Gets the reference value for this GetPermissionsResult.
+     * Gets the reference value for this ACL.
      * 
      * @return reference
      */
-    public org.alfresco.repo.webservice.types.Reference getReference() {
+    public org.alfresco.webservice.types.Reference getReference() {
         return reference;
     }
 
 
     /**
-     * Sets the reference value for this GetPermissionsResult.
+     * Sets the reference value for this ACL.
      * 
      * @param reference
      */
-    public void setReference(org.alfresco.repo.webservice.types.Reference reference) {
+    public void setReference(org.alfresco.webservice.types.Reference reference) {
         this.reference = reference;
     }
 
 
     /**
-     * Gets the permissions value for this GetPermissionsResult.
+     * Gets the inheritPermissions value for this ACL.
      * 
-     * @return permissions
+     * @return inheritPermissions
      */
-    public java.lang.String[] getPermissions() {
-        return permissions;
+    public boolean isInheritPermissions() {
+        return inheritPermissions;
     }
 
 
     /**
-     * Sets the permissions value for this GetPermissionsResult.
+     * Sets the inheritPermissions value for this ACL.
      * 
-     * @param permissions
+     * @param inheritPermissions
      */
-    public void setPermissions(java.lang.String[] permissions) {
-        this.permissions = permissions;
+    public void setInheritPermissions(boolean inheritPermissions) {
+        this.inheritPermissions = inheritPermissions;
     }
 
-    public java.lang.String getPermissions(int i) {
-        return this.permissions[i];
+
+    /**
+     * Gets the aces value for this ACL.
+     * 
+     * @return aces
+     */
+    public org.alfresco.webservice.accesscontrol.ACE[] getAces() {
+        return aces;
     }
 
-    public void setPermissions(int i, java.lang.String _value) {
-        this.permissions[i] = _value;
+
+    /**
+     * Sets the aces value for this ACL.
+     * 
+     * @param aces
+     */
+    public void setAces(org.alfresco.webservice.accesscontrol.ACE[] aces) {
+        this.aces = aces;
+    }
+
+    public org.alfresco.webservice.accesscontrol.ACE getAces(int i) {
+        return this.aces[i];
+    }
+
+    public void setAces(int i, org.alfresco.webservice.accesscontrol.ACE _value) {
+        this.aces[i] = _value;
     }
 
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof GetPermissionsResult)) return false;
-        GetPermissionsResult other = (GetPermissionsResult) obj;
+        if (!(obj instanceof ACL)) return false;
+        ACL other = (ACL) obj;
         if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
@@ -84,9 +107,10 @@ public class GetPermissionsResult  implements java.io.Serializable {
             ((this.reference==null && other.getReference()==null) || 
              (this.reference!=null &&
               this.reference.equals(other.getReference()))) &&
-            ((this.permissions==null && other.getPermissions()==null) || 
-             (this.permissions!=null &&
-              java.util.Arrays.equals(this.permissions, other.getPermissions())));
+            this.inheritPermissions == other.isInheritPermissions() &&
+            ((this.aces==null && other.getAces()==null) || 
+             (this.aces!=null &&
+              java.util.Arrays.equals(this.aces, other.getAces())));
         __equalsCalc = null;
         return _equals;
     }
@@ -101,11 +125,12 @@ public class GetPermissionsResult  implements java.io.Serializable {
         if (getReference() != null) {
             _hashCode += getReference().hashCode();
         }
-        if (getPermissions() != null) {
+        _hashCode += (isInheritPermissions() ? Boolean.TRUE : Boolean.FALSE).hashCode();
+        if (getAces() != null) {
             for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getPermissions());
+                 i<java.lang.reflect.Array.getLength(getAces());
                  i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getPermissions(), i);
+                java.lang.Object obj = java.lang.reflect.Array.get(getAces(), i);
                 if (obj != null &&
                     !obj.getClass().isArray()) {
                     _hashCode += obj.hashCode();
@@ -118,10 +143,10 @@ public class GetPermissionsResult  implements java.io.Serializable {
 
     // Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(GetPermissionsResult.class, true);
+        new org.apache.axis.description.TypeDesc(ACL.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "GetPermissionsResult"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "ACL"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("reference");
         elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "reference"));
@@ -129,9 +154,15 @@ public class GetPermissionsResult  implements java.io.Serializable {
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("permissions");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "permissions"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setFieldName("inheritPermissions");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "inheritPermissions"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("aces");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "aces"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "ACE"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         elemField.setMaxOccursUnbounded(true);

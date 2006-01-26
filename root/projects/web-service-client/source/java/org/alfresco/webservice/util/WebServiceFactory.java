@@ -18,8 +18,12 @@ package org.alfresco.webservice.util;
 
 import javax.xml.rpc.ServiceException;
 
+import org.alfresco.webservice.accesscontrol.AccessControlServiceLocator;
+import org.alfresco.webservice.accesscontrol.AccessControlServiceSoapBindingStub;
 import org.alfresco.webservice.action.ActionServiceLocator;
 import org.alfresco.webservice.action.ActionServiceSoapBindingStub;
+import org.alfresco.webservice.administration.AdministrationServiceLocator;
+import org.alfresco.webservice.administration.AdministrationServiceSoapBindingStub;
 import org.alfresco.webservice.authentication.AuthenticationServiceLocator;
 import org.alfresco.webservice.authentication.AuthenticationServiceSoapBindingStub;
 import org.alfresco.webservice.authoring.AuthoringServiceLocator;
@@ -53,6 +57,8 @@ public final class WebServiceFactory
     private static final String AUTHORING_SERVICE_ADDRESS       = "/alfresco/api/AuthoringService";
     private static final String CLASSIFICATION_SERVICE_ADDRESS  = "/alfresco/api/ClassificationService";
     private static final String ACTION_SERVICE_ADDRESS          = "/alfresco/api/ActionService";
+    private static final String ACCESS_CONTROL_ADDRESS          = "/alfresco/api/AccessControlService";
+    private static final String ADMINISTRATION_ADDRESS          = "/alfresco/api/AdministrationService";
     
     /** Services */
     private static AuthenticationServiceSoapBindingStub authenticationService   = null;
@@ -61,6 +67,8 @@ public final class WebServiceFactory
     private static AuthoringServiceSoapBindingStub      authoringService        = null;
     private static ClassificationServiceSoapBindingStub classificationService   = null;
     private static ActionServiceSoapBindingStub         actionService           = null;
+    private static AccessControlServiceSoapBindingStub  accessControlService    = null;
+    private static AdministrationServiceSoapBindingStub administrationService   = null;
     
     /**
      * Get the authentication service
@@ -245,7 +253,7 @@ public final class WebServiceFactory
     /**
      * Get the content service
      * 
-     * @return
+     * @return  the content service
      */
     public static ContentServiceSoapBindingStub getContentService()
     {
@@ -276,6 +284,78 @@ public final class WebServiceFactory
         }        
         
         return contentService;
+    }
+    
+    /**
+     * Get the access control service
+     * 
+     * @return  the access control service
+     */
+    public static AccessControlServiceSoapBindingStub getAccessControlService()
+    {
+        if (accessControlService == null)
+        {            
+            try 
+            {
+                // Get the access control service
+                AccessControlServiceLocator locator = new AccessControlServiceLocator(AuthenticationUtils.getEngineConfiguration());
+                locator.setAccessControlServiceEndpointAddress(getEndpointAddress() + ACCESS_CONTROL_ADDRESS);                
+                accessControlService = (AccessControlServiceSoapBindingStub)locator.getAccessControlService();
+            }
+            catch (ServiceException jre) 
+            {
+                if (logger.isDebugEnabled() == true)
+                {
+                    if (jre.getLinkedCause() != null)
+                    {
+                        jre.getLinkedCause().printStackTrace();
+                    }
+                }
+   
+                throw new WebServiceException("Error creating access control service: " + jre.getMessage(), jre);
+            }        
+            
+            // Time out after a minute
+            accessControlService.setTimeout(60000);
+        }        
+        
+        return accessControlService;
+    }
+    
+    /**
+     * Get the administation service
+     * 
+     * @return  the administration service
+     */
+    public static AdministrationServiceSoapBindingStub getAdministrationService()
+    {
+        if (administrationService == null)
+        {            
+            try 
+            {
+                // Get the adminstration service
+                AdministrationServiceLocator locator = new AdministrationServiceLocator(AuthenticationUtils.getEngineConfiguration());
+                locator.setAdministrationServiceEndpointAddress(getEndpointAddress() + ADMINISTRATION_ADDRESS);                
+                administrationService = (AdministrationServiceSoapBindingStub)locator.getAdministrationService();
+            }
+            catch (ServiceException jre) 
+            {
+                if (logger.isDebugEnabled() == true)
+                {
+                    if (jre.getLinkedCause() != null)
+                    {
+                        jre.getLinkedCause().printStackTrace();
+                    }
+                }
+   
+                throw new WebServiceException("Error creating administration service: " + jre.getMessage(), jre);
+            }        
+            
+            // Time out after a minute
+            administrationService.setTimeout(60000);
+        }        
+        
+        return administrationService;
     }
     
     /**

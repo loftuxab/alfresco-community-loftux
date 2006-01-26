@@ -5,17 +5,17 @@
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package org.alfresco.repo.webservice.accesscontrol;
+package org.alfresco.webservice.accesscontrol;
 
 public class GetPermissionsResult  implements java.io.Serializable {
-    private org.alfresco.repo.webservice.types.Reference reference;
+    private org.alfresco.webservice.types.Reference reference;
     private java.lang.String[] permissions;
 
     public GetPermissionsResult() {
     }
 
     public GetPermissionsResult(
-           org.alfresco.repo.webservice.types.Reference reference,
+           org.alfresco.webservice.types.Reference reference,
            java.lang.String[] permissions) {
            this.reference = reference;
            this.permissions = permissions;
@@ -27,7 +27,7 @@ public class GetPermissionsResult  implements java.io.Serializable {
      * 
      * @return reference
      */
-    public org.alfresco.repo.webservice.types.Reference getReference() {
+    public org.alfresco.webservice.types.Reference getReference() {
         return reference;
     }
 
@@ -37,7 +37,7 @@ public class GetPermissionsResult  implements java.io.Serializable {
      * 
      * @param reference
      */
-    public void setReference(org.alfresco.repo.webservice.types.Reference reference) {
+    public void setReference(org.alfresco.webservice.types.Reference reference) {
         this.reference = reference;
     }
 

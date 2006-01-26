@@ -82,7 +82,15 @@ public class AuthenticationServiceSystemTest extends TestCase
        AuthenticationResult result = authenticationService.startSession("admin", "admin");
        authenticationService.endSession(result.getTicket());
        
-       // Try and end an invalid session
-       authenticationService.endSession("badSessionId");
+       try
+       {
+           // Try and end an invalid session
+           authenticationService.endSession("badSessionId");
+           fail("An exception should have been thrown since we are trying to end an invalid session");
+       }
+       catch (Throwable exception)
+       {
+           // Web are expecting this exception
+       }
    }
 }

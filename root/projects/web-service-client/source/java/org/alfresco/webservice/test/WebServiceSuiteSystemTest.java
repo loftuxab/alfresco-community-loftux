@@ -35,6 +35,8 @@ public class WebServiceSuiteSystemTest extends TestSuite
         suite.addTestSuite(ContentServiceSystemTest.class);
         suite.addTestSuite(RepositoryServiceSystemTest.class);
         suite.addTestSuite(ActionServiceSystemTest.class);
+        suite.addTestSuite(AdministrationServiceSystemTest.class);
+        suite.addTestSuite(AccessControlServiceSystemTest.class);
         return suite;
     }
 }

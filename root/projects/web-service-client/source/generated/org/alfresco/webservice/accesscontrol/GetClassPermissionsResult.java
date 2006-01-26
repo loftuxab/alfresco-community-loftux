@@ -1,49 +1,49 @@
 /**
- * GetPermissionsResult.java
+ * GetClassPermissionsResult.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package org.alfresco.repo.webservice.accesscontrol;
+package org.alfresco.webservice.accesscontrol;
 
-public class GetPermissionsResult  implements java.io.Serializable {
-    private org.alfresco.repo.webservice.types.Reference reference;
+public class GetClassPermissionsResult  implements java.io.Serializable {
+    private java.lang.String className;
     private java.lang.String[] permissions;
 
-    public GetPermissionsResult() {
+    public GetClassPermissionsResult() {
     }
 
-    public GetPermissionsResult(
-           org.alfresco.repo.webservice.types.Reference reference,
+    public GetClassPermissionsResult(
+           java.lang.String className,
            java.lang.String[] permissions) {
-           this.reference = reference;
+           this.className = className;
            this.permissions = permissions;
     }
 
 
     /**
-     * Gets the reference value for this GetPermissionsResult.
+     * Gets the className value for this GetClassPermissionsResult.
      * 
-     * @return reference
+     * @return className
      */
-    public org.alfresco.repo.webservice.types.Reference getReference() {
-        return reference;
+    public java.lang.String getClassName() {
+        return className;
     }
 
 
     /**
-     * Sets the reference value for this GetPermissionsResult.
+     * Sets the className value for this GetClassPermissionsResult.
      * 
-     * @param reference
+     * @param className
      */
-    public void setReference(org.alfresco.repo.webservice.types.Reference reference) {
-        this.reference = reference;
+    public void setClassName(java.lang.String className) {
+        this.className = className;
     }
 
 
     /**
-     * Gets the permissions value for this GetPermissionsResult.
+     * Gets the permissions value for this GetClassPermissionsResult.
      * 
      * @return permissions
      */
@@ -53,7 +53,7 @@ public class GetPermissionsResult  implements java.io.Serializable {
 
 
     /**
-     * Sets the permissions value for this GetPermissionsResult.
+     * Sets the permissions value for this GetClassPermissionsResult.
      * 
      * @param permissions
      */
@@ -71,8 +71,8 @@ public class GetPermissionsResult  implements java.io.Serializable {
 
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof GetPermissionsResult)) return false;
-        GetPermissionsResult other = (GetPermissionsResult) obj;
+        if (!(obj instanceof GetClassPermissionsResult)) return false;
+        GetClassPermissionsResult other = (GetClassPermissionsResult) obj;
         if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
@@ -81,9 +81,9 @@ public class GetPermissionsResult  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.reference==null && other.getReference()==null) || 
-             (this.reference!=null &&
-              this.reference.equals(other.getReference()))) &&
+            ((this.className==null && other.getClassName()==null) || 
+             (this.className!=null &&
+              this.className.equals(other.getClassName()))) &&
             ((this.permissions==null && other.getPermissions()==null) || 
              (this.permissions!=null &&
               java.util.Arrays.equals(this.permissions, other.getPermissions())));
@@ -98,8 +98,8 @@ public class GetPermissionsResult  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getReference() != null) {
-            _hashCode += getReference().hashCode();
+        if (getClassName() != null) {
+            _hashCode += getClassName().hashCode();
         }
         if (getPermissions() != null) {
             for (int i=0;
@@ -118,14 +118,14 @@ public class GetPermissionsResult  implements java.io.Serializable {
 
     // Type metadata
     private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(GetPermissionsResult.class, true);
+        new org.apache.axis.description.TypeDesc(GetClassPermissionsResult.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "GetPermissionsResult"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "GetClassPermissionsResult"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("reference");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "reference"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"));
+        elemField.setFieldName("className");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "className"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
