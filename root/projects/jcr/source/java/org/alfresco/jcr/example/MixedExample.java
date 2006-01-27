@@ -21,14 +21,12 @@ import javax.jcr.Property;
 import javax.jcr.Repository;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
-import javax.transaction.UserTransaction;
 
 import org.alfresco.jcr.api.JCRNodeRef;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.transaction.TransactionService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -48,7 +46,6 @@ public class MixedExample
         // Setup Spring and Transaction Service
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:alfresco/jcr-context.xml");
         ServiceRegistry registry = (ServiceRegistry)context.getBean(ServiceRegistry.SERVICE_REGISTRY);
-        TransactionService trxService = (TransactionService)registry.getTransactionService();
         NodeService nodeService = (NodeService)registry.getNodeService();
         
         // Retrieve Repository
@@ -58,10 +55,6 @@ public class MixedExample
         // Note: Default workspace is the one used by Alfresco Web Client which contains all the Spaces
         //       and their documents
         Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-
-        // Start a Transaction
-        UserTransaction trx = trxService.getUserTransaction();
-        trx.begin();
 
         try
         {
@@ -82,8 +75,8 @@ public class MixedExample
         }
         finally
         {
-            trx.rollback();
             session.logout();
+            System.exit(0);
         }
     }
     
