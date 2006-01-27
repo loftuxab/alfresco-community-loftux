@@ -18,10 +18,15 @@ package org.alfresco.webservice.test;
 
 import org.alfresco.webservice.administration.NewUserDetails;
 import org.alfresco.webservice.administration.UserDetails;
+import org.alfresco.webservice.administration.UserQueryResults;
+import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.types.NamedValue;
+import org.alfresco.webservice.types.QueryConfiguration;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Administration service system test
@@ -30,6 +35,64 @@ import org.alfresco.webservice.util.WebServiceFactory;
  */
 public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
 {
+    private static Log logger = LogFactory.getLog(AdministrationServiceSystemTest.class);
+    
+    public void testGetUsersBatching() throws Exception
+    {
+        int batchSize = 5;
+        QueryConfiguration queryCfg = new QueryConfiguration();
+        queryCfg.setFetchSize(batchSize);
+        WebServiceFactory.getAdministrationService().setHeader(
+                new RepositoryServiceLocator().getServiceName().getNamespaceURI(), 
+                "QueryHeader", 
+                queryCfg);
+        
+        // Get the details of the new users
+        String homeFolder = store.getScheme().getValue() + "://" + store.getAddress() + "/" + folderReference.getUuid();
+        String one = Long.toString(System.currentTimeMillis());
+        String two = one + "2";        
+        NewUserDetails[] newUsers = new NewUserDetails[] {
+                new NewUserDetails(
+                        "user" + one, 
+                        "password" + one,
+                        createPersonProperties(homeFolder, "first" + one, "middle" + one, "last" + one, "email" + one, "org" + one)),
+                new NewUserDetails(
+                        "user" + two, 
+                        "password2" + two,
+                        createPersonProperties(homeFolder, "first" + two, "middle" + two, "last" + two, "email" + two, "org" + two)) };
+
+        // Create the new users
+        WebServiceFactory.getAdministrationService().createUsers(newUsers);
+        
+        UserQueryResults results = WebServiceFactory.getAdministrationService().queryUsers(null);
+        assertNotNull(results);
+        
+        if (logger.isDebugEnabled() == true)
+        {
+            while(true)
+            {
+                System.out.println("Next batch");
+                System.out.println("Session Id: " + results.getQuerySession());
+                
+                for (UserDetails details : results.getUserDetails())
+                {
+                    System.out.println("User name: " + details.getUserName());
+                }
+                
+                if (results.getQuerySession() == null)
+                {
+                    break;
+                }
+                results = WebServiceFactory.getAdministrationService().fetchMoreUsers(results.getQuerySession());
+            }
+        }
+        
+
+        // Delete the created users
+        String[] userNames = new String[]{"user" + one, "user" + two};
+        WebServiceFactory.getAdministrationService().deleteUsers(userNames);
+    }
+    
     /**
      * Test the general user CRUD methods
      */

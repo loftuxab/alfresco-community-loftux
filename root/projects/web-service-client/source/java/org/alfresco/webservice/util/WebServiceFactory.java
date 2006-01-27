@@ -16,6 +16,9 @@
  */
 package org.alfresco.webservice.util;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import javax.xml.rpc.ServiceException;
 
 import org.alfresco.webservice.accesscontrol.AccessControlServiceLocator;
@@ -37,6 +40,8 @@ import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.sun.org.apache.bcel.internal.util.ClassLoader;
+
 /**
  * 
  * 
@@ -46,6 +51,10 @@ public final class WebServiceFactory
 {
     /** Log */
     private static Log logger = LogFactory.getLog(WebServiceFactory.class);
+    
+    /** Property file name */
+    private static final String PROPERTY_FILE_NAME = "alfresco/webserviceclient.properties";
+    private static final String REPO_LOCATION = "repository.location";
     
     /** Default endpoint address **/
     private static final String DEFAULT_ENDPOINT_ADDRESS = "http://localhost:8080";
@@ -365,7 +374,27 @@ public final class WebServiceFactory
      */
     private static String getEndpointAddress()
     {
-        // TODO need to get this from some config
-        return DEFAULT_ENDPOINT_ADDRESS;
+        String endPoint = DEFAULT_ENDPOINT_ADDRESS;
+        
+        InputStream is = ClassLoader.getSystemResourceAsStream(PROPERTY_FILE_NAME);
+        if (is != null)
+        {
+            Properties props = new Properties();
+            try
+            {
+                props.load(is);            
+                endPoint = props.getProperty(REPO_LOCATION);
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just use the default endpoint
+                if (logger.isDebugEnabled() == true)
+                {
+                    logger.debug("Unable to file web service client proerties file.  Using default.");
+                }
+            }
+        }
+        
+        return endPoint;
     }
 }
