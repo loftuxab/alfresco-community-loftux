@@ -37,9 +37,8 @@
    </target>
 
    <target name="distribute" 
-           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-source, distribute-php"
+           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-source, distribute-php, distribute-web-service-client"
            description="Creates the distribution files for all platforms for all appservers"/>
-   <!-- , distribute-web-service-client -->
 
    <target name="generate-checksums" depends="init" 
            description="Generates checksum files for the distibution files">
