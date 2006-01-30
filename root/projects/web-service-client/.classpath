@@ -5,5 +5,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/3rd Party"/>
 	<classpathentry kind="src" path="config"/>
-	<classpathentry kind="output" path="build"/>
+	<classpathentry kind="output" path="build/classes"/>
 </classpath>
