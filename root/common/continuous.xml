@@ -220,14 +220,12 @@
 
       <zip destfile="${dir.dist}/${file.name.dist.webserviceclient}.zip">
          <zipfileset dir="${dir.project.webserviceclient}/build/dist" />
-         <!--<zipfileset dir="${dir.project.webserviceclient}/build/test_resources" prefix="test_resources"/>
-         <zipfileset dir="${dir.project.webserviceclient}/build/alfresco" prefix="alfresco"/>-->
+         <zipfileset dir="${dir.project.webserviceclient}/config/alfresco" prefix="alfresco"/>
       </zip>
 
       <tar destfile="${dir.dist}/${file.name.dist.webserviceclient}.tar" longfile="gnu">
          <tarfileset dir="${dir.project.webserviceclient}/build/dist" />
-         <!--<tarfileset dir="${dir.project.webserviceclient}/build/test_resources" prefix="test_resources"/>
-         <tarfileset dir="${dir.project.webserviceclient}/build/alfresco" prefix="alfresco"/>-->
+         <tarfileset dir="${dir.project.webserviceclient}/config/alfresco" prefix="alfresco"/>
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.webserviceclient}.tar.gz" src="${dir.dist}/${file.name.dist.webserviceclient}.tar" />
       <delete file="${dir.dist}/${file.name.dist.webserviceclient}.tar" />

@@ -168,7 +168,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        Reference newContentNode = result[0].getDestination();              
        ContentFormat format = new ContentFormat("application/msword", "UTF-8");  
        
-       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("test_resources/quick.doc");
+       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/quick.doc");
        byte[] bytes = ContentUtils.convertToByteArray(viewStream);
        
        this.contentService.write(newContentNode, Constants.PROP_CONTENT, bytes, format);

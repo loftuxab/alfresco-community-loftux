@@ -58,7 +58,7 @@ public class ClassificationServiceSystemTest extends BaseWebServiceSystemTest
         if (ClassificationServiceSystemTest.categoriesLoaded == false)
         {
             // Import categories into the new store
-            InputStream viewStream = getClass().getClassLoader().getResourceAsStream("test_resources/test.acp");
+            InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/test.acp");
             byte[] byteArray = ContentUtils.convertToByteArray(viewStream);
             
             // Create the node that will contain the category import file
