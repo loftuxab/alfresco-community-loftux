@@ -19,6 +19,7 @@
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.jcr}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
+                       ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}
                        ${dir.project.enterprise}/${file.name.project.build}"/>
    </target>
    
