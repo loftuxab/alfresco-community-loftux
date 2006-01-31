@@ -72,6 +72,13 @@ Install Alfresco Tomcat Bundle
   temporary files you application server has created.  
 
 
+Add MySQL Database Connector
+----------------------------
+
+- Down the MySQL Java Database Connector http://dev.mysql.com/downloads/connector/j/3.1.html
+- Copy the JAR file into /jakarta-tomcat/common/lib
+
+
 Create Database
 ---------------
 
