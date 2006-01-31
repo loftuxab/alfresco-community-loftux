@@ -16,9 +16,12 @@
  */
 package org.alfresco.webservice.sample;
 
+import java.io.InputStream;
+
 import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.content.ContentServiceSoapBindingStub;
 import org.alfresco.webservice.repository.UpdateResult;
+import org.alfresco.webservice.test.BaseWebServiceSystemTest;
 import org.alfresco.webservice.types.CML;
 import org.alfresco.webservice.types.CMLCreate;
 import org.alfresco.webservice.types.ContentFormat;
@@ -84,6 +87,30 @@ public class WebServiceSample3 implements WebServiceSampleConfig
             Content content2 = readResult2[0];
             System.out.println("The updated content is:");
             System.out.println(ContentUtils.getContentAsString(content2));
+            
+            // Upload binary content into the repository
+            Reference reference = WebServiceSample2.executeSearch();
+            ParentReference parentReference = new ParentReference(ASSOC_CONTAINS, ASSOC_CONTAINS);
+            parentReference.setStore(reference.getStore());
+            parentReference.setUuid(reference.getUuid());
+            
+            // Create the content
+            NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "test.jpg")};
+            CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_CONTENT, properties);
+            CML cml = new CML();
+            cml.setCreate(new CMLCreate[]{create});
+            UpdateResult[] result = WebServiceFactory.getRepositoryService().update(cml);     
+            
+            // Get the created node and create the format
+            Reference newContentNode = result[0].getDestination();              
+            ContentFormat format = new ContentFormat("image/jpeg", "UTF-8");  
+            
+            // Open the file and convert to byte array
+            InputStream viewStream = newContentNode.getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/test.jpg");
+            byte[] bytes = ContentUtils.convertToByteArray(viewStream);
+            
+            // Write the content
+            WebServiceFactory.getContentService().write(newContentNode, Constants.PROP_CONTENT, bytes, format);
         
         }
         finally

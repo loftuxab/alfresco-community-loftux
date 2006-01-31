@@ -16,6 +16,8 @@
  */
 package org.alfresco.webservice.test;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
 
 import org.alfresco.webservice.content.Content;
@@ -29,6 +31,8 @@ import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
+
+import freemarker.log.Logger;
 
 public class ContentServiceSystemTest extends BaseWebServiceSystemTest
 {
@@ -151,26 +155,88 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        assertNull(content7.getFormat());
    }
    
+   /**
+    * Test uploading content from file
+    * 
+    * @throws Exception
+    */
    public void testUploadContentFromFile() throws Exception
    {
+       // Create the parent reference
        ParentReference parentRef = new ParentReference();
        parentRef.setStore(BaseWebServiceSystemTest.store);
        parentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
        parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
        parentRef.setChildName(Constants.ASSOC_CHILDREN);
        
+       // Create the content
        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "quick.doc")};
        CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
        CML cml = new CML();
        cml.setCreate(new CMLCreate[]{create});
        UpdateResult[] result = this.repositoryService.update(cml);     
        
+       // Get the create node and create the format
        Reference newContentNode = result[0].getDestination();              
        ContentFormat format = new ContentFormat("application/msword", "UTF-8");  
        
+       // Open the file and convert to byte array
        InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/quick.doc");
        byte[] bytes = ContentUtils.convertToByteArray(viewStream);
        
+       // Write the content
        this.contentService.write(newContentNode, Constants.PROP_CONTENT, bytes, format);
+       
+       // Try and get the content, saving it to a file
+       Content[] contents = this.contentService.read(convertToPredicate(newContentNode), Constants.PROP_CONTENT);
+       assertNotNull(contents);
+       assertEquals(1, contents.length);
+       Content content = contents[0];
+       File tempFile = File.createTempFile("testDoc", ".doc");
+       System.out.println(tempFile.getPath());
+       ContentUtils.copyContentToFile(content, tempFile);
+   }
+   
+   /**
+    * Test uploading image from file
+    * 
+    * @throws Exception
+    */
+   public void testUploadImageFromFile() throws Exception
+   {
+       // Create the parent reference
+       ParentReference parentRef = new ParentReference();
+       parentRef.setStore(BaseWebServiceSystemTest.store);
+       parentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+       parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
+       parentRef.setChildName(Constants.ASSOC_CHILDREN);
+       
+       // Create the content
+       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "test.jpg")};
+       CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
+       CML cml = new CML();
+       cml.setCreate(new CMLCreate[]{create});
+       UpdateResult[] result = this.repositoryService.update(cml);     
+       
+       // Get the created node and create the format
+       Reference newContentNode = result[0].getDestination();              
+       ContentFormat format = new ContentFormat("image/jpeg", "UTF-8");  
+       
+       // Open the file and convert to byte array
+       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/test.jpg");
+       byte[] bytes = ContentUtils.convertToByteArray(viewStream);
+       
+       // Write the content
+       this.contentService.write(newContentNode, Constants.PROP_CONTENT, bytes, format);
+       
+       // Try and get the content, saving it to a file
+       Content[] contents = this.contentService.read(convertToPredicate(newContentNode), Constants.PROP_CONTENT);
+       assertNotNull(contents);
+       assertEquals(1, contents.length);
+       Content content = contents[0];
+       File tempFile = File.createTempFile("testImage", ".jpg");
+       System.out.println(tempFile.getPath());
+       ContentUtils.copyContentToFile(content, tempFile);
+
    }
 }
