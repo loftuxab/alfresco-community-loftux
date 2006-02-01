@@ -21,7 +21,6 @@ import java.io.InputStream;
 import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.content.ContentServiceSoapBindingStub;
 import org.alfresco.webservice.repository.UpdateResult;
-import org.alfresco.webservice.test.BaseWebServiceSystemTest;
 import org.alfresco.webservice.types.CML;
 import org.alfresco.webservice.types.CMLCreate;
 import org.alfresco.webservice.types.ContentFormat;
