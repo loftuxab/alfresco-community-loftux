@@ -1,0 +1,23 @@
+<project name="extension-sample" default="build">
+
+    <path id="path.common" path="${basedir}/../../common"/>
+    <property name="dir.common" refid="path.common" />
+    <import file="${dir.common}/common.xml" />	
+
+	<!-- init target -->
+    <target name="init" depends="common-init.init">
+    </target> 
+
+    <target name="package-jar" depends="common.package-jar" description="Packages the JAR file">
+        <jar jarfile="${dir.dist}/${file.name.jar}" update="true">
+        </jar>
+    </target>
+
+    <target name="package-war">
+        <echo>
+         This project can not produce a WAR file, the Remote API functionality is currently
+         packaged within the Web Client WAR file.
+      </echo>
+    </target>
+
+</project>
