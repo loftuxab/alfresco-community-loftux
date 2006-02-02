@@ -91,7 +91,12 @@ public abstract class BaseConfigSource implements ConfigSource
             {
                 logger.debug("Retrieving input stream for source: " + sourceString);
             }
-            inputStreams.add(getInputStream(sourceString));
+            
+            InputStream is = getInputStream(sourceString);
+            if (is != null)
+            {
+               inputStreams.add(is);
+            }
         }
         // done
         return inputStreams.iterator();

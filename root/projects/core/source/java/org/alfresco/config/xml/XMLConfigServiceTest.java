@@ -26,6 +26,7 @@ import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.source.HTTPConfigSource;
+import org.alfresco.config.source.UrlConfigSource;
 import org.alfresco.util.BaseTest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,8 +46,6 @@ public class XMLConfigServiceTest extends BaseTest
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        logger.info("******************************************************");
     }
 
     /**
@@ -64,13 +63,11 @@ public class XMLConfigServiceTest extends BaseTest
         ConfigElement globalItem = global.getConfigElement("global-item");
         assertNotNull("globalItem should not be null", globalItem);
         assertEquals("The global-item value should be 'The global value'", "The global value", globalItem.getValue());
-        logger.info("globalItem = " + globalItem.getValue());
 
         // try and get the override item
         ConfigElement overrideItem = global.getConfigElement("override");
         assertNotNull("overrideItem should not be null", overrideItem);
         assertEquals("The override item should be false", "false", overrideItem.getValue());
-        logger.info("overrideItem = " + overrideItem.getValue());
 
         // test the string evaluator by getting the item config element
         // in the "Unit Test" config section
@@ -79,13 +76,65 @@ public class XMLConfigServiceTest extends BaseTest
         ConfigElement item = unitTest.getConfigElement("item");
         assertNotNull("item should not be null", item);
         assertEquals("The item value should be 'The value'", "The value", item.getValue());
-        logger.info("item = " + item.getValue());
 
         // make sure the override value has changed when retrieved from item
         overrideItem = unitTest.getConfigElement("override");
         assertNotNull("overrideItem should not be null", overrideItem);
         assertEquals("The override item should now be true", "true", overrideItem.getValue());
-        logger.info("overrideItem = " + overrideItem.getValue());
+    }
+    
+    /**
+     * Tests the absence of referenced files
+     */
+    public void testMissingFiles()
+    {
+        // setup the config service using a missing file source
+        String configFile = "file:" + getResourcesDir() + "missing.xml";
+        XMLConfigService svc = new XMLConfigService(new UrlConfigSource(configFile));
+        svc.init();
+
+        // make sure attempts to retrieve config don't fail
+        Config global = svc.getGlobalConfig();
+        assertNotNull("Global config should not be null", global);
+        assertEquals("There shouldn't be any config elements for global", 0, 
+              global.getConfigElements().size());
+        
+        Config cfg = svc.getConfig("Nothing");
+        assertNotNull("Config for Nothing should not be null", cfg);
+        assertEquals("There shouldn't be any config elements for 'Nothing'", 0, 
+              cfg.getConfigElements().size());
+        
+        // do the same test for a classpath resource
+        configFile = "classpath:alfresco/missing.xml";
+        svc = new XMLConfigService(new UrlConfigSource(configFile));
+        svc.init();
+
+        // make sure attempts to retrieve config don't fail
+        global = svc.getGlobalConfig();
+        assertNotNull("Global config should not be null", global);
+        assertEquals("There shouldn't be any config elements for global", 0, 
+              global.getConfigElements().size());
+        
+        cfg = svc.getConfig("Nothing");
+        assertNotNull("Config for Nothing should not be null", cfg);
+        assertEquals("There shouldn't be any config elements for 'Nothing'", 0, 
+              cfg.getConfigElements().size());
+        
+        // do the same test for a HTTP resource
+        configFile = "http://localhost:8080/missing.xml";
+        svc = new XMLConfigService(new UrlConfigSource(configFile));
+        svc.init();
+
+        // make sure attempts to retrieve config don't fail
+        global = svc.getGlobalConfig();
+        assertNotNull("Global config should not be null", global);
+        assertEquals("There shouldn't be any config elements for global", 0, 
+              global.getConfigElements().size());
+        
+        cfg = svc.getConfig("Nothing");
+        assertNotNull("Config for Nothing should not be null", cfg);
+        assertEquals("There shouldn't be any config elements for 'Nothing'", 0, 
+              cfg.getConfigElements().size());
     }
     
     /**
@@ -104,7 +153,6 @@ public class XMLConfigServiceTest extends BaseTest
         
         // get the children config element
         ConfigElement children = cfg.getConfigElement("children");
-        logger.info("Number of children: " + children.getChildCount());
         // check the getNumberOfChildren method works
         assertEquals("There should be four children", 4, children.getChildCount());
         
@@ -113,8 +161,6 @@ public class XMLConfigServiceTest extends BaseTest
         assertNotNull("Child two config element should not be null", childTwo);
         assertEquals("Child two value should be 'child two value'", "child two value", 
               childTwo.getValue());
-        logger.info("Number of attributes for for child-two: " + 
-              childTwo.getAttributeCount());
         assertEquals("The number of attributes should be 0", 0, childTwo.getAttributeCount());
         
         // try and get a non existent child and check its null
@@ -126,15 +172,10 @@ public class XMLConfigServiceTest extends BaseTest
         assertNotNull("Child three config element should not be null", childThree);
         ConfigElement grandKids = childThree.getChild("grand-children");
         assertNotNull("Grand child config element should not be null", grandKids);
-        logger.info("Number of grand-children: " + grandKids.getChildCount());
         assertEquals("There should be 2 grand child config elements", 2, 
               grandKids.getChildCount());
         ConfigElement grandKidOne = grandKids.getChild("grand-child-one");
         assertNotNull("Grand child one config element should not be null", grandKidOne);
-        logger.info("Number of attributes for for grand-child-one: " + 
-              grandKidOne.getAttributeCount());
-        logger.info("Number of children for for grand-child-one: " + 
-              grandKidOne.getChildCount());
         assertEquals("The number of attributes for grand child one should be 1", 
               1, grandKidOne.getAttributeCount());
         assertEquals("The number of children for grand child one should be 0", 
@@ -214,13 +255,11 @@ public class XMLConfigServiceTest extends BaseTest
         ConfigElement globalItem = globalSection.getConfigElement("global-item");
         assertNotNull("globalItem should not be null", globalItem);
         assertEquals("The global-item value should be 'The global value'", "The global value", globalItem.getValue());
-        logger.info("globalItem = " + globalItem.getValue());
 
         ConfigElement globalItem2 = globalSection.getConfigElement("another-global-item");
         assertNotNull("globalItem2 should not be null", globalItem2);
         assertEquals("The another-global-item value should be 'Another global value'", "Another global value",
                 globalItem2.getValue());
-        logger.info("globalItem2 = " + globalItem2.getValue());
 
         // lookup the "Unit Test" section, this should match a section in each
         // file so
@@ -281,6 +320,9 @@ public class XMLConfigServiceTest extends BaseTest
         }
     }
 
+    /**
+     * Tests the merge features of the config service
+     */
     public void testMerging()
     {
         // setup the config service
@@ -299,7 +341,6 @@ public class XMLConfigServiceTest extends BaseTest
         ConfigElement overrideItem = globalSection.getConfigElement("override");
         assertNotNull("overrideItem should not be null", overrideItem);
         assertEquals("The override item should be true", "true", overrideItem.getValue());
-        logger.info("overrideItem = " + overrideItem.getValue());
         
         // make sure the global section gets merged properly
         ConfigElement mergeChildren = globalSection.getConfigElement("merge-children");
@@ -330,5 +371,33 @@ public class XMLConfigServiceTest extends BaseTest
         assertNotNull("children should not be null", children);
         kids = children.getChildren();
         assertEquals("There should be 3 children", 3, kids.size());
+    }
+    
+    /**
+     * Tests the override feature of the config service
+     */
+    public void testOverriding()
+    {
+        // setup the config service
+        List<String> configFiles = new ArrayList<String>(2);
+        configFiles.add(getResourcesDir() + "config.xml");
+        configFiles.add(getResourcesDir() + "config-override.xml");
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
+        svc.init();
+        
+        // try and get the global config section
+        Config globalSection = svc.getGlobalConfig();
+        assertNotNull("global section should not be null", globalSection);
+        
+        // TODO: Test the following:
+        // make sure global-item has the new value
+        // make sure <override>false</override> has disappeared
+        // make sure the <children-override> only has <child-custom> child
+        
+        // get 'Override Test' config section
+        // make sure <second-item> and <third-item> are no longer present
+        // make sure <first-item> has the new value
+        // make sure <fourth-item> is present
+        // make sure <children> has <child-two> and <child-three>
     }
 }

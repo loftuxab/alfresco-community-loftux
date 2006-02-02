@@ -20,7 +20,8 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
-import org.alfresco.config.ConfigException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * ConfigSource implementation that gets its data via the class path.
@@ -29,11 +30,12 @@ import org.alfresco.config.ConfigException;
  */
 public class ClassPathConfigSource extends BaseConfigSource
 {
+    private static Log logger = LogFactory.getLog(ClassPathConfigSource.class);
+    
     /**
      * Constructs a class path configuration source that uses a single file
      * 
-     * @param classpath
-     *            the classpath from which to get config
+     * @param classpath the classpath from which to get config
      * 
      * @see ClassPathConfigSource#ClassPathConfigSource(List<String>)
      */
@@ -45,8 +47,7 @@ public class ClassPathConfigSource extends BaseConfigSource
     /**
      * Constructs an ClassPathConfigSource using the list of classpath elements
      * 
-     * @param source
-     *            List of classpath resources to get config from
+     * @param source List of classpath resources to get config from
      */
     public ClassPathConfigSource(List<String> sourceStrings)
     {
@@ -56,17 +57,16 @@ public class ClassPathConfigSource extends BaseConfigSource
     /**
      * Retrieves an input stream for the given class path source
      * 
-     * @param sourceString
-     *            The class path resource to search for
+     * @param sourceString The class path resource to search for
      * @return The input stream
      */
     public InputStream getInputStream(String sourceString)
     {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(sourceString);
 
-        if (is == null)
+        if (is == null && logger.isWarnEnabled())
         {
-            throw new ConfigException("Failed to obtain input stream to classpath: " + sourceString);
+            logger.warn("Failed to obtain input stream to classpath: " + sourceString);
         }
 
         return is;

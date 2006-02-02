@@ -1,0 +1,19 @@
+<alfresco-config>
+   
+   <config override="true">
+      <global-item>The overridden global value</global-item>
+      <children-override>
+         <child-custom>child custom value</child-custom>
+      </children-override>
+   </config>
+   
+   <config evaluator="string-compare" condition="Override Test" override="true">
+      <first-item>the overridden first value</first-item>
+      <fourth-item>second value</fourth-item>
+      <children>
+         <child-two>child two value</child-two>
+         <child-three>child three value</child-three>
+      </children>
+   </config>
+
+</alfresco-config>

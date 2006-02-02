@@ -77,7 +77,7 @@ public class UrlConfigSource extends BaseConfigSource
         }
         else if (sourceUrl.startsWith(PREFIX_HTTP))
         {
-            sourceString = sourceUrl.substring(5);
+            sourceString = sourceUrl;
             configSource = new HTTPConfigSource(sourceString);
         }
         else if (sourceUrl.startsWith(PREFIX_CLASSPATH))

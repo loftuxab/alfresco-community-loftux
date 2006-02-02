@@ -22,7 +22,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import org.alfresco.config.ConfigException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * ConfigSource implementation that gets its data via HTTP.
@@ -31,7 +32,9 @@ import org.alfresco.config.ConfigException;
  */
 public class HTTPConfigSource extends BaseConfigSource
 {
-   /**
+    private static Log logger = LogFactory.getLog(HTTPConfigSource.class);
+   
+    /**
      * Constructs an HTTP configuration source that uses a single URL
      * 
      * @param url the url of the file from which to get config
@@ -70,7 +73,14 @@ public class HTTPConfigSource extends BaseConfigSource
       }
       catch (Throwable e)
       {
-         throw new ConfigException("Failed to obtain input stream to URL: " + sourceString, e);
+          if (logger.isDebugEnabled())
+          {
+              logger.debug("Failed to obtain input stream to URL: " + sourceString, e);
+          }
+          else if (logger.isWarnEnabled())
+          {
+              logger.warn("Failed to obtain input stream to URL: " + sourceString);
+          }
       }
       
       return is;

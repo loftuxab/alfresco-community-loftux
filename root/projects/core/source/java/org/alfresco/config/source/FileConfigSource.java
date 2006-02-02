@@ -23,7 +23,8 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
-import org.alfresco.config.ConfigException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * ConfigSource implementation that gets its data via a file or files.
@@ -32,6 +33,8 @@ import org.alfresco.config.ConfigException;
  */
 public class FileConfigSource extends BaseConfigSource
 {
+    private static Log logger = LogFactory.getLog(FileConfigSource.class);
+    
     /**
      * Constructs a file configuration source that uses a single file
      * 
@@ -69,8 +72,14 @@ public class FileConfigSource extends BaseConfigSource
         }
         catch (IOException ioe)
         {
-            throw new ConfigException("Failed to obtain input stream to file: " +
-                    sourceString, ioe);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Failed to obtain input stream to file: " + sourceString, ioe);
+            }
+            else if (logger.isWarnEnabled())
+            {
+                logger.warn("Failed to obtain input stream to file: " + sourceString);
+            }
         }
 
         return is;
