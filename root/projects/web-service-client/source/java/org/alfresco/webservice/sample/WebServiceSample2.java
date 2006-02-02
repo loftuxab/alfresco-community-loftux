@@ -132,16 +132,19 @@ public class WebServiceSample2 implements WebServiceSampleConfig
      */
     public static void outputResultSet(ResultSetRow[] rows)
     {
-        for (int x = 0; x < rows.length; x++)
+        if (rows != null)
         {
-            ResultSetRow row = rows[x];
-            
-            NamedValue[] columns = row.getColumns();
-            for (int y = 0; y < columns.length; y++)
+            for (int x = 0; x < rows.length; x++)
             {
-                System.out.println("row " + x + ": "
-                        + row.getColumns(y).getName() + " = "
-                        + row.getColumns(y).getValue());
+                ResultSetRow row = rows[x];
+                
+                NamedValue[] columns = row.getColumns();
+                for (int y = 0; y < columns.length; y++)
+                {
+                    System.out.println("row " + x + ": "
+                            + row.getColumns(y).getName() + " = "
+                            + row.getColumns(y).getValue());
+                }
             }
         }
     }
