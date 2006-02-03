@@ -19,7 +19,7 @@ import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
 
-public class WebServiceSampleGetRankedContent implements WebServiceSampleConfig
+public class WebServiceSampleGetRankedContent extends WebServiceSampleBase
 {    
     /**
      * Main method
@@ -29,7 +29,7 @@ public class WebServiceSampleGetRankedContent implements WebServiceSampleConfig
     public static void main(String[] args)
     {
         WebServiceSampleGetRankedContent sample = new WebServiceSampleGetRankedContent();
-        List<ContentResult> results = sample.getRankedContent("Alfresco Tutorial", "alfresco*");
+        List<ContentResult> results = sample.getRankedContent("Web Service Sample Folder", "Alfresco Development Team");
         
         // Output the results for visual inspection
         int iCount = 1;

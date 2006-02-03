@@ -44,7 +44,7 @@ import org.alfresco.webservice.util.WebServiceFactory;
  * 
  * @author Roy Wetherall
  */
-public class WebServiceSample5 implements WebServiceSampleConfig
+public class WebServiceSample5 extends WebServiceSampleBase
 {
     private final static String INITIAL_CONTENT = "This is the content pror to checkout";
     private final static String UPDATED_CONTENT = "This is the updated content";
@@ -57,7 +57,10 @@ public class WebServiceSample5 implements WebServiceSampleConfig
     {
         AuthenticationUtils.startSession(USERNAME, PASSWORD);
         try
-        {       
+        {          
+            // Make sure smaple data has been created
+            createSampleData();
+            
             // Get the content and authoring service
             RepositoryServiceSoapBindingStub repositoryService = WebServiceFactory.getRepositoryService();
             ContentServiceSoapBindingStub contentService = WebServiceFactory.getContentService();

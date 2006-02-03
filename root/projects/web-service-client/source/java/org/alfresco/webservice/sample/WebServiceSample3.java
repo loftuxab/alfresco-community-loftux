@@ -41,7 +41,7 @@ import org.alfresco.webservice.util.WebServiceFactory;
  * 
  * @author Roy Wetherall
  */
-public class WebServiceSample3 implements WebServiceSampleConfig
+public class WebServiceSample3 extends WebServiceSampleBase
 {
     /** Content strings used in the sample */
     private static final String INITIAL_CONTENT = "This is some new content that I am adding to the repository";
@@ -59,7 +59,10 @@ public class WebServiceSample3 implements WebServiceSampleConfig
         AuthenticationUtils.startSession(USERNAME, PASSWORD);
         
         try
-        {        
+        {         
+            // Make sure smaple data has been created
+            createSampleData();
+            
             // Get the content service
             ContentServiceSoapBindingStub contentService = WebServiceFactory.getContentService();        
             
@@ -130,19 +133,16 @@ public class WebServiceSample3 implements WebServiceSampleConfig
     public static Reference createNewContent(ContentServiceSoapBindingStub contentService, String name, String contentString) 
         throws Exception
     {
-        // First we'll use the previous sample to get hold of a reference to a space that we can create the content within
-        Reference reference = new Reference(STORE, null, "/app:company_home");
-        
         // Create a parent reference, this contains information about the association we are createing to the new content and the
         // parent of the new content (the space retrived from the search)
         ParentReference parentReference = new ParentReference(ASSOC_CONTAINS, ASSOC_CONTAINS);
-        parentReference.setStore(reference.getStore());
-        parentReference.setUuid(reference.getUuid());
+        parentReference.setStore(STORE);
+        parentReference.setPath("/app:company_home/cm:sample_folder");
         
         // Define the content format for the content we are adding
         ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
         
-        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, name)};
+        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_" + name)};
         CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_CONTENT, properties);
         CML cml = new CML();
         cml.setCreate(new CMLCreate[]{create});

@@ -34,7 +34,7 @@ import org.alfresco.webservice.util.WebServiceFactory;
  * 
  * @author Roy Wetherall
  */
-public class WebServiceSample6 implements WebServiceSampleConfig
+public class WebServiceSample6 extends WebServiceSampleBase
 {
     /**
      * Main function
@@ -44,7 +44,10 @@ public class WebServiceSample6 implements WebServiceSampleConfig
     {
         AuthenticationUtils.startSession(USERNAME, PASSWORD);
         try
-        {        
+        {             
+            // Make sure smaple data has been created
+            createSampleData();
+            
             // Get the services
             RepositoryServiceSoapBindingStub repositoryService = WebServiceFactory.getRepositoryService();
             ClassificationServiceSoapBindingStub classificationService = WebServiceFactory.getClassificationService(); 

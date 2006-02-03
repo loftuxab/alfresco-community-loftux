@@ -21,11 +21,9 @@ import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
 import org.alfresco.webservice.types.CMLAddAspect;
 import org.alfresco.webservice.types.CMLCreate;
-import org.alfresco.webservice.types.Node;
+import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.ParentReference;
-import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
-import org.alfresco.webservice.types.Store;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
@@ -37,7 +35,7 @@ import org.alfresco.webservice.util.WebServiceFactory;
  * 
  * @author Roy Wetherall
  */
-public class WebServiceSample4 implements WebServiceSampleConfig
+public class WebServiceSample4 extends WebServiceSampleBase
 {
     /**
      * Main function
@@ -47,18 +45,21 @@ public class WebServiceSample4 implements WebServiceSampleConfig
     {
         AuthenticationUtils.startSession(USERNAME, PASSWORD);
         try
-        {
+        {        
+            // Make sure smaple data has been created
+            createSampleData();
+            
             // Get the repository 
             RepositoryServiceSoapBindingStub repositoryService = WebServiceFactory.getRepositoryService();        
-            Reference folder = getTutorialFolder(STORE, repositoryService);
             
             // Create the CML structure
             // When executed this cml update query will create a new content node beneth the tutorial folder and the add the
             // versionable aspect to the newly created node
             ParentReference parentReference = new ParentReference(Constants.ASSOC_CONTAINS, Constants.ASSOC_CONTAINS);
             parentReference.setStore(STORE);
-            parentReference.setUuid(folder.getUuid());
-            CMLCreate create = new CMLCreate("id1", parentReference, Constants.TYPE_CONTENT, null);        
+            parentReference.setPath("/app:company_home/cm:sample_folder");            
+            NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_WebServiceSample4.txt")};
+            CMLCreate create = new CMLCreate("id1", parentReference, Constants.TYPE_CONTENT, properties);        
             CMLAddAspect addAspect = new CMLAddAspect(Constants.ASPECT_VERSIONABLE, null, null, "id1");
             CML cml = new CML();
             cml.setCreate(new CMLCreate[]{create});
@@ -94,23 +95,5 @@ public class WebServiceSample4 implements WebServiceSampleConfig
             // End the session
             AuthenticationUtils.endSession();
         }
-    }
-    
-    /**
-     * Get the space immediatly beneth company home call "Alfresco Tutorial"
-     * 
-     * @param store
-     * @param repositoryService
-     * @return
-     * @throws Exception
-     */
-    public static Reference getTutorialFolder(Store store, RepositoryServiceSoapBindingStub repositoryService)
-        throws Exception
-    {
-        Reference reference = new Reference(store, null, "/app:company_home/*[@cm:name=\"Alfresco Tutorial\"]");
-        Predicate predicate = new Predicate(new Reference[]{reference}, null, null);        
-        Node[] nodes = repositoryService.get(predicate);
-        return nodes[0].getReference();
-    }
-    
+    }    
 }

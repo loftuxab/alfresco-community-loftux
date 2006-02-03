@@ -40,7 +40,7 @@ import org.alfresco.webservice.util.WebServiceFactory;
  * 
  * @author Roy Wetherall
  */
-public class WebServiceSample2 implements WebServiceSampleConfig
+public class WebServiceSample2 extends WebServiceSampleBase
 {
     /**
      * Main function
@@ -53,6 +53,9 @@ public class WebServiceSample2 implements WebServiceSampleConfig
         
         try
         {        
+            // Make sure smaple data has been created
+            createSampleData();
+            
             // Execute the search sample
             executeSearch();        
         }
@@ -80,7 +83,7 @@ public class WebServiceSample2 implements WebServiceSampleConfig
         RepositoryServiceSoapBindingStub repositoryService = WebServiceFactory.getRepositoryService();         
         
         // Create a query object, looking for all items with alfresco in the name of text
-        Query query = new Query(QueryLanguageEnum.lucene, "( +@\\{http\\://www.alfresco.org/1.0\\}name:alfresco*) OR  TEXT:alfresco*");
+        Query query = new Query(QueryLanguageEnum.lucene, "TEXT:'alfresco development team'");
         
         // Execute the query
         QueryResult queryResult = repositoryService.query(STORE, query, false);

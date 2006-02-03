@@ -36,8 +36,12 @@
         </copy>
     </target>
 
-    <target name="package-jar" depends="common.package-jar" description="Packages the JAR file">
-        <jar jarfile="${dir.dist}/${file.name.jar}" update="true">
+    <target name="package-jar"  depends="compile-java" description="Packages the JAR file">
+        <mkdir dir="${dir.dist}" />
+        <jar jarfile="${dir.dist}/${file.name.jar}">
+        	<fileset dir="${dir.classes}">
+        		<exclude name="**/alfresco/*.properties"/> 
+        	</fileset>
         </jar>
     </target>
 

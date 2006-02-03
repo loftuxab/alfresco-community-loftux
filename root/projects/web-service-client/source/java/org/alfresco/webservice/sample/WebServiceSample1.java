@@ -28,7 +28,7 @@ import org.alfresco.webservice.util.WebServiceFactory;
  * 
  * @author Roy Wetherall
  */
-public class WebServiceSample1 implements WebServiceSampleConfig
+public class WebServiceSample1 extends WebServiceSampleBase
 {
     /**
      * Connect to the respository and print out the names of the available 
@@ -42,7 +42,7 @@ public class WebServiceSample1 implements WebServiceSampleConfig
         AuthenticationUtils.startSession(USERNAME, PASSWORD);
         
         try
-        {
+        {   
             // Get the respoitory service
             RepositoryServiceSoapBindingStub repositoryService = WebServiceFactory.getRepositoryService();
             
