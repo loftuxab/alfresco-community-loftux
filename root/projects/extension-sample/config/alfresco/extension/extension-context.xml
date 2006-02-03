@@ -3,6 +3,10 @@
  
 <beans>
 	
+	<!-- Import the other sample Spring context's -->
+	<import resource="classpath:alfresco/extension/contentHits/content-hits-context.xml" />
+	<import resource="classpath:alfresco/extension/loggerAction/logger-action-context.xml" />
+	
 	<!-- Registration of new models -->	
     <bean id="extension.dictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap" depends-on="dictionaryBootstrap">
         <property name="dictionaryDAO"><ref bean="dictionaryDAO"/></property>
@@ -13,15 +17,5 @@
             </list>
         </property>
     </bean>
-      
-    <!-- ContentHits Aspect Behaviour Bean -->
-    <bean id="contentHitsAspect" class="org.alfresco.sample.contentHits.ContentHitsAspect" init-method="initialise">
-    	<property name="nodeService">
-    		<ref bean="nodeService"/>
-    	</property>
-    	<property name="policyComponent">
-    		<ref bean="policyComponent"/>
-    	</property>
-    </bean>  
-      
+          
 </beans>

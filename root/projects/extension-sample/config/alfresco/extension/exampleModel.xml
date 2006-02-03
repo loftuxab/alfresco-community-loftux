@@ -77,25 +77,6 @@
          </properties>
       </aspect>
       
-      <!-- Definition of new Content Aspects: Content Hits -->
-      <aspect name="my:contentHits">
-      	<title>Content Hits</title>
-      	<properties>      	
-      		<property name="my:countStartedDate">
-      			<type>d:date</type>
-      			<mandatory>true</mandatory>
-      		</property>
-      		<property name="my:updateCount">
-      			<type>d:int</type>
-      			<default>0</default>
-      		</property>
-      		<property name="my:readCount">
-      			<type>d:int</type>
-      			<default>0</default>
-      		</property>
-      	</properties>
-      </aspect>
-      
    </aspects>
    
 </model>

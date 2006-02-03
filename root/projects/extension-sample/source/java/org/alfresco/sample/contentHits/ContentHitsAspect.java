@@ -21,12 +21,12 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
                                           NodeServicePolicies.OnAddAspectPolicy
 {
     /** Aspect name */
-    public static final QName ASPECT_CONTENT_HITS = QName.createQName("my.new.model", "contentHits");
+    public static final QName ASPECT_CONTENT_HITS = QName.createQName("extension.contenthits", "contentHits");
     
     /** Property names */
-    public static final QName PROP_COUNT_STARTED_DATE = QName.createQName("my.new.model", "countStartedDate");
-    public static final QName PROP_UPDATE_COUNT = QName.createQName("my.new.model", "updateCount");
-    public static final QName PROP_READ_COUNT = QName.createQName("my.new.model", "readCount");
+    public static final QName PROP_COUNT_STARTED_DATE = QName.createQName("extension.contenthits", "countStartedDate");
+    public static final QName PROP_UPDATE_COUNT = QName.createQName("extension.contenthits", "updateCount");
+    public static final QName PROP_READ_COUNT = QName.createQName("extension.contenthits", "readCount");
     
     /** The policy component */
     private PolicyComponent policyComponent;
