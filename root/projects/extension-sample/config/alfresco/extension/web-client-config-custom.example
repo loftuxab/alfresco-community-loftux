@@ -1,0 +1,56 @@
+<alfresco-config>
+   
+   <!-- 
+   <config evaluator="string-compare" condition="Custom Content Types">
+      <content-types>
+         <type name="my:sop" />
+      </content-types>
+   </config>
+
+   <config evaluator="node-type" condition="my:sop">
+      <property-sheet>
+         <show-property name="name"/>
+         <show-property name="mimetype" displayLabelId="mimetype" converter="org.alfresco.faces.MimeTypeConverter"/>
+         <show-property name="title"/>
+         <show-property name="description"/>
+         <show-property name="size" displayLabelId="size" converter="org.alfresco.faces.ByteSizeConverter"/>
+         <show-property name="my:publishedDate"/>
+         <show-association name="my:signOff"/>
+         <show-property name="my:authorisedBy"/>
+         <show-child-association name="my:processSteps"/>
+      </property-sheet>
+   </config>
+   -->
+
+   <!-- edit config for my:sop -->
+   <!-- 
+   <config evaluator="node-type" condition="my:sop">
+      <property-sheet>
+         <show-property name="my:publishedDate"/>
+         <show-association name="my:signOff"/>
+         <show-property name="my:authorisedBy"/>
+         <show-child-association name="my:processSteps"/>
+      </property-sheet>
+   </config>
+   -->
+
+   <!-- 
+   <config evaluator="aspect-name" condition="my:imageClassification">
+      <property-sheet>
+         <show-property name="my:width"/>
+         <show-property name="my:height"/>
+         <show-property name="my:resolution"/>
+      </property-sheet>
+   </config>
+
+   <config evaluator="string-compare" condition="Action Wizards" override="true">
+      <aspects>
+         <aspect name="my:imageClassification"/>
+      </aspects>
+      <transformers>
+         <transformer name="image/png" />
+      </transformers>
+   </config>
+   -->
+
+</alfresco-config>

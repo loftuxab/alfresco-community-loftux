@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <bean id="webClientConfigSource" class="org.alfresco.config.source.UrlConfigSource">
+      <constructor-arg>
+        <list>
+            <value>classpath:alfresco/web-client-config.xml</value>
+            <value>classpath:alfresco/web-client-config-properties.xml</value>
+            <value>classpath:alfresco/web-client-config-navigation.xml</value>
+            <value>classpath:alfresco/extension/my-custom-config.xml</value>
+         </list>
+      </constructor-arg>
+   </bean>
+   
+</beans>
