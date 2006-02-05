@@ -427,6 +427,20 @@ public class JCRSystemXMLExporter implements Exporter
     public void endAssocs(NodeRef nodeRef)
     {
     }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startReference(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
+    public void startReference(NodeRef nodeRef, QName childName)
+    {
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endReference(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void endReference(NodeRef nodeRef)
+    {
+    }
     
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#warning(java.lang.String)

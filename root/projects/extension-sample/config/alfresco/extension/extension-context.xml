@@ -8,8 +8,7 @@
 	<import resource="classpath:alfresco/extension/loggerAction/logger-action-context.xml" />
 	
 	<!-- Registration of new models -->	
-    <bean id="extension.dictionaryBootstrap" class="org.alfresco.repo.dictionary.DictionaryBootstrap" init-method="bootstrap" depends-on="dictionaryBootstrap">
-        <property name="dictionaryDAO"><ref bean="dictionaryDAO"/></property>
+    <bean id="extension.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
         <property name="models">
             <list>
                 <value>alfresco/extension/exampleModel.xml</value>
