@@ -31,6 +31,7 @@ public interface XMLConfigConstants
     public static final String ATTR_ELEMENT_NAME = "element-name";
     public static final String ATTR_EVALUATOR = "evaluator";
     public static final String ATTR_CONDITION = "condition";
+    public static final String ATTR_REPLACE = "replace";
 
     // XML element names
     public static final String ELEMENT_PLUG_INS = "plug-ins";

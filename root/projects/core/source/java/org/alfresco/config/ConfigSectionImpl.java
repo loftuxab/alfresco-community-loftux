@@ -28,12 +28,14 @@ public class ConfigSectionImpl implements ConfigSection
 {
     private String evaluator;
     private String condition;
+    private boolean replace = false;
     private List<ConfigElement> configElements;
 
-    public ConfigSectionImpl(String evaluator, String condition)
+    public ConfigSectionImpl(String evaluator, String condition, boolean replace)
     {
         this.evaluator = evaluator;
         this.condition = condition;
+        this.replace = replace;
         this.configElements = new ArrayList<ConfigElement>();
     }
 
@@ -88,12 +90,21 @@ public class ConfigSectionImpl implements ConfigSection
 
         return global;
     }
+    
+    /**
+     * @see org.alfresco.config.ConfigSection#isReplace()
+     */
+    public boolean isReplace()
+    {
+       return this.replace;
+    }
 
     public String toString()
     {
         StringBuilder buffer = new StringBuilder(super.toString());
         buffer.append(" (evaluator=").append(this.evaluator);
-        buffer.append(" condition=").append(this.condition).append(")");
+        buffer.append(" condition=").append(this.condition);
+        buffer.append(" replace=").append(this.replace).append(")");
         return buffer.toString();
     }
 }

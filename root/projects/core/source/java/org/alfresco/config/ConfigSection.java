@@ -55,4 +55,13 @@ public interface ConfigSection
      * @return true if it is global, false otherwise
      */
     public boolean isGlobal();
+    
+    /**
+     * Determines whether the config elements found inside this section
+     * should replace any previously found config elements with the same
+     * name
+     * 
+     * @return true if config elements should replace existing ones, false otherwise
+     */
+    public boolean isReplace();
 }

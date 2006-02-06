@@ -46,18 +46,31 @@ public class DefaultLookupAlgorithm implements ConfigLookupAlgorithm
          List<ConfigElement> sectionConfigElements = section.getConfigElements();
          for (ConfigElement newConfigElement : sectionConfigElements)
          {
-            // if the config element being added already exists we need to combine it
+            // if the config element being added already exists we need to combine it or replace it
             String name = newConfigElement.getName();
             ConfigElement existingConfigElement = (ConfigElement)results.getConfigElements().get(name);
             if (existingConfigElement != null)
             {
-               ConfigElement combinedConfigElement = existingConfigElement.combine(newConfigElement);
-               results.getConfigElements().put(name, combinedConfigElement);
-            
-               if (logger.isDebugEnabled())
+               if (section.isReplace())
                {
-                  logger.debug("Combined " + newConfigElement + " with " + existingConfigElement + 
-                               " to create " + combinedConfigElement);
+                  // if the section has been marked as 'replace' and a config element
+                  // with this name has already been found, replace it
+                  results.getConfigElements().put(name, newConfigElement);
+                  
+                  if (logger.isDebugEnabled())
+                     logger.debug("Replaced " + existingConfigElement + " with " + newConfigElement);
+               }
+               else
+               {
+                  // combine this config element with the previous one found with the same name
+                  ConfigElement combinedConfigElement = existingConfigElement.combine(newConfigElement);
+                  results.getConfigElements().put(name, combinedConfigElement);
+               
+                  if (logger.isDebugEnabled())
+                  {
+                     logger.debug("Combined " + newConfigElement + " with " + existingConfigElement + 
+                                  " to create " + combinedConfigElement);
+                  }
                }
             }
             else

@@ -222,21 +222,34 @@ public abstract class BaseConfigService implements ConfigService
     {
         if (section.isGlobal())
         {
-            // get all the config elements from this section and add them to
-            // the global section, if any already exist we must combine them
+            // get all the config elements from this section and add them to the
+            // global section, if any already exist we must combine or replace them
             for (ConfigElement ce : section.getConfigElements())
             {
-               if (this.globalConfig.hasConfigElement(ce.getName()))
+               ConfigElement existing = this.globalConfig.getConfigElement(ce.getName());
+               
+               if (existing != null)
                {
-                  // combine the config elements
-                  ConfigElement existing = this.globalConfig.getConfigElement(ce.getName());
-                  ConfigElement combined = existing.combine(ce);
-                  this.globalConfig.putConfigElement(combined);
-                  
-                  if (logger.isDebugEnabled())
+                  if (section.isReplace())
                   {
-                     logger.debug("Combined " + existing + " with " + ce + 
-                                  " to create " + combined);
+                     // if the section has been marked as 'replace' and a config element
+                     // with this name has already been found, replace it
+                     this.globalConfig.putConfigElement(ce);
+                     
+                     if (logger.isDebugEnabled())
+                        logger.debug("Replaced " + existing + " with " + ce);
+                  }
+                  else
+                  {
+                     // combine the config elements
+                     ConfigElement combined = existing.combine(ce);
+                     this.globalConfig.putConfigElement(combined);
+                     
+                     if (logger.isDebugEnabled())
+                     {
+                        logger.debug("Combined " + existing + " with " + ce + 
+                                     " to create " + combined);
+                     }
                   }
                }
                else

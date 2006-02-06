@@ -18,6 +18,7 @@ package org.alfresco.config.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
@@ -374,30 +375,68 @@ public class XMLConfigServiceTest extends BaseTest
     }
     
     /**
-     * Tests the override feature of the config service
+     * Tests the replace feature of the config service
      */
-    public void testOverriding()
+    public void testReplace()
     {
         // setup the config service
         List<String> configFiles = new ArrayList<String>(2);
         configFiles.add(getResourcesDir() + "config.xml");
-        configFiles.add(getResourcesDir() + "config-override.xml");
+        configFiles.add(getResourcesDir() + "config-replace.xml");
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.init();
         
         // try and get the global config section
         Config globalSection = svc.getGlobalConfig();
         assertNotNull("global section should not be null", globalSection);
+
+        // make sure the global-item value has changed
+        ConfigElement globalItem = globalSection.getConfigElement("global-item");
+        assertEquals("global-item", "The replaced global value", globalItem.getValue());
         
-        // TODO: Test the following:
-        // make sure global-item has the new value
-        // make sure <override>false</override> has disappeared
-        // make sure the <children-override> only has <child-custom> child
+        // make sure the override element is still present with the same value
+        ConfigElement override = globalSection.getConfigElement("override");
+        assertNotNull("override should not be null", override);
+        assertEquals("override element", "false", override.getValue());
         
-        // get 'Override Test' config section
-        // make sure <second-item> and <third-item> are no longer present
-        // make sure <first-item> has the new value
-        // make sure <fourth-item> is present
-        // make sure <children> has <child-two> and <child-three>
+        // make sure the children-replace element only has 1 child and not 4
+        ConfigElement childrenReplace = globalSection.getConfigElement("children-replace");
+        assertNotNull("childrenReplace should not be null", childrenReplace);
+        List<ConfigElement> children = childrenReplace.getChildren();
+        assertEquals("number of children elements", 1, children.size());
+        
+        // make sure the child is the correct one
+        ConfigElement customChild = children.get(0);
+        assertEquals("custom child element value", "child custom value", customChild.getValue());
+        
+        // make sure the config section is still present
+        Config replaceTestCfg = svc.getConfig("Replace Test");
+        assertNotNull("Replace Test should not be null", replaceTestCfg);
+        
+        // make sure there are 9 elements in the replaced section (including the global section)
+        Map<String, Object> elements = replaceTestCfg.getConfigElements();
+        assertEquals("number of elements", 9, elements.size());
+        
+        // make sure first-item is different
+        assertEquals("first-item", "the replaced first value", replaceTestCfg.
+              getConfigElement("first-item").getValue());
+        
+        // make sure second-item is the same
+        assertEquals("second-item", "second value", replaceTestCfg.
+              getConfigElement("second-item").getValue());
+        
+        // make sure there is a fourth-item is now present
+        assertEquals("fourth-item", "new fourth value", replaceTestCfg.
+              getConfigElement("fourth-item").getValue());
+        
+        // make sure the children config now has 2 children
+        ConfigElement childrenElement = replaceTestCfg.getConfigElement("children");
+        assertEquals("number of children of children", 2, childrenElement.getChildCount());
+        
+        // make sure the two child elements are correct
+        assertEquals("child two name", "child-two", childrenElement.getChildren().get(0).getName());
+        assertEquals("child two value", "child two value", childrenElement.getChildren().get(0).getValue());
+        assertEquals("child three name", "child-three", childrenElement.getChildren().get(1).getName());
+        assertEquals("child three value", "child three value", childrenElement.getChildren().get(1).getValue());
     }
 }

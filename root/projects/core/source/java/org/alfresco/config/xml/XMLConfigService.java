@@ -223,11 +223,17 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     {
         if (configElement != null)
         {
+            boolean replace = false;
             String evaluatorName = configElement.attributeValue(ATTR_EVALUATOR);
             String condition = configElement.attributeValue(ATTR_CONDITION);
+            String replaceValue = configElement.attributeValue(ATTR_REPLACE);
+            if (replaceValue != null && replaceValue.equalsIgnoreCase("true"))
+            {
+               replace = true;
+            }
 
             // create the section object
-            ConfigSectionImpl section = new ConfigSectionImpl(evaluatorName, condition);
+            ConfigSectionImpl section = new ConfigSectionImpl(evaluatorName, condition, replace);
 
             // retrieve the config elements for the section
             Iterator children = configElement.elementIterator();

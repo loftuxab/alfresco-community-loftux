@@ -6,11 +6,11 @@
       <merge-children>
          <child-one>child one value</child-one>
       </merge-children>
-      <children-override>
+      <children-replace>
          <child-one>child one value</child-one>
          <child-two>child two value</child-two>
          <child-three>child three value</child-three>
-      </children-override>
+      </children-replace>
    </config>
    
    <config evaluator="string-compare" condition="Unit Test">
@@ -27,7 +27,7 @@
       </children>
    </config>
    
-   <config evaluator="string-compare" condition="Override Test">
+   <config evaluator="string-compare" condition="Replace Test">
       <first-item>first value</first-item>
       <second-item>second value</second-item>
       <third-item>third value</third-item>
