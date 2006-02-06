@@ -69,6 +69,9 @@ public class SpringAwareUserTransaction
     private static final String NAME = "UserTransaction";
     
     private static final Log logger = LogFactory.getLog(SpringAwareUserTransaction.class);
+    private static final Log traceLogger = LogFactory.getLog(SpringAwareUserTransaction.class.getName() + ".trace");
+    private static boolean traceWarningIssued = false;
+    private StackTraceElement[] traceDebugBeginTrace;
 
     private boolean readOnly;
     private int isolationLevel;
@@ -210,7 +213,7 @@ public class SpringAwareUserTransaction
         }
         catch (NoTransactionException e)
         {
-            // no transaction
+            // No transaction.  It is possible that the transaction threw an exception during commit.
         }
         // perform checks for active transactions
         if (internalStatus == Status.STATUS_ACTIVE)
@@ -316,6 +319,21 @@ public class SpringAwareUserTransaction
      */
     public synchronized void begin() throws NotSupportedException, SystemException
     {
+        if (traceLogger.isDebugEnabled())
+        {
+            synchronized(this.getClass())
+            {
+                if (!traceWarningIssued)
+                {
+                    traceLogger.warn("Trace logging is enabled for class: " + this.getClass().getName());
+                    traceWarningIssued = true;
+                }
+            }
+            // get the stack trace
+            Exception e = new Exception();
+            traceDebugBeginTrace = e.getStackTrace();
+        }
+        
         // make sure that the status and info align - the result may or may not be null
         TransactionInfo txnInfo = getTransactionInfo();
         if (internalStatus != Status.STATUS_NO_TRANSACTION)
@@ -375,11 +393,22 @@ public class SpringAwareUserTransaction
                 // the status seems correct - we can try a commit
                 doCommitTransactionAfterReturning(txnInfo);
             }
+            catch (Throwable e)
+            {
+                // commit failed
+                internalStatus = Status.STATUS_ROLLEDBACK;
+                throw new RollbackException("Transaction didn't commit: " + e.getMessage());
+            }
             finally
             {
                 // make sure that we clean up the stack
                 doFinally(txnInfo);
                 finalized = true;
+                // clean up debug
+                if (traceLogger.isDebugEnabled())
+                {
+                    traceDebugBeginTrace = null;
+                }
             }
         }
         
@@ -429,6 +458,11 @@ public class SpringAwareUserTransaction
                 // make sure that we clean up the stack
                 doFinally(txnInfo);
                 finalized = true;
+                // clean up debug
+                if (traceLogger.isDebugEnabled())
+                {
+                    traceDebugBeginTrace = null;
+                }
             }
         }
 
@@ -449,4 +483,19 @@ public class SpringAwareUserTransaction
         return NAME;
     }
     
+    @Override
+    protected void finalize() throws Throwable
+    {
+        if (traceLogger.isDebugEnabled() && traceDebugBeginTrace != null)
+        {
+            StringBuilder sb = new StringBuilder(1024);
+            sb.append("UserTransaction being garbage collected without a commit() or rollback().\n")
+              .append("Started at: \n");
+            for (StackTraceElement element : traceDebugBeginTrace)
+            {
+                sb.append("   ").append(element).append("\n");
+            }
+            traceLogger.error(sb);
+        }
+    }
 }
