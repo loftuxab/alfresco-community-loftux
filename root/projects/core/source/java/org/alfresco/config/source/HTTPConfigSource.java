@@ -77,10 +77,6 @@ public class HTTPConfigSource extends BaseConfigSource
           {
               logger.debug("Failed to obtain input stream to URL: " + sourceString, e);
           }
-          else if (logger.isWarnEnabled())
-          {
-              logger.warn("Failed to obtain input stream to URL: " + sourceString);
-          }
       }
       
       return is;

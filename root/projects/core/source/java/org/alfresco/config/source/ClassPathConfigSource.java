@@ -64,9 +64,9 @@ public class ClassPathConfigSource extends BaseConfigSource
     {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(sourceString);
 
-        if (is == null && logger.isWarnEnabled())
+        if (is == null && logger.isDebugEnabled())
         {
-            logger.warn("Failed to obtain input stream to classpath: " + sourceString);
+            logger.debug("Failed to obtain input stream to classpath: " + sourceString);
         }
 
         return is;

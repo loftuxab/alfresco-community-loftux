@@ -76,10 +76,6 @@ public class FileConfigSource extends BaseConfigSource
             {
                 logger.debug("Failed to obtain input stream to file: " + sourceString, ioe);
             }
-            else if (logger.isWarnEnabled())
-            {
-                logger.warn("Failed to obtain input stream to file: " + sourceString);
-            }
         }
 
         return is;

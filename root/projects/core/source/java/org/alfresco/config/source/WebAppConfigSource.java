@@ -25,7 +25,8 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.alfresco.config.ConfigException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.ServletContextAware;
 
 /**
@@ -39,6 +40,7 @@ import org.springframework.web.context.ServletContextAware;
  */
 public class WebAppConfigSource extends BaseConfigSource implements ServletContextAware
 {
+    private static Log logger = LogFactory.getLog(FileConfigSource.class);
     private ServletContext servletCtx;
 
     /**
@@ -81,10 +83,13 @@ public class WebAppConfigSource extends BaseConfigSource implements ServletConte
         {
             String fullPath = this.servletCtx.getRealPath(sourceString);
             is = new BufferedInputStream(new FileInputStream(fullPath));
-        } catch (IOException ioe)
+        } 
+        catch (IOException ioe)
         {
-            throw new ConfigException("Failed to obtain input stream to file: " + sourceString,
-                    ioe);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Failed to obtain input stream to file: " + sourceString, ioe);
+            }
         }
 
         return is;
