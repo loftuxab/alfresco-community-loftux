@@ -132,21 +132,7 @@ Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 Upgrading from V1.x to V1.2.0
 =============================
 
-In V1.2.0 some of the configuration has been changed.
-In order to deploy V1.2.0 over the top of an existing V1 installation the following steps must be taken:
-
-Note: Your existing Database and 'alf_data' directory will be preserved.
-
-*** Any Configuration changes that you have made need to be noted. ***
-
-*** Tomcat ***
-For Tomcat, the 'alfresco' directory within 'Tomcat/webapps' needs to be deleted
-Copy the V1.2.0 'alfresco.war' file into 'Tomcat/webapps' - either from downloading the WAR or the Tomcat Bundle
-Start Tomcat, so that the 'alfresco' directory within 'Tomcat/webapps' is created
-Stop Tomcat
-Modify any configuration files that need changing
-Start Tomcat and enjoy using Alfresco V1.2.0
-
+Details can be found at http://www.alfresco.org/mediawiki/index.php/Upgrading_1.2
 
 =====================
 Using the CIFS Server
