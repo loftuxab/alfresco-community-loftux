@@ -395,6 +395,7 @@ public class SpringAwareUserTransaction
             }
             catch (Throwable e)
             {
+                logger.error("Transaction didn't commit", e);
                 // commit failed
                 internalStatus = Status.STATUS_ROLLEDBACK;
                 throw new RollbackException("Transaction didn't commit: " + e.getMessage());
