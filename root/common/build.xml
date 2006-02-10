@@ -91,6 +91,8 @@
          <fileset dir="${home.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${dir.deploy.jboss}/../lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
+      <!-- copy the hotspot_compiler file to bin directory -->
+      <copy file="${file.hotspotcompiler}" todir="${home.jboss}/bin" />
    </target>
 
    <target name="deploy-tomcat" depends="init" description="Deploys to Tomcat">
@@ -102,6 +104,8 @@
          <fileset dir="${home.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${home.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
+      <!-- copy the hotspot_compiler file to bin directory -->
+      <copy file="${file.hotspotcompiler}" todir="${home.tomcat}/bin" />
    </target>
 
    <target name="deploy-exploded-jboss" depends="init">

@@ -15,8 +15,14 @@
    </target>
    
    <target name="assemble-jboss-common" depends="continuous.assemble-jboss-common">
-      <copy todir="${dir.assemble.jboss}/jboss/server/default/conf" overwrite="yes">
-         <fileset dir="${dir.projects}/enterprise/${dir.name.config}" />
+      <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension">
+         <fileset dir="${dir.projects}/enterprise/${dir.name.config}/alfresco/extension" />
+      </copy>
+   </target>
+   
+   <target name="assemble-tomcat-common" depends="continuous.assemble-tomcat-common">
+      <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension">
+         <fileset dir="${dir.projects}/enterprise/${dir.name.config}/alfresco/extension" />
       </copy>
    </target>
 

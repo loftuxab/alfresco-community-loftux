@@ -2,17 +2,12 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
  
 <beans>
-	
-	<!-- Import the other sample Spring context's -->
-	<import resource="classpath:alfresco/extension/contentHits/content-hits-context.xml" />
-	<import resource="classpath:alfresco/extension/loggerAction/logger-action-context.xml" />
-	
-	<!-- Registration of new models -->	
+
+    <!-- Registration of new models -->	
     <bean id="extension.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
         <property name="models">
             <list>
                 <value>alfresco/extension/exampleModel.xml</value>
-                <value>alfresco/extension/customModel.xml</value>
             </list>
         </property>
     </bean>

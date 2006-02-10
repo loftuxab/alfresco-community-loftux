@@ -103,10 +103,16 @@
       <copy todir="${dir.assemble.jboss}/jboss/server/default/deploy">
          <fileset dir="${dir.deploy.jboss}" includes="${file.name.war.alfresco}" />
       </copy>
-      <copy todir="${dir.assemble.jboss}/jboss/server/default/conf">
-         <fileset dir="${dir.config.repository}" />
-         <fileset dir="${dir.config.webclient}" />
+      <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension">
+         <fileset dir="${dir.config.repository}/alfresco/extension" />
+         <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
+      
+      <!-- rename model files ready for use -->
+      <move file="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml.sample"
+            tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml" />
+      <move file="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/exampleModel.xml.sample"
+                  tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/exampleModel.xml" />
    </target>
 
    <!-- ******************** -->
@@ -158,9 +164,20 @@
       </delete>
       <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
       
+      <!-- copy project files common to both platforms -->
       <copy todir="${dir.assemble.tomcat}/tomcat/webapps">
          <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}" />
       </copy>
+      <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension">
+         <fileset dir="${dir.config.repository}/alfresco/extension" />
+         <fileset dir="${dir.config.webclient}/alfresco/extension" />
+      </copy>
+      
+      <!-- rename model files ready for use -->
+      <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml.sample"
+            tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml" />
+      <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/exampleModel.xml.sample"
+                  tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/exampleModel.xml" />
    </target>
    
    <!-- ***************** -->

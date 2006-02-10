@@ -1,0 +1,1 @@
+exclude  org/apache/lucene/index/IndexReader$1 doBody
