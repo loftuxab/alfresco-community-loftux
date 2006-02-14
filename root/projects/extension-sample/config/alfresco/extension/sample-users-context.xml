@@ -3,12 +3,10 @@
 
 <beans>
 
-    <bean id="userBootstrap" parent="userStoreImporter" depends-on="systemBootstrap">
-        <!-- To specify a locale other than the system default, uncomment the following
-        <property name="locale">
-            <value>en_GB</value>
-        </property>
-        -->
+    <bean id="userBootstrap" parent="userStoreImporter">
+	    <property name="log">
+	        <value>true</value>
+	    </property>
         <property name="bootstrapViews">
             <list>
                 <props>
@@ -23,12 +21,10 @@
         </property>
     </bean>
 
-    <bean id="importerBootstrap" parent="spacesStoreImporter" depends-on="userBootstrap, versionBootstrap">
-        <!-- To specify a locale other than the system default, uncomment the following
-        <property name="locale">
-            <value>en_GB</value>
-        </property>
-        -->
+    <bean id="importerBootstrap" parent="spacesStoreImporter" depends-on="systemBootstrap, versionBootstrap">
+	    <property name="log">
+	        <value>true</value>
+	    </property>
         <property name="bootstrapViews">
             <list>
                 <props>
