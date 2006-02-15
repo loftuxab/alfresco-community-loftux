@@ -108,6 +108,10 @@
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
       
+      <!-- copy the hotspot compiler file to the root of the bundle and the bin directory -->
+      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.jboss}" />
+      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.jboss}/jboss/bin" />
+      
       <!-- rename model files ready for use -->
       <move file="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml.sample"
             tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml" />
@@ -173,6 +177,10 @@
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
       
+      <!-- copy the hotspot compiler file to the root of the bundle and the bin directory -->
+      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.tomcat}" />
+      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.tomcat}/tomcat/bin" />
+         
       <!-- rename model files ready for use -->
       <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml.sample"
             tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml" />
