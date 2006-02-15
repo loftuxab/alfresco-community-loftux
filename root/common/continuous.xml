@@ -107,6 +107,8 @@
          <fileset dir="${dir.config.repository}/alfresco/extension" />
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
+      <copy tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/messages/${file.name.langpack.readme}" 
+            file="${file.langpack.readme}" />
       
       <!-- copy the hotspot compiler file to the root of the bundle and the bin directory -->
       <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.jboss}" />
@@ -176,6 +178,8 @@
          <fileset dir="${dir.config.repository}/alfresco/extension" />
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
+      <copy tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages/${file.name.langpack.readme}" 
+                  file="${file.langpack.readme}" />
       
       <!-- copy the hotspot compiler file to the root of the bundle and the bin directory -->
       <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.tomcat}" />
