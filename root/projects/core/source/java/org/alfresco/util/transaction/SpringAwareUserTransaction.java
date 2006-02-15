@@ -26,6 +26,7 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
+import org.alfresco.error.StackTraceUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.transaction.NoTransactionException;
@@ -70,9 +71,17 @@ public class SpringAwareUserTransaction
     
     private static final Log logger = LogFactory.getLog(SpringAwareUserTransaction.class);
     private static final Log traceLogger = LogFactory.getLog(SpringAwareUserTransaction.class.getName() + ".trace");
-    private static boolean traceWarningIssued = false;
-    private StackTraceElement[] traceDebugBeginTrace;
+    static
+    {
+        if (traceLogger.isDebugEnabled())
+        {
+            traceLogger.warn("Trace logging is enabled and will affect performance");
+        }
+    }
 
+    /** stores the begin() call stack trace when DEBUG is on for tracing */
+    private StackTraceElement[] traceDebugBeginTrace;
+    
     private boolean readOnly;
     private int isolationLevel;
     private int propagationBehaviour;
@@ -321,16 +330,9 @@ public class SpringAwareUserTransaction
     {
         if (traceLogger.isDebugEnabled())
         {
-            synchronized(this.getClass())
-            {
-                if (!traceWarningIssued)
-                {
-                    traceLogger.warn("Trace logging is enabled for class: " + this.getClass().getName());
-                    traceWarningIssued = true;
-                }
-            }
             // get the stack trace
             Exception e = new Exception();
+            e.fillInStackTrace();
             traceDebugBeginTrace = e.getStackTrace();
         }
         
@@ -490,12 +492,11 @@ public class SpringAwareUserTransaction
         if (traceLogger.isDebugEnabled() && traceDebugBeginTrace != null)
         {
             StringBuilder sb = new StringBuilder(1024);
-            sb.append("UserTransaction being garbage collected without a commit() or rollback().\n")
-              .append("Started at: \n");
-            for (StackTraceElement element : traceDebugBeginTrace)
-            {
-                sb.append("   ").append(element).append("\n");
-            }
+            StackTraceUtil.buildStackTrace(
+                    "UserTransaction being garbage collected without a commit() or rollback().",
+                    traceDebugBeginTrace,
+                    sb,
+                    -1);
             traceLogger.error(sb);
         }
     }
