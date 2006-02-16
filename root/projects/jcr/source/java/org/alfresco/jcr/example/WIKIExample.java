@@ -36,7 +36,6 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.version.Version;
 import javax.jcr.version.VersionHistory;
 import javax.jcr.version.VersionIterator;
-import javax.transaction.UserTransaction;
 
 import org.alfresco.jcr.api.JCRNodeRef;
 import org.alfresco.model.ContentModel;
@@ -46,7 +45,6 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.transaction.TransactionService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -72,10 +70,18 @@ public class WIKIExample
         
         // access the Alfresco JCR Repository (here it's via programmatic approach, but it could also be injected)
         System.out.println("Initialising Repository...");
-
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:org/alfresco/jcr/example/wiki-context.xml");
         Repository repository = (Repository)context.getBean("JCR.Repository");
 
+        // display information about the repository
+        System.out.println("Repository Description...");
+        String[] keys = repository.getDescriptorKeys();
+        for (String key : keys)
+        {
+            String value = repository.getDescriptor(key);
+            System.out.println(" " + key + " = " + value);
+        }
+        
         //
         // Create a WIKI structure
         //

@@ -21,7 +21,7 @@
         </property>
     </bean>
 
-    <bean id="importerBootstrap" parent="spacesStoreImporter" depends-on="systemBootstrap, versionBootstrap">
+    <bean id="spacesBootstrap" parent="spacesStoreImporter">
 	    <property name="log">
 	        <value>true</value>
 	    </property>
