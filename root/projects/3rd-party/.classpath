@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/aopalliance.jar"/>
-	<classpathentry exported="true" sourcepath="src/hibernate-3.1-beta2_src.zip" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hrtlib.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsp.jar"/>
@@ -81,5 +80,6 @@
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/myfaces-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/myfaces-impl.jar"/>
+	<classpathentry exported="true" sourcepath="src/hibernate-3.1.2-src.zip" kind="lib" path="lib/hibernate-3.1.2.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
