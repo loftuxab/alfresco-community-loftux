@@ -3,7 +3,7 @@
     <fullName>Alfresco Enterprise Content Management</fullName>
     <version>1.2</version>
     <installerFilename>${product_shortname}-${product_version}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
-    <readmeFile></readmeFile>
+    <readmeFile>C:/code/bitrock/output-alfresco-windows-2006-02-17/README.txt</readmeFile>
     <licenseFile>C:/code/bitrock/output-alfresco-windows-2006-02-17/licenses/license.txt</licenseFile>
     <wrapLicenseFileText>1</wrapLicenseFileText>
     <leftImage>C:/code/bitrock/output-alfresco-windows-2006-02-17/leftImage.png</leftImage>
@@ -86,6 +86,10 @@
                                     <value>${installdir}</value>
                                 </substitution>
                                 <substitution>
+                                    <pattern>@@BITROCK_ALFRESCO_INSTALLDIR_JAVA@@</pattern>
+                                    <value>${installdir.unix}</value>
+                                </substitution>
+                                <substitution>
                                     <pattern>//US//%SERVICE_NAME% --JvmOptions</pattern>
                                     <value>//US//%SERVICE_NAME% --Startup auto --JvmOptions</value>
                                 </substitution>
@@ -109,6 +113,22 @@
                                 </substitution>
                             </substitutionList>
                         </substitute>
+                        <renameFile>
+                            <destination>${installdir}/db_setup.bat</destination>
+                            <origin>${installdir}/db_setup_bak.bat</origin>
+                        </renameFile>
+                        <renameFile>
+                            <destination>${installdir}/db_remove.bat</destination>
+                            <origin>${installdir}/db_remove_bak.bat</origin>
+                        </renameFile>
+                        <renameFile>
+                            <destination>${installdir}/db_setup.sql</destination>
+                            <origin>${installdir}/db_setup_bak.sql</origin>
+                        </renameFile>
+                        <renameFile>
+                            <destination>${installdir}/db_remove.sql</destination>
+                            <origin>${installdir}/db_remove_bak.sql</origin>
+                        </renameFile>
                     </actionList>
                     <distributionFileList>
                         <distributionDirectory>
@@ -130,37 +150,28 @@
                             <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/README.txt</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/zstart_oo.bat</origin>
-                        </distributionFile>
-                        <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/alf_start.bat</origin>
+                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/start_oo.bat</origin>
                         </distributionFile>
                         <distributionFile>
                             <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/alfresco.bat</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/alf_stop.bat</origin>
-                        </distributionFile>
-                        <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/RegPaths.exe</origin>
-                        </distributionFile>
-                        <distributionFile>
                             <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/alfresco</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_setup.sql</origin>
+                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_setup_bak.sql</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_setup.bat</origin>
+                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_setup_bak.bat</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_remove.sql</origin>
+                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_remove_bak.sql</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_remove.bat</origin>
+                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/db_remove_bak.bat</origin>
                         </distributionFile>
                         <distributionFile>
-                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/.hotspot_compiler</origin>
+                            <origin>C:/code/bitrock/output-alfresco-windows-2006-02-17/SetPaths.bat</origin>
                         </distributionFile>
                     </distributionFileList>
                     <shortcutList>
@@ -810,7 +821,7 @@
 This way it will automatically be started every time the machine is restarted.
 Install ${product_fullname} as a service?.</explanation>
             <value>0</value>
-            <default>0</default>
+            <default>1</default>
             <ask>1</ask>
             <cliOptionName></cliOptionName>
             <leftImage></leftImage>
@@ -834,14 +845,6 @@ Install ${product_fullname} as a service?.</explanation>
     <postInstallationActionList>
         <actionGroup>
             <actionList>
-                <writeFile>
-                    <path>${installdir}/SetPaths.bat</path>
-                    <text>@ECHO OFF
-REM Set Paths Utility 
-SET JAVA_HOME=${installdir}\java
-SET OPENOFFICE_PATH=${installdir}\openoffice\openoffice\program	    	    
-	    </text>
-                </writeFile>
                 <runProgram>
                     <program>${installdir}/mysql/bin/mysqld.exe</program>
                     <programArguments>--defaults-file=${installdir.dos}/mysql/my.ini &amp;</programArguments>
@@ -921,9 +924,6 @@ ${installdir.dos}\mysql\bin\mysql.exe --defaults-file="${installdir.dos}\mysql\m
                 </compareText>
             </ruleList>
         </actionGroup>
-        <deleteFile>
-            <path>${installdir}/start_oo.sh</path>
-        </deleteFile>
     </preUninstallationActionList>
     <slideShowImageList/>
 </project>
