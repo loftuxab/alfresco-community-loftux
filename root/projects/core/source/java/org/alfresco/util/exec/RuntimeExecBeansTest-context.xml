@@ -7,7 +7,7 @@
       <property name="commandMap">
           <map>
               <entry key="Windows.*">
-                  <value>rmdir ${dir}</value>
+                  <value>cmd /C rmdir ${dir}</value>
               </entry>
               <entry key="Linux">
                   <value>rm -rf ${dir}</value>
