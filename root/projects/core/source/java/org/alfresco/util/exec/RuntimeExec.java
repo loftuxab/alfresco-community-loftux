@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.apache.commons.logging.Log;
@@ -62,6 +65,7 @@ public class RuntimeExec
 
     private String command;
     private Map<String, String> defaultProperties;
+    private Set<Integer> errCodes;
 
     /**
      * Default constructor.  Initialize this instance by setting individual properties.
@@ -69,6 +73,10 @@ public class RuntimeExec
     public RuntimeExec()
     {
         defaultProperties = Collections.emptyMap();
+        // set default error codes
+        this.errCodes = new HashSet<Integer>(2);
+        errCodes.add(1);
+        errCodes.add(2);
     }
     
     /**
@@ -91,18 +99,32 @@ public class RuntimeExec
     public void setCommandMap(Map<String, String> commandsByOS)
     {
         // get the current OS
-        String os = System.getProperty(KEY_OS_NAME);
+        String serverOs = System.getProperty(KEY_OS_NAME);
         // attempt to find a match
-        String command = commandsByOS.get(os);
+        String command = commandsByOS.get(serverOs);
         if (command == null)
         {
-            // not found - look for the default
-            command = commandsByOS.get(KEY_OS_DEFAULT);
+            // go through the commands keys, looking for one that matches by regular expression matching
+            for (String osName : commandsByOS.keySet())
+            {
+                // Ignore * options.  It is dealt with later.
+                if (osName.equals(KEY_OS_DEFAULT))
+                {
+                    continue;
+                }
+                // Do regex match
+                if (serverOs.matches(osName))
+                {
+                    command = commandsByOS.get(osName);
+                    break;
+                }
+            }
         }
         // check
         if (command == null)
         {
-            throw new AlfrescoRuntimeException("No command found for OS " + os + " or '" + KEY_OS_DEFAULT + "': \n" +
+            throw new AlfrescoRuntimeException(
+                    "No command found for OS " + serverOs + " or '" + KEY_OS_DEFAULT + "': \n" +
                     "   commands: " + commandsByOS);
         }
         this.command = command;
@@ -120,6 +142,32 @@ public class RuntimeExec
     public void setDefaultProperties(Map<String, String> defaultProperties)
     {
         this.defaultProperties = defaultProperties;
+    }
+    
+    /**
+     * A comma or space separated list of values that, if returned by the executed command,
+     * indicate an error value.  This defaults to <b>"1, 2"</b>.
+     * 
+     * @param erroCodesStr the error codes for the execution
+     */
+    public void setErrorCodes(String errCodesStr)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(errCodesStr, " ,");
+        while(tokenizer.hasMoreElements())
+        {
+            String errCodeStr = tokenizer.nextToken();
+            // attempt to convert it to an integer
+            try
+            {
+                int errCode = Integer.parseInt(errCodeStr);
+                this.errCodes.add(errCode);
+            }
+            catch (NumberFormatException e)
+            {
+                throw new AlfrescoRuntimeException(
+                        "Property 'errorCodes' must be comma-separated list of integers: " + errCodesStr);
+            }
+        }
     }
     
     /**
@@ -193,7 +241,7 @@ public class RuntimeExec
         String execErr = stdErrGobbler.getBuffer();
         
         // construct the return value
-        ExecutionResult result = new ExecutionResult(commandToExecute, exitValue, execOut, execErr);
+        ExecutionResult result = new ExecutionResult(commandToExecute, errCodes, exitValue, execOut, execErr);
 
         // done
         if (logger.isDebugEnabled())
@@ -278,14 +326,21 @@ public class RuntimeExec
      */
     public static class ExecutionResult
     {
-        private String command;
-        private int exitValue;
-        private String stdOut;
-        private String stdErr;
+        private final String command;
+        private final Set<Integer> errCodes;
+        private final int exitValue;
+        private final String stdOut;
+        private final String stdErr;
        
-        private ExecutionResult(String command, int exitValue, String stdOut, String stdErr)
+        private ExecutionResult(
+                final String command,
+                final Set<Integer> errCodes,
+                final int exitValue,
+                final String stdOut,
+                final String stdErr)
         {
             this.command = command;
+            this.errCodes = errCodes;
             this.exitValue = exitValue;
             this.stdOut = stdOut;
             this.stdErr = stdErr;
@@ -294,19 +349,40 @@ public class RuntimeExec
         @Override
         public String toString()
         {
-            String out = stdOut.length() > 10 ? stdOut.substring(0, 10) : stdOut;
-            String err = stdErr.length() > 10 ? stdErr.substring(0, 10) : stdErr;
+            String out = stdOut.length() > 250 ? stdOut.substring(0, 250) : stdOut;
+            String err = stdErr.length() > 250 ? stdErr.substring(0, 250) : stdErr;
             
             StringBuilder sb = new StringBuilder(128);
             sb.append("Execution result: \n")
               .append("   os:         ").append(System.getProperty(KEY_OS_NAME)).append("\n")
               .append("   command:    ").append(command).append("\n")
+              .append("   succeeded:  ").append(getSuccess()).append("\n")
               .append("   exit code:  ").append(exitValue).append("\n")
               .append("   out:        ").append(out).append("\n")
               .append("   err:        ").append(err);
             return sb.toString();
         }
         
+        /**
+         * @param exitValue the command exit value
+         * @return Returns true if the code is a listed failure code
+         * 
+         * @see #setErrorCodes(String)
+         */
+        private boolean isFailureCode(int exitValue)
+        {
+            return errCodes.contains((Integer)exitValue);
+        }
+        
+        /**
+         * @return Returns true if the command was deemed to be successful according to the
+         *      failure codes returned by the execution.
+         */
+        public boolean getSuccess()
+        {
+            return !isFailureCode(exitValue);
+        }
+
         public int getExitValue()
         {
             return exitValue;

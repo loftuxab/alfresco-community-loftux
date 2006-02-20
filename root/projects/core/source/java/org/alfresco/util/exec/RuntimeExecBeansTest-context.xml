@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+   <bean id="commandRemoveDirectory" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandMap">
+          <map>
+              <entry key="Windows.*">
+                  <value>rmdir ${dir}</value>
+              </entry>
+              <entry key="Linux">
+                  <value>rm -rf ${dir}</value>
+              </entry>
+              <entry key=".*">
+                  <value>wibble</value>
+              </entry>
+          </map>
+      </property>
+      <property name="defaultProperties">
+          <props>
+              <prop key="dir">dir_RuntimeExecBootstrapBeanTest</prop>
+          </props>
+      </property>
+      <property name="errorCodes">
+          <value>1, 2</value>
+      </property>
+   </bean>
+
+   <bean id="testBootstrapCommands" class="org.alfresco.util.exec.RuntimeExecBootstrapBean" >
+      <property name="startupCommands">
+          <list>
+              <ref bean="commandRemoveDirectory" />
+          </list>
+      </property>
+   </bean>
+	
+   <bean id="testShutdownCommands" class="org.alfresco.util.exec.RuntimeExecShutdownBean" >
+      <property name="shutdownCommands">
+          <list>
+              <ref bean="commandRemoveDirectory" />
+          </list>
+      </property>
+   </bean>
+	
+</beans>

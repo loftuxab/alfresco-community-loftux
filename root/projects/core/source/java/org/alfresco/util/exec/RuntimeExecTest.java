@@ -48,13 +48,26 @@ public class RuntimeExecTest extends TestCase
         assertTrue("No error output found", err.length() > 0);
     }
     
+    public void testWildcard() throws Exception
+    {
+        RuntimeExec exec = new RuntimeExec();
+
+        // set the command
+        Map<String, String> commandMap = new HashMap<String, String>(3, 1.0f);
+        commandMap.put(".*", "TEST");
+        exec.setCommandMap(commandMap);
+        
+        String commandStr = exec.getCommand();
+        assertEquals("Expected default match to work", "TEST", commandStr);
+    }
+    
     public void testWithProperties() throws Exception
     {
         RuntimeExec exec = new RuntimeExec();
 
         // set the command
         Map<String, String> commandMap = new HashMap<String, String>(3, 1.0f);
-        commandMap.put("Windows XP", "dir \"${path}\"");
+        commandMap.put("Windows.*", "dir \"${path}\"");
         commandMap.put("Linux", "ls '${path}'");
         commandMap.put("*", "wibble ${path}");
         exec.setCommandMap(commandMap);
@@ -71,7 +84,7 @@ public class RuntimeExecTest extends TestCase
         String os = System.getProperty("os.name");
         String defaultCommandCheck = null;
         String dynamicCommandCheck = null;
-        if (os.equals("Windows XP"))
+        if (os.matches("Windows.*"))
         {
             defaultCommandCheck = "dir \".\"";
             dynamicCommandCheck = "dir \"./\"";
