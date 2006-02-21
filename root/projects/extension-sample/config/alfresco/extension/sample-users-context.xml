@@ -29,16 +29,16 @@
             <list>
                 <props>
                     <prop key="path">/</prop>
-                    <prop key="location">alfresco/bootstrap/categories.xml</prop>
-                </props>
-                <props>
-                    <prop key="path">/</prop>
                     <prop key="location">alfresco/bootstrap/spaces.xml</prop>
                     <prop key="messages">alfresco/messages/bootstrap-spaces</prop>
                 </props>
                 <props>
                     <prop key="path">/</prop>
                     <prop key="location">alfresco/bootstrap/system.xml</prop>
+                </props>
+                <props>
+                    <prop key="path">/</prop>
+                    <prop key="location">alfresco/bootstrap/categories.xml</prop>
                 </props>
                 <props>
                     <prop key="path">/${spaces.company_home.childname}/${spaces.guest_home.childname}</prop>
