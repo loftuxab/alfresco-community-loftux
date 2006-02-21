@@ -1,8 +1,8 @@
 <project>
     <shortName>alfresco</shortName>
-    <fullName>Alfresco ECM - Enterprise Network</fullName>
+    <fullName>Alfresco ECM - Community Network</fullName>
     <version>1.2</version>
-    <installerFilename>${product_shortname}-${product_version}-${platform_name}-enterprise.${platform_exec_suffix}</installerFilename>
+    <installerFilename>${product_shortname}-${product_version}-${platform_name}-community.${platform_exec_suffix}</installerFilename>
     <readmeFile>C:/code/bitrock/output-alfresco-windows-2006-02-17/README.txt</readmeFile>
     <licenseFile>C:/code/bitrock/output-alfresco-windows-2006-02-17/licenses/license.txt</licenseFile>
     <wrapLicenseFileText>1</wrapLicenseFileText>
@@ -594,39 +594,6 @@
                 </compareText>
             </ruleList>
         </runProgram>
-      <actionGroup>
-        <progressText>Launch ${product_fullname} now?</progressText>        
-        <actionList>
-         <runProgram>
-          <program>${installdir}/alfresco/run.bat</program>
-          <programArguments>start &amp;</programArguments>
-	  <ruleEvaluationLogic>and</ruleEvaluationLogic>
-          <ruleList>
-              <compareText text="${installservice}" logic="does_not_equal" value="1" />
-              <compareText text="${platform_name}" value="windows" logic="equals" />
-          </ruleList>
-       </runProgram>
-       <runProgram>
-          <program>${installdir}/alfresco/servicerun.bat</program>
-          <programArguments>START</programArguments>
-	  <ruleEvaluationLogic>and</ruleEvaluationLogic>
-          <ruleList>
-              <compareText text="${installservice}" logic="equals" value="1" />
-              <compareText text="${platform_name}" value="windows" logic="equals" />
-          </ruleList>
-        </runProgram>
-        <wait ms="10000">
-    	    <ruleList>
-	         <compareText text="${installer_ui}" logic="equals" value="gui" />
-	    </ruleList>    
-        </wait>
-        <launchBrowser url="http://$(alfserver}:${tomcatport}/alfresco" >
-    	   <ruleList>
-	       <compareText text="${installer_ui}" logic="equals" value="gui" />
-	   </ruleList>
-        </launchBrowser>
-      </actionList>
-      </actionGroup>
     </finalPageActionList>
     <parameterList>
         <directoryParameter>
@@ -841,9 +808,7 @@ ${installdir.dos}\mysql\bin\mysql.exe --defaults-file="${installdir.dos}\mysql\m
                     <runAs></runAs>
                     <workingDirectory></workingDirectory>
                 </runProgram>
-                <wait>
-                    <ms>3000</ms>
-                </wait>
+                <wait ms="3000" />
                 <runProgram>
                     <program>${installdir}/mysql/bin/mysqladmin.exe</program>
                     <programArguments>--defaults-file=${installdir.dos}/mysql/my.ini shutdown</programArguments>

@@ -42,6 +42,5 @@ call %CATALINA_HOME%\bin\shutdown.bat
 rem ---------------------------------------
 rem Stop OpenOffice for transformations
 rem ---------------------------------------
-if exist "start_oo.bat" c:\windows\system32\taskkill /f /im soffice.bin
-
+call "stop_oo.bat"
 :nostop
