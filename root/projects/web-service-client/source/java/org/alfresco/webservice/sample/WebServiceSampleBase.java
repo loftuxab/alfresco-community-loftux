@@ -54,11 +54,12 @@ public class WebServiceSampleBase
         {
             // Create parent reference to company home
             ParentReference parentReference = new ParentReference(
+                    STORE,
+                    null, 
+                    "/app:company_home",
                     Constants.ASSOC_CONTAINS, 
                     Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, "sample_folder"));
-            parentReference.setStore(STORE);
-            parentReference.setPath("/app:company_home");
-            
+
             // Create folder
             NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "Web Service Sample Folder")};
             CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_FOLDER, properties);
@@ -69,10 +70,11 @@ public class WebServiceSampleBase
             // Create parent reference to sample folder
             Reference sampleFolder = results[0].getDestination();
             ParentReference parentReference2 = new ParentReference(
+                    STORE,
+                    sampleFolder.getUuid(),
+                    null,
                     Constants.ASSOC_CONTAINS, 
                     Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, "sample_content"));
-            parentReference2.setStore(STORE);
-            parentReference2.setUuid(sampleFolder.getUuid());
             
             // Create content
             NamedValue[] properties2 = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "SampleContent.txt")};

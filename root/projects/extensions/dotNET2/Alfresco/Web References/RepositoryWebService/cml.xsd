@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:cms="http://www.alfresco.org/ws/model/content/1.0" xmlns:cml="http://www.alfresco.org/ws/cml/1.0" elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/cml/1.0" version="0.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:import schemaLocation="types.xsd" namespace="http://www.alfresco.org/ws/model/content/1.0" />
+  <xsd:annotation>
+    <xsd:documentation>
+    		Alfresco Web Services for Content Management. CML - Content Manipulation Language - Draft.
+    	</xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType name="CML">
+    <xsd:sequence>
+      <xsd:annotation>
+        <xsd:documentation>The CML statements.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="create">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="1" name="id" type="xsd:string" />
+            <xsd:element name="parent" type="cms:ParentReference" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="type" type="cms:Name" />
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="property" type="cms:NamedValue" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="addAspect">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="aspect" type="cms:Name" />
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="property" type="cms:NamedValue" />
+            <xsd:group ref="cml:Where" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="removeAspect">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="aspect" type="cms:Name" />
+            <xsd:group ref="cml:Where" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="update">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="1" maxOccurs="unbounded" name="property" type="cms:NamedValue" />
+            <xsd:group ref="cml:Where" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="delete">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="where" type="cms:Predicate" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="move">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="cml:ToParent" />
+            <xsd:group ref="cml:Where" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="copy">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="cml:ToParent" />
+            <xsd:group ref="cml:Where" />
+            <xsd:element minOccurs="0" maxOccurs="1" default="false" name="children" type="xsd:boolean" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="addChild">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="cml:ToParent" />
+            <xsd:group ref="cml:Where" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="removeChild">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:choice>
+              <xsd:element name="from" type="cms:Reference" />
+              <xsd:element name="from_id" type="xsd:string" />
+            </xsd:choice>
+            <xsd:group ref="cml:Where" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="createAssociation">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="cml:From" />
+            <xsd:group ref="cml:To" />
+            <xsd:element name="association" type="cms:Name" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="removeAssociation">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="cml:From" />
+            <xsd:group ref="cml:To" />
+            <xsd:element name="association" type="cms:Name" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="cml" type="cml:CML">
+    <xsd:unique name="NodeKey">
+      <xsd:selector xpath="create" />
+      <xsd:field xpath="id" />
+    </xsd:unique>
+    <xsd:keyref name="WhereReference" refer="cml:NodeKey">
+      <xsd:selector xpath="*/." />
+      <xsd:field xpath="where_id" />
+    </xsd:keyref>
+    <xsd:keyref name="ToReference" refer="cml:NodeKey">
+      <xsd:selector xpath="*/." />
+      <xsd:field xpath="to_id" />
+    </xsd:keyref>
+    <xsd:keyref name="FromReference" refer="cml:NodeKey">
+      <xsd:selector xpath="*/." />
+      <xsd:field xpath="from_id" />
+    </xsd:keyref>
+  </xsd:element>
+  <xsd:group name="Where">
+    <xsd:choice>
+      <xsd:element name="where" type="cms:Predicate" />
+      <xsd:element name="where_id" type="xsd:string" />
+    </xsd:choice>
+  </xsd:group>
+  <xsd:group name="From">
+    <xsd:choice>
+      <xsd:element name="from" type="cms:Predicate" />
+      <xsd:element name="from_id" type="xsd:string" />
+    </xsd:choice>
+  </xsd:group>
+  <xsd:group name="To">
+    <xsd:choice>
+      <xsd:element name="to" type="cms:Predicate" />
+      <xsd:element name="to_id" type="xsd:string" />
+    </xsd:choice>
+  </xsd:group>
+  <xsd:group name="ToParent">
+    <xsd:choice>
+      <xsd:element name="to" type="cms:ParentReference" />
+      <xsd:sequence>
+        <xsd:element name="to_id" type="xsd:string" />
+        <xsd:group ref="cms:ChildAssociation" />
+      </xsd:sequence>
+    </xsd:choice>
+  </xsd:group>
+</xsd:schema>

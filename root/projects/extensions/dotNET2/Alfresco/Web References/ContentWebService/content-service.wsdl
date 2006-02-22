@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:content="http://www.alfresco.org/ws/service/content/1.0" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:cms="http://www.alfresco.org/ws/model/content/1.0" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" name="content-service" targetNamespace="http://www.alfresco.org/ws/service/content/1.0" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:import namespace="http://www.alfresco.org/ws/model/content/1.0" location="types.xsd" />
+  <wsdl:types>
+    <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/content/1.0">
+      <xsd:element name="read">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="items" type="cms:Predicate" />
+            <xsd:element name="property" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="readResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="content" type="content:Content" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="write">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="node" type="cms:Reference" />
+            <xsd:element name="property" type="xsd:string" />
+            <xsd:element name="content" type="xsd:base64Binary" />
+            <xsd:element name="format" type="cms:ContentFormat" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="writeResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="content" type="content:Content" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="clear">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="items" type="cms:Predicate" />
+            <xsd:element name="property" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="clearResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="content" type="content:Content" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="ContentSegment">
+        <xsd:sequence>
+          <xsd:element name="offset" type="xsd:long" />
+          <xsd:element name="length" type="xsd:long" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ContentSegment" type="content:ContentSegment" />
+      <xsd:complexType name="Content">
+        <xsd:sequence>
+          <xsd:element name="node" type="cms:Reference" />
+          <xsd:element name="property" type="xsd:string" />
+          <xsd:element name="length" type="xsd:long" />
+          <xsd:element name="format" nillable="true" type="cms:ContentFormat" />
+          <xsd:element name="url" nillable="true" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="Content" type="content:Content" />
+      <xsd:complexType name="ContentFault">
+        <xsd:sequence>
+          <xsd:element name="errorCode" type="xsd:int" />
+          <xsd:element name="message" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ContentFault" type="content:ContentFault" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="readRequest">
+    <wsdl:part name="parameters" element="content:read" />
+  </wsdl:message>
+  <wsdl:message name="readResponse">
+    <wsdl:part name="parameters" element="content:readResponse" />
+  </wsdl:message>
+  <wsdl:message name="writeRequest">
+    <wsdl:part name="parameters" element="content:write" />
+  </wsdl:message>
+  <wsdl:message name="writeResponse">
+    <wsdl:part name="parameters" element="content:writeResponse" />
+  </wsdl:message>
+  <wsdl:message name="clearRequest">
+    <wsdl:part name="parameters" element="content:clear" />
+  </wsdl:message>
+  <wsdl:message name="clearResponse">
+    <wsdl:part name="parameters" element="content:clearResponse" />
+  </wsdl:message>
+  <wsdl:message name="ContentFault">
+    <wsdl:part name="fault" element="content:ContentFault" />
+  </wsdl:message>
+  <wsdl:portType name="ContentServiceSoapPort">
+    <wsdl:operation name="read">
+      <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
+      <wsdl:input name="readRequest" message="content:readRequest" />
+      <wsdl:output name="readResponse" message="content:readResponse" />
+      <wsdl:fault name="ContentFault" message="content:ContentFault" />
+    </wsdl:operation>
+    <wsdl:operation name="write">
+      <wsdl:documentation>Writes content to the repository.</wsdl:documentation>
+      <wsdl:input message="content:writeRequest" />
+      <wsdl:output message="content:writeResponse" />
+      <wsdl:fault name="ContentFault" message="content:ContentFault" />
+    </wsdl:operation>
+    <wsdl:operation name="clear">
+      <wsdl:documentation>Clears content from the repository.</wsdl:documentation>
+      <wsdl:input message="content:clearRequest" />
+      <wsdl:output message="content:clearResponse" />
+      <wsdl:fault name="ContentFault" message="content:ContentFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ContentServiceSoapBinding" type="content:ContentServiceSoapPort">
+    <wsdlsoap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="read">
+      <wsdl:documentation>Retrieves content from the repository.</wsdl:documentation>
+      <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/read" />
+      <wsdl:input>
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ContentFault">
+        <wsdlsoap:fault use="literal" name="ContentFault" namespace="http://www.alfresco.org/ws/service/content/1.0" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="write">
+      <wsdl:documentation>Writes content to the repository.</wsdl:documentation>
+      <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/write" />
+      <wsdl:input>
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ContentFault">
+        <wsdlsoap:fault use="literal" name="ContentFault" namespace="http://www.alfresco.org/ws/service/content/1.0" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="clear">
+      <wsdl:documentation>Clears content from the repository.</wsdl:documentation>
+      <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/content/1.0/clear" />
+      <wsdl:input>
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ContentFault">
+        <wsdlsoap:fault use="literal" name="ContentFault" namespace="http://www.alfresco.org/ws/service/content/1.0" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ContentService">
+    <wsdl:documentation>Provides read and write access to content streams.</wsdl:documentation>
+    <wsdl:port name="ContentService" binding="content:ContentServiceSoapBinding">
+      <wsdlsoap:address location="http://localhost:8080/alfresco/api/ContentService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

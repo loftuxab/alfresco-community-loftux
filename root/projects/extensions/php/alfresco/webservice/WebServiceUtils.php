@@ -26,13 +26,21 @@
 
    function addSecurityHeader($client, $user, $ticket)
    {
+      $createdDate = date("Y-m-d\TH:i:s\Z");
+      $expiresDate = date("Y-m-d\TH:i:s\Z", mktime(date("H")+1, date("i"), date("s"), date("m"), date("d"), date("Y")));
+
+      $created =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Created', false, $createdDate);;
+      $expires =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Expires', false, $expiresDate);;
+      $timestamp =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Timestamp', false, array($created, $expires));
+
       $username =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Username', false, $user);
       $password =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Password', false,
                                $ticket, array('Type' => 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText'));
       $usernameToken =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}UsernameToken', false,
                                   $v = array($username, $password));
+
       $securityHeader =& new SOAP_Header('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security', null,
-                                      $usernameToken, 1);
+                                      array($timestamp, $usernameToken), 1);
       // remove the actor attribute that gets added by the constructor otherwise Axis gets upset!
       unset($securityHeader->attributes['SOAP-ENV:actor']);
       $client->addHeader($securityHeader);

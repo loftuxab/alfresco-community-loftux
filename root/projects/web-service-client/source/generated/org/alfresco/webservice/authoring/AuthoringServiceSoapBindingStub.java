@@ -2,7 +2,7 @@
  * AuthoringServiceSoapBindingStub.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
 package org.alfresco.webservice.authoring;
@@ -48,6 +48,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "comments"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue"), org.alfresco.webservice.types.NamedValue[].class, false, false);
+        param.setOmittable(true);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "keepCheckedOut"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
         oper.addParameter(param);
@@ -69,6 +70,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.webservice.types.Reference.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "comments"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue"), org.alfresco.webservice.types.NamedValue[].class, false, false);
+        param.setOmittable(true);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "keepCheckedOut"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
         oper.addParameter(param);
@@ -168,6 +170,7 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "items"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "comments"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue"), org.alfresco.webservice.types.NamedValue[].class, false, false);
+        param.setOmittable(true);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/authoring/1.0", "versionChildren"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "boolean"), boolean.class, false, false);
         oper.addParameter(param);
@@ -275,15 +278,15 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ContentFormat>mimetype");
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ResultSetRow>node");
             cachedSerQNames.add(qName);
@@ -296,8 +299,8 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "AssociationDefinition");
             cachedSerQNames.add(qName);
@@ -345,8 +348,8 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue");
             cachedSerQNames.add(qName);
@@ -380,8 +383,8 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate");
             cachedSerQNames.add(qName);
@@ -464,8 +467,8 @@ public class AuthoringServiceSoapBindingStub extends org.apache.axis.client.Stub
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ValueDefinition");
             cachedSerQNames.add(qName);

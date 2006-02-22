@@ -106,16 +106,12 @@ public abstract class BaseWebServiceSystemTest extends TestCase
             }
 
             // Create test content
-            ParentReference contentParentRef = new ParentReference(Constants.ASSOC_CHILDREN, "{test}testContent");
-            contentParentRef.setStore(BaseWebServiceSystemTest.store);
-            contentParentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+            ParentReference contentParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testContent");
             NamedValue[] contentProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, CONTENT_NAME)};
             CMLCreate createContent = new CMLCreate("testContent", contentParentRef, Constants.TYPE_CONTENT, contentProperties);
             
             // Create test folder
-            ParentReference folderParentRef = new ParentReference(Constants.ASSOC_CHILDREN, "{test}testFolder");
-            folderParentRef.setStore(BaseWebServiceSystemTest.store);
-            folderParentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+            ParentReference folderParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testFolder");            
             NamedValue[] folderProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, FOLDER_NAME)};
             CMLCreate createFolder = new CMLCreate("testFolder", folderParentRef, Constants.TYPE_FOLDER, folderProperties);
             

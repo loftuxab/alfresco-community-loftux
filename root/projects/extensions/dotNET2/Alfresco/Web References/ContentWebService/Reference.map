@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="http://localhost:8080/alfresco/wsdl/types.xsd" filename="types.xsd" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="http://localhost:8080/alfresco/wsdl/content-service.wsdl" filename="content-service.wsdl" />
+  </Results>
+</DiscoveryClientResultsFile>

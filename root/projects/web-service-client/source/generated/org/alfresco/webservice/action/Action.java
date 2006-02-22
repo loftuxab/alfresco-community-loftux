@@ -2,21 +2,30 @@
  * Action.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
 package org.alfresco.webservice.action;
 
 public class Action  implements java.io.Serializable {
     private java.lang.String id;
+
     private java.lang.String actionName;
+
     private java.lang.String title;
+
     private java.lang.String description;
+
     private boolean executeAsynchronously;
+
     private org.alfresco.webservice.types.NamedValue[] parameters;
+
     private org.alfresco.webservice.action.Condition[] conditions;
+
     private org.alfresco.webservice.action.Action compensatingAction;
+
     private org.alfresco.webservice.action.Action[] actions;
+
     private org.alfresco.webservice.types.Reference reference;
 
     public Action() {

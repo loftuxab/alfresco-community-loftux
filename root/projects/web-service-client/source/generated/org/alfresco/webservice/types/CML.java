@@ -2,22 +2,32 @@
  * CML.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
 package org.alfresco.webservice.types;
 
 public class CML  implements java.io.Serializable {
     private org.alfresco.webservice.types.CMLCreate[] create;
+
     private org.alfresco.webservice.types.CMLAddAspect[] addAspect;
+
     private org.alfresco.webservice.types.CMLRemoveAspect[] removeAspect;
+
     private org.alfresco.webservice.types.CMLUpdate[] update;
+
     private org.alfresco.webservice.types.CMLDelete[] delete;
+
     private org.alfresco.webservice.types.CMLMove[] move;
+
     private org.alfresco.webservice.types.CMLCopy[] copy;
+
     private org.alfresco.webservice.types.CMLAddChild[] addChild;
+
     private org.alfresco.webservice.types.CMLRemoveChild[] removeChild;
+
     private org.alfresco.webservice.types.CMLCreateAssociation[] createAssociation;
+
     private org.alfresco.webservice.types.CMLRemoveAssociation[] removeAssociation;
 
     public CML() {

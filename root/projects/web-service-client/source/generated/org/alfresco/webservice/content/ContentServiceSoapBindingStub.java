@@ -2,7 +2,7 @@
  * ContentServiceSoapBindingStub.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
 package org.alfresco.webservice.content;
@@ -119,15 +119,15 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ContentFormat>mimetype");
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ResultSetRow>node");
             cachedSerQNames.add(qName);
@@ -140,8 +140,8 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "AssociationDefinition");
             cachedSerQNames.add(qName);
@@ -189,8 +189,8 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue");
             cachedSerQNames.add(qName);
@@ -224,8 +224,8 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate");
             cachedSerQNames.add(qName);
@@ -308,8 +308,8 @@ public class ContentServiceSoapBindingStub extends org.apache.axis.client.Stub i
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ValueDefinition");
             cachedSerQNames.add(qName);

@@ -42,7 +42,7 @@ public class AuthenticationUtils implements CallbackHandler
          "   <globalConfiguration >" +
          "      <requestFlow >" +
          "       <handler type='java:org.apache.ws.axis.security.WSDoAllSender' >" +
-         "               <parameter name='action' value='UsernameToken'/>" +
+         "               <parameter name='action' value='UsernameToken Timestamp'/>" +
          "               <parameter name='user' value='ticket'/>" +
          "               <parameter name='passwordCallbackClass' value='org.alfresco.webservice.util.AuthenticationUtils'/>" +
          "               <parameter name='passwordType' value='PasswordText'/>" +

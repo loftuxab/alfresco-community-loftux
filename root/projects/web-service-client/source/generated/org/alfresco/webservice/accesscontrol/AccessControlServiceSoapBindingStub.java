@@ -2,7 +2,7 @@
  * AccessControlServiceSoapBindingStub.java
  *
  * This file was auto-generated from WSDL
- * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
+ * by the Apache Axis 1.3 Oct 05, 2005 (05:23:37 EDT) WSDL2Java emitter.
  */
 
 package org.alfresco.webservice.accesscontrol;
@@ -47,6 +47,7 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "predicate"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "aces"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "ACE"), org.alfresco.webservice.accesscontrol.ACE[].class, false, false);
+        param.setOmittable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "ACL"));
         oper.setReturnClass(org.alfresco.webservice.accesscontrol.ACL[].class);
@@ -66,6 +67,7 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "predicate"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "aces"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "ACE"), org.alfresco.webservice.accesscontrol.ACE[].class, false, false);
+        param.setOmittable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "ACL"));
         oper.setReturnClass(org.alfresco.webservice.accesscontrol.ACL[].class);
@@ -100,6 +102,7 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("getClassPermissions");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "classNames"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String[].class, false, false);
+        param.setOmittable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "GetClassPermissionsResult"));
         oper.setReturnClass(org.alfresco.webservice.accesscontrol.GetClassPermissionsResult[].class);
@@ -119,6 +122,7 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "predicate"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate"), org.alfresco.webservice.types.Predicate.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "permissions"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String[].class, false, false);
+        param.setOmittable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "HasPermissionsResult"));
         oper.setReturnClass(org.alfresco.webservice.accesscontrol.HasPermissionsResult[].class);
@@ -223,15 +227,15 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ContentFormat>mimetype");
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ResultSetRow>node");
             cachedSerQNames.add(qName);
@@ -244,8 +248,8 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "AssociationDefinition");
             cachedSerQNames.add(qName);
@@ -293,8 +297,8 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "NamedValue");
             cachedSerQNames.add(qName);
@@ -328,8 +332,8 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Predicate");
             cachedSerQNames.add(qName);
@@ -412,8 +416,8 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
             cachedSerClasses.add(cls);
-            cachedSerFactories.add(simplesf);
-            cachedDeserFactories.add(simpledf);
+            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
+            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "ValueDefinition");
             cachedSerQNames.add(qName);

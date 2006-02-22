@@ -92,9 +92,7 @@ public class WebServiceSample3 extends WebServiceSampleBase
             
             // Upload binary content into the repository
             Reference reference = WebServiceSample2.executeSearch();
-            ParentReference parentReference = new ParentReference(ASSOC_CONTAINS, ASSOC_CONTAINS);
-            parentReference.setStore(reference.getStore());
-            parentReference.setUuid(reference.getUuid());
+            ParentReference parentReference = new ParentReference(reference.getStore(), reference.getUuid(), null, ASSOC_CONTAINS, ASSOC_CONTAINS);
             
             // Create the content
             NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "test.jpg")};
@@ -135,9 +133,7 @@ public class WebServiceSample3 extends WebServiceSampleBase
     {
         // Create a parent reference, this contains information about the association we are createing to the new content and the
         // parent of the new content (the space retrived from the search)
-        ParentReference parentReference = new ParentReference(ASSOC_CONTAINS, ASSOC_CONTAINS);
-        parentReference.setStore(STORE);
-        parentReference.setPath("/app:company_home/cm:sample_folder");
+        ParentReference parentReference = new ParentReference(STORE, null, "/app:company_home/cm:sample_folder" ,ASSOC_CONTAINS, ASSOC_CONTAINS);
         
         // Define the content format for the content we are adding
         ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");

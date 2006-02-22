@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:auth="http://www.alfresco.org/ws/service/authentication/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="authentication-service" targetNamespace="http://www.alfresco.org/ws/service/authentication/1.0" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.alfresco.org/ws/service/authentication/1.0">
+      <xsd:element name="startSession">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="username" type="xsd:string" />
+            <xsd:element name="password" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="startSessionResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="startSessionReturn" type="auth:AuthenticationResult" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="endSession">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="ticket" type="xsd:string" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="endSessionResponse">
+        <xsd:complexType>
+          <xsd:sequence />
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="AuthenticationResult">
+        <xsd:sequence>
+          <xsd:element name="username" type="xsd:string" />
+          <xsd:element name="ticket" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="AuthenticationResult" type="auth:AuthenticationResult" />
+      <xsd:complexType name="AuthenticationFault">
+        <xsd:sequence>
+          <xsd:element name="errorCode" type="xsd:int" />
+          <xsd:element name="message" type="xsd:string" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="AuthenticationFault" type="auth:AuthenticationFault" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="startSessionRequest">
+    <wsdl:part name="parameters" element="auth:startSession" />
+  </wsdl:message>
+  <wsdl:message name="startSessionResponse">
+    <wsdl:part name="parameters" element="auth:startSessionResponse" />
+  </wsdl:message>
+  <wsdl:message name="endSessionRequest">
+    <wsdl:part name="parameters" element="auth:endSession" />
+  </wsdl:message>
+  <wsdl:message name="endSessionResponse">
+    <wsdl:part name="parameters" element="auth:endSessionResponse" />
+  </wsdl:message>
+  <wsdl:message name="AuthenticationFault">
+    <wsdl:part name="fault" element="auth:AuthenticationFault" />
+  </wsdl:message>
+  <wsdl:portType name="AuthenticationServiceSoapPort">
+    <wsdl:operation name="startSession">
+      <wsdl:input name="startSessionRequest" message="auth:startSessionRequest" />
+      <wsdl:output name="startSessionResponse" message="auth:startSessionResponse" />
+      <wsdl:fault name="AuthenticationFault" message="auth:AuthenticationFault" />
+    </wsdl:operation>
+    <wsdl:operation name="endSession">
+      <wsdl:input name="endSessionRequest" message="auth:endSessionRequest" />
+      <wsdl:output name="endSessionResponse" message="auth:endSessionResponse" />
+      <wsdl:fault name="AuthenticationFault" message="auth:AuthenticationFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AuthenticationServiceSoapBinding" type="auth:AuthenticationServiceSoapPort">
+    <wsdlsoap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="startSession">
+      <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/authentication/1.0/startSession" />
+      <wsdl:input name="startSessionRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="startSessionResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="AuthenticationFault">
+        <wsdlsoap:fault use="literal" name="AuthenticationFault" namespace="http://www.alfresco.org/ws/service/authentication/1.0" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="endSession">
+      <wsdlsoap:operation soapAction="http://www.alfresco.org/ws/service/authentication/1.0/endSession" />
+      <wsdl:input name="endSessionRequest">
+        <wsdlsoap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="endSessionResponse">
+        <wsdlsoap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="AuthenticationFault">
+        <wsdlsoap:fault use="literal" name="AuthenticationFault" namespace="http://www.alfresco.org/ws/service/authentication/1.0" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="AuthenticationService">
+    <wsdl:documentation>Provides simple authentication capability.</wsdl:documentation>
+    <wsdl:port name="AuthenticationService" binding="auth:AuthenticationServiceSoapBinding">
+      <wsdlsoap:address location="http://localhost:8080/alfresco/api/AuthenticationService" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -55,9 +55,7 @@ public class WebServiceSample4 extends WebServiceSampleBase
             // Create the CML structure
             // When executed this cml update query will create a new content node beneth the tutorial folder and the add the
             // versionable aspect to the newly created node
-            ParentReference parentReference = new ParentReference(Constants.ASSOC_CONTAINS, Constants.ASSOC_CONTAINS);
-            parentReference.setStore(STORE);
-            parentReference.setPath("/app:company_home/cm:sample_folder");            
+            ParentReference parentReference = new ParentReference(STORE, null, "/app:company_home/cm:sample_folder", Constants.ASSOC_CONTAINS, Constants.ASSOC_CONTAINS);            
             NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_WebServiceSample4.txt")};
             CMLCreate create = new CMLCreate("id1", parentReference, Constants.TYPE_CONTENT, properties);        
             CMLAddAspect addAspect = new CMLAddAspect(Constants.ASPECT_VERSIONABLE, null, null, "id1");

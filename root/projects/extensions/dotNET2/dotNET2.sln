@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual C# Express 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alfresco", "Alfresco\Alfresco.csproj", "{F7C103E8-5C55-45BB-AEBE-8FF39ED2B298}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples", "Samples\Samples.csproj", "{4964D1F9-931C-4DC1-8750-564FB39A76E7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F7C103E8-5C55-45BB-AEBE-8FF39ED2B298} = {F7C103E8-5C55-45BB-AEBE-8FF39ED2B298}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7C103E8-5C55-45BB-AEBE-8FF39ED2B298}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7C103E8-5C55-45BB-AEBE-8FF39ED2B298}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7C103E8-5C55-45BB-AEBE-8FF39ED2B298}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7C103E8-5C55-45BB-AEBE-8FF39ED2B298}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4964D1F9-931C-4DC1-8750-564FB39A76E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4964D1F9-931C-4DC1-8750-564FB39A76E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4964D1F9-931C-4DC1-8750-564FB39A76E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4964D1F9-931C-4DC1-8750-564FB39A76E7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
