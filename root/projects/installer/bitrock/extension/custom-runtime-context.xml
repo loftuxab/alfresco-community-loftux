@@ -14,11 +14,6 @@
               </entry>
           </map>
       </property>
-      <property name="defaultProperties">
-          <props>
-              <prop key="dir">dir_RuntimeExecBootstrapBeanTest</prop>
-          </props>
-      </property>
       <property name="errorCodes">
           <value>1, 2</value>
       </property>
@@ -33,11 +28,6 @@
                   <value>stop_oo.sh</value>
               </entry>
           </map>
-      </property>
-      <property name="defaultProperties">
-          <props>
-              <prop key="dir">dir_RuntimeExecBootstrapBeanTest</prop>
-          </props>
       </property>
       <property name="errorCodes">
           <value>1, 2</value>
