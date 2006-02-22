@@ -3,7 +3,7 @@
 # Set the following to where Tomcat is installed
 APPSERVER=/opt/alfresco/tomcat
 # Set any default JVM values
-export JAVA_OPTS=-Xmx512m
+export JAVA_OPTS="-Xms128m -Xmx512m -server"
 #
 if [ "$1" = "start" ]; then
   "$APPSERVER"/bin/startup.sh

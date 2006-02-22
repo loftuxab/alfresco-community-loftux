@@ -6,7 +6,7 @@ rem ---------------------------------------------------------------------------
 set CATALINA_HOME=C:\alfresco\tomcat
 
 rem Set any default JVM options
-set JAVA_OPTS=-Xmx512m
+set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server
 
 rem --- If SetPaths.bat already exists - assume set by hand and use as is
 if not exist "SetPaths.bat" goto getpaths 
