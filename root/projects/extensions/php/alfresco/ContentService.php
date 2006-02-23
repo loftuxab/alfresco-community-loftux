@@ -36,7 +36,7 @@ class ContentService extends BaseService
       $this->addSecurityHeader();
       $result = $this->web_service->read(
               getPredicateSOAPValue($references, null, null, null), 
-              new SOAP_Value('property', 'stirng', $property));
+              new SOAP_Value('property', 'string', $property));
 
       // Check for any errors
       $this->checkForError($result);
