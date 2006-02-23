@@ -38,8 +38,11 @@ class AuthenticationService extends BaseService
    
    public function endSession()
    {
-      $this->web_service->endSession();
-      unset($_SESSION["authDetails"]);
+      if ($this->isUserAuthenticated() == true)
+      {
+         $this->web_service->endSession($this->getAuthenticationDetails()->getTicket());
+         unset($_SESSION["authDetails"]);
+      }
    }
    
    public function isUserAuthenticated()

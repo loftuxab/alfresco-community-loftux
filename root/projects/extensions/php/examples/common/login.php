@@ -19,21 +19,29 @@
 
    // Start the session
    session_start();
-   
+
    require_once('alfresco/AuthenticationService.php');
    require_once('alfresco/tag/TagFramework.php');
    require_once('alfresco/tag/CommonTags.php');
 
    $error_message = "";
+   
+   $authentication_service = new AuthenticationService();
+   
+   if (isset($_REQUEST["logout"]) == true && $_REQUEST["logout"] == "true" && $authentication_service->isUserAuthenticated() == true)
+   {
+      // Try and the log the user out!
+      $auth_details = $authentication_service->getAuthenticationDetails();
+      $authentication_service->endSession();
+   }
 
    if (isset($_REQUEST["username"]) == true && isset($_REQUEST["password"]) == true)
    {
       try
       {
-         $authentication_service = new AuthenticationService();
          $authentication_service->startSession($_REQUEST["username"], $_REQUEST["password"]);
       
-         header("Location: index.php");
+         header("Location: ".$_REQUEST["redirect"]);
          exit;
        }
        catch (Exception $e)
@@ -41,7 +49,7 @@
          $error_message = $e->getMessage();
        }
    }
-   
+
    start_tags();
 ?>
 
@@ -58,16 +66,18 @@
       </style>
    </head>
 
-   <body>
+   <body style="background-image: url(/examples/common/images/AlfrescoFadedBG.png); background-repeat: no-repeat; background-attachment: fixed">
 
       <form id="loginForm" name="loginForm" method="post" action="login.php" enctype="application/x-www-form-urlencoded">
+         <input type='hidden' name='redirect' value='<?php echo $_REQUEST['redirect'] ?>'/>
+
          <table border="0" width="98%" height="100%" align="center">
             <tr >
                <td valign="middle" align="center" width="100%">
                   <table border="0" cellspacing="4" cellpadding="4" class="loginDialog">
                      <tr>
                         <td colspan="2">
-                           <img src="AlfrescoLogo200.png" width="200" height="58" alt="Alfresco" title="Alfresco">
+                           <img src="images/AlfrescoLogo200.png" width="200" height="58" alt="Alfresco" title="Alfresco">
                         </td>
                      </tr>
                      <tr>
