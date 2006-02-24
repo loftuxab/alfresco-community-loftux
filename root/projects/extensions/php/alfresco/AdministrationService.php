@@ -79,10 +79,45 @@ class AdministrationService extends BaseService
                                                                new SOAP_Value('value', false, $user_detail->home_folder)));
 
          $values[] = new SOAP_Value('userName', false, $user_detail->user_name);
+         
+         // TODO .. somehow we need to place this lot in an array??
       }
 
       $this->addSecurityHeader();
-      $result = $this->web_service->updateUsers(new SOAP_Value('users', "UserDetails", $values));
+      // TODO:  how do we pass an array to this method??  at the moment only the last user will be updated!!
+      $result = $this->web_service->updateUsers(new SOAP_Value('users', false, $values));
+      $this->checkForError($result);
+   }
+   
+   function createUsers($user_details)
+   {
+      $web_service_new_user_details = array();
+      foreach ($user_details as $user_detail)
+      {
+         $values = array();
+
+         $values[] = new SOAP_Value('properties', false, array(
+                                                               new SOAP_Value('name', false, '{http://www.alfresco.org/model/content/1.0}firstName'),
+                                                               new SOAP_Value('value', false, $user_detail->first_name)));
+         $values[] = new SOAP_Value('properties', false, array(
+                                                               new SOAP_Value('name', false, '{http://www.alfresco.org/model/content/1.0}lastName'),
+                                                               new SOAP_Value('value', false, $user_detail->last_name)));
+         $values[] = new SOAP_Value('properties', false, array(
+                                                               new SOAP_Value('name', false, '{http://www.alfresco.org/model/content/1.0}email'),
+                                                               new SOAP_Value('value', false, $user_detail->email)));
+         $values[] = new SOAP_Value('properties', false, array(
+                                                               new SOAP_Value('name', false, '{http://www.alfresco.org/model/content/1.0}organizationId'),
+                                                               new SOAP_Value('value', false, $user_detail->organization_id)));
+         $values[] = new SOAP_Value('properties', false, array(
+                                                               new SOAP_Value('name', false, '{http://www.alfresco.org/model/content/1.0}homeFolder'),
+                                                               new SOAP_Value('value', false, $user_detail->home_folder)));
+
+         $values[] = new SOAP_Value('userName', false, $user_detail->user_name);
+         $values[] = new SOAP_Value('password', false, $user_detail->password);
+      }
+
+      $this->addSecurityHeader();
+      $result = $this->web_service->createUsers(new SOAP_Value('newUsers', false, $values));
       $this->checkForError($result);
    }
 }
@@ -114,6 +149,7 @@ class UserDetails
    public $email = null;
    public $home_folder = null;
    public $organization_id = null;
+   public $password = null;  // Only set if these are the details of a new user
    
    public static function createUserDetails($web_service_user_details)
    {

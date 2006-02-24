@@ -91,6 +91,13 @@
    <br>
    <table cellspacing=0 cellpadding=0 border=0 width=95% align=center>
       <tr>
+          <td colspan=99 align=left><nobr>
+              <img src="/examples/common/images/add_user.gif" border=0 alt="Create User" title="Create User" align=absmiddle><span style='padding-left:2px; valign: bottom'><a href='edituser.php?action=create'>Create User</a></span>
+           </nobr>
+          </td>
+      <tr>
+      <tr height=7><td></td></tr>
+      <tr>
           <td width=7><img src='/examples/common/images/blue_01.gif' width=7 height=7 alt=''></td><td background='/examples/common/images/blue_02.gif'><img src='/examples/common/images/blue_02.gif' width=7 height=7 alt=''></td>
           <td width=7><img src='/examples/common/images/blue_03.gif' width=7 height=7 alt=''></td></tr><tr><td background='/examples/common/images/blue_04.gif'><img src='/examples/common/images/blue_04.gif' width=7 height=7 alt=''></td>
           <td bgcolor='#D3E6FE'>

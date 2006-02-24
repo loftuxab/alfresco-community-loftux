@@ -100,9 +100,27 @@ class RepositoryService extends BaseService
       // TODO
    }
 
-   public function get($references)
+
+   public function get($references, $store, $query_statement, $query_language='lucene')
    {
-      // TODO
+      $params = array();
+      if ($references != null)
+      {
+         foreach ($references as $reference)
+         {
+            $params[] = getReferenceSOAPValue($reference, 'nodes');
+         }
+      }
+
+      $params[] = getStoreSOAPValue($store);
+      $params[] = getQuerySOAPValue($query_statement, $query_language);
+
+      $this->addSecurityHeader();
+      $result = $this->web_service->get(new SOAP_Value('where', false, $params));
+      $this->checkForError($result);
+
+      // TODO marshal this result into something nicer!!
+      return $result;
    }
 }
 

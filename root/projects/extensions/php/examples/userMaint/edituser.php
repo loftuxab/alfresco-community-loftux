@@ -21,6 +21,9 @@
 
    require_once('alfresco/AuthenticationService.php');
    require_once('alfresco/AdministrationService.php');
+   require_once('alfresco/RepositoryService.php');
+   require_once('alfresco/type/Store.php');
+   require_once('alfresco/type/Reference.php');
 
 
    $authentication_service = new AuthenticationService();
@@ -33,6 +36,7 @@
 
    $auth_details = $authentication_service->getAuthenticationDetails();
    $administation_service = new AdministrationService($auth_details);
+   $repository_service = new RepositoryService($auth_details);
 
    $action = $_REQUEST["action"];
    $do = "false";
@@ -46,27 +50,43 @@
    {
       $user_details = $administation_service->getUser($_REQUEST["username"]);
    }
-   
+
    if ($do == "true")
    {
+      if ($user_details == null)
+      {
+         $user_details = new UserDetails();
+      }
+
+      // Update the user details
+      $user_details->first_name = $_REQUEST['firstname'];
+      $user_details->last_name = $_REQUEST['lastname'];
+      $user_details->email = $_REQUEST['email'];
+      $user_details->organization_id = $_REQUEST['orgid'];
+      $user_details->home_folder = $_REQUEST['homefolder'];
+
       if ($action == "edit")
       {
           // Update the user details
-          $user_details->first_name = $_REQUEST['firstname'];
-          $user_details->last_name = $_REQUEST['lastname'];
-          $user_details->email = $_REQUEST['email'];
-          $user_details->organization_id = $_REQUEST['orgid'];
-          $user_details->home_folder = $_REQUEST['homefolder'];
-          
-          // Update the user details
           $administation_service->updateUsers(array($user_details));
-          
-          // Redirect back to main page
-          header("Location: index.php");
       }
       else if ($action == "create")
       {
+         // Set the user name and password
+         $user_details->user_name = $_REQUEST['username'];
+         $user_details->password = $_REQUEST['password'];
+         
+         // Set the home folder to the company home (need to this as you can't leave the company home blank!)
+         $store = new Store('SpacesStore');
+         $result = $repository_service->get(null, $store, 'PATH:"/app:company_home"');
+         $user_details->home_folder = $store->scheme."://".$store->address."/".$result->reference->uuid;
+
+         // Create the user
+         $administation_service->createUsers(array($user_details));
       }
+
+      // Redirect back to main page
+      header("Location: index.php");
    }
 ?>
 
@@ -158,6 +178,17 @@
                        <td>User name:</td>
                        <td><input type='edit' name='username' <?php if ($action == 'edit') {echo "readonly";} ?> value='<?php if ($user_details != null) {echo $user_details->user_name;} ?>' style='width: 250'></td>
                    </tr>
+<?php
+                   if ($action == "create")
+                   {
+?>
+                   <tr>
+                       <td>Password:</td>
+                       <td><input type='password' name='password' style='width: 250'></td>
+                   </tr>
+<?php
+                   }
+?>
                    <tr>
                        <td>First name:</td>
                        <td><input type='edit' name='firstname' value='<?php if ($user_details != null) {echo $user_details->first_name;} ?>' style='width: 250'></td>
