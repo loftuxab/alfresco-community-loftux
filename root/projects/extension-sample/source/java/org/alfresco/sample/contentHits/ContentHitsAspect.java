@@ -101,10 +101,17 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
      */
     public void onContentRead(NodeRef nodeRef)
     {
-        // Increment the read count property value
-        Integer currentValue = (Integer)this.nodeService.getProperty(nodeRef, PROP_READ_COUNT);
-        int newValue = currentValue.intValue() + 1;
-        this.nodeService.setProperty(nodeRef, PROP_READ_COUNT, newValue);
+        try
+        {
+            // Increment the read count property value
+            Integer currentValue = (Integer)this.nodeService.getProperty(nodeRef, PROP_READ_COUNT);
+            int newValue = currentValue.intValue() + 1;
+            this.nodeService.setProperty(nodeRef, PROP_READ_COUNT, newValue);
+        }
+        catch (Exception exception)
+        {
+            // Do nothing since we do not want failure here to effect the transaction
+        }
     }
 
     /**
