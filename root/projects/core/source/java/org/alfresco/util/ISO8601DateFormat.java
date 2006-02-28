@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 
 /**
  * Formatting support for ISO 8601 dates
@@ -52,6 +54,7 @@ public class ISO8601DateFormat
      */
     public static String format(Date isoDate)
     {
+        // Note: always serialise to Gregorian Calendar
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(isoDate);
         
@@ -164,8 +167,9 @@ public class ISO8601DateFormat
                 throw new IndexOutOfBoundsException();
             }
 
-            // initialize Calendar object
-            Calendar calendar = Calendar.getInstance(timezone);
+            // initialize Calendar object#
+            // Note: always de-serialise from Gregorian Calendar
+            Calendar calendar = new GregorianCalendar(timezone);
             calendar.setLenient(false);
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month - 1);
@@ -180,12 +184,15 @@ public class ISO8601DateFormat
         }
         catch(IndexOutOfBoundsException e)
         {
+            throw new AlfrescoRuntimeException("Failed to parse date " + isoDate, e);
         }
         catch(NumberFormatException e)
         {
+            throw new AlfrescoRuntimeException("Failed to parse date " + isoDate, e);
         }
         catch(IllegalArgumentException e)
         {
+            throw new AlfrescoRuntimeException("Failed to parse date " + isoDate, e);
         }
         
         return parsed;
