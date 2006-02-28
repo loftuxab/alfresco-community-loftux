@@ -152,6 +152,7 @@ public class RuntimeExec
      */
     public void setErrorCodes(String errCodesStr)
     {
+        errCodes.clear();
         StringTokenizer tokenizer = new StringTokenizer(errCodesStr, " ,");
         while(tokenizer.hasMoreElements())
         {
