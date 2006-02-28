@@ -320,6 +320,20 @@ public class JCRSystemXMLExporter implements Exporter
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#startValueCollection(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
+    public void startValueCollection(NodeRef nodeRef, QName property)
+    {
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.cmr.view.Exporter#endValueCollection(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
+    public void endValueCollection(NodeRef nodeRef, QName property)
+    {
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
     public void value(NodeRef nodeRef, QName property, Object value)
@@ -342,30 +356,6 @@ public class JCRSystemXMLExporter implements Exporter
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.util.Collection)
-     */
-    public void value(NodeRef nodeRef, QName property, Collection values)
-    {
-        try
-        {
-            // convert using JCR type converter
-            Collection<String> strValues = session.getTypeConverter().getConverter().convert(String.class, values);
-
-            for (String strValue : strValues)
-            {
-                // emit value element
-                contentHandler.startElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME), EMPTY_ATTRIBUTES);
-                contentHandler.characters(strValue.toCharArray(), 0, strValue.length());
-                contentHandler.endElement(VALUE_QNAME.getNamespaceURI(), VALUE_LOCALNAME, toPrefixString(VALUE_QNAME));
-            }
-        }
-        catch (SAXException e)
-        {
-            throw new ExporterException("Failed to process value event - nodeRef " + nodeRef + "; property " + toPrefixString(property) + "; value " + values, e);
-        }
-    }
-    
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
      */
