@@ -131,6 +131,12 @@
       </exec>
    </target>
  
+   <target name="stop-tomcat" depends="init" description="Stops the Tomcat server on Windows">
+      <exec dir="${home.tomcat}/bin" executable="cmd.exe" spawn="true">
+         <arg line="/k shutdown.bat" />
+      </exec>
+   </target>
+ 
    <target name="start-tomcat-debug" depends="init" description="Starts the Tomcat server on Windows">
       <fail unless="env.JPDA_ADDRESS" 
             message="To run Tomcat in debug mode you need to setup the JPDA_ADDRESS enviornment variable"/>
