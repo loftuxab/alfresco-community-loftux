@@ -54,7 +54,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-common.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-jmx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-system.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry exported="true" sourcepath="src/jcr_src.zip" kind="lib" path="lib/jcr-1.0.jar"/>
 	<classpathentry exported="true" sourcepath="W:/freemarker-2.3.3/src" kind="lib" path="lib/freemarker.jar"/>
@@ -81,5 +80,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/myfaces-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/myfaces-impl.jar"/>
 	<classpathentry exported="true" sourcepath="src/hibernate-3.1.2-src.zip" kind="lib" path="lib/hibernate-3.1.2.jar"/>
+	<classpathentry exported="true" sourcepath="src/ehcache-1.2beta4-src.zip" kind="lib" path="lib/ehcache-1.2beta4.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
