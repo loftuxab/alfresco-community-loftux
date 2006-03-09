@@ -26,8 +26,8 @@
 
    function addSecurityHeader($client, $user, $ticket)
    {
-      $createdDate = date("Y-m-d\TH:i:s\Z");
-      $expiresDate = date("Y-m-d\TH:i:s\Z", mktime(date("H")+1, date("i"), date("s"), date("m"), date("d"), date("Y")));
+      $createdDate = date("Y-m-d\TH:i:s\Z", mktime(date("H")+24, date("i"), date("s"), date("m"), date("d"), date("Y")));
+      $expiresDate = date("Y-m-d\TH:i:s\Z", mktime(date("H")+25, date("i"), date("s"), date("m"), date("d"), date("Y")));
 
       $created =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Created', false, $createdDate);;
       $expires =& new SOAP_Value('{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Expires', false, $expiresDate);;

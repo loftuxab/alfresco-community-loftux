@@ -58,6 +58,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WebServiceFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />

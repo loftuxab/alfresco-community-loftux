@@ -57,11 +57,11 @@ namespace Samples
 
             // Create the repo service and set the authentication credentials
             UsernameToken userToken = new UsernameToken(AuthenticationUtils.UserName, AuthenticationUtils.Ticket, (PasswordOption)2);
-            this.repoService = new RepositoryService();            
+            this.repoService = WebServiceFactory.getRepositoryService();
             this.repoService.RequestSoapContext.Security.Timestamp.TtlInSeconds = (long)300;
             this.repoService.RequestSoapContext.Security.Tokens.Add(userToken);
 
-            this.contentService = new ContentService();
+            this.contentService = WebServiceFactory.getContentService();
             this.contentService.RequestSoapContext.Security.Timestamp.TtlInSeconds = (long)300;
             this.contentService.RequestSoapContext.Security.Tokens.Add(userToken);
 

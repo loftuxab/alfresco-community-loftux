@@ -13,7 +13,7 @@ namespace Alfresco
         [ThreadStatic]
         private static string currentUserName;
 
-        private static AuthenticationService authenticationService = new AuthenticationService();
+        private static AuthenticationService authenticationService = WebServiceFactory.getAuthenticationService();
 
         public static string Ticket
         {
