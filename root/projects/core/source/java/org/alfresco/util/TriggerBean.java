@@ -18,7 +18,6 @@ package org.alfresco.util;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import org.springframework.scheduling.quartz.SimpleTriggerBean;
 
@@ -59,10 +58,8 @@ public class TriggerBean extends SimpleTriggerBean
     public void afterPropertiesSet() throws ParseException
     {
         // set the start time
-        Calendar calendar = new GregorianCalendar();
+        Calendar calendar = Calendar.getInstance();
         calendar.setLenient(true);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
         int nowMinute = calendar.get(Calendar.MINUTE);

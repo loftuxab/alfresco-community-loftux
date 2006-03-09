@@ -337,6 +337,7 @@ public class SpringAwareUserTransaction
         }
         
         // make sure that the status and info align - the result may or may not be null
+        @SuppressWarnings("unused")
         TransactionInfo txnInfo = getTransactionInfo();
         if (internalStatus != Status.STATUS_NO_TRANSACTION)
         {

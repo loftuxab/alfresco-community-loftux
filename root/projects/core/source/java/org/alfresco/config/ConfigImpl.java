@@ -21,9 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Default implementation of the Config interface, this should be used as the
  * base class for any customisations
@@ -32,8 +29,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ConfigImpl implements Config
 {
-   private static final Log logger = LogFactory.getLog(ConfigImpl.class);
-
    private Map<String, Object> configElements;
 
    /**
@@ -68,6 +63,7 @@ public class ConfigImpl implements Config
    /**
     * @see org.alfresco.config.Config#getConfigElementList(java.lang.String)
     */
+   @SuppressWarnings("unchecked")
    public List<ConfigElement> getConfigElementList(String name)
    {
       List<ConfigElement> list = null;
@@ -124,6 +120,7 @@ public class ConfigImpl implements Config
     * @param configElement
     *           The config element to add
     */
+   @SuppressWarnings("unchecked")
    public void addConfigElement(ConfigElement configElement)
    {
       Object obj = this.configElements.get(configElement.getName());

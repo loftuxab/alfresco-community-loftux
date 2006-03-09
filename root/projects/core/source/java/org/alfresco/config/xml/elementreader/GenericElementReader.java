@@ -57,6 +57,7 @@ public class GenericElementReader implements ConfigElementReader
     * @param element
     * @param parentConfig
     */
+   @SuppressWarnings("unchecked")
    private void processChildren(Element element, GenericConfigElement parentConfig)
    {
       // get the list of children for the given element
@@ -78,6 +79,7 @@ public class GenericElementReader implements ConfigElementReader
     * @param element
     * @return
     */
+   @SuppressWarnings("unchecked")
    private GenericConfigElement createConfigElement(Element element)
    {
       // get the name and value of the given element

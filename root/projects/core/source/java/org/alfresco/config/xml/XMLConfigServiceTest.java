@@ -29,18 +29,15 @@ import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.source.HTTPConfigSource;
 import org.alfresco.config.source.UrlConfigSource;
 import org.alfresco.util.BaseTest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Unit tests for the XML based configuration service
  * 
  * @author gavinc
  */
+@SuppressWarnings("unused")
 public class XMLConfigServiceTest extends BaseTest
 {
-    private static Log logger = LogFactory.getLog(XMLConfigServiceTest.class);
-    
     /**
      * @see junit.framework.TestCase#setUp()
      */
