@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testSuite name="ParsingPerformance" xmlns="http://www.sun.com/japex/testSuite">
+
+    <param name="japex.classPath" value="./lib/jdsl/*.jar"/>
+    
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/3rd-party/lib/*.jar"/>
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/3rd-party/lib/commons/*.jar"/>  
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/3rd-party/lib/jibx/*.jar"/>  
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/3rd-party/lib/jgroups/*.jar"/>   
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/3rd-party/lib/swarmcache/*.jar"/>   
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/3rd-party/lib/treecache/*.jar"/>    
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/3rd-party/lib/openoffice/*.jar"/>   
+    
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/core/build/classes"/> 
+    <param name="japex.classPath" value="C:/work/HEAD/root/projects/repository/build/classes"/> 
+    <param name="japex.classPath" value="./build/classes"/>    
+
+    <driver name="JAXPDriver">
+        <param name="japex.driverClass" value="org.alfresco.benchmark.driver.AlfrescoInternalCreateContentDriver"/>
+        <param name="description" value="Alfresco Internal API"/>
+   
+    	<param name="japex.numberOfThreads" value="10"/> 
+    	<param name="japex.threadRampupTime" value="60"/>
+    	<param name="japex.includeWarmupRun" value="false"/>
+    	
+    </driver>
+
+    <testCase name="firstRun" normal='true'>
+        <param name="japex.warmupIterations" value="0"/>            
+    	<param name="japex.runTime" value="02:00"/> 
+    	<param name="japex.runDelay" value="15"/>
+    	<param name="japex.runDelayVariation" value="10"/>
+    </testCase>
+    
+</testSuite>

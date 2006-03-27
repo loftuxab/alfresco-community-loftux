@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+ 
+<beans>
+
+    <!-- Data provider component bean -->
+    <bean id="dataProviderComponent" class="org.alfresco.benchmark.dataprovider.DataProviderComponentImpl" init-method='init'>    	
+       <property name="dataLocation">
+	      <value>C:\work\HEAD\root\projects\benchmark-tests\data</value>
+	   </property>	
+	   <property name="mimetypeMap">
+	   	  <ref bean="mimetypeService" />
+	   </property>
+    </bean>  
+    
+    <bean id="dataLoaderComponent" class="org.alfresco.benchmark.dataloader.AlfrescoDataLoaderComponentImpl" >    	       	
+	   <property name="nodeService">
+	   	  <ref bean="nodeService" />
+	   </property>
+	   <property name="searchService">
+	   	  <ref bean="searchService" />
+	   </property>
+	   <property name="contentService">
+	   	  <ref bean="contentService" />
+	   </property>
+	   <property name="authenticationComponent">
+	   	  <ref bean="authenticationComponent" />
+	   </property>
+	   <property name="dataProviderComponent">
+	   	  <ref bean="dataProviderComponent" />
+	   </property>
+	   <property name="transactionService">
+	   	  <ref bean="transactionComponent" />
+	   </property>
+    </bean> 
+      
+</beans>
