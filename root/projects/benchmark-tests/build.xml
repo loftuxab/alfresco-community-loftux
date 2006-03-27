@@ -1,4 +1,9 @@
 <project name="Japex Sample" default="run"  basedir=".">
+
+   <path id="path.common" path="${basedir}/../../common"/>
+   <property name="dir.common" refid="path.common"/>
+   <import file="${dir.common}/common.xml"/>
+
     <property environment="env"/>
     
     <property name="config" value="config/create-content-config.xml"/>
