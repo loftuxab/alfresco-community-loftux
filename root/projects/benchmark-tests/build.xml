@@ -12,6 +12,23 @@
         <fileset dir="./lib/japex" includes="*.jar"/>
     </path>
 
+    <target name="compile-java" depends="init" description="Compiles the Java source code">
+      <mkdir dir="${dir.classes}" />
+      <javac destdir="${dir.classes}" fork="true" deprecation="on" debug="on" target="1.5" source="1.5">
+          <src path="${dir.src.java}" />
+          <classpath refid="classpath.compile" />
+          <classpath refid="class.path"/>
+      </javac>
+
+      <copy todir="${dir.classes}">
+          <fileset dir="${dir.src.java}">
+              <patternset>
+                  <exclude name="**/*.java" />
+              </patternset>
+          </fileset>
+      </copy>
+    </target>
+
     <target name="run">
         <java dir="." fork="true" classname="com.sun.japex.Japex">
             <jvmarg value="-server"/>
