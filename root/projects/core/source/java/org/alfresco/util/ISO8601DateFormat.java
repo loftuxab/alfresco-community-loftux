@@ -132,7 +132,7 @@ public class ISO8601DateFormat
             int hour = Integer.parseInt(isoDate.substring(offset += 1, offset += 2));
             if (isoDate.charAt(offset) != ':')
             {
-                throw new IndexOutOfBoundsException("Expected T character but found " + isoDate.charAt(offset));
+                throw new IndexOutOfBoundsException("Expected : character but found " + isoDate.charAt(offset));
             }
             int minutes = Integer.parseInt(isoDate.substring(offset += 1, offset += 2));
             if (isoDate.charAt(offset) != ':')
