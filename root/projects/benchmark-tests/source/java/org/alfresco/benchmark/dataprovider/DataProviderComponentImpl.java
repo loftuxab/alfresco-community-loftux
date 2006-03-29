@@ -68,7 +68,10 @@ public class DataProviderComponentImpl implements DataProviderComponent
         {
             if (file.isDirectory() == true)
             {
-                cacheContentData(file.getPath());
+                if (file.getName().contains("svn") == false)
+                {
+                    cacheContentData(file.getPath());
+                }
             }
             else
             {

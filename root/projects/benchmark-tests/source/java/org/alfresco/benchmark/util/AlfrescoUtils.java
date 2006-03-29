@@ -22,20 +22,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.benchmark.dataloader.DataLoaderComponent;
+import org.alfresco.benchmark.dataloader.LoadedData;
 import org.alfresco.benchmark.dataprovider.ContentData;
 import org.alfresco.benchmark.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.dataprovider.PropertyProfile;
 import org.alfresco.benchmark.dataprovider.RepositoryProfile;
 import org.alfresco.benchmark.dataprovider.PropertyProfile.PropertyType;
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.GUID;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.sun.japex.TestCase;
 
 /**
  * @author Roy Wetherall
@@ -45,6 +51,12 @@ public class AlfrescoUtils
     private static ApplicationContext applicationContext;    
     
     private static List<PropertyProfile> contentPropertyProfiles;
+    
+    private static Map<String, String> testCaseOutputLocation = new HashMap<String, String>(5);
+    private static Map<String, NodeRef> testCaseFolder = new HashMap<String, NodeRef>(5);
+    private static Map<String, List<NodeRef>> testCaseFolders = new HashMap<String, List<NodeRef>>(5);
+    private static Map<String, List<NodeRef>> testCaseContent = new HashMap<String, List<NodeRef>>(5);
+    
 
     // Model constants
     public static QName DC_PUBLISHER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "publisher");
@@ -65,6 +77,80 @@ public class AlfrescoUtils
         }
         
         return applicationContext;
+    }
+    
+    public static synchronized String getOutputFileLocation(TestCase testCase)
+    {
+        String location = testCaseOutputLocation.get(testCase.getName());
+        if (location == null)
+        {
+            location = "./data/output/testCase_" + testCase.getName() + "_" + System.currentTimeMillis() + ".csv";
+            testCaseOutputLocation.put(testCase.getName(), location);
+        }
+        return location;
+    }
+    
+    public static synchronized NodeRef getTestCaseRootFolder(
+            DataLoaderComponent dataLoaderComponent,
+            NodeService nodeService, 
+            RepositoryProfile repositoryProfile, 
+            TestCase testCase)
+    {
+        NodeRef result = testCaseFolder.get(testCase.getName());
+        if (result == null)
+        {
+            LoadedData loadedData = dataLoaderComponent.loadData(repositoryProfile);
+            
+            List<NodeRef> folders = new ArrayList<NodeRef>(50);
+            List<NodeRef> content = new ArrayList<NodeRef>(200);
+            getFolderAndContentLists(nodeService, folders, content, loadedData.getRootFolder());
+            
+            testCaseFolder.put(testCase.getName(), loadedData.getRootFolder());
+            testCaseFolders.put(testCase.getName(), folders);
+            testCaseContent.put(testCase.getName(), content);
+            result = loadedData.getRootFolder();
+        }
+        return result;
+    }
+   
+    public static synchronized NodeRef getRandomFolder(TestCase testCase)
+    {
+        List<NodeRef> folders = testCaseFolders.get(testCase.getName());
+        if (folders == null)
+        {
+            throw new RuntimeException("The test case folders list has not been populated");
+        }
+        int randValue = RandUtils.rand.nextInt(folders.size());
+        return folders.get(randValue);
+    }
+    
+    public static synchronized NodeRef getRandomContent(TestCase testCase)
+    {
+        List<NodeRef> content = testCaseContent.get(testCase.getName());
+        if (content == null)
+        {
+            throw new RuntimeException("The test case content list has not been populated");
+        }
+        int randValue = RandUtils.rand.nextInt(content.size());
+        return content.get(randValue);
+    }
+    
+    private static void getFolderAndContentLists(NodeService nodeService, List<NodeRef> folders, List<NodeRef> content, NodeRef folder)
+    {
+        folders.add(folder);
+        
+        for (ChildAssociationRef childAssoc : nodeService.getChildAssocs(folder))
+        {
+            NodeRef childNodeRef = childAssoc.getChildRef();
+            if (nodeService.getType(childNodeRef).toString().contains("folder") == true)
+            {
+                getFolderAndContentLists(nodeService, folders, content, childNodeRef);
+            }
+            else if (nodeService.getType(childNodeRef).toString().contains("content") == true)
+            {
+                content.add(childNodeRef);
+            }
+        }         
     }
     
     public static synchronized List<PropertyProfile> getContentPropertyProfiles()
@@ -135,18 +221,27 @@ public class AlfrescoUtils
     }
     
     public static NodeRef createFolderNode(DataProviderComponent dataProviderComponent, NodeService nodeService, RepositoryProfile repositoryProfile, NodeRef folderNodeRef)
-    {   
+    {
+        return createFolderNode(dataProviderComponent, nodeService, repositoryProfile, folderNodeRef, null);
+    }
+        
+    public static NodeRef createFolderNode(DataProviderComponent dataProviderComponent, NodeService nodeService, RepositoryProfile repositoryProfile, NodeRef folderNodeRef, String nameValue)
+    {
         // Get folder property data
         List<PropertyProfile> folderPropertyProfiles = new ArrayList<PropertyProfile>();
-        PropertyProfile name = new PropertyProfile();
-        name.setPropertyName(ContentModel.PROP_NAME.toString());
-        name.setPropertyType(PropertyType.TEXT);
-        folderPropertyProfiles.add(name);
-        Map<String, Object> propertyValues = dataProviderComponent.getPropertyData(
-                repositoryProfile, 
-                folderPropertyProfiles);
         
-        String nameValue = (String)propertyValues.get(ContentModel.PROP_NAME.toString());
+        if (nameValue == null)
+        {
+            PropertyProfile name = new PropertyProfile();
+            name.setPropertyName(ContentModel.PROP_NAME.toString());
+            name.setPropertyType(PropertyType.TEXT);
+            folderPropertyProfiles.add(name);
+            Map<String, Object> propertyValues = dataProviderComponent.getPropertyData(
+                    repositoryProfile, 
+                    folderPropertyProfiles);
+            
+            nameValue = (String)propertyValues.get(ContentModel.PROP_NAME.toString());
+        }
         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
         folderProps.put(ContentModel.PROP_NAME, nameValue);
         return nodeService.createNode(

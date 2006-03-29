@@ -16,8 +16,10 @@
  */
 package org.alfresco.benchmark.driver;
 
+import java.io.File;
 import java.util.Map;
 
+import org.alfresco.benchmark.dataloader.DataLoaderComponent;
 import org.alfresco.benchmark.dataprovider.ContentData;
 import org.alfresco.benchmark.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.dataprovider.RepositoryProfile;
@@ -25,21 +27,19 @@ import org.alfresco.benchmark.util.AlfrescoUtils;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.TransactionUtil;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.transaction.TransactionService;
 
-import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
 
 /**
  * @author Roy Wetherall
  */
-public class AlfrescoInternalCreateContentDriver extends JapexDriverBase
+public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
 {    
     private NodeService nodeService;
     private ContentService contentService;
@@ -48,6 +48,7 @@ public class AlfrescoInternalCreateContentDriver extends JapexDriverBase
     private SearchService searchService;
     
     private DataProviderComponent dataProviderComponent;
+    private DataLoaderComponent dataLoaderComponent;
     
     private NodeRef folderNodeRef;
     
@@ -62,25 +63,25 @@ public class AlfrescoInternalCreateContentDriver extends JapexDriverBase
         this.searchService = (SearchService)AlfrescoUtils.getApplicationContext().getBean("SearchService");
         
         this.dataProviderComponent = (DataProviderComponent)AlfrescoUtils.getApplicationContext().getBean("dataProviderComponent");
+        this.dataLoaderComponent = (DataLoaderComponent)AlfrescoUtils.getApplicationContext().getBean("dataLoaderComponent");
     }
     
     @Override
     public void prepare(TestCase tc)
     {
         try
-        {                                
+        {    
+            super.prepare(tc);
+            
             // Set the authentication
             this.authenticationComponent.setSystemUserAsCurrentUser();
             
-            // Get the company home node
-            ResultSet rs = this.searchService.query(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"), SearchService.LANGUAGE_XPATH, "/app:company_home");
-            final NodeRef companyHomeNodeRef = rs.getNodeRef(0);
-            
-            // Create a folder for the contents for this test to reside in
-            this.folderNodeRef = AlfrescoUtils.createFolderNode(this.dataProviderComponent, this.nodeService, new RepositoryProfile(), companyHomeNodeRef);
-            
-            // Set the location for the data files
-            tc.setParam("alfresco.outputFile", ".\\data\\output\\" + System.currentTimeMillis() + "_data.csv");
+            // Get the test case folder node ref
+            AlfrescoUtils.getTestCaseRootFolder(
+                    this.dataLoaderComponent, 
+                    this.nodeService, 
+                    new RepositoryProfile(), 
+                    tc);
         }
         catch (Throwable exception)
         {
@@ -88,14 +89,24 @@ public class AlfrescoInternalCreateContentDriver extends JapexDriverBase
         }
     }
     
-    @Override
-    public void warmup(TestCase tc)
-    {
-        // Do nothing!!
-    }
+    private Map<String, Object> contentPropertyValues; 
+    private NodeRef contentNodeRef;
     
     @Override
-    public void run(final TestCase tc)
+    public void preRun(TestCase testCase)
+    {
+        // Get content property values
+        this.contentPropertyValues = AlfrescoInternalAPIDriver.this.dataProviderComponent.getPropertyData(
+                new RepositoryProfile(), 
+                AlfrescoUtils.getContentPropertyProfiles());
+        
+        // Get the folder and content node references
+        this.folderNodeRef = AlfrescoUtils.getRandomFolder(testCase);
+        this.contentNodeRef = AlfrescoUtils.getRandomContent(testCase);
+    }
+
+    @Override
+    protected void doCreateContentBenchmark(final TestCase tc)
     {
         try
         {
@@ -106,20 +117,16 @@ public class AlfrescoInternalCreateContentDriver extends JapexDriverBase
                     // TODO we get the test data whilst creating the node .. how do we do this without affecting the tests??
                     
                     // Set the authentication
-                    AlfrescoInternalCreateContentDriver.this.authenticationComponent.setSystemUserAsCurrentUser();
-                    
-                    Map<String, Object> propertyValues = AlfrescoInternalCreateContentDriver.this.dataProviderComponent.getPropertyData(
-                            new RepositoryProfile(), 
-                            AlfrescoUtils.getContentPropertyProfiles());
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.setSystemUserAsCurrentUser();
                     
                     AlfrescoUtils.createContentNode(
-                            AlfrescoInternalCreateContentDriver.this.nodeService, 
-                            AlfrescoInternalCreateContentDriver.this.contentService, 
-                            propertyValues, 
-                            AlfrescoInternalCreateContentDriver.this.folderNodeRef);
+                            AlfrescoInternalAPIDriver.this.nodeService, 
+                            AlfrescoInternalAPIDriver.this.contentService, 
+                            AlfrescoInternalAPIDriver.this.contentPropertyValues, 
+                            AlfrescoInternalAPIDriver.this.folderNodeRef);
                     
                     // Store the content size for later use
-                    ContentData contentData = (ContentData)propertyValues.get(ContentModel.PROP_CONTENT.toString());
+                    ContentData contentData = (ContentData)AlfrescoInternalAPIDriver.this.contentPropertyValues.get(ContentModel.PROP_CONTENT.toString());
                     tc.setParam("alfresco.contentSize", Integer.toString(contentData.getSize()));
                     
                     // Do nothing on return 
@@ -131,6 +138,41 @@ public class AlfrescoInternalCreateContentDriver extends JapexDriverBase
         catch (Throwable exception)
         {
             exception.printStackTrace();
-        }        
+        }       
+    }
+
+    @Override
+    protected void doReadContentBenchmark(final TestCase tc)
+    {
+        try
+        {
+            TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
+            {
+                public Object doWork() throws Exception
+                {
+                    // TODO need to login as a non-system user ...
+                    // Set the authentication
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.setSystemUserAsCurrentUser();
+                    
+                    // Read the content
+                    ContentReader contentReader = AlfrescoInternalAPIDriver.this.contentService.getReader(
+                            AlfrescoInternalAPIDriver.this.contentNodeRef, 
+                            ContentModel.PROP_CONTENT);
+                    contentReader.getContent(File.createTempFile("benchmark", "temp"));
+                    
+                    // Store the content size for later use
+                    tc.setParam("alfresco.contentSize", Long.toString(contentReader.getSize()));
+                    
+                    // Do nothing on return 
+                    return null;
+                }
+        
+            });            
+        }
+        catch (Throwable exception)
+        {
+            exception.printStackTrace();
+        } 
+        
     }
 }

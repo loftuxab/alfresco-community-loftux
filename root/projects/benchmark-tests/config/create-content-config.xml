@@ -13,10 +13,11 @@
     
     <param name="japex.classPath" value="C:/work/HEAD/root/projects/core/build/classes"/> 
     <param name="japex.classPath" value="C:/work/HEAD/root/projects/repository/build/classes"/> 
-    <param name="japex.classPath" value="./build/classes"/>    
+    <param name="japex.classPath" value="./build/classes"/>  
+    <param name="japex.classPath" value="./config"/>   
 
     <driver name="JAXPDriver">
-        <param name="japex.driverClass" value="org.alfresco.benchmark.driver.AlfrescoInternalCreateContentDriver"/>
+        <param name="japex.driverClass" value="org.alfresco.benchmark.driver.AlfrescoInternalAPIDriver"/>
         <param name="description" value="Alfresco Internal API"/>
    
     	<param name="japex.numberOfThreads" value="10"/> 
