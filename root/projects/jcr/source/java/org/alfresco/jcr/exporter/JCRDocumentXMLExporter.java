@@ -292,7 +292,7 @@ public class JCRDocumentXMLExporter implements Exporter
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
-    public void value(NodeRef nodeRef, QName property, Object value)
+    public void value(NodeRef nodeRef, QName property, Object value, int index)
     {
         currentProperties.add(property);
         currentValues.add(value);
@@ -301,7 +301,7 @@ public class JCRDocumentXMLExporter implements Exporter
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
      */
-    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData)
+    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData, int index)
     {
         try
         {

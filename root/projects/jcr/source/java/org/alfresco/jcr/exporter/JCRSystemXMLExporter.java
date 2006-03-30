@@ -18,8 +18,6 @@ package org.alfresco.jcr.exporter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
@@ -171,23 +169,22 @@ public class JCRSystemXMLExporter implements Exporter
             // primary type
             PropertyImpl primaryType = new JCRPrimaryTypeProperty(nodeImpl);
             startProperty(nodeRef, JCRPrimaryTypeProperty.PROPERTY_NAME);
-            value(nodeRef, JCRPrimaryTypeProperty.PROPERTY_NAME, primaryType.getValue().getString());
+            value(nodeRef, JCRPrimaryTypeProperty.PROPERTY_NAME, primaryType.getValue().getString(), -1);
             endProperty(nodeRef, JCRPrimaryTypeProperty.PROPERTY_NAME);
             
             // mixin type
             PropertyImpl mixinTypes = new JCRMixinTypesProperty(nodeImpl);
             startProperty(nodeRef, JCRMixinTypesProperty.PROPERTY_NAME);
-            Collection<String> mixins = new ArrayList<String>();
-            for (Value value : mixinTypes.getValues())
+            Value[] mixinValues = mixinTypes.getValues();
+            for (int i = 0; i < mixinValues.length; i++)
             {
-                mixins.add(value.getString());
+                value(nodeRef, JCRMixinTypesProperty.PROPERTY_NAME, mixinValues[i], i);
             }
-            value(nodeRef, JCRMixinTypesProperty.PROPERTY_NAME, mixins);
             endProperty(nodeRef, JCRMixinTypesProperty.PROPERTY_NAME);
             
             // uuid (for mix:referencable)
             startProperty(nodeRef, JCRUUIDProperty.PROPERTY_NAME);
-            value(nodeRef, JCRUUIDProperty.PROPERTY_NAME, nodeRef.getId());
+            value(nodeRef, JCRUUIDProperty.PROPERTY_NAME, nodeRef.getId(), -1);
             endProperty(nodeRef, JCRUUIDProperty.PROPERTY_NAME);
         }
         catch (SAXException e)
@@ -336,7 +333,7 @@ public class JCRSystemXMLExporter implements Exporter
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#value(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.Serializable)
      */
-    public void value(NodeRef nodeRef, QName property, Object value)
+    public void value(NodeRef nodeRef, QName property, Object value, int index)
     {
         try
         {
@@ -359,7 +356,7 @@ public class JCRSystemXMLExporter implements Exporter
     /* (non-Javadoc)
      * @see org.alfresco.service.cmr.view.Exporter#content(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, java.io.InputStream)
      */
-    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData)
+    public void content(NodeRef nodeRef, QName property, InputStream content, ContentData contentData, int index)
     {
         try
         {

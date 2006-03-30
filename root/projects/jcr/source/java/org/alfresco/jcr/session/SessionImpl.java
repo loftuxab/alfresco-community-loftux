@@ -843,6 +843,15 @@ public class SessionImpl implements Session
         {
             return false;
         }
+
+        /*
+         *  (non-Javadoc)
+         * @see org.alfresco.service.cmr.view.ImporterBinding#getExcludedClasses()
+         */
+        public QName[] getExcludedClasses()
+        {
+            return null;
+        }
     }
 
     //
