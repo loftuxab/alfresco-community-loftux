@@ -26,7 +26,23 @@
     	
     </driver>
 
-    <testCase name="firstRun" normal='true'>
+    <testCase name="Alfresco Internal API">
+    
+        <!-- Usage Profile -->
+        <param name="alfresco.usageProfile.readContent" value="35"/>
+        <param name="alfresco.usageProfile.readProperties" value="30"/>
+		<param name="alfresco.usageProfile.createContent" value="15"/>		
+        <param name="alfresco.usageProfile.createVersion" value="15"/>
+        <param name="alfresco.usageProfile.createFolder" value="5"/>
+        
+        <!-- Repository Profile -->
+        <param name="alfrsco.repositoryProfile.folderDepth.average" value="3"/>
+        <param name="alfrsco.repositoryProfile.folderDepth.variation" value="1"/>
+        <param name="alfrsco.repositoryProfile.documentsInFolderCount.average" value="5"/>
+        <param name="alfrsco.repositoryProfile.documentsInFolderCount.variation" value="1"/>
+        <param name="alfrsco.repositoryProfile.subFoldersCount.average" value="3"/>
+        <param name="alfrsco.repositoryProfile.subFoldersCount.variation" value="1"/>                                       
+    
         <param name="japex.warmupIterations" value="0"/>            
     	<param name="japex.runTime" value="02:00"/> 
     	<param name="japex.runDelay" value="15"/>

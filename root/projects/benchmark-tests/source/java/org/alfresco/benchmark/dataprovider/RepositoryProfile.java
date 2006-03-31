@@ -16,25 +16,68 @@
  */
 package org.alfresco.benchmark.dataprovider;
 
+import com.sun.japex.TestCase;
+
 public class RepositoryProfile
 {
-    private int averageFolderDepth = 3;
+    private static final String PARAM_PREFIX = "alfrsco.repositoryProfile.";
+    private static final String PARAM_FOLDER_DEPTH_AVERAGE = PARAM_PREFIX + "folderDepth.average";
+    private static final String PARAM_FOLDER_DEPTH_VARIATION = PARAM_PREFIX + "folderDepth.variation";
+    private static final String PARAM_DOCUMENTS_IN_FOLDER_COUNT_AVERAGE = PARAM_PREFIX + "documentsInFolderCount.average";
+    private static final String PARAM_DOCUMENTS_IN_FOLDER_COUNT_VARIATION = PARAM_PREFIX + "documentsInFolderCount.variation";
+    private static final String PARAM_SUB_FOLDERS_COUNT_AVERAGE = PARAM_PREFIX + "subFoldersCount.average";
+    private static final String PARAM_SUB_FOLDERS_COUNT_VARIATION = PARAM_PREFIX + "subFoldersCount.variation";
+    
+    private int folderDepthAverage = 3;
     private int folderDepthVariation = 1;
     
-    private int averageNumberOfDocumentsInFolder = 5;
-    private int numberOfDocumentsInFolderVariation = 1;
+    private int documentsInFolderCountAverage = 5;
+    private int documentsInFolderCountVariation = 1;
     
-    private int averageNumberOfSubFolders = 3;
-    private int numberOfSubFoldersVariation = 1;
+    private int subFoldersCountAverage = 3;
+    private int subFoldersCountVariation = 1;
     
-    public int getAverageFolderDepth()
+    public static RepositoryProfile createRespoitoryProfile(TestCase testCase)
     {
-        return averageFolderDepth;
+        RepositoryProfile repositoryProfile = new RepositoryProfile();
+        
+        // Check the test case for profile parameters
+        if (testCase.hasParam(PARAM_FOLDER_DEPTH_AVERAGE) == true)
+        {
+            repositoryProfile.setFolderDepthAverage(testCase.getIntParam(PARAM_FOLDER_DEPTH_AVERAGE));
+        }
+        if (testCase.hasParam(PARAM_FOLDER_DEPTH_VARIATION) == true)
+        {
+            repositoryProfile.setFolderDepthVariation(testCase.getIntParam(PARAM_FOLDER_DEPTH_VARIATION));
+        }
+        if (testCase.hasParam(PARAM_DOCUMENTS_IN_FOLDER_COUNT_AVERAGE) == true)
+        {
+            repositoryProfile.setDocumentsInFolderCountAverage(testCase.getIntParam(PARAM_DOCUMENTS_IN_FOLDER_COUNT_AVERAGE));
+        }
+        if (testCase.hasParam(PARAM_DOCUMENTS_IN_FOLDER_COUNT_VARIATION) == true)
+        {
+            repositoryProfile.setDocumentsInFolderCountVariation(testCase.getIntParam(PARAM_DOCUMENTS_IN_FOLDER_COUNT_VARIATION));
+        }
+        if (testCase.hasParam(PARAM_SUB_FOLDERS_COUNT_AVERAGE) == true)
+        {
+            repositoryProfile.setSubFoldersCountAverage(testCase.getIntParam(PARAM_SUB_FOLDERS_COUNT_AVERAGE));
+        }
+        if (testCase.hasParam(PARAM_SUB_FOLDERS_COUNT_VARIATION) == true)
+        {
+            repositoryProfile.setSubFoldersCountVariation(testCase.getIntParam(PARAM_SUB_FOLDERS_COUNT_VARIATION));
+        }
+        
+        return repositoryProfile;
     }
     
-    public void setAverageFolderDepth(int averageFolderDepth)
+    public int getFolderDepthAverage()
     {
-        this.averageFolderDepth = averageFolderDepth;
+        return folderDepthAverage;
+    }
+    
+    public void setFolderDepthAverage(int averageFolderDepth)
+    {
+        this.folderDepthAverage = averageFolderDepth;
     }
     
     public int getFolderDepthVariation()
@@ -47,43 +90,43 @@ public class RepositoryProfile
         this.folderDepthVariation = folderDepthVariation;
     }
     
-    public int getAverageNumberOfDocumentsInFolder()
+    public int getDocumentsInFolderCountAverage()
     {
-        return averageNumberOfDocumentsInFolder;
+        return documentsInFolderCountAverage;
     }
     
-    public void setAverageNumberOfDocumentsInFolder(int averageFolderSize)
+    public void setDocumentsInFolderCountAverage(int averageFolderSize)
     {
-        this.averageNumberOfDocumentsInFolder = averageFolderSize;
+        this.documentsInFolderCountAverage = averageFolderSize;
     }
     
-    public int getNumberOfDocumentsInFolderVariation()
+    public int getDocumentsInFolderCountVariation()
     {
-        return numberOfDocumentsInFolderVariation;
+        return documentsInFolderCountVariation;
     }
     
-    public void setNumberOfDocumentsInFolderVariation(int folderSizeVariation)
+    public void setDocumentsInFolderCountVariation(int folderSizeVariation)
     {
-        this.numberOfDocumentsInFolderVariation = folderSizeVariation;
+        this.documentsInFolderCountVariation = folderSizeVariation;
     }
     
-    public int getAverageNumberOfSubFolders()
+    public int getSubFoldersCountAverage()
     {
-        return averageNumberOfSubFolders;
+        return subFoldersCountAverage;
     }
     
-    public void setAverageNumberOfSubFolders(int averageNumberOfSubFolders)
+    public void setSubFoldersCountAverage(int averageNumberOfSubFolders)
     {
-        this.averageNumberOfSubFolders = averageNumberOfSubFolders;
+        this.subFoldersCountAverage = averageNumberOfSubFolders;
     }
     
-    public int getNumberOfSubFoldersVariation()
+    public int getSubFoldersCountVariation()
     {
-        return numberOfSubFoldersVariation;
+        return subFoldersCountVariation;
     }
     
-    public void setNumberOfSubFoldersVariation(int numberOfSubFoldersVariation)
+    public void setSubFoldersCountVariation(int numberOfSubFoldersVariation)
     {
-        this.numberOfSubFoldersVariation = numberOfSubFoldersVariation;
+        this.subFoldersCountVariation = numberOfSubFoldersVariation;
     }
 }

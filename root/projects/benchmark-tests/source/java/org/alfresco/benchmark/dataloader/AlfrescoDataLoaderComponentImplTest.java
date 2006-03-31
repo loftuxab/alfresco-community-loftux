@@ -32,15 +32,15 @@ public class AlfrescoDataLoaderComponentImplTest extends TestCase
         RepositoryProfile repositoryProfile = new RepositoryProfile();
         
         // Number of documents in folder
-        repositoryProfile.setAverageNumberOfDocumentsInFolder(15);
-        repositoryProfile.setNumberOfDocumentsInFolderVariation(5);
+        repositoryProfile.setDocumentsInFolderCountAverage(15);
+        repositoryProfile.setDocumentsInFolderCountVariation(5);
         
         // Number of sub-folders
-        repositoryProfile.setAverageNumberOfSubFolders(8);
-        repositoryProfile.setNumberOfDocumentsInFolderVariation(2);
+        repositoryProfile.setSubFoldersCountAverage(8);
+        repositoryProfile.setDocumentsInFolderCountVariation(2);
         
         // Folder depth
-        repositoryProfile.setAverageFolderDepth(5);
+        repositoryProfile.setFolderDepthAverage(5);
         repositoryProfile.setFolderDepthVariation(2);
         
         DataLoaderComponent dataLoaderComponent = (DataLoaderComponent)AlfrescoUtils.getApplicationContext().getBean("dataLoaderComponent");        

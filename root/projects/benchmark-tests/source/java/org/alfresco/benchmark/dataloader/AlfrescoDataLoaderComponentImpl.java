@@ -35,59 +35,142 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.GUID;
 
 /**
  * @author Roy Wetherall
  */
 public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
 {
+    /** The spaces store reference */
     private StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
+    /** The node service */
     private NodeService nodeService;
     
+    /** The search service */
     private SearchService searchService;
     
+    /** The authentication service */
     private AuthenticationComponent authenticationComponent;
     
+    /** The data provider componenent */
     private DataProviderComponent dataProviderComponent;
     
+    /** The content service */
     private ContentService contentService;
     
+    /** The transaction service */
     private TransactionService transactionService;
     
+    /** The authentication service */
+    private AuthenticationService authenticationService;
+    
+    /** The person service */
+    private PersonService personService;
+    
+    private AuthorityService authorityService;
+    
+    /**
+     * Set the node service 
+     * 
+     * @param nodeService   the node service
+     */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
     
+    /**
+     * Set the search service
+     * 
+     * @param searchService     the serarch service
+     */
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
     }
     
+    /**
+     * Set the authentication service
+     * 
+     * @param authenticationComponent   the suthentication component
+     */
     public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
         this.authenticationComponent = authenticationComponent;
     }
     
+    /**
+     * Set the data provider component
+     * 
+     * @param dataProviderComponent     the data provider component
+     */
     public void setDataProviderComponent(DataProviderComponent dataProviderComponent)
     {
         this.dataProviderComponent = dataProviderComponent;
     }
     
+    /**
+     * Set the content service
+     * 
+     * @param contentService    the content service
+     */
     public void setContentService(ContentService contentService)
     {
         this.contentService = contentService;
     }
     
+    /**
+     * Set the transaction service
+     * 
+     * @param transactionService    the transaction service
+     */
     public void setTransactionService(TransactionService transactionService)
     {
         this.transactionService = transactionService;
     }
     
+    /**
+     * Set the authentication service
+     * 
+     * @param authenticationService     the authentication service
+     */
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService;
+    }
+    
+    /**
+     * Set the person service
+     * 
+     * @param personService     the person service
+     */
+    public void setPersonService(PersonService personService)
+    {
+        this.personService = personService;
+    }
+    
+    /**
+     * Set the authority service
+     * 
+     * @param authorityService      the authority service
+     */
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
+    
+    /**
+     * @see org.alfresco.benchmark.dataloader.DataLoaderComponent#loadData(org.alfresco.benchmark.dataprovider.RepositoryProfile)
+     */
     public LoadedData loadData(RepositoryProfile repositoryProfile)
     {   
         // Set the authentication
@@ -123,7 +206,15 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
         return loadedData;
     }
     
-    public void populateFolders(final LoadedData loadedData, final RepositoryProfile repositoryProfile, final List<NodeRef> folderNodeRefs, int depth)
+    /**
+     * Populates the folders with the content and sub folders.
+     * 
+     * @param loadedData        details of the loaded data 
+     * @param repositoryProfile the repository profile
+     * @param folderNodeRefs    the folder nore references
+     * @param depth             the current depth
+     */
+    private void populateFolders(final LoadedData loadedData, final RepositoryProfile repositoryProfile, final List<NodeRef> folderNodeRefs, int depth)
     {
         System.out.println("depth=" + depth + "; list_size=" + folderNodeRefs.size());
         
@@ -139,13 +230,13 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
                 {
                     // Now start adding data to the test data folder
                     int numberOfContentNodes = RandUtils.nextGaussianInteger(
-                                                                repositoryProfile.getAverageNumberOfDocumentsInFolder(), 
-                                                                repositoryProfile.getNumberOfDocumentsInFolderVariation());
+                                                                repositoryProfile.getDocumentsInFolderCountAverage(), 
+                                                                repositoryProfile.getDocumentsInFolderCountVariation());
                     int numberOfSubFolderNodes = RandUtils.nextGaussianInteger(
-                                                                repositoryProfile.getAverageNumberOfSubFolders(),
-                                                                repositoryProfile.getNumberOfSubFoldersVariation());
+                                                                repositoryProfile.getSubFoldersCountAverage(),
+                                                                repositoryProfile.getSubFoldersCountVariation());
                     int folderDepth = RandUtils.nextGaussianInteger(
-                                                                repositoryProfile.getAverageFolderDepth(),
+                                                                repositoryProfile.getFolderDepthAverage(),
                                                                 repositoryProfile.getFolderDepthVariation());
                     
                     // Create content
@@ -185,5 +276,55 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
             // Populate the sub folders
             populateFolders(loadedData, repositoryProfile, subFolders, newDepth);
         }
+    }
+
+    /**
+     * @see org.alfresco.benchmark.dataloader.DataLoaderComponent#createUsers(int)
+     */
+    public List<String> createUsers(final int count)
+    {
+        return TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<List<String>> ()
+        {
+            public List<String> doWork() throws Exception
+            {
+                List<String> users = new ArrayList<String>(count);
+                
+                for (int i = 0; i < count; i++)
+                {
+                    // Create the users home folder
+                    NodeRef companyHome = AlfrescoUtils.getCompanyHomeNodeRef(
+                                                        AlfrescoDataLoaderComponentImpl.this.searchService,
+                                                        AlfrescoDataLoaderComponentImpl.this.storeRef);
+                    NodeRef homeFolder = AlfrescoUtils.createFolderNode(
+                                                        AlfrescoDataLoaderComponentImpl.this.dataProviderComponent,
+                                                        AlfrescoDataLoaderComponentImpl.this.nodeService,
+                                                        new RepositoryProfile(),
+                                                        companyHome,
+                                                        "userHome_" + GUID.generate());
+                    
+                    // Create the authentication
+                    String userName = "bm_" + Long.toString(System.currentTimeMillis());
+                    String password = "password";
+                    AlfrescoDataLoaderComponentImpl.this.authenticationService.createAuthentication(userName, password.toCharArray());
+                    
+                    // Create the person
+                    Map<QName, Serializable> personProperties = new HashMap<QName, Serializable>();
+                    personProperties.put(ContentModel.PROP_USERNAME, userName);
+                    personProperties.put(ContentModel.PROP_HOMEFOLDER, homeFolder);
+                    personProperties.put(ContentModel.PROP_FIRSTNAME, "benchmark");
+                    personProperties.put(ContentModel.PROP_LASTNAME, "user");
+                    personService.createPerson(personProperties);
+                    
+                    // TODO figure out why this doesn't work for now ...
+                    // Set the permissions
+                    //AlfrescoDataLoaderComponentImpl.this.authorityService.addAuthority(PermissionService.ADMINISTRATOR_AUTHORITY, userName);
+                    
+                    // Add the new user to the list
+                    users.add(userName);
+                }
+                
+                return users;
+            }
+        });        
     }
 }

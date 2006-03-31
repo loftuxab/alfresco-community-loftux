@@ -16,6 +16,8 @@
  */
 package org.alfresco.benchmark.dataloader;
 
+import java.util.List;
+
 import org.alfresco.benchmark.dataprovider.RepositoryProfile;
 
 /**
@@ -23,5 +25,20 @@ import org.alfresco.benchmark.dataprovider.RepositoryProfile;
  */
 public interface DataLoaderComponent
 {
+    /**
+     * Load data into the repository.  A new folder is created into which the
+     * new data is looaded.  The respoitory profile is used to determine
+     * the structure and size of the data loaded.
+     * 
+     * @param repositoryProfile     the repository profile
+     * @return                      detais of the loaded data
+     */
     public LoadedData loadData(RepositoryProfile repositoryProfile);
+    
+    /**
+     * Create a number of test users
+     * 
+     * @param count     the number of users to create
+     */
+    public List<String> createUsers(int count);
 }

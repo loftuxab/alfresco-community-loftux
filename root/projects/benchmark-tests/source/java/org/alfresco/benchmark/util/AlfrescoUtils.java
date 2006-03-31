@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.benchmark.dataloader.DataLoaderComponent;
 import org.alfresco.benchmark.dataloader.LoadedData;
@@ -35,9 +36,12 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.GUID;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -57,7 +61,8 @@ public class AlfrescoUtils
     private static Map<String, List<NodeRef>> testCaseFolders = new HashMap<String, List<NodeRef>>(5);
     private static Map<String, List<NodeRef>> testCaseContent = new HashMap<String, List<NodeRef>>(5);
     
-
+    private static List<String> availableUsers;
+    
     // Model constants
     public static QName DC_PUBLISHER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "publisher");
     public static QName DC_CONTRIBUTER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "contributer");
@@ -151,6 +156,13 @@ public class AlfrescoUtils
                 content.add(childNodeRef);
             }
         }         
+    }
+    
+    public static NodeRef getCompanyHomeNodeRef(SearchService searchService, StoreRef storeRef)
+    {
+        // Get the company home node
+        ResultSet rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home");
+        return rs.getNodeRef(0);
     }
     
     public static synchronized List<PropertyProfile> getContentPropertyProfiles()
@@ -298,6 +310,77 @@ public class AlfrescoUtils
         contentWriter.putContent(contentData.getFile());
         
         return newNodeRef;
+    }
+    
+    private static Object mutex = new Object();
+    public static int NUMBER_OF_BM_USERS = 50;
+    
+    public static List<String> prepairUsers(DataLoaderComponent dataLoaderComponent, PersonService personService, NodeService nodeService)
+    {
+        synchronized (mutex)
+        {
+            if (availableUsers == null)
+            {
+                // Create the list and populate from the repository (exclude 'admin')
+                availableUsers = new ArrayList<String>();
+                Set<NodeRef> people = personService.getAllPeople();
+                for (NodeRef person : people)
+                {
+                    String currentUserName = (String)nodeService.getProperty(person, ContentModel.PROP_USERNAME);
+                    if (currentUserName.startsWith("bm") == true)
+                    {
+                        availableUsers.add(currentUserName);
+                    }
+                }                
+            }
+            
+            int numberOfAvilableUsers = availableUsers.size();
+            if (numberOfAvilableUsers < NUMBER_OF_BM_USERS)
+            {
+                // Create some new users and add them to the available list
+                List<String> newUsers = dataLoaderComponent.createUsers(NUMBER_OF_BM_USERS - numberOfAvilableUsers);
+                availableUsers.addAll(newUsers);
+            }
+            
+            return availableUsers;
+        }
+    }
+    
+    public static String getUserName()
+    {
+        synchronized (mutex)
+        {
+            String userName = null;
+            
+            try
+            {
+                if (availableUsers == null || availableUsers.size() == 0)                    
+                {
+                    throw new RuntimeException("Run out of users, increase number of test users available");
+                }
+                
+                int randIndex = RandUtils.rand.nextInt(availableUsers.size());
+                userName = availableUsers.get(randIndex);
+                availableUsers.remove(randIndex);                            
+            }
+            catch (Throwable exception)
+            {
+                exception.printStackTrace();
+            }
+            
+            return userName;
+        }
+    }
+    
+    public static void releaseUserName(String userName)
+    {
+        synchronized (mutex)
+        {
+            if (availableUsers != null)
+            {
+                availableUsers.add(userName);
+            }
+        }
     }
 
     

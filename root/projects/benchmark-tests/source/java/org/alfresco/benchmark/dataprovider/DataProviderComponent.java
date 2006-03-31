@@ -26,6 +26,5 @@ import java.util.Map;
  */
 public interface DataProviderComponent
 {    
-    Map<String, Object> getPropertyData(RepositoryProfile repositoryProfile, List<PropertyProfile> propertyProfiles);
-    
+    Map<String, Object> getPropertyData(RepositoryProfile repositoryProfile, List<PropertyProfile> propertyProfiles);    
 }
