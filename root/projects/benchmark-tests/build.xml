@@ -7,7 +7,7 @@
     <property environment="env"/>
     
     <property name="config" value="config/create-content-config.xml"/>
-    
+
     <path id="class.path">
         <fileset dir="./lib/japex" includes="*.jar"/>
     </path>
@@ -31,7 +31,7 @@
 
     <target name="run">
         <java dir="." fork="true" classname="com.sun.japex.Japex">
-            <jvmarg value="-server"/>
+            <jvmarg value="-server -Xms512m -Xmx2048m -Xss64k"/>
             <classpath refid="class.path"/>
             <arg line="${config}"/>
         </java>
