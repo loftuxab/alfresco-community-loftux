@@ -31,7 +31,10 @@
 
     <target name="run">
         <java dir="." fork="true" classname="com.sun.japex.Japex">
-            <jvmarg value="-server -Xms512m -Xmx2048m -Xss64k"/>
+            <jvmarg value="-server"/>
+            <jvmarg value="-Xms512m"/>
+            <jvmarg value="-Xmx2048m"/>
+            <jvmarg value="-Xss64k"/>
             <classpath refid="class.path"/>
             <arg line="${config}"/>
         </java>
