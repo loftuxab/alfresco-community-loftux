@@ -23,6 +23,7 @@ import org.alfresco.benchmark.dataprovider.RepositoryProfile;
 import org.alfresco.benchmark.util.AlfrescoUtils;
 import org.alfresco.benchmark.util.RandUtils;
 
+import com.alfresco.benchmark.report.AlfrescoReport;
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
 
@@ -35,6 +36,9 @@ public abstract class BaseAlfrescoBenchmarkDriver extends JapexDriverBase
     public static final String PARAM_CONTENT_SIZE = "alfresco.contentSize";
     public static final String PARAM_CONTENT_MIMETYPE = "alfresco.contentMimetype";
     public static final String PARAM_USER_NAME = "alfresco.userName";
+    public static final String PARAM_NUMBER_OF_AVAILABLE_USERS  = "alfresco.numberOfAvailableUsers";
+    
+    public static final int DEFAULT_NUMBER_OF_AVAILABLE_USERS = 50; 
     
     protected RepositoryProfile repositoryProfile;
     
@@ -185,6 +189,12 @@ public abstract class BaseAlfrescoBenchmarkDriver extends JapexDriverBase
         {
             exception.printStackTrace();
         }        
+    }
+    
+    @Override
+    public void finish(TestCase testCase)
+    {
+        AlfrescoReport.generate(testCase);
     }
     
     protected abstract void doCreateContentBenchmark(TestCase tc);

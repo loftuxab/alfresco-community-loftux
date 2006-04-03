@@ -32,34 +32,61 @@ import org.alfresco.repo.content.MimetypeMap;
 
 public class DataProviderComponentImpl implements DataProviderComponent
 {   
-    private String dataLocation;
+    /** The locations of the content data */
+    private String[] dataLocations;
     
+    /** Mimetype map */
     private MimetypeMap mimetypeMap;
     
+    /** Content cache */
     private List<ContentData> contentCache; 
     
-    public void setDataLocation(String dataLocation)
+    /**
+     * Set the data locations
+     * 
+     * @param dataLocations     the data location
+     */
+    public void setDataLocations(String[] dataLocations)
     {
-        this.dataLocation = dataLocation;
+        this.dataLocations = dataLocations;
     }
     
+    /**
+     * Set the mime type map
+     * 
+     * @param mimetypeMap   the mime type map
+     */
     public void setMimetypeMap(MimetypeMap mimetypeMap)
     {
         this.mimetypeMap = mimetypeMap;
     }
     
+    /**
+     * Bean initialisation 
+     */
     public void init()
     {
         // Load the content details into the cache
         cacheContentData();
     }
     
+    /**
+     * Cache the content data
+     */
     private void cacheContentData()
     {
         this.contentCache = new ArrayList<ContentData>();
-        cacheContentData(this.dataLocation + File.separator + "content");        
+        for (String dataLocation : this.dataLocations)
+        {
+            cacheContentData(dataLocation);
+        }        
     }
     
+    /**
+     * Cache the content data
+     * 
+     * @param locations     the content data locations
+     */
     private void cacheContentData(String location)
     {
         File folder = new File(location);

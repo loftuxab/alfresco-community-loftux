@@ -20,8 +20,8 @@
         <param name="japex.driverClass" value="org.alfresco.benchmark.driver.AlfrescoInternalAPIDriver"/>
         <param name="description" value="Alfresco Internal API"/>
    
-    	<param name="japex.numberOfThreads" value="10"/> 
-    	<param name="japex.threadRampupTime" value="60"/>
+    	<param name="japex.numberOfThreads" value="1"/> 
+    	<param name="japex.threadRampupTime" value="0"/>
     	<param name="japex.includeWarmupRun" value="false"/>
     	
     </driver>
@@ -41,12 +41,15 @@
         <param name="alfrsco.repositoryProfile.documentsInFolderCount.average" value="5"/>
         <param name="alfrsco.repositoryProfile.documentsInFolderCount.variation" value="1"/>
         <param name="alfrsco.repositoryProfile.subFoldersCount.average" value="3"/>
-        <param name="alfrsco.repositoryProfile.subFoldersCount.variation" value="1"/>                                       
+        <param name="alfrsco.repositoryProfile.subFoldersCount.variation" value="1"/>      
+        
+        <!-- Number of available users -->
+        <param name="alfresco.numberOfAvailableUsers" value="50"/>                                       
     
         <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runTime" value="02:00"/> 
-    	<param name="japex.runDelay" value="15"/>
-    	<param name="japex.runDelayVariation" value="10"/>
+    	<param name="japex.runTime" value="00:30"/> 
+    	<param name="japex.runDelay" value="0"/>
+    	<param name="japex.runDelayVariation" value="0"/>
     </testCase>
     
 </testSuite>

@@ -37,7 +37,6 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
-import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -314,10 +313,6 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
                     personProperties.put(ContentModel.PROP_FIRSTNAME, "benchmark");
                     personProperties.put(ContentModel.PROP_LASTNAME, "user");
                     personService.createPerson(personProperties);
-                    
-                    // TODO figure out why this doesn't work for now ...
-                    // Set the permissions
-                    //AlfrescoDataLoaderComponentImpl.this.authorityService.addAuthority(PermissionService.ADMINISTRATOR_AUTHORITY, userName);
                     
                     // Add the new user to the list
                     users.add(userName);

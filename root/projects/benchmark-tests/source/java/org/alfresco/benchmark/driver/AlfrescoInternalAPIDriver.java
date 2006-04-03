@@ -88,11 +88,11 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
     }
     
     @Override
-    public synchronized void prepare(TestCase tc)
+    public synchronized void prepare(final TestCase tc)
     {
         try
         {    
-            super.prepare(tc);
+            super.prepare(tc);             
             
             // Set the authentication
             this.authenticationComponent.setSystemUserAsCurrentUser();
@@ -113,8 +113,19 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
                     {
                         public Object doWork() throws Exception
                         { 
+                            // Get the number of available users
+                            int numberOfAvailableUsers = DEFAULT_NUMBER_OF_AVAILABLE_USERS;
+                            if (tc.hasParam(PARAM_NUMBER_OF_AVAILABLE_USERS) == true)
+                            {
+                                numberOfAvailableUsers = tc.getIntParam(PARAM_NUMBER_OF_AVAILABLE_USERS);
+                            }
+                            
                             // Get a list of the users and ensure they all have permissions on the root node
-                            List<String> users = AlfrescoUtils.prepairUsers(AlfrescoInternalAPIDriver.this.dataLoaderComponent, AlfrescoInternalAPIDriver.this.personService, AlfrescoInternalAPIDriver.this.nodeService);
+                            List<String> users = AlfrescoUtils.prepairUsers(
+                                    AlfrescoInternalAPIDriver.this.dataLoaderComponent, 
+                                    AlfrescoInternalAPIDriver.this.personService, 
+                                    AlfrescoInternalAPIDriver.this.nodeService,
+                                    numberOfAvailableUsers);
                             for (String userName : users)
                             {
                                 // TODO how do we check this without doing it over and over again!!
@@ -130,6 +141,8 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
                             return null;
                         }
                     });
+                    
+                    System.out.println("Prepare complete");
                 }
             }
             finally

@@ -63,6 +63,8 @@ public class AlfrescoUtils
     
     private static List<String> availableUsers;
     
+    public static String OUTPUT_FOLDER = "./data/output/";
+    
     // Model constants
     public static QName DC_PUBLISHER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "publisher");
     public static QName DC_CONTRIBUTER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "contributer");
@@ -89,7 +91,7 @@ public class AlfrescoUtils
         String location = testCaseOutputLocation.get(testCase.getName());
         if (location == null)
         {
-            location = "./data/output/testCase_" + testCase.getName() + "_" + System.currentTimeMillis() + ".csv";
+            location = OUTPUT_FOLDER + "testCase_" + testCase.getName() + "_" + System.currentTimeMillis() + ".csv";
             testCaseOutputLocation.put(testCase.getName(), location);
         }
         return location;
@@ -313,9 +315,12 @@ public class AlfrescoUtils
     }
     
     private static Object mutex = new Object();
-    public static int NUMBER_OF_BM_USERS = 50;
     
-    public static List<String> prepairUsers(DataLoaderComponent dataLoaderComponent, PersonService personService, NodeService nodeService)
+    public static List<String> prepairUsers(
+            DataLoaderComponent dataLoaderComponent, 
+            PersonService personService, 
+            NodeService nodeService,
+            int numberOfUsers)
     {
         synchronized (mutex)
         {
@@ -335,10 +340,10 @@ public class AlfrescoUtils
             }
             
             int numberOfAvilableUsers = availableUsers.size();
-            if (numberOfAvilableUsers < NUMBER_OF_BM_USERS)
+            if (numberOfAvilableUsers < numberOfUsers)
             {
                 // Create some new users and add them to the available list
-                List<String> newUsers = dataLoaderComponent.createUsers(NUMBER_OF_BM_USERS - numberOfAvilableUsers);
+                List<String> newUsers = dataLoaderComponent.createUsers(numberOfUsers - numberOfAvilableUsers);
                 availableUsers.addAll(newUsers);
             }
             
