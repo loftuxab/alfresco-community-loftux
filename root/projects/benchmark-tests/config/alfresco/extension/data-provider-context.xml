@@ -7,7 +7,7 @@
     <bean id="dataProviderComponent" class="org.alfresco.benchmark.dataprovider.DataProviderComponentImpl" init-method='init'>    	
        <property name="dataLocations">
           <list>
-	      <value>C:\sandbox\root\projects\benchmark-tests\data\content</value>
+	      <value>C:\work\HEAD\root\projects\benchmark-tests\data\content</value>
           </list>
 	   </property>
 	   <property name="mimetypeMap">

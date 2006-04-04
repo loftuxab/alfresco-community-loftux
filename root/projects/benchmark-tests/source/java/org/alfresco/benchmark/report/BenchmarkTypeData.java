@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package com.alfresco.benchmark.report;
+package org.alfresco.benchmark.report;
 
 public class BenchmarkTypeData
 {

@@ -14,7 +14,7 @@
  * language governing permissions and limitations under the
  * License.
  */
-package com.alfresco.benchmark.report;
+package org.alfresco.benchmark.report;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,22 +89,16 @@ public class AlfrescoReport
                   
                     // Output the general details of the test case                    
                     builder.append("<table cellspacing='3' cellpadding=2' border='1'>");
-                    if (testCase.hasParam("japex.numberOfThreads") == true)
+                    if (testCase.hasParam("alfresco.numberOfThreads") == true)
                     {
                         builder.append("<tr><td>Number of threads</td><td>");
-                        builder.append(testCase.getParam("japex.numberOfThreads"));
+                        builder.append(testCase.getParam("alfresco.numberOfThreads"));
                         builder.append("</td></tr>");
                     }
-                    if (testCase.hasParam("japex.threadRampupTime") == true)
+                    if (testCase.hasParam("alfresco.threadRampupTime") == true)
                     {
                         builder.append("<tr><td>Thread Rampup Time (Secs)</td><td>");
-                        builder.append(testCase.getParam("japex.threadRampupTime"));
-                        builder.append("</td></tr>");
-                    }
-                    if (testCase.hasParam("japex.threadRampupTime") == true)
-                    {
-                        builder.append("<tr><td>Thread Rampup Time (Secs)</td><td>");
-                        builder.append(testCase.getParam("japex.threadRampupTime"));
+                        builder.append(testCase.getParam("alfresco.threadRampupTime"));
                         builder.append("</td></tr>");
                     }
                     if (testCase.hasParam("japex.runTime") == true)

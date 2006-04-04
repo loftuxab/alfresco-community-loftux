@@ -200,6 +200,13 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
         // Release the user
         AlfrescoUtils.releaseUserName(AlfrescoInternalAPIDriver.this.userName);
     }
+    
+    @Override
+    public void finish(TestCase testCase) 
+    {
+        super.finish(testCase);
+        usersPrepaired = false;
+    }
 
     @Override
     protected void doCreateContentBenchmark(final TestCase tc)

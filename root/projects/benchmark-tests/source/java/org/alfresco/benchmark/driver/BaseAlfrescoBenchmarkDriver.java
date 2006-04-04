@@ -23,7 +23,7 @@ import org.alfresco.benchmark.dataprovider.RepositoryProfile;
 import org.alfresco.benchmark.util.AlfrescoUtils;
 import org.alfresco.benchmark.util.RandUtils;
 
-import com.alfresco.benchmark.report.AlfrescoReport;
+import org.alfresco.benchmark.report.AlfrescoReport;
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
 

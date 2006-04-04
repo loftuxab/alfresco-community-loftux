@@ -78,7 +78,7 @@ public class DataProviderComponentImpl implements DataProviderComponent
         this.contentCache = new ArrayList<ContentData>();
         for (String dataLocation : this.dataLocations)
         {
-            cacheContentData(dataLocation);
+            cacheContentData(dataLocation); 
         }        
     }
     
@@ -90,6 +90,10 @@ public class DataProviderComponentImpl implements DataProviderComponent
     private void cacheContentData(String location)
     {
         File folder = new File(location);
+        if (folder == null)
+        {
+            throw new RuntimeException("Unable to find folder at location " + location);
+        }
         
         for (File file : folder.listFiles())
         {

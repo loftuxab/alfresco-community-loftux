@@ -6,7 +6,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/3rd Party"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
-	<classpathentry exported="true" sourcepath="lib/src/japex-src-27032006.zip" kind="lib" path="lib/japex/japex.jar"/>
+	<classpathentry exported="true" sourcepath="lib/src/japex-source.zip" kind="lib" path="lib/japex/japex.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/japex/jaxb1-impl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/japex/jaxb-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/japex/jaxb-impl.jar"/>
