@@ -310,7 +310,7 @@ public class AlfrescoUtils
         contentWriter.setEncoding(contentData.getEncoding());
         contentWriter.setMimetype(contentData.getMimetype());
         contentWriter.putContent(contentData.getFile());
-        
+
         return newNodeRef;
     }
     
