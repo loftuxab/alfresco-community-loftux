@@ -123,7 +123,7 @@ public abstract class BaseConfigService implements ConfigService
     public Config getConfig(Object object, ConfigLookupContext context)
     {
         if (logger.isDebugEnabled())
-            logger.debug("Retrieving configuration for " + object);
+            logger.debug("Retrieving configuration for '" + object + "'");
 
         ConfigImpl results = null;
 
