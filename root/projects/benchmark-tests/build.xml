@@ -1,4 +1,4 @@
-<project name="Japex Sample" default="run"  basedir=".">
+<project name="BenchmarkTests" default="run"  basedir=".">
 
    <path id="path.common" path="${basedir}/../../common"/>
    <property name="dir.common" refid="path.common"/>
