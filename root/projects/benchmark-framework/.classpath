@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="source/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="config"/>
+	<classpathentry exported="true" sourcepath="lib/src/japex-source.zip" kind="lib" path="lib/japex/japex.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/jaxb1-impl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/jaxb-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/jaxb-impl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/jaxb-xjc.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/jcommon-1.0.0-rc1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/jfreechart-1.0.0-rc1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/jsr173_api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/japex/sjsxp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ostermillerutils_1_06_00.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jug.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
